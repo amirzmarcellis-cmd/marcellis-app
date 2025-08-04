@@ -10,7 +10,10 @@ import {
   Calendar,
   FileText,
   Briefcase,
+  LogOut,
 } from "lucide-react"
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
 
 import {
   Sidebar,
@@ -39,6 +42,7 @@ const navigationItems = [
 
 export function DashboardSidebar() {
   const { state } = useSidebar()
+  const { signOut } = useAuth();
   const location = useLocation()
   const currentPath = location.pathname
   const isCollapsed = state === "collapsed"
@@ -109,17 +113,35 @@ export function DashboardSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Status indicator at bottom */}
-        <div className="p-4 border-t border-border">
+        {/* Status indicator and sign out */}
+        <div className="p-4 border-t border-border space-y-3">
           {!isCollapsed && (
-            <div className="flex items-center space-x-2 text-sm">
-              <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
-              <span className="text-muted-foreground">System Online</span>
-            </div>
+            <>
+              <div className="flex items-center space-x-2 text-sm">
+                <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+                <span className="text-muted-foreground">System Online</span>
+              </div>
+              <Button
+                onClick={signOut}
+                variant="ghost"
+                className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              >
+                <LogOut className="w-4 h-4 mr-3" />
+                Sign Out
+              </Button>
+            </>
           )}
           {isCollapsed && (
-            <div className="flex justify-center">
+            <div className="flex flex-col items-center space-y-3">
               <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+              <Button
+                onClick={signOut}
+                variant="ghost"
+                size="sm"
+                className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              >
+                <LogOut className="w-4 h-4" />
+              </Button>
             </div>
           )}
         </div>
