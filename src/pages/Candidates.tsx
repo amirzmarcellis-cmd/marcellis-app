@@ -8,84 +8,69 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { User, MapPin, Briefcase, Mail, Phone, Search, Filter, Eye, Download, Calendar, Clock } from "lucide-react"
-import { useState } from "react"
+import { User, MapPin, Briefcase, Mail, Phone, Search, Filter, Eye, Download, Calendar, Clock, ExternalLink } from "lucide-react"
+import { useState, useEffect } from "react"
+import { supabase } from "@/integrations/supabase/client"
 
-const candidates = [
-  {
-    id: "1",
-    name: "Sarah Chen",
-    position: "Senior Developer",
-    location: "San Francisco, CA", 
-    status: "interviewed",
-    experience: "5+ years",
-    email: "sarah.chen@email.com",
-    phone: "+1 (555) 123-4567",
-    skills: ["React", "TypeScript", "Node.js", "Python"],
-    lastContact: "2024-01-15",
-    callHistory: [
-      { date: "2024-01-15", duration: "25 min", outcome: "Positive", notes: "Great technical skills, interested in role" },
-      { date: "2024-01-10", duration: "15 min", outcome: "Scheduled", notes: "Initial screening call" }
-    ],
-    avatar: "/placeholder.svg"
-  },
-  {
-    id: "2",
-    name: "Mike Johnson", 
-    position: "Product Manager",
-    location: "New York, NY",
-    status: "contacted",
-    experience: "3+ years", 
-    email: "mike.johnson@email.com",
-    phone: "+1 (555) 987-6543",
-    skills: ["Product Strategy", "Agile", "Analytics", "Leadership"],
-    lastContact: "2024-01-12",
-    callHistory: [
-      { date: "2024-01-12", duration: "20 min", outcome: "Follow-up", notes: "Discussed role requirements" }
-    ],
-    avatar: "/placeholder.svg"
-  },
-  {
-    id: "3",
-    name: "Emily Davis",
-    position: "UI/UX Designer",
-    location: "Austin, TX",
-    status: "screening",
-    experience: "4+ years",
-    email: "emily.davis@email.com", 
-    phone: "+1 (555) 456-7890",
-    skills: ["Figma", "Adobe Creative Suite", "User Research", "Prototyping"],
-    lastContact: "2024-01-14",
-    callHistory: [
-      { date: "2024-01-14", duration: "30 min", outcome: "Positive", notes: "Excellent portfolio, cultural fit" }
-    ],
-    avatar: "/placeholder.svg"
-  }
-]
-
-const getStatusBadgeVariant = (status: string) => {
-  switch (status) {
-    case "interviewed": return "default"
-    case "screening": return "secondary" 
-    case "contacted": return "outline"
-    default: return "secondary"
-  }
+interface Candidate {
+  "Cadndidate_ID": string
+  "First Name": string | null
+  "Last Name": string | null
+  "Email": string | null
+  "Phone Number": string | null
+  "Title": string | null
+  "Location": string | null
+  "Skills": string | null
+  "Experience": string | null
+  "Current Company": string | null
+  "Applied for": string | null
+  "CV_Link": string | null
+  "CV Summary": string | null
+  "Education": string | null
+  "Language": string | null
+  "Certifications": string | null
+  "Other Notes": string | null
+  "Timestamp": string | null
 }
 
 export default function Candidates() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
   const [positionFilter, setPositionFilter] = useState("all")
+  const [candidates, setCandidates] = useState<Candidate[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchCandidates()
+  }, [])
+
+  const fetchCandidates = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('CVs')
+        .select('*')
+        .order('Timestamp', { ascending: false })
+
+      if (error) throw error
+      setCandidates(data || [])
+    } catch (error) {
+      console.error('Error fetching candidates:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const filteredCandidates = candidates.filter(candidate => {
-    const matchesSearch = candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         candidate.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         candidate.email.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === "all" || candidate.status === statusFilter
-    const matchesPosition = positionFilter === "all" || candidate.position === positionFilter
+    const fullName = `${candidate["First Name"] || ""} ${candidate["Last Name"] || ""}`.trim()
+    const matchesSearch = fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (candidate.Title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (candidate.Email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (candidate.Skills || "").toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesPosition = positionFilter === "all" || (candidate["Applied for"] || "").includes(positionFilter)
     
-    return matchesSearch && matchesStatus && matchesPosition
+    return matchesSearch && matchesPosition
   })
+
+  const uniquePositions = [...new Set(candidates.map(c => c["Applied for"]).filter(Boolean))]
 
   return (
     <DashboardLayout>
@@ -107,26 +92,15 @@ export default function Candidates() {
                 className="pl-10 bg-background/50 border-glass-border"
               />
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[150px] bg-background/50 border-glass-border">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="contacted">Contacted</SelectItem>
-                <SelectItem value="screening">Screening</SelectItem>
-                <SelectItem value="interviewed">Interviewed</SelectItem>
-              </SelectContent>
-            </Select>
             <Select value={positionFilter} onValueChange={setPositionFilter}>
               <SelectTrigger className="w-[180px] bg-background/50 border-glass-border">
                 <SelectValue placeholder="Position" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Positions</SelectItem>
-                <SelectItem value="Senior Developer">Senior Developer</SelectItem>
-                <SelectItem value="Product Manager">Product Manager</SelectItem>
-                <SelectItem value="UI/UX Designer">UI/UX Designer</SelectItem>
+                {uniquePositions.map(position => (
+                  <SelectItem key={position} value={position}>{position}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -153,154 +127,188 @@ export default function Candidates() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredCandidates.map((candidate) => (
-                  <TableRow key={candidate.id} className="border-glass-border hover:bg-glass-primary transition-colors">
-                    <TableCell>
-                      <div className="flex items-center space-x-3">
-                        <Avatar className="w-10 h-10">
-                          <AvatarImage src={candidate.avatar} />
-                          <AvatarFallback className="bg-gradient-primary text-white">
-                            {candidate.name.split(' ').map(n => n[0]).join('')}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-medium">{candidate.name}</div>
-                          <div className="text-sm text-muted-foreground">{candidate.email}</div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <Briefcase className="w-4 h-4 text-muted-foreground" />
-                        <span>{candidate.position}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusBadgeVariant(candidate.status)} className="capitalize">
-                        {candidate.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <MapPin className="w-4 h-4 text-muted-foreground" />
-                        <span>{candidate.location}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <Calendar className="w-4 h-4 text-muted-foreground" />
-                        <span>{candidate.lastContact}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end space-x-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              <Eye className="w-4 h-4 mr-1" />
-                              View
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-4xl bg-gradient-card backdrop-blur-glass border-glass-border">
-                            <DialogHeader>
-                              <DialogTitle className="flex items-center space-x-3">
-                                <Avatar className="w-12 h-12">
-                                  <AvatarImage src={candidate.avatar} />
-                                  <AvatarFallback className="bg-gradient-primary text-white">
-                                    {candidate.name.split(' ').map(n => n[0]).join('')}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                  <h2 className="text-xl font-bold">{candidate.name}</h2>
-                                  <p className="text-muted-foreground">{candidate.position}</p>
-                                </div>
-                              </DialogTitle>
-                            </DialogHeader>
-                            
-                            <Tabs defaultValue="profile" className="w-full">
-                              <TabsList className="grid w-full grid-cols-3">
-                                <TabsTrigger value="profile">Profile</TabsTrigger>
-                                <TabsTrigger value="calls">Call History</TabsTrigger>
-                                <TabsTrigger value="documents">Documents</TabsTrigger>
-                              </TabsList>
-                              
-                              <TabsContent value="profile" className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div className="space-y-2">
-                                    <h3 className="font-semibold flex items-center gap-2">
-                                      <Mail className="w-4 h-4" />
-                                      Contact Information
-                                    </h3>
-                                    <p><strong>Email:</strong> {candidate.email}</p>
-                                    <p><strong>Phone:</strong> {candidate.phone}</p>
-                                    <p><strong>Location:</strong> {candidate.location}</p>
-                                  </div>
-                                  <div className="space-y-2">
-                                    <h3 className="font-semibold">Professional Details</h3>
-                                    <p><strong>Experience:</strong> {candidate.experience}</p>
-                                    <p><strong>Status:</strong> <Badge variant={getStatusBadgeVariant(candidate.status)}>{candidate.status}</Badge></p>
-                                    <div>
-                                      <strong>Skills:</strong>
-                                      <div className="flex flex-wrap gap-1 mt-1">
-                                        {candidate.skills.map(skill => (
-                                          <Badge key={skill} variant="secondary" className="text-xs">{skill}</Badge>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </TabsContent>
-                              
-                              <TabsContent value="calls" className="space-y-4">
-                                <h3 className="font-semibold flex items-center gap-2">
-                                  <Phone className="w-4 h-4" />
-                                  Call History
-                                </h3>
-                                <div className="space-y-3">
-                                  {candidate.callHistory.map((call, index) => (
-                                    <div key={index} className="p-4 rounded-lg bg-background/50 border border-glass-border">
-                                      <div className="flex justify-between items-start">
-                                        <div>
-                                          <p className="font-medium flex items-center gap-2">
-                                            <Calendar className="w-4 h-4" />
-                                            {call.date}
-                                          </p>
-                                          <p className="text-sm text-muted-foreground flex items-center gap-2">
-                                            <Clock className="w-4 h-4" />
-                                            Duration: {call.duration}
-                                          </p>
-                                        </div>
-                                        <Badge variant={call.outcome === "Positive" ? "default" : "secondary"}>
-                                          {call.outcome}
-                                        </Badge>
-                                      </div>
-                                      <p className="mt-2 text-sm">{call.notes}</p>
-                                    </div>
-                                  ))}
-                                </div>
-                              </TabsContent>
-                              
-                              <TabsContent value="documents" className="space-y-4">
-                                <div className="text-center py-8">
-                                  <Download className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                                  <h3 className="font-semibold">Documents</h3>
-                                  <p className="text-muted-foreground">CV and portfolio documents will appear here</p>
-                                  <Button className="mt-4" variant="outline">
-                                    <Download className="w-4 h-4 mr-2" />
-                                    Upload Document
-                                  </Button>
-                                </div>
-                              </TabsContent>
-                            </Tabs>
-                          </DialogContent>
-                        </Dialog>
-                        <Button size="sm" className="bg-gradient-primary hover:bg-gradient-primary/90">
-                          Schedule Call
-                        </Button>
-                      </div>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8">
+                      Loading candidates...
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : filteredCandidates.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8">
+                      No candidates found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredCandidates.map((candidate) => {
+                    const fullName = `${candidate["First Name"] || ""} ${candidate["Last Name"] || ""}`.trim()
+                    const initials = `${candidate["First Name"]?.[0] || ""}${candidate["Last Name"]?.[0] || ""}`
+                    const skills = candidate.Skills ? candidate.Skills.split(',').map(s => s.trim()) : []
+                    
+                    return (
+                      <TableRow key={candidate["Cadndidate_ID"]} className="border-glass-border hover:bg-glass-primary transition-colors">
+                        <TableCell>
+                          <div className="flex items-center space-x-3">
+                            <Avatar className="w-10 h-10">
+                              <AvatarFallback className="bg-gradient-primary text-white">
+                                {initials}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="font-medium">{fullName || "N/A"}</div>
+                              <div className="text-sm text-muted-foreground">{candidate.Email || "N/A"}</div>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center space-x-2">
+                            <Briefcase className="w-4 h-4 text-muted-foreground" />
+                            <span>{candidate.Title || "N/A"}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className="capitalize">
+                            {candidate["Applied for"] || "Not Applied"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center space-x-2">
+                            <MapPin className="w-4 h-4 text-muted-foreground" />
+                            <span>{candidate.Location || "N/A"}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center space-x-2">
+                            <Calendar className="w-4 h-4 text-muted-foreground" />
+                            <span>{candidate.Timestamp ? new Date(candidate.Timestamp).toLocaleDateString() : "N/A"}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end space-x-2">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                  <Eye className="w-4 h-4 mr-1" />
+                                  View
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-4xl bg-gradient-card backdrop-blur-glass border-glass-border">
+                                <DialogHeader>
+                                  <DialogTitle className="flex items-center space-x-3">
+                                    <Avatar className="w-12 h-12">
+                                      <AvatarFallback className="bg-gradient-primary text-white">
+                                        {initials}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                      <h2 className="text-xl font-bold">{fullName}</h2>
+                                      <p className="text-muted-foreground">{candidate.Title}</p>
+                                    </div>
+                                  </DialogTitle>
+                                </DialogHeader>
+                                
+                                <Tabs defaultValue="profile" className="w-full">
+                                  <TabsList className="grid w-full grid-cols-3">
+                                    <TabsTrigger value="profile">Profile</TabsTrigger>
+                                    <TabsTrigger value="calls">Call History</TabsTrigger>
+                                    <TabsTrigger value="documents">Documents</TabsTrigger>
+                                  </TabsList>
+                                  
+                                  <TabsContent value="profile" className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <div className="space-y-2">
+                                        <h3 className="font-semibold flex items-center gap-2">
+                                          <Mail className="w-4 h-4" />
+                                          Contact Information
+                                        </h3>
+                                        <p><strong>Email:</strong> {candidate.Email || "N/A"}</p>
+                                        <p><strong>Phone:</strong> {candidate["Phone Number"] || "N/A"}</p>
+                                        <p><strong>Location:</strong> {candidate.Location || "N/A"}</p>
+                                        <p><strong>Current Company:</strong> {candidate["Current Company"] || "N/A"}</p>
+                                      </div>
+                                      <div className="space-y-2">
+                                        <h3 className="font-semibold">Professional Details</h3>
+                                        <p><strong>Experience:</strong> {candidate.Experience || "N/A"}</p>
+                                        <p><strong>Education:</strong> {candidate.Education || "N/A"}</p>
+                                        <p><strong>Language:</strong> {candidate.Language || "N/A"}</p>
+                                        <p><strong>Certifications:</strong> {candidate.Certifications || "N/A"}</p>
+                                        <div>
+                                          <strong>Skills:</strong>
+                                          <div className="flex flex-wrap gap-1 mt-1">
+                                            {skills.map((skill, index) => (
+                                              <Badge key={index} variant="secondary" className="text-xs">{skill}</Badge>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    {candidate["CV Summary"] && (
+                                      <div className="space-y-2">
+                                        <h3 className="font-semibold">CV Summary</h3>
+                                        <p className="text-sm text-muted-foreground">{candidate["CV Summary"]}</p>
+                                      </div>
+                                    )}
+                                    {candidate["Other Notes"] && (
+                                      <div className="space-y-2">
+                                        <h3 className="font-semibold">Other Notes</h3>
+                                        <p className="text-sm text-muted-foreground">{candidate["Other Notes"]}</p>
+                                      </div>
+                                    )}
+                                  </TabsContent>
+                                  
+                                  <TabsContent value="calls" className="space-y-4">
+                                    <h3 className="font-semibold flex items-center gap-2">
+                                      <Phone className="w-4 h-4" />
+                                      Call History
+                                    </h3>
+                                    <div className="text-center py-8">
+                                      <Phone className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                                      <p className="text-muted-foreground">No call history available</p>
+                                    </div>
+                                  </TabsContent>
+                                  
+                                  <TabsContent value="documents" className="space-y-4">
+                                    <div className="space-y-4">
+                                      <h3 className="font-semibold flex items-center gap-2">
+                                        <Download className="w-4 h-4" />
+                                        Documents
+                                      </h3>
+                                      {candidate.CV_Link ? (
+                                        <div className="flex items-center justify-between p-4 rounded-lg bg-background/50 border border-glass-border">
+                                          <div className="flex items-center space-x-3">
+                                            <Download className="w-8 h-8 text-primary" />
+                                            <div>
+                                              <p className="font-medium">CV Document</p>
+                                              <p className="text-sm text-muted-foreground">Curriculum Vitae</p>
+                                            </div>
+                                          </div>
+                                          <Button variant="outline" size="sm" asChild>
+                                            <a href={candidate.CV_Link} target="_blank" rel="noopener noreferrer">
+                                              <ExternalLink className="w-4 h-4 mr-2" />
+                                              View
+                                            </a>
+                                          </Button>
+                                        </div>
+                                      ) : (
+                                        <div className="text-center py-8">
+                                          <Download className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                                          <p className="text-muted-foreground">No documents available</p>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </TabsContent>
+                                </Tabs>
+                              </DialogContent>
+                            </Dialog>
+                            <Button size="sm" className="bg-gradient-primary hover:bg-gradient-primary/90">
+                              Schedule Call
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
+                )}
               </TableBody>
             </Table>
           </CardContent>

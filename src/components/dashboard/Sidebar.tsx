@@ -9,6 +9,7 @@ import {
   TrendingUp,
   Calendar,
   FileText,
+  Briefcase,
 } from "lucide-react"
 
 import {
@@ -26,7 +27,9 @@ import {
 
 const navigationItems = [
   { title: "Dashboard", url: "/", icon: Home },
+  { title: "Jobs", url: "/jobs", icon: Briefcase },
   { title: "Active Calls", url: "/calls", icon: Phone },
+  { title: "Call Log", url: "/call-log", icon: FileText },
   { title: "Candidates", url: "/candidates", icon: Users },
   { title: "Analytics", url: "/analytics", icon: BarChart3 },
   { title: "Performance", url: "/performance", icon: TrendingUp },
