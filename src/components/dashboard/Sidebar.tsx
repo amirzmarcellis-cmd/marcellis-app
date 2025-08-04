@@ -30,7 +30,6 @@ const navigationItems = [
   { title: "Candidates", url: "/candidates", icon: Users },
   { title: "Analytics", url: "/analytics", icon: BarChart3 },
   { title: "Performance", url: "/performance", icon: TrendingUp },
-  { title: "Schedule", url: "/schedule", icon: Calendar },
   { title: "Reports", url: "/reports", icon: FileText },
   { title: "Settings", url: "/settings", icon: Settings },
 ]
