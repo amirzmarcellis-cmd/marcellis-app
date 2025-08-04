@@ -7,7 +7,7 @@ import { Upload, Settings as SettingsIcon, Palette } from "lucide-react"
 import { useState } from "react"
 
 export default function Settings() {
-  const [systemName, setSystemName] = useState("AI Recruiter Dashboard")
+  const [systemName, setSystemName] = useState("Pulse Marc Ellis")
   const [primaryColor, setPrimaryColor] = useState("#8B5CF6")
   const [logo, setLogo] = useState<File | null>(null)
 

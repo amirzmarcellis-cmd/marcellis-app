@@ -63,8 +63,8 @@ export function DashboardSidebar() {
             </div>
             {!isCollapsed && (
               <div>
-                <h2 className="text-lg font-bold text-foreground">AIZCRM</h2>
-                <p className="text-xs text-muted-foreground">AI Recruiter</p>
+                <h2 className="text-lg font-bold text-foreground">Pulse Marc Ellis</h2>
+                <p className="text-xs text-muted-foreground">AI Recruitment</p>
               </div>
             )}
           </div>
