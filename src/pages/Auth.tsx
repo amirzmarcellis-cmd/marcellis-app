@@ -62,7 +62,7 @@ export default function Auth() {
       <Card className="w-full max-w-md bg-card/80 backdrop-blur-sm border-border/50">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            AIZCRM
+            Pulse - Marc Ellis
           </CardTitle>
           <CardDescription className="text-center text-muted-foreground">
             {isLogin ? 'Sign in to your account' : 'Create a new account'}
