@@ -1,19 +1,25 @@
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { 
-  Phone, 
-  Users, 
-  TrendingUp, 
-  Clock, 
-  CheckCircle,
-  Target,
+import {
+  Phone,
+  Calendar,
   Activity,
-  Calendar
+  Target,
 } from "lucide-react"
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from "recharts"
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar
+} from "recharts"
 
-// Mock data for charts
 const callTrendData = [
   { time: '00:00', calls: 45 },
   { time: '04:00', calls: 32 },
@@ -44,14 +50,10 @@ const Index = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6 p-6">
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground">AI Recruiter Performance Overview</p>
-        </div>
 
         {/* Top Row - Main Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
           {/* Total Calls Today */}
           <Card className="glass-card metric-card">
             <CardContent className="p-6">
@@ -65,13 +67,7 @@ const Index = () => {
                   <div className="h-8 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={callTrendData.slice(0, 4)}>
-                        <Line 
-                          type="monotone" 
-                          dataKey="calls" 
-                          stroke="hsl(var(--primary))" 
-                          strokeWidth={2}
-                          dot={false}
-                        />
+                        <Line type="monotone" dataKey="calls" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -108,7 +104,7 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          {/* Active Calls */}
+          {/* Visitor Online */}
           <Card className="glass-card metric-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -150,7 +146,7 @@ const Index = () => {
           </Card>
         </div>
 
-        {/* Second Row - Charts */}
+        {/* Second Row - Funnel & Performance */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Candidate Funnel */}
           <Card className="glass-card">
@@ -179,10 +175,7 @@ const Index = () => {
               <div className="grid grid-cols-2 gap-4 mt-4">
                 {funnelData.map((item, index) => (
                   <div key={index} className="flex items-center space-x-2">
-                    <div 
-                      className="w-3 h-3 rounded-full" 
-                      style={{ backgroundColor: item.color }}
-                    ></div>
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
                     <span className="text-sm text-muted-foreground">{item.name}</span>
                     <span className="text-sm font-medium text-foreground">{item.value}</span>
                   </div>
@@ -197,7 +190,6 @@ const Index = () => {
               <CardTitle className="text-lg font-semibold">Performance insights</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* AI Caller Success Rating */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-muted-foreground">AI caller success</span>
@@ -207,15 +199,12 @@ const Index = () => {
                   {[1, 2, 3, 4, 5].map((star) => (
                     <div
                       key={star}
-                      className={`w-4 h-4 rounded-sm ${
-                        star <= 4 ? 'bg-primary' : star === 5 ? 'bg-primary/50' : 'bg-muted'
-                      }`}
+                      className={`w-4 h-4 rounded-sm ${star <= 4 ? 'bg-primary' : star === 5 ? 'bg-primary/50' : 'bg-muted'}`}
                     ></div>
                   ))}
                 </div>
               </div>
 
-              {/* Retention Rate */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-muted-foreground">Retention rate</span>
@@ -224,7 +213,6 @@ const Index = () => {
                 <Progress value={85} className="h-2" />
               </div>
 
-              {/* Call Quality Score */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-muted-foreground">Call quality score</span>
@@ -233,7 +221,6 @@ const Index = () => {
                 <Progress value={92} className="h-2" />
               </div>
 
-              {/* Response Time */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-muted-foreground">Avg response time</span>
@@ -254,30 +241,18 @@ const Index = () => {
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={weeklyCallData}>
-                  <XAxis 
-                    dataKey="day" 
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                  />
-                  <YAxis 
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                  />
-                  <Bar 
-                    dataKey="calls" 
-                    fill="hsl(var(--primary))" 
-                    radius={4}
-                  />
+                  <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
+                  <Bar dataKey="calls" fill="hsl(var(--primary))" radius={4} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
+
       </div>
     </DashboardLayout>
-  );
-};
+  )
+}
 
-export default Index;
+export default Index
