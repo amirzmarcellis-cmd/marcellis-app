@@ -24,21 +24,22 @@ export default function JobDetails() {
 
   const fetchJob = async (jobId: string) => {
     try {
-      setJob({
-        "Job ID": jobId,
-        "Job Title": "Loading...",
-        "Client Description": "Loading...", 
-        "Job Location": "Loading...",
-        "Job Salary Range (ex: 15000 AED)": "Loading...",
-        "Job Description": "Loading...",
-        "Things to look for": "Loading...",
-        "Criteria to evaluate by": "Loading...",
-        "JD Summary": "Loading...",
-        Processed: "false",
-        Timestamp: new Date().toISOString()
-      })
+      const { data, error } = await supabase
+        .from('Jobs')
+        .select('*')
+        .eq('Job ID', jobId)
+        .single()
+
+      if (error) throw error
+      
+      if (data) {
+        setJob(data)
+      } else {
+        setJob(null)
+      }
     } catch (error) {
       console.error('Error fetching job:', error)
+      setJob(null)
     } finally {
       setLoading(false)
     }
