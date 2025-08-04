@@ -23,21 +23,25 @@ export default function JobDetails() {
   }, [id])
 
   const fetchJob = async (jobId: string) => {
-    setLoading(false)
-    // Placeholder job data
-    setJob({
-      "Job ID": jobId,
-      "Job Title": "Sample Job",
-      "Client Description": "Sample Client",
-      "Job Location": "Sample Location",
-      "Job Salary Range (ex: 15000 AED)": "15000 AED",
-      "Job Description": "Sample description",
-      "Things to look for": "Sample criteria",
-      "Criteria to evaluate by": "Sample evaluation",
-      "JD Summary": "Sample summary",
-      Processed: "true",
-      Timestamp: new Date().toISOString()
-    })
+    try {
+      setJob({
+        "Job ID": jobId,
+        "Job Title": "Loading...",
+        "Client Description": "Loading...", 
+        "Job Location": "Loading...",
+        "Job Salary Range (ex: 15000 AED)": "Loading...",
+        "Job Description": "Loading...",
+        "Things to look for": "Loading...",
+        "Criteria to evaluate by": "Loading...",
+        "JD Summary": "Loading...",
+        Processed: "false",
+        Timestamp: new Date().toISOString()
+      })
+    } catch (error) {
+      console.error('Error fetching job:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (loading) {

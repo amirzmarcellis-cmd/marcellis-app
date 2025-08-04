@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Briefcase, MapPin, DollarSign, Search, Plus, Eye, Edit } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
+import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -353,53 +354,12 @@ export default function Jobs() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end space-x-2">
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="outline" size="sm">
-                                <Eye className="w-4 h-4 mr-1" />
-                                View
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-3xl bg-gradient-card backdrop-blur-glass border-glass-border">
-                              <DialogHeader>
-                                <DialogTitle>{job["Job Title"]}</DialogTitle>
-                              </DialogHeader>
-                              <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div>
-                                    <h3 className="font-semibold mb-2">Job Details</h3>
-                                    <p><strong>Location:</strong> {job["Job Location"] || "N/A"}</p>
-                                    <p><strong>Salary:</strong> {job["Job Salary Range (ex: 15000 AED)"] || "N/A"}</p>
-                                    <p><strong>Status:</strong> {job.Processed || "Pending"}</p>
-                                  </div>
-                                  <div>
-                                    <h3 className="font-semibold mb-2">Client Information</h3>
-                                    <p className="text-sm text-muted-foreground">
-                                      {job["Client Description"] || "No client description available"}
-                                    </p>
-                                  </div>
-                                </div>
-                                <div>
-                                  <h3 className="font-semibold mb-2">Job Description</h3>
-                                  <p className="text-sm text-muted-foreground">
-                                    {job["Job Description"] || "No job description available"}
-                                  </p>
-                                </div>
-                                {job["Things to look for"] && (
-                                  <div>
-                                    <h3 className="font-semibold mb-2">Requirements</h3>
-                                    <p className="text-sm text-muted-foreground">{job["Things to look for"]}</p>
-                                  </div>
-                                )}
-                                {job["Criteria to evaluate by"] && (
-                                  <div>
-                                    <h3 className="font-semibold mb-2">Evaluation Criteria</h3>
-                                    <p className="text-sm text-muted-foreground">{job["Criteria to evaluate by"]}</p>
-                                  </div>
-                                )}
-                              </div>
-                            </DialogContent>
-                          </Dialog>
+                          <Button variant="outline" size="sm" asChild>
+                            <Link to={`/job/${job["Job ID"]}`}>
+                              <Eye className="w-4 h-4 mr-1" />
+                              View
+                            </Link>
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>

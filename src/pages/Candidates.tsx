@@ -5,11 +5,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { User, MapPin, Briefcase, Mail, Phone, Search, Filter, Eye, Download, Calendar, Clock, ExternalLink } from "lucide-react"
 import { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 
 interface Candidate {
@@ -185,121 +184,12 @@ export default function Candidates() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end space-x-2">
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button variant="outline" size="sm">
-                                  <Eye className="w-4 h-4 mr-1" />
-                                  View
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="max-w-4xl bg-gradient-card backdrop-blur-glass border-glass-border">
-                                <DialogHeader>
-                                  <DialogTitle className="flex items-center space-x-3">
-                                    <Avatar className="w-12 h-12">
-                                      <AvatarFallback className="bg-gradient-primary text-white">
-                                        {initials}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                      <h2 className="text-xl font-bold">{fullName}</h2>
-                                      <p className="text-muted-foreground">{candidate.Title}</p>
-                                    </div>
-                                  </DialogTitle>
-                                </DialogHeader>
-                                
-                                <Tabs defaultValue="profile" className="w-full">
-                                  <TabsList className="grid w-full grid-cols-3">
-                                    <TabsTrigger value="profile">Profile</TabsTrigger>
-                                    <TabsTrigger value="calls">Call History</TabsTrigger>
-                                    <TabsTrigger value="documents">Documents</TabsTrigger>
-                                  </TabsList>
-                                  
-                                  <TabsContent value="profile" className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                      <div className="space-y-2">
-                                        <h3 className="font-semibold flex items-center gap-2">
-                                          <Mail className="w-4 h-4" />
-                                          Contact Information
-                                        </h3>
-                                        <p><strong>Email:</strong> {candidate.Email || "N/A"}</p>
-                                        <p><strong>Phone:</strong> {candidate["Phone Number"] || "N/A"}</p>
-                                        <p><strong>Location:</strong> {candidate.Location || "N/A"}</p>
-                                        <p><strong>Current Company:</strong> {candidate["Current Company"] || "N/A"}</p>
-                                      </div>
-                                      <div className="space-y-2">
-                                        <h3 className="font-semibold">Professional Details</h3>
-                                        <p><strong>Experience:</strong> {candidate.Experience || "N/A"}</p>
-                                        <p><strong>Education:</strong> {candidate.Education || "N/A"}</p>
-                                        <p><strong>Language:</strong> {candidate.Language || "N/A"}</p>
-                                        <p><strong>Certifications:</strong> {candidate.Certifications || "N/A"}</p>
-                                        <div>
-                                          <strong>Skills:</strong>
-                                          <div className="flex flex-wrap gap-1 mt-1">
-                                            {skills.map((skill, index) => (
-                                              <Badge key={index} variant="secondary" className="text-xs">{skill}</Badge>
-                                            ))}
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    {candidate["CV Summary"] && (
-                                      <div className="space-y-2">
-                                        <h3 className="font-semibold">CV Summary</h3>
-                                        <p className="text-sm text-muted-foreground">{candidate["CV Summary"]}</p>
-                                      </div>
-                                    )}
-                                    {candidate["Other Notes"] && (
-                                      <div className="space-y-2">
-                                        <h3 className="font-semibold">Other Notes</h3>
-                                        <p className="text-sm text-muted-foreground">{candidate["Other Notes"]}</p>
-                                      </div>
-                                    )}
-                                  </TabsContent>
-                                  
-                                  <TabsContent value="calls" className="space-y-4">
-                                    <h3 className="font-semibold flex items-center gap-2">
-                                      <Phone className="w-4 h-4" />
-                                      Call History
-                                    </h3>
-                                    <div className="text-center py-8">
-                                      <Phone className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                                      <p className="text-muted-foreground">No call history available</p>
-                                    </div>
-                                  </TabsContent>
-                                  
-                                  <TabsContent value="documents" className="space-y-4">
-                                    <div className="space-y-4">
-                                      <h3 className="font-semibold flex items-center gap-2">
-                                        <Download className="w-4 h-4" />
-                                        Documents
-                                      </h3>
-                                      {candidate.CV_Link ? (
-                                        <div className="flex items-center justify-between p-4 rounded-lg bg-background/50 border border-glass-border">
-                                          <div className="flex items-center space-x-3">
-                                            <Download className="w-8 h-8 text-primary" />
-                                            <div>
-                                              <p className="font-medium">CV Document</p>
-                                              <p className="text-sm text-muted-foreground">Curriculum Vitae</p>
-                                            </div>
-                                          </div>
-                                          <Button variant="outline" size="sm" asChild>
-                                            <a href={candidate.CV_Link} target="_blank" rel="noopener noreferrer">
-                                              <ExternalLink className="w-4 h-4 mr-2" />
-                                              View
-                                            </a>
-                                          </Button>
-                                        </div>
-                                      ) : (
-                                        <div className="text-center py-8">
-                                          <Download className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                                          <p className="text-muted-foreground">No documents available</p>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </TabsContent>
-                                </Tabs>
-                              </DialogContent>
-                            </Dialog>
+                            <Button variant="outline" size="sm" asChild>
+                              <Link to={`/candidate/${candidate["Cadndidate_ID"]}`}>
+                                <Eye className="w-4 h-4 mr-1" />
+                                View
+                              </Link>
+                            </Button>
                             <Button size="sm" className="bg-gradient-primary hover:bg-gradient-primary/90">
                               Schedule Call
                             </Button>

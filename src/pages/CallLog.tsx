@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -5,11 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Phone, Search, Eye, Calendar, Clock, User, FileText } from "lucide-react"
-import { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 
 interface CallLog {
@@ -246,136 +245,19 @@ export default function CallLog() {
                           <span>{log["Salary Expectations"] || "N/A"}</span>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="outline" size="sm">
+                          <div className="flex justify-end space-x-2">
+                            <Button variant="outline" size="sm" asChild>
+                              <Link to={`/candidate/${log["Candidate_ID"]}`}>
                                 <Eye className="w-4 h-4 mr-1" />
-                                Details
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-4xl max-h-[90vh] bg-gradient-card backdrop-blur-glass border-glass-border">
-                              <DialogHeader>
-                                <DialogTitle className="flex items-center space-x-3">
-                                  <Avatar className="w-12 h-12">
-                                    <AvatarFallback className="bg-gradient-primary text-white">
-                                      {initials}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <div>
-                                    <h2 className="text-xl font-bold">{log["Candidate Name"]}</h2>
-                                    <p className="text-muted-foreground">Call Details - {log["Job Title"]} ({log["Job ID"]})</p>
-                                  </div>
-                                </DialogTitle>
-                                <DialogDescription className="sr-only">
-                                  Detailed information about the call with {log["Candidate Name"]}
-                                </DialogDescription>
-                              </DialogHeader>
-                              
-                              <ScrollArea className="max-h-[70vh] pr-4">
-                                <div className="space-y-6">
-                                  <div className="grid grid-cols-2 gap-6">
-                                    <div className="space-y-4">
-                                      <h3 className="font-semibold flex items-center gap-2">
-                                        <User className="w-4 h-4" />
-                                        Contact Information
-                                      </h3>
-                                      <div className="space-y-2">
-                                        <p><strong>Email:</strong> {log["Candidate Email"] || "N/A"}</p>
-                                        <p><strong>Phone:</strong> {formatPhoneNumber(log["Candidate Phone Number"])}</p>
-                                        <p><strong>Job ID:</strong> {log["Job ID"] || "N/A"}</p>
-                                        <p><strong>Job Title:</strong> {log["Job Title"] || "N/A"}</p>
-                                        <p><strong>Contacted:</strong> 
-                                          <Badge variant={getContactedBadgeVariant(log.Contacted)} className="ml-2 capitalize">
-                                            {log.Contacted || "Unknown"}
-                                          </Badge>
-                                        </p>
-                                      </div>
-                                    </div>
-                                    
-                                    <div className="space-y-4">
-                                      <h3 className="font-semibold flex items-center gap-2">
-                                        <FileText className="w-4 h-4" />
-                                        Performance Metrics
-                                      </h3>
-                                      <div className="space-y-2">
-                                        <p><strong>Success Score:</strong> 
-                                          <Badge variant={getScoreBadgeVariant(log["Success Score"])} className="ml-2">
-                                            {log["Success Score"] ? `${log["Success Score"]}/100` : "N/A"}
-                                          </Badge>
-                                        </p>
-                                        <p><strong>Notice Period:</strong> {log["Notice Period"] || "N/A"}</p>
-                                        <p><strong>Salary Expectations:</strong> {log["Salary Expectations"] || "N/A"}</p>
-                                        <p><strong>Agency Experience:</strong> {log["Agency Experience"] || "N/A"}</p>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  {log["Score and Reason"] && (
-                                    <div className="space-y-2">
-                                      <h3 className="font-semibold">Score Reasoning</h3>
-                                      <div className="max-h-32 overflow-y-auto">
-                                        <p className="text-sm text-muted-foreground p-3 bg-background/50 rounded-lg border border-glass-border">
-                                          {log["Score and Reason"]}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  <div className="grid grid-cols-2 gap-6">
-                                    {log.pros && (
-                                      <div className="space-y-2">
-                                        <h3 className="font-semibold text-green-600">Pros</h3>
-                                        <div className="max-h-32 overflow-y-auto">
-                                          <p className="text-sm text-muted-foreground p-3 bg-green-500/10 rounded-lg border border-green-500/20">
-                                            {log.pros}
-                                          </p>
-                                        </div>
-                                      </div>
-                                    )}
-
-                                    {log.cons && (
-                                      <div className="space-y-2">
-                                        <h3 className="font-semibold text-red-600">Cons</h3>
-                                        <div className="max-h-32 overflow-y-auto">
-                                          <p className="text-sm text-muted-foreground p-3 bg-red-500/10 rounded-lg border border-red-500/20">
-                                            {log.cons}
-                                          </p>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-
-                                  {log.Summary && (
-                                    <div className="space-y-2">
-                                      <h3 className="font-semibold flex items-center gap-2">
-                                        <FileText className="w-4 h-4" />
-                                        Call Summary
-                                      </h3>
-                                      <div className="max-h-40 overflow-y-auto">
-                                        <p className="text-sm text-muted-foreground p-3 bg-background/50 rounded-lg border border-glass-border">
-                                          {log.Summary}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {log.Transcript && (
-                                    <div className="space-y-2">
-                                      <h3 className="font-semibold flex items-center gap-2">
-                                        <Phone className="w-4 h-4" />
-                                        Call Transcript
-                                      </h3>
-                                      <ScrollArea className="max-h-60 p-3 bg-background/50 rounded-lg border border-glass-border">
-                                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                                          {log.Transcript}
-                                        </p>
-                                      </ScrollArea>
-                                    </div>
-                                  )}
-                                </div>
-                              </ScrollArea>
-                            </DialogContent>
-                          </Dialog>
+                                View Candidate
+                              </Link>
+                            </Button>
+                            <Button variant="outline" size="sm" asChild>
+                              <Link to={`/job/${log["Job ID"]}`}>
+                                View Job
+                              </Link>
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     )
