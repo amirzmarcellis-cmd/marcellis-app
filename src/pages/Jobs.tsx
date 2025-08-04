@@ -135,7 +135,6 @@ export default function Jobs() {
   const uniqueLocations = [...new Set(jobs.map(j => j["Job Location"]).filter(Boolean))]
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
@@ -370,6 +369,5 @@ export default function Jobs() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   )
 }

@@ -72,7 +72,6 @@ export default function Candidates() {
   const uniquePositions = [...new Set(candidates.map(c => c["Applied for"]).filter(Boolean))]
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">Candidates</h1>
@@ -204,6 +203,5 @@ export default function Candidates() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   )
 }

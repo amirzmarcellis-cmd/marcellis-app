@@ -48,7 +48,6 @@ const topPerformers = [
 
 export default function Performance() {
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Performance</h1>
@@ -157,6 +156,5 @@ export default function Performance() {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
   )
 }

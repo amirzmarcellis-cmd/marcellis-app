@@ -116,7 +116,6 @@ export default function CallLog() {
   })
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">Call Log</h1>
@@ -268,6 +267,5 @@ export default function CallLog() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   )
 }

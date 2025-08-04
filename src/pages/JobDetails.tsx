@@ -46,17 +46,14 @@ export default function JobDetails() {
 
   if (loading) {
     return (
-      <DashboardLayout>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
-      </DashboardLayout>
     )
   }
 
   if (!job) {
     return (
-      <DashboardLayout>
         <div className="flex flex-col items-center justify-center h-64 space-y-4">
           <h2 className="text-2xl font-bold text-muted-foreground">Job not found</h2>
           <Button onClick={() => navigate('/jobs')}>
@@ -64,7 +61,6 @@ export default function JobDetails() {
             Back to Jobs
           </Button>
         </div>
-      </DashboardLayout>
     )
   }
 
@@ -82,7 +78,6 @@ export default function JobDetails() {
   }
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -248,6 +243,5 @@ export default function JobDetails() {
           </TabsContent>
         </Tabs>
       </div>
-    </DashboardLayout>
   )
 }

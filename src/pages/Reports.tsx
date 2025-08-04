@@ -45,7 +45,6 @@ const reports = [
 
 export default function Reports() {
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -120,6 +119,5 @@ export default function Reports() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   )
 }

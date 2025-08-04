@@ -134,7 +134,6 @@ export default function Calls() {
   })
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">Call Center</h1>
@@ -330,6 +329,5 @@ export default function Calls() {
           </TabsContent>
         </Tabs>
       </div>
-    </DashboardLayout>
   )
 }

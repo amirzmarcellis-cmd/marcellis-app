@@ -6,7 +6,6 @@ import { TrendingUp, TrendingDown, Phone, Users, Clock, Target } from "lucide-re
 
 export default function Analytics() {
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Analytics</h1>
@@ -93,6 +92,5 @@ export default function Analytics() {
           </Card>
         </div>
       </div>
-    </DashboardLayout>
   )
 }

@@ -25,7 +25,6 @@ export default function Settings() {
   }
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">Settings</h1>
@@ -167,6 +166,5 @@ export default function Settings() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
   )
 }

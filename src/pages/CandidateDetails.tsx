@@ -42,17 +42,14 @@ export default function CandidateDetails() {
 
   if (loading) {
     return (
-      <DashboardLayout>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
-      </DashboardLayout>
     )
   }
 
   if (!candidate) {
     return (
-      <DashboardLayout>
         <div className="flex flex-col items-center justify-center h-64 space-y-4">
           <h2 className="text-2xl font-bold text-muted-foreground">Candidate not found</h2>
           <Button onClick={() => navigate('/candidates')}>
@@ -60,7 +57,6 @@ export default function CandidateDetails() {
             Back to Candidates
           </Button>
         </div>
-      </DashboardLayout>
     )
   }
 
@@ -119,7 +115,6 @@ export default function CandidateDetails() {
   }
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -313,6 +308,5 @@ export default function CandidateDetails() {
           </TabsContent>
         </Tabs>
       </div>
-    </DashboardLayout>
   )
 }
