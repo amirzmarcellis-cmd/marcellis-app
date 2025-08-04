@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Phone, Search, Eye, Calendar, Clock, User, FileText } from "lucide-react"
@@ -60,33 +60,43 @@ export default function CallLog() {
   const [contactedFilter, setContactedFilter] = useState("all")
   const [scoreFilter, setScoreFilter] = useState("all")
   const [callLogs, setCallLogs] = useState<CallLog[]>([])
+  const [jobs, setJobs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchCallLogs()
+    fetchData()
   }, [])
 
-  const fetchCallLogs = async () => {
+  const fetchData = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch Jobs_CVs data
+      const { data: callLogsData, error: callLogsError } = await supabase
         .from('Jobs_CVs')
-        .select(`
-          *,
-          Jobs!inner("Job Title")
-        `)
+        .select('*')
         .order('"Candidate Name"', { ascending: true })
 
-      if (error) throw error
-      
-      // Transform data to include job title
-      const transformedData = (data || []).map(item => ({
-        ...item,
-        "Job Title": item.Jobs?.["Job Title"] || null
-      }))
-      
-      setCallLogs(transformedData)
+      if (callLogsError) throw callLogsError
+
+      // Fetch Jobs data
+      const { data: jobsData, error: jobsError } = await supabase
+        .from('Jobs')
+        .select('*')
+
+      if (jobsError) throw jobsError
+
+      // Match job titles with call logs
+      const enrichedCallLogs = (callLogsData || []).map(log => {
+        const job = (jobsData || []).find(j => j["Job ID"] === log["Job ID"])
+        return {
+          ...log,
+          "Job Title": job?.["Job Title"] || null
+        }
+      })
+
+      setCallLogs(enrichedCallLogs)
+      setJobs(jobsData || [])
     } catch (error) {
-      console.error('Error fetching call logs:', error)
+      console.error('Error fetching data:', error)
     } finally {
       setLoading(false)
     }
@@ -256,6 +266,9 @@ export default function CallLog() {
                                     <p className="text-muted-foreground">Call Details - {log["Job Title"]} ({log["Job ID"]})</p>
                                   </div>
                                 </DialogTitle>
+                                <DialogDescription className="sr-only">
+                                  Detailed information about the call with {log["Candidate Name"]}
+                                </DialogDescription>
                               </DialogHeader>
                               
                               <ScrollArea className="max-h-[70vh] pr-4">
