@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar"
-import { DashboardSidebar } from "./Sidebar"
+// import { DashboardSidebar } from "./Sidebar"
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 
