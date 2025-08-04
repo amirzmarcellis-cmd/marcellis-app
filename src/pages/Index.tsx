@@ -1,4 +1,3 @@
-
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
@@ -49,7 +48,7 @@ const funnelData = [
 
 const Index = () => {
   return (
-    <DashboardLayout>
+   
       <div className="space-y-6 p-6">
 
         {/* Top Row - Main Metrics */}
@@ -252,7 +251,7 @@ const Index = () => {
         </Card>
 
       </div>
-    </DashboardLayout>
+    
   )
 }
 
