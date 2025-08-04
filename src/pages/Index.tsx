@@ -48,7 +48,7 @@ const funnelData = [
 
 const Index = () => {
   return (
-   
+  
       <div className="space-y-6 p-6">
 
         {/* Top Row - Main Metrics */}
@@ -251,7 +251,6 @@ const Index = () => {
         </Card>
 
       </div>
-    
   )
 }
 
