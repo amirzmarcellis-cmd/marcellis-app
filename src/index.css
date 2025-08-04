@@ -2,146 +2,113 @@
 @tailwind components;
 @tailwind utilities;
 
-/* AI Recruiter Dashboard Design System - Professional recruiting theme with modern glassmorphism */
+/* AI CRM Dashboard Design System - Modern dark theme inspired by AIZCRM */
 
 @layer base {
   :root {
-    /* Base colors - Clean professional palette */
-    --background: 240 10% 98%;
-    --foreground: 240 10% 8%;
-
-    /* Card system with subtle elevation */
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 8%;
-
+    /* Light mode base colors */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 8%;
-
-    /* Primary - Professional recruiting blue */
-    --primary: 221 83% 53%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --primary: 174 72% 56%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 221 83% 65%;
-    --primary-dark: 221 83% 40%;
-
-    /* Secondary - Supporting purple accent */
-    --secondary: 262 52% 47%;
-    --secondary-foreground: 0 0% 100%;
-
-    /* Muted tones for subtle elements */
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
-
-    /* Accent - Success green for positive metrics */
-    --accent: 142 76% 36%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --accent: 174 72% 56%;
     --accent-foreground: 0 0% 100%;
-
-    /* Status colors for call outcomes */
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
-    --warning: 43 96% 56%;
-    --warning-foreground: 240 10% 8%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    /* Border and input styling */
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 221 83% 53%;
-
-    /* Gradients for modern appeal */
-    --gradient-primary: linear-gradient(135deg, hsl(221 83% 53%), hsl(262 52% 47%));
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(160 84% 39%));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100% / 0.7), hsl(240 5% 96% / 0.3));
-    --gradient-hero: linear-gradient(135deg, hsl(221 83% 53% / 0.1), hsl(262 52% 47% / 0.05));
-
-    /* Shadows for depth */
-    --shadow-soft: 0 2px 8px -2px hsl(240 10% 8% / 0.04);
-    --shadow-medium: 0 4px 16px -4px hsl(240 10% 8% / 0.08);
-    --shadow-strong: 0 8px 32px -8px hsl(240 10% 8% / 0.12);
-    --shadow-glow: 0 0 24px hsl(221 83% 53% / 0.2);
-
-    /* Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --ring: 174 72% 56%;
     --radius: 0.5rem;
 
+    /* Sidebar variables */
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 220 23% 6%;
-    --foreground: 213 31% 95%;
-    --muted: 217 19% 15%;
-    --muted-foreground: 215 20% 65%;
-    --popover: 224 71% 8%;
-    --popover-foreground: 215 20% 85%;
-    --border: 216 34% 12%;
-    --input: 216 34% 12%;
-    --card: 224 71% 8%;
-    --card-foreground: 213 31% 95%;
-    --primary: 263 70% 55%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 216 34% 15%;
+    /* Dark theme - matching AIZCRM aesthetic */
+    --background: 222 84% 5%;
+    --foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --popover: 222 84% 5%;
+    --popover-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --card: 222 84% 5%;
+    --card-foreground: 210 40% 98%;
+    
+    /* Primary - Teal/Cyan accent matching reference */
+    --primary: 174 72% 56%;
+    --primary-foreground: 222 84% 5%;
+    --primary-glow: 174 72% 70%;
+    
+    /* Secondary */
+    --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
-    --accent: 280 100% 70%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 50%;
-    --destructive-foreground: 210 40% 98%;
-    --ring: 263 70% 55%;
-
-    /* Modern dashboard colors */
-    --primary-glow: 263 70% 75%;
+    
+    /* Accent - matching the teal theme */
+    --accent: 174 72% 56%;
+    --accent-foreground: 222 84% 5%;
+    --accent-blue: 200 100% 70%;
     --accent-purple: 280 100% 70%;
-    --accent-blue: 220 100% 70%;
-    --accent-teal: 180 100% 70%;
-    --accent-pink: 320 100% 70%;
-    --accent-orange: 30 100% 70%;
-    --success: 120 100% 60%;
-    --warning: 45 100% 60%;
-
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(263 70% 55%), hsl(280 100% 70%));
-    --gradient-secondary: linear-gradient(135deg, hsl(220 100% 70%), hsl(180 100% 70%));
-    --gradient-accent: linear-gradient(135deg, hsl(320 100% 70%), hsl(30 100% 70%));
-    --gradient-success: linear-gradient(135deg, hsl(120 100% 60%), hsl(180 100% 70%));
-    --gradient-warning: linear-gradient(135deg, hsl(45 100% 60%), hsl(30 100% 70%));
-    --gradient-card: linear-gradient(135deg, hsl(224 71% 8% / 0.6), hsl(216 34% 15% / 0.3));
+    --accent-orange: 25 95% 53%;
+    --accent-red: 0 72% 51%;
     
-    /* Glassmorphism */
-    --glass-primary: hsla(263, 70%, 55%, 0.1);
-    --glass-secondary: hsla(220, 100%, 70%, 0.1);
-    --glass-border: hsla(213, 31%, 95%, 0.1);
-    --glass-bg: hsla(224, 71%, 8%, 0.8);
+    /* Status colors */
+    --success: 142 76% 36%;
+    --success-foreground: 355.7 100% 97.3%;
+    --warning: 43 96% 56%;
+    --warning-foreground: 222 84% 5%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
     
-    /* Shadows */
-    --shadow-glow: 0 0 40px hsl(263 70% 55% / 0.3);
-    --shadow-card: 0 8px 32px hsl(224 71% 4% / 0.4);
-    --shadow-elevated: 0 16px 64px hsl(224 71% 4% / 0.6);
-    --shadow-inner: inset 0 1px 0 hsl(213 31% 95% / 0.1);
+    --ring: 174 72% 56%;
 
-    --sidebar-background: 224 71% 8%;
-    --sidebar-foreground: 213 31% 95%;
-    --sidebar-primary: 263 70% 55%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 216 34% 15%;
-    --sidebar-accent-foreground: 213 31% 95%;
-    --sidebar-border: 216 34% 12%;
-    --sidebar-ring: 263 70% 55%;
+    /* Modern gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(174 72% 56%), hsl(200 100% 70%));
+    --gradient-secondary: linear-gradient(135deg, hsl(217.2 32.6% 17.5%), hsl(222 84% 8%));
+    --gradient-accent: linear-gradient(135deg, hsl(174 72% 56%), hsl(142 76% 36%));
+    --gradient-card: linear-gradient(135deg, hsl(222 84% 5% / 0.8), hsl(217.2 32.6% 17.5% / 0.4));
+    --gradient-hero: linear-gradient(135deg, hsl(222 84% 5%), hsl(217.2 32.6% 17.5%));
+    
+    /* Glassmorphism effects */
+    --glass-primary: hsla(174, 72%, 56%, 0.1);
+    --glass-secondary: hsla(217.2, 32.6%, 17.5%, 0.8);
+    --glass-border: hsla(210, 40%, 98%, 0.1);
+    --glass-bg: hsla(222, 84%, 5%, 0.95);
+    
+    /* Enhanced shadows */
+    --shadow-soft: 0 2px 8px -2px hsl(222 84% 4% / 0.2);
+    --shadow-medium: 0 8px 16px -4px hsl(222 84% 4% / 0.3);
+    --shadow-strong: 0 16px 32px -8px hsl(222 84% 4% / 0.4);
+    --shadow-glow: 0 0 32px hsl(174 72% 56% / 0.3);
+    --shadow-card: 0 4px 16px hsl(222 84% 4% / 0.25);
+    --shadow-elevated: 0 8px 32px hsl(222 84% 4% / 0.35);
+
+    /* Sidebar dark theme */
+    --sidebar-background: 222 84% 5%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 174 72% 56%;
+    --sidebar-primary-foreground: 222 84% 5%;
+    --sidebar-accent: 217.2 32.6% 17.5%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-ring: 174 72% 56%;
   }
 }
 
@@ -151,6 +118,50 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground dark;
+  }
+  
+  /* Global dark mode activation */
+  html {
+    @apply dark;
+  }
+}
+
+@layer components {
+  /* Custom chart styles */
+  .chart-container {
+    @apply bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg;
+  }
+  
+  /* Progress ring animations */
+  .progress-ring {
+    @apply transition-all duration-1000 ease-out;
+  }
+  
+  /* Glassmorphism card effect */
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-md border border-border/50 shadow-card;
+  }
+  
+  /* Interactive hover effects */
+  .metric-card {
+    @apply transition-all duration-300 hover:scale-[1.02] hover:shadow-elevated;
+  }
+  
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-muted/20;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-primary/20 rounded-full;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/40;
   }
 }

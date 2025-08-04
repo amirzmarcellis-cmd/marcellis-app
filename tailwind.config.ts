@@ -44,14 +44,11 @@ export default {
 				accent: {
 					DEFAULT: 'hsl(var(--accent))',
 					foreground: 'hsl(var(--accent-foreground))',
-					purple: 'hsl(var(--accent-purple))',
 					blue: 'hsl(var(--accent-blue))',
-					teal: 'hsl(var(--accent-teal))',
-					pink: 'hsl(var(--accent-pink))',
+					purple: 'hsl(var(--accent-purple))',
 					orange: 'hsl(var(--accent-orange))',
+					red: 'hsl(var(--accent-red))',
 				},
-				success: 'hsl(var(--success))',
-				warning: 'hsl(var(--warning))',
 				success: {
 					DEFAULT: 'hsl(var(--success))',
 					foreground: 'hsl(var(--success-foreground))'
