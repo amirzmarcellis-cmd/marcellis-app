@@ -1,190 +1,171 @@
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Settings2, Bell, Phone, Shield, Database } from "lucide-react"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { Upload, Settings as SettingsIcon, Palette } from "lucide-react"
+import { useState } from "react"
 
 export default function Settings() {
+  const [systemName, setSystemName] = useState("AI Recruiter Dashboard")
+  const [primaryColor, setPrimaryColor] = useState("#8B5CF6")
+  const [logo, setLogo] = useState<File | null>(null)
+
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      setLogo(file)
+    }
+  }
+
+  const handleSave = () => {
+    // Here you would typically save to your backend/database
+    console.log({ systemName, primaryColor, logo })
+    alert("Settings saved successfully!")
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-          <p className="text-muted-foreground">Configure your AI caller system preferences</p>
+          <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">Settings</h1>
+          <p className="text-muted-foreground">Customize your system appearance and branding</p>
         </div>
 
-        <Tabs defaultValue="general" className="w-full">
-          <TabsList className="grid grid-cols-5 w-full">
-            <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="calling">Calling</TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
-            <TabsTrigger value="integrations">Integrations</TabsTrigger>
-          </TabsList>
+        <div className="max-w-2xl space-y-6">
+          {/* System Branding */}
+          <Card className="bg-gradient-card backdrop-blur-glass border-glass-border shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <SettingsIcon className="w-5 h-5" />
+                System Branding
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Logo Upload */}
+              <div className="space-y-2">
+                <Label htmlFor="logo">System Logo</Label>
+                <div className="flex items-center space-x-4">
+                  <div className="w-16 h-16 rounded-lg bg-gradient-primary flex items-center justify-center">
+                    {logo ? (
+                      <img 
+                        src={URL.createObjectURL(logo)} 
+                        alt="Logo preview" 
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    ) : (
+                      <Upload className="w-6 h-6 text-white" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <Input
+                      id="logo"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="bg-background/50 border-glass-border"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Recommended: 64x64px, PNG or SVG format
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-          <TabsContent value="general" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>General Settings</CardTitle>
-                <CardDescription>Basic configuration for your AI caller system</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="company-name">Company Name</Label>
-                  <Input id="company-name" placeholder="Your Company Name" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="timezone">Timezone</Label>
-                  <Input id="timezone" placeholder="UTC-08:00 (PST)" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="default-script">Default Call Script</Label>
-                  <Textarea id="default-script" placeholder="Enter your default AI caller script..." rows={4} />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              {/* System Name */}
+              <div className="space-y-2">
+                <Label htmlFor="systemName">System Name</Label>
+                <Input
+                  id="systemName"
+                  value={systemName}
+                  onChange={(e) => setSystemName(e.target.value)}
+                  placeholder="Enter your system name"
+                  className="bg-background/50 border-glass-border"
+                />
+              </div>
 
-          <TabsContent value="calling" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Calling Configuration</CardTitle>
-                <CardDescription>Configure AI caller behavior and settings</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Auto-retry failed calls</Label>
-                    <p className="text-sm text-muted-foreground">Automatically retry calls that fail to connect</p>
-                  </div>
-                  <Switch />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Voice modulation</Label>
-                    <p className="text-sm text-muted-foreground">Enable natural voice variations</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="call-hours">Calling Hours</Label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input placeholder="9:00 AM" />
-                    <Input placeholder="6:00 PM" />
+              {/* Primary Color */}
+              <div className="space-y-2">
+                <Label htmlFor="primaryColor">Primary Color</Label>
+                <div className="flex items-center space-x-4">
+                  <div 
+                    className="w-12 h-12 rounded-lg border-2 border-glass-border shadow-inner"
+                    style={{ backgroundColor: primaryColor }}
+                  />
+                  <div className="flex-1">
+                    <Input
+                      id="primaryColor"
+                      type="color"
+                      value={primaryColor}
+                      onChange={(e) => setPrimaryColor(e.target.value)}
+                      className="bg-background/50 border-glass-border h-12"
+                    />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                <div className="grid grid-cols-6 gap-2 mt-2">
+                  {["#8B5CF6", "#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#EC4899"].map((color) => (
+                    <button
+                      key={color}
+                      className="w-8 h-8 rounded-md border-2 border-glass-border hover:scale-110 transition-transform"
+                      style={{ backgroundColor: color }}
+                      onClick={() => setPrimaryColor(color)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="notifications" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Notification Preferences</CardTitle>
-                <CardDescription>Choose when and how you want to be notified</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Call completion alerts</Label>
-                    <p className="text-sm text-muted-foreground">Get notified when calls are completed</p>
+          {/* Preview */}
+          <Card className="bg-gradient-card backdrop-blur-glass border-glass-border shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="w-5 h-5" />
+                Preview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 rounded-lg bg-background border border-glass-border">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div 
+                    className="w-10 h-10 rounded-lg flex items-center justify-center"
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    {logo ? (
+                      <img 
+                        src={URL.createObjectURL(logo)} 
+                        alt="Logo" 
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    ) : (
+                      <Upload className="w-5 h-5 text-white" />
+                    )}
                   </div>
-                  <Switch defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Daily performance summary</Label>
-                    <p className="text-sm text-muted-foreground">Receive daily performance reports</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>System alerts</Label>
-                    <p className="text-sm text-muted-foreground">Get notified of system issues</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="security" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Security Settings</CardTitle>
-                <CardDescription>Manage security and privacy settings</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Two-factor authentication</Label>
-                    <p className="text-sm text-muted-foreground">Add an extra layer of security</p>
-                  </div>
-                  <Button variant="outline" size="sm">Enable</Button>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Call recording encryption</Label>
-                    <p className="text-sm text-muted-foreground">Encrypt all call recordings</p>
-                  </div>
-                  <Switch defaultChecked />
+                  <h3 className="font-semibold text-lg">{systemName}</h3>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="data-retention">Data Retention Period</Label>
-                  <Input id="data-retention" placeholder="90 days" />
+                  <div 
+                    className="h-2 rounded-full w-full"
+                    style={{ backgroundColor: `${primaryColor}20` }}
+                  >
+                    <div 
+                      className="h-2 rounded-full w-3/4"
+                      style={{ backgroundColor: primaryColor }}
+                    />
+                  </div>
+                  <p className="text-sm text-muted-foreground">Sample progress bar with your primary color</p>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="integrations" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>System Integrations</CardTitle>
-                <CardDescription>Connect with external systems and services</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <Database className="w-8 h-8 text-primary" />
-                    <div>
-                      <h4 className="font-medium">CRM Integration</h4>
-                      <p className="text-sm text-muted-foreground">Connect to your CRM system</p>
-                    </div>
-                  </div>
-                  <Button variant="outline">Configure</Button>
-                </div>
-                
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <Phone className="w-8 h-8 text-primary" />
-                    <div>
-                      <h4 className="font-medium">VoIP Provider</h4>
-                      <p className="text-sm text-muted-foreground">Configure calling infrastructure</p>
-                    </div>
-                  </div>
-                  <Button variant="outline">Setup</Button>
-                </div>
-
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <Bell className="w-8 h-8 text-primary" />
-                    <div>
-                      <h4 className="font-medium">Slack Notifications</h4>
-                      <p className="text-sm text-muted-foreground">Get updates in Slack</p>
-                    </div>
-                  </div>
-                  <Button variant="outline">Connect</Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+          {/* Save Button */}
+          <div className="flex justify-end">
+            <Button onClick={handleSave} className="bg-gradient-primary hover:bg-gradient-primary/90">
+              Save Settings
+            </Button>
+          </div>
+        </div>
       </div>
     </DashboardLayout>
   )
