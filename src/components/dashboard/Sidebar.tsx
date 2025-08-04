@@ -58,24 +58,17 @@ export function DashboardSidebar() {
       <SidebarContent className="bg-transparent">
         {/* Header */}
         <div className="p-4 border-b border-border">
-          {!isCollapsed && (
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <Phone className="w-4 h-4 text-primary-foreground" />
-              </div>
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <Phone className="w-4 h-4 text-primary-foreground" />
+            </div>
+            {!isCollapsed && (
               <div>
                 <h2 className="text-lg font-bold text-foreground">AIZCRM</h2>
                 <p className="text-xs text-muted-foreground">AI Recruiter</p>
               </div>
-            </div>
-          )}
-          {isCollapsed && (
-            <div className="flex justify-center">
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-                <Phone className="w-4 h-4 text-primary-foreground" />
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         <SidebarGroup className="flex-1">

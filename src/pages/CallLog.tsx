@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Phone, Search, Eye, Calendar, Clock, User, Star, FileText } from "lucide-react"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Phone, Search, Eye, Calendar, Clock, User, FileText } from "lucide-react"
 import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 
@@ -27,13 +28,21 @@ interface CallLog {
   "Notice Period": string | null
   "Salary Expectations": string | null
   "Agency Experience": string | null
+  "Job Title": string | null
+}
+
+const formatPhoneNumber = (phone: string | null) => {
+  if (!phone) return "N/A"
+  // Handle scientific notation and convert to proper phone format
+  const numericString = parseFloat(phone).toString()
+  return numericString.length > 10 ? numericString : phone
 }
 
 const getScoreBadgeVariant = (score: string | null) => {
   if (!score) return "secondary"
   const numScore = parseInt(score)
-  if (numScore >= 8) return "default"
-  if (numScore >= 6) return "secondary"
+  if (numScore >= 80) return "default"
+  if (numScore >= 60) return "secondary"
   return "destructive"
 }
 
@@ -61,11 +70,21 @@ export default function CallLog() {
     try {
       const { data, error } = await supabase
         .from('Jobs_CVs')
-        .select('*')
+        .select(`
+          *,
+          Jobs!inner("Job Title")
+        `)
         .order('"Candidate Name"', { ascending: true })
 
       if (error) throw error
-      setCallLogs(data || [])
+      
+      // Transform data to include job title
+      const transformedData = (data || []).map(item => ({
+        ...item,
+        "Job Title": item.Jobs?.["Job Title"] || null
+      }))
+      
+      setCallLogs(transformedData)
     } catch (error) {
       console.error('Error fetching call logs:', error)
     } finally {
@@ -76,12 +95,13 @@ export default function CallLog() {
   const filteredCallLogs = callLogs.filter(log => {
     const matchesSearch = (log["Candidate Name"] || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (log["Candidate Email"] || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (log["Job ID"] || "").toLowerCase().includes(searchTerm.toLowerCase())
+                         (log["Job ID"] || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (log["Job Title"] || "").toLowerCase().includes(searchTerm.toLowerCase())
     const matchesContacted = contactedFilter === "all" || (log.Contacted || "").toLowerCase() === contactedFilter
     const matchesScore = scoreFilter === "all" || 
-                        (scoreFilter === "high" && parseInt(log["Success Score"] || "0") >= 8) ||
-                        (scoreFilter === "medium" && parseInt(log["Success Score"] || "0") >= 6 && parseInt(log["Success Score"] || "0") < 8) ||
-                        (scoreFilter === "low" && parseInt(log["Success Score"] || "0") < 6)
+                        (scoreFilter === "high" && parseInt(log["Success Score"] || "0") >= 80) ||
+                        (scoreFilter === "medium" && parseInt(log["Success Score"] || "0") >= 60 && parseInt(log["Success Score"] || "0") < 80) ||
+                        (scoreFilter === "low" && parseInt(log["Success Score"] || "0") < 60)
     
     return matchesSearch && matchesContacted && matchesScore
   })
@@ -123,9 +143,9 @@ export default function CallLog() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Scores</SelectItem>
-                <SelectItem value="high">High (8-10)</SelectItem>
-                <SelectItem value="medium">Medium (6-7)</SelectItem>
-                <SelectItem value="low">Low (0-5)</SelectItem>
+                <SelectItem value="high">High (80-100)</SelectItem>
+                <SelectItem value="medium">Medium (60-79)</SelectItem>
+                <SelectItem value="low">Low (0-59)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -144,7 +164,7 @@ export default function CallLog() {
               <TableHeader>
                 <TableRow className="border-glass-border">
                   <TableHead>Candidate</TableHead>
-                  <TableHead>Job ID</TableHead>
+                  <TableHead>Job</TableHead>
                   <TableHead>Contacted</TableHead>
                   <TableHead>Success Score</TableHead>
                   <TableHead>Notice Period</TableHead>
@@ -189,9 +209,12 @@ export default function CallLog() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="font-mono">
-                            {log["Job ID"] || "N/A"}
-                          </Badge>
+                          <div>
+                            <div className="font-medium">{log["Job Title"] || "N/A"}</div>
+                            <Badge variant="outline" className="font-mono text-xs">
+                              {log["Job ID"] || "N/A"}
+                            </Badge>
+                          </div>
                         </TableCell>
                         <TableCell>
                           <Badge variant={getContactedBadgeVariant(log.Contacted)} className="capitalize">
@@ -199,12 +222,9 @@ export default function CallLog() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center space-x-2">
-                            <Star className="w-4 h-4 text-yellow-500" />
-                            <Badge variant={getScoreBadgeVariant(log["Success Score"])}>
-                              {log["Success Score"] ? `${log["Success Score"]}/10` : "N/A"}
-                            </Badge>
-                          </div>
+                          <Badge variant={getScoreBadgeVariant(log["Success Score"])}>
+                            {log["Success Score"] ? `${log["Success Score"]}/100` : "N/A"}
+                          </Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center space-x-2">
@@ -223,7 +243,7 @@ export default function CallLog() {
                                 Details
                               </Button>
                             </DialogTrigger>
-                            <DialogContent className="max-w-4xl bg-gradient-card backdrop-blur-glass border-glass-border">
+                            <DialogContent className="max-w-4xl max-h-[90vh] bg-gradient-card backdrop-blur-glass border-glass-border">
                               <DialogHeader>
                                 <DialogTitle className="flex items-center space-x-3">
                                   <Avatar className="w-12 h-12">
@@ -233,103 +253,114 @@ export default function CallLog() {
                                   </Avatar>
                                   <div>
                                     <h2 className="text-xl font-bold">{log["Candidate Name"]}</h2>
-                                    <p className="text-muted-foreground">Call Details - {log["Job ID"]}</p>
+                                    <p className="text-muted-foreground">Call Details - {log["Job Title"]} ({log["Job ID"]})</p>
                                   </div>
                                 </DialogTitle>
                               </DialogHeader>
                               
-                              <div className="space-y-6">
-                                <div className="grid grid-cols-2 gap-6">
-                                  <div className="space-y-4">
-                                    <h3 className="font-semibold flex items-center gap-2">
-                                      <User className="w-4 h-4" />
-                                      Contact Information
-                                    </h3>
-                                    <div className="space-y-2">
-                                      <p><strong>Email:</strong> {log["Candidate Email"] || "N/A"}</p>
-                                      <p><strong>Phone:</strong> {log["Candidate Phone Number"] || "N/A"}</p>
-                                      <p><strong>Job ID:</strong> {log["Job ID"] || "N/A"}</p>
-                                      <p><strong>Contacted:</strong> 
-                                        <Badge variant={getContactedBadgeVariant(log.Contacted)} className="ml-2 capitalize">
-                                          {log.Contacted || "Unknown"}
-                                        </Badge>
-                                      </p>
+                              <ScrollArea className="max-h-[70vh] pr-4">
+                                <div className="space-y-6">
+                                  <div className="grid grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                      <h3 className="font-semibold flex items-center gap-2">
+                                        <User className="w-4 h-4" />
+                                        Contact Information
+                                      </h3>
+                                      <div className="space-y-2">
+                                        <p><strong>Email:</strong> {log["Candidate Email"] || "N/A"}</p>
+                                        <p><strong>Phone:</strong> {formatPhoneNumber(log["Candidate Phone Number"])}</p>
+                                        <p><strong>Job ID:</strong> {log["Job ID"] || "N/A"}</p>
+                                        <p><strong>Job Title:</strong> {log["Job Title"] || "N/A"}</p>
+                                        <p><strong>Contacted:</strong> 
+                                          <Badge variant={getContactedBadgeVariant(log.Contacted)} className="ml-2 capitalize">
+                                            {log.Contacted || "Unknown"}
+                                          </Badge>
+                                        </p>
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="space-y-4">
+                                      <h3 className="font-semibold flex items-center gap-2">
+                                        <FileText className="w-4 h-4" />
+                                        Performance Metrics
+                                      </h3>
+                                      <div className="space-y-2">
+                                        <p><strong>Success Score:</strong> 
+                                          <Badge variant={getScoreBadgeVariant(log["Success Score"])} className="ml-2">
+                                            {log["Success Score"] ? `${log["Success Score"]}/100` : "N/A"}
+                                          </Badge>
+                                        </p>
+                                        <p><strong>Notice Period:</strong> {log["Notice Period"] || "N/A"}</p>
+                                        <p><strong>Salary Expectations:</strong> {log["Salary Expectations"] || "N/A"}</p>
+                                        <p><strong>Agency Experience:</strong> {log["Agency Experience"] || "N/A"}</p>
+                                      </div>
                                     </div>
                                   </div>
-                                  
-                                  <div className="space-y-4">
-                                    <h3 className="font-semibold flex items-center gap-2">
-                                      <Star className="w-4 h-4" />
-                                      Performance Metrics
-                                    </h3>
-                                    <div className="space-y-2">
-                                      <p><strong>Success Score:</strong> 
-                                        <Badge variant={getScoreBadgeVariant(log["Success Score"])} className="ml-2">
-                                          {log["Success Score"] ? `${log["Success Score"]}/10` : "N/A"}
-                                        </Badge>
-                                      </p>
-                                      <p><strong>Notice Period:</strong> {log["Notice Period"] || "N/A"}</p>
-                                      <p><strong>Salary Expectations:</strong> {log["Salary Expectations"] || "N/A"}</p>
-                                      <p><strong>Agency Experience:</strong> {log["Agency Experience"] || "N/A"}</p>
-                                    </div>
-                                  </div>
-                                </div>
 
-                                {log["Score and Reason"] && (
-                                  <div className="space-y-2">
-                                    <h3 className="font-semibold">Score Reasoning</h3>
-                                    <p className="text-sm text-muted-foreground p-3 bg-background/50 rounded-lg border border-glass-border">
-                                      {log["Score and Reason"]}
-                                    </p>
-                                  </div>
-                                )}
-
-                                <div className="grid grid-cols-2 gap-6">
-                                  {log.pros && (
+                                  {log["Score and Reason"] && (
                                     <div className="space-y-2">
-                                      <h3 className="font-semibold text-green-600">Pros</h3>
-                                      <p className="text-sm text-muted-foreground p-3 bg-green-500/10 rounded-lg border border-green-500/20">
-                                        {log.pros}
-                                      </p>
+                                      <h3 className="font-semibold">Score Reasoning</h3>
+                                      <div className="max-h-32 overflow-y-auto">
+                                        <p className="text-sm text-muted-foreground p-3 bg-background/50 rounded-lg border border-glass-border">
+                                          {log["Score and Reason"]}
+                                        </p>
+                                      </div>
                                     </div>
                                   )}
 
-                                  {log.cons && (
+                                  <div className="grid grid-cols-2 gap-6">
+                                    {log.pros && (
+                                      <div className="space-y-2">
+                                        <h3 className="font-semibold text-green-600">Pros</h3>
+                                        <div className="max-h-32 overflow-y-auto">
+                                          <p className="text-sm text-muted-foreground p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                                            {log.pros}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {log.cons && (
+                                      <div className="space-y-2">
+                                        <h3 className="font-semibold text-red-600">Cons</h3>
+                                        <div className="max-h-32 overflow-y-auto">
+                                          <p className="text-sm text-muted-foreground p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                                            {log.cons}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {log.Summary && (
                                     <div className="space-y-2">
-                                      <h3 className="font-semibold text-red-600">Cons</h3>
-                                      <p className="text-sm text-muted-foreground p-3 bg-red-500/10 rounded-lg border border-red-500/20">
-                                        {log.cons}
-                                      </p>
+                                      <h3 className="font-semibold flex items-center gap-2">
+                                        <FileText className="w-4 h-4" />
+                                        Call Summary
+                                      </h3>
+                                      <div className="max-h-40 overflow-y-auto">
+                                        <p className="text-sm text-muted-foreground p-3 bg-background/50 rounded-lg border border-glass-border">
+                                          {log.Summary}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {log.Transcript && (
+                                    <div className="space-y-2">
+                                      <h3 className="font-semibold flex items-center gap-2">
+                                        <Phone className="w-4 h-4" />
+                                        Call Transcript
+                                      </h3>
+                                      <ScrollArea className="max-h-60 p-3 bg-background/50 rounded-lg border border-glass-border">
+                                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                                          {log.Transcript}
+                                        </p>
+                                      </ScrollArea>
                                     </div>
                                   )}
                                 </div>
-
-                                {log.Summary && (
-                                  <div className="space-y-2">
-                                    <h3 className="font-semibold flex items-center gap-2">
-                                      <FileText className="w-4 h-4" />
-                                      Call Summary
-                                    </h3>
-                                    <p className="text-sm text-muted-foreground p-3 bg-background/50 rounded-lg border border-glass-border">
-                                      {log.Summary}
-                                    </p>
-                                  </div>
-                                )}
-
-                                {log.Transcript && (
-                                  <div className="space-y-2">
-                                    <h3 className="font-semibold flex items-center gap-2">
-                                      <Phone className="w-4 h-4" />
-                                      Call Transcript
-                                    </h3>
-                                    <div className="max-h-60 overflow-y-auto p-3 bg-background/50 rounded-lg border border-glass-border">
-                                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                                        {log.Transcript}
-                                      </p>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
+                              </ScrollArea>
                             </DialogContent>
                           </Dialog>
                         </TableCell>
