@@ -189,8 +189,10 @@ export default function Candidates() {
                                 View
                               </Link>
                             </Button>
-                            <Button size="sm" className="bg-gradient-primary hover:bg-gradient-primary/90">
-                              Schedule Call
+                            <Button size="sm" className="bg-gradient-primary hover:bg-gradient-primary/90" asChild>
+                              <Link to={`/candidate/edit/${candidate["Cadndidate_ID"]}`}>
+                                Edit Candidate
+                              </Link>
                             </Button>
                           </div>
                         </TableCell>

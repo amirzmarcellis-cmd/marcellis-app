@@ -233,37 +233,47 @@ export default function CallLogPanel() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Call Center</h2>
-          <p className="text-muted-foreground">Manage candidate communications and track call activities</p>
+    <div className="space-y-6 min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+      {/* Mission Control Header */}
+      <div className="flex justify-between items-center p-6 bg-gradient-to-r from-blue-900/50 to-slate-900/50 backdrop-blur-md border border-blue-500/20 rounded-xl shadow-2xl">
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full flex items-center justify-center animate-pulse">
+              <Phone className="w-6 h-6 text-white" />
+            </div>
+            <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-white bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+              MISSION CONTROL CENTER
+            </h2>
+            <p className="text-blue-200">Advanced Recruitment Command Hub</p>
+          </div>
         </div>
         
         <Dialog open={isCallDialogOpen} onOpenChange={setIsCallDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="mission-control-button">
+            <Button className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white border border-blue-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
               <Plus className="h-4 w-4 mr-2" />
-              Log New Call
+              INITIATE CALL LOG
             </Button>
           </DialogTrigger>
-          <DialogContent className="mission-control-panel">
+          <DialogContent className="bg-gradient-to-br from-slate-900 to-blue-900 border border-blue-500/30 text-white max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Log New Call</DialogTitle>
-              <DialogDescription>Record a new call with candidate details</DialogDescription>
+              <DialogTitle className="text-blue-400 text-xl">INITIALIZE NEW CALL PROTOCOL</DialogTitle>
+              <DialogDescription className="text-blue-200">Configure mission parameters for candidate contact</DialogDescription>
             </DialogHeader>
             
             <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Candidate</label>
+              <div className="relative">
+                <label className="text-sm font-medium text-blue-300 mb-2 block">TARGET CANDIDATE</label>
                 <Select value={newCall.candidate_id} onValueChange={(value) => setNewCall({...newCall, candidate_id: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select candidate" />
+                  <SelectTrigger className="bg-slate-800/50 border-blue-500/30 text-white">
+                    <SelectValue placeholder="Select mission target" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-slate-800 border-blue-500/30">
                     {candidates.map(candidate => (
-                      <SelectItem key={candidate['Cadndidate_ID']} value={candidate['Cadndidate_ID']}>
+                      <SelectItem key={candidate['Cadndidate_ID']} value={candidate['Cadndidate_ID']} className="text-white hover:bg-blue-600/20">
                         {candidate['First Name']} {candidate['Last Name']} - {candidate['Title']}
                       </SelectItem>
                     ))}
@@ -273,103 +283,105 @@ export default function CallLogPanel() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">Call Type</label>
+                  <label className="text-sm font-medium text-blue-300 mb-2 block">TRANSMISSION TYPE</label>
                   <Select value={newCall.call_type} onValueChange={(value) => setNewCall({...newCall, call_type: value})}>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-slate-800/50 border-blue-500/30 text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="outbound">Outbound</SelectItem>
-                      <SelectItem value="inbound">Inbound</SelectItem>
-                      <SelectItem value="follow_up">Follow Up</SelectItem>
+                    <SelectContent className="bg-slate-800 border-blue-500/30">
+                      <SelectItem value="outbound" className="text-white hover:bg-blue-600/20">Outbound Signal</SelectItem>
+                      <SelectItem value="inbound" className="text-white hover:bg-blue-600/20">Incoming Signal</SelectItem>
+                      <SelectItem value="follow_up" className="text-white hover:bg-blue-600/20">Follow-up Protocol</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 
                 <div>
-                  <label className="text-sm font-medium">Status</label>
+                  <label className="text-sm font-medium text-blue-300 mb-2 block">MISSION STATUS</label>
                   <Select value={newCall.call_status} onValueChange={(value) => setNewCall({...newCall, call_status: value})}>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-slate-800/50 border-blue-500/30 text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="answered">Answered</SelectItem>
-                      <SelectItem value="no_answer">No Answer</SelectItem>
-                      <SelectItem value="busy">Busy</SelectItem>
-                      <SelectItem value="voicemail">Voicemail</SelectItem>
+                    <SelectContent className="bg-slate-800 border-blue-500/30">
+                      <SelectItem value="answered" className="text-white hover:bg-blue-600/20">Connection Established</SelectItem>
+                      <SelectItem value="no_answer" className="text-white hover:bg-blue-600/20">No Response</SelectItem>
+                      <SelectItem value="busy" className="text-white hover:bg-blue-600/20">Target Busy</SelectItem>
+                      <SelectItem value="voicemail" className="text-white hover:bg-blue-600/20">Voice Log Left</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               
               <div>
-                <label className="text-sm font-medium">Duration (minutes)</label>
+                <label className="text-sm font-medium text-blue-300 mb-2 block">DURATION (Minutes)</label>
                 <Input
                   type="number"
                   value={newCall.duration}
                   onChange={(e) => setNewCall({...newCall, duration: parseInt(e.target.value) || 0})}
                   placeholder="0"
+                  className="bg-slate-800/50 border-blue-500/30 text-white placeholder-blue-300/50"
                 />
               </div>
               
               <div>
-                <label className="text-sm font-medium">Notes</label>
+                <label className="text-sm font-medium text-blue-300 mb-2 block">MISSION REPORT</label>
                 <Textarea
                   value={newCall.recruiter_notes}
                   onChange={(e) => setNewCall({...newCall, recruiter_notes: e.target.value})}
-                  placeholder="Call notes and observations..."
+                  placeholder="Enter detailed mission observations and outcomes..."
                   rows={3}
+                  className="bg-slate-800/50 border-blue-500/30 text-white placeholder-blue-300/50"
                 />
               </div>
               
-              <Button onClick={handleSaveCall} className="w-full mission-control-button">
-                Save Call Log
+              <Button onClick={handleSaveCall} className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-3 border border-green-400/50 shadow-lg">
+                SAVE MISSION LOG
               </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* Filters */}
-      <Card className="mission-control-panel">
+      {/* Control Panel Filters */}
+      <Card className="bg-gradient-to-r from-slate-900/80 to-blue-900/80 backdrop-blur-md border border-blue-500/30 shadow-2xl">
         <CardContent className="pt-6">
           <div className="flex gap-4">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-3 h-4 w-4 text-blue-400" />
                 <Input
-                  placeholder="Search by candidate name or notes..."
+                  placeholder="Search mission logs..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 bg-slate-800/50 border-blue-500/30 text-white placeholder-blue-300/50"
                 />
               </div>
             </div>
             
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-48">
+              <SelectTrigger className="w-48 bg-slate-800/50 border-blue-500/30 text-white">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="answered">Answered</SelectItem>
-                <SelectItem value="no_answer">No Answer</SelectItem>
-                <SelectItem value="busy">Busy</SelectItem>
-                <SelectItem value="voicemail">Voicemail</SelectItem>
+              <SelectContent className="bg-slate-800 border-blue-500/30">
+                <SelectItem value="all" className="text-white hover:bg-blue-600/20">All Status</SelectItem>
+                <SelectItem value="answered" className="text-white hover:bg-blue-600/20">Connection Established</SelectItem>
+                <SelectItem value="no_answer" className="text-white hover:bg-blue-600/20">No Response</SelectItem>
+                <SelectItem value="busy" className="text-white hover:bg-blue-600/20">Target Busy</SelectItem>
+                <SelectItem value="voicemail" className="text-white hover:bg-blue-600/20">Voice Log Left</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </CardContent>
       </Card>
 
-      {/* Call Logs Grid */}
+      {/* Mission Logs Grid */}
       <div className="grid gap-4">
         {filteredCallLogs.map(call => {
           const candidate = getCandidate(call.candidate_id);
           
           return (
-            <Card key={call.id} className="mission-control-panel hover:glow-effect transition-all cursor-pointer"
+            <Card key={call.id} className="bg-gradient-to-r from-slate-900/90 to-blue-900/90 backdrop-blur-md border border-blue-500/30 hover:border-cyan-400/60 transition-all duration-300 cursor-pointer transform hover:scale-[1.02] shadow-xl hover:shadow-2xl hover:shadow-blue-500/20"
                   onClick={() => {
                     setSelectedCall(call);
                     fetchComments(call.id);
@@ -377,38 +389,43 @@ export default function CallLogPanel() {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <Avatar>
-                      <AvatarImage src="" />
-                      <AvatarFallback>
-                        {candidate ? `${candidate['First Name']?.[0]}${candidate['Last Name']?.[0]}` : 'UN'}
-                      </AvatarFallback>
-                    </Avatar>
+                    <div className="relative">
+                      <Avatar className="w-12 h-12 border-2 border-blue-400/50">
+                        <AvatarImage src="" />
+                        <AvatarFallback className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white">
+                          {candidate ? `${candidate['First Name']?.[0]}${candidate['Last Name']?.[0]}` : 'UN'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-slate-900 animate-pulse"></div>
+                    </div>
                     
                     <div>
-                      <h3 className="font-semibold">
-                        {candidate ? `${candidate['First Name']} ${candidate['Last Name']}` : 'Unknown Candidate'}
+                      <h3 className="font-bold text-white text-lg">
+                        {candidate ? `${candidate['First Name']} ${candidate['Last Name']}` : 'UNKNOWN TARGET'}
                       </h3>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-blue-300 text-sm">
                         {candidate?.['Title']} • {candidate?.['Email']}
                       </p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-4">
-                    <Badge variant={getStatusVariant(call.call_status)}>
+                  <div className="flex items-center space-x-6">
+                    <Badge className={`${getStatusVariant(call.call_status) === 'default' ? 'bg-green-500/20 text-green-400 border-green-500/50' : 
+                                                getStatusVariant(call.call_status) === 'secondary' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50' : 
+                                                'bg-red-500/20 text-red-400 border-red-500/50'} font-bold uppercase tracking-wider`}>
                       {call.call_status.replace('_', ' ')}
                     </Badge>
                     
-                    <div className="text-right text-sm text-muted-foreground">
-                      <div className="flex items-center">
-                        <Phone className="h-4 w-4 mr-1" />
-                        {call.call_type}
+                    <div className="text-right text-sm text-blue-200 space-y-1">
+                      <div className="flex items-center text-cyan-400">
+                        <Phone className="h-4 w-4 mr-2" />
+                        <span className="font-mono">{call.call_type.toUpperCase()}</span>
                       </div>
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 mr-1" />
-                        {call.duration}m
+                      <div className="flex items-center text-blue-300">
+                        <Clock className="h-4 w-4 mr-2" />
+                        <span className="font-mono">{call.duration}m</span>
                       </div>
-                      <div>
+                      <div className="text-blue-400 font-mono">
                         {format(new Date(call.call_timestamp), 'MMM dd, HH:mm')}
                       </div>
                     </div>
@@ -416,8 +433,8 @@ export default function CallLogPanel() {
                 </div>
                 
                 {call.recruiter_notes && (
-                  <div className="mt-4 p-3 bg-background/50 rounded-lg">
-                    <p className="text-sm">{call.recruiter_notes}</p>
+                  <div className="mt-4 p-4 bg-slate-800/50 rounded-lg border border-blue-500/20">
+                    <p className="text-blue-200 text-sm font-mono">{call.recruiter_notes}</p>
                   </div>
                 )}
               </CardContent>
@@ -426,107 +443,97 @@ export default function CallLogPanel() {
         })}
       </div>
 
-      {/* Call Detail Dialog */}
+      {/* Mission Detail Protocol Dialog */}
       {selectedCall && (
         <Dialog open={!!selectedCall} onOpenChange={() => setSelectedCall(null)}>
-          <DialogContent className="mission-control-panel max-w-2xl">
+          <DialogContent className="bg-gradient-to-br from-slate-900 to-blue-900 border border-blue-500/30 text-white max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Call Details</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-2xl font-bold text-blue-400 tracking-wider">MISSION BRIEFING</DialogTitle>
+              <DialogDescription className="text-blue-200">
                 {(() => {
                   const candidate = getCandidate(selectedCall.candidate_id);
-                  return candidate ? `${candidate['First Name']} ${candidate['Last Name']}` : 'Unknown Candidate';
+                  return candidate ? `Target: ${candidate['First Name']} ${candidate['Last Name']}` : 'Unknown Target';
                 })()}
               </DialogDescription>
             </DialogHeader>
             
             <Tabs defaultValue="details" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="details">Call Details</TabsTrigger>
-                <TabsTrigger value="comments">Comments ({comments.length})</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 bg-slate-800/50 border border-blue-500/30">
+                <TabsTrigger value="details" className="data-[state=active]:bg-blue-600/50 data-[state=active]:text-white">Mission Intel</TabsTrigger>
+                <TabsTrigger value="comments" className="data-[state=active]:bg-blue-600/50 data-[state=active]:text-white">Communications ({comments.length})</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="details" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium">Call Type</label>
-                    <p className="text-sm text-muted-foreground capitalize">{selectedCall.call_type}</p>
+              <TabsContent value="details" className="space-y-6 mt-6">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-blue-300 uppercase tracking-wider">Transmission Type</label>
+                    <p className="text-cyan-400 font-mono text-lg capitalize bg-slate-800/30 p-2 rounded border border-blue-500/20">{selectedCall.call_type}</p>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium">Status</label>
-                    <Badge variant={getStatusVariant(selectedCall.call_status)}>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-blue-300 uppercase tracking-wider">Mission Status</label>
+                    <Badge className={`${getStatusVariant(selectedCall.call_status) === 'default' ? 'bg-green-500/20 text-green-400 border-green-500/50' : 
+                                                    getStatusVariant(selectedCall.call_status) === 'secondary' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50' : 
+                                                    'bg-red-500/20 text-red-400 border-red-500/50'} font-bold uppercase tracking-wider text-base p-2`}>
                       {selectedCall.call_status.replace('_', ' ')}
                     </Badge>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium">Duration</label>
-                    <p className="text-sm text-muted-foreground">{selectedCall.duration} minutes</p>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-blue-300 uppercase tracking-wider">Duration</label>
+                    <p className="text-cyan-400 font-mono text-lg bg-slate-800/30 p-2 rounded border border-blue-500/20">{selectedCall.duration} minutes</p>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium">Date & Time</label>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-blue-300 uppercase tracking-wider">Timestamp</label>
+                    <p className="text-cyan-400 font-mono bg-slate-800/30 p-2 rounded border border-blue-500/20">
                       {format(new Date(selectedCall.call_timestamp), 'MMM dd, yyyy HH:mm')}
                     </p>
                   </div>
                 </div>
                 
                 {selectedCall.recruiter_notes && (
-                  <div>
-                    <label className="text-sm font-medium">Recruiter Notes</label>
-                    <div className="mt-2 p-3 bg-background/50 rounded-lg">
-                      <p className="text-sm">{selectedCall.recruiter_notes}</p>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-blue-300 uppercase tracking-wider">Mission Report</label>
+                    <div className="bg-slate-800/50 rounded-lg border border-blue-500/20 p-4">
+                      <p className="text-blue-200 font-mono leading-relaxed">{selectedCall.recruiter_notes}</p>
                     </div>
                   </div>
                 )}
               </TabsContent>
               
-              <TabsContent value="comments" className="space-y-4">
-                <div className="space-y-3 max-h-64 overflow-y-auto">
-                  {comments.map(comment => (
-                    <div key={comment.id} className="p-3 bg-background/50 rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">Recruiter</span>
-                        <span className="text-xs text-muted-foreground">
+              <TabsContent value="comments" className="space-y-4 mt-6">
+                <div className="space-y-4 max-h-64 overflow-y-auto bg-slate-800/30 p-4 rounded-lg border border-blue-500/20">
+                  {comments.length === 0 ? (
+                    <p className="text-blue-300 text-center font-mono">No communications logged</p>
+                  ) : (
+                    comments.map(comment => (
+                      <div key={comment.id} className="bg-slate-700/50 p-3 rounded border border-blue-500/20">
+                        <p className="text-blue-200 font-mono text-sm">{comment.content}</p>
+                        <p className="text-blue-400 text-xs mt-2 font-mono">
                           {format(new Date(comment.created_at), 'MMM dd, HH:mm')}
-                        </span>
+                        </p>
                       </div>
-                      <p className="text-sm">{comment.content}</p>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
                 
-                <div className="space-y-2">
-                  <Textarea
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Add mission communication..."
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Add a comment..."
-                    rows={3}
+                    className="bg-slate-800/50 border-blue-500/30 text-white placeholder-blue-300/50"
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
                   />
-                  <Button onClick={handleAddComment} className="mission-control-button">
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Add Comment
+                  <Button 
+                    onClick={handleAddComment}
+                    className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white border border-blue-400/50"
+                  >
+                    <MessageSquare className="h-4 w-4" />
                   </Button>
                 </div>
               </TabsContent>
             </Tabs>
           </DialogContent>
         </Dialog>
-      )}
-
-      {filteredCallLogs.length === 0 && (
-        <Card className="mission-control-panel">
-          <CardContent className="pt-6 text-center py-12">
-            <Phone className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">No call logs found</h3>
-            <p className="text-muted-foreground mb-4">
-              {searchTerm || statusFilter !== 'all' ? 'No calls match your current filters' : 'Start by logging your first call'}
-            </p>
-            <Button onClick={() => setIsCallDialogOpen(true)} className="mission-control-button">
-              <Plus className="h-4 w-4 mr-2" />
-              Log First Call
-            </Button>
-          </CardContent>
-        </Card>
       )}
     </div>
   );
