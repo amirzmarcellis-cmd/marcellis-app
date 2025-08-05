@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, MapPin, Calendar, DollarSign, Users, FileText, Clock, Target, Phone, Mail, Star } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ArrowLeft, MapPin, Calendar, DollarSign, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 
 // Using any type to avoid TypeScript complexity with quoted property names
@@ -17,6 +19,11 @@ export default function JobDetails() {
   const [loading, setLoading] = useState(true)
   const [candidates, setCandidates] = useState<any[]>([])
   const [candidatesLoading, setCandidatesLoading] = useState(true)
+  const [nameFilter, setNameFilter] = useState("")
+  const [emailFilter, setEmailFilter] = useState("")
+  const [phoneFilter, setPhoneFilter] = useState("")
+  const [scoreFilter, setScoreFilter] = useState("all")
+  const [contactedFilter, setContactedFilter] = useState("all")
 
   useEffect(() => {
     if (id) {
@@ -111,6 +118,44 @@ export default function JobDetails() {
       return <Badge className="bg-red-500 text-white">{score} Poor</Badge>
     }
   }
+
+  // Filtered candidates based on all filters
+  const filteredCandidates = candidates.filter(candidate => {
+    const nameMatch = !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase())
+    const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase())
+    const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter)
+    
+    let scoreMatch = true
+    if (scoreFilter !== "all") {
+      const score = parseInt(candidate["Success Score"] || "0")
+      switch (scoreFilter) {
+        case "high":
+          scoreMatch = score >= 75
+          break
+        case "moderate":
+          scoreMatch = score >= 50 && score < 75
+          break
+        case "poor":
+          scoreMatch = score > 0 && score < 50
+          break
+        case "none":
+          scoreMatch = score === 0 || !candidate["Success Score"]
+          break
+      }
+    }
+    
+    let contactedMatch = true
+    if (contactedFilter !== "all") {
+      const contacted = candidate["Contacted"] || ""
+      contactedMatch = contactedFilter === "contacted" 
+        ? contacted && contacted !== "Not contacted"
+        : !contacted || contacted === "Not contacted"
+    }
+    
+    return nameMatch && emailMatch && phoneMatch && scoreMatch && contactedMatch
+  })
+
+  const uniqueContactedStatuses = [...new Set(candidates.map(c => c["Contacted"]).filter(Boolean))]
 
   return (
       <div className="space-y-6">
@@ -278,31 +323,85 @@ export default function JobDetails() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="candidates" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Users className="w-5 h-5 mr-2" />
-                  Contacted Candidates ({candidates.length})
-                </CardTitle>
-                <CardDescription>
-                  Candidates who have been contacted for this position
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {candidatesLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  </div>
-                ) : candidates.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No candidates contacted yet</h3>
-                    <p className="text-muted-foreground">Start reaching out to potential candidates for this position</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {candidates.map((candidate, index) => (
+           <TabsContent value="candidates" className="space-y-4">
+             <Card>
+               <CardHeader>
+                 <CardTitle className="flex items-center">
+                   <Users className="w-5 h-5 mr-2" />
+                   Contacted Candidates ({filteredCandidates.length} of {candidates.length})
+                 </CardTitle>
+                 <CardDescription>
+                   Candidates who have been contacted for this position
+                 </CardDescription>
+               </CardHeader>
+               <CardContent>
+                 {candidatesLoading ? (
+                   <div className="flex items-center justify-center py-8">
+                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                   </div>
+                 ) : candidates.length === 0 ? (
+                   <div className="text-center py-8">
+                     <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                     <h3 className="text-lg font-semibold mb-2">No candidates contacted yet</h3>
+                     <p className="text-muted-foreground">Start reaching out to potential candidates for this position</p>
+                   </div>
+                 ) : (
+                   <>
+                     {/* Filters */}
+                     <Card className="p-4 mb-4 bg-muted/50">
+                       <div className="flex items-center gap-2 mb-3">
+                         <Filter className="w-4 h-4" />
+                         <h4 className="font-medium">Filters</h4>
+                       </div>
+                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                         <div className="relative">
+                           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                           <Input
+                             placeholder="Filter by name..."
+                             value={nameFilter}
+                             onChange={(e) => setNameFilter(e.target.value)}
+                             className="pl-10 h-8"
+                           />
+                         </div>
+                         <Input
+                           placeholder="Filter by email..."
+                           value={emailFilter}
+                           onChange={(e) => setEmailFilter(e.target.value)}
+                           className="h-8"
+                         />
+                         <Input
+                           placeholder="Filter by phone..."
+                           value={phoneFilter}
+                           onChange={(e) => setPhoneFilter(e.target.value)}
+                           className="h-8"
+                         />
+                         <Select value={scoreFilter} onValueChange={setScoreFilter}>
+                           <SelectTrigger className="h-8">
+                             <SelectValue placeholder="Score" />
+                           </SelectTrigger>
+                           <SelectContent>
+                             <SelectItem value="all">All Scores</SelectItem>
+                             <SelectItem value="high">High (75+)</SelectItem>
+                             <SelectItem value="moderate">Moderate (50-74)</SelectItem>
+                             <SelectItem value="poor">Poor (1-49)</SelectItem>
+                             <SelectItem value="none">No Score</SelectItem>
+                           </SelectContent>
+                         </Select>
+                         <Select value={contactedFilter} onValueChange={setContactedFilter}>
+                           <SelectTrigger className="h-8">
+                             <SelectValue placeholder="Status" />
+                           </SelectTrigger>
+                           <SelectContent>
+                             <SelectItem value="all">All Status</SelectItem>
+                             <SelectItem value="contacted">Contacted</SelectItem>
+                             <SelectItem value="not-contacted">Not Contacted</SelectItem>
+                           </SelectContent>
+                         </Select>
+                       </div>
+                     </Card>
+
+                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                       {filteredCandidates.map((candidate, index) => (
                       <Link 
                         key={index} 
                         to={`/call-log?candidate=${candidate["Candidate_ID"]}&job=${id}`}
@@ -350,12 +449,13 @@ export default function JobDetails() {
                           </CardContent>
                         </Card>
                       </Link>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+                     ))}
+                   </div>
+                   </>
+                 )}
+               </CardContent>
+             </Card>
+           </TabsContent>
         </Tabs>
       </div>
   )
