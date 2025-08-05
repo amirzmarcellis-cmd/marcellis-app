@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, MapPin, Calendar, DollarSign, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter } from "lucide-react"
+import { ArrowLeft, MapPin, Calendar, DollarSign, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { JobDialog } from "@/components/jobs/JobDialog"
 
@@ -220,13 +220,14 @@ export default function JobDetails() {
         </Card>
 
         {/* Detailed Information Tabs */}
-        <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="description">Description</TabsTrigger>
-            <TabsTrigger value="requirements">Requirements</TabsTrigger>
-            <TabsTrigger value="candidates">Contacted Candidates</TabsTrigger>
-          </TabsList>
+         <Tabs defaultValue="overview" className="space-y-4">
+           <TabsList className="grid w-full grid-cols-5">
+             <TabsTrigger value="overview">Overview</TabsTrigger>
+             <TabsTrigger value="description">Description</TabsTrigger>
+             <TabsTrigger value="requirements">Requirements</TabsTrigger>
+             <TabsTrigger value="documents">Job Documents</TabsTrigger>
+             <TabsTrigger value="candidates">Contacted Candidates</TabsTrigger>
+           </TabsList>
 
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -327,7 +328,32 @@ export default function JobDetails() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+           </TabsContent>
+
+           <TabsContent value="documents" className="space-y-4">
+             <Card>
+               <CardHeader>
+                 <CardTitle className="flex items-center">
+                   <FileText className="w-5 h-5 mr-2" />
+                   Job Documents
+                 </CardTitle>
+                 <CardDescription>
+                   Uploaded job description files and related documents
+                 </CardDescription>
+               </CardHeader>
+               <CardContent>
+                 <div className="text-center py-8">
+                   <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                   <h3 className="text-lg font-semibold mb-2">No documents uploaded</h3>
+                   <p className="text-muted-foreground">Upload job description files when creating or editing this job</p>
+                   <Button variant="outline" className="mt-4" onClick={() => setIsEditDialogOpen(true)}>
+                     <Upload className="w-4 h-4 mr-2" />
+                     Upload Documents
+                   </Button>
+                 </div>
+               </CardContent>
+             </Card>
+           </TabsContent>
 
            <TabsContent value="candidates" className="space-y-4">
              <Card>

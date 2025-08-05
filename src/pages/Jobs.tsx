@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Briefcase, MapPin, DollarSign, Search, Plus, Eye, Edit } from "lucide-react"
+import { Briefcase, MapPin, DollarSign, Search, Plus, Eye, Edit, Upload } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { Link } from "react-router-dom"
@@ -37,6 +37,8 @@ interface JobFormData {
   salaryRange: string
   thingsToLookFor: string
   criteriaToEvaluate: string
+  summary: string
+  proceed: string
 }
 
 export default function Jobs() {
@@ -55,7 +57,9 @@ export default function Jobs() {
       location: "",
       salaryRange: "",
       thingsToLookFor: "",
-      criteriaToEvaluate: ""
+      criteriaToEvaluate: "",
+      summary: "",
+      proceed: "No"
     }
   })
 
@@ -97,7 +101,8 @@ export default function Jobs() {
         "Job Salary Range (ex: 15000 AED)": data.salaryRange,
         "Things to look for": data.thingsToLookFor,
         "Criteria to evaluate by": data.criteriaToEvaluate,
-        "Processed": "No",
+        "JD Summary": data.summary,
+        "Processed": data.proceed,
         "Timestamp": new Date().toISOString()
       }
 
@@ -272,8 +277,60 @@ export default function Jobs() {
                         </FormControl>
                         <FormMessage />
                       </FormItem>
-                    )}
-                  />
+                   )}
+                   />
+                   <FormField
+                     control={form.control}
+                     name="summary"
+                     render={({ field }) => (
+                       <FormItem>
+                         <FormLabel>JD Summary</FormLabel>
+                         <FormControl>
+                           <Textarea placeholder="Brief summary of the job" rows={2} {...field} className="bg-background/50 border-glass-border" />
+                         </FormControl>
+                         <FormMessage />
+                       </FormItem>
+                     )}
+                   />
+                   <FormField
+                     control={form.control}
+                     name="proceed"
+                     render={({ field }) => (
+                       <FormItem>
+                         <FormLabel>Proceed</FormLabel>
+                         <Select onValueChange={field.onChange} defaultValue={field.value}>
+                           <FormControl>
+                             <SelectTrigger className="bg-background/50 border-glass-border">
+                               <SelectValue placeholder="Select proceed status" />
+                             </SelectTrigger>
+                           </FormControl>
+                           <SelectContent>
+                             <SelectItem value="Yes">Yes</SelectItem>
+                             <SelectItem value="No">No</SelectItem>
+                           </SelectContent>
+                         </Select>
+                         <FormMessage />
+                       </FormItem>
+                     )}
+                   />
+                   <div className="space-y-2">
+                     <FormLabel>Upload Job Description File</FormLabel>
+                     <div className="border-2 border-dashed border-border/50 rounded-lg p-4 text-center hover:border-primary/50 transition-colors">
+                       <input
+                         type="file"
+                         accept=".pdf,.doc,.docx,.txt"
+                         className="hidden"
+                         id="jd-upload"
+                       />
+                       <label htmlFor="jd-upload" className="cursor-pointer">
+                         <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                         <p className="text-sm text-muted-foreground">
+                           Click to upload JD file or drag and drop
+                         </p>
+                         <p className="text-xs text-muted-foreground">PDF, DOC, DOCX, TXT up to 10MB</p>
+                       </label>
+                     </div>
+                   </div>
                   <div className="flex justify-end space-x-2">
                     <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                       Cancel

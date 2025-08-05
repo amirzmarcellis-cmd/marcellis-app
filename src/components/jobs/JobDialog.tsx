@@ -225,14 +225,14 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="status">Job Status</Label>
+                <Label htmlFor="status">Proceed</Label>
                 <Select value={formData.status} onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}>
                   <SelectTrigger className="bg-background/50">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Yes">Active</SelectItem>
-                    <SelectItem value="No">Paused</SelectItem>
+                    <SelectItem value="Yes">Yes</SelectItem>
+                    <SelectItem value="No">No</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
