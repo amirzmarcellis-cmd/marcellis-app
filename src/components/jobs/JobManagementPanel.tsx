@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +28,7 @@ export function JobManagementPanel() {
   const [loading, setLoading] = useState(true);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -156,15 +158,15 @@ export function JobManagementPanel() {
         </TabsList>
 
         <TabsContent value="active">
-          <JobGrid jobs={activeJobs} onEdit={(job) => { setSelectedJob(job); setIsDialogOpen(true); }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} />
+          <JobGrid jobs={activeJobs} onEdit={(job) => { setSelectedJob(job); setIsDialogOpen(true); }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} navigate={navigate} />
         </TabsContent>
         
         <TabsContent value="paused">
-          <JobGrid jobs={pausedJobs} onEdit={(job) => { setSelectedJob(job); setIsDialogOpen(true); }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} />
+          <JobGrid jobs={pausedJobs} onEdit={(job) => { setSelectedJob(job); setIsDialogOpen(true); }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} navigate={navigate} />
         </TabsContent>
         
         <TabsContent value="all">
-          <JobGrid jobs={jobs} onEdit={(job) => { setSelectedJob(job); setIsDialogOpen(true); }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} />
+          <JobGrid jobs={jobs} onEdit={(job) => { setSelectedJob(job); setIsDialogOpen(true); }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} navigate={navigate} />
         </TabsContent>
       </Tabs>
 
@@ -192,9 +194,10 @@ interface JobGridProps {
   onEdit: (job: Job) => void;
   onDelete: (jobId: string) => void;
   onStatusToggle: (jobId: string, currentStatus: string | null) => void;
+  navigate: (path: string) => void;
 }
 
-function JobGrid({ jobs, onEdit, onDelete, onStatusToggle }: JobGridProps) {
+function JobGrid({ jobs, onEdit, onDelete, onStatusToggle, navigate }: JobGridProps) {
   
   const getStatusBadge = (status: string | null) => {
     return status === "Yes" ? (
@@ -306,7 +309,11 @@ function JobGrid({ jobs, onEdit, onDelete, onStatusToggle }: JobGridProps) {
                 </Button>
               </div>
               
-              <Button size="sm" className="h-8">
+              <Button 
+                size="sm" 
+                className="h-8"
+                onClick={() => navigate(`/job/${job["Job ID"]}`)}
+              >
                 <Users className="h-3 w-3 mr-1" />
                 Open Job
               </Button>
