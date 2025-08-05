@@ -156,25 +156,31 @@ export function JobManagementPanel() {
         </TabsList>
 
         <TabsContent value="active">
-          <JobGrid jobs={activeJobs} onEdit={setSelectedJob} onDelete={handleDelete} onStatusToggle={handleStatusToggle} />
+          <JobGrid jobs={activeJobs} onEdit={(job) => { setSelectedJob(job); setIsDialogOpen(true); }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} />
         </TabsContent>
         
         <TabsContent value="paused">
-          <JobGrid jobs={pausedJobs} onEdit={setSelectedJob} onDelete={handleDelete} onStatusToggle={handleStatusToggle} />
+          <JobGrid jobs={pausedJobs} onEdit={(job) => { setSelectedJob(job); setIsDialogOpen(true); }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} />
         </TabsContent>
         
         <TabsContent value="all">
-          <JobGrid jobs={jobs} onEdit={setSelectedJob} onDelete={handleDelete} onStatusToggle={handleStatusToggle} />
+          <JobGrid jobs={jobs} onEdit={(job) => { setSelectedJob(job); setIsDialogOpen(true); }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} />
         </TabsContent>
       </Tabs>
 
       <JobDialog
         job={selectedJob}
         open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) {
+            setSelectedJob(null);
+          }
+        }}
         onSave={() => {
           fetchJobs();
           setIsDialogOpen(false);
+          setSelectedJob(null);
         }}
       />
     </div>
@@ -189,7 +195,6 @@ interface JobGridProps {
 }
 
 function JobGrid({ jobs, onEdit, onDelete, onStatusToggle }: JobGridProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   const getStatusBadge = (status: string | null) => {
     return status === "Yes" ? (
@@ -274,10 +279,7 @@ function JobGrid({ jobs, onEdit, onDelete, onStatusToggle }: JobGridProps) {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => {
-                    onEdit(job);
-                    setIsDialogOpen(true);
-                  }}
+                  onClick={() => onEdit(job)}
                   className="h-8 px-2"
                 >
                   <Edit className="h-3 w-3" />

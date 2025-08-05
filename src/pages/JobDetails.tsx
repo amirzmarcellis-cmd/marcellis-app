@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, MapPin, Calendar, DollarSign, Users, FileText, Clock, Target } from "lucide-react"
+import { ArrowLeft, MapPin, Calendar, DollarSign, Users, FileText, Clock, Target, Phone, Mail, Star } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 
 // Using any type to avoid TypeScript complexity with quoted property names
@@ -15,10 +15,13 @@ export default function JobDetails() {
   const navigate = useNavigate()
   const [job, setJob] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [candidates, setCandidates] = useState<any[]>([])
+  const [candidatesLoading, setCandidatesLoading] = useState(true)
 
   useEffect(() => {
     if (id) {
       fetchJob(id)
+      fetchCandidates(id)
     }
   }, [id])
 
@@ -42,6 +45,24 @@ export default function JobDetails() {
       setJob(null)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchCandidates = async (jobId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('Jobs_CVs')
+        .select('*')
+        .eq('Job ID', jobId)
+        .order('callid', { ascending: false })
+
+      if (error) throw error
+      setCandidates(data || [])
+    } catch (error) {
+      console.error('Error fetching candidates:', error)
+      setCandidates([])
+    } finally {
+      setCandidatesLoading(false)
     }
   }
 
@@ -136,10 +157,11 @@ export default function JobDetails() {
 
         {/* Detailed Information Tabs */}
         <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="description">Description</TabsTrigger>
             <TabsTrigger value="requirements">Requirements</TabsTrigger>
+            <TabsTrigger value="candidates">Contacted Candidates</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-4">
@@ -239,6 +261,90 @@ export default function JobDetails() {
                     </p>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="candidates" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Users className="w-5 h-5 mr-2" />
+                  Contacted Candidates ({candidates.length})
+                </CardTitle>
+                <CardDescription>
+                  Candidates who have been contacted for this position
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {candidatesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                ) : candidates.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No candidates contacted yet</h3>
+                    <p className="text-muted-foreground">Start reaching out to potential candidates for this position</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {candidates.map((candidate, index) => (
+                      <Card key={index} className="border border-border/50 hover:border-primary/50 transition-colors">
+                        <CardContent className="p-4">
+                          <div className="space-y-3">
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <h4 className="font-semibold">{candidate["Candidate Name"] || "Unknown"}</h4>
+                                <p className="text-sm text-muted-foreground">{candidate["Candidate_ID"]}</p>
+                              </div>
+                              {candidate["Success Score"] && (
+                                <Badge variant="outline" className="text-xs">
+                                  <Star className="w-3 h-3 mr-1" />
+                                  {candidate["Success Score"]}
+                                </Badge>
+                              )}
+                            </div>
+                            
+                            <div className="space-y-2 text-sm">
+                              {candidate["Candidate Email"] && (
+                                <div className="flex items-center text-muted-foreground">
+                                  <Mail className="w-4 h-4 mr-2" />
+                                  <span className="truncate">{candidate["Candidate Email"]}</span>
+                                </div>
+                              )}
+                              
+                              {candidate["Candidate Phone Number"] && (
+                                <div className="flex items-center text-muted-foreground">
+                                  <Phone className="w-4 h-4 mr-2" />
+                                  <span>{candidate["Candidate Phone Number"]}</span>
+                                </div>
+                              )}
+                            </div>
+
+                            {candidate["Summary"] && (
+                              <p className="text-sm text-muted-foreground line-clamp-3">
+                                {candidate["Summary"]}
+                              </p>
+                            )}
+
+                            <div className="flex items-center justify-between pt-2 border-t">
+                              <Badge variant={candidate["Contacted"] === "Yes" ? "default" : "secondary"}>
+                                {candidate["Contacted"] === "Yes" ? "Contacted" : "Not Contacted"}
+                              </Badge>
+                              
+                              {candidate["Relatable CV?"] && (
+                                <Badge variant={candidate["Relatable CV?"] === "Yes" ? "default" : "destructive"}>
+                                  {candidate["Relatable CV?"] === "Yes" ? "Relevant" : "Not Relevant"}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

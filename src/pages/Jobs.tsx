@@ -86,8 +86,10 @@ export default function Jobs() {
 
   const onSubmit = async (data: JobFormData) => {
     try {
+      // Generate ID in format DMS-J-0004
+      const timestamp = Date.now().toString().slice(-4);
       const jobData = {
-        "Job ID": `JOB_${Date.now()}`,
+        "Job ID": `DMS-J-${timestamp}`,
         "Job Title": data.title,
         "Job Description": data.description,
         "Client Description": data.clientDescription,

@@ -77,7 +77,9 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
   }, [job, open]);
 
   const generateJobId = () => {
-    return `JOB-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+    // Generate ID in format DMS-J-0004
+    const timestamp = Date.now().toString().slice(-4);
+    return `DMS-J-${timestamp}`;
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
