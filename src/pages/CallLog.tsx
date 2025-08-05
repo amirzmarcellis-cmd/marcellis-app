@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useSearchParams } from "react-router-dom"
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -56,12 +57,16 @@ const getContactedBadgeVariant = (contacted: string | null) => {
 }
 
 export default function CallLog() {
+  const [searchParams] = useSearchParams()
   const [searchTerm, setSearchTerm] = useState("")
   const [contactedFilter, setContactedFilter] = useState("all")
   const [scoreFilter, setScoreFilter] = useState("all")
   const [callLogs, setCallLogs] = useState<CallLog[]>([])
   const [jobs, setJobs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+
+  const candidateParam = searchParams.get('candidate')
+  const jobParam = searchParams.get('job')
 
   useEffect(() => {
     fetchData()
@@ -113,7 +118,11 @@ export default function CallLog() {
                         (scoreFilter === "medium" && parseInt(log["Success Score"] || "0") >= 60 && parseInt(log["Success Score"] || "0") < 80) ||
                         (scoreFilter === "low" && parseInt(log["Success Score"] || "0") < 60)
     
-    return matchesSearch && matchesContacted && matchesScore
+    // URL parameter filtering
+    const matchesCandidate = !candidateParam || log["Candidate_ID"] === candidateParam
+    const matchesJob = !jobParam || log["Job ID"] === jobParam
+    
+    return matchesSearch && matchesContacted && matchesScore && matchesCandidate && matchesJob
   })
 
   return (
