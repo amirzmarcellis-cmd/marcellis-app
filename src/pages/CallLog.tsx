@@ -192,11 +192,9 @@ export default function CallLog() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Contacted</SelectItem>
-                <SelectItem value="ready-to-contact">Ready to Contact</SelectItem>
-                <SelectItem value="call-done">Call Done</SelectItem>
                 <SelectItem value="contacted">Contacted</SelectItem>
                 <SelectItem value="not-contacted">Not Contacted</SelectItem>
-                <SelectItem value="unknown">Unknown</SelectItem>
+                <SelectItem value="ready-to-contact">Ready to Contact</SelectItem>
               </SelectContent>
             </Select>
             <Select value={scoreFilter} onValueChange={setScoreFilter}>
