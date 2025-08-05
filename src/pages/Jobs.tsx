@@ -7,15 +7,6 @@ export default function Jobs() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
-        <Button 
-          onClick={() => navigate("/jobs/add")}
-          className="mb-6"
-        >
-          Add Job
-        </Button>
-      </div>
-
       <div>
         <JobManagementPanel />
       </div>
