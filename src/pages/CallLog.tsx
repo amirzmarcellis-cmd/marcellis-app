@@ -64,6 +64,7 @@ export default function CallLog() {
   const [searchTerm, setSearchTerm] = useState("")
   const [contactedFilter, setContactedFilter] = useState("all")
   const [scoreFilter, setScoreFilter] = useState("all")
+  const [jobFilter, setJobFilter] = useState("all")
   const [callLogs, setCallLogs] = useState<CallLog[]>([])
   const [jobs, setJobs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -112,20 +113,19 @@ export default function CallLog() {
 
   const filteredCallLogs = callLogs.filter(log => {
     const matchesSearch = (log["Candidate Name"] || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (log["Candidate Email"] || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (log["Job ID"] || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (log["Job Title"] || "").toLowerCase().includes(searchTerm.toLowerCase())
+                         (log["Candidate Email"] || "").toLowerCase().includes(searchTerm.toLowerCase())
     const matchesContacted = contactedFilter === "all" || (log.Contacted || "").toLowerCase() === contactedFilter
     const matchesScore = scoreFilter === "all" || 
                         (scoreFilter === "high" && parseInt(log["Success Score"] || "0") >= 80) ||
                         (scoreFilter === "medium" && parseInt(log["Success Score"] || "0") >= 60 && parseInt(log["Success Score"] || "0") < 80) ||
                         (scoreFilter === "low" && parseInt(log["Success Score"] || "0") < 60)
+    const matchesJob = jobFilter === "all" || log["Job ID"] === jobFilter
     
     // URL parameter filtering
     const matchesCandidate = !candidateParam || log["Candidate_ID"] === candidateParam
-    const matchesJob = !jobParam || log["Job ID"] === jobParam
+    const matchesJobParam = !jobParam || log["Job ID"] === jobParam
     
-    return matchesSearch && matchesContacted && matchesScore && matchesCandidate && matchesJob
+    return matchesSearch && matchesContacted && matchesScore && matchesJob && matchesCandidate && matchesJobParam
   })
 
   return (
@@ -147,6 +147,19 @@ export default function CallLog() {
                 className="pl-10 bg-background/50 border-glass-border"
               />
             </div>
+            <Select value={jobFilter} onValueChange={setJobFilter}>
+              <SelectTrigger className="w-[200px] bg-background/50 border-glass-border">
+                <SelectValue placeholder="Job" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Jobs</SelectItem>
+                {jobs.map((job) => (
+                  <SelectItem key={job["Job ID"]} value={job["Job ID"]}>
+                    {job["Job Title"] || job["Job ID"]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Select value={contactedFilter} onValueChange={setContactedFilter}>
               <SelectTrigger className="w-[150px] bg-background/50 border-glass-border">
                 <SelectValue placeholder="Contacted" />
