@@ -35,7 +35,10 @@ interface Candidate {
 export default function Candidates() {
   const [searchTerm, setSearchTerm] = useState("")
   const [positionFilter, setPositionFilter] = useState("all")
+  const [jobTitleFilter, setJobTitleFilter] = useState("all")
   const [candidates, setCandidates] = useState<Candidate[]>([])
+  const [jobs, setJobs] = useState<any[]>([])
+  const [jobsCVs, setJobsCVs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -44,15 +47,33 @@ export default function Candidates() {
 
   const fetchCandidates = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch CVs data
+      const { data: candidatesData, error: candidatesError } = await supabase
         .from('CVs')
         .select('*')
         .order('Timestamp', { ascending: false })
 
-      if (error) throw error
-      setCandidates(data || [])
+      if (candidatesError) throw candidatesError
+
+      // Fetch Jobs data
+      const { data: jobsData, error: jobsError } = await supabase
+        .from('Jobs')
+        .select('*')
+
+      if (jobsError) throw jobsError
+
+      // Fetch Jobs_CVs data
+      const { data: jobsCVsData, error: jobsCVsError } = await supabase
+        .from('Jobs_CVs')
+        .select('*')
+
+      if (jobsCVsError) throw jobsCVsError
+
+      setCandidates(candidatesData || [])
+      setJobs(jobsData || [])
+      setJobsCVs(jobsCVsData || [])
     } catch (error) {
-      console.error('Error fetching candidates:', error)
+      console.error('Error fetching data:', error)
     } finally {
       setLoading(false)
     }
@@ -66,10 +87,20 @@ export default function Candidates() {
                          (candidate.Skills || "").toLowerCase().includes(searchTerm.toLowerCase())
     const matchesPosition = positionFilter === "all" || (candidate["Applied for"] || "").includes(positionFilter)
     
-    return matchesSearch && matchesPosition
+    // Job title filter - check if candidate applied to jobs with this title
+    let matchesJobTitle = true
+    if (jobTitleFilter !== "all") {
+      const candidateJobApplications = jobsCVs.filter(jc => jc["Candidate_ID"] === candidate["Cadndidate_ID"])
+      const candidateJobIds = candidateJobApplications.map(jc => jc["Job ID"])
+      const candidateJobs = jobs.filter(job => candidateJobIds.includes(job["Job ID"]))
+      matchesJobTitle = candidateJobs.some(job => job["Job Title"] === jobTitleFilter)
+    }
+    
+    return matchesSearch && matchesPosition && matchesJobTitle
   })
 
   const uniquePositions = [...new Set(candidates.map(c => c["Applied for"]).filter(Boolean))]
+  const uniqueJobTitles = [...new Set(jobs.map(j => j["Job Title"]).filter(Boolean))]
 
   return (
       <div className="space-y-6">
@@ -98,6 +129,17 @@ export default function Candidates() {
                 <SelectItem value="all">All Positions</SelectItem>
                 {uniquePositions.map(position => (
                   <SelectItem key={position} value={position}>{position}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={jobTitleFilter} onValueChange={setJobTitleFilter}>
+              <SelectTrigger className="w-[200px] bg-background/50 border-glass-border">
+                <SelectValue placeholder="Job Title" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Job Titles</SelectItem>
+                {uniqueJobTitles.map(jobTitle => (
+                  <SelectItem key={jobTitle} value={jobTitle}>{jobTitle}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
