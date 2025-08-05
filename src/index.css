@@ -7,108 +7,129 @@
 @layer base {
   :root {
     /* Light mode base colors */
-    --background: 0 0% 100%;
+    --background: 240 10% 95%;
     --foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
+    --muted: 210 40% 85%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --popover: 0 0% 100%;
+    --popover: 240 10% 95%;
     --popover-foreground: 222.2 84% 4.9%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --card: 0 0% 100%;
+    --border: 214.3 31.8% 75%;
+    --input: 214.3 31.8% 85%;
+    --card: 240 15% 98%;
     --card-foreground: 222.2 84% 4.9%;
-    --primary: 174 72% 56%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96%;
+    --primary: 200 98% 39%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 90%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-    --accent: 174 72% 56%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 200 98% 39%;
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --ring: 174 72% 56%;
-    --radius: 0.5rem;
+    --ring: 200 98% 39%;
+    --radius: 0.75rem;
+
+    /* Mission control accents */
+    --cyan: 180 100% 50%;
+    --blue: 200 98% 39%;
+    --purple: 270 95% 60%;
+    --orange: 25 95% 53%;
+    --green: 142 76% 36%;
+    
+    /* Status colors */
+    --status-active: 142 76% 36%;
+    --status-pending: 43 96% 56%;
+    --status-inactive: 0 72% 51%;
+    --status-success: 142 76% 36%;
 
     /* Sidebar variables */
-    --sidebar-background: 0 0% 98%;
+    --sidebar-background: 240 15% 92%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-primary: 200 98% 39%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 240 10% 88%;
     --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-border: 220 13% 80%;
+    --sidebar-ring: 200 98% 39%;
   }
 
   .dark {
-    /* Dark theme - matching AIZCRM aesthetic */
-    --background: 222 84% 5%;
+    /* Dark theme - Mission Control */
+    --background: 220 25% 8%;
     --foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --popover: 222 84% 5%;
+    --muted: 217 32% 15%;
+    --muted-foreground: 215 20% 65%;
+    --popover: 220 25% 8%;
     --popover-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --card: 222 84% 5%;
+    --border: 217 32% 20%;
+    --input: 217 32% 15%;
+    --card: 220 25% 10%;
     --card-foreground: 210 40% 98%;
     
-    /* Primary - Teal/Cyan accent matching reference */
-    --primary: 174 72% 56%;
-    --primary-foreground: 222 84% 5%;
-    --primary-glow: 174 72% 70%;
+    /* Mission control primary - Cyan */
+    --primary: 180 100% 50%;
+    --primary-foreground: 220 25% 8%;
+    --primary-glow: 180 100% 70%;
     
     /* Secondary */
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 217 32% 15%;
     --secondary-foreground: 210 40% 98%;
     
-    /* Accent - matching the teal theme */
-    --accent: 174 72% 56%;
-    --accent-foreground: 222 84% 5%;
-    --accent-blue: 200 100% 70%;
-    --accent-purple: 280 100% 70%;
-    --accent-orange: 25 95% 53%;
-    --accent-red: 0 72% 51%;
+    /* Accent colors for mission control */
+    --accent: 180 100% 50%;
+    --accent-foreground: 220 25% 8%;
+    --cyan: 180 100% 50%;
+    --blue: 200 98% 39%;
+    --purple: 270 95% 60%;
+    --orange: 25 95% 53%;
+    --green: 142 76% 36%;
     
     /* Status colors */
+    --status-active: 142 76% 36%;
+    --status-pending: 43 96% 56%;
+    --status-inactive: 0 72% 51%;
+    --status-success: 142 76% 36%;
     --success: 142 76% 36%;
     --success-foreground: 355.7 100% 97.3%;
     --warning: 43 96% 56%;
-    --warning-foreground: 222 84% 5%;
+    --warning-foreground: 220 25% 8%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 210 40% 98%;
     
-    --ring: 174 72% 56%;
+    --ring: 180 100% 50%;
 
-    /* Modern gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(174 72% 56%), hsl(200 100% 70%));
-    --gradient-secondary: linear-gradient(135deg, hsl(217.2 32.6% 17.5%), hsl(222 84% 8%));
-    --gradient-accent: linear-gradient(135deg, hsl(174 72% 56%), hsl(142 76% 36%));
-    --gradient-card: linear-gradient(135deg, hsl(222 84% 5% / 0.8), hsl(217.2 32.6% 17.5% / 0.4));
-    --gradient-hero: linear-gradient(135deg, hsl(222 84% 5%), hsl(217.2 32.6% 17.5%));
+    /* Mission control gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(180 100% 50%), hsl(200 98% 39%));
+    --gradient-secondary: linear-gradient(135deg, hsl(217 32% 15%), hsl(220 25% 12%));
+    --gradient-accent: linear-gradient(135deg, hsl(180 100% 50%), hsl(270 95% 60%));
+    --gradient-card: linear-gradient(135deg, hsl(220 25% 10% / 0.9), hsl(217 32% 15% / 0.6));
+    --gradient-hero: linear-gradient(135deg, hsl(220 25% 8%), hsl(217 32% 12%));
+    --gradient-panel: linear-gradient(135deg, hsl(220 25% 10% / 0.95), hsl(217 32% 15% / 0.8));
     
     /* Glassmorphism effects */
-    --glass-primary: hsla(174, 72%, 56%, 0.1);
-    --glass-secondary: hsla(217.2, 32.6%, 17.5%, 0.8);
-    --glass-border: hsla(210, 40%, 98%, 0.1);
-    --glass-bg: hsla(222, 84%, 5%, 0.95);
+    --glass-primary: hsla(180, 100%, 50%, 0.15);
+    --glass-secondary: hsla(217, 32%, 15%, 0.9);
+    --glass-border: hsla(210, 40%, 98%, 0.15);
+    --glass-bg: hsla(220, 25%, 8%, 0.95);
     
-    /* Enhanced shadows */
-    --shadow-soft: 0 2px 8px -2px hsl(222 84% 4% / 0.2);
-    --shadow-medium: 0 8px 16px -4px hsl(222 84% 4% / 0.3);
-    --shadow-strong: 0 16px 32px -8px hsl(222 84% 4% / 0.4);
-    --shadow-glow: 0 0 32px hsl(174 72% 56% / 0.3);
-    --shadow-card: 0 4px 16px hsl(222 84% 4% / 0.25);
-    --shadow-elevated: 0 8px 32px hsl(222 84% 4% / 0.35);
+    /* Enhanced shadows with glow */
+    --shadow-soft: 0 2px 8px -2px hsl(220 25% 4% / 0.3);
+    --shadow-medium: 0 8px 16px -4px hsl(220 25% 4% / 0.4);
+    --shadow-strong: 0 16px 32px -8px hsl(220 25% 4% / 0.5);
+    --shadow-glow: 0 0 40px hsl(180 100% 50% / 0.25);
+    --shadow-glow-blue: 0 0 32px hsl(200 98% 39% / 0.3);
+    --shadow-glow-purple: 0 0 28px hsl(270 95% 60% / 0.25);
+    --shadow-card: 0 8px 24px hsl(220 25% 4% / 0.4);
+    --shadow-elevated: 0 12px 40px hsl(220 25% 4% / 0.5);
 
     /* Sidebar dark theme */
-    --sidebar-background: 222 84% 5%;
+    --sidebar-background: 220 25% 8%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 174 72% 56%;
-    --sidebar-primary-foreground: 222 84% 5%;
-    --sidebar-accent: 217.2 32.6% 17.5%;
+    --sidebar-primary: 180 100% 50%;
+    --sidebar-primary-foreground: 220 25% 8%;
+    --sidebar-accent: 217 32% 15%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217.2 32.6% 17.5%;
-    --sidebar-ring: 174 72% 56%;
+    --sidebar-border: 217 32% 20%;
+    --sidebar-ring: 180 100% 50%;
   }
 }
 
@@ -128,24 +149,78 @@
 }
 
 @layer components {
-  /* Custom chart styles */
-  .chart-container {
-    @apply bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg;
+  /* Mission Control Panel Styles */
+  .control-panel {
+    @apply bg-gradient-panel backdrop-blur-xl border border-border/30 rounded-xl shadow-elevated;
   }
   
-  /* Progress ring animations */
+  .mission-card {
+    @apply bg-gradient-card backdrop-blur-lg border border-border/40 rounded-lg shadow-card hover:shadow-glow transition-all duration-300 hover:scale-[1.02];
+  }
+  
+  .status-indicator {
+    @apply relative inline-flex h-3 w-3 rounded-full;
+  }
+  
+  .status-indicator::before {
+    @apply content-[''] absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping;
+  }
+  
+  .status-active {
+    @apply bg-green-500;
+  }
+  
+  .status-active::before {
+    @apply bg-green-500;
+  }
+  
+  .status-pending {
+    @apply bg-yellow-500;
+  }
+  
+  .status-pending::before {
+    @apply bg-yellow-500;
+  }
+  
+  /* Data visualization */
+  .chart-container {
+    @apply bg-card/80 backdrop-blur-lg border border-border/40 rounded-xl p-6;
+  }
+  
+  /* Progress indicators */
   .progress-ring {
     @apply transition-all duration-1000 ease-out;
   }
   
-  /* Glassmorphism card effect */
+  /* Glassmorphism effects */
   .glass-card {
-    @apply bg-card/80 backdrop-blur-md border border-border/50 shadow-card;
+    @apply bg-card/90 backdrop-blur-xl border border-border/30 shadow-card;
   }
   
-  /* Interactive hover effects */
+  .glass-header {
+    @apply bg-background/80 backdrop-blur-lg border-b border-border/30;
+  }
+  
+  /* Interactive elements */
   .metric-card {
-    @apply transition-all duration-300 hover:scale-[1.02] hover:shadow-elevated;
+    @apply transition-all duration-300 hover:scale-[1.02] hover:shadow-glow;
+  }
+  
+  .action-button {
+    @apply transition-all duration-200 hover:shadow-glow-blue active:scale-95;
+  }
+  
+  /* Glow effects */
+  .glow-cyan {
+    @apply shadow-[0_0_20px_hsl(180_100%_50%_/_0.3)];
+  }
+  
+  .glow-blue {
+    @apply shadow-[0_0_20px_hsl(200_98%_39%_/_0.3)];
+  }
+  
+  .glow-purple {
+    @apply shadow-[0_0_20px_hsl(270_95%_60%_/_0.3)];
   }
   
   /* Custom scrollbar */
@@ -154,14 +229,20 @@
   }
   
   .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-muted/20;
+    @apply bg-muted/20 rounded-full;
   }
   
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-primary/20 rounded-full;
+    @apply bg-primary/30 rounded-full hover:bg-primary/50;
   }
   
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary/40;
+  /* Text effects */
+  .text-glow {
+    @apply drop-shadow-[0_0_8px_hsl(180_100%_50%_/_0.8)];
+  }
+  
+  /* Animations */
+  .pulse-glow {
+    @apply animate-[pulse-glow_2s_ease-in-out_infinite];
   }
 }
