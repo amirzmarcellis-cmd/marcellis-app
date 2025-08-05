@@ -165,9 +165,9 @@ export default function CallLog() {
                 <SelectValue placeholder="Contacted" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="yes">Contacted</SelectItem>
-                <SelectItem value="no">Not Contacted</SelectItem>
+                <SelectItem value="all">All Contacted</SelectItem>
+                <SelectItem value="yes">Yes</SelectItem>
+                <SelectItem value="no">No</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
               </SelectContent>
             </Select>
