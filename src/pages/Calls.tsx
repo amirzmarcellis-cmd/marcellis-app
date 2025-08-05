@@ -140,74 +140,7 @@ export default function Calls() {
           <p className="text-muted-foreground">Monitor active calls and review call history</p>
         </div>
 
-        <Tabs defaultValue="active" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="active">Active Calls</TabsTrigger>
-            <TabsTrigger value="history">Call History</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="active" className="space-y-4">
-            <Card className="bg-gradient-card backdrop-blur-glass border-glass-border shadow-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <PhoneCall className="w-5 h-5" />
-                  Active Calls ({activeCalls.length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4">
-                  {activeCalls.map((call) => (
-                    <Card key={call.id} className="bg-gradient-card backdrop-blur-glass border-glass-border hover:shadow-glow transition-all">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <Avatar className="w-12 h-12">
-                              <AvatarImage src={call.avatar} />
-                              <AvatarFallback className="bg-gradient-primary text-white">
-                                {call.candidateName.split(' ').map(n => n[0]).join('')}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <h3 className="font-semibold">{call.candidateName}</h3>
-                              <p className="text-sm text-muted-foreground">{call.position}</p>
-                              <div className="flex items-center space-x-2 mt-1">
-                                <Clock className="w-4 h-4 text-muted-foreground" />
-                                <span className="text-sm font-mono">{call.duration}</span>
-                                <Badge variant={getStatusBadgeVariant(call.status)}>
-                                  {call.status}
-                                </Badge>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Badge variant={call.priority === "high" ? "destructive" : call.priority === "medium" ? "default" : "secondary"}>
-                              {call.priority} priority
-                            </Badge>
-                            <Button variant="outline" size="sm">
-                              <PhoneCall className="w-4 h-4 mr-2" />
-                              Join
-                            </Button>
-                            <Button variant="destructive" size="sm">
-                              End Call
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                  {activeCalls.length === 0 && (
-                    <div className="text-center py-8">
-                      <Phone className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                      <h3 className="font-semibold">No Active Calls</h3>
-                      <p className="text-muted-foreground">All agents are currently available</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="history" className="space-y-4">
+        <div className="space-y-4">
             {/* Filters */}
             <Card className="p-6 bg-gradient-card backdrop-blur-glass border-glass-border">
               <div className="flex flex-wrap gap-4">
@@ -326,8 +259,7 @@ export default function Calls() {
                 </Table>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+        </div>
       </div>
   )
 }
