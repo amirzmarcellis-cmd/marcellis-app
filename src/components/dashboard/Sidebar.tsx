@@ -31,7 +31,6 @@ import {
 const navigationItems = [
   { title: "Dashboard", url: "/", icon: Home },
   { title: "Jobs", url: "/jobs", icon: Briefcase },
-  { title: "Active Calls", url: "/calls", icon: Phone },
   { title: "Call Log", url: "/call-log", icon: PhoneCall },
   { title: "Candidates", url: "/candidates", icon: Users },
   { title: "Analytics", url: "/analytics", icon: BarChart3 },
