@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, MapPin, Calendar, DollarSign, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
+import { JobDialog } from "@/components/jobs/JobDialog"
 
 // Using any type to avoid TypeScript complexity with quoted property names
 
@@ -24,6 +25,7 @@ export default function JobDetails() {
   const [phoneFilter, setPhoneFilter] = useState("")
   const [scoreFilter, setScoreFilter] = useState("all")
   const [contactedFilter, setContactedFilter] = useState("all")
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -178,7 +180,7 @@ export default function JobDetails() {
             <h1 className="text-3xl font-bold">Job Details</h1>
           </div>
           <div className="flex items-center space-x-2">
-            <Button onClick={() => navigate(`/jobs?edit=${id}`)}>
+            <Button onClick={() => setIsEditDialogOpen(true)}>
               <FileText className="w-4 h-4 mr-2" />
               Edit Job
             </Button>
@@ -461,7 +463,17 @@ export default function JobDetails() {
                </CardContent>
              </Card>
            </TabsContent>
-        </Tabs>
-      </div>
-  )
-}
+         </Tabs>
+         
+         <JobDialog
+           job={job}
+           open={isEditDialogOpen}
+           onOpenChange={setIsEditDialogOpen}
+           onSave={() => {
+             fetchJob(id!)
+             setIsEditDialogOpen(false)
+           }}
+         />
+       </div>
+   )
+ }
