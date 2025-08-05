@@ -51,11 +51,14 @@ const getScoreBadgeVariant = (score: string | null) => {
 }
 
 const getContactedBadgeVariant = (contacted: string | null) => {
-  switch (contacted?.toLowerCase()) {
-    case "yes": return "default"
-    case "no": return "destructive"
-    case "pending": return "secondary"
-    default: return "outline"
+  switch (contacted) {
+    case "Call Done": return "default"  // Green
+    case "Ready to Contact": return "secondary"  // Blue
+    case "Not contacted": return "destructive"  // Red
+    case "Unknown": return "outline"
+    case "": return "outline"
+    case null: return "outline"
+    default: return "default"  // Any other contacted status gets green
   }
 }
 
@@ -114,7 +117,30 @@ export default function CallLog() {
   const filteredCallLogs = callLogs.filter(log => {
     const matchesSearch = (log["Candidate Name"] || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (log["Candidate Email"] || "").toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesContacted = contactedFilter === "all" || (log.Contacted || "").toLowerCase() === contactedFilter
+    
+    let matchesContacted = true
+    if (contactedFilter !== "all") {
+      const contacted = log.Contacted || ""
+      switch (contactedFilter) {
+        case "contacted":
+          matchesContacted = contacted && contacted !== "Not contacted" && contacted !== "Ready to Contact"
+          break
+        case "ready-to-contact":
+          matchesContacted = contacted === "Ready to Contact"
+          break
+        case "not-contacted":
+          matchesContacted = !contacted || contacted === "Not contacted"
+          break
+        case "call-done":
+          matchesContacted = contacted === "Call Done"
+          break
+        case "unknown":
+          matchesContacted = !contacted || contacted === "Unknown" || contacted === ""
+          break
+        default:
+          matchesContacted = contacted === contactedFilter
+      }
+    }
     const matchesScore = scoreFilter === "all" || 
                         (scoreFilter === "high" && parseInt(log["Success Score"] || "0") >= 80) ||
                         (scoreFilter === "medium" && parseInt(log["Success Score"] || "0") >= 60 && parseInt(log["Success Score"] || "0") < 80) ||
@@ -166,9 +192,11 @@ export default function CallLog() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Contacted</SelectItem>
-                <SelectItem value="yes">Yes</SelectItem>
-                <SelectItem value="no">No</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="ready-to-contact">Ready to Contact</SelectItem>
+                <SelectItem value="call-done">Call Done</SelectItem>
+                <SelectItem value="contacted">Contacted</SelectItem>
+                <SelectItem value="not-contacted">Not Contacted</SelectItem>
+                <SelectItem value="unknown">Unknown</SelectItem>
               </SelectContent>
             </Select>
             <Select value={scoreFilter} onValueChange={setScoreFilter}>
