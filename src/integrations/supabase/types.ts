@@ -14,6 +14,114 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action_type: string
+          created_at: string
+          description: string
+          entity_id: string
+          entity_type: string
+          id: string
+          metadata: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          description: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          description?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      call_logs: {
+        Row: {
+          call_status: string
+          call_timestamp: string
+          call_type: string
+          candidate_id: string
+          created_at: string
+          duration: number | null
+          id: string
+          job_id: string | null
+          recruiter_id: string | null
+          recruiter_notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          call_status?: string
+          call_timestamp?: string
+          call_type?: string
+          candidate_id: string
+          created_at?: string
+          duration?: number | null
+          id?: string
+          job_id?: string | null
+          recruiter_id?: string | null
+          recruiter_notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          call_status?: string
+          call_timestamp?: string
+          call_type?: string
+          candidate_id?: string
+          created_at?: string
+          duration?: number | null
+          id?: string
+          job_id?: string | null
+          recruiter_id?: string | null
+          recruiter_notes?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      comments: {
+        Row: {
+          content: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          tagged_users: string[] | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          tagged_users?: string[] | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          tagged_users?: string[] | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       CVs: {
         Row: {
           "Applied for": string | null
@@ -80,6 +188,42 @@ export type Database = {
           Skills?: string | null
           Timestamp?: string | null
           Title?: string | null
+        }
+        Relationships: []
+      }
+      file_uploads: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_type: string
+          file_name: string
+          file_size: number
+          file_type: string
+          file_url: string
+          id: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          file_name: string
+          file_size: number
+          file_type: string
+          file_url: string
+          id?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          file_name?: string
+          file_size?: number
+          file_type?: string
+          file_url?: string
+          id?: string
+          uploaded_by?: string | null
         }
         Relationships: []
       }
@@ -191,15 +335,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "manager" | "recruiter"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -326,6 +494,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "manager", "recruiter"],
+    },
   },
 } as const
