@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, Link } from "react-router-dom"
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -96,6 +96,19 @@ export default function JobDetails() {
         return 'secondary'
       default:
         return 'outline'
+    }
+  }
+
+  const getScoreBadge = (score: string | null) => {
+    if (!score || score === "0" || score === "") return null
+    
+    const numScore = parseInt(score)
+    if (numScore >= 75) {
+      return <Badge className="bg-green-500 text-white">High ({score})</Badge>
+    } else if (numScore >= 50) {
+      return <Badge className="bg-blue-500 text-white">Moderate ({score})</Badge>
+    } else {
+      return <Badge className="bg-red-500 text-white">Poor ({score})</Badge>
     }
   }
 
@@ -290,58 +303,59 @@ export default function JobDetails() {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {candidates.map((candidate, index) => (
-                      <Card key={index} className="border border-border/50 hover:border-primary/50 transition-colors">
-                        <CardContent className="p-4">
-                          <div className="space-y-3">
-                            <div className="flex items-start justify-between">
-                              <div>
-                                <h4 className="font-semibold">{candidate["Candidate Name"] || "Unknown"}</h4>
-                                <p className="text-sm text-muted-foreground">{candidate["Candidate_ID"]}</p>
+                      <Link 
+                        key={index} 
+                        to={`/call-log?candidate=${candidate["Candidate_ID"]}&job=${id}`}
+                        className="block"
+                      >
+                        <Card className="border border-border/50 hover:border-primary/50 transition-colors cursor-pointer hover:shadow-lg">
+                          <CardContent className="p-4">
+                            <div className="space-y-3">
+                              <div className="flex items-start justify-between">
+                                <div>
+                                  <h4 className="font-semibold">{candidate["Candidate Name"] || "Unknown"}</h4>
+                                  <p className="text-sm text-muted-foreground">{candidate["Candidate_ID"]}</p>
+                                </div>
+                                {getScoreBadge(candidate["Success Score"])}
                               </div>
-                              {candidate["Success Score"] && (
-                                <Badge variant="outline" className="text-xs">
-                                  <Star className="w-3 h-3 mr-1" />
-                                  {candidate["Success Score"]}
-                                </Badge>
-                              )}
-                            </div>
-                            
-                            <div className="space-y-2 text-sm">
-                              {candidate["Candidate Email"] && (
-                                <div className="flex items-center text-muted-foreground">
-                                  <Mail className="w-4 h-4 mr-2" />
-                                  <span className="truncate">{candidate["Candidate Email"]}</span>
-                                </div>
-                              )}
                               
-                              {candidate["Candidate Phone Number"] && (
-                                <div className="flex items-center text-muted-foreground">
-                                  <Phone className="w-4 h-4 mr-2" />
-                                  <span>{candidate["Candidate Phone Number"]}</span>
-                                </div>
+                              <div className="space-y-2 text-sm">
+                                {candidate["Candidate Email"] && (
+                                  <div className="flex items-center text-muted-foreground">
+                                    <Mail className="w-4 h-4 mr-2" />
+                                    <span className="truncate">{candidate["Candidate Email"]}</span>
+                                  </div>
+                                )}
+                                
+                                {candidate["Candidate Phone Number"] && (
+                                  <div className="flex items-center text-muted-foreground">
+                                    <Phone className="w-4 h-4 mr-2" />
+                                    <span>{candidate["Candidate Phone Number"]}</span>
+                                  </div>
+                                )}
+                              </div>
+
+                              {candidate["Summary"] && (
+                                <p className="text-sm text-muted-foreground line-clamp-3">
+                                  {candidate["Summary"]}
+                                </p>
                               )}
-                            </div>
 
-                            {candidate["Summary"] && (
-                              <p className="text-sm text-muted-foreground line-clamp-3">
-                                {candidate["Summary"]}
-                              </p>
-                            )}
-
-                            <div className="flex items-center justify-between pt-2 border-t">
-                              <Badge variant={candidate["Contacted"] === "Yes" ? "default" : "secondary"}>
-                                {candidate["Contacted"] === "Yes" ? "Contacted" : "Not Contacted"}
-                              </Badge>
-                              
-                              {candidate["Relatable CV?"] && (
-                                <Badge variant={candidate["Relatable CV?"] === "Yes" ? "default" : "destructive"}>
-                                  {candidate["Relatable CV?"] === "Yes" ? "Relevant" : "Not Relevant"}
+                              <div className="flex items-center justify-between pt-2 border-t">
+                                <Badge variant="default">
+                                  Contacted
                                 </Badge>
-                              )}
+                                
+                                {candidate["Relatable CV?"] && (
+                                  <Badge variant={candidate["Relatable CV?"] === "Yes" ? "default" : "destructive"}>
+                                    {candidate["Relatable CV?"] === "Yes" ? "Relevant" : "Not Relevant"}
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
+                          </CardContent>
+                        </Card>
+                      </Link>
                     ))}
                   </div>
                 )}

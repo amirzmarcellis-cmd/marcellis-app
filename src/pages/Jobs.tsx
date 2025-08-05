@@ -304,7 +304,7 @@ export default function Jobs() {
                   <TableHead>Job Title</TableHead>
                   <TableHead>Location</TableHead>
                   <TableHead>Salary Range</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Proceed</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -347,7 +347,7 @@ export default function Jobs() {
                       </TableCell>
                       <TableCell>
                         <Badge variant={job.Processed === "Yes" ? "default" : "secondary"}>
-                          {job.Processed === "Yes" ? "Processed" : "Pending"}
+                          {job.Processed === "Yes" ? "Yes" : "No"}
                         </Badge>
                       </TableCell>
                       <TableCell>
