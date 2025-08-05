@@ -167,19 +167,19 @@
   }
   
   .status-active {
-    @apply bg-green-500;
+    @apply bg-status-active;
   }
   
   .status-active::before {
-    @apply bg-green-500;
+    @apply bg-status-active;
   }
   
   .status-pending {
-    @apply bg-yellow-500;
+    @apply bg-status-pending;
   }
   
   .status-pending::before {
-    @apply bg-yellow-500;
+    @apply bg-status-pending;
   }
   
   /* Data visualization */
