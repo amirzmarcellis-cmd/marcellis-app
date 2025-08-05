@@ -147,9 +147,17 @@ export default function JobDetails() {
     let contactedMatch = true
     if (contactedFilter !== "all") {
       const contacted = candidate["Contacted"] || ""
-      contactedMatch = contactedFilter === "contacted" 
-        ? contacted && contacted !== "Not contacted"
-        : !contacted || contacted === "Not contacted"
+      switch (contactedFilter) {
+        case "contacted":
+          contactedMatch = contacted && contacted !== "Not contacted" && contacted !== "Ready to Contact"
+          break
+        case "ready-to-contact":
+          contactedMatch = contacted === "Ready to Contact"
+          break
+        case "not-contacted":
+          contactedMatch = !contacted || contacted === "Not contacted"
+          break
+      }
     }
     
     return nameMatch && emailMatch && phoneMatch && scoreMatch && contactedMatch
@@ -170,11 +178,7 @@ export default function JobDetails() {
             <h1 className="text-3xl font-bold">Job Details</h1>
           </div>
           <div className="flex items-center space-x-2">
-            <Button variant="outline">
-              <Users className="w-4 h-4 mr-2" />
-              View Candidates
-            </Button>
-            <Button>
+            <Button onClick={() => navigate(`/jobs?edit=${id}`)}>
               <FileText className="w-4 h-4 mr-2" />
               Edit Job
             </Button>
@@ -391,11 +395,12 @@ export default function JobDetails() {
                            <SelectTrigger className="h-8">
                              <SelectValue placeholder="Status" />
                            </SelectTrigger>
-                           <SelectContent>
-                             <SelectItem value="all">All Status</SelectItem>
-                             <SelectItem value="contacted">Contacted</SelectItem>
-                             <SelectItem value="not-contacted">Not Contacted</SelectItem>
-                           </SelectContent>
+                            <SelectContent>
+                              <SelectItem value="all">All Status</SelectItem>
+                              <SelectItem value="contacted">Contacted</SelectItem>
+                              <SelectItem value="ready-to-contact">Ready to Contact</SelectItem>
+                              <SelectItem value="not-contacted">Not Contacted</SelectItem>
+                            </SelectContent>
                          </Select>
                        </div>
                      </Card>
