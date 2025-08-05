@@ -142,8 +142,8 @@ export default function CallLog() {
       }
     }
     const matchesScore = scoreFilter === "all" || 
-                        (scoreFilter === "high" && parseInt(log["Success Score"] || "0") > 75) ||
-                        (scoreFilter === "medium" && parseInt(log["Success Score"] || "0") >= 50 && parseInt(log["Success Score"] || "0") <= 75) ||
+                        (scoreFilter === "high" && parseInt(log["Success Score"] || "0") >= 75) ||
+                        (scoreFilter === "medium" && parseInt(log["Success Score"] || "0") >= 50 && parseInt(log["Success Score"] || "0") <= 74) ||
                         (scoreFilter === "low" && parseInt(log["Success Score"] || "0") >= 1 && parseInt(log["Success Score"] || "0") <= 49)
     const matchesJob = jobFilter === "all" || log["Job ID"] === jobFilter
     
@@ -206,7 +206,7 @@ export default function CallLog() {
               <SelectContent>
                 <SelectItem value="all">All Scores</SelectItem>
                 <SelectItem value="high">+75</SelectItem>
-                <SelectItem value="medium">50-75</SelectItem>
+                <SelectItem value="medium">50-74</SelectItem>
                 <SelectItem value="low">1-49</SelectItem>
               </SelectContent>
             </Select>
