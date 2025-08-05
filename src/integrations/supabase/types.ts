@@ -129,6 +129,7 @@ export type Database = {
         Row: {
           "2 Questions of Interview": string | null
           "Agency Experience": string | null
+          callid: number
           "Candidate Email": string | null
           "Candidate Name": string | null
           "Candidate Phone Number": string | null
@@ -149,6 +150,7 @@ export type Database = {
         Insert: {
           "2 Questions of Interview"?: string | null
           "Agency Experience"?: string | null
+          callid?: number
           "Candidate Email"?: string | null
           "Candidate Name"?: string | null
           "Candidate Phone Number"?: string | null
@@ -169,6 +171,7 @@ export type Database = {
         Update: {
           "2 Questions of Interview"?: string | null
           "Agency Experience"?: string | null
+          callid?: number
           "Candidate Email"?: string | null
           "Candidate Name"?: string | null
           "Candidate Phone Number"?: string | null
