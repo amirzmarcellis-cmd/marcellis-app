@@ -250,9 +250,9 @@ export default function JobDetails() {
                     <span>{job["Job Location"]}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Status:</span>
+                    <span className="text-muted-foreground">Proceed:</span>
                     <Badge variant="outline">
-                      Proceed
+                      {job.Processed === "true" ? "Yes" : "No"}
                     </Badge>
                   </div>
                 </CardContent>
