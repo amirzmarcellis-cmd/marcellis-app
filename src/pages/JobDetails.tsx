@@ -104,11 +104,11 @@ export default function JobDetails() {
     
     const numScore = parseInt(score)
     if (numScore >= 75) {
-      return <Badge className="bg-green-500 text-white">High ({score})</Badge>
+      return <Badge className="bg-green-500 text-white">{score} High</Badge>
     } else if (numScore >= 50) {
-      return <Badge className="bg-blue-500 text-white">Moderate ({score})</Badge>
+      return <Badge className="bg-blue-500 text-white">{score} Moderate</Badge>
     } else {
-      return <Badge className="bg-red-500 text-white">Poor ({score})</Badge>
+      return <Badge className="bg-red-500 text-white">{score} Poor</Badge>
     }
   }
 
@@ -316,7 +316,6 @@ export default function JobDetails() {
                                   <h4 className="font-semibold">{candidate["Candidate Name"] || "Unknown"}</h4>
                                   <p className="text-sm text-muted-foreground">{candidate["Candidate_ID"]}</p>
                                 </div>
-                                {getScoreBadge(candidate["Success Score"])}
                               </div>
                               
                               <div className="space-y-2 text-sm">
@@ -342,15 +341,10 @@ export default function JobDetails() {
                               )}
 
                               <div className="flex items-center justify-between pt-2 border-t">
-                                <Badge variant="default">
-                                  Contacted
-                                </Badge>
-                                
-                                {candidate["Relatable CV?"] && (
-                                  <Badge variant={candidate["Relatable CV?"] === "Yes" ? "default" : "destructive"}>
-                                    {candidate["Relatable CV?"] === "Yes" ? "Relevant" : "Not Relevant"}
-                                  </Badge>
-                                )}
+                                <span className="text-sm text-muted-foreground">
+                                  {candidate["Contacted"] || "Not contacted"}
+                                </span>
+                                {getScoreBadge(candidate["Success Score"])}
                               </div>
                             </div>
                           </CardContent>
