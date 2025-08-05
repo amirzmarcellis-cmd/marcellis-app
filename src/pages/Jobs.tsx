@@ -13,7 +13,7 @@ import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 
 interface Job {
   "Job ID": string
@@ -120,6 +120,31 @@ export default function Jobs() {
       toast({
         title: "Error",
         description: "Failed to create job",
+        variant: "destructive"
+      })
+    }
+  }
+
+  const updateProceedStatus = async (jobId: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('Jobs')
+        .update({ "Processed": newStatus })
+        .eq('Job ID', jobId)
+
+      if (error) throw error
+
+      toast({
+        title: "Success",
+        description: `Job status updated to ${newStatus}`
+      })
+
+      fetchJobs()
+    } catch (error) {
+      console.error('Error updating job status:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update job status",
         variant: "destructive"
       })
     }
@@ -345,11 +370,20 @@ export default function Jobs() {
                           <span>{job["Job Salary Range (ex: 15000 AED)"] || "N/A"}</span>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <Badge variant={job.Processed === "Yes" ? "default" : "secondary"}>
-                          {job.Processed === "Yes" ? "Yes" : "No"}
-                        </Badge>
-                      </TableCell>
+                       <TableCell>
+                         <Select
+                           value={job.Processed === "Yes" ? "Yes" : "No"}
+                           onValueChange={(value) => updateProceedStatus(job["Job ID"], value)}
+                         >
+                           <SelectTrigger className="w-20 h-6 bg-background/50 border-glass-border">
+                             <SelectValue />
+                           </SelectTrigger>
+                           <SelectContent>
+                             <SelectItem value="Yes">Yes</SelectItem>
+                             <SelectItem value="No">No</SelectItem>
+                           </SelectContent>
+                         </Select>
+                       </TableCell>
                       <TableCell>
                         {job.Timestamp ? new Date(job.Timestamp).toLocaleDateString() : "N/A"}
                       </TableCell>
