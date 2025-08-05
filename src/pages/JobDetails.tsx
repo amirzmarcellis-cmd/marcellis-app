@@ -434,57 +434,99 @@ export default function JobDetails() {
                        </div>
                      </Card>
 
-                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                       {filteredCandidates.map((candidate, index) => (
-                      <Link 
-                        key={index} 
-                        to={`/call-log?candidate=${candidate["Candidate_ID"]}&job=${id}`}
-                        className="block"
-                      >
-                        <Card className="border border-border/50 hover:border-primary/50 transition-colors cursor-pointer hover:shadow-lg">
-                          <CardContent className="p-4">
-                            <div className="space-y-3">
-                              <div className="flex items-start justify-between">
-                                <div>
-                                  <h4 className="font-semibold">{candidate["Candidate Name"] || "Unknown"}</h4>
-                                  <p className="text-sm text-muted-foreground">{candidate["Candidate_ID"]}</p>
-                                </div>
-                              </div>
-                              
-                              <div className="space-y-2 text-sm">
-                                {candidate["Candidate Email"] && (
-                                  <div className="flex items-center text-muted-foreground">
-                                    <Mail className="w-4 h-4 mr-2" />
-                                    <span className="truncate">{candidate["Candidate Email"]}</span>
-                                  </div>
-                                )}
-                                
-                                {candidate["Candidate Phone Number"] && (
-                                  <div className="flex items-center text-muted-foreground">
-                                    <Phone className="w-4 h-4 mr-2" />
-                                    <span>{candidate["Candidate Phone Number"]}</span>
-                                  </div>
-                                )}
-                              </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {(() => {
+                          // Group candidates by Candidate_ID to handle multiple contacts
+                          const groupedCandidates = filteredCandidates.reduce((acc, candidate) => {
+                            const candidateId = candidate["Candidate_ID"]
+                            if (!acc[candidateId]) {
+                              acc[candidateId] = []
+                            }
+                            acc[candidateId].push(candidate)
+                            return acc
+                          }, {} as Record<string, any[]>)
 
-                              {candidate["Summary"] && (
-                                <p className="text-sm text-muted-foreground line-clamp-3">
-                                  {candidate["Summary"]}
-                                </p>
-                              )}
+                          return Object.entries(groupedCandidates).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                            // Use the first contact for display info
+                            const mainCandidate = candidateContacts[0]
+                            
+                            return (
+                              <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
+                                <CardContent className="p-4">
+                                  <div className="space-y-3">
+                                    <div className="flex items-start justify-between">
+                                      <div>
+                                        <h4 className="font-semibold">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
+                                        <p className="text-sm text-muted-foreground">{candidateId}</p>
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="space-y-2 text-sm">
+                                      {mainCandidate["Candidate Email"] && (
+                                        <div className="flex items-center text-muted-foreground">
+                                          <Mail className="w-4 h-4 mr-2" />
+                                          <span className="truncate">{mainCandidate["Candidate Email"]}</span>
+                                        </div>
+                                      )}
+                                      
+                                      {mainCandidate["Candidate Phone Number"] && (
+                                        <div className="flex items-center text-muted-foreground">
+                                          <Phone className="w-4 h-4 mr-2" />
+                                          <span>{mainCandidate["Candidate Phone Number"]}</span>
+                                        </div>
+                                      )}
+                                    </div>
 
-                              <div className="flex items-center justify-between pt-2 border-t">
-                                <span className="text-sm text-muted-foreground">
-                                  {candidate["Contacted"] || "Not contacted"}
-                                </span>
-                                {getScoreBadge(candidate["Success Score"])}
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </Link>
-                     ))}
-                   </div>
+                                    {mainCandidate["Summary"] && (
+                                      <p className="text-sm text-muted-foreground line-clamp-3">
+                                        {mainCandidate["Summary"]}
+                                      </p>
+                                    )}
+
+                                    <div className="flex items-center justify-between pt-2 border-t">
+                                      <span className="text-sm text-muted-foreground">
+                                        {candidateContacts.length > 1 ? `${candidateContacts.length} contacts` : mainCandidate["Contacted"] || "Not contacted"}
+                                      </span>
+                                      {getScoreBadge(mainCandidate["Success Score"])}
+                                    </div>
+
+                                    {/* Call Log Buttons */}
+                                    <div className="space-y-2 pt-2 border-t">
+                                      <div className="flex flex-wrap gap-2">
+                                        {candidateContacts.map((contact, contactIndex) => (
+                                          <Button
+                                            key={contactIndex}
+                                            variant="outline"
+                                            size="sm"
+                                            asChild
+                                            className="flex-1 min-w-[100px]"
+                                          >
+                                            <Link to={`/call-log?candidate=${candidateId}&job=${id}`}>
+                                              <Phone className="w-3 h-3 mr-1" />
+                                              {candidateContacts.length > 1 ? `Call ${contactIndex + 1}` : 'Call Log'}
+                                            </Link>
+                                          </Button>
+                                        ))}
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          asChild
+                                          className="flex-1 min-w-[100px]"
+                                        >
+                                          <Link to={`/candidate/${candidateId}`}>
+                                            <Users className="w-3 h-3 mr-1" />
+                                            View Profile
+                                          </Link>
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            )
+                          })
+                        })()}
+                      </div>
                    </>
                  )}
                </CardContent>
