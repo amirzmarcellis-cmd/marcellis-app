@@ -53,12 +53,12 @@ const getScoreBadgeVariant = (score: string | null) => {
 const getContactedBadgeVariant = (contacted: string | null) => {
   switch (contacted) {
     case "Call Done": return "default"  // Green
+    case "Contacted": return "default"  // Green
     case "Ready to Contact": return "secondary"  // Blue
     case "Not contacted": return "destructive"  // Red
-    case "Unknown": return "outline"
     case "": return "outline"
     case null: return "outline"
-    default: return "default"  // Any other contacted status gets green
+    default: return "outline"  // Any unknown status gets outline
   }
 }
 
@@ -122,23 +122,18 @@ export default function CallLog() {
     if (contactedFilter !== "all") {
       const contacted = log.Contacted || ""
       switch (contactedFilter) {
-        case "contacted":
-          matchesContacted = contacted && contacted !== "Not contacted" && contacted !== "Ready to Contact"
-          break
         case "ready-to-contact":
           matchesContacted = contacted === "Ready to Contact"
           break
-        case "not-contacted":
-          matchesContacted = !contacted || contacted === "Not contacted"
+        case "contacted":
+          matchesContacted = contacted === "Contacted"
           break
         case "call-done":
           matchesContacted = contacted === "Call Done"
           break
-        case "unknown":
-          matchesContacted = !contacted || contacted === "Unknown" || contacted === ""
+        case "empty":
+          matchesContacted = !contacted || contacted === "" || contacted === null
           break
-        default:
-          matchesContacted = contacted === contactedFilter
       }
     }
     const matchesScore = scoreFilter === "all" || 
@@ -192,9 +187,10 @@ export default function CallLog() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Contacted</SelectItem>
-                <SelectItem value="contacted">Contacted</SelectItem>
-                <SelectItem value="not-contacted">Not Contacted</SelectItem>
                 <SelectItem value="ready-to-contact">Ready to Contact</SelectItem>
+                <SelectItem value="contacted">Contacted</SelectItem>
+                <SelectItem value="call-done">Call Done</SelectItem>
+                <SelectItem value="empty">Empty / Null</SelectItem>
               </SelectContent>
             </Select>
             <Select value={scoreFilter} onValueChange={setScoreFilter}>
