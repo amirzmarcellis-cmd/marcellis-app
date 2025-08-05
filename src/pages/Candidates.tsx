@@ -34,7 +34,6 @@ interface Candidate {
 
 export default function Candidates() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [positionFilter, setPositionFilter] = useState("all")
   const [jobTitleFilter, setJobTitleFilter] = useState("all")
   const [candidates, setCandidates] = useState<Candidate[]>([])
   const [jobs, setJobs] = useState<any[]>([])
@@ -85,7 +84,6 @@ export default function Candidates() {
                          (candidate.Title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (candidate.Email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (candidate.Skills || "").toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesPosition = positionFilter === "all" || (candidate["Applied for"] || "").includes(positionFilter)
     
     // Job title filter - check if candidate applied to jobs with this title
     let matchesJobTitle = true
@@ -96,10 +94,9 @@ export default function Candidates() {
       matchesJobTitle = candidateJobs.some(job => job["Job Title"] === jobTitleFilter)
     }
     
-    return matchesSearch && matchesPosition && matchesJobTitle
+    return matchesSearch && matchesJobTitle
   })
 
-  const uniquePositions = [...new Set(candidates.map(c => c["Applied for"]).filter(Boolean))]
   const uniqueJobTitles = [...new Set(jobs.map(j => j["Job Title"]).filter(Boolean))]
 
   return (
@@ -121,17 +118,6 @@ export default function Candidates() {
                 className="pl-10 bg-background/50 border-glass-border"
               />
             </div>
-            <Select value={positionFilter} onValueChange={setPositionFilter}>
-              <SelectTrigger className="w-[180px] bg-background/50 border-glass-border">
-                <SelectValue placeholder="Position" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Positions</SelectItem>
-                {uniquePositions.map(position => (
-                  <SelectItem key={position} value={position}>{position}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
             <Select value={jobTitleFilter} onValueChange={setJobTitleFilter}>
               <SelectTrigger className="w-[200px] bg-background/50 border-glass-border">
                 <SelectValue placeholder="Job Title" />
