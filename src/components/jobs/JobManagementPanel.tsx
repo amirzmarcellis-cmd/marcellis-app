@@ -308,7 +308,7 @@ function JobGrid({ jobs, onEdit, onDelete, onStatusToggle }: JobGridProps) {
               
               <Button size="sm" className="h-8">
                 <Users className="h-3 w-3 mr-1" />
-                Candidates
+                Open Job
               </Button>
             </div>
           </CardContent>
