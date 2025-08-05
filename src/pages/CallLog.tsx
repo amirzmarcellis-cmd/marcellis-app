@@ -40,9 +40,10 @@ const formatPhoneNumber = (phone: string | null) => {
 const getScoreBadgeVariant = (score: string | null) => {
   if (!score) return "secondary"
   const numScore = parseInt(score)
-  if (numScore >= 80) return "default"
-  if (numScore >= 60) return "secondary"
-  return "destructive"
+  if (numScore >= 75) return "default"  // Green
+  if (numScore >= 50) return "secondary"  // Blue
+  if (numScore >= 1) return "destructive"  // Red
+  return "secondary"
 }
 
 const getContactedBadgeVariant = (contacted: string | null) => {
