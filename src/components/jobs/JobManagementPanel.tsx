@@ -133,10 +133,7 @@ export function JobManagementPanel() {
           <p className="text-muted-foreground">Manage job postings and recruitment campaigns</p>
         </div>
         <Button 
-          onClick={() => {
-            setSelectedJob(null);
-            setIsDialogOpen(true);
-          }}
+          onClick={() => navigate("/add-job")}
           className="action-button bg-gradient-primary hover:shadow-glow"
         >
           <Plus className="h-4 w-4 mr-2" />
