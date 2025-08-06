@@ -12,6 +12,7 @@ import {
   Briefcase,
   LogOut,
   PhoneCall,
+  Activity,
 } from "lucide-react"
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,7 @@ import {
 
 const navigationItems = [
   { title: "Dashboard", url: "/", icon: Home },
+  { title: "Live Feed", url: "/live-feed", icon: Activity },
   { title: "Call Log", url: "/call-log", icon: PhoneCall },
   { title: "Jobs", url: "/jobs", icon: Briefcase },
   { title: "Candidates", url: "/candidates", icon: Users },

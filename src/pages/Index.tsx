@@ -63,6 +63,7 @@ export default function Index() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState({ title: '', type: 'job', entityId: '', dueDate: '' });
   const [candidates, setCandidates] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<any[]>([]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -100,9 +101,10 @@ export default function Index() {
 
       const recentCandidates = highScoreCandidates
         .sort((a, b) => new Date(b['Timestamp'] || 0).getTime() - new Date(a['Timestamp'] || 0).getTime())
-        .slice(0, 10);
+         .slice(0, 10);
 
       setCandidates(recentCandidates);
+      setJobs(jobs || []);
 
       // Calculate average time to hire (placeholder calculation)
       const averageTimeToHire = 14; // days
@@ -182,9 +184,19 @@ export default function Index() {
     return 'Good evening';
   };
 
+  // Filter candidates based on selected job
   const filteredCandidates = selectedJobFilter === 'all' 
     ? candidates || []
     : candidates?.filter(c => c['Job ID'] === selectedJobFilter) || [];
+
+  // Enrich candidates with job titles
+  const enrichedCandidates = filteredCandidates.map(candidate => {
+    const job = jobs.find(j => j['Job ID'] === candidate['Job ID']);
+    return {
+      ...candidate,
+      'Job Title': job?.['Job Title'] || 'Unknown Position'
+    };
+  });
 
   if (loading) {
     return (
@@ -317,46 +329,67 @@ export default function Index() {
         {/* Center - Live Candidate Feed & Action Center */}
         <div className="col-span-6 space-y-6">
           {/* Live Candidate Feed */}
-          <Card className="bg-white/5 backdrop-blur-lg border-white/10">
+          <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl text-cyan-300 flex items-center">
-                  <Activity className="h-5 w-5 mr-2 animate-pulse" />
+                  <Activity className="h-5 w-5 mr-2 animate-pulse text-cyan-400" />
                   Live Candidate Feed
+                  <Badge className="ml-3 bg-gradient-to-r from-emerald-400/20 to-cyan-400/20 text-emerald-300 border-emerald-400/40 animate-pulse">
+                    LIVE
+                  </Badge>
                 </CardTitle>
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-cyan-300">Live</span>
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse"></div>
+                    <span className="text-sm text-emerald-300 font-medium">Active</span>
+                  </div>
                   <Button 
                     size="sm" 
                     variant="outline"
                     onClick={() => setSelectedJobFilter('all')}
-                    className="ml-4 border-cyan-400/50 text-cyan-400 hover:bg-cyan-400/10"
+                    className="border-cyan-400/50 text-cyan-300 hover:bg-cyan-400/10 hover:border-cyan-400 transition-all duration-300"
                   >
                     Show All
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white border border-cyan-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                    onClick={() => window.location.href = '/live-feed'}
+                  >
+                    <Activity className="w-4 h-4 mr-2" />
+                    Open Live Feed
                   </Button>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[400px]">
-                <div className="space-y-3">
-                  {filteredCandidates.map((candidate, index) => {
+                <div className="space-y-4">
+                  {enrichedCandidates.slice(0, 5).map((candidate, index) => {
                     const score = parseFloat(candidate['Success Score']) || 0;
+                    const jobTitle = candidate['Job Title'] || 'Unknown Position';
+                    
                     return (
-                      <div key={index} className="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-cyan-400/30 transition-all">
-                        <div className="flex items-center justify-between mb-2">
+                      <div key={index} className="bg-gradient-to-r from-white/5 to-white/10 rounded-xl p-4 border border-white/20 hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group">
+                        <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
-                              {candidate['Candidate Name']?.charAt(0) || 'C'}
+                            <div className="relative">
+                              <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                {candidate['Candidate Name']?.charAt(0) || 'C'}
+                              </div>
+                              <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border-2 border-white animate-pulse"></div>
                             </div>
                             <div>
-                              <h4 className="font-semibold">{candidate['Candidate Name']}</h4>
-                              <p className="text-sm text-gray-400">{candidate['Job ID']}</p>
+                              <h4 className="font-semibold text-white text-lg group-hover:text-cyan-300 transition-colors">{candidate['Candidate Name']}</h4>
+                              <p className="text-sm text-purple-300 font-medium">{jobTitle}</p>
+                              <Badge variant="outline" className="mt-1 text-xs border-cyan-400/50 text-cyan-400 bg-cyan-400/10">
+                                ID: {candidate['Job ID']}
+                              </Badge>
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className={`text-xl font-bold ${getScoreColor(score)}`}>
+                            <div className={`text-2xl font-bold mb-2 ${getScoreColor(score)}`}>
                               {score}
                             </div>
                             <StatusDropdown
@@ -374,24 +407,44 @@ export default function Index() {
                             />
                           </div>
                         </div>
-                        <p className="text-sm text-gray-300 mb-3">{candidate['Score and Reason']?.slice(0, 100)}...</p>
-                        <div className="flex space-x-2">
-                          <StatusDropdown
-                            currentStatus={candidate['Contacted']}
-                            candidateId={candidate["Candidate_ID"]}
-                            jobId={candidate["Job ID"]}
-                            onStatusChange={(newStatus) => {
-                              setCandidates(prev => prev.map(c => 
-                                c["Candidate_ID"] === candidate["Candidate_ID"] 
-                                  ? { ...c, Contacted: newStatus }
-                                  : c
-                              ))
-                            }}
-                          />
+                        <p className="text-sm text-gray-300 mb-4 leading-relaxed bg-black/20 p-3 rounded-lg">
+                          {candidate['Score and Reason']?.slice(0, 120)}...
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex space-x-2">
+                            <StatusDropdown
+                              currentStatus={candidate['Contacted']}
+                              candidateId={candidate["Candidate_ID"]}
+                              jobId={candidate["Job ID"]}
+                              onStatusChange={(newStatus) => {
+                                setCandidates(prev => prev.map(c => 
+                                  c["Candidate_ID"] === candidate["Candidate_ID"] 
+                                    ? { ...c, Contacted: newStatus }
+                                    : c
+                                ))
+                              }}
+                            />
+                          </div>
+                          {score >= 74 && (
+                            <Badge className="bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-300 border-emerald-400/40 animate-pulse">
+                              ⭐ Priority
+                            </Badge>
+                          )}
                         </div>
                       </div>
                     );
                   })}
+                  {enrichedCandidates.length > 5 && (
+                    <div className="text-center pt-4">
+                      <Button 
+                        className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border border-purple-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                        onClick={() => window.location.href = '/live-feed'}
+                      >
+                        View All {enrichedCandidates.length} Candidates
+                        <Activity className="w-4 h-4 ml-2" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </ScrollArea>
             </CardContent>
