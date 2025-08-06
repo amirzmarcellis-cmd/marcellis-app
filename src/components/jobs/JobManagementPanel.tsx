@@ -279,7 +279,7 @@ function JobGrid({ jobs, onEdit, onDelete, onStatusToggle, navigate }: JobGridPr
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => onEdit(job)}
+                  onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)}
                   className="h-8 px-2"
                 >
                   <Edit className="h-3 w-3" />

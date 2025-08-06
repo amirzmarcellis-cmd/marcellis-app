@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Jobs from "./pages/Jobs";
 import AddJob from "./pages/AddJob";
+import EditJob from "./pages/EditJob";
 import JobDetails from "./pages/JobDetails";
 import Candidates from "./pages/Candidates";
 import EditCandidate from "./pages/EditCandidate";
@@ -42,6 +43,7 @@ const App = () => (
               <Route path="/live-feed" element={<DashboardLayout><LiveCandidateFeed /></DashboardLayout>} />
               <Route path="/jobs" element={<DashboardLayout><Jobs /></DashboardLayout>} />
               <Route path="/jobs/add" element={<DashboardLayout><AddJob /></DashboardLayout>} />
+              <Route path="/jobs/edit/:id" element={<DashboardLayout><EditJob /></DashboardLayout>} />
               <Route path="/job/:id" element={<DashboardLayout><JobDetails /></DashboardLayout>} />
               <Route path="/candidates" element={<DashboardLayout><Candidates /></DashboardLayout>} />
               <Route path="/candidate/:id" element={<DashboardLayout><CandidateDetails /></DashboardLayout>} />
