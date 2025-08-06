@@ -8,7 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { StatusDropdown } from '@/components/candidates/StatusDropdown';
+import { TaskManager } from '@/components/tasks/TaskManager';
 import { useProfile } from '@/hooks/useProfile';
+import { useNavigate } from 'react-router-dom';
 import {
   Plus,
   Play,
@@ -29,7 +31,8 @@ import {
   Target,
   Zap,
   Activity,
-  Timer
+  Timer,
+  Phone
 } from 'lucide-react';
 
 interface DashboardData {
@@ -41,33 +44,21 @@ interface DashboardData {
   averageTimeToHire: number;
   recentCandidates: any[];
   activeJobs: any[];
-  todos: any[];
-}
-
-interface Todo {
-  id: string;
-  title: string;
-  type: 'job' | 'candidate';
-  entityId: string;
-  entityName: string;
-  dueDate?: Date;
-  completed: boolean;
 }
 
 export default function Index() {
   const { profile } = useProfile();
+  const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedJobFilter, setSelectedJobFilter] = useState<string>('all');
   const [aiSearchActive, setAiSearchActive] = useState<Record<string, boolean>>({});
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [newTodo, setNewTodo] = useState({ title: '', type: 'job', entityId: '', dueDate: '' });
   const [candidates, setCandidates] = useState<any[]>([]);
   const [jobs, setJobs] = useState<any[]>([]);
+  const [openTasksCount, setOpenTasksCount] = useState(0);
 
   useEffect(() => {
     fetchDashboardData();
-    loadTodos();
   }, []);
 
   const fetchDashboardData = async () => {
@@ -113,12 +104,11 @@ export default function Index() {
         totalCandidates: candidates?.length || 0,
         totalJobs: jobs?.length || 0,
         candidatesAwaitingReview: highScoreCandidates.length,
-        tasksToday: 3, // placeholder
+        tasksToday: openTasksCount,
         interviewsThisWeek: 5, // placeholder
         averageTimeToHire,
         recentCandidates,
-        activeJobs: jobs || [],
-        todos: []
+        activeJobs: jobs || []
       });
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -127,40 +117,14 @@ export default function Index() {
     }
   };
 
-  const loadTodos = () => {
-    const saved = localStorage.getItem('dashboard-todos');
-    if (saved) {
-      setTodos(JSON.parse(saved));
-    }
+  const handleTaskCountChange = (count: number) => {
+    setOpenTasksCount(count);
+    // Update the dashboard data to reflect the new task count
+    setData(prev => prev ? { ...prev, tasksToday: count } : null);
   };
 
-  const saveTodos = (updatedTodos: Todo[]) => {
-    setTodos(updatedTodos);
-    localStorage.setItem('dashboard-todos', JSON.stringify(updatedTodos));
-  };
-
-  const addTodo = () => {
-    if (!newTodo.title) return;
-    
-    const todo: Todo = {
-      id: Date.now().toString(),
-      title: newTodo.title,
-      type: newTodo.type as 'job' | 'candidate',
-      entityId: newTodo.entityId,
-      entityName: newTodo.entityId,
-      dueDate: newTodo.dueDate ? new Date(newTodo.dueDate) : undefined,
-      completed: false
-    };
-
-    saveTodos([...todos, todo]);
-    setNewTodo({ title: '', type: 'job', entityId: '', dueDate: '' });
-  };
-
-  const toggleTodo = (id: string) => {
-    const updated = todos.map(todo => 
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    );
-    saveTodos(updated);
+  const handleCandidateClick = (candidateId: string, jobId: string) => {
+    navigate(`/call-log?candidate=${candidateId}&job=${jobId}`);
   };
 
   const getScoreColor = (score: number) => {
@@ -371,7 +335,11 @@ export default function Index() {
                     const jobTitle = candidate['Job Title'] || 'Unknown Position';
                     
                     return (
-                      <div key={index} className="bg-gradient-to-r from-white/5 to-white/10 rounded-xl p-4 border border-white/20 hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group">
+                      <div 
+                        key={index} 
+                        className="bg-gradient-to-r from-white/5 to-white/10 rounded-xl p-4 border border-white/20 hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group cursor-pointer"
+                        onClick={() => handleCandidateClick(candidate["Candidate_ID"], candidate["Job ID"])}
+                      >
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center space-x-3">
                             <div className="relative">
@@ -472,106 +440,9 @@ export default function Index() {
           </Card>
         </div>
 
-        {/* Right Side - To-Do List */}
+        {/* Right Side - Task Manager */}
         <div className="col-span-3">
-          <Card className="bg-white/5 backdrop-blur-lg border-white/10">
-            <CardHeader>
-              <CardTitle className="text-lg text-emerald-300 flex items-center">
-                <ClipboardList className="h-5 w-5 mr-2" />
-                Mission Tasks
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Add New Todo */}
-              <div className="space-y-2">
-                <Input
-                  placeholder="Task description..."
-                  value={newTodo.title}
-                  onChange={(e) => setNewTodo({ ...newTodo, title: e.target.value })}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400"
-                />
-                <div className="grid grid-cols-2 gap-2">
-                  <Select value={newTodo.type} onValueChange={(value) => setNewTodo({ ...newTodo, type: value })}>
-                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="job">Job</SelectItem>
-                      <SelectItem value="candidate">Candidate</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    type="datetime-local"
-                    value={newTodo.dueDate}
-                    onChange={(e) => setNewTodo({ ...newTodo, dueDate: e.target.value })}
-                    className="bg-white/10 border-white/20 text-white"
-                  />
-                </div>
-                <Input
-                  placeholder={`${newTodo.type === 'job' ? 'Job Title' : 'Candidate Name'}...`}
-                  value={newTodo.entityId}
-                  onChange={(e) => setNewTodo({ ...newTodo, entityId: e.target.value })}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400"
-                />
-                <Button onClick={addTodo} className="w-full bg-emerald-500 hover:bg-emerald-600">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Task
-                </Button>
-              </div>
-
-              <Separator className="bg-white/20" />
-
-              {/* Todo List */}
-              <ScrollArea className="h-[300px]">
-                <div className="space-y-2">
-                  {todos.map((todo) => (
-                    <div 
-                      key={todo.id} 
-                      className={`p-3 rounded-lg border ${
-                        todo.completed 
-                          ? 'bg-emerald-500/10 border-emerald-400/30 opacity-50' 
-                          : 'bg-white/5 border-white/10'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start space-x-3 flex-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => toggleTodo(todo.id)}
-                            className="p-0 h-5 w-5 mt-0.5"
-                          >
-                            <CheckCircle className={`h-4 w-4 ${todo.completed ? 'text-emerald-400' : 'text-gray-400'}`} />
-                          </Button>
-                          <div className="flex-1">
-                            <p className={`text-sm ${todo.completed ? 'line-through text-gray-500' : 'text-white'}`}>
-                              {todo.title}
-                            </p>
-                            <div className="flex items-center space-x-2 mt-1">
-                              <Badge variant="outline" className="text-xs">
-                                {todo.type}
-                              </Badge>
-                              {todo.entityId && (
-                                <span className="text-xs text-gray-400">{todo.entityId}</span>
-                              )}
-                            </div>
-                            {todo.dueDate && (
-                              <div className="flex items-center space-x-1 mt-1">
-                                <Clock className="h-3 w-3 text-gray-400" />
-                                <span className="text-xs text-gray-400">
-                                  {new Date(todo.dueDate).toLocaleDateString()}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
+          <TaskManager onTaskCountChange={handleTaskCountChange} />
         </div>
       </div>
 

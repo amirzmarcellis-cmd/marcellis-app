@@ -266,6 +266,7 @@ export default function LiveCandidateFeed() {
                       bg-gradient-to-r ${getScoreGradient(score)} border-white/20 hover:border-cyan-400/40
                       backdrop-blur-sm animate-fade-in`}
                     style={{ animationDelay: `${index * 0.1}s` }}
+                    onClick={() => window.location.href = `/call-log?candidate=${candidate["Candidate_ID"]}&job=${candidate["Job ID"]}`}
                   >
                     {/* Score Badge */}
                     <div className="absolute top-4 right-4">
