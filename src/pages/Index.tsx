@@ -220,23 +220,16 @@ export default function Index() {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-orange-500/20 to-orange-600/20 border-orange-400/30 hover:scale-105 transition-transform cursor-pointer">
-              <CardContent className="p-4 text-center">
-                <Timer className="h-8 w-8 text-orange-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-orange-300">{data?.averageTimeToHire || 0}</div>
-                <div className="text-xs text-orange-200">Avg Days to Hire</div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-12 gap-6">
         {/* Left Side - Job Control Panels */}
-        <div className="col-span-3 space-y-4">
-          <h2 className="text-xl font-bold text-cyan-300 mb-4 flex items-center">
+        <div className="col-span-2 space-y-4">
+          <h2 className="text-lg font-bold text-cyan-300 mb-4 flex items-center">
             <Target className="h-5 w-5 mr-2" />
-            Job Control Panels
+            Job Control
           </h2>
           <ScrollArea className="h-[600px]">
             <div className="space-y-3">
@@ -290,8 +283,8 @@ export default function Index() {
           </ScrollArea>
         </div>
 
-        {/* Center - Live Candidate Feed & Action Center */}
-        <div className="col-span-6 space-y-6">
+        {/* Right Side - Live Candidate Feed & Action Center */}
+        <div className="col-span-10 space-y-6">
           {/* Live Candidate Feed */}
           <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20">
             <CardHeader>
