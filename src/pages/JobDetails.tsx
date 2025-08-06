@@ -181,7 +181,7 @@ export default function JobDetails() {
             <h1 className="text-3xl font-bold">Job Details</h1>
           </div>
           <div className="flex items-center space-x-2">
-            <Button onClick={() => setIsEditDialogOpen(true)}>
+            <Button onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)}>
               <FileText className="w-4 h-4 mr-2" />
               Edit Job
             </Button>
