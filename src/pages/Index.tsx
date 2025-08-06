@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { StatusDropdown } from '@/components/candidates/StatusDropdown';
 import { useProfile } from '@/hooks/useProfile';
 import {
   Plus,
@@ -61,6 +62,7 @@ export default function Index() {
   const [aiSearchActive, setAiSearchActive] = useState<Record<string, boolean>>({});
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState({ title: '', type: 'job', entityId: '', dueDate: '' });
+  const [candidates, setCandidates] = useState<any[]>([]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -99,6 +101,8 @@ export default function Index() {
       const recentCandidates = highScoreCandidates
         .sort((a, b) => new Date(b['Timestamp'] || 0).getTime() - new Date(a['Timestamp'] || 0).getTime())
         .slice(0, 10);
+
+      setCandidates(recentCandidates);
 
       // Calculate average time to hire (placeholder calculation)
       const averageTimeToHire = 14; // days
@@ -179,8 +183,8 @@ export default function Index() {
   };
 
   const filteredCandidates = selectedJobFilter === 'all' 
-    ? data?.recentCandidates || []
-    : data?.recentCandidates?.filter(c => c['Job ID'] === selectedJobFilter) || [];
+    ? candidates || []
+    : candidates?.filter(c => c['Job ID'] === selectedJobFilter) || [];
 
   if (loading) {
     return (
@@ -355,29 +359,35 @@ export default function Index() {
                             <div className={`text-xl font-bold ${getScoreColor(score)}`}>
                               {score}
                             </div>
-                            <Badge variant="outline" className="text-xs border-cyan-400/50 text-cyan-400">
-                              {candidate['Contacted'] === 'Yes' ? 'Contacted' : 'New'}
-                            </Badge>
+                            <StatusDropdown
+                              currentStatus={candidate['Contacted']}
+                              candidateId={candidate["Candidate_ID"]}
+                              jobId={candidate["Job ID"]}
+                              onStatusChange={(newStatus) => {
+                                setCandidates(prev => prev.map(c => 
+                                  c["Candidate_ID"] === candidate["Candidate_ID"] 
+                                    ? { ...c, Contacted: newStatus }
+                                    : c
+                                ))
+                              }}
+                              variant="badge"
+                            />
                           </div>
                         </div>
                         <p className="text-sm text-gray-300 mb-3">{candidate['Score and Reason']?.slice(0, 100)}...</p>
                         <div className="flex space-x-2">
-                          <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 text-white">
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Shortlist
-                          </Button>
-                          <Button size="sm" variant="outline" className="border-red-400/50 text-red-400 hover:bg-red-400/10">
-                            <XCircle className="h-3 w-3 mr-1" />
-                            Reject
-                          </Button>
-                          <Button size="sm" variant="outline" className="border-blue-400/50 text-blue-400 hover:bg-blue-400/10">
-                            <ClipboardList className="h-3 w-3 mr-1" />
-                            Task
-                          </Button>
-                          <Button size="sm" variant="outline" className="border-purple-400/50 text-purple-400 hover:bg-purple-400/10">
-                            <Video className="h-3 w-3 mr-1" />
-                            Interview
-                          </Button>
+                          <StatusDropdown
+                            currentStatus={candidate['Contacted']}
+                            candidateId={candidate["Candidate_ID"]}
+                            jobId={candidate["Job ID"]}
+                            onStatusChange={(newStatus) => {
+                              setCandidates(prev => prev.map(c => 
+                                c["Candidate_ID"] === candidate["Candidate_ID"] 
+                                  ? { ...c, Contacted: newStatus }
+                                  : c
+                              ))
+                            }}
+                          />
                         </div>
                       </div>
                     );

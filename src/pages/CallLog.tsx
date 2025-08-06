@@ -13,6 +13,7 @@ import { Progress } from "@/components/ui/progress"
 import { Phone, Search, Eye, Calendar, Clock, User, FileText } from "lucide-react"
 import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
+import { StatusDropdown } from "@/components/candidates/StatusDropdown"
 
 interface CallLog {
   "Job ID": string | null
@@ -122,8 +123,11 @@ export default function CallLog() {
     if (contactedFilter !== "all") {
       const contacted = log.Contacted || ""
       switch (contactedFilter) {
-        case "ready-to-contact":
-          matchesContacted = contacted === "Ready to Contact"
+        case "not-contacted":
+          matchesContacted = contacted === "Not Contacted" || !contacted
+          break
+        case "ready-to-call":
+          matchesContacted = contacted === "Ready to Call"
           break
         case "contacted":
           matchesContacted = contacted === "Contacted"
@@ -131,8 +135,20 @@ export default function CallLog() {
         case "call-done":
           matchesContacted = contacted === "Call Done"
           break
-        case "empty":
-          matchesContacted = !contacted || contacted === "" || contacted === null
+        case "rejected":
+          matchesContacted = contacted === "Rejected"
+          break
+        case "shortlisted":
+          matchesContacted = contacted === "Shortlisted"
+          break
+        case "tasked":
+          matchesContacted = contacted === "Tasked"
+          break
+        case "interview":
+          matchesContacted = contacted === "Interview"
+          break
+        case "hired":
+          matchesContacted = contacted === "Hired"
           break
       }
     }
@@ -183,14 +199,19 @@ export default function CallLog() {
             </Select>
             <Select value={contactedFilter} onValueChange={setContactedFilter}>
               <SelectTrigger className="w-[150px] bg-background/50 border-glass-border">
-                <SelectValue placeholder="Contacted" />
+                <SelectValue placeholder="Status" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Contacted</SelectItem>
-                <SelectItem value="ready-to-contact">Ready to Contact</SelectItem>
+              <SelectContent className="bg-background border-glass-border backdrop-blur-sm z-50">
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="not-contacted">Not Contacted</SelectItem>
+                <SelectItem value="ready-to-call">Ready to Call</SelectItem>
                 <SelectItem value="contacted">Contacted</SelectItem>
                 <SelectItem value="call-done">Call Done</SelectItem>
-                <SelectItem value="empty">Empty / Null</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
+                <SelectItem value="shortlisted">Shortlisted</SelectItem>
+                <SelectItem value="tasked">Tasked</SelectItem>
+                <SelectItem value="interview">Interview</SelectItem>
+                <SelectItem value="hired">Hired</SelectItem>
               </SelectContent>
             </Select>
             <Select value={scoreFilter} onValueChange={setScoreFilter}>
@@ -273,9 +294,18 @@ export default function CallLog() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={getContactedBadgeVariant(log.Contacted)} className="capitalize">
-                            {log.Contacted || "Unknown"}
-                          </Badge>
+                          <StatusDropdown
+                            currentStatus={log.Contacted}
+                            candidateId={log["Candidate_ID"] || ""}
+                            jobId={log["Job ID"]}
+                            onStatusChange={(newStatus) => {
+                              setCallLogs(prev => prev.map(l => 
+                                l["Candidate_ID"] === log["Candidate_ID"] && l["Job ID"] === log["Job ID"]
+                                  ? { ...l, Contacted: newStatus }
+                                  : l
+                              ))
+                            }}
+                          />
                         </TableCell>
                         <TableCell>
                           <Badge variant={getScoreBadgeVariant(log["Success Score"])}>
