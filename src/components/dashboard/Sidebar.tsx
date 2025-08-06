@@ -29,11 +29,10 @@ import {
 } from "@/components/ui/sidebar"
 
 const navigationItems = [
-  { title: "Dashboard", url: "/", icon: Home },
   { title: "Jobs", url: "/jobs", icon: Briefcase },
   { title: "Call Log", url: "/call-log", icon: PhoneCall },
   { title: "Candidates", url: "/candidates", icon: Users },
-  { title: "Analytics", url: "/analytics", icon: BarChart3 },
+  { title: "Analytics", url: "/", icon: BarChart3 },
   { title: "Performance", url: "/performance", icon: TrendingUp },
   { title: "Reports", url: "/reports", icon: FileText },
   { title: "Settings", url: "/settings", icon: Settings },
