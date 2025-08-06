@@ -13,9 +13,12 @@ import {
   LogOut,
   PhoneCall,
   Activity,
+  Sun,
+  Moon,
 } from "lucide-react"
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { useTheme } from 'next-themes';
 
 import {
   Sidebar,
@@ -43,12 +46,17 @@ const navigationItems = [
 export function DashboardSidebar() {
   const { state } = useSidebar()
   const { signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
   const location = useLocation()
   const currentPath = location.pathname
   const isCollapsed = state === "collapsed"
 
   const isActive = (path: string) => currentPath === path
   const hasActiveItem = navigationItems.some((item) => isActive(item.url))
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
 
   return (
     <Sidebar
@@ -114,6 +122,21 @@ export function DashboardSidebar() {
                 <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
                 <span className="text-muted-foreground">System Online</span>
               </div>
+              
+              {/* Theme Toggle */}
+              <Button
+                onClick={toggleTheme}
+                variant="ghost"
+                className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-4 h-4 mr-3" />
+                ) : (
+                  <Moon className="w-4 h-4 mr-3" />
+                )}
+                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+              </Button>
+              
               <Button
                 onClick={signOut}
                 variant="ghost"
@@ -127,6 +150,21 @@ export function DashboardSidebar() {
           {isCollapsed && (
             <div className="flex flex-col items-center space-y-3">
               <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+              
+              {/* Theme Toggle - Collapsed */}
+              <Button
+                onClick={toggleTheme}
+                variant="ghost"
+                size="sm"
+                className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-4 h-4" />
+                ) : (
+                  <Moon className="w-4 h-4" />
+                )}
+              </Button>
+              
               <Button
                 onClick={signOut}
                 variant="ghost"
