@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { StatusDropdown } from '@/components/candidates/StatusDropdown';
-import { TaskManager } from '@/components/tasks/TaskManager';
+
 import { useProfile } from '@/hooks/useProfile';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -440,10 +440,6 @@ export default function Index() {
           </Card>
         </div>
 
-        {/* Right Side - Task Manager */}
-        <div className="col-span-3">
-          <TaskManager onTaskCountChange={handleTaskCountChange} />
-        </div>
       </div>
 
       {/* Quick Action Dock */}

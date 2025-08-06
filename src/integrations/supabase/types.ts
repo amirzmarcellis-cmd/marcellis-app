@@ -229,6 +229,7 @@ export type Database = {
       }
       Jobs: {
         Row: {
+          assignment: string | null
           "Client Description": string | null
           "Criteria to evaluate by": string | null
           "JD Summary": string | null
@@ -242,6 +243,7 @@ export type Database = {
           Timestamp: string | null
         }
         Insert: {
+          assignment?: string | null
           "Client Description"?: string | null
           "Criteria to evaluate by"?: string | null
           "JD Summary"?: string | null
@@ -255,6 +257,7 @@ export type Database = {
           Timestamp?: string | null
         }
         Update: {
+          assignment?: string | null
           "Client Description"?: string | null
           "Criteria to evaluate by"?: string | null
           "JD Summary"?: string | null

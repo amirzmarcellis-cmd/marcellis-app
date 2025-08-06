@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
 import FileUpload from "@/components/upload/FileUpload";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -25,8 +26,10 @@ export default function AddJob() {
     benefits: "",
     contactEmail: "",
     contactPhone: "",
-    proceed: "yes"
+    proceed: "yes",
+    assignment: ""
   });
+  const [hasAssignment, setHasAssignment] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
 
   const handleInputChange = (field: string, value: string) => {
@@ -213,6 +216,32 @@ export default function AddJob() {
                       placeholder="Enter contact phone"
                     />
                   </div>
+                </div>
+
+                {/* Assignment Section */}
+                <div className="space-y-4 border-t pt-6">
+                  <div className="flex items-center space-x-3">
+                    <Switch
+                      id="hasAssignment"
+                      checked={hasAssignment}
+                      onCheckedChange={setHasAssignment}
+                    />
+                    <Label htmlFor="hasAssignment" className="text-sm font-medium">
+                      Has Assignment?
+                    </Label>
+                  </div>
+                  
+                  {hasAssignment && (
+                    <div className="space-y-2">
+                      <Label htmlFor="assignment">Assignment Link</Label>
+                      <Input
+                        id="assignment"
+                        value={formData.assignment}
+                        onChange={(e) => handleInputChange("assignment", e.target.value)}
+                        placeholder="Enter assignment URL or link"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex gap-4 pt-4">
