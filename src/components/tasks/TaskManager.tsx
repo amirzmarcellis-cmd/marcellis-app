@@ -234,203 +234,207 @@ export function TaskManager({ showAddForm = true, onTaskCountChange }: TaskManag
     return <div className="text-center text-gray-400">Loading tasks...</div>;
   }
 
-  return (
-    <Card className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg border-white/20">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-white flex items-center">
-            <Clock className="w-5 h-5 mr-2 text-cyan-400" />
-            Task Manager
-            <Badge className="ml-3 bg-cyan-500/20 text-cyan-400 border-cyan-400/40">
-              {tasks.filter(t => !t.completed).length} Open
-            </Badge>
-          </CardTitle>
-          {showAddForm && (
-            <Button
-              onClick={() => setShowForm(!showForm)}
-              size="sm"
-              className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Task
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent>
-        {showForm && (
-          <div className="mb-6 p-4 bg-black/20 rounded-xl border border-white/10 space-y-4">
-            <Input
-              placeholder="Task title..."
-              value={newTask.title}
-              onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-              className="bg-white/10 border-cyan-400/30 text-white placeholder-gray-400"
-            />
-            
-            <Textarea
-              placeholder="Task description (optional)..."
-              value={newTask.description}
-              onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-              className="bg-white/10 border-cyan-400/30 text-white placeholder-gray-400"
-              rows={3}
-            />
+    return (
+      <div className="space-y-6">
+        {/* Add Task Panel */}
+        {showAddForm && (
+          <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30">
+            <CardHeader>
+              <CardTitle className="text-cyan-300 flex items-center">
+                <Plus className="w-5 h-5 mr-2" />
+                Create New Task
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {showForm ? (
+                <div className="space-y-4">
+                  <Input
+                    placeholder="Task title..."
+                    value={newTask.title}
+                    onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                    className="bg-white/10 border-cyan-400/30 text-white placeholder-gray-400 focus:border-cyan-400"
+                  />
+                  
+                  <Textarea
+                    placeholder="Task description (optional)..."
+                    value={newTask.description}
+                    onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                    className="bg-white/10 border-cyan-400/30 text-white placeholder-gray-400 focus:border-cyan-400"
+                    rows={2}
+                  />
 
-            <div className="grid grid-cols-2 gap-4">
-              <Select
-                value={newTask.entity_type}
-                onValueChange={(value) => setNewTask({ ...newTask, entity_type: value as any, entity_id: '' })}
-              >
-                <SelectTrigger className="bg-white/10 border-purple-400/30 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-purple-400/30">
-                  <SelectItem value="general" className="text-white">General Task</SelectItem>
-                  <SelectItem value="candidate" className="text-white">Candidate Related</SelectItem>
-                  <SelectItem value="job" className="text-white">Job Related</SelectItem>
-                </SelectContent>
-              </Select>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Select
+                      value={newTask.entity_type}
+                      onValueChange={(value) => setNewTask({ ...newTask, entity_type: value as any, entity_id: '' })}
+                    >
+                      <SelectTrigger className="bg-white/10 border-purple-400/30 text-white focus:border-purple-400">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800 border-purple-400/30">
+                        <SelectItem value="general" className="text-white">📋 General Task</SelectItem>
+                        <SelectItem value="candidate" className="text-white">👤 Candidate Related</SelectItem>
+                        <SelectItem value="job" className="text-white">💼 Job Related</SelectItem>
+                      </SelectContent>
+                    </Select>
 
-              {newTask.entity_type === 'candidate' && (
-                <Select
-                  value={newTask.entity_id}
-                  onValueChange={(value) => setNewTask({ ...newTask, entity_id: value })}
-                >
-                  <SelectTrigger className="bg-white/10 border-cyan-400/30 text-white">
-                    <SelectValue placeholder="Select candidate" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-cyan-400/30">
-                    {candidates.map((candidate) => (
-                      <SelectItem 
-                        key={candidate['Cadndidate_ID']} 
-                        value={candidate['Cadndidate_ID']}
-                        className="text-white"
+                    {newTask.entity_type !== 'general' && (
+                      <Select
+                        value={newTask.entity_id}
+                        onValueChange={(value) => setNewTask({ ...newTask, entity_id: value })}
                       >
-                        {`${candidate['First Name'] || ''} ${candidate['Last Name'] || ''}`.trim()}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
+                        <SelectTrigger className="bg-white/10 border-cyan-400/30 text-white focus:border-cyan-400">
+                          <SelectValue placeholder={`Select ${newTask.entity_type}`} />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-800 border-cyan-400/30">
+                          {newTask.entity_type === 'candidate' 
+                            ? candidates.map((candidate) => (
+                                <SelectItem 
+                                  key={candidate['Cadndidate_ID']} 
+                                  value={candidate['Cadndidate_ID']}
+                                  className="text-white"
+                                >
+                                  {`${candidate['First Name'] || ''} ${candidate['Last Name'] || ''}`.trim()}
+                                </SelectItem>
+                              ))
+                            : jobs.map((job) => (
+                                <SelectItem 
+                                  key={job['Job ID']} 
+                                  value={job['Job ID']}
+                                  className="text-white"
+                                >
+                                  {job['Job Title']}
+                                </SelectItem>
+                              ))
+                          }
+                        </SelectContent>
+                      </Select>
+                    )}
 
-              {newTask.entity_type === 'job' && (
-                <Select
-                  value={newTask.entity_id}
-                  onValueChange={(value) => setNewTask({ ...newTask, entity_id: value })}
+                    <Input
+                      type="date"
+                      value={newTask.due_date}
+                      onChange={(e) => setNewTask({ ...newTask, due_date: e.target.value })}
+                      className="bg-white/10 border-cyan-400/30 text-white focus:border-cyan-400"
+                    />
+                  </div>
+
+                  <div className="flex space-x-3">
+                    <Button onClick={addTask} className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 flex-1">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create Task
+                    </Button>
+                    <Button 
+                      onClick={() => setShowForm(false)} 
+                      variant="outline"
+                      className="border-gray-400/50 text-gray-400 hover:bg-gray-400/10"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button
+                  onClick={() => setShowForm(true)}
+                  className="w-full bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600"
                 >
-                  <SelectTrigger className="bg-white/10 border-purple-400/30 text-white">
-                    <SelectValue placeholder="Select job" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-purple-400/30">
-                    {jobs.map((job) => (
-                      <SelectItem 
-                        key={job['Job ID']} 
-                        value={job['Job ID']}
-                        className="text-white"
-                      >
-                        {job['Job Title']}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add New Task
+                </Button>
               )}
-            </div>
-
-            <Input
-              type="date"
-              value={newTask.due_date}
-              onChange={(e) => setNewTask({ ...newTask, due_date: e.target.value })}
-              className="bg-white/10 border-cyan-400/30 text-white"
-            />
-
-            <div className="flex space-x-2">
-              <Button onClick={addTask} className="bg-cyan-500 hover:bg-cyan-600">
-                Create Task
-              </Button>
-              <Button 
-                onClick={() => setShowForm(false)} 
-                variant="outline"
-                className="border-gray-400/50 text-gray-400 hover:bg-gray-400/10"
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
-        <ScrollArea className="h-[400px]">
-          <div className="space-y-3">
-            {tasks.map((task) => (
-              <div
-                key={task.id}
-                className={`p-4 rounded-xl border transition-all duration-300 ${
-                  task.completed 
-                    ? 'bg-green-500/10 border-green-400/30 opacity-60' 
-                    : 'bg-white/5 border-white/20 hover:border-cyan-400/40'
-                }`}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-3 flex-1">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => toggleTask(task.id, task.completed)}
-                      className={`p-1 ${task.completed ? 'text-green-400' : 'text-gray-400 hover:text-cyan-400'}`}
-                    >
-                      <CheckCircle className={`w-5 h-5 ${task.completed ? 'fill-current' : ''}`} />
-                    </Button>
-                    
-                    <div className="flex-1">
-                      <h4 className={`font-medium ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
-                        {task.title}
-                      </h4>
-                      {task.description && (
-                        <p className={`text-sm mt-1 ${task.completed ? 'text-gray-600' : 'text-gray-300'}`}>
-                          {task.description}
-                        </p>
-                      )}
-                      
-                      <div className="flex items-center space-x-2 mt-2">
-                        <Badge className={`text-xs ${getEntityColor(task.entity_type)}`}>
-                          {getEntityIcon(task.entity_type)}
-                          <span className="ml-1">{task.entity_type}</span>
-                        </Badge>
+        {/* Task Manager */}
+        <Card className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg border-white/20">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center justify-between">
+              <div className="flex items-center">
+                <Clock className="w-5 h-5 mr-2 text-cyan-400" />
+                Task Manager
+                <Badge className="ml-3 bg-cyan-500/20 text-cyan-400 border-cyan-400/40">
+                  {tasks.filter(t => !t.completed).length} Open
+                </Badge>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[350px]">
+              <div className="space-y-3">
+                {tasks.map((task) => (
+                  <div
+                    key={task.id}
+                    className={`p-4 rounded-xl border transition-all duration-300 animate-fade-in ${
+                      task.completed 
+                        ? 'bg-green-500/10 border-green-400/30 opacity-60' 
+                        : 'bg-white/5 border-white/20 hover:border-cyan-400/40'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start space-x-3 flex-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => toggleTask(task.id, task.completed)}
+                          className={`p-1 ${task.completed ? 'text-green-400' : 'text-gray-400 hover:text-cyan-400'}`}
+                        >
+                          <CheckCircle className={`w-5 h-5 ${task.completed ? 'fill-current' : ''}`} />
+                        </Button>
                         
-                        {task.entity_name && (
-                          <Badge variant="outline" className="text-xs border-gray-400/40 text-gray-400">
-                            {task.entity_name}
-                          </Badge>
-                        )}
-                        
-                        {task.due_date && (
-                          <Badge variant="outline" className="text-xs border-orange-400/40 text-orange-400">
-                            Due: {new Date(task.due_date).toLocaleDateString()}
-                          </Badge>
-                        )}
+                        <div className="flex-1">
+                          <h4 className={`font-medium ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
+                            {task.title}
+                          </h4>
+                          {task.description && (
+                            <p className={`text-sm mt-1 ${task.completed ? 'text-gray-600' : 'text-gray-300'}`}>
+                              {task.description}
+                            </p>
+                          )}
+                          
+                          <div className="flex items-center space-x-2 mt-2">
+                            <Badge className={`text-xs ${getEntityColor(task.entity_type)}`}>
+                              {getEntityIcon(task.entity_type)}
+                              <span className="ml-1">{task.entity_type}</span>
+                            </Badge>
+                            
+                            {task.entity_name && (
+                              <Badge variant="outline" className="text-xs border-gray-400/40 text-gray-400">
+                                {task.entity_name}
+                              </Badge>
+                            )}
+                            
+                            {task.due_date && (
+                              <Badge variant="outline" className="text-xs border-orange-400/40 text-orange-400">
+                                Due: {new Date(task.due_date).toLocaleDateString()}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
                       </div>
+                      
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => deleteTask(task.id)}
+                        className="p-1 text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
-                  
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => deleteTask(task.id)}
-                    className="p-1 text-red-400 hover:text-red-300 hover:bg-red-400/10"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
+                ))}
+                
+                {tasks.length === 0 && (
+                  <div className="text-center py-8 text-gray-400">
+                    <Clock className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>No tasks yet. Create your first task!</p>
+                  </div>
+                )}
               </div>
-            ))}
-            
-            {tasks.length === 0 && (
-              <div className="text-center py-8 text-gray-400">
-                <Clock className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>No tasks yet. Create your first task!</p>
-              </div>
-            )}
-          </div>
-        </ScrollArea>
-      </CardContent>
-    </Card>
-  );
-}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
