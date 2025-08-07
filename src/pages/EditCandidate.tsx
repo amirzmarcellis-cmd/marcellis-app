@@ -21,7 +21,7 @@ interface Candidate {
   "Skills": string | null
   "Experience": string | null
   "Current Company": string | null
-  "Applied for": string | null
+  "Applied for": string[] | null
   "CV_Link": string | null
   "CV Summary": string | null
   "Education": string | null
@@ -96,7 +96,7 @@ export default function EditCandidate() {
     }
   }
 
-  const updateField = (field: keyof Candidate, value: string) => {
+  const updateField = (field: keyof Candidate, value: string | string[]) => {
     if (candidate) {
       setCandidate({ ...candidate, [field]: value })
     }
@@ -299,13 +299,22 @@ export default function EditCandidate() {
               </div>
 
               <div>
-                <Label htmlFor="appliedFor">Applied For</Label>
-                <Input
-                  id="appliedFor"
-                  value={candidate["Applied for"] || ""}
-                  onChange={(e) => updateField("Applied for", e.target.value)}
-                  className="bg-background/50 border-glass-border"
-                />
+                <Label htmlFor="appliedFor">Applied For Jobs</Label>
+                <div className="space-y-2">
+                  <Input
+                    value={Array.isArray(candidate["Applied for"]) ? candidate["Applied for"].join(", ") : (candidate["Applied for"] || "")}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const jobIds = value.split(',').map(id => id.trim()).filter(id => id);
+                      updateField("Applied for", jobIds);
+                    }}
+                    placeholder="Enter job IDs separated by commas"
+                    className="bg-background/50 border-glass-border"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Multiple job IDs can be separated by commas
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>

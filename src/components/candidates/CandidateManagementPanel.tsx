@@ -21,7 +21,7 @@ interface Candidate {
   Location: string | null;
   "Current Company": string | null;
   Skills: string | null;
-  "Applied for": string | null;
+  "Applied for": string[] | null;
   "CV Summary": string | null;
   Experience: string | null;
   Education: string | null;
@@ -233,9 +233,16 @@ export function CandidateManagementPanel() {
 
               <div className="space-y-2">
                 <div className="text-xs text-muted-foreground">Applied for:</div>
-                <Badge variant="outline" className="text-xs">
-                  {getJobTitle(candidate["Applied for"])}
-                </Badge>
+                <div className="flex flex-wrap gap-1">
+                  {Array.isArray(candidate["Applied for"]) && candidate["Applied for"].length > 0 
+                    ? candidate["Applied for"].map((jobId) => (
+                        <Badge key={jobId} variant="outline" className="text-xs">
+                          {getJobTitle(jobId)}
+                        </Badge>
+                      ))
+                    : <Badge variant="outline" className="text-xs">None</Badge>
+                  }
+                </div>
               </div>
 
               {candidate.Skills && (

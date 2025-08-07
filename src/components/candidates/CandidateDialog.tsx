@@ -21,7 +21,7 @@ interface Candidate {
   Location: string | null;
   "Current Company": string | null;
   Skills: string | null;
-  "Applied for": string | null;
+  "Applied for": string[] | null;
   "CV Summary": string | null;
   Experience: string | null;
   Education: string | null;
@@ -50,7 +50,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
     location: "",
     currentCompany: "",
     skills: "",
-    appliedFor: "",
+    appliedFor: [],
     cvSummary: "",
     experience: "",
     education: "",
@@ -74,7 +74,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
         location: candidate.Location || "",
         currentCompany: candidate["Current Company"] || "",
         skills: candidate.Skills || "",
-        appliedFor: candidate["Applied for"] || "",
+        appliedFor: candidate["Applied for"] || [],
         cvSummary: candidate["CV Summary"] || "",
         experience: candidate.Experience || "",
         education: candidate.Education || "",
@@ -94,7 +94,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
         location: "",
         currentCompany: "",
         skills: "",
-        appliedFor: "",
+        appliedFor: [],
         cvSummary: "",
         experience: "",
         education: "",
@@ -133,7 +133,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
         Location: formData.location,
         "Current Company": formData.currentCompany,
         Skills: formData.skills,
-        "Applied for": formData.appliedFor,
+        "Applied for": formData.appliedFor.length > 0 ? formData.appliedFor : null,
         "CV Summary": formData.cvSummary,
         Experience: formData.experience,
         Education: formData.education,
@@ -302,20 +302,57 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="appliedFor">Applied for Job</Label>
-                <Select value={formData.appliedFor} onValueChange={(value) => setFormData(prev => ({ ...prev, appliedFor: value }))}>
-                  <SelectTrigger className="bg-background/50">
-                    <SelectValue placeholder="Select a job" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">No specific job</SelectItem>
-                    {jobs.map((job) => (
-                      <SelectItem key={job["Job ID"]} value={job["Job ID"]}>
-                        {job["Job Title"]} (ID: {job["Job ID"]})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="appliedFor">Applied for Jobs</Label>
+                <div className="space-y-2">
+                  <Select 
+                    value="" 
+                    onValueChange={(value) => {
+                      if (value && !formData.appliedFor.includes(value)) {
+                        setFormData(prev => ({ 
+                          ...prev, 
+                          appliedFor: [...prev.appliedFor, value] 
+                        }));
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="bg-background/50">
+                      <SelectValue placeholder="Add a job..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {jobs
+                        .filter(job => !formData.appliedFor.includes(job["Job ID"]))
+                        .map((job) => (
+                          <SelectItem key={job["Job ID"]} value={job["Job ID"]}>
+                            {job["Job Title"]} (ID: {job["Job ID"]})
+                          </SelectItem>
+                        ))
+                      }
+                    </SelectContent>
+                  </Select>
+                  
+                  {formData.appliedFor.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {formData.appliedFor.map((jobId) => {
+                        const job = jobs.find(j => j["Job ID"] === jobId);
+                        return (
+                          <Badge 
+                            key={jobId} 
+                            variant="secondary" 
+                            className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
+                            onClick={() => {
+                              setFormData(prev => ({
+                                ...prev,
+                                appliedFor: prev.appliedFor.filter(id => id !== jobId)
+                              }));
+                            }}
+                          >
+                            {job ? job["Job Title"] : jobId} ×
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">

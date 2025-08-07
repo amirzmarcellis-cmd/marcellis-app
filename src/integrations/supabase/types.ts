@@ -124,7 +124,7 @@ export type Database = {
       }
       CVs: {
         Row: {
-          "Applied for": string | null
+          "Applied for": string[] | null
           Cadndidate_ID: string
           Certifications: string | null
           "Current Company": string | null
@@ -146,7 +146,7 @@ export type Database = {
           Title: string | null
         }
         Insert: {
-          "Applied for"?: string | null
+          "Applied for"?: string[] | null
           Cadndidate_ID: string
           Certifications?: string | null
           "Current Company"?: string | null
@@ -168,7 +168,7 @@ export type Database = {
           Title?: string | null
         }
         Update: {
-          "Applied for"?: string | null
+          "Applied for"?: string[] | null
           Cadndidate_ID?: string
           Certifications?: string | null
           "Current Company"?: string | null

@@ -23,7 +23,7 @@ interface Candidate {
   "Skills": string | null
   "Experience": string | null
   "Current Company": string | null
-  "Applied for": string | null
+  "Applied for": string[] | null
   "CV_Link": string | null
   "CV Summary": string | null
   "Education": string | null
@@ -103,7 +103,9 @@ export default function Candidates() {
   const handleCallCandidate = async (candidateID: string) => {
     try {
       const candidate = candidates.find(c => c["Cadndidate_ID"] === candidateID)
-      const jobID = candidate?.["Applied for"] || ""
+      const jobID = Array.isArray(candidate?.["Applied for"]) && candidate["Applied for"].length > 0 
+        ? candidate["Applied for"][0] 
+        : ""
       
       const response = await fetch('https://hook.eu2.make.com/i3owa6dmu1mstug4tsfb0dnhhjfh4arj', {
         method: 'POST',
@@ -221,9 +223,16 @@ export default function Candidates() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className="capitalize">
-                            {candidate["Applied for"] || "Not Applied"}
-                          </Badge>
+                          <div className="flex flex-wrap gap-1">
+                            {Array.isArray(candidate["Applied for"]) && candidate["Applied for"].length > 0 
+                              ? candidate["Applied for"].map((jobId) => (
+                                  <Badge key={jobId} variant="secondary" className="capitalize text-xs">
+                                    {jobId}
+                                  </Badge>
+                                ))
+                              : <Badge variant="secondary" className="capitalize">Not Applied</Badge>
+                            }
+                          </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center space-x-2">
