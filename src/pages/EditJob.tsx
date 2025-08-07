@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Save, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -24,6 +25,12 @@ interface JobData {
   "Criteria to evaluate by": string;
   "assignment": string;
   "Processed": string;
+  "Notice Period": string;
+  "Nationality to include": string;
+  "Nationality to Exclude": string;
+  "Type": string;
+  "Contract Length": string;
+  "Currency": string;
 }
 
 export default function EditJob() {
@@ -46,7 +53,13 @@ export default function EditJob() {
     "JD Summary": "",
     "Criteria to evaluate by": "",
     "assignment": "",
-    "Processed": "Yes"
+    "Processed": "Yes",
+    "Notice Period": "",
+    "Nationality to include": "",
+    "Nationality to Exclude": "",
+    "Type": "",
+    "Contract Length": "",
+    "Currency": ""
   });
 
   useEffect(() => {
@@ -224,9 +237,86 @@ export default function EditJob() {
                       name="Job Salary Range (ex: 15000 AED)"
                       value={formData["Job Salary Range (ex: 15000 AED)"]}
                       onChange={handleInputChange}
-                      placeholder="e.g., 15000 - 20000 AED"
+                      placeholder="e.g., 15000"
                     />
                   </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="Notice Period">Notice Period</Label>
+                    <Input
+                      id="Notice Period"
+                      name="Notice Period"
+                      value={formData["Notice Period"]}
+                      onChange={handleInputChange}
+                      placeholder="Number of days"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="Currency">Currency</Label>
+                    <Select value={formData["Currency"]} onValueChange={(value) => setFormData(prev => ({ ...prev, "Currency": value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select currency" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="AED">AED</SelectItem>
+                        <SelectItem value="SAR">SAR</SelectItem>
+                        <SelectItem value="QAR">QAR</SelectItem>
+                        <SelectItem value="USD">USD</SelectItem>
+                        <SelectItem value="EUR">EUR</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="Nationality to include">Nationality to Include</Label>
+                    <Input
+                      id="Nationality to include"
+                      name="Nationality to include"
+                      value={formData["Nationality to include"]}
+                      onChange={handleInputChange}
+                      placeholder="e.g., UAE, Saudi Arabia"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="Nationality to Exclude">Nationality to Exclude</Label>
+                    <Input
+                      id="Nationality to Exclude"
+                      name="Nationality to Exclude"
+                      value={formData["Nationality to Exclude"]}
+                      onChange={handleInputChange}
+                      placeholder="e.g., India, Pakistan"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="Type">Job Type</Label>
+                    <Select value={formData["Type"]} onValueChange={(value) => setFormData(prev => ({ ...prev, "Type": value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select job type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Permanent">Permanent</SelectItem>
+                        <SelectItem value="Contract">Contract</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {formData["Type"] === "Contract" && (
+                    <div className="space-y-2">
+                      <Label htmlFor="Contract Length">Contract Length</Label>
+                      <Input
+                        id="Contract Length"
+                        name="Contract Length"
+                        value={formData["Contract Length"]}
+                        onChange={handleInputChange}
+                        placeholder="e.g., 6 months, 1 year"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">

@@ -284,7 +284,17 @@ export default function JobDetails() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Location:</span>
-                    <span>{job["Job Location"]}</span>
+                    <span>{job["Job Location"] || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Salary Range:</span>
+                    <span className="font-medium">
+                      {job["Job Salary Range (ex: 15000 AED)"] || "N/A"} {job["Currency"] && `(${job["Currency"]})`}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Notice Period:</span>
+                    <span>{job["Notice Period"] || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Proceed:</span>
@@ -297,16 +307,40 @@ export default function JobDetails() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Timeline & Compensation</CardTitle>
+                  <CardTitle>Job Requirements & Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Salary Range:</span>
-                    <span className="font-medium">{job["Job Salary Range (ex: 15000 AED)"]}</span>
+                    <span className="text-muted-foreground">Nationality to Include:</span>
+                    <span>{job["Nationality to include"] || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
+                    <span className="text-muted-foreground">Nationality to Exclude:</span>
+                    <span>{job["Nationality to Exclude"] || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Job Type:</span>
+                    <span>
+                      {job["Type"] || "N/A"}
+                      {job["Contract Length"] && job["Type"] === "Contract" && ` (${job["Contract Length"]})`}
+                    </span>
+                  </div>
+                  {job["assignment"] && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Assignment Link:</span>
+                      <a 
+                        href={job["assignment"]} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline break-all"
+                      >
+                        View Assignment
+                      </a>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
                     <span className="text-muted-foreground">Posted Date:</span>
-                    <span>{job.Timestamp}</span>
+                    <span>{job.Timestamp || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">JD Summary:</span>
