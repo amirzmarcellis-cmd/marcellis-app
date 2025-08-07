@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,7 +21,13 @@ export default function AddJob() {
     jobLocation: "",
     jobSalaryRange: "",
     hasAssignment: false,
-    assignmentLink: ""
+    assignmentLink: "",
+    noticePeriod: "",
+    nationalityToInclude: "",
+    nationalityToExclude: "",
+    type: "",
+    contractLength: "",
+    currency: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -76,6 +83,12 @@ export default function AddJob() {
           "Job Location": formData.jobLocation,
           "Job Salary Range (ex: 15000 AED)": formData.jobSalaryRange,
           "assignment": formData.hasAssignment ? formData.assignmentLink : null,
+          "Notice Period": formData.noticePeriod,
+          "Nationality to include": formData.nationalityToInclude,
+          "Nationality to Exclude": formData.nationalityToExclude,
+          "Type": formData.type,
+          "Contract Length": formData.type === "Contract" ? formData.contractLength : null,
+          "Currency": formData.currency,
           "Timestamp": new Date().toISOString()
         });
 
@@ -188,6 +201,81 @@ export default function AddJob() {
                     value={formData.assignmentLink}
                     onChange={(e) => handleInputChange("assignmentLink", e.target.value)}
                     placeholder="Enter assignment link"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="noticePeriod">Notice Period</Label>
+                <Input
+                  id="noticePeriod"
+                  value={formData.noticePeriod}
+                  onChange={(e) => handleInputChange("noticePeriod", e.target.value)}
+                  placeholder="e.g., 1 month, 2 weeks"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="currency">Currency</Label>
+                <Select value={formData.currency} onValueChange={(value) => handleInputChange("currency", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="AED">AED</SelectItem>
+                    <SelectItem value="SAR">SAR</SelectItem>
+                    <SelectItem value="QAR">QAR</SelectItem>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="EUR">EUR</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="nationalityToInclude">Nationality to Include</Label>
+                <Input
+                  id="nationalityToInclude"
+                  value={formData.nationalityToInclude}
+                  onChange={(e) => handleInputChange("nationalityToInclude", e.target.value)}
+                  placeholder="e.g., UAE, Saudi Arabia"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="nationalityToExclude">Nationality to Exclude</Label>
+                <Input
+                  id="nationalityToExclude"
+                  value={formData.nationalityToExclude}
+                  onChange={(e) => handleInputChange("nationalityToExclude", e.target.value)}
+                  placeholder="e.g., India, Pakistan"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="type">Job Type</Label>
+                <Select value={formData.type} onValueChange={(value) => handleInputChange("type", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select job type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Permanent">Permanent</SelectItem>
+                    <SelectItem value="Contract">Contract</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {formData.type === "Contract" && (
+                <div className="space-y-2">
+                  <Label htmlFor="contractLength">Contract Length</Label>
+                  <Input
+                    id="contractLength"
+                    value={formData.contractLength}
+                    onChange={(e) => handleInputChange("contractLength", e.target.value)}
+                    placeholder="e.g., 6 months, 1 year"
                   />
                 </div>
               )}

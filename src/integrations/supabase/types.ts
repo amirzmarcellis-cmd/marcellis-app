@@ -231,44 +231,62 @@ export type Database = {
         Row: {
           assignment: string | null
           "Client Description": string | null
+          "Contract Length": string | null
           "Criteria to evaluate by": string | null
+          Currency: string | null
           "JD Summary": string | null
           "Job Description": string | null
           "Job ID": string
           "Job Location": string | null
           "Job Salary Range (ex: 15000 AED)": string | null
           "Job Title": string | null
+          "Nationality to Exclude": string | null
+          "Nationality to include": string | null
+          "Notice Period": string | null
           Processed: string | null
           "Things to look for": string | null
           Timestamp: string | null
+          Type: string | null
         }
         Insert: {
           assignment?: string | null
           "Client Description"?: string | null
+          "Contract Length"?: string | null
           "Criteria to evaluate by"?: string | null
+          Currency?: string | null
           "JD Summary"?: string | null
           "Job Description"?: string | null
           "Job ID": string
           "Job Location"?: string | null
           "Job Salary Range (ex: 15000 AED)"?: string | null
           "Job Title"?: string | null
+          "Nationality to Exclude"?: string | null
+          "Nationality to include"?: string | null
+          "Notice Period"?: string | null
           Processed?: string | null
           "Things to look for"?: string | null
           Timestamp?: string | null
+          Type?: string | null
         }
         Update: {
           assignment?: string | null
           "Client Description"?: string | null
+          "Contract Length"?: string | null
           "Criteria to evaluate by"?: string | null
+          Currency?: string | null
           "JD Summary"?: string | null
           "Job Description"?: string | null
           "Job ID"?: string
           "Job Location"?: string | null
           "Job Salary Range (ex: 15000 AED)"?: string | null
           "Job Title"?: string | null
+          "Nationality to Exclude"?: string | null
+          "Nationality to include"?: string | null
+          "Notice Period"?: string | null
           Processed?: string | null
           "Things to look for"?: string | null
           Timestamp?: string | null
+          Type?: string | null
         }
         Relationships: []
       }
