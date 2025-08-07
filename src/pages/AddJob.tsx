@@ -19,7 +19,8 @@ export default function AddJob() {
     clientDescription: "",
     jobLocation: "",
     jobSalaryRange: "",
-    assignment: false
+    hasAssignment: false,
+    assignmentLink: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -74,7 +75,7 @@ export default function AddJob() {
           "Client Description": formData.clientDescription,
           "Job Location": formData.jobLocation,
           "Job Salary Range (ex: 15000 AED)": formData.jobSalaryRange,
-          "assignment": formData.assignment ? "yes" : "no",
+          "assignment": formData.hasAssignment ? formData.assignmentLink : null,
           "Timestamp": new Date().toISOString()
         });
 
@@ -169,15 +170,27 @@ export default function AddJob() {
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Switch
-                  id="assignment"
-                  checked={formData.assignment}
-                  onCheckedChange={(value) => handleInputChange("assignment", value)}
+                  id="hasAssignment"
+                  checked={formData.hasAssignment}
+                  onCheckedChange={(value) => handleInputChange("hasAssignment", value)}
                 />
-                <Label htmlFor="assignment">Include Assignment</Label>
+                <Label htmlFor="hasAssignment">Has Assignment?</Label>
               </div>
+              
+              {formData.hasAssignment && (
+                <div className="space-y-2">
+                  <Label htmlFor="assignmentLink">Assignment Link</Label>
+                  <Input
+                    id="assignmentLink"
+                    value={formData.assignmentLink}
+                    onChange={(e) => handleInputChange("assignmentLink", e.target.value)}
+                    placeholder="Enter assignment link"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="flex gap-4 pt-4">
