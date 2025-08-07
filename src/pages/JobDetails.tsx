@@ -7,9 +7,10 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, MapPin, Calendar, DollarSign, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload } from "lucide-react"
+import { ArrowLeft, MapPin, Calendar, DollarSign, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { JobDialog } from "@/components/jobs/JobDialog"
+import { useToast } from "@/components/ui/use-toast"
 
 // Using any type to avoid TypeScript complexity with quoted property names
 
@@ -26,6 +27,7 @@ export default function JobDetails() {
   const [scoreFilter, setScoreFilter] = useState("all")
   const [contactedFilter, setContactedFilter] = useState("all")
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const { toast } = useToast()
 
   useEffect(() => {
     if (id) {
@@ -74,6 +76,34 @@ export default function JobDetails() {
       setCandidatesLoading(false)
     }
   }
+
+  const handleStartAutomation = async () => {
+    try {
+      const response = await fetch('https://hook.eu2.make.com/6so4sjxmr9gh97bzbvq8ggu1d4p49yva', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ jobID: job["Job ID"] }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Automation started successfully",
+        });
+      } else {
+        throw new Error('Failed to start automation');
+      }
+    } catch (error) {
+      console.error('Error starting automation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start automation",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -181,6 +211,13 @@ export default function JobDetails() {
             <h1 className="text-3xl font-bold">Job Details</h1>
           </div>
           <div className="flex items-center space-x-2">
+            <Button 
+              onClick={handleStartAutomation}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <Zap className="w-4 h-4 mr-2" />
+              Start Automation
+            </Button>
             <Button onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)}>
               <FileText className="w-4 h-4 mr-2" />
               Edit Job

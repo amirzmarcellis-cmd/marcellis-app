@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,11 +18,12 @@ export default function AddJob() {
     jobDescription: "",
     clientDescription: "",
     jobLocation: "",
-    jobSalaryRange: ""
+    jobSalaryRange: "",
+    assignment: false
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -72,6 +74,7 @@ export default function AddJob() {
           "Client Description": formData.clientDescription,
           "Job Location": formData.jobLocation,
           "Job Salary Range (ex: 15000 AED)": formData.jobSalaryRange,
+          "assignment": formData.assignment ? "yes" : "no",
           "Timestamp": new Date().toISOString()
         });
 
@@ -163,6 +166,17 @@ export default function AddJob() {
                   onChange={(e) => handleInputChange("jobSalaryRange", e.target.value)}
                   placeholder="e.g., 15000 AED"
                 />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="assignment"
+                  checked={formData.assignment}
+                  onCheckedChange={(value) => handleInputChange("assignment", value)}
+                />
+                <Label htmlFor="assignment">Include Assignment</Label>
               </div>
             </div>
 

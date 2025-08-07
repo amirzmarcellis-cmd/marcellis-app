@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Building2, MapPin, DollarSign, Users, Edit, Trash2, Play, Pause, Briefcase } from "lucide-react";
+import { Plus, Building2, MapPin, DollarSign, Users, Edit, Trash2, Play, Pause, Briefcase, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { JobDialog } from "./JobDialog";
@@ -195,6 +195,35 @@ interface JobGridProps {
 }
 
 function JobGrid({ jobs, onEdit, onDelete, onStatusToggle, navigate }: JobGridProps) {
+  const { toast } = useToast();
+
+  const handleStartAutomation = async (jobId: string) => {
+    try {
+      const response = await fetch('https://hook.eu2.make.com/6so4sjxmr9gh97bzbvq8ggu1d4p49yva', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ jobID: jobId }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Automation started successfully",
+        });
+      } else {
+        throw new Error('Failed to start automation');
+      }
+    } catch (error) {
+      console.error('Error starting automation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start automation",
+        variant: "destructive",
+      });
+    }
+  };
   
   const getStatusBadge = (status: string | null) => {
     return status === "Yes" ? (
@@ -303,6 +332,14 @@ function JobGrid({ jobs, onEdit, onDelete, onStatusToggle, navigate }: JobGridPr
                   className="h-8 px-2 hover:bg-destructive hover:text-destructive-foreground"
                 >
                   <Trash2 className="h-3 w-3" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleStartAutomation(job["Job ID"])}
+                  className="h-8 px-2 bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
+                >
+                  <Zap className="h-3 w-3" />
                 </Button>
               </div>
               
