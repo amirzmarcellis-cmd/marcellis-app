@@ -6,10 +6,11 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User, MapPin, Briefcase, Mail, Phone, Search, Filter, Eye, Download, Calendar, Clock, ExternalLink } from "lucide-react"
+import { User, MapPin, Briefcase, Mail, Phone, Search, Filter, Eye, Download, Calendar, Clock, ExternalLink, Edit } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
+import { toast } from "sonner"
 
 interface Candidate {
   "Cadndidate_ID": string
@@ -98,6 +99,33 @@ export default function Candidates() {
   })
 
   const uniqueJobTitles = [...new Set(jobs.map(j => j["Job Title"]).filter(Boolean))]
+
+  const handleCallCandidate = async (candidateID: string) => {
+    try {
+      const candidate = candidates.find(c => c["Cadndidate_ID"] === candidateID)
+      const jobID = candidate?.["Applied for"] || ""
+      
+      const response = await fetch('https://hook.eu2.make.com/i3owa6dmu1mstug4tsfb0dnhhjfh4arj', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          candidateID,
+          jobID
+        }),
+      })
+
+      if (response.ok) {
+        toast.success("Call initiated successfully!")
+      } else {
+        toast.error("Failed to initiate call")
+      }
+    } catch (error) {
+      console.error('Error calling candidate:', error)
+      toast.error("Failed to initiate call")
+    }
+  }
 
   return (
       <div className="space-y-6">
@@ -210,17 +238,24 @@ export default function Candidates() {
                           </div>
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex justify-end space-x-2">
-                            <Button variant="outline" size="sm" asChild>
+                          <div className="flex justify-end space-x-1">
+                            <Button variant="outline" size="sm" asChild title="View Candidate">
                               <Link to={`/candidate/${candidate["Cadndidate_ID"]}`}>
-                                <Eye className="w-4 h-4 mr-1" />
-                                View
+                                👁️
                               </Link>
                             </Button>
-                            <Button size="sm" className="bg-gradient-primary hover:bg-gradient-primary/90" asChild>
+                            <Button variant="outline" size="sm" asChild title="Edit Candidate">
                               <Link to={`/candidate/edit/${candidate["Cadndidate_ID"]}`}>
-                                Edit Candidate
+                                ✏️
                               </Link>
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => handleCallCandidate(candidate["Cadndidate_ID"])}
+                              title="Call Candidate"
+                            >
+                              📞
                             </Button>
                           </div>
                         </TableCell>
