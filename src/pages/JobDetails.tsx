@@ -235,10 +235,10 @@ export default function JobDetails() {
                 <p className="text-lg text-muted-foreground">{job["Client Description"] || "Client Description"}</p>
               </div>
               <Badge 
-                variant={job.Processed === "true" ? "default" : "destructive"}
-                className={`text-sm px-3 py-1 ${job.Processed === "true" ? "bg-green-600 text-white border-0" : "bg-red-600 text-white border-0"}`}
+                variant={job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "default" : "destructive"}
+                className={`text-sm px-3 py-1 ${job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "bg-green-600 text-white border-0" : "bg-red-600 text-white border-0"}`}
               >
-                {job.Processed === "true" ? "Active" : "Not Active"}
+                {job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "Active" : "Not Active"}
               </Badge>
               </div>
               
