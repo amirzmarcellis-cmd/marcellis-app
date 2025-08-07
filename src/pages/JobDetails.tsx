@@ -234,8 +234,11 @@ export default function JobDetails() {
                 <h2 className="text-2xl font-bold">{job["Job Title"]}</h2>
                 <p className="text-lg text-muted-foreground">{job["Client Description"] || "Client Description"}</p>
               </div>
-              <Badge variant="outline" className="text-sm px-3 py-1">
-                {job.Processed === "true" ? "Processed" : "Pending"}
+              <Badge 
+                variant={job.Processed === "true" ? "default" : "destructive"}
+                className={`text-sm px-3 py-1 ${job.Processed === "true" ? "bg-green-600 text-white border-0" : "bg-red-600 text-white border-0"}`}
+              >
+                {job.Processed === "true" ? "Active" : "Not Active"}
               </Badge>
               </div>
               
@@ -295,12 +298,6 @@ export default function JobDetails() {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Notice Period:</span>
                     <span>{job["Notice Period"] || "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Proceed:</span>
-                    <Badge variant="outline">
-                      {job.Processed === "true" ? "Yes" : "No"}
-                    </Badge>
                   </div>
                 </CardContent>
               </Card>
