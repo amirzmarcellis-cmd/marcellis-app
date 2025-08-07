@@ -178,33 +178,11 @@ export default function AddJob() {
                   id="jobSalaryRange"
                   value={formData.jobSalaryRange}
                   onChange={(e) => handleInputChange("jobSalaryRange", e.target.value)}
-                  placeholder="e.g., 15000 AED"
+                  placeholder="eg., 15000"
                 />
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="hasAssignment"
-                  checked={formData.hasAssignment}
-                  onCheckedChange={(value) => handleInputChange("hasAssignment", value)}
-                />
-                <Label htmlFor="hasAssignment">Has Assignment?</Label>
-              </div>
-              
-              {formData.hasAssignment && (
-                <div className="space-y-2">
-                  <Label htmlFor="assignmentLink">Assignment Link</Label>
-                  <Input
-                    id="assignmentLink"
-                    value={formData.assignmentLink}
-                    onChange={(e) => handleInputChange("assignmentLink", e.target.value)}
-                    placeholder="Enter assignment link"
-                  />
-                </div>
-              )}
-            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -213,7 +191,7 @@ export default function AddJob() {
                   id="noticePeriod"
                   value={formData.noticePeriod}
                   onChange={(e) => handleInputChange("noticePeriod", e.target.value)}
-                  placeholder="e.g., 1 month, 2 weeks"
+                  placeholder="Number of days"
                 />
               </div>
               <div className="space-y-2">
@@ -276,6 +254,29 @@ export default function AddJob() {
                     value={formData.contractLength}
                     onChange={(e) => handleInputChange("contractLength", e.target.value)}
                     placeholder="e.g., 6 months, 1 year"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="hasAssignment"
+                  checked={formData.hasAssignment}
+                  onCheckedChange={(value) => handleInputChange("hasAssignment", value)}
+                />
+                <Label htmlFor="hasAssignment">Has Assignment?</Label>
+              </div>
+              
+              {formData.hasAssignment && (
+                <div className="space-y-2">
+                  <Label htmlFor="assignmentLink">Assignment Link</Label>
+                  <Input
+                    id="assignmentLink"
+                    value={formData.assignmentLink}
+                    onChange={(e) => handleInputChange("assignmentLink", e.target.value)}
+                    placeholder="Enter assignment link"
                   />
                 </div>
               )}
