@@ -126,12 +126,6 @@ export default function CandidateDetails() {
             <div className="h-6 w-px bg-border" />
             <h1 className="text-3xl font-bold">Candidate Details</h1>
           </div>
-          <div className="flex items-center space-x-2">
-            <Button>
-              <Phone className="w-4 h-4 mr-2" />
-              Schedule Call
-            </Button>
-          </div>
         </div>
 
         {/* Candidate Header Card */}

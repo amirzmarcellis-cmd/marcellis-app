@@ -259,14 +259,6 @@ export default function Candidates() {
                                 ✏️
                               </Link>
                             </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              onClick={() => handleCallCandidate(candidate["Cadndidate_ID"])}
-                              title="Call Candidate"
-                            >
-                              📞
-                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
