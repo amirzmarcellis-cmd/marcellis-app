@@ -7,14 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
-import { ArrowLeft, Check, ChevronsUpDown } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 const nationalities = [
   "Afghan", "Albanian", "Algerian", "American", "Andorran", "Angolan", "Antiguans", "Argentinean", "Armenian", "Australian",
@@ -75,8 +72,6 @@ export default function AddJob() {
     currency: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [openIncludePopover, setOpenIncludePopover] = useState(false);
-  const [openExcludePopover, setOpenExcludePopover] = useState(false);
 
   const handleInputChange = (field: string, value: string | boolean | number[] | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -273,50 +268,25 @@ export default function AddJob() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Nationality to Include</Label>
-                <Popover open={openIncludePopover} onOpenChange={setOpenIncludePopover}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={openIncludePopover}
-                      className="w-full justify-between"
-                    >
-                      {(formData.nationalityToInclude || []).length > 0
-                        ? `${(formData.nationalityToInclude || []).length} selected`
-                        : "Select nationalities..."}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[400px] p-0">
-                    <Command>
-                      <CommandInput placeholder="Search nationality..." className="h-9" />
-                      <CommandEmpty>No nationality found.</CommandEmpty>
-                      <CommandGroup className="max-h-64 overflow-auto">
-                        {nationalities.map((nationality) => (
-                          <CommandItem
-                            key={nationality}
-                            value={nationality}
-                            onSelect={() => {
-                              const currentInclude = formData.nationalityToInclude || [];
-                              const updatedInclude = currentInclude.includes(nationality)
-                                ? currentInclude.filter((n) => n !== nationality)
-                                : [...currentInclude, nationality];
-                              handleInputChange("nationalityToInclude", updatedInclude);
-                             }}
-                           >
-                             <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                (formData.nationalityToInclude || []).includes(nationality) ? "opacity-100" : "opacity-0"
-                              )}
-                            />
-                            {nationality}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                <Select onValueChange={(value) => {
+                  const currentInclude = formData.nationalityToInclude || [];
+                  if (!currentInclude.includes(value)) {
+                    handleInputChange("nationalityToInclude", [...currentInclude, value]);
+                  }
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select nationality to include..." />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    {nationalities.filter(nationality => 
+                      !(formData.nationalityToInclude || []).includes(nationality)
+                    ).map((nationality) => (
+                      <SelectItem key={nationality} value={nationality}>
+                        {nationality}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {(formData.nationalityToInclude || []).length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {(formData.nationalityToInclude || []).map((nationality) => (
@@ -343,50 +313,25 @@ export default function AddJob() {
               </div>
               <div className="space-y-2">
                 <Label>Nationality to Exclude</Label>
-                <Popover open={openExcludePopover} onOpenChange={setOpenExcludePopover}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={openExcludePopover}
-                      className="w-full justify-between"
-                    >
-                      {(formData.nationalityToExclude || []).length > 0
-                        ? `${(formData.nationalityToExclude || []).length} selected`
-                        : "Select nationalities..."}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[400px] p-0">
-                    <Command>
-                      <CommandInput placeholder="Search nationality..." className="h-9" />
-                      <CommandEmpty>No nationality found.</CommandEmpty>
-                      <CommandGroup className="max-h-64 overflow-auto">
-                        {nationalities.map((nationality) => (
-                          <CommandItem
-                            key={nationality}
-                            value={nationality}
-                            onSelect={() => {
-                              const currentExclude = formData.nationalityToExclude || [];
-                              const updatedExclude = currentExclude.includes(nationality)
-                                ? currentExclude.filter((n) => n !== nationality)
-                                : [...currentExclude, nationality];
-                              handleInputChange("nationalityToExclude", updatedExclude);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                (formData.nationalityToExclude || []).includes(nationality) ? "opacity-100" : "opacity-0"
-                              )}
-                            />
-                            {nationality}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                <Select onValueChange={(value) => {
+                  const currentExclude = formData.nationalityToExclude || [];
+                  if (!currentExclude.includes(value)) {
+                    handleInputChange("nationalityToExclude", [...currentExclude, value]);
+                  }
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select nationality to exclude..." />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    {nationalities.filter(nationality => 
+                      !(formData.nationalityToExclude || []).includes(nationality)
+                    ).map((nationality) => (
+                      <SelectItem key={nationality} value={nationality}>
+                        {nationality}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {(formData.nationalityToExclude || []).length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {(formData.nationalityToExclude || []).map((nationality) => (
