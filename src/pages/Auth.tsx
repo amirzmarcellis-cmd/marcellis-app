@@ -6,9 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Phone } from 'lucide-react';
+import { useAppSettings } from '@/contexts/AppSettingsContext';
 
 export default function Auth() {
+  const { settings } = useAppSettings();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
@@ -61,8 +63,21 @@ export default function Auth() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-card/80 backdrop-blur-sm border-border/50">
         <CardHeader className="space-y-1">
+          <div className="flex items-center justify-center space-x-3 mb-4">
+            <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+              {settings.logo ? (
+                <img 
+                  src={settings.logo} 
+                  alt="Company Logo" 
+                  className="w-full h-full object-cover rounded-lg"
+                />
+              ) : (
+                <Phone className="w-6 h-6 text-primary-foreground" />
+              )}
+            </div>
+          </div>
           <CardTitle className="text-2xl text-center font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Pulse Marc Ellis
+            {settings.systemName}
           </CardTitle>
           <CardDescription className="text-center text-muted-foreground">
             {isLogin ? 'Sign in to your account' : 'Create a new account'}

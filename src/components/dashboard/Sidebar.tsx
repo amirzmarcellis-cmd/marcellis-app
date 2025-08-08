@@ -17,6 +17,7 @@ import {
   Moon,
 } from "lucide-react"
 import { useAuth } from '@/contexts/AuthContext';
+import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
 
@@ -46,6 +47,7 @@ const navigationItems = [
 export function DashboardSidebar() {
   const { state } = useSidebar()
   const { signOut } = useAuth();
+  const { settings } = useAppSettings();
   const { theme, setTheme } = useTheme();
   const location = useLocation()
   const currentPath = location.pathname
@@ -68,11 +70,19 @@ export function DashboardSidebar() {
         <div className="p-4 border-b border-border">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Phone className="w-4 h-4 text-primary-foreground" />
+              {settings.logo ? (
+                <img 
+                  src={settings.logo} 
+                  alt="Company Logo" 
+                  className="w-full h-full object-cover rounded-lg"
+                />
+              ) : (
+                <Phone className="w-4 h-4 text-primary-foreground" />
+              )}
             </div>
             {!isCollapsed && (
               <div>
-                <h2 className="text-lg font-bold text-foreground">Pulse Marc Ellis</h2>
+                <h2 className="text-lg font-bold text-foreground">{settings.systemName}</h2>
                 <p className="text-xs text-muted-foreground">AI Recruitment</p>
               </div>
             )}

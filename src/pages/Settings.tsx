@@ -5,23 +5,35 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Upload, Settings as SettingsIcon, Palette } from "lucide-react"
 import { useState } from "react"
+import { useAppSettings } from "@/contexts/AppSettingsContext"
+import { toast } from "sonner"
 
 export default function Settings() {
-  const [systemName, setSystemName] = useState("Pulse Marc Ellis")
-  const [primaryColor, setPrimaryColor] = useState("#8B5CF6")
+  const { settings, updateSettings } = useAppSettings();
+  const [systemName, setSystemName] = useState(settings.systemName)
+  const [primaryColor, setPrimaryColor] = useState(settings.primaryColor)
   const [logo, setLogo] = useState<File | null>(null)
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
       setLogo(file)
+      // Convert file to base64 for storage
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const result = e.target?.result as string
+        updateSettings({ logo: result })
+      }
+      reader.readAsDataURL(file)
     }
   }
 
   const handleSave = () => {
-    // Here you would typically save to your backend/database
-    console.log({ systemName, primaryColor, logo })
-    alert("Settings saved successfully!")
+    updateSettings({ 
+      systemName, 
+      primaryColor
+    })
+    toast.success("Settings saved successfully!")
   }
 
   return (
@@ -45,16 +57,22 @@ export default function Settings() {
               <div className="space-y-2">
                 <Label htmlFor="logo">System Logo</Label>
                 <div className="flex items-center space-x-4">
-                  <div className="w-16 h-16 rounded-lg bg-gradient-primary flex items-center justify-center">
-                    {logo ? (
-                      <img 
-                        src={URL.createObjectURL(logo)} 
-                        alt="Logo preview" 
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    ) : (
-                      <Upload className="w-6 h-6 text-white" />
-                    )}
+                <div className="w-16 h-16 rounded-lg bg-gradient-primary flex items-center justify-center">
+                  {settings.logo ? (
+                    <img 
+                      src={settings.logo} 
+                      alt="Logo preview" 
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  ) : logo ? (
+                    <img 
+                      src={URL.createObjectURL(logo)} 
+                      alt="Logo preview" 
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  ) : (
+                    <Upload className="w-6 h-6 text-white" />
+                  )}
                   </div>
                   <div className="flex-1">
                     <Input
@@ -130,7 +148,13 @@ export default function Settings() {
                     className="w-10 h-10 rounded-lg flex items-center justify-center"
                     style={{ backgroundColor: primaryColor }}
                   >
-                    {logo ? (
+                    {settings.logo ? (
+                      <img 
+                        src={settings.logo} 
+                        alt="Logo" 
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    ) : logo ? (
                       <img 
                         src={URL.createObjectURL(logo)} 
                         alt="Logo" 
