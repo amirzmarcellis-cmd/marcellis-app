@@ -7,10 +7,55 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft } from "lucide-react";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Slider } from "@/components/ui/slider";
+import { ArrowLeft, Check, ChevronsUpDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+
+const nationalities = [
+  "Afghan", "Albanian", "Algerian", "American", "Andorran", "Angolan", "Antiguans", "Argentinean", "Armenian", "Australian",
+  "Austrian", "Azerbaijani", "Bahamian", "Bahraini", "Bangladeshi", "Barbadian", "Barbudans", "Batswana", "Belarusian", "Belgian",
+  "Belizean", "Beninese", "Bhutanese", "Bolivian", "Bosnian", "Brazilian", "British", "Bruneian", "Bulgarian", "Burkinabe",
+  "Burmese", "Burundian", "Cambodian", "Cameroonian", "Canadian", "Cape Verdean", "Central African", "Chadian", "Chilean", "Chinese",
+  "Colombian", "Comoran", "Congolese", "Costa Rican", "Croatian", "Cuban", "Cypriot", "Czech", "Danish", "Djibouti",
+  "Dominican", "Dutch", "East Timorese", "Ecuadorean", "Egyptian", "Emirian", "Equatorial Guinean", "Eritrean", "Estonian", "Ethiopian",
+  "Fijian", "Filipino", "Finnish", "French", "Gabonese", "Gambian", "Georgian", "German", "Ghanaian", "Greek",
+  "Grenadian", "Guatemalan", "Guinea-Bissauan", "Guinean", "Guyanese", "Haitian", "Herzegovinian", "Honduran", "Hungarian", "Icelander",
+  "Indian", "Indonesian", "Iranian", "Iraqi", "Irish", "Israeli", "Italian", "Ivorian", "Jamaican", "Japanese",
+  "Jordanian", "Kazakhstani", "Kenyan", "Kittian and Nevisian", "Kuwaiti", "Kyrgyz", "Laotian", "Latvian", "Lebanese", "Liberian",
+  "Libyan", "Liechtensteiner", "Lithuanian", "Luxembourger", "Macedonian", "Malagasy", "Malawian", "Malaysian", "Maldivan", "Malian",
+  "Maltese", "Marshallese", "Mauritanian", "Mauritian", "Mexican", "Micronesian", "Moldovan", "Monacan", "Mongolian", "Moroccan",
+  "Mosotho", "Motswana", "Mozambican", "Namibian", "Nauruan", "Nepalese", "New Zealander", "Ni-Vanuatu", "Nicaraguan", "Nigerian",
+  "Nigerien", "North Korean", "Northern Irish", "Norwegian", "Omani", "Pakistani", "Palauan", "Panamanian", "Papua New Guinean", "Paraguayan",
+  "Peruvian", "Polish", "Portuguese", "Qatari", "Romanian", "Russian", "Rwandan", "Saint Lucian", "Salvadoran", "Samoan",
+  "San Marinese", "Sao Tomean", "Saudi", "Scottish", "Senegalese", "Serbian", "Seychellois", "Sierra Leonean", "Singaporean", "Slovakian",
+  "Slovenian", "Solomon Islander", "Somali", "South African", "South Korean", "Spanish", "Sri Lankan", "Sudanese", "Surinamer", "Swazi",
+  "Swedish", "Swiss", "Syrian", "Taiwanese", "Tajik", "Tanzanian", "Thai", "Togolese", "Tongan", "Trinidadian or Tobagonian",
+  "Tunisian", "Turkish", "Tuvaluan", "Ugandan", "Ukrainian", "Uruguayan", "Uzbekistani", "Venezuelan", "Vietnamese", "Welsh",
+  "Yemenite", "Zambian", "Zimbabwean"
+];
+
+const noticePeriods = [
+  "Immediate",
+  "7 Days",
+  "14 Days", 
+  "30 Days",
+  "60 Days",
+  "90 Days"
+];
+
+const contractLengths = [
+  "3 Months",
+  "6 Months", 
+  "9 Months",
+  "12 Months",
+  "18 Months",
+  "24 Months"
+];
 
 export default function AddJob() {
   const navigate = useNavigate();
@@ -19,19 +64,21 @@ export default function AddJob() {
     jobDescription: "",
     clientDescription: "",
     jobLocation: "",
-    jobSalaryRange: "",
+    jobSalaryRange: [10000] as number[],
     hasAssignment: false,
     assignmentLink: "",
     noticePeriod: "",
-    nationalityToInclude: "",
-    nationalityToExclude: "",
+    nationalityToInclude: [] as string[],
+    nationalityToExclude: [] as string[],
     type: "",
     contractLength: "",
     currency: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [openIncludePopover, setOpenIncludePopover] = useState(false);
+  const [openExcludePopover, setOpenExcludePopover] = useState(false);
 
-  const handleInputChange = (field: string, value: string | boolean) => {
+  const handleInputChange = (field: string, value: string | boolean | number[] | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -81,11 +128,11 @@ export default function AddJob() {
           "Job Description": formData.jobDescription,
           "Client Description": formData.clientDescription,
           "Job Location": formData.jobLocation,
-          "Job Salary Range (ex: 15000 AED)": formData.jobSalaryRange,
+          "Job Salary Range (ex: 15000 AED)": formData.jobSalaryRange[0].toString(),
           "assignment": formData.hasAssignment ? formData.assignmentLink : null,
           "Notice Period": formData.noticePeriod,
-          "Nationality to include": formData.nationalityToInclude,
-          "Nationality to Exclude": formData.nationalityToExclude,
+          "Nationality to include": formData.nationalityToInclude.join(", "),
+          "Nationality to Exclude": formData.nationalityToExclude.join(", "),
           "Type": formData.type,
           "Contract Length": formData.type === "Contract" ? formData.contractLength : null,
           "Currency": formData.currency,
@@ -172,14 +219,20 @@ export default function AddJob() {
                   placeholder="Enter job location"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="jobSalaryRange">Job Salary Range</Label>
-                <Input
-                  id="jobSalaryRange"
+              <div className="space-y-4">
+                <Label htmlFor="jobSalaryRange">Salary Range: {formData.jobSalaryRange[0].toLocaleString()}</Label>
+                <Slider
                   value={formData.jobSalaryRange}
-                  onChange={(e) => handleInputChange("jobSalaryRange", e.target.value)}
-                  placeholder="eg., 15000"
+                  onValueChange={(value) => handleInputChange("jobSalaryRange", value)}
+                  max={100000}
+                  min={1000}
+                  step={500}
+                  className="w-full"
                 />
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>1,000</span>
+                  <span>100,000</span>
+                </div>
               </div>
             </div>
 
@@ -187,12 +240,18 @@ export default function AddJob() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="noticePeriod">Notice Period</Label>
-                <Input
-                  id="noticePeriod"
-                  value={formData.noticePeriod}
-                  onChange={(e) => handleInputChange("noticePeriod", e.target.value)}
-                  placeholder="Number of days"
-                />
+                <Select value={formData.noticePeriod} onValueChange={(value) => handleInputChange("noticePeriod", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select notice period" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {noticePeriods.map((period) => (
+                      <SelectItem key={period} value={period}>
+                        {period}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="currency">Currency</Label>
@@ -213,22 +272,140 @@ export default function AddJob() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="nationalityToInclude">Nationality to Include</Label>
-                <Input
-                  id="nationalityToInclude"
-                  value={formData.nationalityToInclude}
-                  onChange={(e) => handleInputChange("nationalityToInclude", e.target.value)}
-                  placeholder="e.g., UAE, Saudi Arabia"
-                />
+                <Label>Nationality to Include</Label>
+                <Popover open={openIncludePopover} onOpenChange={setOpenIncludePopover}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={openIncludePopover}
+                      className="w-full justify-between"
+                    >
+                      {formData.nationalityToInclude.length > 0
+                        ? `${formData.nationalityToInclude.length} selected`
+                        : "Select nationalities..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0">
+                    <Command>
+                      <CommandInput placeholder="Search nationality..." />
+                      <CommandEmpty>No nationality found.</CommandEmpty>
+                      <CommandGroup className="max-h-64 overflow-auto">
+                        {nationalities.map((nationality) => (
+                          <CommandItem
+                            key={nationality}
+                            value={nationality}
+                            onSelect={() => {
+                              const updatedInclude = formData.nationalityToInclude.includes(nationality)
+                                ? formData.nationalityToInclude.filter((n) => n !== nationality)
+                                : [...formData.nationalityToInclude, nationality];
+                              handleInputChange("nationalityToInclude", updatedInclude);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                formData.nationalityToInclude.includes(nationality) ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {nationality}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                {formData.nationalityToInclude.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {formData.nationalityToInclude.map((nationality) => (
+                      <span
+                        key={nationality}
+                        className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
+                      >
+                        {nationality}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = formData.nationalityToInclude.filter((n) => n !== nationality);
+                            handleInputChange("nationalityToInclude", updated);
+                          }}
+                          className="ml-1 text-primary/60 hover:text-primary"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="nationalityToExclude">Nationality to Exclude</Label>
-                <Input
-                  id="nationalityToExclude"
-                  value={formData.nationalityToExclude}
-                  onChange={(e) => handleInputChange("nationalityToExclude", e.target.value)}
-                  placeholder="e.g., India, Pakistan"
-                />
+                <Label>Nationality to Exclude</Label>
+                <Popover open={openExcludePopover} onOpenChange={setOpenExcludePopover}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={openExcludePopover}
+                      className="w-full justify-between"
+                    >
+                      {formData.nationalityToExclude.length > 0
+                        ? `${formData.nationalityToExclude.length} selected`
+                        : "Select nationalities..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0">
+                    <Command>
+                      <CommandInput placeholder="Search nationality..." />
+                      <CommandEmpty>No nationality found.</CommandEmpty>
+                      <CommandGroup className="max-h-64 overflow-auto">
+                        {nationalities.map((nationality) => (
+                          <CommandItem
+                            key={nationality}
+                            value={nationality}
+                            onSelect={() => {
+                              const updatedExclude = formData.nationalityToExclude.includes(nationality)
+                                ? formData.nationalityToExclude.filter((n) => n !== nationality)
+                                : [...formData.nationalityToExclude, nationality];
+                              handleInputChange("nationalityToExclude", updatedExclude);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                formData.nationalityToExclude.includes(nationality) ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {nationality}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                {formData.nationalityToExclude.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {formData.nationalityToExclude.map((nationality) => (
+                      <span
+                        key={nationality}
+                        className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-destructive/10 text-destructive"
+                      >
+                        {nationality}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = formData.nationalityToExclude.filter((n) => n !== nationality);
+                            handleInputChange("nationalityToExclude", updated);
+                          }}
+                          className="ml-1 text-destructive/60 hover:text-destructive"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -249,12 +426,18 @@ export default function AddJob() {
               {formData.type === "Contract" && (
                 <div className="space-y-2">
                   <Label htmlFor="contractLength">Contract Length</Label>
-                  <Input
-                    id="contractLength"
-                    value={formData.contractLength}
-                    onChange={(e) => handleInputChange("contractLength", e.target.value)}
-                    placeholder="e.g., 6 months, 1 year"
-                  />
+                  <Select value={formData.contractLength} onValueChange={(value) => handleInputChange("contractLength", value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select contract length" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {contractLengths.map((length) => (
+                        <SelectItem key={length} value={length}>
+                          {length}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               )}
             </div>
