@@ -268,7 +268,7 @@ export default function JobDetails() {
              <TabsTrigger value="description">Description</TabsTrigger>
              <TabsTrigger value="requirements">Requirements</TabsTrigger>
              <TabsTrigger value="documents">Job Documents</TabsTrigger>
-             <TabsTrigger value="candidates">Contacted Candidates</TabsTrigger>
+             <TabsTrigger value="candidates">Long List</TabsTrigger>
            </TabsList>
 
           <TabsContent value="overview" className="space-y-4">
