@@ -300,7 +300,7 @@ export default function JobDetails() {
            <TabsList className="grid w-full grid-cols-5">
              <TabsTrigger value="overview">Overview</TabsTrigger>
              <TabsTrigger value="description">Description</TabsTrigger>
-             <TabsTrigger value="requirements">Requirements</TabsTrigger>
+             <TabsTrigger value="requirements">AI Requirements</TabsTrigger>
              <TabsTrigger value="documents">Job Documents</TabsTrigger>
              <TabsTrigger value="candidates">Long List</TabsTrigger>
            </TabsList>
@@ -383,16 +383,30 @@ export default function JobDetails() {
             </div>
           </TabsContent>
 
-          <TabsContent value="description" className="space-y-4">
+           <TabsContent value="description" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <FileText className="w-5 h-5 mr-2" />
-                  Job Description
-                </CardTitle>
-                <CardDescription>
-                  Detailed overview of the role and responsibilities
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center">
+                      <FileText className="w-5 h-5 mr-2" />
+                      Job Description
+                    </CardTitle>
+                    <CardDescription>
+                      Detailed overview of the role and responsibilities
+                    </CardDescription>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button variant="outline" size="sm">
+                      <Upload className="w-4 h-4 mr-2" />
+                      Upload File
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)}>
+                      <FileText className="w-4 h-4 mr-2" />
+                      Edit Job
+                    </Button>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="prose prose-sm max-w-none">
@@ -404,16 +418,24 @@ export default function JobDetails() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="requirements" className="space-y-4">
+           <TabsContent value="requirements" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Target className="w-5 h-5 mr-2" />
-                  Requirements & Qualifications
-                </CardTitle>
-                <CardDescription>
-                  Skills, experience, and qualifications needed for this role
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center">
+                      <Target className="w-5 h-5 mr-2" />
+                      AI Requirements
+                    </CardTitle>
+                    <CardDescription>
+                      Skills, experience, and qualifications needed for this role
+                    </CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)}>
+                    <FileText className="w-4 h-4 mr-2" />
+                    Amend
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="prose prose-sm max-w-none space-y-4">
