@@ -67,17 +67,17 @@ export function DashboardSidebar() {
     >
       <SidebarContent className="bg-transparent">
         {/* Header */}
-        <div className="p-4 border-b border-border">
+        <div className="p-6 border-b border-border">
           <div className="flex items-center justify-center">
-            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-xl">
               {settings.logo ? (
                 <img 
                   src={settings.logo} 
                   alt="Company Logo" 
-                  className="w-full h-full object-contain rounded-xl p-1"
+                  className="w-full h-full object-contain rounded-2xl p-2"
                 />
               ) : (
-                <Phone className="w-6 h-6 text-primary-foreground" />
+                <Phone className="w-8 h-8 text-primary-foreground" />
               )}
             </div>
           </div>
