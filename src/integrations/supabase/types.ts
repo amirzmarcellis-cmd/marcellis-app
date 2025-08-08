@@ -130,6 +130,7 @@ export type Database = {
           "Current Company": string | null
           "CV Summary": string | null
           CV_Link: string | null
+          cv_text: string | null
           "Done Questions": string | null
           Education: string | null
           Email: string | null
@@ -152,6 +153,7 @@ export type Database = {
           "Current Company"?: string | null
           "CV Summary"?: string | null
           CV_Link?: string | null
+          cv_text?: string | null
           "Done Questions"?: string | null
           Education?: string | null
           Email?: string | null
@@ -174,6 +176,7 @@ export type Database = {
           "Current Company"?: string | null
           "CV Summary"?: string | null
           CV_Link?: string | null
+          cv_text?: string | null
           "Done Questions"?: string | null
           Education?: string | null
           Email?: string | null
@@ -240,6 +243,7 @@ export type Database = {
           "Job Location": string | null
           "Job Salary Range (ex: 15000 AED)": string | null
           "Job Title": string | null
+          longlist: number
           "Nationality to Exclude": string | null
           "Nationality to include": string | null
           "Notice Period": string | null
@@ -260,6 +264,7 @@ export type Database = {
           "Job Location"?: string | null
           "Job Salary Range (ex: 15000 AED)"?: string | null
           "Job Title"?: string | null
+          longlist?: number
           "Nationality to Exclude"?: string | null
           "Nationality to include"?: string | null
           "Notice Period"?: string | null
@@ -280,6 +285,7 @@ export type Database = {
           "Job Location"?: string | null
           "Job Salary Range (ex: 15000 AED)"?: string | null
           "Job Title"?: string | null
+          longlist?: number
           "Nationality to Exclude"?: string | null
           "Nationality to include"?: string | null
           "Notice Period"?: string | null
@@ -302,6 +308,7 @@ export type Database = {
           cons: string | null
           Contacted: string | null
           CV_Link: string | null
+          group_id: number | null
           "Job ID": string | null
           "Notice Period": string | null
           pros: string | null
@@ -323,6 +330,7 @@ export type Database = {
           cons?: string | null
           Contacted?: string | null
           CV_Link?: string | null
+          group_id?: number | null
           "Job ID"?: string | null
           "Notice Period"?: string | null
           pros?: string | null
@@ -344,6 +352,7 @@ export type Database = {
           cons?: string | null
           Contacted?: string | null
           CV_Link?: string | null
+          group_id?: number | null
           "Job ID"?: string | null
           "Notice Period"?: string | null
           pros?: string | null
