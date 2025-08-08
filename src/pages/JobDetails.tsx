@@ -78,8 +78,22 @@ export default function JobDetails() {
     }
   }
 
-  const handleStartAutomation = async () => {
+  const handleGenerateLongList = async () => {
     try {
+      // First, increment the longlist count in the database
+      const { error: updateError } = await supabase
+        .from('Jobs')
+        .update({ longlist: (job?.longlist || 0) + 1 })
+        .eq('Job ID', job?.["Job ID"]);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Update local state
+      setJob(prev => ({ ...prev, longlist: (prev?.longlist || 0) + 1 }));
+
+      // Call the automation endpoint
       const response = await fetch('https://hook.eu2.make.com/6so4sjxmr9gh97bzbvq8ggu1d4p49yva', {
         method: 'POST',
         headers: {
@@ -94,13 +108,13 @@ export default function JobDetails() {
 
       toast({
         title: "Success",
-        description: "Automation started successfully",
+        description: job?.longlist && job.longlist > 0 ? "Long list regenerated successfully" : "Long list generated successfully",
       });
     } catch (error) {
-      console.error('Error starting automation:', error);
+      console.error('Error generating long list:', error);
       toast({
         title: "Error",
-        description: "Failed to start automation",
+        description: "Failed to generate long list",
         variant: "destructive",
       });
     }
@@ -213,11 +227,11 @@ export default function JobDetails() {
           </div>
           <div className="flex items-center space-x-2">
             <Button 
-              onClick={handleStartAutomation}
+              onClick={handleGenerateLongList}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               <Zap className="w-4 h-4 mr-2" />
-              Start Automation
+              {job?.longlist && job.longlist > 0 ? "Re-generate Long List" : "Generate Long List"}
             </Button>
             <Button onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)}>
               <FileText className="w-4 h-4 mr-2" />
