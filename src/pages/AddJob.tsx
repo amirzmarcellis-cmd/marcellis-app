@@ -13,27 +13,27 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const nationalities = [
-  "Afghan", "Albanian", "Algerian", "American", "Andorran", "Angolan", "Antiguans", "Argentinean", "Armenian", "Australian",
-  "Austrian", "Azerbaijani", "Bahamian", "Bahraini", "Bangladeshi", "Barbadian", "Barbudans", "Batswana", "Belarusian", "Belgian",
-  "Belizean", "Beninese", "Bhutanese", "Bolivian", "Bosnian", "Brazilian", "British", "Bruneian", "Bulgarian", "Burkinabe",
-  "Burmese", "Burundian", "Cambodian", "Cameroonian", "Canadian", "Cape Verdean", "Central African", "Chadian", "Chilean", "Chinese",
-  "Colombian", "Comoran", "Congolese", "Costa Rican", "Croatian", "Cuban", "Cypriot", "Czech", "Danish", "Djibouti",
-  "Dominican", "Dutch", "East Timorese", "Ecuadorean", "Egyptian", "Emirian", "Equatorial Guinean", "Eritrean", "Estonian", "Ethiopian",
-  "Fijian", "Filipino", "Finnish", "French", "Gabonese", "Gambian", "Georgian", "German", "Ghanaian", "Greek",
-  "Grenadian", "Guatemalan", "Guinea-Bissauan", "Guinean", "Guyanese", "Haitian", "Herzegovinian", "Honduran", "Hungarian", "Icelander",
-  "Indian", "Indonesian", "Iranian", "Iraqi", "Irish", "Israeli", "Italian", "Ivorian", "Jamaican", "Japanese",
-  "Jordanian", "Kazakhstani", "Kenyan", "Kittian and Nevisian", "Kuwaiti", "Kyrgyz", "Laotian", "Latvian", "Lebanese", "Liberian",
-  "Libyan", "Liechtensteiner", "Lithuanian", "Luxembourger", "Macedonian", "Malagasy", "Malawian", "Malaysian", "Maldivan", "Malian",
-  "Maltese", "Marshallese", "Mauritanian", "Mauritian", "Mexican", "Micronesian", "Moldovan", "Monacan", "Mongolian", "Moroccan",
-  "Mosotho", "Motswana", "Mozambican", "Namibian", "Nauruan", "Nepalese", "New Zealander", "Ni-Vanuatu", "Nicaraguan", "Nigerian",
-  "Nigerien", "North Korean", "Northern Irish", "Norwegian", "Omani", "Pakistani", "Palauan", "Panamanian", "Papua New Guinean", "Paraguayan",
-  "Peruvian", "Polish", "Portuguese", "Qatari", "Romanian", "Russian", "Rwandan", "Saint Lucian", "Salvadoran", "Samoan",
-  "San Marinese", "Sao Tomean", "Saudi", "Scottish", "Senegalese", "Serbian", "Seychellois", "Sierra Leonean", "Singaporean", "Slovakian",
-  "Slovenian", "Solomon Islander", "Somali", "South African", "South Korean", "Spanish", "Sri Lankan", "Sudanese", "Surinamer", "Swazi",
-  "Swedish", "Swiss", "Syrian", "Taiwanese", "Tajik", "Tanzanian", "Thai", "Togolese", "Tongan", "Trinidadian or Tobagonian",
-  "Tunisian", "Turkish", "Tuvaluan", "Ugandan", "Ukrainian", "Uruguayan", "Uzbekistani", "Venezuelan", "Vietnamese", "Welsh",
-  "Yemenite", "Zambian", "Zimbabwean"
+const countries = [
+  "Afghanistan", "Albania", "Algeria", "United States", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia",
+  "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium",
+  "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Brazil", "United Kingdom", "Brunei", "Bulgaria", "Burkina Faso",
+  "Myanmar", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Central African Republic", "Chad", "Chile", "China",
+  "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti",
+  "Dominican Republic", "Netherlands", "East Timor", "Ecuador", "Egypt", "United Arab Emirates", "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia",
+  "Fiji", "Philippines", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece",
+  "Grenada", "Guatemala", "Guinea-Bissau", "Guinea", "Guyana", "Haiti", "Herzegovina", "Honduras", "Hungary", "Iceland",
+  "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Ivory Coast", "Jamaica", "Japan",
+  "Jordan", "Kazakhstan", "Kenya", "Saint Kitts and Nevis", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Liberia",
+  "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "North Macedonia", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali",
+  "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Morocco",
+  "Lesotho", "Botswana", "Mozambique", "Namibia", "Nauru", "Nepal", "New Zealand", "Vanuatu", "Nicaragua", "Nigeria",
+  "Niger", "North Korea", "Northern Ireland", "Norway", "Oman", "Pakistan", "Palau", "Panama", "Papua New Guinea", "Paraguay",
+  "Peru", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Lucia", "El Salvador", "Samoa",
+  "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Scotland", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia",
+  "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "Spain", "Sri Lanka", "Sudan", "Suriname", "Eswatini",
+  "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Togo", "Tonga", "Trinidad and Tobago",
+  "Tunisia", "Turkey", "Tuvalu", "Uganda", "Ukraine", "Uruguay", "Uzbekistan", "Venezuela", "Vietnam", "Wales",
+  "Yemen", "Zambia", "Zimbabwe"
 ];
 
 const noticePeriods = [
@@ -215,7 +215,7 @@ export default function AddJob() {
                 />
               </div>
               <div className="space-y-4">
-                <Label htmlFor="jobSalaryRange">Salary Range: {formData.jobSalaryRange[0].toLocaleString()}</Label>
+                <Label htmlFor="jobSalaryRange">Salary: {formData.jobSalaryRange[0].toLocaleString()}</Label>
                 <Slider
                   value={formData.jobSalaryRange}
                   onValueChange={(value) => handleInputChange("jobSalaryRange", value)}
@@ -267,7 +267,7 @@ export default function AddJob() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Nationality to Include</Label>
+                <Label>Countries to Include</Label>
                 <Select onValueChange={(value) => {
                   const currentInclude = formData.nationalityToInclude || [];
                   if (!currentInclude.includes(value)) {
@@ -275,31 +275,31 @@ export default function AddJob() {
                   }
                 }}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select nationality to include..." />
+                    <SelectValue placeholder="Select countries to include..." />
                   </SelectTrigger>
                   <SelectContent className="max-h-60">
-                    {nationalities.filter(nationality => 
-                      !(formData.nationalityToInclude || []).includes(nationality)
-                    ).map((nationality) => (
-                      <SelectItem key={nationality} value={nationality}>
-                        {nationality}
+                    {countries.filter(country => 
+                      !(formData.nationalityToInclude || []).includes(country)
+                    ).map((country) => (
+                      <SelectItem key={country} value={country}>
+                        {country}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
                 {(formData.nationalityToInclude || []).length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
-                    {(formData.nationalityToInclude || []).map((nationality) => (
+                    {(formData.nationalityToInclude || []).map((country) => (
                       <span
-                        key={nationality}
+                        key={country}
                         className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
                       >
-                        {nationality}
+                        {country}
                         <button
                           type="button"
                           onClick={() => {
                             const currentInclude = formData.nationalityToInclude || [];
-                            const updated = currentInclude.filter((n) => n !== nationality);
+                            const updated = currentInclude.filter((n) => n !== country);
                             handleInputChange("nationalityToInclude", updated);
                           }}
                           className="ml-1 text-primary/60 hover:text-primary"
@@ -312,7 +312,7 @@ export default function AddJob() {
                 )}
               </div>
               <div className="space-y-2">
-                <Label>Nationality to Exclude</Label>
+                <Label>Countries to Exclude</Label>
                 <Select onValueChange={(value) => {
                   const currentExclude = formData.nationalityToExclude || [];
                   if (!currentExclude.includes(value)) {
@@ -320,31 +320,31 @@ export default function AddJob() {
                   }
                 }}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select nationality to exclude..." />
+                    <SelectValue placeholder="Select countries to exclude..." />
                   </SelectTrigger>
                   <SelectContent className="max-h-60">
-                    {nationalities.filter(nationality => 
-                      !(formData.nationalityToExclude || []).includes(nationality)
-                    ).map((nationality) => (
-                      <SelectItem key={nationality} value={nationality}>
-                        {nationality}
+                    {countries.filter(country => 
+                      !(formData.nationalityToExclude || []).includes(country)
+                    ).map((country) => (
+                      <SelectItem key={country} value={country}>
+                        {country}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
                 {(formData.nationalityToExclude || []).length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
-                    {(formData.nationalityToExclude || []).map((nationality) => (
+                    {(formData.nationalityToExclude || []).map((country) => (
                       <span
-                        key={nationality}
+                        key={country}
                         className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-destructive/10 text-destructive"
                       >
-                        {nationality}
+                        {country}
                         <button
                           type="button"
                           onClick={() => {
                             const currentExclude = formData.nationalityToExclude || [];
-                            const updated = currentExclude.filter((n) => n !== nationality);
+                            const updated = currentExclude.filter((n) => n !== country);
                             handleInputChange("nationalityToExclude", updated);
                           }}
                           className="ml-1 text-destructive/60 hover:text-destructive"
