@@ -69,7 +69,7 @@ export function DashboardSidebar() {
         {/* Header */}
         <div className="p-6 border-b border-border">
           <div className="flex items-center justify-center">
-            <div className="w-16 h-16 flex items-center justify-center">
+            <div className="w-24 h-24 flex items-center justify-center">
               {settings.logo ? (
                 <img 
                   src={settings.logo} 
@@ -77,7 +77,7 @@ export function DashboardSidebar() {
                   className="w-full h-full object-contain"
                 />
               ) : (
-                <Phone className="w-8 h-8 text-primary" />
+                <Phone className="w-12 h-12 text-primary" />
               )}
             </div>
           </div>
