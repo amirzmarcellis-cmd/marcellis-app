@@ -69,21 +69,20 @@ export function DashboardSidebar() {
         {/* Header */}
         <div className="p-4 border-b border-border">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
               {settings.logo ? (
                 <img 
                   src={settings.logo} 
                   alt="Company Logo" 
-                  className="w-full h-full object-cover rounded-lg"
+                  className="w-full h-full object-contain rounded-xl p-1"
                 />
               ) : (
-                <Phone className="w-4 h-4 text-primary-foreground" />
+                <Phone className="w-6 h-6 text-primary-foreground" />
               )}
             </div>
             {!isCollapsed && (
               <div>
-                <h2 className="text-lg font-bold text-foreground">{settings.systemName}</h2>
-                <p className="text-xs text-muted-foreground">AI Recruitment</p>
+                <h2 className="text-xl font-bold text-foreground">{settings.systemName}</h2>
               </div>
             )}
           </div>
