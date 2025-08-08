@@ -435,39 +435,6 @@ export default function Index() {
 
       </div>
 
-      {/* Quick Action Dock */}
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2">
-        <Card className="bg-black/50 backdrop-blur-lg border-white/20 shadow-2xl">
-          <CardContent className="p-3">
-            <div className="flex items-center space-x-3">
-              <Button size="sm" className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600">
-                <Plus className="h-4 w-4 mr-1" />
-                Add Job
-              </Button>
-              <Button size="sm" className="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600">
-                <Play className="h-4 w-4 mr-1" />
-                Start AI
-              </Button>
-              <Button size="sm" variant="outline" className="border-orange-400/50 text-orange-400 hover:bg-orange-400/10">
-                <Pause className="h-4 w-4 mr-1" />
-                Pause AI
-              </Button>
-              <Button size="sm" variant="outline" className="border-purple-400/50 text-purple-400 hover:bg-purple-400/10">
-                <Search className="h-4 w-4 mr-1" />
-                View All
-              </Button>
-              <Button size="sm" variant="outline" className="border-cyan-400/50 text-cyan-400 hover:bg-cyan-400/10">
-                <ClipboardList className="h-4 w-4 mr-1" />
-                Templates
-              </Button>
-              <Button size="sm" variant="outline" className="border-blue-400/50 text-blue-400 hover:bg-blue-400/10">
-                <Upload className="h-4 w-4 mr-1" />
-                Export
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }

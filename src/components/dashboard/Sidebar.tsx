@@ -114,6 +114,68 @@ export function DashboardSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
+        {/* Status indicator and sign out */}
+        <div className="p-4 border-t border-border space-y-3">
+          {!isCollapsed && (
+            <>
+              <div className="flex items-center space-x-2 text-sm">
+                <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+                <span className="text-muted-foreground">System Online</span>
+              </div>
+              
+              {/* Theme Toggle */}
+              <Button
+                onClick={toggleTheme}
+                variant="ghost"
+                className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-4 h-4 mr-3" />
+                ) : (
+                  <Moon className="w-4 h-4 mr-3" />
+                )}
+                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+              </Button>
+              
+              <Button
+                onClick={signOut}
+                variant="ghost"
+                className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              >
+                <LogOut className="w-4 h-4 mr-3" />
+                Sign Out
+              </Button>
+            </>
+          )}
+          {isCollapsed && (
+            <div className="flex flex-col items-center space-y-3">
+              <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+              
+              {/* Theme Toggle - Collapsed */}
+              <Button
+                onClick={toggleTheme}
+                variant="ghost"
+                size="sm"
+                className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-4 h-4" />
+                ) : (
+                  <Moon className="w-4 h-4" />
+                )}
+              </Button>
+              
+              <Button
+                onClick={signOut}
+                variant="ghost"
+                size="sm"
+                className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              >
+                <LogOut className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
+        </div>
       </SidebarContent>
     </Sidebar>
   )
