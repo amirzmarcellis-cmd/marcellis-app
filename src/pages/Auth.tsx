@@ -60,9 +60,8 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <div className="w-full max-w-md mx-auto">
-        <Card className="bg-card/80 backdrop-blur-sm border-border/50">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-card/80 backdrop-blur-sm border-border/50">
           <CardHeader className="space-y-6">
             <div className="flex items-center justify-center">
               <div className="w-24 h-24 bg-primary rounded-2xl flex items-center justify-center shadow-2xl">
@@ -133,8 +132,7 @@ export default function Auth() {
             </Button>
           </form>
         </CardContent>
-        </Card>
-      </div>
+      </Card>
     </div>
   );
 }
