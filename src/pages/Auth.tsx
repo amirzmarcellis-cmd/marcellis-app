@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Phone } from 'lucide-react';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
+import defaultLogo from '@/assets/default-logo.png';
 
 export default function Auth() {
   const { settings } = useAppSettings();
@@ -65,15 +66,11 @@ export default function Auth() {
           <CardHeader className="space-y-6">
             <div className="flex items-center justify-center">
               <div className="w-40 h-40 flex items-center justify-center">
-                {settings.logo ? (
-                  <img 
-                    src={settings.logo} 
-                    alt="Company Logo" 
-                    className="w-full h-full object-contain"
-                  />
-                ) : (
-                  <Phone className="w-20 h-20 text-primary" />
-                )}
+                <img 
+                  src={settings.logo || defaultLogo} 
+                  alt="Company Logo" 
+                  className="w-full h-full object-contain"
+                />
               </div>
             </div>
           <CardDescription className="text-center text-muted-foreground">
