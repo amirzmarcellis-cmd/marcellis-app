@@ -11,6 +11,7 @@ import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
+import { formatDate } from "@/lib/utils"
 
 interface Candidate {
   "Cadndidate_ID": string
@@ -243,7 +244,7 @@ export default function Candidates() {
                         <TableCell>
                           <div className="flex items-center space-x-2">
                             <Calendar className="w-4 h-4 text-muted-foreground" />
-                            <span>{candidate.Timestamp ? new Date(candidate.Timestamp).toLocaleDateString() : "N/A"}</span>
+                            <span>{candidate.Timestamp ? formatDate(candidate.Timestamp) : "N/A"}</span>
                           </div>
                         </TableCell>
                         <TableCell className="text-right">

@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Phone, Clock, User, FileText, MessageSquare, Plus, Search, Filter } from 'lucide-react';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 
 interface CallLog {
   id: string;
@@ -426,7 +426,7 @@ export default function CallLogPanel() {
                         <span className="font-mono">{call.duration}m</span>
                       </div>
                       <div className="text-blue-400 font-mono">
-                        {format(new Date(call.call_timestamp), 'MMM dd, HH:mm')}
+                        {formatDate(call.call_timestamp)}
                       </div>
                     </div>
                   </div>
@@ -484,7 +484,7 @@ export default function CallLogPanel() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-blue-300 uppercase tracking-wider">Timestamp</label>
                     <p className="text-cyan-400 font-mono bg-slate-800/30 p-2 rounded border border-blue-500/20">
-                      {format(new Date(selectedCall.call_timestamp), 'MMM dd, yyyy HH:mm')}
+                      {formatDate(selectedCall.call_timestamp)}
                     </p>
                   </div>
                 </div>
@@ -508,7 +508,7 @@ export default function CallLogPanel() {
                       <div key={comment.id} className="bg-slate-700/50 p-3 rounded border border-blue-500/20">
                         <p className="text-blue-200 font-mono text-sm">{comment.content}</p>
                         <p className="text-blue-400 text-xs mt-2 font-mono">
-                          {format(new Date(comment.created_at), 'MMM dd, HH:mm')}
+                          {formatDate(comment.created_at)}
                         </p>
                       </div>
                     ))

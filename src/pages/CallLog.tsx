@@ -14,6 +14,7 @@ import { Phone, Search, Eye, Calendar, Clock, User, FileText } from "lucide-reac
 import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
+import { formatDate } from "@/lib/utils"
 
 interface CallLog {
   "Job ID": string | null

@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, X, CheckCircle, Clock, User, Briefcase } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
+import { formatDate } from '@/lib/utils';
 
 interface Task {
   id: string;
@@ -406,7 +407,7 @@ export function TaskManager({ showAddForm = true, onTaskCountChange }: TaskManag
                             
                             {task.due_date && (
                               <Badge variant="outline" className="text-xs border-orange-400/40 text-orange-400">
-                                Due: {new Date(task.due_date).toLocaleDateString()}
+                                Due: {formatDate(task.due_date)}
                               </Badge>
                             )}
                           </div>
