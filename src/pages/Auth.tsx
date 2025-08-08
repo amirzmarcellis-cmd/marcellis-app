@@ -61,24 +61,25 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-card/80 backdrop-blur-sm border-border/50">
-        <CardHeader className="space-y-1">
-          <div className="flex items-center justify-center space-x-3 mb-4">
-            <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-              {settings.logo ? (
-                <img 
-                  src={settings.logo} 
-                  alt="Company Logo" 
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              ) : (
-                <Phone className="w-6 h-6 text-primary-foreground" />
-              )}
+      <div className="w-full max-w-md">
+        <Card className="bg-card/80 backdrop-blur-sm border-border/50">
+          <CardHeader className="space-y-6">
+            <div className="flex items-center justify-center">
+              <div className="w-24 h-24 bg-primary rounded-2xl flex items-center justify-center shadow-2xl">
+                {settings.logo ? (
+                  <img 
+                    src={settings.logo} 
+                    alt="Company Logo" 
+                    className="w-full h-full object-contain rounded-2xl p-2"
+                  />
+                ) : (
+                  <Phone className="w-12 h-12 text-primary-foreground" />
+                )}
+              </div>
             </div>
-          </div>
-          <CardTitle className="text-2xl text-center font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            {settings.systemName}
-          </CardTitle>
+            <CardTitle className="text-3xl text-center font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              {settings.systemName}
+            </CardTitle>
           <CardDescription className="text-center text-muted-foreground">
             {isLogin ? 'Sign in to your account' : 'Create a new account'}
           </CardDescription>
@@ -132,7 +133,8 @@ export default function Auth() {
             </Button>
           </form>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }
