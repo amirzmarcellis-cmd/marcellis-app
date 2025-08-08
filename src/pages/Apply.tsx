@@ -1,0 +1,360 @@
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import FileUpload from "@/components/upload/FileUpload";
+
+const applicationSchema = z.object({
+  fullName: z.string().min(2, "Full name must be at least 2 characters"),
+  phoneNumber: z.string().min(10, "Please enter a valid phone number"),
+  email: z.string().email("Please enter a valid email address"),
+  jobApplied: z.string().min(1, "Please select a job"),
+  portfolioLink: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+  agencyExperience: z.string().min(1, "Please specify your agency experience"),
+  overallExperience: z.string().min(1, "Please specify your overall experience"),
+  salaryExpectations: z.string().min(1, "Please enter your salary expectations"),
+  noticePeriod: z.string().min(1, "Please enter your notice period"),
+  uaeLocation: z.enum(["yes", "no"], { required_error: "Please select an option" }),
+  notes: z.string().optional(),
+});
+
+type ApplicationForm = z.infer<typeof applicationSchema>;
+
+interface Job {
+  "Job ID": string;
+  "Job Title": string;
+  "Job Location": string;
+}
+
+export default function Apply() {
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cvFile, setCvFile] = useState<string>("");
+  const { toast } = useToast();
+
+  const form = useForm<ApplicationForm>({
+    resolver: zodResolver(applicationSchema),
+    defaultValues: {
+      fullName: "",
+      phoneNumber: "",
+      email: "",
+      jobApplied: "",
+      portfolioLink: "",
+      agencyExperience: "",
+      overallExperience: "",
+      salaryExpectations: "",
+      noticePeriod: "",
+      notes: "",
+    },
+  });
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
+  const fetchJobs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("Jobs")
+        .select('"Job ID", "Job Title", "Job Location"')
+        .order('"Job Title"');
+
+      if (error) throw error;
+      setJobs(data || []);
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load available jobs",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const onSubmit = async (data: ApplicationForm) => {
+    setIsSubmitting(true);
+    
+    try {
+      // Generate a unique candidate ID
+      const candidateId = `CAND-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
+      const cvData = {
+        "Cadndidate_ID": candidateId,
+        "First Name": data.fullName.split(" ")[0],
+        "Last Name": data.fullName.split(" ").slice(1).join(" "),
+        "Phone Number": data.phoneNumber,
+        "Email": data.email,
+        "Applied for": [data.jobApplied],
+        "CV_Link": cvFile,
+        "Linkedin": data.portfolioLink,
+        "Other Notes": data.notes,
+        "Timestamp": new Date().toISOString(),
+        "Experience": `Agency: ${data.agencyExperience}, Overall: ${data.overallExperience}`,
+        "Location": data.uaeLocation === "yes" ? "UAE" : "Outside UAE",
+        "CV Summary": `Salary Expectations: ${data.salaryExpectations} AED/month, Notice Period: ${data.noticePeriod} days`,
+      };
+
+      const { error } = await supabase
+        .from("CVs")
+        .insert([cvData]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Application Submitted",
+        description: "Thank you for your application. We will review it and get back to you soon.",
+      });
+
+      form.reset();
+      setCvFile("");
+    } catch (error) {
+      console.error("Error submitting application:", error);
+      toast({
+        title: "Error",
+        description: "Failed to submit application. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleFileUpload = (files: any[]) => {
+    if (files.length > 0) {
+      setCvFile(files[0].url);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background p-4">
+      <div className="max-w-2xl mx-auto">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl text-center">Job Application</CardTitle>
+            <CardDescription className="text-center">
+              Please fill out the form below to apply for a position with us.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="fullName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your full name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number (ex. 971558884444)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="971558884444" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email Address</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="your.email@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="jobApplied"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Job Applied</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a job position" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {jobs.map((job) => (
+                            <SelectItem key={job["Job ID"]} value={job["Job ID"]}>
+                              {job["Job Title"]} - {job["Job Location"]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="portfolioLink"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Portfolio Link (Behance, Dribbble, YouTube, Website, Google Drive, etc.)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://your-portfolio.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="agencyExperience"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>How many years of experience do you have working in a marketing or creative agency?</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., 3 years" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="overallExperience"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>How many years of professional experience do you have in this role overall?</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., 5 years" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="salaryExpectations"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Salary Expectations (AED/month)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., 15000" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="noticePeriod"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notice Period (in Days)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., 30" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="uaeLocation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Are you currently located in the UAE?</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex flex-row space-x-6"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="yes" id="yes" />
+                            <Label htmlFor="yes">Yes</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="no" id="no" />
+                            <Label htmlFor="no">No</Label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div>
+                  <Label className="text-sm font-medium">Upload your CV</Label>
+                  <div className="mt-2">
+                    <FileUpload
+                      entityType="application"
+                      entityId="temp"
+                      accept=".pdf,.doc,.docx"
+                      maxSize={10}
+                      onUploadComplete={handleFileUpload}
+                    />
+                  </div>
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notes (Optional)</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Any additional information you'd like to share..."
+                          rows={4}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit Application"}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

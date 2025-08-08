@@ -24,6 +24,7 @@ import Performance from "./pages/Performance";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import LiveCandidateFeed from "./pages/LiveCandidateFeed";
+import Apply from "./pages/Apply";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
             <SidebarProvider>
             <Routes>
               <Route path="/auth" element={<Auth />} />
+              <Route path="/apply" element={<Apply />} />
               <Route path="/" element={<DashboardLayout><Index /></DashboardLayout>} />
               <Route path="/live-feed" element={<DashboardLayout><LiveCandidateFeed /></DashboardLayout>} />
               <Route path="/jobs" element={<DashboardLayout><Jobs /></DashboardLayout>} />
