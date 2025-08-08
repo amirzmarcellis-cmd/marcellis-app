@@ -482,15 +482,23 @@ export default function JobDetails() {
 
            <TabsContent value="candidates" className="space-y-4">
              <Card>
-               <CardHeader>
-                 <CardTitle className="flex items-center">
-                   <Users className="w-5 h-5 mr-2" />
-                   Contacted Candidates ({filteredCandidates.length} of {candidates.length})
-                 </CardTitle>
-                 <CardDescription>
-                   Candidates who have been contacted for this position
-                 </CardDescription>
-               </CardHeader>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center">
+                        <Users className="w-5 h-5 mr-2" />
+                        Contacted Candidates ({filteredCandidates.length} of {candidates.length})
+                      </CardTitle>
+                      <CardDescription>
+                        Candidates who have been contacted for this position
+                      </CardDescription>
+                    </div>
+                    <Button variant="default" className="bg-green-600 hover:bg-green-700 text-white">
+                      <Phone className="w-4 h-4 mr-2" />
+                      Call & Generate Short List
+                    </Button>
+                  </div>
+                </CardHeader>
                <CardContent>
                  {candidatesLoading ? (
                    <div className="flex items-center justify-center py-8">
