@@ -68,7 +68,7 @@ export function DashboardSidebar() {
       <SidebarContent className="bg-transparent">
         {/* Header */}
         <div className="p-4 border-b border-border">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center justify-center">
             <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
               {settings.logo ? (
                 <img 
@@ -80,11 +80,6 @@ export function DashboardSidebar() {
                 <Phone className="w-6 h-6 text-primary-foreground" />
               )}
             </div>
-            {!isCollapsed && (
-              <div>
-                <h2 className="text-xl font-bold text-foreground">{settings.systemName}</h2>
-              </div>
-            )}
           </div>
         </div>
 
