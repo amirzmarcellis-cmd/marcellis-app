@@ -281,15 +281,15 @@ export default function AddJob() {
                       aria-expanded={openIncludePopover}
                       className="w-full justify-between"
                     >
-                      {formData.nationalityToInclude.length > 0
-                        ? `${formData.nationalityToInclude.length} selected`
+                      {(formData.nationalityToInclude || []).length > 0
+                        ? `${(formData.nationalityToInclude || []).length} selected`
                         : "Select nationalities..."}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-full p-0">
+                  <PopoverContent className="w-[400px] p-0">
                     <Command>
-                      <CommandInput placeholder="Search nationality..." />
+                      <CommandInput placeholder="Search nationality..." className="h-9" />
                       <CommandEmpty>No nationality found.</CommandEmpty>
                       <CommandGroup className="max-h-64 overflow-auto">
                         {nationalities.map((nationality) => (
@@ -297,16 +297,17 @@ export default function AddJob() {
                             key={nationality}
                             value={nationality}
                             onSelect={() => {
-                              const updatedInclude = formData.nationalityToInclude.includes(nationality)
-                                ? formData.nationalityToInclude.filter((n) => n !== nationality)
-                                : [...formData.nationalityToInclude, nationality];
+                              const currentInclude = formData.nationalityToInclude || [];
+                              const updatedInclude = currentInclude.includes(nationality)
+                                ? currentInclude.filter((n) => n !== nationality)
+                                : [...currentInclude, nationality];
                               handleInputChange("nationalityToInclude", updatedInclude);
-                            }}
-                          >
-                            <Check
+                             }}
+                           >
+                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                formData.nationalityToInclude.includes(nationality) ? "opacity-100" : "opacity-0"
+                                (formData.nationalityToInclude || []).includes(nationality) ? "opacity-100" : "opacity-0"
                               )}
                             />
                             {nationality}
@@ -316,9 +317,9 @@ export default function AddJob() {
                     </Command>
                   </PopoverContent>
                 </Popover>
-                {formData.nationalityToInclude.length > 0 && (
+                {(formData.nationalityToInclude || []).length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
-                    {formData.nationalityToInclude.map((nationality) => (
+                    {(formData.nationalityToInclude || []).map((nationality) => (
                       <span
                         key={nationality}
                         className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
@@ -327,7 +328,8 @@ export default function AddJob() {
                         <button
                           type="button"
                           onClick={() => {
-                            const updated = formData.nationalityToInclude.filter((n) => n !== nationality);
+                            const currentInclude = formData.nationalityToInclude || [];
+                            const updated = currentInclude.filter((n) => n !== nationality);
                             handleInputChange("nationalityToInclude", updated);
                           }}
                           className="ml-1 text-primary/60 hover:text-primary"
@@ -349,15 +351,15 @@ export default function AddJob() {
                       aria-expanded={openExcludePopover}
                       className="w-full justify-between"
                     >
-                      {formData.nationalityToExclude.length > 0
-                        ? `${formData.nationalityToExclude.length} selected`
+                      {(formData.nationalityToExclude || []).length > 0
+                        ? `${(formData.nationalityToExclude || []).length} selected`
                         : "Select nationalities..."}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-full p-0">
+                  <PopoverContent className="w-[400px] p-0">
                     <Command>
-                      <CommandInput placeholder="Search nationality..." />
+                      <CommandInput placeholder="Search nationality..." className="h-9" />
                       <CommandEmpty>No nationality found.</CommandEmpty>
                       <CommandGroup className="max-h-64 overflow-auto">
                         {nationalities.map((nationality) => (
@@ -365,16 +367,17 @@ export default function AddJob() {
                             key={nationality}
                             value={nationality}
                             onSelect={() => {
-                              const updatedExclude = formData.nationalityToExclude.includes(nationality)
-                                ? formData.nationalityToExclude.filter((n) => n !== nationality)
-                                : [...formData.nationalityToExclude, nationality];
+                              const currentExclude = formData.nationalityToExclude || [];
+                              const updatedExclude = currentExclude.includes(nationality)
+                                ? currentExclude.filter((n) => n !== nationality)
+                                : [...currentExclude, nationality];
                               handleInputChange("nationalityToExclude", updatedExclude);
                             }}
                           >
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                formData.nationalityToExclude.includes(nationality) ? "opacity-100" : "opacity-0"
+                                (formData.nationalityToExclude || []).includes(nationality) ? "opacity-100" : "opacity-0"
                               )}
                             />
                             {nationality}
@@ -384,9 +387,9 @@ export default function AddJob() {
                     </Command>
                   </PopoverContent>
                 </Popover>
-                {formData.nationalityToExclude.length > 0 && (
+                {(formData.nationalityToExclude || []).length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
-                    {formData.nationalityToExclude.map((nationality) => (
+                    {(formData.nationalityToExclude || []).map((nationality) => (
                       <span
                         key={nationality}
                         className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-destructive/10 text-destructive"
@@ -395,7 +398,8 @@ export default function AddJob() {
                         <button
                           type="button"
                           onClick={() => {
-                            const updated = formData.nationalityToExclude.filter((n) => n !== nationality);
+                            const currentExclude = formData.nationalityToExclude || [];
+                            const updated = currentExclude.filter((n) => n !== nationality);
                             handleInputChange("nationalityToExclude", updated);
                           }}
                           className="ml-1 text-destructive/60 hover:text-destructive"
