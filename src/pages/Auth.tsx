@@ -67,7 +67,7 @@ export default function Auth() {
             <div className="flex items-center justify-center">
               <div className="w-40 h-40 flex items-center justify-center">
                 <img 
-                  src="/lovable-uploads/fb42f528-13f8-4d72-b247-1f5037e8640b.png" 
+                  src="/lovable-uploads/43641ce1-cadf-4331-8519-75b24de04fe1.png" 
                   alt="Company Logo" 
                   className="w-full h-full object-contain"
                 />
