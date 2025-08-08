@@ -11,6 +11,7 @@ import { ArrowLeft, MapPin, Calendar, DollarSign, Users, FileText, Clock, Target
 import { supabase } from "@/integrations/supabase/client"
 import { JobDialog } from "@/components/jobs/JobDialog"
 import { useToast } from "@/components/ui/use-toast"
+import { formatDate } from "@/lib/utils"
 
 // Using any type to avoid TypeScript complexity with quoted property names
 
@@ -253,7 +254,7 @@ export default function JobDetails() {
                 </div>
                 <div className="flex items-center space-x-2 text-sm">
                   <Calendar className="w-4 h-4 text-muted-foreground" />
-                  <span>Posted: {job.Timestamp}</span>
+                  <span>Posted: {formatDate(job.Timestamp)}</span>
                 </div>
               </div>
             </div>
@@ -337,7 +338,7 @@ export default function JobDetails() {
                   )}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Posted Date:</span>
-                    <span>{job.Timestamp || "N/A"}</span>
+                    <span>{job.Timestamp ? formatDate(job.Timestamp) : "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">JD Summary:</span>
