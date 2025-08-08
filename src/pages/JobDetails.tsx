@@ -39,6 +39,7 @@ export default function JobDetails() {
   const [contactedFilter, setContactedFilter] = useState("all")
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+  const [isGeneratingShortList, setIsGeneratingShortList] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -136,6 +137,54 @@ export default function JobDetails() {
         description: "Failed to generate long list",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleGenerateShortList = async () => {
+    if (!job?.["Job ID"] || candidates.length === 0) {
+      toast({
+        title: "Error",
+        description: "No candidates available to process",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingShortList(true);
+    
+    try {
+      // Prepare the candidates array for the API
+      const candidatesData = candidates.map(candidate => ({
+        candidateID: candidate["Candidate_ID"],
+        jobID: job["Job ID"]
+      }));
+
+      // Make HTTP request to the webhook
+      const response = await fetch('https://hook.eu2.make.com/i3owa6dmu1mstug4tsfb0dnhhjfh4arj', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(candidatesData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      toast({
+        title: "Success",
+        description: "Short list generation initiated successfully",
+      });
+    } catch (error) {
+      console.error('Error generating short list:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate short list",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingShortList(false);
     }
   };
 
@@ -297,11 +346,12 @@ export default function JobDetails() {
 
         {/* Detailed Information Tabs */}
          <Tabs defaultValue="overview" className="space-y-4">
-           <TabsList className="grid w-full grid-cols-4">
+           <TabsList className="grid w-full grid-cols-5">
              <TabsTrigger value="overview">Overview</TabsTrigger>
              <TabsTrigger value="description">Job Description</TabsTrigger>
              <TabsTrigger value="requirements">AI Requirements</TabsTrigger>
              <TabsTrigger value="candidates">Long List</TabsTrigger>
+             <TabsTrigger value="shortlist">Short List</TabsTrigger>
            </TabsList>
 
           <TabsContent value="overview" className="space-y-4">
@@ -493,9 +543,14 @@ export default function JobDetails() {
                         Candidates who have been contacted for this position
                       </CardDescription>
                     </div>
-                    <Button variant="default" className="bg-green-600 hover:bg-green-700 text-white">
+                    <Button 
+                      variant="default" 
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      onClick={handleGenerateShortList}
+                      disabled={isGeneratingShortList}
+                    >
                       <Phone className="w-4 h-4 mr-2" />
-                      Call & Generate Short List
+                      {isGeneratingShortList ? "Generating..." : "Call & Generate Short List"}
                     </Button>
                   </div>
                 </CardHeader>
@@ -663,8 +718,29 @@ export default function JobDetails() {
                  )}
                </CardContent>
              </Card>
+            </TabsContent>
+
+           <TabsContent value="shortlist" className="space-y-4">
+             <Card>
+               <CardHeader>
+                 <CardTitle className="flex items-center">
+                   <Star className="w-5 h-5 mr-2" />
+                   Short List
+                 </CardTitle>
+                 <CardDescription>
+                   Selected candidates who have passed the initial screening
+                 </CardDescription>
+               </CardHeader>
+               <CardContent>
+                 <div className="text-center py-8">
+                   <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                   <h3 className="text-lg font-semibold mb-2">No candidates in short list yet</h3>
+                   <p className="text-muted-foreground">Use the "Call & Generate Short List" button to process candidates from the long list</p>
+                 </div>
+               </CardContent>
+             </Card>
            </TabsContent>
-         </Tabs>
+          </Tabs>
          
          <JobDialog
            job={job}
