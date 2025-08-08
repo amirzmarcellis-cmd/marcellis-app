@@ -85,17 +85,17 @@ export default function JobDetails() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ jobID: job["Job ID"] }),
+        body: JSON.stringify({ jobID: job?.["Job ID"] || '' }),
       });
 
-      if (response.ok) {
-        toast({
-          title: "Success",
-          description: "Automation started successfully",
-        });
-      } else {
-        throw new Error('Failed to start automation');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      toast({
+        title: "Success",
+        description: "Automation started successfully",
+      });
     } catch (error) {
       console.error('Error starting automation:', error);
       toast({

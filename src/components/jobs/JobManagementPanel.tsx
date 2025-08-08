@@ -207,14 +207,14 @@ function JobGrid({ jobs, onEdit, onDelete, onStatusToggle, navigate }: JobGridPr
         body: JSON.stringify({ jobID: jobId }),
       });
 
-      if (response.ok) {
-        toast({
-          title: "Success",
-          description: "Automation started successfully",
-        });
-      } else {
-        throw new Error('Failed to start automation');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      toast({
+        title: "Success",
+        description: "Automation started successfully",
+      });
     } catch (error) {
       console.error('Error starting automation:', error);
       toast({
