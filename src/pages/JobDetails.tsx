@@ -12,6 +12,16 @@ import { supabase } from "@/integrations/supabase/client"
 import { JobDialog } from "@/components/jobs/JobDialog"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDate } from "@/lib/utils"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 // Using any type to avoid TypeScript complexity with quoted property names
 
@@ -28,6 +38,7 @@ export default function JobDetails() {
   const [scoreFilter, setScoreFilter] = useState("all")
   const [contactedFilter, setContactedFilter] = useState("all")
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -77,6 +88,14 @@ export default function JobDetails() {
       setCandidatesLoading(false)
     }
   }
+
+  const handleButtonClick = () => {
+    if (job?.longlist && job.longlist > 0) {
+      setShowConfirmDialog(true);
+    } else {
+      handleGenerateLongList();
+    }
+  };
 
   const handleGenerateLongList = async () => {
     try {
@@ -227,8 +246,9 @@ export default function JobDetails() {
           </div>
           <div className="flex items-center space-x-2">
             <Button 
-              onClick={handleGenerateLongList}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={handleButtonClick}
+              disabled={job?.longlist === 3}
+              className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Zap className="w-4 h-4 mr-2" />
               {job?.longlist && job.longlist > 0 ? "Re-generate Long List" : "Generate Long List"}
@@ -626,6 +646,28 @@ export default function JobDetails() {
              setIsEditDialogOpen(false)
            }}
          />
+
+         <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+           <AlertDialogContent>
+             <AlertDialogHeader>
+               <AlertDialogTitle>Regenerate Long List</AlertDialogTitle>
+               <AlertDialogDescription>
+                 Are you sure you want to regenerate Long List?
+               </AlertDialogDescription>
+             </AlertDialogHeader>
+             <AlertDialogFooter>
+               <AlertDialogCancel>Cancel</AlertDialogCancel>
+               <AlertDialogAction 
+                 onClick={() => {
+                   setShowConfirmDialog(false);
+                   handleGenerateLongList();
+                 }}
+               >
+                 Yes, Regenerate
+               </AlertDialogAction>
+             </AlertDialogFooter>
+           </AlertDialogContent>
+         </AlertDialog>
        </div>
    )
  }
