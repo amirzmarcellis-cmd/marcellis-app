@@ -42,16 +42,19 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
       
       // Convert hex to HSL
       const hexToHsl = (hex: string) => {
-        const r = parseInt(hex.slice(1, 3), 16) / 255;
-        const g = parseInt(hex.slice(3, 5), 16) / 255;
-        const b = parseInt(hex.slice(5, 7), 16) / 255;
+        // Remove the hash if present
+        hex = hex.replace('#', '');
+        
+        const r = parseInt(hex.slice(0, 2), 16) / 255;
+        const g = parseInt(hex.slice(2, 4), 16) / 255;
+        const b = parseInt(hex.slice(4, 6), 16) / 255;
 
         const max = Math.max(r, g, b);
         const min = Math.min(r, g, b);
         let h, s, l = (max + min) / 2;
 
         if (max === min) {
-          h = s = 0;
+          h = s = 0; // achromatic
         } else {
           const d = max - min;
           s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
@@ -69,13 +72,24 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
 
       const [h, s, l] = hexToHsl(settings.primaryColor);
       
-      // Update CSS variables
+      // Update CSS variables for both light and dark themes
       root.style.setProperty('--primary', `${h} ${s}% ${l}%`);
       root.style.setProperty('--accent', `${h} ${s}% ${l}%`);
       root.style.setProperty('--cyan', `${h} ${s}% ${l}%`);
       root.style.setProperty('--sidebar-primary', `${h} ${s}% ${l}%`);
       root.style.setProperty('--ring', `${h} ${s}% ${l}%`);
       root.style.setProperty('--sidebar-ring', `${h} ${s}% ${l}%`);
+      
+      // Update primary glow for dark theme
+      const glowL = Math.min(l + 20, 90);
+      root.style.setProperty('--primary-glow', `${h} ${s}% ${glowL}%`);
+      
+      // Update gradient variables
+      const gradient1 = `hsl(${h} ${s}% ${l}%)`;
+      const gradient2 = `hsl(${Math.max(h - 20, 0)} ${Math.max(s - 10, 0)}% ${Math.max(l - 10, 10)}%)`;
+      root.style.setProperty('--gradient-primary', `linear-gradient(135deg, ${gradient1}, ${gradient2})`);
+      
+      console.log(`Primary color updated to: ${h} ${s}% ${l}%`);
     }
   }, [settings.primaryColor]);
 

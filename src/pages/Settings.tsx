@@ -36,6 +36,12 @@ export default function Settings() {
     toast.success("Settings saved successfully!")
   }
 
+  // Update colors immediately when changed
+  const handleColorChange = (color: string) => {
+    setPrimaryColor(color);
+    updateSettings({ primaryColor: color });
+  }
+
   return (
       <div className="space-y-6">
         <div>
@@ -114,19 +120,42 @@ export default function Settings() {
                       id="primaryColor"
                       type="color"
                       value={primaryColor}
-                      onChange={(e) => setPrimaryColor(e.target.value)}
+                      onChange={(e) => handleColorChange(e.target.value)}
                       className="bg-background/50 border-glass-border h-12"
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-6 gap-2 mt-2">
-                  {["#8B5CF6", "#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#EC4899"].map((color) => (
+                <div className="grid grid-cols-8 gap-2 mt-3">
+                  {[
+                    "#00FFFF", // Cyan
+                    "#3B82F6", // Blue  
+                    "#8B5CF6", // Purple
+                    "#10B981", // Green
+                    "#F59E0B", // Orange
+                    "#EF4444", // Red
+                    "#EC4899", // Pink
+                    "#06B6D4", // Sky Blue
+                    "#8B5A2B", // Brown
+                    "#6B7280", // Gray
+                    "#F97316", // Orange Red
+                    "#84CC16", // Lime
+                    "#A855F7", // Violet
+                    "#14B8A6", // Teal
+                    "#F43F5E", // Rose
+                    "#6366F1"  // Indigo
+                  ].map((color) => (
                     <button
                       key={color}
-                      className="w-8 h-8 rounded-md border-2 border-glass-border hover:scale-110 transition-transform"
+                      className={`relative w-10 h-10 rounded-lg border-2 hover:scale-110 transition-all duration-200 hover:shadow-lg ${
+                        primaryColor === color ? 'border-white shadow-white/30 shadow-md' : 'border-glass-border'
+                      }`}
                       style={{ backgroundColor: color }}
-                      onClick={() => setPrimaryColor(color)}
-                    />
+                      onClick={() => handleColorChange(color)}
+                    >
+                      {primaryColor === color && (
+                        <div className="absolute inset-0 rounded-lg border-2 border-white animate-pulse" />
+                      )}
+                    </button>
                   ))}
                 </div>
               </div>
