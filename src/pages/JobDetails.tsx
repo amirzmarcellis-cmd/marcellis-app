@@ -297,11 +297,10 @@ export default function JobDetails() {
 
         {/* Detailed Information Tabs */}
          <Tabs defaultValue="overview" className="space-y-4">
-           <TabsList className="grid w-full grid-cols-5">
+           <TabsList className="grid w-full grid-cols-4">
              <TabsTrigger value="overview">Overview</TabsTrigger>
-             <TabsTrigger value="description">Description</TabsTrigger>
+             <TabsTrigger value="description">Job Description</TabsTrigger>
              <TabsTrigger value="requirements">AI Requirements</TabsTrigger>
-             <TabsTrigger value="documents">Job Documents</TabsTrigger>
              <TabsTrigger value="candidates">Long List</TabsTrigger>
            </TabsList>
 
@@ -408,15 +407,39 @@ export default function JobDetails() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="prose prose-sm max-w-none">
-                  <p className="leading-relaxed whitespace-pre-wrap">
-                    {job["Job Description"] || "No description available for this position."}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+               <CardContent>
+                 <div className="prose prose-sm max-w-none">
+                   <p className="leading-relaxed whitespace-pre-wrap">
+                     {job["Job Description"] || "No description available for this position."}
+                   </p>
+                 </div>
+               </CardContent>
+             </Card>
+
+             {/* Job Documents Section */}
+             <Card>
+               <CardHeader>
+                 <CardTitle className="flex items-center">
+                   <FileText className="w-5 h-5 mr-2" />
+                   Job Documents
+                 </CardTitle>
+                 <CardDescription>
+                   Uploaded job description files and related documents
+                 </CardDescription>
+               </CardHeader>
+               <CardContent>
+                 <div className="text-center py-8">
+                   <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                   <h3 className="text-lg font-semibold mb-2">No documents uploaded</h3>
+                   <p className="text-muted-foreground">Upload job description files when creating or editing this job</p>
+                   <Button variant="outline" className="mt-4" onClick={() => setIsEditDialogOpen(true)}>
+                     <Upload className="w-4 h-4 mr-2" />
+                     Upload Documents
+                   </Button>
+                 </div>
+               </CardContent>
+             </Card>
+           </TabsContent>
 
            <TabsContent value="requirements" className="space-y-4">
             <Card>
@@ -456,30 +479,6 @@ export default function JobDetails() {
             </Card>
            </TabsContent>
 
-           <TabsContent value="documents" className="space-y-4">
-             <Card>
-               <CardHeader>
-                 <CardTitle className="flex items-center">
-                   <FileText className="w-5 h-5 mr-2" />
-                   Job Documents
-                 </CardTitle>
-                 <CardDescription>
-                   Uploaded job description files and related documents
-                 </CardDescription>
-               </CardHeader>
-               <CardContent>
-                 <div className="text-center py-8">
-                   <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                   <h3 className="text-lg font-semibold mb-2">No documents uploaded</h3>
-                   <p className="text-muted-foreground">Upload job description files when creating or editing this job</p>
-                   <Button variant="outline" className="mt-4" onClick={() => setIsEditDialogOpen(true)}>
-                     <Upload className="w-4 h-4 mr-2" />
-                     Upload Documents
-                   </Button>
-                 </div>
-               </CardContent>
-             </Card>
-           </TabsContent>
 
            <TabsContent value="candidates" className="space-y-4">
              <Card>
