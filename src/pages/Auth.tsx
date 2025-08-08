@@ -76,9 +76,6 @@ export default function Auth() {
                 )}
               </div>
             </div>
-            <CardTitle className="text-3xl text-center font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              {settings.systemName}
-            </CardTitle>
           <CardDescription className="text-center text-muted-foreground">
             {isLogin ? 'Sign in to your account' : 'Create a new account'}
           </CardDescription>
