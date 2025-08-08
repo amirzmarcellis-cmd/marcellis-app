@@ -69,15 +69,15 @@ export function DashboardSidebar() {
         {/* Header */}
         <div className="p-6 border-b border-border">
           <div className="flex items-center justify-center">
-            <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-xl">
+            <div className="w-16 h-16 flex items-center justify-center">
               {settings.logo ? (
                 <img 
                   src={settings.logo} 
                   alt="Company Logo" 
-                  className="w-full h-full object-contain rounded-2xl p-2"
+                  className="w-full h-full object-contain"
                 />
               ) : (
-                <Phone className="w-8 h-8 text-primary-foreground" />
+                <Phone className="w-8 h-8 text-primary" />
               )}
             </div>
           </div>

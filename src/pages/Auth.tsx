@@ -64,15 +64,15 @@ export default function Auth() {
       <Card className="w-full max-w-md bg-card/80 backdrop-blur-sm border-border/50">
           <CardHeader className="space-y-6">
             <div className="flex items-center justify-center">
-              <div className="w-24 h-24 bg-primary rounded-2xl flex items-center justify-center shadow-2xl">
+              <div className="w-24 h-24 flex items-center justify-center">
                 {settings.logo ? (
                   <img 
                     src={settings.logo} 
                     alt="Company Logo" 
-                    className="w-full h-full object-contain rounded-2xl p-2"
+                    className="w-full h-full object-contain"
                   />
                 ) : (
-                  <Phone className="w-12 h-12 text-primary-foreground" />
+                  <Phone className="w-12 h-12 text-primary" />
                 )}
               </div>
             </div>
