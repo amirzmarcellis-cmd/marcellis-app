@@ -64,7 +64,7 @@ export default function Auth() {
       <Card className="w-full max-w-md bg-card/80 backdrop-blur-sm border-border/50">
           <CardHeader className="space-y-6">
             <div className="flex items-center justify-center">
-              <div className="w-32 h-32 flex items-center justify-center">
+              <div className="w-40 h-40 flex items-center justify-center">
                 {settings.logo ? (
                   <img 
                     src={settings.logo} 
@@ -72,7 +72,7 @@ export default function Auth() {
                     className="w-full h-full object-contain"
                   />
                 ) : (
-                  <Phone className="w-16 h-16 text-primary" />
+                  <Phone className="w-20 h-20 text-primary" />
                 )}
               </div>
             </div>
