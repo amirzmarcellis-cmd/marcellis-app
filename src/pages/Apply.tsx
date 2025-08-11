@@ -146,25 +146,31 @@ export default function Apply() {
     setIsSubmitting(true);
     
     try {
+      // Function to clean text data and remove null characters
+      const cleanText = (text: string) => {
+        if (!text) return "";
+        return text.replace(/\u0000/g, "").trim();
+      };
+
       // Generate a proper candidate ID
       const candidateId = await generateCandidateId();
       
       const cvData = {
         "Cadndidate_ID": candidateId,
-        "Title": data.title || "",
-        "First Name": data.fullName.split(" ")[0] || "",
-        "Last Name": data.fullName.split(" ").slice(1).join(" ") || "",
-        "Phone Number": data.phoneNumber || "",
-        "Email": data.email || "",
+        "Title": cleanText(data.title),
+        "First Name": cleanText(data.fullName.split(" ")[0] || ""),
+        "Last Name": cleanText(data.fullName.split(" ").slice(1).join(" ") || ""),
+        "Phone Number": cleanText(data.phoneNumber),
+        "Email": cleanText(data.email),
         "Applied for": [data.jobApplied],
-        "CV_Link": cvFile || "",
-        "cv_text": cvText || "",
-        "Linkedin": data.portfolioLink || "",
-        "Other Notes": data.notes || "",
+        "CV_Link": cleanText(cvFile),
+        "cv_text": cleanText(cvText),
+        "Linkedin": cleanText(data.portfolioLink || ""),
+        "Other Notes": cleanText(data.notes || ""),
         "Timestamp": new Date().toISOString(),
-        "Experience": `Agency: ${data.agencyExperience}, Overall: ${data.overallExperience}`,
-        "Location": data.currentLocation,
-        "CV Summary": `Salary Expectations: ${data.salaryExpectations} AED/month, Notice Period: ${data.noticePeriod} days`,
+        "Experience": cleanText(`Agency: ${data.agencyExperience}, Overall: ${data.overallExperience}`),
+        "Location": cleanText(data.currentLocation),
+        "CV Summary": cleanText(`Salary Expectations: ${data.salaryExpectations} AED/month, Notice Period: ${data.noticePeriod} days`),
       };
 
       const { error } = await supabase
