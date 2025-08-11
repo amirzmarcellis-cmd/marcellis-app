@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
+import { Textarea } from "@/components/ui/textarea"
 import { Phone, Search, Eye, Calendar, Clock, User, FileText } from "lucide-react"
 import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
@@ -34,6 +35,7 @@ interface CallLog {
   "Agency Experience": string | null
   "Job Title": string | null
   "2 Questions of Interview": string | null
+  "Notes": string | null
 }
 
 const formatPhoneNumber = (phone: string | null) => {
@@ -73,6 +75,8 @@ export default function CallLog() {
   const [callLogs, setCallLogs] = useState<CallLog[]>([])
   const [jobs, setJobs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [editingNotes, setEditingNotes] = useState<{[key: string]: string}>({})
+  const [savingNotes, setSavingNotes] = useState<{[key: string]: boolean}>({})
 
   const candidateParam = searchParams.get('candidate')
   const jobParam = searchParams.get('job')
@@ -113,6 +117,44 @@ export default function CallLog() {
       console.error('Error fetching data:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleNotesChange = (logKey: string, notes: string) => {
+    setEditingNotes(prev => ({ ...prev, [logKey]: notes }))
+  }
+
+  const saveNotes = async (log: CallLog) => {
+    const logKey = `${log["Candidate_ID"]}-${log["Job ID"]}`
+    const notes = editingNotes[logKey] || log["Notes"] || ""
+    
+    setSavingNotes(prev => ({ ...prev, [logKey]: true }))
+    
+    try {
+      const { error } = await supabase
+        .from('Jobs_CVs')
+        .update({ 'Notes': notes })
+        .eq('Candidate_ID', log["Candidate_ID"])
+        .eq('Job ID', log["Job ID"])
+
+      if (error) throw error
+
+      // Update local state
+      setCallLogs(prev => prev.map(l => 
+        l["Candidate_ID"] === log["Candidate_ID"] && l["Job ID"] === log["Job ID"]
+          ? { ...l, Notes: notes }
+          : l
+      ))
+
+      // Clear editing state
+      setEditingNotes(prev => {
+        const { [logKey]: _, ...rest } = prev
+        return rest
+      })
+    } catch (error) {
+      console.error('Error saving notes:', error)
+    } finally {
+      setSavingNotes(prev => ({ ...prev, [logKey]: false }))
     }
   }
 
@@ -299,6 +341,7 @@ export default function CallLog() {
                             currentStatus={log.Contacted}
                             candidateId={log["Candidate_ID"] || ""}
                             jobId={log["Job ID"]}
+                            statusType="contacted"
                             onStatusChange={(newStatus) => {
                               setCallLogs(prev => prev.map(l => 
                                 l["Candidate_ID"] === log["Candidate_ID"] && l["Job ID"] === log["Job ID"]
@@ -383,6 +426,27 @@ export default function CallLog() {
                                       </div>
                                     </div>
                                   )}
+
+                                  {/* Notes Section */}
+                                  <div className="space-y-2">
+                                    <h3 className="text-lg font-semibold">Notes</h3>
+                                    <div className="space-y-3">
+                                      <Textarea
+                                        placeholder="Add your notes about this candidate..."
+                                        value={editingNotes[`${log["Candidate_ID"]}-${log["Job ID"]}`] ?? log["Notes"] ?? ""}
+                                        onChange={(e) => handleNotesChange(`${log["Candidate_ID"]}-${log["Job ID"]}`, e.target.value)}
+                                        className="min-h-[100px] bg-background/50 border-glass-border"
+                                      />
+                                      <Button
+                                        onClick={() => saveNotes(log)}
+                                        disabled={savingNotes[`${log["Candidate_ID"]}-${log["Job ID"]}`]}
+                                        size="sm"
+                                        className="w-full"
+                                      >
+                                        {savingNotes[`${log["Candidate_ID"]}-${log["Job ID"]}`] ? "Saving..." : "Save Notes"}
+                                      </Button>
+                                    </div>
+                                  </div>
 
                                   {/* Additional Details */}
                                   <div className="grid grid-cols-2 gap-4">

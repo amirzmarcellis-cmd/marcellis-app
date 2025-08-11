@@ -353,10 +353,47 @@ export default function Index() {
                             <div className={`text-2xl font-bold mb-2 ${getScoreColor(score)}`}>
                               {score}
                             </div>
+                            <div className="flex flex-col space-y-1">
+                              <StatusDropdown
+                                currentStatus={candidate['Contacted']}
+                                candidateId={candidate["Candidate_ID"]}
+                                jobId={candidate["Job ID"]}
+                                statusType="contacted"
+                                onStatusChange={(newStatus) => {
+                                  setCandidates(prev => prev.map(c => 
+                                    c["Candidate_ID"] === candidate["Candidate_ID"] 
+                                      ? { ...c, Contacted: newStatus }
+                                      : c
+                                  ))
+                                }}
+                                variant="badge"
+                              />
+                              <StatusDropdown
+                                currentStatus={candidate['CandidateStatus']}
+                                candidateId={candidate["Candidate_ID"]}
+                                statusType="candidate"
+                                onStatusChange={(newStatus) => {
+                                  setCandidates(prev => prev.map(c => 
+                                    c["Candidate_ID"] === candidate["Candidate_ID"] 
+                                      ? { ...c, CandidateStatus: newStatus }
+                                      : c
+                                  ))
+                                }}
+                                variant="badge"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-300 mb-4 leading-relaxed bg-black/20 p-3 rounded-lg">
+                          {candidate['Score and Reason']?.slice(0, 120)}...
+                        </p>
+                        <div className="flex items-center justify-between">
+                        <div className="flex space-x-2">
                             <StatusDropdown
                               currentStatus={candidate['Contacted']}
                               candidateId={candidate["Candidate_ID"]}
                               jobId={candidate["Job ID"]}
+                              statusType="contacted"
                               onStatusChange={(newStatus) => {
                                 setCandidates(prev => prev.map(c => 
                                   c["Candidate_ID"] === candidate["Candidate_ID"] 
@@ -364,23 +401,15 @@ export default function Index() {
                                     : c
                                 ))
                               }}
-                              variant="badge"
                             />
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-300 mb-4 leading-relaxed bg-black/20 p-3 rounded-lg">
-                          {candidate['Score and Reason']?.slice(0, 120)}...
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex space-x-2">
                             <StatusDropdown
-                              currentStatus={candidate['Contacted']}
+                              currentStatus={candidate['CandidateStatus']}
                               candidateId={candidate["Candidate_ID"]}
-                              jobId={candidate["Job ID"]}
+                              statusType="candidate"
                               onStatusChange={(newStatus) => {
                                 setCandidates(prev => prev.map(c => 
                                   c["Candidate_ID"] === candidate["Candidate_ID"] 
-                                    ? { ...c, Contacted: newStatus }
+                                    ? { ...c, CandidateStatus: newStatus }
                                     : c
                                 ))
                               }}

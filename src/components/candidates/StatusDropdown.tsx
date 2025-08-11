@@ -10,18 +10,26 @@ interface StatusDropdownProps {
   jobId?: string | null
   onStatusChange?: (newStatus: string) => void
   variant?: "dropdown" | "badge"
+  statusType?: "contacted" | "candidate"
 }
 
-const statusOptions = [
+const contactedStatusOptions = [
   "Not Contacted",
   "Ready to Call",
   "Contacted",
-  "Call Done", 
-  "Rejected",
+  "Call Done",
+  "1st No Answer",
+  "2nd No Answer", 
+  "3rd No Answer",
+  "Low Scored"
+]
+
+const candidateStatusOptions = [
   "Shortlisted",
   "Tasked",
   "Interview",
-  "Hired"
+  "Hired",
+  "Rejected"
 ]
 
 const getStatusVariant = (status: string | null) => {
@@ -59,7 +67,8 @@ export function StatusDropdown({
   candidateId, 
   jobId, 
   onStatusChange,
-  variant = "dropdown" 
+  variant = "dropdown",
+  statusType = "contacted"
 }: StatusDropdownProps) {
   const [isUpdating, setIsUpdating] = useState(false)
   const { toast } = useToast()
@@ -69,7 +78,7 @@ export function StatusDropdown({
     
     setIsUpdating(true)
     try {
-      if (jobId) {
+      if (statusType === "contacted" && jobId) {
         // Update in Jobs_CVs table (Contacted status)
         const { error } = await supabase
           .from('Jobs_CVs')
@@ -78,7 +87,7 @@ export function StatusDropdown({
           .eq('Job ID', jobId)
 
         if (error) throw error
-      } else {
+      } else if (statusType === "candidate") {
         // Update in CVs table (CandidateStatus)
         const { error } = await supabase
           .from('CVs')
@@ -92,13 +101,13 @@ export function StatusDropdown({
       
       toast({
         title: "Status Updated",
-        description: `${jobId ? 'Contact' : 'Candidate'} status changed to ${newStatus}`,
+        description: `${statusType === 'contacted' ? 'Contact' : 'Candidate'} status changed to ${newStatus}`,
       })
     } catch (error) {
       console.error('Error updating status:', error)
       toast({
         title: "Error",
-        description: `Failed to update ${jobId ? 'contact' : 'candidate'} status`,
+        description: `Failed to update ${statusType === 'contacted' ? 'contact' : 'candidate'} status`,
         variant: "destructive",
       })
     } finally {
@@ -106,20 +115,23 @@ export function StatusDropdown({
     }
   }
 
+  const statusOptions = statusType === "contacted" ? contactedStatusOptions : candidateStatusOptions
+  const defaultStatus = statusType === "contacted" ? "Not Contacted" : "Shortlisted"
+
   if (variant === "badge") {
     return (
       <Badge 
         variant={getStatusVariant(currentStatus)} 
         className={`${getStatusColor(currentStatus)} capitalize font-medium`}
       >
-        {currentStatus || "Not Contacted"}
+        {currentStatus || defaultStatus}
       </Badge>
     )
   }
 
   return (
     <Select 
-      value={currentStatus || "Not Contacted"} 
+      value={currentStatus || defaultStatus} 
       onValueChange={handleStatusChange}
       disabled={isUpdating}
     >
@@ -129,7 +141,7 @@ export function StatusDropdown({
             variant={getStatusVariant(currentStatus)} 
             className={`${getStatusColor(currentStatus)} capitalize font-medium text-xs`}
           >
-            {currentStatus || "Not Contacted"}
+            {currentStatus || defaultStatus}
           </Badge>
         </SelectValue>
       </SelectTrigger>

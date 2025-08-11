@@ -126,6 +126,7 @@ export type Database = {
         Row: {
           "Applied for": string[] | null
           Cadndidate_ID: string
+          CandidateStatus: string | null
           Certifications: string | null
           "Current Company": string | null
           "CV Summary": string | null
@@ -149,6 +150,7 @@ export type Database = {
         Insert: {
           "Applied for"?: string[] | null
           Cadndidate_ID: string
+          CandidateStatus?: string | null
           Certifications?: string | null
           "Current Company"?: string | null
           "CV Summary"?: string | null
@@ -172,6 +174,7 @@ export type Database = {
         Update: {
           "Applied for"?: string[] | null
           Cadndidate_ID?: string
+          CandidateStatus?: string | null
           Certifications?: string | null
           "Current Company"?: string | null
           "CV Summary"?: string | null
@@ -300,16 +303,21 @@ export type Database = {
         Row: {
           "2 Questions of Interview": string | null
           "Agency Experience": string | null
+          callcount: number
           callid: number
           "Candidate Email": string | null
           "Candidate Name": string | null
           "Candidate Phone Number": string | null
           Candidate_ID: string | null
+          CandidateStatus: string | null
           cons: string | null
           Contacted: string | null
+          current_salary: string | null
           CV_Link: string | null
           group_id: number | null
           "Job ID": string | null
+          lastcalltime: string | null
+          Notes: string | null
           "Notice Period": string | null
           pros: string | null
           "Relatable CV?": string | null
@@ -322,16 +330,21 @@ export type Database = {
         Insert: {
           "2 Questions of Interview"?: string | null
           "Agency Experience"?: string | null
+          callcount?: number
           callid?: number
           "Candidate Email"?: string | null
           "Candidate Name"?: string | null
           "Candidate Phone Number"?: string | null
           Candidate_ID?: string | null
+          CandidateStatus?: string | null
           cons?: string | null
           Contacted?: string | null
+          current_salary?: string | null
           CV_Link?: string | null
           group_id?: number | null
           "Job ID"?: string | null
+          lastcalltime?: string | null
+          Notes?: string | null
           "Notice Period"?: string | null
           pros?: string | null
           "Relatable CV?"?: string | null
@@ -344,16 +357,21 @@ export type Database = {
         Update: {
           "2 Questions of Interview"?: string | null
           "Agency Experience"?: string | null
+          callcount?: number
           callid?: number
           "Candidate Email"?: string | null
           "Candidate Name"?: string | null
           "Candidate Phone Number"?: string | null
           Candidate_ID?: string | null
+          CandidateStatus?: string | null
           cons?: string | null
           Contacted?: string | null
+          current_salary?: string | null
           CV_Link?: string | null
           group_id?: number | null
           "Job ID"?: string | null
+          lastcalltime?: string | null
+          Notes?: string | null
           "Notice Period"?: string | null
           pros?: string | null
           "Relatable CV?"?: string | null

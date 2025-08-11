@@ -307,6 +307,7 @@ export default function LiveCandidateFeed() {
                               currentStatus={candidate['Contacted']}
                               candidateId={candidate["Candidate_ID"]}
                               jobId={candidate["Job ID"]}
+                              statusType="contacted"
                               onStatusChange={(newStatus) => {
                                 setCandidates(prev => prev.map(c => 
                                   c["Candidate_ID"] === candidate["Candidate_ID"] 
@@ -319,7 +320,7 @@ export default function LiveCandidateFeed() {
                             <StatusDropdown
                               currentStatus={getCandidateStatus(candidate["Candidate_ID"])}
                               candidateId={candidate["Candidate_ID"]}
-                              jobId={null}
+                              statusType="candidate"
                               onStatusChange={(newStatus) => {
                                 setCvData(prev => prev.map(cv => 
                                   cv['Cadndidate_ID'] === candidate["Candidate_ID"] 
@@ -367,6 +368,7 @@ export default function LiveCandidateFeed() {
                         currentStatus={candidate['Contacted']}
                         candidateId={candidate["Candidate_ID"]}
                         jobId={candidate["Job ID"]}
+                        statusType="contacted"
                         onStatusChange={(newStatus) => {
                           setCandidates(prev => prev.map(c => 
                             c["Candidate_ID"] === candidate["Candidate_ID"] 
