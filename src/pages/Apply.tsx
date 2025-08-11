@@ -16,6 +16,7 @@ import FileUpload from "@/components/upload/FileUpload";
 
 const applicationSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
+  title: z.string().min(2, "Title must be at least 2 characters"),
   phoneNumber: z.string().min(10, "Please enter a valid phone number"),
   email: z.string().email("Please enter a valid email address"),
   jobApplied: z.string().min(1, "Please select a job"),
@@ -75,6 +76,7 @@ export default function Apply() {
     resolver: zodResolver(applicationSchema),
     defaultValues: {
       fullName: "",
+      title: "",
       phoneNumber: "",
       email: "",
       jobApplied: "",
@@ -149,6 +151,7 @@ export default function Apply() {
       
       const cvData = {
         "Cadndidate_ID": candidateId,
+        "Title": data.title || "",
         "First Name": data.fullName.split(" ")[0] || "",
         "Last Name": data.fullName.split(" ").slice(1).join(" ") || "",
         "Phone Number": data.phoneNumber || "",
@@ -243,6 +246,20 @@ export default function Apply() {
                       <FormLabel>Full Name</FormLabel>
                       <FormControl>
                         <Input placeholder="Enter your full name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Job Title</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Digital Marketing Specialist" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -351,7 +368,7 @@ export default function Apply() {
                     <FormItem>
                       <FormLabel>Salary Expectations (AED/month)</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., 15000" {...field} />
+                        <Input placeholder="e.g., 8000" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
