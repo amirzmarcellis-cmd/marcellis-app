@@ -31,6 +31,8 @@ interface CallLogDetail {
   "Notes": string | null
   "lastcalltime": string | null
   "callcount": number | null
+  "duration": string | null
+  "recording": string | null
 }
 
 export default function CallLogDetails() {
@@ -71,9 +73,29 @@ export default function CallLogDetails() {
         .eq('Job ID', jobId)
         .single()
 
-      const enrichedData = {
-        ...data,
-        "Job Title": jobData?.["Job Title"] || null
+      const enrichedData: CallLogDetail = {
+        "Job ID": data["Job ID"],
+        "Candidate_ID": data["Candidate_ID"],
+        "Contacted": data["Contacted"],
+        "Transcript": data["Transcript"],
+        "Summary": data["Summary"],
+        "Success Score": data["Success Score"],
+        "Score and Reason": data["Score and Reason"],
+        "Candidate Name": data["Candidate Name"],
+        "Candidate Email": data["Candidate Email"],
+        "Candidate Phone Number": data["Candidate Phone Number"],
+        "pros": data["pros"],
+        "cons": data["cons"],
+        "Notice Period": data["Notice Period"],
+        "Salary Expectations": data["Salary Expectations"],
+        "current_salary": data["current_salary"],
+        "Agency Experience": data["Agency Experience"],
+        "Job Title": jobData?.["Job Title"] || null,
+        "Notes": data["Notes"],
+        "lastcalltime": data["lastcalltime"],
+        "callcount": data["callcount"],
+        "duration": data["duration"],
+        "recording": data["recording"]
       }
 
       setCallLog(enrichedData)
@@ -178,7 +200,7 @@ export default function CallLogDetails() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Duration</label>
-                <p className="text-lg">-</p>
+                <p className="text-lg">{callLog["duration"] || 'N/A'}</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Last Call Time</label>
@@ -190,7 +212,13 @@ export default function CallLogDetails() {
               </div>
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Call Recording Link</label>
-                <p className="text-lg">N/A</p>
+                <p className="text-lg">
+                  {callLog["recording"] ? (
+                    <a href={callLog["recording"]} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                      View Recording
+                    </a>
+                  ) : 'N/A'}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -247,6 +275,27 @@ export default function CallLogDetails() {
               <Save className="w-4 h-4 mr-2" />
               {saving ? "Saving..." : "Save Notes"}
             </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Pros & Cons */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-green-600">Pros</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="whitespace-pre-wrap">{callLog["pros"] || 'No pros available'}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-red-600">Cons</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="whitespace-pre-wrap">{callLog["cons"] || 'No cons available'}</p>
           </CardContent>
         </Card>
       </div>
