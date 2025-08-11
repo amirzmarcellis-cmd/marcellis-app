@@ -24,7 +24,7 @@ const applicationSchema = z.object({
   overallExperience: z.string().min(1, "Please specify your overall experience"),
   salaryExpectations: z.string().min(1, "Please enter your salary expectations"),
   noticePeriod: z.string().min(1, "Please enter your notice period"),
-  uaeLocation: z.enum(["yes", "no"], { required_error: "Please select an option" }),
+  currentLocation: z.string().min(1, "Please select your current location"),
   notes: z.string().optional(),
 });
 
@@ -35,6 +35,34 @@ interface Job {
   "Job Title": string;
   "Job Location": string;
 }
+
+const countries = [
+  "United Arab Emirates",
+  "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan",
+  "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi",
+  "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic",
+  "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica", "Dominican Republic",
+  "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia",
+  "Fiji", "Finland", "France",
+  "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana",
+  "Haiti", "Honduras", "Hungary",
+  "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Ivory Coast",
+  "Jamaica", "Japan", "Jordan",
+  "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan",
+  "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg",
+  "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar",
+  "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway",
+  "Oman",
+  "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal",
+  "Qatar",
+  "Romania", "Russia", "Rwanda",
+  "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria",
+  "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
+  "Uganda", "Ukraine", "United Kingdom", "United States", "Uruguay", "Uzbekistan",
+  "Vanuatu", "Vatican City", "Venezuela", "Vietnam",
+  "Yemen",
+  "Zambia", "Zimbabwe"
+];
 
 export default function Apply() {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -55,6 +83,7 @@ export default function Apply() {
       overallExperience: "",
       salaryExpectations: "",
       noticePeriod: "",
+      currentLocation: "",
       notes: "",
     },
   });
@@ -131,7 +160,7 @@ export default function Apply() {
         "Other Notes": data.notes || "",
         "Timestamp": new Date().toISOString(),
         "Experience": `Agency: ${data.agencyExperience}, Overall: ${data.overallExperience}`,
-        "Location": data.uaeLocation === "yes" ? "UAE" : "Outside UAE",
+        "Location": data.currentLocation,
         "CV Summary": `Salary Expectations: ${data.salaryExpectations} AED/month, Notice Period: ${data.noticePeriod} days`,
       };
 
@@ -345,26 +374,24 @@ export default function Apply() {
 
                 <FormField
                   control={form.control}
-                  name="uaeLocation"
+                  name="currentLocation"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Are you currently located in the UAE?</FormLabel>
-                      <FormControl>
-                        <RadioGroup
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          className="flex flex-row space-x-6"
-                        >
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="yes" id="yes" />
-                            <Label htmlFor="yes">Yes</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="no" id="no" />
-                            <Label htmlFor="no">No</Label>
-                          </div>
-                        </RadioGroup>
-                      </FormControl>
+                      <FormLabel>Where are you currently located?</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your current country" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="bg-background z-50">
+                          {countries.map((country) => (
+                            <SelectItem key={country} value={country}>
+                              {country}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
