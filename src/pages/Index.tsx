@@ -143,7 +143,7 @@ export default function Index() {
 
   const getCurrentTimeGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
+    if (hour < 12) return 'Good Morning';
     if (hour < 18) return 'Good afternoon';
     return 'Good evening';
   };
@@ -182,7 +182,7 @@ export default function Index() {
             {getCurrentTimeGreeting()}, {profile?.first_name || 'Commander'}
           </h1>
           <p className="text-cyan-300 mb-6">
-            You have {data?.totalJobs || 0} roles running, {data?.candidatesAwaitingReview || 0} candidates awaiting review, 
+            You have {data?.totalJobs || 0} Active roles, {data?.candidatesAwaitingReview || 0} candidates to review, 
             and {data?.tasksToday || 0} tasks due today.
           </p>
           
