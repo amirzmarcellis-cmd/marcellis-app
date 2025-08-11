@@ -8,10 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Progress } from "@/components/ui/progress"
-import { Textarea } from "@/components/ui/textarea"
-import { Phone, Search, Eye, Calendar, Clock, User, FileText } from "lucide-react"
+import { Phone, Search, Eye, FileText, Clock } from "lucide-react"
 import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
@@ -367,101 +364,12 @@ export default function CallLog() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end space-x-2">
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button variant="outline" size="sm">
-                                  <FileText className="w-4 h-4 mr-1" />
-                                  See Call Log
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                                <DialogHeader>
-                                  <DialogTitle>Call Log Details - {log["Candidate Name"]}</DialogTitle>
-                                </DialogHeader>
-                                <div className="space-y-6">
-                                  {/* Success Score Progress Bar */}
-                                  <div className="space-y-2">
-                                    <div className="flex items-center justify-between">
-                                      <h3 className="text-lg font-semibold">Success Score</h3>
-                                      <span className="text-sm font-medium">{log["Success Score"] || "0"}/100</span>
-                                    </div>
-                                    <Progress 
-                                      value={parseInt(log["Success Score"] || "0")} 
-                                      className="h-3"
-                                    />
-                                    {log["Score and Reason"] && (
-                                      <div className="mt-2">
-                                        <h4 className="font-medium text-sm mb-1">Score Reason:</h4>
-                                        <p className="text-sm text-muted-foreground">{log["Score and Reason"]}</p>
-                                      </div>
-                                    )}
-                                  </div>
-
-                                  {/* Interview Questions */}
-                                  {log["2 Questions of Interview"] && (
-                                    <div className="space-y-2">
-                                      <h3 className="text-lg font-semibold">Interview Questions</h3>
-                                      <div className="bg-muted/30 p-4 rounded-lg">
-                                        <p className="text-sm whitespace-pre-wrap">{log["2 Questions of Interview"]}</p>
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {/* Summary */}
-                                  {log["Summary"] && (
-                                    <div className="space-y-2">
-                                      <h3 className="text-lg font-semibold">Call Summary</h3>
-                                      <div className="bg-muted/30 p-4 rounded-lg">
-                                        <p className="text-sm whitespace-pre-wrap">{log["Summary"]}</p>
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {/* Transcript */}
-                                  {log["Transcript"] && (
-                                    <div className="space-y-2">
-                                      <h3 className="text-lg font-semibold">Call Transcript</h3>
-                                      <div className="bg-muted/30 p-4 rounded-lg max-h-60 overflow-y-auto">
-                                        <p className="text-sm whitespace-pre-wrap">{log["Transcript"]}</p>
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {/* Notes Section */}
-                                  <div className="space-y-2">
-                                    <h3 className="text-lg font-semibold">Notes</h3>
-                                    <div className="space-y-3">
-                                      <Textarea
-                                        placeholder="Add your notes about this candidate..."
-                                        value={editingNotes[`${log["Candidate_ID"]}-${log["Job ID"]}`] ?? log["Notes"] ?? ""}
-                                        onChange={(e) => handleNotesChange(`${log["Candidate_ID"]}-${log["Job ID"]}`, e.target.value)}
-                                        className="min-h-[100px] bg-background/50 border-glass-border"
-                                      />
-                                      <Button
-                                        onClick={() => saveNotes(log)}
-                                        disabled={savingNotes[`${log["Candidate_ID"]}-${log["Job ID"]}`]}
-                                        size="sm"
-                                        className="w-full"
-                                      >
-                                        {savingNotes[`${log["Candidate_ID"]}-${log["Job ID"]}`] ? "Saving..." : "Save Notes"}
-                                      </Button>
-                                    </div>
-                                  </div>
-
-                                  {/* Additional Details */}
-                                  <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                      <h4 className="font-medium">Pros</h4>
-                                      <p className="text-sm text-muted-foreground">{log["pros"] || "N/A"}</p>
-                                    </div>
-                                    <div className="space-y-2">
-                                      <h4 className="font-medium">Cons</h4>
-                                      <p className="text-sm text-muted-foreground">{log["cons"] || "N/A"}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              </DialogContent>
-                            </Dialog>
+                            <Button variant="outline" size="sm" asChild>
+                              <Link to={`/call-log-details?candidate=${log["Candidate_ID"]}&job=${log["Job ID"]}`}>
+                                <FileText className="w-4 h-4 mr-1" />
+                                See Call Log
+                              </Link>
+                            </Button>
                             <Button variant="outline" size="sm" asChild>
                               <Link to={`/candidate/${log["Candidate_ID"]}`}>
                                 <Eye className="w-4 h-4 mr-1" />
