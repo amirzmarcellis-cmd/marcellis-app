@@ -116,7 +116,7 @@ export function StatusDropdown({
   }
 
   const statusOptions = statusType === "contacted" ? contactedStatusOptions : candidateStatusOptions
-  const defaultStatus = statusType === "contacted" ? "Not Contacted" : "Shortlisted"
+  const defaultStatus = statusType === "contacted" ? "Not Contacted" : null
 
   if (variant === "badge") {
     return (
