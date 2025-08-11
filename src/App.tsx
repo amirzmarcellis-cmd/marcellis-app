@@ -20,6 +20,7 @@ import EditCandidate from "./pages/EditCandidate";
 import CandidateDetails from "./pages/CandidateDetails";
 import Calls from "./pages/Calls";
 import CallLog from "./pages/CallLog";
+import CallLogDetails from "./pages/CallLogDetails";
 import Analytics from "./pages/Analytics";
 import Performance from "./pages/Performance";
 import Reports from "./pages/Reports";
@@ -54,6 +55,7 @@ const App = () => (
               <Route path="/candidate/edit/:id" element={<DashboardLayout><EditCandidate /></DashboardLayout>} />
               <Route path="/calls" element={<DashboardLayout><Calls /></DashboardLayout>} />
               <Route path="/call-log" element={<DashboardLayout><CallLog /></DashboardLayout>} />
+              <Route path="/call-log-details" element={<DashboardLayout><CallLogDetails /></DashboardLayout>} />
               <Route path="/analytics" element={<DashboardLayout><Analytics /></DashboardLayout>} />
               <Route path="/performance" element={<DashboardLayout><Performance /></DashboardLayout>} />
               <Route path="/reports" element={<DashboardLayout><Reports /></DashboardLayout>} />
