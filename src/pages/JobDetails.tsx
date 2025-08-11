@@ -153,23 +153,26 @@ export default function JobDetails() {
     setIsGeneratingShortList(true);
     
     try {
-      // Prepare the candidates array for the API
-      const candidatesData = candidates.map(candidate => ({
-        candidateID: candidate["Candidate_ID"],
-        jobID: job["Job ID"]
-      }));
+      // Process each candidate individually with their callid
+      for (const candidate of candidates) {
+        const payload = {
+          candidateID: candidate["Candidate_ID"],
+          jobID: job["Job ID"],
+          callid: candidate["callid"]
+        };
 
-      // Make HTTP request to the webhook
-      const response = await fetch('https://hook.eu2.make.com/i3owa6dmu1mstug4tsfb0dnhhjfh4arj', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(candidatesData),
-      });
+        // Make HTTP request to the webhook for each candidate
+        const response = await fetch('https://hook.eu2.make.com/i3owa6dmu1mstug4tsfb0dnhhjfh4arj', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
       }
 
       toast({
