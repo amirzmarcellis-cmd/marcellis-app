@@ -68,80 +68,94 @@ export default function FileUpload({
   };
 
   const uploadFile = async (file: File): Promise<FileUploadResult> => {
-    // Simulate file upload progress (replace with actual upload logic)
-    return new Promise((resolve, reject) => {
-      const uploadId = Date.now().toString();
-      
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const filename = `${timestamp}_${file.name}`;
+      const filePath = `${entityType}/${filename}`;
+
+      // Start progress tracking
+      setUploadingFiles(prev => 
+        prev.map(f => 
+          f.file === file 
+            ? { ...f, progress: 20 }
+            : f
+        )
+      );
+
+      // Upload file to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('cvs')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
       // Update progress
-      const progressInterval = setInterval(() => {
-        setUploadingFiles(prev => 
-          prev.map(f => 
-            f.file === file 
-              ? { ...f, progress: Math.min(f.progress + 10, 90) }
-              : f
-          )
-        );
-      }, 200);
+      setUploadingFiles(prev => 
+        prev.map(f => 
+          f.file === file 
+            ? { ...f, progress: 70 }
+            : f
+        )
+      );
 
-      // Simulate upload completion
-      setTimeout(async () => {
-        clearInterval(progressInterval);
-        
-        try {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (!user) throw new Error('Not authenticated');
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('cvs')
+        .getPublicUrl(filePath);
 
-          // For demo purposes, we'll create a mock file URL
-          // In production, you'd upload to Supabase Storage or another service
-          const mockFileUrl = `https://example.com/files/${uploadId}_${file.name}`;
+      // Save file info to database
+      const fileData = {
+        entity_type: entityType,
+        entity_id: entityId,
+        file_name: file.name,
+        file_url: publicUrl,
+        file_type: file.type,
+        file_size: file.size,
+        uploaded_by: user.id
+      };
 
-          const fileData = {
-            entity_type: entityType,
-            entity_id: entityId,
-            file_name: file.name,
-            file_url: mockFileUrl,
-            file_type: file.type,
-            file_size: file.size,
-            uploaded_by: user.id
-          };
+      const { data, error } = await supabase
+        .from('file_uploads')
+        .insert([fileData])
+        .select()
+        .single();
 
-          const { data, error } = await supabase
-            .from('file_uploads')
-            .insert([fileData])
-            .select()
-            .single();
+      if (error) throw error;
 
-          if (error) throw error;
+      const result: FileUploadResult = {
+        id: data.id,
+        file_name: data.file_name,
+        file_url: data.file_url,
+        file_type: data.file_type,
+        file_size: data.file_size
+      };
 
-          const result: FileUploadResult = {
-            id: data.id,
-            file_name: data.file_name,
-            file_url: data.file_url,
-            file_type: data.file_type,
-            file_size: data.file_size
-          };
+      setUploadingFiles(prev => 
+        prev.map(f => 
+          f.file === file 
+            ? { ...f, progress: 100, status: 'success', result }
+            : f
+        )
+      );
 
-          setUploadingFiles(prev => 
-            prev.map(f => 
-              f.file === file 
-                ? { ...f, progress: 100, status: 'success', result }
-                : f
-            )
-          );
-
-          resolve(result);
-        } catch (error) {
-          setUploadingFiles(prev => 
-            prev.map(f => 
-              f.file === file 
-                ? { ...f, status: 'error', error: error instanceof Error ? error.message : 'Upload failed' }
-                : f
-            )
-          );
-          reject(error);
-        }
-      }, 2000);
-    });
+      return result;
+    } catch (error) {
+      setUploadingFiles(prev => 
+        prev.map(f => 
+          f.file === file 
+            ? { ...f, status: 'error', error: error instanceof Error ? error.message : 'Upload failed' }
+            : f
+        )
+      );
+      throw error;
+    }
   };
 
   const handleFiles = async (files: FileList) => {
