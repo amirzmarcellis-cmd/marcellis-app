@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, MapPin, Calendar, DollarSign, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { JobDialog } from "@/components/jobs/JobDialog"
+import { StatusDropdown } from "@/components/candidates/StatusDropdown"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDate } from "@/lib/utils"
 import {
@@ -32,6 +33,7 @@ export default function JobDetails() {
   const [loading, setLoading] = useState(true)
   const [candidates, setCandidates] = useState<any[]>([])
   const [candidatesLoading, setCandidatesLoading] = useState(true)
+  const [cvData, setCvData] = useState<any[]>([])
   const [nameFilter, setNameFilter] = useState("")
   const [emailFilter, setEmailFilter] = useState("")
   const [phoneFilter, setPhoneFilter] = useState("")
@@ -46,6 +48,7 @@ export default function JobDetails() {
     if (id) {
       fetchJob(id)
       fetchCandidates(id)
+      fetchCvData()
     }
   }, [id])
 
@@ -87,6 +90,20 @@ export default function JobDetails() {
       setCandidates([])
     } finally {
       setCandidatesLoading(false)
+    }
+  }
+
+  const fetchCvData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('CVs')
+        .select('*')
+
+      if (error) throw error
+      setCvData(data || [])
+    } catch (error) {
+      console.error('Error fetching CV data:', error)
+      setCvData([])
     }
   }
 
@@ -283,6 +300,18 @@ export default function JobDetails() {
   })
 
   const uniqueContactedStatuses = [...new Set(candidates.map(c => c["Contacted"]).filter(Boolean))]
+
+  // Get CV status for a candidate
+  const getCandidateStatus = (candidateId: string) => {
+    const cvRecord = cvData.find(cv => cv['Cadndidate_ID'] === candidateId)
+    return cvRecord?.['CandidateStatus'] || null
+  }
+
+  // Short list candidates (score 74+)
+  const shortListCandidates = candidates.filter(candidate => {
+    const score = parseInt(candidate["Success Score"] || "0")
+    return score >= 74
+  })
 
   return (
       <div className="space-y-6">
@@ -673,12 +702,37 @@ export default function JobDetails() {
                                       </p>
                                     )}
 
-                                    <div className="flex items-center justify-between pt-2 border-t">
-                                      <span className="text-sm text-muted-foreground">
-                                        {candidateContacts.length > 1 ? `${candidateContacts.length} contacts` : mainCandidate["Contacted"] || "Not contacted"}
-                                      </span>
-                                      {getScoreBadge(mainCandidate["Success Score"])}
-                                    </div>
+                                     <div className="flex items-center justify-between pt-2 border-t">
+                                       <div className="flex items-center space-x-2">
+                                         <StatusDropdown
+                                           currentStatus={mainCandidate["Contacted"]}
+                                           candidateId={mainCandidate["Candidate_ID"]}
+                                           jobId={id!}
+                                           onStatusChange={(newStatus) => {
+                                             setCandidates(prev => prev.map(c => 
+                                               c["Candidate_ID"] === mainCandidate["Candidate_ID"] 
+                                                 ? { ...c, Contacted: newStatus }
+                                                 : c
+                                             ))
+                                           }}
+                                           variant="badge"
+                                         />
+                                         <StatusDropdown
+                                           currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
+                                           candidateId={mainCandidate["Candidate_ID"]}
+                                           jobId={null}
+                                           onStatusChange={(newStatus) => {
+                                             setCvData(prev => prev.map(cv => 
+                                               cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] 
+                                                 ? { ...cv, CandidateStatus: newStatus }
+                                                 : cv
+                                             ))
+                                           }}
+                                           variant="badge"
+                                         />
+                                       </div>
+                                       {getScoreBadge(mainCandidate["Success Score"])}
+                                     </div>
 
                                     {/* Call Log Buttons */}
                                     <div className="space-y-2 pt-2 border-t">
@@ -724,25 +778,145 @@ export default function JobDetails() {
             </TabsContent>
 
            <TabsContent value="shortlist" className="space-y-4">
-             <Card>
-               <CardHeader>
-                 <CardTitle className="flex items-center">
-                   <Star className="w-5 h-5 mr-2" />
-                   Short List
-                 </CardTitle>
-                 <CardDescription>
-                   Selected candidates who have passed the initial screening
-                 </CardDescription>
-               </CardHeader>
-               <CardContent>
-                 <div className="text-center py-8">
-                   <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                   <h3 className="text-lg font-semibold mb-2">No candidates in short list yet</h3>
-                   <p className="text-muted-foreground">Use the "Call & Generate Short List" button to process candidates from the long list</p>
-                 </div>
-               </CardContent>
-             </Card>
-           </TabsContent>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Star className="w-5 h-5 mr-2" />
+                    Short List ({shortListCandidates.length} candidates with 74+ score)
+                  </CardTitle>
+                  <CardDescription>
+                    High-scoring candidates (74+) who have passed the initial screening
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {shortListCandidates.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">No high-scoring candidates yet</h3>
+                      <p className="text-muted-foreground">Candidates with scores of 74+ will appear here automatically</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {(() => {
+                        // Group short list candidates by Candidate_ID
+                        const groupedShortList = shortListCandidates.reduce((acc, candidate) => {
+                          const candidateId = candidate["Candidate_ID"]
+                          if (!acc[candidateId]) {
+                            acc[candidateId] = []
+                          }
+                          acc[candidateId].push(candidate)
+                          return acc
+                        }, {} as Record<string, any[]>)
+
+                        return Object.entries(groupedShortList).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                          const mainCandidate = candidateContacts[0]
+                          
+                          return (
+                            <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20">
+                              <CardContent className="p-4">
+                                <div className="space-y-3">
+                                  <div className="flex items-start justify-between">
+                                    <div>
+                                      <h4 className="font-semibold">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
+                                      <p className="text-sm text-muted-foreground">{candidateId}</p>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="space-y-2 text-sm">
+                                    {mainCandidate["Candidate Email"] && (
+                                      <div className="flex items-center text-muted-foreground">
+                                        <Mail className="w-4 h-4 mr-2" />
+                                        <span className="truncate">{mainCandidate["Candidate Email"]}</span>
+                                      </div>
+                                    )}
+                                    
+                                    {mainCandidate["Candidate Phone Number"] && (
+                                      <div className="flex items-center text-muted-foreground">
+                                        <Phone className="w-4 h-4 mr-2" />
+                                        <span>{mainCandidate["Candidate Phone Number"]}</span>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {mainCandidate["Summary"] && (
+                                    <p className="text-sm text-muted-foreground line-clamp-3">
+                                      {mainCandidate["Summary"]}
+                                    </p>
+                                  )}
+
+                                  <div className="flex items-center justify-between pt-2 border-t">
+                                    <div className="flex items-center space-x-2">
+                                      <StatusDropdown
+                                        currentStatus={mainCandidate["Contacted"]}
+                                        candidateId={mainCandidate["Candidate_ID"]}
+                                        jobId={id!}
+                                        onStatusChange={(newStatus) => {
+                                          setCandidates(prev => prev.map(c => 
+                                            c["Candidate_ID"] === mainCandidate["Candidate_ID"] 
+                                              ? { ...c, Contacted: newStatus }
+                                              : c
+                                          ))
+                                        }}
+                                        variant="badge"
+                                      />
+                                      <StatusDropdown
+                                        currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
+                                        candidateId={mainCandidate["Candidate_ID"]}
+                                        jobId={null}
+                                        onStatusChange={(newStatus) => {
+                                          setCvData(prev => prev.map(cv => 
+                                            cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] 
+                                              ? { ...cv, CandidateStatus: newStatus }
+                                              : cv
+                                          ))
+                                        }}
+                                        variant="badge"
+                                      />
+                                    </div>
+                                    {getScoreBadge(mainCandidate["Success Score"])}
+                                  </div>
+
+                                  {/* Call Log Buttons */}
+                                  <div className="space-y-2 pt-2 border-t">
+                                    <div className="flex flex-wrap gap-2">
+                                      {candidateContacts.map((contact, contactIndex) => (
+                                        <Button
+                                          key={contactIndex}
+                                          variant="outline"
+                                          size="sm"
+                                          asChild
+                                          className="flex-1 min-w-[100px]"
+                                        >
+                                          <Link to={`/call-log?candidate=${candidateId}&job=${id}`}>
+                                            <Phone className="w-3 h-3 mr-1" />
+                                            {candidateContacts.length > 1 ? `Call ${contactIndex + 1}` : 'Call Log'}
+                                          </Link>
+                                        </Button>
+                                      ))}
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        asChild
+                                        className="flex-1 min-w-[100px]"
+                                      >
+                                        <Link to={`/candidate/${candidateId}`}>
+                                          <Users className="w-3 h-3 mr-1" />
+                                          View Profile
+                                        </Link>
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          )
+                        })
+                      })()}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
           </Tabs>
          
          <JobDialog

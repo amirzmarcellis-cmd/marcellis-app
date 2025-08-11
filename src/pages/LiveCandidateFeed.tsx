@@ -35,6 +35,7 @@ interface Job {
 export default function LiveCandidateFeed() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [cvData, setCvData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState<string>('all');
@@ -62,6 +63,13 @@ export default function LiveCandidateFeed() {
 
       if (jobsError) throw jobsError;
 
+      // Fetch CVs data for candidate status
+      const { data: cvsData, error: cvsError } = await supabase
+        .from('CVs')
+        .select('*');
+
+      if (cvsError) throw cvsError;
+
       // Enrich candidates with job titles
       const enrichedCandidates = (jobsCvsData || []).map(candidate => {
         const job = (jobsData || []).find(j => j['Job ID'] === candidate['Job ID']);
@@ -73,6 +81,7 @@ export default function LiveCandidateFeed() {
 
       setCandidates(enrichedCandidates);
       setJobs(jobsData || []);
+      setCvData(cvsData || []);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -113,6 +122,12 @@ export default function LiveCandidateFeed() {
     if (score >= 50) return 'from-yellow-400/20 to-yellow-600/40';
     return 'from-red-400/20 to-red-600/40';
   };
+
+  // Get CV status for a candidate
+  const getCandidateStatus = (candidateId: string) => {
+    const cvRecord = cvData.find(cv => cv['Cadndidate_ID'] === candidateId)
+    return cvRecord?.['CandidateStatus'] || null
+  }
 
   if (loading) {
     return (
@@ -287,19 +302,34 @@ export default function LiveCandidateFeed() {
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
                           <h3 className="text-xl font-bold text-white">{candidate['Candidate Name']}</h3>
-                          <StatusDropdown
-                            currentStatus={candidate['Contacted']}
-                            candidateId={candidate["Candidate_ID"]}
-                            jobId={candidate["Job ID"]}
-                            onStatusChange={(newStatus) => {
-                              setCandidates(prev => prev.map(c => 
-                                c["Candidate_ID"] === candidate["Candidate_ID"] 
-                                  ? { ...c, Contacted: newStatus }
-                                  : c
-                              ))
-                            }}
-                            variant="badge"
-                          />
+                          <div className="flex items-center space-x-2">
+                            <StatusDropdown
+                              currentStatus={candidate['Contacted']}
+                              candidateId={candidate["Candidate_ID"]}
+                              jobId={candidate["Job ID"]}
+                              onStatusChange={(newStatus) => {
+                                setCandidates(prev => prev.map(c => 
+                                  c["Candidate_ID"] === candidate["Candidate_ID"] 
+                                    ? { ...c, Contacted: newStatus }
+                                    : c
+                                ))
+                              }}
+                              variant="badge"
+                            />
+                            <StatusDropdown
+                              currentStatus={getCandidateStatus(candidate["Candidate_ID"])}
+                              candidateId={candidate["Candidate_ID"]}
+                              jobId={null}
+                              onStatusChange={(newStatus) => {
+                                setCvData(prev => prev.map(cv => 
+                                  cv['Cadndidate_ID'] === candidate["Candidate_ID"] 
+                                    ? { ...cv, CandidateStatus: newStatus }
+                                    : cv
+                                ))
+                              }}
+                              variant="badge"
+                            />
+                          </div>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">

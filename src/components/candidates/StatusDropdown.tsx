@@ -69,26 +69,36 @@ export function StatusDropdown({
     
     setIsUpdating(true)
     try {
-      // Update in Jobs_CVs table
-      const { error } = await supabase
-        .from('Jobs_CVs')
-        .update({ 'Contacted': newStatus })
-        .eq('Candidate_ID', candidateId)
-        .eq('Job ID', jobId || candidateId)
+      if (jobId) {
+        // Update in Jobs_CVs table (Contacted status)
+        const { error } = await supabase
+          .from('Jobs_CVs')
+          .update({ 'Contacted': newStatus })
+          .eq('Candidate_ID', candidateId)
+          .eq('Job ID', jobId)
 
-      if (error) throw error
+        if (error) throw error
+      } else {
+        // Update in CVs table (CandidateStatus)
+        const { error } = await supabase
+          .from('CVs')
+          .update({ CandidateStatus: newStatus } as any)
+          .eq('Cadndidate_ID', candidateId)
+
+        if (error) throw error
+      }
 
       onStatusChange?.(newStatus)
       
       toast({
         title: "Status Updated",
-        description: `Candidate status changed to ${newStatus}`,
+        description: `${jobId ? 'Contact' : 'Candidate'} status changed to ${newStatus}`,
       })
     } catch (error) {
       console.error('Error updating status:', error)
       toast({
         title: "Error",
-        description: "Failed to update candidate status",
+        description: `Failed to update ${jobId ? 'contact' : 'candidate'} status`,
         variant: "destructive",
       })
     } finally {
