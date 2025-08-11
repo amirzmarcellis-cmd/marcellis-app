@@ -163,7 +163,7 @@ export default function Apply() {
 
   const handleFileUpload = async (files: any[]) => {
     if (files.length > 0) {
-      const fileUrl = files[0].url;
+      const fileUrl = files[0].file_url; // Correct property name
       setCvFile(fileUrl);
       
       // Extract text from the uploaded CV
