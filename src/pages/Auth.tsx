@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Phone } from 'lucide-react';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
-
+import defaultLogo from '@/assets/default-logo.png';
 
 export default function Auth() {
   const { settings } = useAppSettings();
@@ -67,7 +67,7 @@ export default function Auth() {
             <div className="flex items-center justify-center">
               <div className="w-40 h-40 flex items-center justify-center">
                 <img 
-                  src="/lovable-uploads/43641ce1-cadf-4331-8519-75b24de04fe1.png" 
+                  src={settings.logo || defaultLogo} 
                   alt="Company Logo" 
                   className="w-full h-full object-contain"
                 />
