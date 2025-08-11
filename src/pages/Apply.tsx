@@ -20,7 +20,7 @@ const applicationSchema = z.object({
   phoneNumber: z.string().min(10, "Please enter a valid phone number"),
   email: z.string().email("Please enter a valid email address"),
   jobApplied: z.string().min(1, "Please select a job"),
-  portfolioLink: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+  portfolioLink: z.string().optional().or(z.literal("")).refine((val) => !val || z.string().url().safeParse(val).success, "Please enter a valid URL"),
   agencyExperience: z.string().min(1, "Please specify your agency experience"),
   overallExperience: z.string().min(1, "Please specify your overall experience"),
   salaryExpectations: z.string().min(1, "Please enter your salary expectations"),
