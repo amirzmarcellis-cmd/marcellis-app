@@ -14,7 +14,7 @@ interface AppSettingsContextType {
 const AppSettingsContext = createContext<AppSettingsContextType | undefined>(undefined);
 
 const DEFAULT_SETTINGS: AppSettings = {
-  logo: null,
+  logo: "/logo.png",
   systemName: "Pulse Marc Ellis",
   primaryColor: "#00FFFF" // Cyan color
 };

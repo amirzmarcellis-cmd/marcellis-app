@@ -69,15 +69,15 @@ export function DashboardSidebar() {
         {/* Header */}
         <div className="p-6 border-b border-border">
           <div className="flex items-center justify-center">
-            <div className="w-24 h-24 flex items-center justify-center">
+            <div className={`${isCollapsed ? 'w-12 h-12' : 'w-32 h-32'} flex items-center justify-center transition-all duration-200`}>
               {settings.logo ? (
                 <img 
                   src={settings.logo} 
                   alt="Company Logo" 
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain rounded-lg"
                 />
               ) : (
-                <Phone className="w-12 h-12 text-primary" />
+                <Phone className={`${isCollapsed ? 'w-8 h-8' : 'w-16 h-16'} text-primary`} />
               )}
             </div>
           </div>
