@@ -40,6 +40,7 @@ export default function Apply() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cvFile, setCvFile] = useState<string>("");
+  const [cvText, setCvText] = useState<string>("");
   const { toast } = useToast();
 
   const form = useForm<ApplicationForm>({
@@ -81,12 +82,41 @@ export default function Apply() {
     }
   };
 
+  const generateCandidateId = async (): Promise<string> => {
+    try {
+      // Get the latest candidate ID to determine the next number
+      const { data, error } = await supabase
+        .from("CVs")
+        .select('"Cadndidate_ID"')
+        .like('"Cadndidate_ID"', 'DMS-C-%')
+        .order('"Cadndidate_ID"', { ascending: false })
+        .limit(1);
+
+      if (error) throw error;
+
+      let nextNumber = 659; // Starting number
+      if (data && data.length > 0) {
+        const lastId = data[0]["Cadndidate_ID"];
+        const match = lastId.match(/DMS-C-(\d+)/);
+        if (match) {
+          nextNumber = parseInt(match[1]) + 1;
+        }
+      }
+
+      return `DMS-C-${nextNumber.toString().padStart(4, '0')}`;
+    } catch (error) {
+      console.error('Error generating candidate ID:', error);
+      // Fallback to timestamp-based ID
+      return `DMS-C-${Date.now().toString().slice(-4)}`;
+    }
+  };
+
   const onSubmit = async (data: ApplicationForm) => {
     setIsSubmitting(true);
     
     try {
-      // Generate a unique candidate ID
-      const candidateId = `CAND-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      // Generate a proper candidate ID
+      const candidateId = await generateCandidateId();
       
       const cvData = {
         "Cadndidate_ID": candidateId,
@@ -96,6 +126,7 @@ export default function Apply() {
         "Email": data.email,
         "Applied for": [data.jobApplied],
         "CV_Link": cvFile,
+        "cv_text": cvText,
         "Linkedin": data.portfolioLink,
         "Other Notes": data.notes,
         "Timestamp": new Date().toISOString(),
@@ -117,6 +148,7 @@ export default function Apply() {
 
       form.reset();
       setCvFile("");
+      setCvText("");
     } catch (error) {
       console.error("Error submitting application:", error);
       toast({
@@ -129,9 +161,35 @@ export default function Apply() {
     }
   };
 
-  const handleFileUpload = (files: any[]) => {
+  const handleFileUpload = async (files: any[]) => {
     if (files.length > 0) {
-      setCvFile(files[0].url);
+      const fileUrl = files[0].url;
+      setCvFile(fileUrl);
+      
+      // Extract text from the uploaded CV
+      try {
+        const { data, error } = await supabase.functions.invoke('extract-cv-text', {
+          body: { fileUrl }
+        });
+
+        if (error) throw error;
+        
+        if (data?.text) {
+          setCvText(data.text);
+          toast({
+            title: "CV Text Extracted",
+            description: "CV text has been automatically extracted and will be saved.",
+          });
+        }
+      } catch (error) {
+        console.error('Error extracting CV text:', error);
+        setCvText('CV uploaded - text extraction failed');
+        toast({
+          title: "Text Extraction Notice",
+          description: "CV uploaded successfully, but text extraction failed. Manual review may be needed.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
