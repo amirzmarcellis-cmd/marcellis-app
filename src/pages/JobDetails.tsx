@@ -42,6 +42,8 @@ export default function JobDetails() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [isGeneratingShortList, setIsGeneratingShortList] = useState(false)
+  const [shortListButtonDisabled, setShortListButtonDisabled] = useState(false)
+  const [shortListTimeRemaining, setShortListTimeRemaining] = useState(0)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -49,8 +51,46 @@ export default function JobDetails() {
       fetchJob(id)
       fetchCandidates(id)
       fetchCvData()
+      checkShortListButtonStatus()
     }
   }, [id])
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout
+    if (shortListButtonDisabled && shortListTimeRemaining > 0) {
+      interval = setInterval(() => {
+        setShortListTimeRemaining(prev => {
+          if (prev <= 1) {
+            setShortListButtonDisabled(false)
+            const storageKey = `shortlist_${id}_disabled`
+            localStorage.removeItem(storageKey)
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+    }
+    return () => clearInterval(interval)
+  }, [shortListButtonDisabled, shortListTimeRemaining, id])
+
+  const checkShortListButtonStatus = () => {
+    if (!id) return
+    
+    const storageKey = `shortlist_${id}_disabled`
+    const disabledUntil = localStorage.getItem(storageKey)
+    
+    if (disabledUntil) {
+      const now = Date.now()
+      const disabledTime = parseInt(disabledUntil)
+      
+      if (now < disabledTime) {
+        setShortListButtonDisabled(true)
+        setShortListTimeRemaining(Math.ceil((disabledTime - now) / 1000))
+      } else {
+        localStorage.removeItem(storageKey)
+      }
+    }
+  }
 
   const fetchJob = async (jobId: string) => {
     try {
@@ -169,6 +209,13 @@ export default function JobDetails() {
 
     setIsGeneratingShortList(true);
     
+    // Set button disabled for 30 minutes (1800 seconds)
+    const disabledUntil = Date.now() + (30 * 60 * 1000)
+    const storageKey = `shortlist_${id}_disabled`
+    localStorage.setItem(storageKey, disabledUntil.toString())
+    setShortListButtonDisabled(true)
+    setShortListTimeRemaining(30 * 60) // 30 minutes in seconds
+    
     try {
       // Process each candidate individually with their callid
       for (const candidate of candidates) {
@@ -203,6 +250,10 @@ export default function JobDetails() {
         description: "Failed to generate short list",
         variant: "destructive",
       });
+      // Remove the disabled state if there was an error
+      localStorage.removeItem(storageKey)
+      setShortListButtonDisabled(false)
+      setShortListTimeRemaining(0)
     } finally {
       setIsGeneratingShortList(false);
     }
@@ -577,12 +628,17 @@ export default function JobDetails() {
                     </div>
                     <Button 
                       variant="default" 
-                      className="bg-green-600 hover:bg-green-700 text-white"
+                      className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={handleGenerateShortList}
-                      disabled={isGeneratingShortList}
+                      disabled={isGeneratingShortList || shortListButtonDisabled}
                     >
                       <Phone className="w-4 h-4 mr-2" />
-                      {isGeneratingShortList ? "Generating..." : "Call & Generate Short List"}
+                      {isGeneratingShortList 
+                        ? "Generating..." 
+                        : shortListButtonDisabled 
+                          ? `Short List is being processed (${Math.floor(shortListTimeRemaining / 60)}:${(shortListTimeRemaining % 60).toString().padStart(2, '0')})`
+                          : "Call & Generate Short List"
+                      }
                     </Button>
                   </div>
                 </CardHeader>
