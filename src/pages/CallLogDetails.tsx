@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useSearchParams, useNavigate } from "react-router-dom"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -34,7 +34,9 @@ interface CallLogDetail {
 }
 
 export default function CallLogDetails() {
-  const { candidateId, jobId } = useParams()
+  const [searchParams] = useSearchParams()
+  const candidateId = searchParams.get('candidate')
+  const jobId = searchParams.get('job')
   const navigate = useNavigate()
   const [callLog, setCallLog] = useState<CallLogDetail | null>(null)
   const [loading, setLoading] = useState(true)
@@ -52,9 +54,15 @@ export default function CallLogDetails() {
         .select('*')
         .eq('Candidate_ID', candidateId)
         .eq('Job ID', jobId)
-        .single()
+        .maybeSingle()
 
       if (error) throw error
+      
+      if (!data) {
+        setCallLog(null)
+        setLoading(false)
+        return
+      }
 
       // Fetch job title
       const { data: jobData } = await supabase
