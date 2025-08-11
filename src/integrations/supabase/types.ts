@@ -309,17 +309,18 @@ export type Database = {
           "Candidate Name": string | null
           "Candidate Phone Number": string | null
           Candidate_ID: string | null
-          CandidateStatus: string | null
           cons: string | null
           Contacted: string | null
           current_salary: string | null
           CV_Link: string | null
+          duration: string | null
           group_id: number | null
           "Job ID": string | null
           lastcalltime: string | null
           Notes: string | null
           "Notice Period": string | null
           pros: string | null
+          recording: string | null
           "Relatable CV?": string | null
           "Salary Expectations": string | null
           "Score and Reason": string | null
@@ -336,17 +337,18 @@ export type Database = {
           "Candidate Name"?: string | null
           "Candidate Phone Number"?: string | null
           Candidate_ID?: string | null
-          CandidateStatus?: string | null
           cons?: string | null
           Contacted?: string | null
           current_salary?: string | null
           CV_Link?: string | null
+          duration?: string | null
           group_id?: number | null
           "Job ID"?: string | null
           lastcalltime?: string | null
           Notes?: string | null
           "Notice Period"?: string | null
           pros?: string | null
+          recording?: string | null
           "Relatable CV?"?: string | null
           "Salary Expectations"?: string | null
           "Score and Reason"?: string | null
@@ -363,17 +365,18 @@ export type Database = {
           "Candidate Name"?: string | null
           "Candidate Phone Number"?: string | null
           Candidate_ID?: string | null
-          CandidateStatus?: string | null
           cons?: string | null
           Contacted?: string | null
           current_salary?: string | null
           CV_Link?: string | null
+          duration?: string | null
           group_id?: number | null
           "Job ID"?: string | null
           lastcalltime?: string | null
           Notes?: string | null
           "Notice Period"?: string | null
           pros?: string | null
+          recording?: string | null
           "Relatable CV?"?: string | null
           "Salary Expectations"?: string | null
           "Score and Reason"?: string | null
