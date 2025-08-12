@@ -40,6 +40,15 @@ import { ScoreRing } from '@/components/ui/ScoreRing';
 import { AuroraBackground } from '@/components/decor/AuroraBackground';
 import { HeroHeader } from '@/components/dashboard/HeroHeader';
 import { BentoKpis } from '@/components/dashboard/BentoKpis';
+import { CosmicGrid } from '@/components/decor/CosmicGrid';
+import { Particles } from '@/components/decor/Particles';
+import { SpotlightCursor } from '@/components/effects/SpotlightCursor';
+import { TiltCard } from '@/components/effects/TiltCard';
+import { RadarCard } from '@/components/dashboard/RadarCard';
+import { ActivityTicker } from '@/components/dashboard/ActivityTicker';
+import { QuickActionsDock } from '@/components/dashboard/QuickActionsDock';
+import { CommandPalette } from '@/components/command/CommandPalette';
+import { AccentSwitcher } from '@/components/ui/AccentSwitcher';
 
 
 interface DashboardData {
@@ -227,6 +236,9 @@ export default function Index() {
     <div className="min-h-screen bg-background text-foreground p-6 relative overflow-hidden">
       {/* Animated background elements */}
       <AuroraBackground />
+      <div className="cosmic-grid cosmic-grid--animated" aria-hidden="true" />
+      <Particles />
+      <SpotlightCursor />
       
       <div className="mb-8 relative z-10">
         <div className="rounded-2xl border border-border/50 bg-gradient-card backdrop-blur-xl p-6 shadow-card animate-fade-in">
@@ -234,45 +246,61 @@ export default function Index() {
             title="Mission Control"
             subtitle={`Welcome back, ${profile?.first_name || 'Commander'}. Your day at a glance.`}
             actions={
-              <Button variant="outline" size="sm" className="font-medium">
-                <TrendingUp className="h-4 w-4 mr-2" /> View Reports
-              </Button>
+              <div className="flex items-center gap-2">
+                <AccentSwitcher />
+                <Button variant="outline" size="sm" className="font-medium">
+                  <TrendingUp className="h-4 w-4 mr-2" /> View Reports
+                </Button>
+              </div>
             }
           />
 
           <BentoKpis>
-            <MetricCardPro
-              title="Active Jobs"
-              value={data?.totalJobs ?? 0}
-              delta="+3 this week"
-              icon={Briefcase}
-              accent="primary"
-              trend={[3,5,4,6,7,8,7,9]}
-            />
-            <MetricCardPro
-              title="Awaiting Review"
-              value={data?.candidatesAwaitingReview ?? 0}
-              delta="-12%"
-              icon={ClipboardList}
-              accent="purple"
-              trend={[12,10,11,9,8,7,8,6]}
-            />
-            <MetricCardPro
-              title="Interviews"
-              value={data?.interviewsThisWeek ?? 0}
-              delta="+8%"
-              icon={Video}
-              accent="cyan"
-              trend={[2,3,3,4,5,6,6,7]}
-            />
-            <MetricCardPro
-              title="Tasks Today"
-              value={data?.tasksToday ?? 0}
-              delta={data?.tasksToday ? `${data.tasksToday > 0 ? '+' : ''}${data.tasksToday}%` : undefined}
-              icon={Target}
-              accent="emerald"
-              trend={[1,2,1,3,2,4,3,5]}
-            />
+            <TiltCard>
+              <MetricCardPro
+                title="Active Jobs"
+                value={data?.totalJobs ?? 0}
+                delta="+3 this week"
+                icon={Briefcase}
+                accent="primary"
+                trend={[3,5,4,6,7,8,7,9]}
+                progress={Math.min(100, (data?.totalJobs ?? 0) * 12)}
+                glow
+              />
+            </TiltCard>
+            <TiltCard>
+              <MetricCardPro
+                title="Awaiting Review"
+                value={data?.candidatesAwaitingReview ?? 0}
+                delta="-12%"
+                icon={ClipboardList}
+                accent="purple"
+                trend={[12,10,11,9,8,7,8,6]}
+                progress={Math.min(100, (data?.candidatesAwaitingReview ?? 0))}
+              />
+            </TiltCard>
+            <TiltCard>
+              <MetricCardPro
+                title="Interviews"
+                value={data?.interviewsThisWeek ?? 0}
+                delta="+8%"
+                icon={Video}
+                accent="cyan"
+                trend={[2,3,3,4,5,6,6,7]}
+                progress={Math.min(100, (data?.interviewsThisWeek ?? 0) * 15)}
+              />
+            </TiltCard>
+            <TiltCard>
+              <MetricCardPro
+                title="Tasks Today"
+                value={data?.tasksToday ?? 0}
+                delta={data?.tasksToday ? `${data.tasksToday > 0 ? '+' : ''}${data.tasksToday}%` : undefined}
+                icon={Target}
+                accent="emerald"
+                trend={[1,2,1,3,2,4,3,5]}
+                progress={Math.min(100, (data?.tasksToday ?? 0) * 10)}
+              />
+            </TiltCard>
           </BentoKpis>
         </div>
       </div>
@@ -338,6 +366,7 @@ export default function Index() {
 
         {/* Right Side - Live Candidate Feed & Action Center - 60% width */}
         <div className="w-[60%] space-y-6">
+          <ActivityTicker items={enrichedCandidates.slice(0,10).map(c => `${c['Candidate Name']} • ${c['Job Title']} • ${parseFloat(c['Success Score']) || 0}`)} />
           {/* Live Candidate Feed */}
           <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20">
             <CardHeader>

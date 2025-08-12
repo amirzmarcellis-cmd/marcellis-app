@@ -11,6 +11,8 @@ interface MetricCardProProps {
   icon: LucideIcon
   trend?: number[]
   accent?: "primary" | "purple" | "cyan" | "emerald"
+  progress?: number
+  glow?: boolean
   className?: string
 }
 
@@ -21,10 +23,12 @@ const accentMap: Record<NonNullable<MetricCardProProps["accent"]>, string> = {
   emerald: "text-success",
 }
 
-export function MetricCardPro({ title, value, delta, icon: Icon, trend = [], accent = "primary", className }: MetricCardProProps) {
+export function MetricCardPro({ title, value, delta, icon: Icon, trend = [], accent = "primary", progress, glow = false, className }: MetricCardProProps) {
+  const pct = typeof progress === 'number' ? Math.max(0, Math.min(100, progress)) : undefined
   return (
     <Card className={cn(
       "relative overflow-hidden border border-border/50 bg-gradient-card backdrop-blur-sm hover:shadow-medium transition-all duration-300 hover:scale-[1.02]",
+      glow && "animate-pulse-glow",
       className
     )}>
       <CardContent className="p-4">
@@ -38,8 +42,17 @@ export function MetricCardPro({ title, value, delta, icon: Icon, trend = [], acc
               )}
             </div>
           </div>
-          <div className={cn("flex-shrink-0 rounded-md bg-primary/10 p-2", accentMap[accent])}>
-            <Icon className={cn("h-5 w-5", accentMap[accent])} />
+          <div className={cn("relative flex-shrink-0 text-primary", accentMap[accent])}>
+            {typeof pct === 'number' && (
+              <div
+                aria-hidden="true"
+                className="absolute inset-[-6px] rounded-full opacity-40"
+                style={{ background: `conic-gradient(currentColor ${pct}%, transparent 0)` }}
+              />
+            )}
+            <div className={cn("relative z-10 rounded-md bg-primary/10 p-2", accentMap[accent])}>
+              <Icon className={cn("h-5 w-5", accentMap[accent])} />
+            </div>
           </div>
         </div>
         {trend.length > 0 && (

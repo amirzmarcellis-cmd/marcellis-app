@@ -152,7 +152,12 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.5s ease-out',
 				'slide-in': 'slide-in 0.3s ease-out',
-				'pulse-glow': 'pulse-glow 2s ease-in-out infinite'
+				'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+				'radar-sweep': 'radar-sweep 6s linear infinite',
+				'float-slow': 'float 6s ease-in-out infinite',
+				'marquee': 'marquee 24s linear infinite',
+				'parallax-pan': 'parallax-pan 60s linear infinite',
+				'spotlight-fade': 'spotlight-fade 0.6s ease-out'
 			}
 		}
 	},

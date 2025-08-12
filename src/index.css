@@ -246,3 +246,31 @@
     @apply animate-[pulse-glow_2s_ease-in-out_infinite];
   }
 }
+
+@layer utilities {
+  /* Spotlight overlay that follows cursor via CSS variables --mx / --my */
+  .spotlight-overlay {
+    @apply fixed inset-0 pointer-events-none mix-blend-screen opacity-70 animate-spotlight-fade;
+    background: radial-gradient(600px at var(--mx,50%) var(--my,50%), hsl(var(--primary) / 0.12), transparent 60%);
+  }
+
+  /* Cosmic grid background */
+  .cosmic-grid {
+    @apply absolute inset-0 opacity-40;
+    background-image:
+      radial-gradient(circle at 1px 1px, hsl(var(--primary) / 0.08) 1px, transparent 0),
+      radial-gradient(circle at 3px 3px, hsl(var(--accent) / 0.06) 1px, transparent 0);
+    background-size: 40px 40px, 80px 80px;
+  }
+  .cosmic-grid--animated { @apply animate-parallax-pan; }
+
+  /* Marquee ticker */
+  .marquee-row { @apply overflow-hidden whitespace-nowrap; }
+  .marquee-inner { @apply inline-block animate-marquee; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-inner { animation: none !important; }
+    .spotlight-overlay { display: none; }
+    .cosmic-grid--animated { animation: none; }
+  }
+}
