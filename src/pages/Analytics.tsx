@@ -171,23 +171,29 @@ export default function Analytics() {
         };
       }).filter(job => job.averageScore > 0).slice(0, 4) || [];
 
-      // Average salaries by job
+      // Average salaries by job - include all non-null values (including zeros)
       const averageSalariesByJob = jobsData?.map(job => {
         const jobCandidates = jobsCvsData?.filter(item => item['Job ID'] === job['Job ID']) || [];
 
         const parseSalary = (val: any) => {
-          if (!val || typeof val !== 'string') return 0;
-          const num = parseFloat(val.replace(/[^0-9.]/g, ''));
-          return isNaN(num) ? 0 : num;
+          if (val === null || val === undefined) return NaN;
+          if (typeof val === 'number') return val;
+          if (typeof val === 'string') {
+            const cleaned = val.trim();
+            if (!cleaned) return NaN;
+            const num = parseFloat(cleaned.replace(/[^0-9.]/g, ''));
+            return isNaN(num) ? NaN : num;
+          }
+          return NaN;
         };
 
         const expectedVals = jobCandidates
           .map(item => parseSalary(item['Salary Expectations']))
-          .filter((n: number) => n > 0);
+          .filter((n: number) => !Number.isNaN(n));
 
         const currentVals = jobCandidates
           .map(item => parseSalary(item['current_salary']))
-          .filter((n: number) => n > 0);
+          .filter((n: number) => !Number.isNaN(n));
 
         const avgExpected = expectedVals.length ? Math.round(expectedVals.reduce((a: number, b: number) => a + b, 0) / expectedVals.length) : 0;
         const avgCurrent = currentVals.length ? Math.round(currentVals.reduce((a: number, b: number) => a + b, 0) / currentVals.length) : 0;
@@ -197,7 +203,7 @@ export default function Analytics() {
           avgExpected,
           avgCurrent,
         };
-      }).filter(entry => entry.avgExpected > 0 || entry.avgCurrent > 0).slice(0, 4) || [];
+      })?.slice(0, 4) || [];
       // Calculate rates and average days to hire
       const callSuccessRate = totalCallLogs > 0 ? Math.round((contactedCount / totalCallLogs) * 100) : 0;
       const contactRate = totalCandidates > 0 ? Math.round((contactedCount / totalCandidates) * 100) : 0;
