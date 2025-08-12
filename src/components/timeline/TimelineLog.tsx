@@ -46,7 +46,7 @@ export function TimelineLog({ candidateId, jobId }: TimelineLogProps) {
       case 'candidate_status_change':
         return `Candidate status changed: ${from || '—'} → ${to || '—'}`
       case 'note_saved':
-        return 'Notes updated'
+        return meta.note ? `Note updated: "${meta.note}"` : 'Notes updated'
       case 'call_logged':
         return `Call logged (${meta.call_status || 'unknown'})`
       default:
