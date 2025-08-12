@@ -245,14 +245,6 @@ export default function Index() {
           <HeroHeader
             title="Mission Control"
             subtitle={`Welcome back, ${profile?.first_name || 'Commander'}. Your day at a glance.`}
-            actions={
-              <div className="flex items-center gap-2">
-                <AccentSwitcher />
-                <Button variant="outline" size="sm" className="font-medium">
-                  <TrendingUp className="h-4 w-4 mr-2" /> View Reports
-                </Button>
-              </div>
-            }
           />
 
           <BentoKpis>
@@ -265,18 +257,19 @@ export default function Index() {
                 accent="primary"
                 trend={[3,5,4,6,7,8,7,9]}
                 progress={Math.min(100, (data?.totalJobs ?? 0) * 12)}
-                glow
+                
               />
             </TiltCard>
             <TiltCard>
               <MetricCardPro
                 title="Awaiting Review"
-                value={data?.candidatesAwaitingReview ?? 0}
+                value={highScoreActiveCount || 0}
                 delta="-12%"
                 icon={ClipboardList}
                 accent="purple"
                 trend={[12,10,11,9,8,7,8,6]}
-                progress={Math.min(100, (data?.candidatesAwaitingReview ?? 0))}
+                progress={Math.min(100, highScoreActiveCount || 0)}
+                className="border-success shadow-glow"
               />
             </TiltCard>
             <TiltCard>

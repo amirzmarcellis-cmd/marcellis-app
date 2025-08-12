@@ -14,7 +14,7 @@ export function ActivityTicker({ items, className }: ActivityTickerProps) {
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <span className="inline-flex h-2 w-2 rounded-full bg-success animate-pulse" aria-hidden="true" />
         <span className="font-medium text-foreground">LIVE</span>
-        <div className="marquee-row flex-1">
+        <div className="marquee-row flex-1" aria-live="polite" role="marquee">
           <div className="marquee-inner">
             <span className="px-4">{line}</span>
             <span className="px-4">{line}</span>
