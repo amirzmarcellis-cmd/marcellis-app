@@ -65,7 +65,7 @@ interface JobData {
   "Job Salary Range (ex: 15000 AED)": string;
   "Things to look for": string;
   "JD Summary": string;
-  "Criteria to evaluate by": string;
+  "Criteria to evaluate by"?: string;
   "assignment": string;
   "Processed": string;
   "Notice Period": string;
