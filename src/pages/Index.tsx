@@ -35,6 +35,11 @@ import {
   Phone
 } from 'lucide-react';
 
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { MetricCardPro } from '@/components/dashboard/MetricCardPro';
+import { ScoreRing } from '@/components/ui/ScoreRing';
+
+
 interface DashboardData {
   totalCandidates: number;
   totalJobs: number;
@@ -212,42 +217,53 @@ export default function Index() {
         <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-2000"></div>
       </div>
       
-      {/* Welcome & Quick Status */}
+      {/* Overview */}
       <div className="mb-8 relative z-10">
-        <div className="bg-gradient-to-r from-white/10 via-white/5 to-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-6 shadow-2xl shadow-cyan-500/10">
-          <h1 className="text-3xl font-bold mb-2">
-            {getCurrentTimeGreeting()}, {profile?.first_name || 'Commander'}
-          </h1>
-          <p className="text-cyan-300 mb-6">
-            You have {data?.totalJobs || 0} Active roles, {data?.candidatesAwaitingReview || 0} candidates to review, 
-            and {data?.tasksToday || 0} tasks due today.
-          </p>
-          
-          {/* Quick Stats Bar */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <Card className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 border-blue-400/30 hover:scale-105 transition-transform cursor-pointer shadow-lg shadow-blue-500/20">
-              <CardContent className="p-4 text-center">
-                <Briefcase className="h-8 w-8 text-blue-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-blue-300">{data?.totalJobs || 0}</div>
-                <div className="text-xs text-blue-200">Active Jobs</div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 border-purple-400/30 hover:scale-105 transition-transform cursor-pointer shadow-lg shadow-purple-500/20">
-              <CardContent className="p-4 text-center">
-                <Star className="h-8 w-8 text-purple-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-purple-300">{data?.candidatesAwaitingReview || 0}</div>
-                <div className="text-xs text-purple-200">Tasks Sent</div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gradient-to-br from-cyan-500/20 to-cyan-600/20 border-cyan-400/30 hover:scale-105 transition-transform cursor-pointer shadow-lg shadow-cyan-500/20">
-              <CardContent className="p-4 text-center">
-                <Video className="h-8 w-8 text-cyan-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-cyan-300">{data?.interviewsThisWeek || 0}</div>
-                <div className="text-xs text-cyan-200">Interview This Week</div>
-              </CardContent>
-            </Card>
+        <div className="bg-gradient-card backdrop-blur-xl rounded-2xl border border-border/50 p-6 shadow-card animate-fade-in">
+          <SectionHeader
+            title="Mission Control"
+            subtitle={`Welcome back, ${profile?.first_name || 'Commander'}. Your day at a glance.`}
+            actions={
+              <Button variant="outline" size="sm" className="font-medium">
+                <TrendingUp className="h-4 w-4 mr-2" /> View Reports
+              </Button>
+            }
+          />
+
+          {/* Metric Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <MetricCardPro
+              title="Active Jobs"
+              value={data?.totalJobs ?? 0}
+              delta="+3 this week"
+              icon={Briefcase}
+              accent="primary"
+              trend={[3,5,4,6,7,8,7,9]}
+            />
+            <MetricCardPro
+              title="Awaiting Review"
+              value={data?.candidatesAwaitingReview ?? 0}
+              delta="-12%"
+              icon={ClipboardList}
+              accent="purple"
+              trend={[12,10,11,9,8,7,8,6]}
+            />
+            <MetricCardPro
+              title="Interviews"
+              value={data?.interviewsThisWeek ?? 0}
+              delta="+8%"
+              icon={Video}
+              accent="cyan"
+              trend={[2,3,3,4,5,6,6,7]}
+            />
+            <MetricCardPro
+              title="Tasks Today"
+              value={data?.tasksToday ?? 0}
+              delta={data?.tasksToday ? `${data.tasksToday > 0 ? '+' : ''}${data.tasksToday}%` : undefined}
+              icon={Target}
+              accent="emerald"
+              trend={[1,2,1,3,2,4,3,5]}
+            />
           </div>
         </div>
       </div>
