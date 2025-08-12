@@ -57,6 +57,7 @@ export default function Index() {
   const [jobs, setJobs] = useState<any[]>([]);
   const [openTasksCount, setOpenTasksCount] = useState(0);
   const [jobStats, setJobStats] = useState<Record<string, any>>({});
+  const [highScoreActiveCount, setHighScoreActiveCount] = useState(0);
 
   useEffect(() => {
     fetchDashboardData();
@@ -124,6 +125,11 @@ export default function Index() {
       })
 
       setJobStats(stats)
+
+      // Candidates needing review: Score > 74 across active jobs only
+      const activeJobIds = new Set(activeJobs.map((j: any) => j['Job ID']))
+      const highScoreActiveCountVal = highScoreCandidates.filter((jc: any) => activeJobIds.has(jc['Job ID'])).length
+      setHighScoreActiveCount(highScoreActiveCountVal)
 
       setData({
         totalCandidates: cvs.length,
@@ -471,7 +477,7 @@ export default function Index() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-400/30">
                   <h4 className="font-semibold text-purple-300 mb-2">Candidates Needing Review</h4>
-                  <div className="text-2xl font-bold text-purple-400">{data?.candidatesAwaitingReview || 0}</div>
+                  <div className="text-2xl font-bold text-purple-400">{highScoreActiveCount || 0}</div>
                   <p className="text-sm text-purple-200">Score &gt; 74</p>
                 </div>
                 <div className="bg-cyan-500/10 rounded-lg p-4 border border-cyan-400/30">
