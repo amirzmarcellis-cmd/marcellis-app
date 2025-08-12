@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress"
 import { ArrowLeft, Phone, Clock, User, DollarSign, Calendar, Link2, Save } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
+import { TimelineLog } from "@/components/timeline/TimelineLog"
 
 interface CallLogDetail {
   "Job ID": string | null
@@ -322,6 +323,11 @@ export default function CallLogDetails() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Timeline Log */}
+      {candidateId && jobId && (
+        <TimelineLog candidateId={candidateId} jobId={jobId} />
+      )}
     </div>
   )
 }
