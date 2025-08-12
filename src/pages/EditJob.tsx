@@ -320,7 +320,7 @@ export default function EditJob() {
                         <SelectTrigger>
                           <SelectValue placeholder="Select notice period" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="z-[60] bg-popover">
                           {noticePeriods.map((period) => (
                             <SelectItem key={period} value={period}>
                               {period}
@@ -335,7 +335,7 @@ export default function EditJob() {
                         <SelectTrigger>
                           <SelectValue placeholder="Select currency" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="z-[60] bg-popover">
                           <SelectItem value="AED">AED</SelectItem>
                           <SelectItem value="SAR">SAR</SelectItem>
                           <SelectItem value="QAR">QAR</SelectItem>
@@ -357,7 +357,7 @@ export default function EditJob() {
                         <SelectTrigger>
                           <SelectValue placeholder="Select countries to include..." />
                         </SelectTrigger>
-                        <SelectContent className="max-h-60">
+                        <SelectContent className="max-h-60 z-[60] bg-popover">
                           {countries.filter(country => 
                             !nationalityToInclude.includes(country)
                           ).map((country) => (
@@ -399,7 +399,7 @@ export default function EditJob() {
                         <SelectTrigger>
                           <SelectValue placeholder="Select countries to exclude..." />
                         </SelectTrigger>
-                        <SelectContent className="max-h-60">
+                        <SelectContent className="max-h-60 z-[60] bg-popover">
                           {countries.filter(country => 
                             !nationalityToExclude.includes(country)
                           ).map((country) => (
@@ -440,7 +440,7 @@ export default function EditJob() {
                         <SelectTrigger>
                           <SelectValue placeholder="Select job type" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="z-[60] bg-popover">
                           <SelectItem value="Permanent">Permanent</SelectItem>
                           <SelectItem value="Contract">Contract</SelectItem>
                         </SelectContent>
@@ -454,7 +454,7 @@ export default function EditJob() {
                           <SelectTrigger>
                             <SelectValue placeholder="Select contract length" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="z-[60] bg-popover">
                             {contractLengths.map((length) => (
                               <SelectItem key={length} value={length}>
                                 {length}
