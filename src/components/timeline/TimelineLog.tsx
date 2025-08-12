@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Clock, MessageSquare, UserCheck, UserPlus, FileText, Phone } from "lucide-react"
+import { Clock, UserCheck, UserPlus, FileText, Phone } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { format } from "date-fns"
 
@@ -67,88 +67,47 @@ export function TimelineLog({ candidateId, jobId }: TimelineLogProps) {
 
   const fetchTimelineEvents = async () => {
     try {
-      const timelineEvents: TimelineEvent[] = []
+      const allowedTypes = new Set([
+        'longlisted',
+        'shortlisted',
+        'contacted_status_change',
+        'candidate_status_change',
+        'note_saved',
+      ])
 
-      // 1) Fetch status_history for this candidate-job context
-      const { data: history } = await supabase
+      const { data: history, error } = await supabase
         .from('status_history')
         .select('*')
         .or(`candidate_id.eq.${candidateId},job_id.eq.${jobId}`)
         .order('created_at', { ascending: false })
 
+      if (error) throw error
+
+      const filtered: TimelineEvent[] = []
+
       if (history && Array.isArray(history)) {
         for (const row of history) {
-          const description = buildHistoryDescription(row)
-          timelineEvents.push({
-            id: row.id,
-            type: row.change_type.includes('status') ? 'status_change' : 'activity',
-            timestamp: row.created_at,
-            description,
-            user_id: row.user_id,
-            details: {
-              entity_type: row.entity_type,
-              change_type: row.change_type,
-              from_status: row.from_status,
-              to_status: row.to_status,
-              metadata: row.metadata
-            },
-            icon: iconForHistory(row)
-          })
+          if (!allowedTypes.has(row.change_type)) continue
+
+          const isCandidateStatus = row.change_type === 'candidate_status_change'
+          const candidateMatches = row.candidate_id === candidateId
+          const jobMatches = row.job_id === jobId
+
+          if (isCandidateStatus ? candidateMatches : (candidateMatches && jobMatches)) {
+            filtered.push({
+              id: row.id,
+              type: 'status_change',
+              timestamp: row.created_at,
+              description: buildHistoryDescription(row),
+              user_id: row.user_id,
+              icon: iconForHistory(row)
+            })
+          }
         }
       }
 
-      // 2) Fetch activity logs related to this candidate-job combination
-      const { data: activityLogs } = await supabase
-        .from('activity_logs')
-        .select('*')
-        .or(`entity_id.eq.${candidateId},entity_id.eq.${jobId}`)
-        .order('created_at', { ascending: false })
-
-      if (activityLogs) {
-        for (const log of activityLogs) {
-          let icon = <FileText className="w-4 h-4" />
-          const at = (log.action_type || '').toLowerCase()
-          if (at.includes('longlist')) icon = <UserPlus className="w-4 h-4" />
-          else if (at.includes('status')) icon = <UserCheck className="w-4 h-4" />
-          else if (at.includes('call')) icon = <Phone className="w-4 h-4" />
-
-          timelineEvents.push({
-            id: log.id,
-            type: 'activity',
-            timestamp: log.created_at,
-            description: log.description,
-            user_id: log.user_id,
-            details: log.metadata,
-            icon
-          })
-        }
-      }
-
-      // 3) Fetch comments related to this candidate-job combination
-      const { data: comments } = await supabase
-        .from('comments')
-        .select('*')
-        .in('entity_type', ['candidate', 'job', 'call_log'])
-        .or(`entity_id.eq.${candidateId},entity_id.eq.${jobId}`)
-        .order('created_at', { ascending: false })
-
-      if (comments) {
-        for (const comment of comments) {
-          timelineEvents.push({
-            id: comment.id,
-            type: 'comment',
-            timestamp: comment.created_at,
-            description: `Comment: ${comment.content}`,
-            user_id: comment.user_id,
-            icon: <MessageSquare className="w-4 h-4" />
-          })
-        }
-      }
-
-      // Sort all events by timestamp (most recent first)
-      timelineEvents.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-
-      setEvents(timelineEvents)
+      filtered.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      setEvents(filtered)
     } catch (error) {
       console.error('Error fetching timeline events:', error)
     } finally {
@@ -229,13 +188,6 @@ export function TimelineLog({ candidateId, jobId }: TimelineLogProps) {
                       </div>
                     )}
                   </div>
-                  {event.details && Object.keys(event.details).length > 0 && (
-                    <div className="mt-2 p-2 bg-muted rounded text-xs">
-                      <pre className="whitespace-pre-wrap">
-                        {JSON.stringify(event.details, null, 2)}
-                      </pre>
-                    </div>
-                  )}
                 </div>
                 {index < events.length - 1 && (
                   <div className="absolute left-4 mt-8 h-4 w-px bg-border" style={{ marginLeft: '15px' }} />
