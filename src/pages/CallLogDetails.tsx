@@ -140,6 +140,8 @@ export default function CallLogDetails() {
       if (error) throw error
       
       setCallLog(prev => prev ? { ...prev, Notes: notes } : null)
+      // Refresh the page after successful save to reflect timeline updates
+      window.location.reload()
     } catch (error) {
       console.error('Error saving notes:', error)
     } finally {
