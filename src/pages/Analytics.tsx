@@ -44,6 +44,11 @@ interface AnalyticsData {
     jobTitle: string;
     averageScore: number;
   }>;
+  averageSalariesByJob: Array<{
+    jobTitle: string;
+    avgExpected: number;
+    avgCurrent: number;
+  }>;
   callSuccessRate: number;
   contactRate: number;
   avgCandidatesPerJob: number;
@@ -166,6 +171,33 @@ export default function Analytics() {
         };
       }).filter(job => job.averageScore > 0).slice(0, 4) || [];
 
+      // Average salaries by job
+      const averageSalariesByJob = jobsData?.map(job => {
+        const jobCandidates = jobsCvsData?.filter(item => item['Job ID'] === job['Job ID']) || [];
+
+        const parseSalary = (val: any) => {
+          if (!val || typeof val !== 'string') return 0;
+          const num = parseFloat(val.replace(/[^0-9.]/g, ''));
+          return isNaN(num) ? 0 : num;
+        };
+
+        const expectedVals = jobCandidates
+          .map(item => parseSalary(item['Salary Expectations']))
+          .filter((n: number) => n > 0);
+
+        const currentVals = jobCandidates
+          .map(item => parseSalary(item['current_salary']))
+          .filter((n: number) => n > 0);
+
+        const avgExpected = expectedVals.length ? Math.round(expectedVals.reduce((a: number, b: number) => a + b, 0) / expectedVals.length) : 0;
+        const avgCurrent = currentVals.length ? Math.round(currentVals.reduce((a: number, b: number) => a + b, 0) / currentVals.length) : 0;
+
+        return {
+          jobTitle: (job['Job Title'] || job['Job ID'] || 'Unknown').substring(0, 15),
+          avgExpected,
+          avgCurrent,
+        };
+      }).filter(entry => entry.avgExpected > 0 || entry.avgCurrent > 0).slice(0, 4) || [];
       // Calculate rates and average days to hire
       const callSuccessRate = totalCallLogs > 0 ? Math.round((contactedCount / totalCallLogs) * 100) : 0;
       const contactRate = totalCandidates > 0 ? Math.round((contactedCount / totalCandidates) * 100) : 0;
@@ -192,6 +224,7 @@ export default function Analytics() {
         candidatesPerJob: jobCandidateCounts.slice(0, 4),
         topPerformingJobs,
         averageScoresByJob,
+        averageSalariesByJob,
         callSuccessRate,
         contactRate,
         avgCandidatesPerJob
@@ -422,7 +455,7 @@ export default function Analytics() {
       </div>
 
       {/* Bottom Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Candidates per Job */}
         <Card className="bg-white/10 backdrop-blur-md border-white/20">
           <CardHeader>
@@ -522,6 +555,40 @@ export default function Analytics() {
                   }}
                 />
                 <Bar dataKey="averageScore" fill={COLORS.primary} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Average Salaries by Job */}
+        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center">
+              <TrendingUp className="w-5 h-5 mr-2" />
+              Average Salaries by Job
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={data?.averageSalariesByJob}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis 
+                  dataKey="jobTitle" 
+                  angle={-45}
+                  textAnchor="end"
+                  height={100}
+                  tick={{ fontSize: 10, fill: '#93c5fd' }}
+                />
+                <YAxis tick={{ fill: '#93c5fd' }} />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1f2937', 
+                    border: '1px solid #374151',
+                    borderRadius: '8px'
+                  }}
+                />
+                <Bar dataKey="avgCurrent" name="Avg Current" fill="#3b82f6" />
+                <Bar dataKey="avgExpected" name="Avg Expected" fill="#f59e0b" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
