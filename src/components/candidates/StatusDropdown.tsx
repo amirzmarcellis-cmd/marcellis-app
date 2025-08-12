@@ -71,23 +71,22 @@ export function StatusDropdown({
       setLoadingOptions(true)
       try {
         if (statusType === "contacted") {
-          const { data, error } = await supabase
-            .from('status_contacted_lookup')
-            .select('value, label, sort_order, active')
-            .eq('active', true)
-            .order('sort_order', { ascending: true })
-          if (error) throw error
+          const allowed = [
+            "Not Contacted",
+            "Ready to Call",
+            "Contacted",
+            "Call Done",
+            "1st No Answer",
+            "2nd No Answer",
+            "3rd No Answer",
+            "Low Scored"
+          ]
           if (!active) return
-          setOptions((data || []).map(r => r.value))
+          setOptions(allowed)
         } else {
-          const { data, error } = await supabase
-            .from('status_candidate_lookup')
-            .select('value, label, sort_order, active')
-            .eq('active', true)
-            .order('sort_order', { ascending: true })
-          if (error) throw error
+          const allowed = ["Shortlisted", "Interview", "Hired", "Rejected"]
           if (!active) return
-          setOptions((data || []).map(r => r.value))
+          setOptions(allowed)
         }
       } catch (e) {
         console.error("Failed to load status options:", e)
@@ -110,8 +109,8 @@ export function StatusDropdown({
     if (statusType === "contacted") {
       return options.includes("Not Contacted") ? "Not Contacted" : (options[0] || "Not Contacted")
     }
-    // candidate: prefer "Applied" if present, else first option
-    return options.includes("Applied") ? "Applied" : (options[0] || "")
+    // candidate: default to first allowed or Shortlisted
+    return options[0] || "Shortlisted"
   }, [options, statusType])
 
   const handleStatusChange = async (newStatus: string) => {
