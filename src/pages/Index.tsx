@@ -29,7 +29,7 @@ import {
   ClipboardList,
   Video,
   Target,
-  Zap,
+  
   Activity,
   Timer,
   Phone
@@ -60,7 +60,7 @@ export default function Index() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedJobFilter, setSelectedJobFilter] = useState<string>('all');
-  const [aiSearchActive, setAiSearchActive] = useState<Record<string, boolean>>({});
+  
   const [candidates, setCandidates] = useState<any[]>([]);
   const [jobs, setJobs] = useState<any[]>([]);
   const [openTasksCount, setOpenTasksCount] = useState(0);
@@ -103,10 +103,7 @@ export default function Index() {
 
       const activeJobs = jobsData.filter((job: any) => job.Processed === 'Yes')
 
-      // Default Live Candidate Feed to the first active job
-      if (activeJobs.length > 0) {
-        setSelectedJobFilter((prev) => (prev === 'all' ? activeJobs[0]['Job ID'] : prev))
-      }
+      // Keep 'all' to show candidates across all jobs by default
 
       // Metrics
       const shortlistedCandidates = cvs.filter((c: any) => c.CandidateStatus === 'Shortlisted')
@@ -185,12 +182,6 @@ export default function Index() {
     return 'text-muted-foreground';
   };
 
-  const toggleAiSearch = (jobId: string) => {
-    setAiSearchActive(prev => ({
-      ...prev,
-      [jobId]: !prev[jobId]
-    }));
-  };
 
   const getCurrentTimeGreeting = () => {
     const hour = new Date().getHours();
@@ -256,7 +247,7 @@ export default function Index() {
                 accent="purple"
                 trend={[12,10,11,9,8,7,8,6]}
                 progress={Math.min(100, highScoreActiveCount || 0)}
-                className="border-success shadow-glow"
+                className="border-2 border-primary/60 glow-cyan"
               />
             </TiltCard>
             <TiltCard>
@@ -297,18 +288,8 @@ export default function Index() {
               {data?.activeJobs?.map((job) => (
                 <Card key={job['Job ID']} className="bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-lg border-white/20 hover:border-cyan-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 hover:scale-[1.02]">
                   <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center mb-3">
                       <h3 className="font-semibold text-sm truncate">{job['Job Title']}</h3>
-                      <Button
-                        size="sm"
-                        variant={aiSearchActive[job['Job ID']] ? "default" : "outline"}
-                        onClick={() => toggleAiSearch(job['Job ID'])}
-                        className={`h-6 px-2 ${aiSearchActive[job['Job ID']] 
-                          ? 'bg-cyan-500 hover:bg-cyan-600 animate-pulse' 
-                          : 'border-cyan-400/50 text-cyan-400 hover:bg-cyan-400/10'}`}
-                      >
-                        <Zap className="h-3 w-3" />
-                      </Button>
                     </div>
                     <p className="text-xs text-gray-400 mb-3">{job['Job Location']}</p>
                     <div className="grid grid-cols-4 gap-1 text-xs">
@@ -354,7 +335,7 @@ export default function Index() {
                 <CardTitle className="text-xl text-cyan-300 flex items-center">
                   <Activity className="h-5 w-5 mr-2 animate-pulse text-cyan-400" />
                   Live Candidate Feed
-                  <Badge className="ml-3 bg-gradient-to-r from-emerald-400/20 to-cyan-400/20 text-emerald-300 border-emerald-400/40 animate-pulse">
+                  <Badge className="ml-3 bg-background/40 text-primary border-2 border-primary/60 glow-cyan animate-pulse">
                     LIVE
                   </Badge>
                 </CardTitle>

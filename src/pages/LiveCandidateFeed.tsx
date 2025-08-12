@@ -84,12 +84,7 @@ export default function LiveCandidateFeed() {
       setJobs(jobsData || []);
       setCvData(cvsData || []);
 
-      const activeJobs = (jobsData || []).filter((j: any) => j.Processed === 'Yes');
-      if (activeJobs.length > 0) {
-        setSelectedJob(activeJobs[0]['Job ID']);
-      } else if ((jobsData || []).length > 0) {
-        setSelectedJob((jobsData as any[])[0]['Job ID']);
-      }
+      // Keep 'all' to show all jobs by default
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -183,9 +178,9 @@ export default function LiveCandidateFeed() {
           </div>
           
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 bg-green-500/20 px-4 py-2 rounded-full border border-green-400/40">
-              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-green-400 font-medium">LIVE</span>
+            <div className="flex items-center space-x-2 bg-background/30 px-4 py-2 rounded-full border-2 border-primary/60 glow-cyan">
+              <div className="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+              <span className="text-primary font-medium">LIVE</span>
             </div>
             <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-400/40 px-4 py-2 text-lg">
               {filteredCandidates.length} Active
@@ -221,7 +216,7 @@ export default function LiveCandidateFeed() {
               <label className="text-sm font-medium text-purple-300">Active Job</label>
               <div className="flex items-center gap-2 bg-black/20 border border-purple-400/30 text-white px-3 py-2 rounded-md">
                 <Briefcase className="w-4 h-4 text-purple-300" />
-                <span>{jobs.find(j => j['Job ID'] === selectedJob)?.['Job Title'] || '—'}</span>
+                <span>{selectedJob === 'all' ? 'All Jobs' : (jobs.find(j => j['Job ID'] === selectedJob)?.['Job Title'] || '—')}</span>
               </div>
             </div>
 
