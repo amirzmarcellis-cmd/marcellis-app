@@ -768,19 +768,21 @@ export default function JobDetails() {
                                            }}
                                            variant="badge"
                                          />
-                                         <StatusDropdown
-                                           currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
-                                           candidateId={mainCandidate["Candidate_ID"]}
-                                           jobId={null}
-                                           onStatusChange={(newStatus) => {
-                                             setCvData(prev => prev.map(cv => 
-                                               cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] 
-                                                 ? { ...cv, CandidateStatus: newStatus }
-                                                 : cv
-                                             ))
-                                           }}
-                                           variant="badge"
-                                         />
+                                         {getCandidateStatus(mainCandidate["Candidate_ID"]) && (
+                                           <StatusDropdown
+                                             currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
+                                             candidateId={mainCandidate["Candidate_ID"]}
+                                             jobId={null}
+                                             onStatusChange={(newStatus) => {
+                                               setCvData(prev => prev.map(cv => 
+                                                 cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] 
+                                                   ? { ...cv, CandidateStatus: newStatus }
+                                                   : cv
+                                               ))
+                                             }}
+                                             variant="badge"
+                                           />
+                                         )}
                                        </div>
                                        {getScoreBadge(mainCandidate["Success Score"])}
                                      </div>
@@ -895,37 +897,39 @@ export default function JobDetails() {
                                     </p>
                                   )}
 
-                                  <div className="flex items-center justify-between pt-2 border-t">
-                                    <div className="flex items-center space-x-2">
-                                      <StatusDropdown
-                                        currentStatus={mainCandidate["Contacted"]}
-                                        candidateId={mainCandidate["Candidate_ID"]}
-                                        jobId={id!}
-                                        onStatusChange={(newStatus) => {
-                                          setCandidates(prev => prev.map(c => 
-                                            c["Candidate_ID"] === mainCandidate["Candidate_ID"] 
-                                              ? { ...c, Contacted: newStatus }
-                                              : c
-                                          ))
-                                        }}
-                                        variant="badge"
-                                      />
-                                      <StatusDropdown
-                                        currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
-                                        candidateId={mainCandidate["Candidate_ID"]}
-                                        jobId={null}
-                                        onStatusChange={(newStatus) => {
-                                          setCvData(prev => prev.map(cv => 
-                                            cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] 
-                                              ? { ...cv, CandidateStatus: newStatus }
-                                              : cv
-                                          ))
-                                        }}
-                                        variant="badge"
-                                      />
-                                    </div>
-                                    {getScoreBadge(mainCandidate["Success Score"])}
-                                  </div>
+                                   <div className="flex items-center justify-between pt-2 border-t">
+                                     <div className="flex items-center space-x-2">
+                                       <StatusDropdown
+                                         currentStatus={mainCandidate["Contacted"]}
+                                         candidateId={mainCandidate["Candidate_ID"]}
+                                         jobId={id!}
+                                         onStatusChange={(newStatus) => {
+                                           setCandidates(prev => prev.map(c => 
+                                             c["Candidate_ID"] === mainCandidate["Candidate_ID"] 
+                                               ? { ...c, Contacted: newStatus }
+                                               : c
+                                           ))
+                                         }}
+                                         variant="badge"
+                                       />
+                                       {getCandidateStatus(mainCandidate["Candidate_ID"]) && (
+                                         <StatusDropdown
+                                           currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
+                                           candidateId={mainCandidate["Candidate_ID"]}
+                                           jobId={null}
+                                           onStatusChange={(newStatus) => {
+                                             setCvData(prev => prev.map(cv => 
+                                               cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] 
+                                                 ? { ...cv, CandidateStatus: newStatus }
+                                                 : cv
+                                             ))
+                                           }}
+                                           variant="badge"
+                                         />
+                                       )}
+                                     </div>
+                                     {getScoreBadge(mainCandidate["Success Score"])}
+                                   </div>
 
                                   {/* Call Log Buttons */}
                                   <div className="space-y-2 pt-2 border-t">
