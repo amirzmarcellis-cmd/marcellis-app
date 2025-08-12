@@ -1,15 +1,17 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { useSearchParams, useNavigate } from "react-router-dom"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
-import { ArrowLeft, Phone, Clock, User, DollarSign, Calendar, Link2, Save } from "lucide-react"
+import { ArrowLeft, Phone, Clock, User, DollarSign, Calendar, Link2, Save, Search } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
 import { TimelineLog } from "@/components/timeline/TimelineLog"
+import WaveformPlayer from "@/components/calls/WaveformPlayer"
 
 interface CallLogDetail {
   "Job ID": string | null
@@ -45,6 +47,22 @@ export default function CallLogDetails() {
   const [loading, setLoading] = useState(true)
   const [notes, setNotes] = useState("")
   const [saving, setSaving] = useState(false)
+  const [search, setSearch] = useState("")
+
+  const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+  const highlightedTranscript = useMemo(() => {
+    const t = callLog?.["Transcript"] || ""
+    if (!search) return t
+    const regex = new RegExp(`(${escapeRegExp(search)})`, "gi")
+    const parts = t.split(regex)
+    return parts.map((part, i) =>
+      part.toLowerCase() === search.toLowerCase() ? (
+        <mark key={i} className="bg-primary/20 text-primary px-0.5 rounded">{part}</mark>
+      ) : (
+        <span key={i}>{part}</span>
+      )
+    )
+  }, [callLog, search])
 
   useEffect(() => {
     fetchCallLogDetail()
@@ -222,6 +240,14 @@ export default function CallLogDetails() {
                 </p>
               </div>
             </div>
+            {callLog["recording"] && (
+              <div className="pt-2">
+                <label className="text-sm font-medium text-muted-foreground">Playback</label>
+                <div className="mt-2">
+                  <WaveformPlayer url={callLog["recording"]!} />
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -317,8 +343,23 @@ export default function CallLogDetails() {
             <CardTitle>Transcript</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="max-h-60 overflow-y-auto">
-              <p className="whitespace-pre-wrap text-sm">{callLog["Transcript"] || 'No transcript available'}</p>
+            <div className="space-y-3">
+              <div className="relative">
+                <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                <Input
+                  placeholder="Search transcript keywords..."
+                  className="pl-9"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+              <div className="max-h-60 overflow-y-auto text-sm leading-relaxed">
+                {callLog["Transcript"] ? (
+                  <div className="whitespace-pre-wrap">{highlightedTranscript}</div>
+                ) : (
+                  <p className="text-muted-foreground">No transcript available</p>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
