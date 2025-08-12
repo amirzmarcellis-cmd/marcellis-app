@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -30,37 +31,86 @@ export function TimelineLog({ candidateId, jobId }: TimelineLogProps) {
     fetchTimelineEvents()
   }, [candidateId, jobId])
 
+  const buildHistoryDescription = (row: any) => {
+    const ct: string = row.change_type
+    const from = row.from_status
+    const to = row.to_status
+    const meta = row.metadata || {}
+    switch (ct) {
+      case 'longlisted':
+        return 'Candidate was longlisted for this position'
+      case 'shortlisted':
+        return 'Candidate shortlisted for this position'
+      case 'contacted_status_change':
+        return `Contacted status changed: ${from || '—'} → ${to || '—'}`
+      case 'candidate_status_change':
+        return `Candidate status changed: ${from || '—'} → ${to || '—'}`
+      case 'note_saved':
+        return 'Notes updated'
+      case 'call_logged':
+        return `Call logged (${meta.call_status || 'unknown'})`
+      default:
+        return row.description || 'Status updated'
+    }
+  }
+
+  const iconForHistory = (row: any) => {
+    const ct: string = row.change_type
+    if (ct === 'longlisted') return <UserPlus className="w-4 h-4" />
+    if (ct === 'shortlisted') return <UserCheck className="w-4 h-4" />
+    if (ct === 'contacted_status_change') return <Phone className="w-4 h-4" />
+    if (ct === 'candidate_status_change') return <UserCheck className="w-4 h-4" />
+    if (ct === 'note_saved') return <FileText className="w-4 h-4" />
+    if (ct === 'call_logged') return <Phone className="w-4 h-4" />
+    return <FileText className="w-4 h-4" />
+  }
+
   const fetchTimelineEvents = async () => {
     try {
       const timelineEvents: TimelineEvent[] = []
 
-      // Fetch activity logs related to this candidate-job combination
+      // 1) Fetch status_history for this candidate-job context
+      const { data: history } = await supabase
+        .from('status_history')
+        .select('*')
+        .or(`candidate_id.eq.${candidateId},job_id.eq.${jobId}`)
+        .order('created_at', { ascending: false })
+
+      if (history && Array.isArray(history)) {
+        for (const row of history) {
+          const description = buildHistoryDescription(row)
+          timelineEvents.push({
+            id: row.id,
+            type: row.change_type.includes('status') ? 'status_change' : 'activity',
+            timestamp: row.created_at,
+            description,
+            user_id: row.user_id,
+            details: {
+              entity_type: row.entity_type,
+              change_type: row.change_type,
+              from_status: row.from_status,
+              to_status: row.to_status,
+              metadata: row.metadata
+            },
+            icon: iconForHistory(row)
+          })
+        }
+      }
+
+      // 2) Fetch activity logs related to this candidate-job combination
       const { data: activityLogs } = await supabase
         .from('activity_logs')
         .select('*')
         .or(`entity_id.eq.${candidateId},entity_id.eq.${jobId}`)
         .order('created_at', { ascending: false })
 
-      // Fetch comments related to this candidate-job combination
-      const { data: comments } = await supabase
-        .from('comments')
-        .select('*')
-        .in('entity_type', ['candidate', 'job', 'call_log'])
-        .or(`entity_id.eq.${candidateId},entity_id.eq.${jobId}`)
-        .order('created_at', { ascending: false })
-
-      // Process activity logs
       if (activityLogs) {
         for (const log of activityLogs) {
           let icon = <FileText className="w-4 h-4" />
-          
-          if (log.action_type === 'longlist') {
-            icon = <UserPlus className="w-4 h-4" />
-          } else if (log.action_type === 'status_change') {
-            icon = <UserCheck className="w-4 h-4" />
-          } else if (log.action_type === 'call') {
-            icon = <Phone className="w-4 h-4" />
-          }
+          const at = (log.action_type || '').toLowerCase()
+          if (at.includes('longlist')) icon = <UserPlus className="w-4 h-4" />
+          else if (at.includes('status')) icon = <UserCheck className="w-4 h-4" />
+          else if (at.includes('call')) icon = <Phone className="w-4 h-4" />
 
           timelineEvents.push({
             id: log.id,
@@ -74,7 +124,14 @@ export function TimelineLog({ candidateId, jobId }: TimelineLogProps) {
         }
       }
 
-      // Process comments
+      // 3) Fetch comments related to this candidate-job combination
+      const { data: comments } = await supabase
+        .from('comments')
+        .select('*')
+        .in('entity_type', ['candidate', 'job', 'call_log'])
+        .or(`entity_id.eq.${candidateId},entity_id.eq.${jobId}`)
+        .order('created_at', { ascending: false })
+
       if (comments) {
         for (const comment of comments) {
           timelineEvents.push({
@@ -86,26 +143,6 @@ export function TimelineLog({ candidateId, jobId }: TimelineLogProps) {
             icon: <MessageSquare className="w-4 h-4" />
           })
         }
-      }
-
-      // Add longlisting event from Jobs_CVs table if it exists
-      const { data: jobsCvs } = await supabase
-        .from('Jobs_CVs')
-        .select('*')
-        .eq('Candidate_ID', candidateId)
-        .eq('Job ID', jobId)
-        .single()
-
-      if (jobsCvs) {
-        // We can approximate when they were longlisted based on the record existence
-        // In a real system, you'd have a timestamp for when they were added to longlist
-        timelineEvents.push({
-          id: 'longlist-' + candidateId + jobId,
-          type: 'status_change',
-          timestamp: new Date().toISOString(), // This should ideally be from a timestamp field
-          description: 'Candidate was longlisted for this position',
-          icon: <UserPlus className="w-4 h-4" />
-        })
       }
 
       // Sort all events by timestamp (most recent first)
@@ -171,8 +208,8 @@ export function TimelineLog({ candidateId, jobId }: TimelineLogProps) {
                     <p className="text-sm font-medium text-foreground">
                       {event.description}
                     </p>
-                    <Badge variant="outline" className="text-xs">
-                      {event.type}
+                    <Badge variant="outline" className="text-xs capitalize">
+                      {event.type.replace('_', ' ')}
                     </Badge>
                   </div>
                   <div className="flex items-center space-x-2 mt-1">

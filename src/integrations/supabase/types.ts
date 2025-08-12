@@ -238,7 +238,6 @@ export type Database = {
           assignment: string | null
           "Client Description": string | null
           "Contract Length": string | null
-          "Criteria to evaluate by": string | null
           Currency: string | null
           "JD Summary": string | null
           "Job Description": string | null
@@ -247,8 +246,10 @@ export type Database = {
           "Job Salary Range (ex: 15000 AED)": string | null
           "Job Title": string | null
           longlist: number
+          musttohave: string | null
           "Nationality to Exclude": string | null
           "Nationality to include": string | null
+          nicetohave: string | null
           "Notice Period": string | null
           Processed: string | null
           "Things to look for": string | null
@@ -259,7 +260,6 @@ export type Database = {
           assignment?: string | null
           "Client Description"?: string | null
           "Contract Length"?: string | null
-          "Criteria to evaluate by"?: string | null
           Currency?: string | null
           "JD Summary"?: string | null
           "Job Description"?: string | null
@@ -268,8 +268,10 @@ export type Database = {
           "Job Salary Range (ex: 15000 AED)"?: string | null
           "Job Title"?: string | null
           longlist?: number
+          musttohave?: string | null
           "Nationality to Exclude"?: string | null
           "Nationality to include"?: string | null
+          nicetohave?: string | null
           "Notice Period"?: string | null
           Processed?: string | null
           "Things to look for"?: string | null
@@ -280,7 +282,6 @@ export type Database = {
           assignment?: string | null
           "Client Description"?: string | null
           "Contract Length"?: string | null
-          "Criteria to evaluate by"?: string | null
           Currency?: string | null
           "JD Summary"?: string | null
           "Job Description"?: string | null
@@ -289,8 +290,10 @@ export type Database = {
           "Job Salary Range (ex: 15000 AED)"?: string | null
           "Job Title"?: string | null
           longlist?: number
+          musttohave?: string | null
           "Nationality to Exclude"?: string | null
           "Nationality to include"?: string | null
+          nicetohave?: string | null
           "Notice Period"?: string | null
           Processed?: string | null
           "Things to look for"?: string | null
@@ -317,6 +320,7 @@ export type Database = {
           group_id: number | null
           "Job ID": string | null
           lastcalltime: string | null
+          longlisted_at: string | null
           Notes: string | null
           "Notice Period": string | null
           pros: string | null
@@ -324,6 +328,7 @@ export type Database = {
           "Relatable CV?": string | null
           "Salary Expectations": string | null
           "Score and Reason": string | null
+          shortlisted_at: string | null
           "Success Score": string | null
           Summary: string | null
           Transcript: string | null
@@ -345,6 +350,7 @@ export type Database = {
           group_id?: number | null
           "Job ID"?: string | null
           lastcalltime?: string | null
+          longlisted_at?: string | null
           Notes?: string | null
           "Notice Period"?: string | null
           pros?: string | null
@@ -352,6 +358,7 @@ export type Database = {
           "Relatable CV?"?: string | null
           "Salary Expectations"?: string | null
           "Score and Reason"?: string | null
+          shortlisted_at?: string | null
           "Success Score"?: string | null
           Summary?: string | null
           Transcript?: string | null
@@ -373,6 +380,7 @@ export type Database = {
           group_id?: number | null
           "Job ID"?: string | null
           lastcalltime?: string | null
+          longlisted_at?: string | null
           Notes?: string | null
           "Notice Period"?: string | null
           pros?: string | null
@@ -380,9 +388,106 @@ export type Database = {
           "Relatable CV?"?: string | null
           "Salary Expectations"?: string | null
           "Score and Reason"?: string | null
+          shortlisted_at?: string | null
           "Success Score"?: string | null
           Summary?: string | null
           Transcript?: string | null
+        }
+        Relationships: []
+      }
+      status_candidate_lookup: {
+        Row: {
+          active: boolean
+          created_at: string
+          label: string
+          sort_order: number
+          value: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          label: string
+          sort_order: number
+          value: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          label?: string
+          sort_order?: number
+          value?: string
+        }
+        Relationships: []
+      }
+      status_contacted_lookup: {
+        Row: {
+          active: boolean
+          created_at: string
+          label: string
+          sort_order: number
+          value: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          label: string
+          sort_order: number
+          value: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          label?: string
+          sort_order?: number
+          value?: string
+        }
+        Relationships: []
+      }
+      status_history: {
+        Row: {
+          call_log_id: string | null
+          candidate_id: string | null
+          change_type: string
+          comment_id: string | null
+          created_at: string
+          description: string | null
+          entity_type: string
+          from_status: string | null
+          id: string
+          job_id: string | null
+          metadata: Json
+          to_status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          call_log_id?: string | null
+          candidate_id?: string | null
+          change_type: string
+          comment_id?: string | null
+          created_at?: string
+          description?: string | null
+          entity_type: string
+          from_status?: string | null
+          id?: string
+          job_id?: string | null
+          metadata?: Json
+          to_status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          call_log_id?: string | null
+          candidate_id?: string | null
+          change_type?: string
+          comment_id?: string | null
+          created_at?: string
+          description?: string | null
+          entity_type?: string
+          from_status?: string | null
+          id?: string
+          job_id?: string | null
+          metadata?: Json
+          to_status?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -448,7 +553,40 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      mv_calls_daily: {
+        Row: {
+          avg_duration_seconds: number | null
+          connected_calls: number | null
+          day: string | null
+          job_id: string | null
+          no_answer_calls: number | null
+          recruiter_id: string | null
+          total_calls: number | null
+        }
+        Relationships: []
+      }
+      mv_candidate_status_counts: {
+        Row: {
+          count: number | null
+          status: string | null
+        }
+        Relationships: []
+      }
+      mv_contacted_status_counts_by_job: {
+        Row: {
+          contacted_status: string | null
+          count: number | null
+          job_id: string | null
+        }
+        Relationships: []
+      }
+      v_time_to_shortlist: {
+        Row: {
+          avg_hours_to_shortlist: number | null
+          job_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
@@ -457,6 +595,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
         }
         Returns: boolean
+      }
+      refresh_reporting_materialized_views: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
     }
     Enums: {
