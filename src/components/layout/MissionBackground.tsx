@@ -17,7 +17,7 @@ export function MissionBackground({ className, children, ...props }: MissionBack
       <SpotlightCursor />
 
       {/* Foreground content */}
-      <div className="relative z-10">{children}</div>
+      <div className="relative z-20">{children}</div>
     </div>
   )
 }

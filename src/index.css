@@ -250,8 +250,8 @@
 @layer utilities {
   /* Spotlight overlay that follows cursor via CSS variables --mx / --my */
   .spotlight-overlay {
-    @apply fixed inset-0 pointer-events-none mix-blend-screen opacity-70 animate-spotlight-fade;
-    background: radial-gradient(600px at var(--mx,50%) var(--my,50%), hsl(var(--primary) / 0.12), transparent 60%);
+    @apply fixed inset-0 pointer-events-none mix-blend-screen opacity-80 z-10;
+    background: radial-gradient(700px at var(--mx,50%) var(--my,50%), hsl(var(--primary) / 0.22), transparent 60%);
   }
 
   /* Cosmic grid background */
