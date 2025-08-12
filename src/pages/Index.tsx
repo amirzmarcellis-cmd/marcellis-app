@@ -148,7 +148,7 @@ export default function Index() {
   };
 
   const handleCandidateClick = (candidateId: string, jobId: string) => {
-    navigate(`/call-log?candidate=${candidateId}&job=${jobId}`);
+    navigate(`/call-log-details?candidate=${candidateId}&job=${jobId}`);
   };
 
   const getScoreColor = (score: number) => {
