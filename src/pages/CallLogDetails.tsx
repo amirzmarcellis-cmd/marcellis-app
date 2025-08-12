@@ -6,12 +6,13 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Progress } from "@/components/ui/progress"
+
 import { ArrowLeft, Phone, Clock, User, DollarSign, Calendar, Link2, Save, Search } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
 import { TimelineLog } from "@/components/timeline/TimelineLog"
 import WaveformPlayer from "@/components/calls/WaveformPlayer"
+import RulerScore from "@/components/ui/ruler-score"
 
 interface CallLogDetail {
   "Job ID": string | null
@@ -166,6 +167,7 @@ export default function CallLogDetails() {
   }
 
   const score = parseInt(callLog["Success Score"] || "0")
+  const scoreColorClass = score >= 80 ? "text-primary" : score >= 50 ? "text-foreground" : "text-destructive"
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -283,10 +285,13 @@ export default function CallLogDetails() {
         {/* Success Score */}
         <Card>
           <CardHeader>
-            <CardTitle>Success Score</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              <span>Success Score</span>
+              <span className={`text-xl font-semibold ${scoreColorClass}`}>{score}</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <Progress value={score} className="h-4 mb-4" />
+          <CardContent className="space-y-3">
+            <RulerScore value={score} />
             <p className="text-sm text-muted-foreground">{callLog["Score and Reason"]}</p>
           </CardContent>
         </Card>
