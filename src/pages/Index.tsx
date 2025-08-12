@@ -114,7 +114,7 @@ export default function Index() {
         const cvsForJob = cvs.filter((cv: any) => jobLinks.some((jc: any) => jc['Candidate_ID'] === cv['Cadndidate_ID']))
 
         stats[jobId] = {
-          longlist: jobLinks.filter((jc: any) => Boolean(jc.longlisted_at)).length,
+          longlist: cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Long List').length,
           shortlist:
             jobLinks.filter((jc: any) => Boolean(jc.shortlisted_at)).length ||
             cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Shortlisted').length,
