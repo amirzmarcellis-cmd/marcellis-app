@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { StatusDropdown } from '@/components/candidates/StatusDropdown';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Search, Filter, Users, Zap, Activity, Star, Clock, Mail, Phone, MapPin } from 'lucide-react';
+import { Search, Filter, Users, Zap, Activity, Star, Clock, Mail, Phone, MapPin, Briefcase } from 'lucide-react';
 
 interface Candidate {
   'Candidate_ID': string;
@@ -30,6 +30,7 @@ interface Candidate {
 interface Job {
   'Job ID': string;
   'Job Title': string;
+  'Processed'?: string | null;
 }
 
 export default function LiveCandidateFeed() {
@@ -82,6 +83,13 @@ export default function LiveCandidateFeed() {
       setCandidates(enrichedCandidates);
       setJobs(jobsData || []);
       setCvData(cvsData || []);
+
+      const activeJobs = (jobsData || []).filter((j: any) => j.Processed === 'Yes');
+      if (activeJobs.length > 0) {
+        setSelectedJob(activeJobs[0]['Job ID']);
+      } else if ((jobsData || []).length > 0) {
+        setSelectedJob((jobsData as any[])[0]['Job ID']);
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -203,20 +211,11 @@ export default function LiveCandidateFeed() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-purple-300">Job Position</label>
-              <Select value={selectedJob} onValueChange={setSelectedJob}>
-                <SelectTrigger className="bg-black/20 border-purple-400/30 text-white focus:border-purple-400">
-                  <SelectValue placeholder="All Positions" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-purple-400/30 backdrop-blur-xl">
-                  <SelectItem value="all" className="text-white hover:bg-purple-600/20">All Positions</SelectItem>
-                  {jobs.map((job) => (
-                    <SelectItem key={job['Job ID']} value={job['Job ID']} className="text-white hover:bg-purple-600/20">
-                      {job['Job Title']}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <label className="text-sm font-medium text-purple-300">Active Job</label>
+              <div className="flex items-center gap-2 bg-black/20 border border-purple-400/30 text-white px-3 py-2 rounded-md">
+                <Briefcase className="w-4 h-4 text-purple-300" />
+                <span>{jobs.find(j => j['Job ID'] === selectedJob)?.['Job Title'] || '—'}</span>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -278,7 +277,7 @@ export default function LiveCandidateFeed() {
                   <div 
                     key={index} 
                     className={`group relative p-6 rounded-2xl border transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer
-                      bg-gradient-to-r ${getScoreGradient(score)} border-white/20 hover:border-cyan-400/40
+                      bg-gradient-to-r ${index < 3 ? 'from-yellow-400/30 to-amber-500/50' : getScoreGradient(score)} ${index < 3 ? 'border-yellow-400/50 hover:border-yellow-400/60' : 'border-white/20 hover:border-cyan-400/40'}
                       backdrop-blur-sm animate-fade-in`}
                     style={{ animationDelay: `${index * 0.1}s` }}
                     onClick={() => window.location.href = `/call-log?candidate=${candidate["Candidate_ID"]}&job=${candidate["Job ID"]}`}
