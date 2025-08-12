@@ -13,6 +13,7 @@ interface FileUploadProps {
   accept?: string;
   maxSize?: number; // in MB
   multiple?: boolean;
+  mode?: 'private' | 'public';
   onUploadComplete?: (files: FileUploadResult[]) => void;
 }
 
@@ -38,6 +39,7 @@ export default function FileUpload({
   accept = '.pdf,.doc,.docx,.txt',
   maxSize = 10,
   multiple = false,
+  mode = 'private',
   onUploadComplete
 }: FileUploadProps) {
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
@@ -70,7 +72,7 @@ export default function FileUpload({
   const uploadFile = async (file: File): Promise<FileUploadResult> => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!user && mode === 'private') throw new Error('Not authenticated');
 
       // Generate unique filename
       const timestamp = Date.now();
@@ -110,7 +112,26 @@ export default function FileUpload({
         .from('cvs')
         .getPublicUrl(filePath);
 
-      // Save file info to database
+      // If public mode, skip DB insert and just return the storage info
+      if (mode === 'public') {
+        const result: FileUploadResult = {
+          id: filePath,
+          file_name: file.name,
+          file_url: publicUrl,
+          file_type: file.type,
+          file_size: file.size
+        };
+        setUploadingFiles(prev =>
+          prev.map(f =>
+            f.file === file
+              ? { ...f, progress: 100, status: 'success', result }
+              : f
+          )
+        );
+        return result;
+      }
+
+      // Save file info to database (private mode)
       const fileData = {
         entity_type: entityType,
         entity_id: entityId,
@@ -118,7 +139,7 @@ export default function FileUpload({
         file_url: publicUrl,
         file_type: file.type,
         file_size: file.size,
-        uploaded_by: user.id
+        uploaded_by: user!.id
       };
 
       const { data, error } = await supabase

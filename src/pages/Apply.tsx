@@ -429,6 +429,7 @@ export default function Apply() {
                       entityId="temp"
                       accept=".pdf,.doc,.docx"
                       maxSize={10}
+                      mode="public"
                       onUploadComplete={handleFileUpload}
                     />
                   </div>
