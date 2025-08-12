@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { RulerScore } from "@/components/ui/ruler-score"
+import { Progress } from "@/components/ui/progress"
 import { ArrowLeft, Phone, Clock, User, DollarSign, Calendar, Link2, Save, Search } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
@@ -286,7 +286,7 @@ export default function CallLogDetails() {
             <CardTitle>Success Score</CardTitle>
           </CardHeader>
           <CardContent>
-            <RulerScore value={score} className="mb-3" />
+            <Progress value={score} className="h-4 mb-4" />
             <p className="text-sm text-muted-foreground">{callLog["Score and Reason"]}</p>
           </CardContent>
         </Card>
