@@ -117,6 +117,13 @@ export default function LiveCandidateFeed() {
     return matchesSearch && matchesJob && matchesStatus && matchesScoreFilter;
   });
 
+  // Ensure highest scores are shown first regardless of fetch order
+  const sortedCandidates = [...filteredCandidates].sort((a, b) => {
+    const sa = parseFloat(a['Success Score'] || '0') || 0;
+    const sb = parseFloat(b['Success Score'] || '0') || 0;
+    return sb - sa;
+  });
+
   const getScoreColor = (score: number) => {
     if (score >= 90) return 'text-emerald-400 bg-emerald-400/20 border-emerald-400/40';
     if (score >= 75) return 'text-cyan-400 bg-cyan-400/20 border-cyan-400/40';
@@ -271,7 +278,7 @@ export default function LiveCandidateFeed() {
         <CardContent>
           <ScrollArea className="h-[600px] pr-4">
             <div className="space-y-4">
-              {filteredCandidates.map((candidate, index) => {
+              {sortedCandidates.map((candidate, index) => {
                 const score = parseFloat(candidate['Success Score']) || 0;
                 return (
                   <div 
