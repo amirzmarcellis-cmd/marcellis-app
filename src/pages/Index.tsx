@@ -35,9 +35,11 @@ import {
   Phone
 } from 'lucide-react';
 
-import { SectionHeader } from '@/components/ui/SectionHeader';
 import { MetricCardPro } from '@/components/dashboard/MetricCardPro';
 import { ScoreRing } from '@/components/ui/ScoreRing';
+import { AuroraBackground } from '@/components/decor/AuroraBackground';
+import { HeroHeader } from '@/components/dashboard/HeroHeader';
+import { BentoKpis } from '@/components/dashboard/BentoKpis';
 
 
 interface DashboardData {
@@ -65,6 +67,19 @@ export default function Index() {
   const [highScoreActiveCount, setHighScoreActiveCount] = useState(0);
 
   useEffect(() => {
+    // SEO
+    document.title = 'AI CRM Mission Control | Dashboard'
+    const meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null
+    const content = 'Mission Control dashboard with live candidates, jobs, and KPIs.'
+    if (meta) meta.setAttribute('content', content)
+    else {
+      const m = document.createElement('meta')
+      m.name = 'description'
+      m.content = content
+      document.head.appendChild(m)
+    }
+
+    // Fetch initial data
     fetchDashboardData();
   }, []);
 
@@ -209,18 +224,13 @@ export default function Index() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground p-6 relative overflow-hidden">
       {/* Animated background elements */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-20 left-20 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-1000"></div>
-        <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-2000"></div>
-      </div>
+      <AuroraBackground />
       
-      {/* Overview */}
       <div className="mb-8 relative z-10">
-        <div className="bg-gradient-card backdrop-blur-xl rounded-2xl border border-border/50 p-6 shadow-card animate-fade-in">
-          <SectionHeader
+        <div className="rounded-2xl border border-border/50 bg-gradient-card backdrop-blur-xl p-6 shadow-card animate-fade-in">
+          <HeroHeader
             title="Mission Control"
             subtitle={`Welcome back, ${profile?.first_name || 'Commander'}. Your day at a glance.`}
             actions={
@@ -230,8 +240,7 @@ export default function Index() {
             }
           />
 
-          {/* Metric Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <BentoKpis>
             <MetricCardPro
               title="Active Jobs"
               value={data?.totalJobs ?? 0}
@@ -264,7 +273,7 @@ export default function Index() {
               accent="emerald"
               trend={[1,2,1,3,2,4,3,5]}
             />
-          </div>
+          </BentoKpis>
         </div>
       </div>
 
