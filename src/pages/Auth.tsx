@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Phone } from 'lucide-react';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
 import defaultLogo from '@/assets/default-logo.png';
-
+import { MissionBackground } from '@/components/layout/MissionBackground';
 export default function Auth() {
   const { settings } = useAppSettings();
   const [email, setEmail] = useState('');
@@ -61,72 +61,74 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-card/80 backdrop-blur-sm border-border/50">
-          <CardHeader className="space-y-6">
-            <div className="flex items-center justify-center">
-              <div className="w-48 h-48 flex items-center justify-center">
-                <img 
-                  src={settings.logo || defaultLogo} 
-                  alt="Company Logo" 
-                  className="w-full h-full object-contain rounded-lg"
+    <MissionBackground>
+      <div className="min-h-screen flex items-center justify-center p-4 relative z-10">
+        <Card className="w-full max-w-md bg-card/80 backdrop-blur-sm border-border/50">
+            <CardHeader className="space-y-6">
+              <div className="flex items-center justify-center">
+                <div className="w-48 h-48 flex items-center justify-center">
+                  <img 
+                    src={settings.logo || defaultLogo} 
+                    alt="Company Logo" 
+                    className="w-full h-full object-contain rounded-lg"
+                  />
+                </div>
+              </div>
+            <CardDescription className="text-center text-muted-foreground">
+              {isLogin ? 'Sign in to your account' : 'Create a new account'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleAuth} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="bg-input border-border/50"
                 />
               </div>
-            </div>
-          <CardDescription className="text-center text-muted-foreground">
-            {isLogin ? 'Sign in to your account' : 'Create a new account'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleAuth} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="bg-input border-border/50"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="bg-input border-border/50"
-              />
-            </div>
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            <Button 
-              type="submit" 
-              className="w-full bg-primary hover:bg-primary/90"
-              disabled={loading}
-            >
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLogin ? 'Sign In' : 'Sign Up'}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setIsLogin(!isLogin)}
-              className="w-full text-muted-foreground hover:text-foreground"
-            >
-              {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="bg-input border-border/50"
+                />
+              </div>
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              <Button 
+                type="submit" 
+                className="w-full bg-primary hover:bg-primary/90"
+                disabled={loading}
+              >
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLogin ? 'Sign In' : 'Sign Up'}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setIsLogin(!isLogin)}
+                className="w-full text-muted-foreground hover:text-foreground"
+              >
+                {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </MissionBackground>
   );
 }

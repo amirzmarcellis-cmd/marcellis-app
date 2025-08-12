@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import FileUpload from "@/components/upload/FileUpload";
-
+import { MissionBackground } from "@/components/layout/MissionBackground";
 const applicationSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
   title: z.string().min(2, "Title must be at least 2 characters"),
@@ -232,7 +232,8 @@ export default function Apply() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <MissionBackground>
+      <div className="min-h-screen p-4 relative z-10">
       <div className="max-w-2xl mx-auto">
         <Card>
           <CardHeader>
@@ -464,5 +465,6 @@ export default function Apply() {
         </Card>
       </div>
     </div>
+    </MissionBackground>
   );
 }

@@ -37,18 +37,10 @@ import {
 
 import { MetricCardPro } from '@/components/dashboard/MetricCardPro';
 import { ScoreRing } from '@/components/ui/ScoreRing';
-import { AuroraBackground } from '@/components/decor/AuroraBackground';
 import { HeroHeader } from '@/components/dashboard/HeroHeader';
 import { BentoKpis } from '@/components/dashboard/BentoKpis';
-import { CosmicGrid } from '@/components/decor/CosmicGrid';
-import { Particles } from '@/components/decor/Particles';
-import { SpotlightCursor } from '@/components/effects/SpotlightCursor';
 import { TiltCard } from '@/components/effects/TiltCard';
-import { RadarCard } from '@/components/dashboard/RadarCard';
 import { ActivityTicker } from '@/components/dashboard/ActivityTicker';
-import { QuickActionsDock } from '@/components/dashboard/QuickActionsDock';
-import { CommandPalette } from '@/components/command/CommandPalette';
-import { AccentSwitcher } from '@/components/ui/AccentSwitcher';
 
 
 interface DashboardData {
@@ -234,11 +226,6 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6 relative overflow-hidden">
-      {/* Animated background elements */}
-      <AuroraBackground />
-      <div className="cosmic-grid cosmic-grid--animated" aria-hidden="true" />
-      <Particles />
-      <SpotlightCursor />
       
       <div className="mb-8 relative z-10">
         <div className="rounded-2xl border border-border/50 bg-gradient-card backdrop-blur-xl p-6 shadow-card animate-fade-in">
