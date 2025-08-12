@@ -114,7 +114,7 @@ export default function Index() {
         const cvsForJob = cvs.filter((cv: any) => jobLinks.some((jc: any) => jc['Candidate_ID'] === cv['Cadndidate_ID']))
 
         stats[jobId] = {
-          longlist: cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Long List').length,
+          longlist: jobLinks.filter((jc: any) => jc['Contacted'] && String(jc['Contacted']).trim() !== '').length,
           shortlist:
             jobLinks.filter((jc: any) => Boolean(jc.shortlisted_at)).length ||
             cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Shortlisted').length,
@@ -293,10 +293,10 @@ export default function Index() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => setSelectedJobFilter(job['Job ID'])}
+                      onClick={() => navigate(`/job/${job['Job ID']}`)}
                       className="w-full mt-2 text-xs text-cyan-400 hover:bg-cyan-400/10"
                     >
-                      Filter Feed
+                      Open Job
                     </Button>
                   </CardContent>
                 </Card>
