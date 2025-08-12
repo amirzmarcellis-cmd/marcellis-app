@@ -798,10 +798,10 @@ export default function JobDetails() {
                                             asChild
                                             className="flex-1 min-w-[100px]"
                                           >
-                                            <Link to={`/call-log?candidate=${candidateId}&job=${id}`}>
-                                              <Phone className="w-3 h-3 mr-1" />
-                                              {candidateContacts.length > 1 ? `Call ${contactIndex + 1}` : 'Call Log'}
-                                            </Link>
+                                           <Link to={`/call-log-details?candidate=${candidateId}&job=${id}`}>
+                                             <Phone className="w-3 h-3 mr-1" />
+                                             {candidateContacts.length > 1 ? `Call ${contactIndex + 1}` : 'Call Log'}
+                                           </Link>
                                           </Button>
                                         ))}
                                         <Button
@@ -942,10 +942,10 @@ export default function JobDetails() {
                                           asChild
                                           className="flex-1 min-w-[100px]"
                                         >
-                                          <Link to={`/call-log?candidate=${candidateId}&job=${id}`}>
-                                            <Phone className="w-3 h-3 mr-1" />
-                                            {candidateContacts.length > 1 ? `Call ${contactIndex + 1}` : 'Call Log'}
-                                          </Link>
+                                           <Link to={`/call-log-details?candidate=${candidateId}&job=${id}`}>
+                                             <Phone className="w-3 h-3 mr-1" />
+                                             {candidateContacts.length > 1 ? `Call ${contactIndex + 1}` : 'Call Log'}
+                                           </Link>
                                         </Button>
                                       ))}
                                       <Button
