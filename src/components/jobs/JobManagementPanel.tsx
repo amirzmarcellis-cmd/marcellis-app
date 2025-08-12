@@ -19,8 +19,8 @@ interface Job {
   "Processed": string | null;
   "Things to look for": string | null;
   "JD Summary": string | null;
-  // Make this optional because the column doesn't exist in the DB rows being returned
-  "Criteria to evaluate by"?: string | null;
+  musttohave?: string | null;
+  nicetohave?: string | null;
   Timestamp: string | null;
 }
 

@@ -592,9 +592,15 @@ export default function JobDetails() {
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-2">Evaluation Criteria:</h4>
+                    <h4 className="font-semibold mb-2">Must to Have:</h4>
                     <p className="leading-relaxed whitespace-pre-wrap">
-                      {job["Criteria to evaluate by"] || "No evaluation criteria specified."}
+                      {job.musttohave || "No must-have requirements specified."}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Nice to Have:</h4>
+                    <p className="leading-relaxed whitespace-pre-wrap">
+                      {job.nicetohave || "No nice-to-have requirements specified."}
                     </p>
                   </div>
                 </div>

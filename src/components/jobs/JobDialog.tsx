@@ -10,7 +10,7 @@ import { Upload, FileText, Briefcase } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-interface Job {
+interface JobRecord {
   "Job ID": string;
   "Job Title": string | null;
   "Job Description": string | null;
@@ -20,12 +20,13 @@ interface Job {
   "Processed": string | null;
   "Things to look for": string | null;
   "JD Summary": string | null;
-  "Criteria to evaluate by": string | null;
+  musttohave?: string | null;
+  nicetohave?: string | null;
   Timestamp: string | null;
 }
 
 interface JobDialogProps {
-  job: Job | null;
+  job: JobRecord | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: () => void;
@@ -40,7 +41,8 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
     salaryRange: "",
     thingsToLookFor: "",
     summary: "",
-    criteria: "",
+    musttohave: "",
+    nicetohave: "",
     status: "No",
   });
   const [loading, setLoading] = useState(false);
@@ -57,7 +59,8 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
         salaryRange: job["Job Salary Range (ex: 15000 AED)"] || "",
         thingsToLookFor: job["Things to look for"] || "",
         summary: job["JD Summary"] || "",
-        criteria: job["Criteria to evaluate by"] || "",
+        musttohave: job.musttohave || "",
+        nicetohave: job.nicetohave || "",
         status: job["Processed"] || "No",
       });
     } else {
@@ -69,7 +72,8 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
         salaryRange: "",
         thingsToLookFor: "",
         summary: "",
-        criteria: "",
+        musttohave: "",
+        nicetohave: "",
         status: "No",
       });
     }
@@ -116,7 +120,8 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
         "Processed": formData.status,
         "Things to look for": formData.thingsToLookFor,
         "JD Summary": formData.summary,
-        "Criteria to evaluate by": formData.criteria,
+        musttohave: formData.musttohave,
+        nicetohave: formData.nicetohave,
         "Timestamp": job?.Timestamp || new Date().toISOString(),
       };
 
@@ -292,7 +297,7 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
           {/* Requirements & Criteria */}
           <Card className="mission-card lg:col-span-2">
             <CardHeader>
-              <CardTitle className="text-lg">Requirements & Evaluation</CardTitle>
+              <CardTitle className="text-lg">Requirements</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -307,12 +312,23 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="criteria">Evaluation Criteria</Label>
+                <Label htmlFor="musttohave">Must to Have</Label>
                 <Textarea
-                  id="criteria"
-                  value={formData.criteria}
-                  onChange={(e) => setFormData(prev => ({ ...prev, criteria: e.target.value }))}
-                  placeholder="Criteria for evaluating candidates"
+                  id="musttohave"
+                  value={formData.musttohave}
+                  onChange={(e) => setFormData(prev => ({ ...prev, musttohave: e.target.value }))}
+                  placeholder="Critical skills and requirements"
+                  className="bg-background/50 min-h-[100px]"
+                />
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="nicetohave">Nice to Have</Label>
+                <Textarea
+                  id="nicetohave"
+                  value={formData.nicetohave}
+                  onChange={(e) => setFormData(prev => ({ ...prev, nicetohave: e.target.value }))}
+                  placeholder="Preferred skills and bonuses"
                   className="bg-background/50 min-h-[100px]"
                 />
               </div>

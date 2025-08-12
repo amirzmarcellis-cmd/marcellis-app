@@ -65,14 +65,15 @@ interface JobData {
   "Job Salary Range (ex: 15000 AED)": string;
   "Things to look for": string;
   "JD Summary": string;
-  "Criteria to evaluate by"?: string;
+  musttohave?: string;
+  nicetohave?: string;
   "assignment": string;
   "Processed": string;
   "Notice Period": string;
   "Nationality to include": string;
   "Nationality to Exclude": string;
   "Type": string;
-  "Contract Length": string;
+  "Contract Length": string | null;
   "Currency": string;
 }
 
@@ -96,7 +97,8 @@ export default function EditJob() {
     "Job Salary Range (ex: 15000 AED)": "",
     "Things to look for": "",
     "JD Summary": "",
-    "Criteria to evaluate by": "",
+    musttohave: "",
+    nicetohave: "",
     "assignment": "",
     "Processed": "Yes",
     "Notice Period": "",
