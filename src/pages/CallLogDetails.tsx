@@ -192,6 +192,9 @@ export default function CallLogDetails() {
               <Badge variant="outline" className="mt-2">
                 Score: {callLog["Success Score"]}/100
               </Badge>
+              <p className="text-sm text-muted-foreground mt-1 truncate">
+                Latest Note: {callLog["Notes"] || '—'}
+              </p>
             </div>
             <StatusDropdown
               currentStatus={callLog["Contacted"]}

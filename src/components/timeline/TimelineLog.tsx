@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+
 import { Clock, UserCheck, UserPlus, FileText, Phone } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { format } from "date-fns"
@@ -175,17 +175,8 @@ export function TimelineLog({ candidateId, jobId }: TimelineLogProps) {
                     <p className="text-xs text-muted-foreground">
                       {format(new Date(event.timestamp), 'MMM dd, yyyy HH:mm')}
                     </p>
-                    {event.user_id && (
-                      <div className="flex items-center space-x-1">
-                        <Avatar className="w-4 h-4">
-                          <AvatarFallback className="text-xs">
-                            {event.user_name?.charAt(0) || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="text-xs text-muted-foreground">
-                          {event.user_name || 'Unknown User'}
-                        </span>
-                      </div>
+                    {event.user_name && (
+                      <span className="text-xs text-muted-foreground">By {event.user_name}</span>
                     )}
                   </div>
                 </div>
