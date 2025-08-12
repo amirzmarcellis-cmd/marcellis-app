@@ -45,6 +45,7 @@ export default function JobDetails() {
   const [shortListButtonDisabled, setShortListButtonDisabled] = useState(false)
   const [shortListTimeRemaining, setShortListTimeRemaining] = useState(0)
   const { toast } = useToast()
+  const [callingCandidateId, setCallingCandidateId] = useState<string | null>(null)
 
   useEffect(() => {
     if (id) {
@@ -256,6 +257,27 @@ export default function JobDetails() {
       setShortListTimeRemaining(0)
     } finally {
       setIsGeneratingShortList(false);
+    }
+  };
+
+  const handleCallCandidate = async (candidateId: string, jobId: string, callid: number | null | undefined) => {
+    try {
+      setCallingCandidateId(candidateId);
+      const payload = { candidateID: candidateId, jobID: jobId, callid };
+      const response = await fetch('https://hook.eu2.make.com/i3owa6dmu1mstug4tsfb0dnhhjfh4arj', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      toast({ title: 'Success', description: 'Call initiated successfully' });
+    } catch (error) {
+      console.error('Error calling candidate:', error);
+      toast({ title: 'Error', description: 'Failed to initiate call', variant: 'destructive' });
+    } finally {
+      setCallingCandidateId(null);
     }
   };
 
@@ -796,6 +818,16 @@ export default function JobDetails() {
                                     {/* Call Log Buttons */}
                                     <div className="space-y-2 pt-2 border-t">
                                       <div className="flex flex-wrap gap-2">
+                                        <Button
+                                          variant="default"
+                                          size="sm"
+                                          onClick={() => handleCallCandidate(mainCandidate["Candidate_ID"], id!, mainCandidate["callid"])}
+                                          disabled={callingCandidateId === candidateId}
+                                          className="flex-1 min-w-[120px] bg-green-600 hover:bg-green-700 text-white disabled:opacity-50"
+                                        >
+                                          <Phone className="w-3 h-3 mr-1" />
+                                          {callingCandidateId === candidateId ? 'Calling...' : 'Call Candidate'}
+                                        </Button>
                                         {candidateContacts.map((contact, contactIndex) => (
                                           <Button
                                             key={contactIndex}
