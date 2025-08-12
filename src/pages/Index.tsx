@@ -331,14 +331,6 @@ export default function Index() {
                   </div>
                   <Button 
                     size="sm" 
-                    variant="outline"
-                    onClick={() => setSelectedJobFilter('all')}
-                    className="border-cyan-400/50 text-cyan-300 hover:bg-cyan-400/10 hover:border-cyan-400 transition-all duration-300"
-                  >
-                    Show All
-                  </Button>
-                  <Button 
-                    size="sm" 
                     className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white border border-cyan-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                     onClick={() => window.location.href = '/live-feed'}
                   >
