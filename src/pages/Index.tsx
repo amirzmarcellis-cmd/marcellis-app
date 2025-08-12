@@ -56,6 +56,7 @@ export default function Index() {
   const [candidates, setCandidates] = useState<any[]>([]);
   const [jobs, setJobs] = useState<any[]>([]);
   const [openTasksCount, setOpenTasksCount] = useState(0);
+  const [jobStats, setJobStats] = useState<Record<string, any>>({});
 
   useEffect(() => {
     fetchDashboardData();
@@ -77,14 +78,29 @@ export default function Index() {
 
       if (jobsError) throw jobsError;
 
-      // Fetch job-candidate matches
+      // Fetch job-candidate matches with candidate status from CVs
       const { data: jobCandidates, error: jobCandidatesError } = await supabase
         .from('Jobs_CVs')
-        .select('*');
+        .select(`
+          *,
+          CVs!inner(CandidateStatus)
+        `);
 
       if (jobCandidatesError) throw jobCandidatesError;
 
-      // Calculate metrics
+      // Calculate metrics with real data
+      const activeJobs = jobs?.filter(job => job.Processed === 'Yes') || [];
+      
+      // Count candidates with "Shortlisted" status
+      const shortlistedCandidates = candidates?.filter(candidate => 
+        candidate.CandidateStatus === 'Shortlisted'
+      ) || [];
+      
+      // Count candidates with "Interview" status
+      const interviewCandidates = candidates?.filter(candidate => 
+        candidate.CandidateStatus === 'Interview'
+      ) || [];
+
       const highScoreCandidates = jobCandidates?.filter(jc => {
         const score = parseFloat(jc['Success Score']) || 0;
         return score > 74;
@@ -97,18 +113,34 @@ export default function Index() {
       setCandidates(recentCandidates);
       setJobs(jobs || []);
 
-      // Calculate average time to hire (placeholder calculation)
-      const averageTimeToHire = 14; // days
+      // Calculate job statistics
+      const stats: Record<string, any> = {};
+      activeJobs.forEach(job => {
+        const jobId = job['Job ID'];
+        const jobCandidatesForJob = jobCandidates?.filter(jc => jc['Job ID'] === jobId) || [];
+        const candidatesForJob = candidates?.filter(c => 
+          jobCandidatesForJob.some(jc => jc['Candidate_ID'] === c['Cadndidate_ID'])
+        ) || [];
+        
+        stats[jobId] = {
+          contacted: jobCandidatesForJob.filter(jc => jc.Contacted && jc.Contacted !== 'Not Contacted').length,
+          shortlisted: candidatesForJob.filter(c => c.CandidateStatus === 'Shortlisted').length,
+          tasks: candidatesForJob.filter(c => c.CandidateStatus === 'Task Sent').length,
+          interviews: candidatesForJob.filter(c => c.CandidateStatus === 'Interview').length
+        };
+      });
+      
+      setJobStats(stats);
 
       setData({
         totalCandidates: candidates?.length || 0,
-        totalJobs: jobs?.length || 0,
-        candidatesAwaitingReview: highScoreCandidates.length,
+        totalJobs: activeJobs.length,
+        candidatesAwaitingReview: shortlistedCandidates.length,
         tasksToday: openTasksCount,
-        interviewsThisWeek: 5, // placeholder
-        averageTimeToHire,
+        interviewsThisWeek: interviewCandidates.length,
+        averageTimeToHire: 14,
         recentCandidates,
-        activeJobs: jobs || []
+        activeJobs: activeJobs
       });
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -174,10 +206,17 @@ export default function Index() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-6 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-20 left-20 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-1000"></div>
+        <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-2000"></div>
+      </div>
+      
       {/* Welcome & Quick Status */}
-      <div className="mb-8">
-        <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-6 shadow-2xl">
+      <div className="mb-8 relative z-10">
+        <div className="bg-gradient-to-r from-white/10 via-white/5 to-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-6 shadow-2xl shadow-cyan-500/10">
           <h1 className="text-3xl font-bold mb-2">
             {getCurrentTimeGreeting()}, {profile?.first_name || 'Commander'}
           </h1>
@@ -187,8 +226,8 @@ export default function Index() {
           </p>
           
           {/* Quick Stats Bar */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <Card className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 border-blue-400/30 hover:scale-105 transition-transform cursor-pointer">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <Card className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 border-blue-400/30 hover:scale-105 transition-transform cursor-pointer shadow-lg shadow-blue-500/20">
               <CardContent className="p-4 text-center">
                 <Briefcase className="h-8 w-8 text-blue-400 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-blue-300">{data?.totalJobs || 0}</div>
@@ -196,37 +235,28 @@ export default function Index() {
               </CardContent>
             </Card>
             
-            <Card className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 border-purple-400/30 hover:scale-105 transition-transform cursor-pointer">
+            <Card className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 border-purple-400/30 hover:scale-105 transition-transform cursor-pointer shadow-lg shadow-purple-500/20">
               <CardContent className="p-4 text-center">
                 <Star className="h-8 w-8 text-purple-400 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-purple-300">{data?.candidatesAwaitingReview || 0}</div>
-                <div className="text-xs text-purple-200">Scores &gt; 74</div>
+                <div className="text-xs text-purple-200">Tasks Sent</div>
               </CardContent>
             </Card>
             
-            <Card className="bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 border-emerald-400/30 hover:scale-105 transition-transform cursor-pointer">
-              <CardContent className="p-4 text-center">
-                <ClipboardList className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-emerald-300">{data?.tasksToday || 0}</div>
-                <div className="text-xs text-emerald-200">Tasks Due</div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gradient-to-br from-cyan-500/20 to-cyan-600/20 border-cyan-400/30 hover:scale-105 transition-transform cursor-pointer">
+            <Card className="bg-gradient-to-br from-cyan-500/20 to-cyan-600/20 border-cyan-400/30 hover:scale-105 transition-transform cursor-pointer shadow-lg shadow-cyan-500/20">
               <CardContent className="p-4 text-center">
                 <Video className="h-8 w-8 text-cyan-400 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-cyan-300">{data?.interviewsThisWeek || 0}</div>
-                <div className="text-xs text-cyan-200">Interviews This Week</div>
+                <div className="text-xs text-cyan-200">Interview This Week</div>
               </CardContent>
             </Card>
-
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-6">
-        {/* Left Side - Job Control Panels */}
-        <div className="col-span-2 space-y-4">
+      <div className="flex gap-6 relative z-10">
+        {/* Left Side - Job Control Panels - 30% width */}
+        <div className="w-[30%] space-y-4">
           <h2 className="text-lg font-bold text-cyan-300 mb-4 flex items-center">
             <Target className="h-5 w-5 mr-2" />
             Job Control
@@ -234,7 +264,7 @@ export default function Index() {
           <ScrollArea className="h-[600px]">
             <div className="space-y-3">
               {data?.activeJobs?.map((job) => (
-                <Card key={job['Job ID']} className="bg-white/5 backdrop-blur-lg border-white/10 hover:border-cyan-400/50 transition-all">
+                <Card key={job['Job ID']} className="bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-lg border-white/20 hover:border-cyan-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 hover:scale-[1.02]">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-semibold text-sm truncate">{job['Job Title']}</h3>
@@ -252,19 +282,19 @@ export default function Index() {
                     <p className="text-xs text-gray-400 mb-3">{job['Job Location']}</p>
                     <div className="grid grid-cols-4 gap-1 text-xs">
                       <div className="text-center">
-                        <div className="text-cyan-300 font-bold">12</div>
+                        <div className="text-cyan-300 font-bold">{jobStats[job['Job ID']]?.contacted || 0}</div>
                         <div className="text-gray-500">Contact</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-purple-300 font-bold">5</div>
+                        <div className="text-purple-300 font-bold">{jobStats[job['Job ID']]?.shortlisted || 0}</div>
                         <div className="text-gray-500">Short</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-blue-300 font-bold">3</div>
+                        <div className="text-blue-300 font-bold">{jobStats[job['Job ID']]?.tasks || 0}</div>
                         <div className="text-gray-500">Task</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-emerald-300 font-bold">1</div>
+                        <div className="text-emerald-300 font-bold">{jobStats[job['Job ID']]?.interviews || 0}</div>
                         <div className="text-gray-500">Inter</div>
                       </div>
                     </div>
@@ -283,8 +313,8 @@ export default function Index() {
           </ScrollArea>
         </div>
 
-        {/* Right Side - Live Candidate Feed & Action Center */}
-        <div className="col-span-10 space-y-6">
+        {/* Right Side - Live Candidate Feed & Action Center - 60% width */}
+        <div className="w-[60%] space-y-6">
           {/* Live Candidate Feed */}
           <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20">
             <CardHeader>
@@ -441,7 +471,7 @@ export default function Index() {
           </Card>
 
           {/* Action Center */}
-          <Card className="bg-white/5 backdrop-blur-lg border-white/10">
+          <Card className="bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-lg border-white/20 shadow-xl shadow-purple-500/20">
             <CardHeader>
               <CardTitle className="text-lg text-purple-300">My Next Moves</CardTitle>
             </CardHeader>
