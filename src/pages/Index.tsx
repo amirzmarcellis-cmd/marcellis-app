@@ -64,91 +64,76 @@ export default function Index() {
 
   const fetchDashboardData = async () => {
     try {
-      // Fetch candidates
-      const { data: candidates, error: candidatesError } = await supabase
-        .from('CVs')
-        .select('*');
+      // Fetch base tables separately (no relational selects since there are no FKs)
+      const [cvsRes, jobsRes, linksRes] = await Promise.all([
+        supabase.from('CVs').select('*'),
+        supabase.from('Jobs').select('*'),
+        supabase.from('Jobs_CVs').select('*'),
+      ])
 
-      if (candidatesError) throw candidatesError;
+      if (cvsRes.error) throw cvsRes.error
+      if (jobsRes.error) throw jobsRes.error
+      if (linksRes.error) throw linksRes.error
 
-      // Fetch jobs
-      const { data: jobs, error: jobsError } = await supabase
-        .from('Jobs')
-        .select('*');
+      const cvs = cvsRes.data || []
+      const jobsData = jobsRes.data || []
+      const links = linksRes.data || []
 
-      if (jobsError) throw jobsError;
+      const activeJobs = jobsData.filter((job: any) => job.Processed === 'Yes')
 
-      // Fetch job-candidate matches with candidate status from CVs
-      const { data: jobCandidates, error: jobCandidatesError } = await supabase
-        .from('Jobs_CVs')
-        .select(`
-          *,
-          CVs!inner(CandidateStatus)
-        `);
+      // Metrics
+      const shortlistedCandidates = cvs.filter((c: any) => c.CandidateStatus === 'Shortlisted')
+      const interviewCandidates = cvs.filter((c: any) => c.CandidateStatus === 'Interview')
 
-      if (jobCandidatesError) throw jobCandidatesError;
-
-      // Calculate metrics with real data
-      const activeJobs = jobs?.filter(job => job.Processed === 'Yes') || [];
-      
-      // Count candidates with "Shortlisted" status
-      const shortlistedCandidates = candidates?.filter(candidate => 
-        candidate.CandidateStatus === 'Shortlisted'
-      ) || [];
-      
-      // Count candidates with "Interview" status
-      const interviewCandidates = candidates?.filter(candidate => 
-        candidate.CandidateStatus === 'Interview'
-      ) || [];
-
-      const highScoreCandidates = jobCandidates?.filter(jc => {
-        const score = parseFloat(jc['Success Score']) || 0;
-        return score > 74;
-      }) || [];
+      // High score candidates from Job-Candidate links
+      const highScoreCandidates = links.filter((jc: any) => {
+        const scoreNum = parseFloat(jc['Success Score'])
+        return Number.isFinite(scoreNum) && scoreNum > 74
+      })
 
       const recentCandidates = highScoreCandidates
-        .sort((a, b) => new Date(b['Timestamp'] || 0).getTime() - new Date(a['Timestamp'] || 0).getTime())
-         .slice(0, 10);
+        .sort(
+          (a: any, b: any) => new Date(b['lastcalltime'] || 0).getTime() - new Date(a['lastcalltime'] || 0).getTime()
+        )
+        .slice(0, 10)
 
-      setCandidates(recentCandidates);
-      setJobs(jobs || []);
+      setCandidates(recentCandidates)
+      setJobs(jobsData)
 
-      // Calculate job statistics
-      const stats: Record<string, any> = {};
-      activeJobs.forEach(job => {
-        const jobId = job['Job ID'];
-        const jobCandidatesForJob = jobCandidates?.filter(jc => jc['Job ID'] === jobId) || [];
-        const candidatesForJob = candidates?.filter(c => 
-          jobCandidatesForJob.some(jc => jc['Candidate_ID'] === c['Cadndidate_ID'])
-        ) || [];
-        
+      // Per-job stats
+      const stats: Record<string, any> = {}
+      activeJobs.forEach((job: any) => {
+        const jobId = job['Job ID']
+        const jobLinks = links.filter((jc: any) => jc['Job ID'] === jobId)
+        const cvsForJob = cvs.filter((cv: any) => jobLinks.some((jc: any) => jc['Candidate_ID'] === cv['Cadndidate_ID']))
+
         stats[jobId] = {
-          contacted: jobCandidatesForJob.filter(jc => jc.Contacted && jc.Contacted !== 'Not Contacted').length,
-          shortlisted: candidatesForJob.filter(c => c.CandidateStatus === 'Shortlisted').length,
-          tasks: candidatesForJob.filter(c => c.CandidateStatus === 'Task Sent').length,
-          interviews: candidatesForJob.filter(c => c.CandidateStatus === 'Interview').length
-        };
-      });
-      
-      setJobStats(stats);
+          contacted: jobLinks.filter((jc: any) => jc.Contacted && jc.Contacted !== 'Not Contacted').length,
+          shortlisted: jobLinks.filter((jc: any) => Boolean(jc.shortlisted_at)).length ||
+            cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Shortlisted').length,
+          tasks: cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Task Sent').length,
+          interviews: cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Interview').length,
+        }
+      })
+
+      setJobStats(stats)
 
       setData({
-        totalCandidates: candidates?.length || 0,
+        totalCandidates: cvs.length,
         totalJobs: activeJobs.length,
         candidatesAwaitingReview: shortlistedCandidates.length,
         tasksToday: openTasksCount,
         interviewsThisWeek: interviewCandidates.length,
         averageTimeToHire: 14,
         recentCandidates,
-        activeJobs: activeJobs
-      });
+        activeJobs,
+      })
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      console.error('Error fetching dashboard data:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   };
-
   const handleTaskCountChange = (count: number) => {
     setOpenTasksCount(count);
     // Update the dashboard data to reflect the new task count
