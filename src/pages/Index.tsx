@@ -81,9 +81,15 @@ export default function Index() {
 
       const activeJobs = jobsData.filter((job: any) => job.Processed === 'Yes')
 
+      // Default Live Candidate Feed to the first active job
+      if (activeJobs.length > 0) {
+        setSelectedJobFilter((prev) => (prev === 'all' ? activeJobs[0]['Job ID'] : prev))
+      }
+
       // Metrics
       const shortlistedCandidates = cvs.filter((c: any) => c.CandidateStatus === 'Shortlisted')
       const interviewCandidates = cvs.filter((c: any) => c.CandidateStatus === 'Interview')
+      const taskedCandidates = cvs.filter((c: any) => c.CandidateStatus === 'Tasked')
 
       // High score candidates from Job-Candidate links
       const highScoreCandidates = links.filter((jc: any) => {
@@ -100,7 +106,7 @@ export default function Index() {
       setCandidates(recentCandidates)
       setJobs(jobsData)
 
-      // Per-job stats
+      // Per-job stats (for Active Jobs Funnel)
       const stats: Record<string, any> = {}
       activeJobs.forEach((job: any) => {
         const jobId = job['Job ID']
@@ -108,11 +114,12 @@ export default function Index() {
         const cvsForJob = cvs.filter((cv: any) => jobLinks.some((jc: any) => jc['Candidate_ID'] === cv['Cadndidate_ID']))
 
         stats[jobId] = {
-          contacted: jobLinks.filter((jc: any) => jc.Contacted && jc.Contacted !== 'Not Contacted').length,
-          shortlisted: jobLinks.filter((jc: any) => Boolean(jc.shortlisted_at)).length ||
+          longlist: jobLinks.filter((jc: any) => Boolean(jc.longlisted_at)).length,
+          shortlist:
+            jobLinks.filter((jc: any) => Boolean(jc.shortlisted_at)).length ||
             cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Shortlisted').length,
-          tasks: cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Task Sent').length,
-          interviews: cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Interview').length,
+          tasked: cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Tasked').length,
+          hired: cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Hired').length,
         }
       })
 
@@ -121,7 +128,7 @@ export default function Index() {
       setData({
         totalCandidates: cvs.length,
         totalJobs: activeJobs.length,
-        candidatesAwaitingReview: shortlistedCandidates.length,
+        candidatesAwaitingReview: taskedCandidates.length,
         tasksToday: openTasksCount,
         interviewsThisWeek: interviewCandidates.length,
         averageTimeToHire: 14,
@@ -244,7 +251,7 @@ export default function Index() {
         <div className="w-[30%] space-y-4">
           <h2 className="text-lg font-bold text-cyan-300 mb-4 flex items-center">
             <Target className="h-5 w-5 mr-2" />
-            Job Control
+            Active Jobs Funnel
           </h2>
           <ScrollArea className="h-[600px]">
             <div className="space-y-3">
@@ -267,20 +274,20 @@ export default function Index() {
                     <p className="text-xs text-gray-400 mb-3">{job['Job Location']}</p>
                     <div className="grid grid-cols-4 gap-1 text-xs">
                       <div className="text-center">
-                        <div className="text-cyan-300 font-bold">{jobStats[job['Job ID']]?.contacted || 0}</div>
-                        <div className="text-gray-500">Contact</div>
+                        <div className="text-cyan-300 font-bold">{jobStats[job['Job ID']]?.longlist || 0}</div>
+                        <div className="text-gray-500">Longlist</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-purple-300 font-bold">{jobStats[job['Job ID']]?.shortlisted || 0}</div>
-                        <div className="text-gray-500">Short</div>
+                        <div className="text-purple-300 font-bold">{jobStats[job['Job ID']]?.shortlist || 0}</div>
+                        <div className="text-gray-500">Shortlist</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-blue-300 font-bold">{jobStats[job['Job ID']]?.tasks || 0}</div>
-                        <div className="text-gray-500">Task</div>
+                        <div className="text-blue-300 font-bold">{jobStats[job['Job ID']]?.tasked || 0}</div>
+                        <div className="text-gray-500">Tasked</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-emerald-300 font-bold">{jobStats[job['Job ID']]?.interviews || 0}</div>
-                        <div className="text-gray-500">Inter</div>
+                        <div className="text-emerald-300 font-bold">{jobStats[job['Job ID']]?.hired || 0}</div>
+                        <div className="text-gray-500">Hired</div>
                       </div>
                     </div>
                     <Button
@@ -345,7 +352,7 @@ export default function Index() {
                     return (
                       <div 
                         key={index} 
-                        className="bg-gradient-to-r from-white/5 to-white/10 rounded-xl p-4 border border-white/20 hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group cursor-pointer"
+                        className={`bg-gradient-to-r rounded-xl p-4 border ${index < 3 ? 'from-amber-400/20 to-yellow-500/20 border-yellow-400/40' : 'from-white/5 to-white/10 border-white/20'} hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group cursor-pointer`}
                         onClick={() => handleCandidateClick(candidate["Candidate_ID"], candidate["Job ID"])}
                       >
                         <div className="flex items-center justify-between mb-3">
