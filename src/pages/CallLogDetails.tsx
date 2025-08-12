@@ -169,9 +169,9 @@ export default function CallLogDetails() {
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center space-x-4 mb-6">
-        <Button variant="outline" onClick={() => navigate('/call-log')}>
+        <Button variant="outline" onClick={() => navigate('/jobs')}>
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Call Log
+          Back to Jobs
         </Button>
         <h1 className="text-3xl font-bold">Call Details</h1>
       </div>
