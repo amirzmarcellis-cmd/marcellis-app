@@ -80,11 +80,16 @@ export default function LiveCandidateFeed() {
         };
       });
 
-      setCandidates(enrichedCandidates);
+      // Filter: only score >= 74 and ACTIVE jobs
+      const activeJobIds = new Set((jobsData || []).filter(j => j.Processed === 'Yes').map(j => j['Job ID']))
+      const filteredHighScoreActive = enrichedCandidates.filter(c => {
+        const score = parseFloat(c['Success Score'] || '0');
+        return Number.isFinite(score) && score >= 74 && activeJobIds.has(c['Job ID']);
+      });
+
+      setCandidates(filteredHighScoreActive);
       setJobs(jobsData || []);
       setCvData(cvsData || []);
-
-      // Keep 'all' to show all jobs by default
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {

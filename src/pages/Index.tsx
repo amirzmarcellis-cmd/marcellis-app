@@ -102,6 +102,7 @@ export default function Index() {
       const links = linksRes.data || []
 
       const activeJobs = jobsData.filter((job: any) => job.Processed === 'Yes')
+      const activeJobIds = new Set(activeJobs.map((j: any) => j['Job ID']))
 
       // Keep 'all' to show candidates across all jobs by default
 
@@ -110,13 +111,13 @@ export default function Index() {
       const interviewCandidates = cvs.filter((c: any) => c.CandidateStatus === 'Interview')
       const taskedCandidates = cvs.filter((c: any) => c.CandidateStatus === 'Tasked')
 
-      // High score candidates from Job-Candidate links
-      const highScoreCandidates = links.filter((jc: any) => {
+      // High score candidates from Job-Candidate links for ACTIVE jobs only (score >= 74)
+      const highScoreActiveCandidates = links.filter((jc: any) => {
         const scoreNum = parseFloat(jc['Success Score'])
-        return Number.isFinite(scoreNum) && scoreNum > 74
+        return Number.isFinite(scoreNum) && scoreNum >= 74 && activeJobIds.has(jc['Job ID'])
       })
 
-      const recentCandidates = highScoreCandidates
+      const recentCandidates = highScoreActiveCandidates
         .sort(
           (a: any, b: any) => new Date(b['lastcalltime'] || 0).getTime() - new Date(a['lastcalltime'] || 0).getTime()
         )
@@ -144,9 +145,8 @@ export default function Index() {
 
       setJobStats(stats)
 
-      // Candidates needing review: Score > 74 across active jobs only
-      const activeJobIds = new Set(activeJobs.map((j: any) => j['Job ID']))
-      const highScoreActiveCountVal = highScoreCandidates.filter((jc: any) => activeJobIds.has(jc['Job ID'])).length
+      // Candidates needing review: Score >= 74 across active jobs only
+      const highScoreActiveCountVal = highScoreActiveCandidates.length
       setHighScoreActiveCount(highScoreActiveCountVal)
 
       setData({
