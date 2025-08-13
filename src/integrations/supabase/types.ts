@@ -124,73 +124,73 @@ export type Database = {
       }
       CVs: {
         Row: {
-          "Applied for": string[] | null
-          Cadndidate_ID: string
+          applied_for: string[] | null
+          candidate_id: string
           CandidateStatus: string | null
           Certifications: string | null
-          "Current Company": string | null
-          "CV Summary": string | null
+          current_company: string | null
           CV_Link: string | null
+          cv_summary: string | null
           cv_text: string | null
-          "Done Questions": string | null
+          done_questions: string | null
           Education: string | null
           Email: string | null
           Experience: string | null
-          "First Name": string | null
+          first_name: string | null
           Language: string | null
-          "Last Name": string | null
+          last_name: string | null
           Linkedin: string | null
           Location: string | null
-          "Other Notes": string | null
-          "Phone Number": string | null
+          other_notes: string | null
+          phone_number: string | null
           Skills: string | null
           Timestamp: string | null
           Title: string | null
         }
         Insert: {
-          "Applied for"?: string[] | null
-          Cadndidate_ID: string
+          applied_for?: string[] | null
+          candidate_id: string
           CandidateStatus?: string | null
           Certifications?: string | null
-          "Current Company"?: string | null
-          "CV Summary"?: string | null
+          current_company?: string | null
           CV_Link?: string | null
+          cv_summary?: string | null
           cv_text?: string | null
-          "Done Questions"?: string | null
+          done_questions?: string | null
           Education?: string | null
           Email?: string | null
           Experience?: string | null
-          "First Name"?: string | null
+          first_name?: string | null
           Language?: string | null
-          "Last Name"?: string | null
+          last_name?: string | null
           Linkedin?: string | null
           Location?: string | null
-          "Other Notes"?: string | null
-          "Phone Number"?: string | null
+          other_notes?: string | null
+          phone_number?: string | null
           Skills?: string | null
           Timestamp?: string | null
           Title?: string | null
         }
         Update: {
-          "Applied for"?: string[] | null
-          Cadndidate_ID?: string
+          applied_for?: string[] | null
+          candidate_id?: string
           CandidateStatus?: string | null
           Certifications?: string | null
-          "Current Company"?: string | null
-          "CV Summary"?: string | null
+          current_company?: string | null
           CV_Link?: string | null
+          cv_summary?: string | null
           cv_text?: string | null
-          "Done Questions"?: string | null
+          done_questions?: string | null
           Education?: string | null
           Email?: string | null
           Experience?: string | null
-          "First Name"?: string | null
+          first_name?: string | null
           Language?: string | null
-          "Last Name"?: string | null
+          last_name?: string | null
           Linkedin?: string | null
           Location?: string | null
-          "Other Notes"?: string | null
-          "Phone Number"?: string | null
+          other_notes?: string | null
+          phone_number?: string | null
           Skills?: string | null
           Timestamp?: string | null
           Title?: string | null
@@ -236,67 +236,67 @@ export type Database = {
       Jobs: {
         Row: {
           assignment: string | null
-          "Client Description": string | null
-          "Contract Length": string | null
+          client_description: string | null
+          contract_length: string | null
           Currency: string | null
           "JD Summary": string | null
-          "Job Description": string | null
-          "Job ID": string
-          "Job Location": string | null
-          "Job Salary Range (ex: 15000 AED)": string | null
-          "Job Title": string | null
+          job_description: string | null
+          job_id: string
+          job_location: string | null
+          job_salary_range: string | null
+          job_title: string | null
           longlist: number
           musttohave: string | null
-          "Nationality to Exclude": string | null
-          "Nationality to include": string | null
+          nationality_to_exclude: string | null
+          nationality_to_include: string | null
           nicetohave: string | null
-          "Notice Period": string | null
+          notice_period: string | null
           Processed: string | null
-          "Things to look for": string | null
+          things_to_look_for: string | null
           Timestamp: string | null
           Type: string | null
         }
         Insert: {
           assignment?: string | null
-          "Client Description"?: string | null
-          "Contract Length"?: string | null
+          client_description?: string | null
+          contract_length?: string | null
           Currency?: string | null
           "JD Summary"?: string | null
-          "Job Description"?: string | null
-          "Job ID": string
-          "Job Location"?: string | null
-          "Job Salary Range (ex: 15000 AED)"?: string | null
-          "Job Title"?: string | null
+          job_description?: string | null
+          job_id: string
+          job_location?: string | null
+          job_salary_range?: string | null
+          job_title?: string | null
           longlist?: number
           musttohave?: string | null
-          "Nationality to Exclude"?: string | null
-          "Nationality to include"?: string | null
+          nationality_to_exclude?: string | null
+          nationality_to_include?: string | null
           nicetohave?: string | null
-          "Notice Period"?: string | null
+          notice_period?: string | null
           Processed?: string | null
-          "Things to look for"?: string | null
+          things_to_look_for?: string | null
           Timestamp?: string | null
           Type?: string | null
         }
         Update: {
           assignment?: string | null
-          "Client Description"?: string | null
-          "Contract Length"?: string | null
+          client_description?: string | null
+          contract_length?: string | null
           Currency?: string | null
           "JD Summary"?: string | null
-          "Job Description"?: string | null
-          "Job ID"?: string
-          "Job Location"?: string | null
-          "Job Salary Range (ex: 15000 AED)"?: string | null
-          "Job Title"?: string | null
+          job_description?: string | null
+          job_id?: string
+          job_location?: string | null
+          job_salary_range?: string | null
+          job_title?: string | null
           longlist?: number
           musttohave?: string | null
-          "Nationality to Exclude"?: string | null
-          "Nationality to include"?: string | null
+          nationality_to_exclude?: string | null
+          nationality_to_include?: string | null
           nicetohave?: string | null
-          "Notice Period"?: string | null
+          notice_period?: string | null
           Processed?: string | null
-          "Things to look for"?: string | null
+          things_to_look_for?: string | null
           Timestamp?: string | null
           Type?: string | null
         }
@@ -304,94 +304,94 @@ export type Database = {
       }
       Jobs_CVs: {
         Row: {
-          "2 Questions of Interview": string | null
-          "Agency Experience": string | null
+          agency_experience: string | null
           callcount: number
           callid: number
-          "Candidate Email": string | null
-          "Candidate Name": string | null
-          "Candidate Phone Number": string | null
+          candidate_email: string | null
           Candidate_ID: string | null
+          candidate_name: string | null
+          candidate_phone_number: string | null
           cons: string | null
-          Contacted: string | null
+          contacted: string | null
           current_salary: string | null
-          CV_Link: string | null
+          cv_link: string | null
           duration: string | null
           group_id: number | null
-          "Job ID": string | null
+          job_id: string | null
           lastcalltime: string | null
           longlisted_at: string | null
-          Notes: string | null
-          "Notice Period": string | null
+          notes: string | null
+          notice_period: string | null
           pros: string | null
           recording: string | null
-          "Relatable CV?": string | null
-          "Salary Expectations": string | null
-          "Score and Reason": string | null
+          relatable_cv: string | null
+          salary_expectations: string | null
+          score_and_reason: string | null
           shortlisted_at: string | null
-          "Success Score": string | null
-          Summary: string | null
-          Transcript: string | null
+          success_score: string | null
+          summary: string | null
+          transcript: string | null
+          two_questions_of_interview: string | null
         }
         Insert: {
-          "2 Questions of Interview"?: string | null
-          "Agency Experience"?: string | null
+          agency_experience?: string | null
           callcount?: number
           callid?: number
-          "Candidate Email"?: string | null
-          "Candidate Name"?: string | null
-          "Candidate Phone Number"?: string | null
+          candidate_email?: string | null
           Candidate_ID?: string | null
+          candidate_name?: string | null
+          candidate_phone_number?: string | null
           cons?: string | null
-          Contacted?: string | null
+          contacted?: string | null
           current_salary?: string | null
-          CV_Link?: string | null
+          cv_link?: string | null
           duration?: string | null
           group_id?: number | null
-          "Job ID"?: string | null
+          job_id?: string | null
           lastcalltime?: string | null
           longlisted_at?: string | null
-          Notes?: string | null
-          "Notice Period"?: string | null
+          notes?: string | null
+          notice_period?: string | null
           pros?: string | null
           recording?: string | null
-          "Relatable CV?"?: string | null
-          "Salary Expectations"?: string | null
-          "Score and Reason"?: string | null
+          relatable_cv?: string | null
+          salary_expectations?: string | null
+          score_and_reason?: string | null
           shortlisted_at?: string | null
-          "Success Score"?: string | null
-          Summary?: string | null
-          Transcript?: string | null
+          success_score?: string | null
+          summary?: string | null
+          transcript?: string | null
+          two_questions_of_interview?: string | null
         }
         Update: {
-          "2 Questions of Interview"?: string | null
-          "Agency Experience"?: string | null
+          agency_experience?: string | null
           callcount?: number
           callid?: number
-          "Candidate Email"?: string | null
-          "Candidate Name"?: string | null
-          "Candidate Phone Number"?: string | null
+          candidate_email?: string | null
           Candidate_ID?: string | null
+          candidate_name?: string | null
+          candidate_phone_number?: string | null
           cons?: string | null
-          Contacted?: string | null
+          contacted?: string | null
           current_salary?: string | null
-          CV_Link?: string | null
+          cv_link?: string | null
           duration?: string | null
           group_id?: number | null
-          "Job ID"?: string | null
+          job_id?: string | null
           lastcalltime?: string | null
           longlisted_at?: string | null
-          Notes?: string | null
-          "Notice Period"?: string | null
+          notes?: string | null
+          notice_period?: string | null
           pros?: string | null
           recording?: string | null
-          "Relatable CV?"?: string | null
-          "Salary Expectations"?: string | null
-          "Score and Reason"?: string | null
+          relatable_cv?: string | null
+          salary_expectations?: string | null
+          score_and_reason?: string | null
           shortlisted_at?: string | null
-          "Success Score"?: string | null
-          Summary?: string | null
-          Transcript?: string | null
+          success_score?: string | null
+          summary?: string | null
+          transcript?: string | null
+          two_questions_of_interview?: string | null
         }
         Relationships: []
       }
