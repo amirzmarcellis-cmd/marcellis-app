@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, MapPin, Calendar, DollarSign, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap } from "lucide-react"
+import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { JobDialog } from "@/components/jobs/JobDialog"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
@@ -436,9 +436,9 @@ export default function JobDetails() {
                   <MapPin className="w-4 h-4 text-muted-foreground" />
                   <span>{job["Job Location"]}</span>
                 </div>
-                <div className="flex items-center space-x-2 text-sm">
-                  <DollarSign className="w-4 h-4 text-muted-foreground" />
-                  <span>{job["Job Salary Range (ex: 15000 AED)"]}</span>
+<div className="flex items-center space-x-2 text-sm">
+                  <Banknote className="w-4 h-4 text-muted-foreground" />
+                  <span>{formatCurrency(job["Job Salary Range (ex: 15000 AED)"], job["Currency"])}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-sm">
                   <Calendar className="w-4 h-4 text-muted-foreground" />

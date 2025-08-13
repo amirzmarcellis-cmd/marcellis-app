@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Building2, MapPin, DollarSign, Users, Edit, Trash2, Play, Pause, Briefcase, Zap } from "lucide-react";
+import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Briefcase, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { JobDialog } from "./JobDialog";
@@ -16,6 +16,7 @@ interface Job {
   "Client Description": string | null;
   "Job Location": string | null;
   "Job Salary Range (ex: 15000 AED)": string | null;
+  "Currency"?: string | null;
   "Processed": string | null;
   "Things to look for": string | null;
   "JD Summary": string | null;
@@ -196,7 +197,17 @@ interface JobGridProps {
 }
 
 function JobGrid({ jobs, onEdit, onDelete, onStatusToggle, navigate }: JobGridProps) {
-  const { toast } = useToast();
+const { toast } = useToast();
+
+  const formatCurrency = (amountStr: string | null | undefined, currency?: string | null) => {
+    const amount = parseFloat((amountStr || "").toString().replace(/[^0-9.]/g, ""));
+    if (!amount || !currency) return amountStr || "N/A";
+    try {
+      return new Intl.NumberFormat("en", { style: "currency", currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
+    } catch {
+      return `${currency} ${isNaN(amount) ? amountStr : amount.toLocaleString()}`;
+    }
+  };
 
   const handleStartAutomation = async (jobId: string) => {
     try {
@@ -283,10 +294,10 @@ function JobGrid({ jobs, onEdit, onDelete, onStatusToggle, navigate }: JobGridPr
                 </div>
               )}
               
-              {job["Job Salary Range (ex: 15000 AED)"] && (
+{job["Job Salary Range (ex: 15000 AED)"] && (
                 <div className="flex items-center text-muted-foreground">
-                  <DollarSign className="h-4 w-4 mr-2 text-green" />
-                  {job["Job Salary Range (ex: 15000 AED)"]}
+                  <Banknote className="h-4 w-4 mr-2 text-green" />
+                  {formatCurrency(job["Job Salary Range (ex: 15000 AED)"], job["Currency"] as string | null)}
                 </div>
               )}
               
