@@ -377,18 +377,18 @@ export default function JobDetails() {
   })
 
   return (
-      <div className="space-y-6">
+      <div className="space-y-6 overflow-x-auto">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center space-x-4">
             <Button variant="ghost" onClick={() => navigate('/jobs')}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Jobs
             </Button>
-            <div className="h-6 w-px bg-border" />
-            <h1 className="text-3xl font-bold">Job Details</h1>
+            <div className="h-6 w-px bg-border hidden sm:block" />
+            <h1 className="text-2xl sm:text-3xl font-bold">Job Details</h1>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button 
               onClick={handleButtonClick}
               disabled={job?.longlist === 3}
@@ -441,13 +441,15 @@ export default function JobDetails() {
 
         {/* Detailed Information Tabs */}
          <Tabs defaultValue="overview" className="space-y-4">
-           <TabsList className="grid w-full grid-cols-5">
-             <TabsTrigger value="overview">Overview</TabsTrigger>
-             <TabsTrigger value="description">Job Description</TabsTrigger>
-             <TabsTrigger value="requirements">AI Requirements</TabsTrigger>
-             <TabsTrigger value="candidates">Long List</TabsTrigger>
-             <TabsTrigger value="shortlist">Short List</TabsTrigger>
-           </TabsList>
+           <div className="overflow-x-auto">
+             <TabsList className="min-w-[560px] inline-flex">
+               <TabsTrigger value="overview">Overview</TabsTrigger>
+               <TabsTrigger value="description">Job Description</TabsTrigger>
+               <TabsTrigger value="requirements">AI Requirements</TabsTrigger>
+               <TabsTrigger value="candidates">Long List</TabsTrigger>
+               <TabsTrigger value="shortlist">Short List</TabsTrigger>
+             </TabsList>
+           </div>
 
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

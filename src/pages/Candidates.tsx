@@ -172,101 +172,103 @@ export default function Candidates() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow className="border-glass-border">
-                  <TableHead>Candidate</TableHead>
-                  <TableHead>Position</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Last Contact</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
-                      Loading candidates...
-                    </TableCell>
+            <div className="w-full overflow-x-auto">
+              <Table className="min-w-[800px]">
+                <TableHeader>
+                  <TableRow className="border-glass-border">
+                    <TableHead>Candidate</TableHead>
+                    <TableHead>Position</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Location</TableHead>
+                    <TableHead>Last Contact</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ) : filteredCandidates.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
-                      No candidates found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredCandidates.map((candidate) => {
-                    const fullName = `${candidate["First Name"] || ""} ${candidate["Last Name"] || ""}`.trim()
-                    const initials = `${candidate["First Name"]?.[0] || ""}${candidate["Last Name"]?.[0] || ""}`
-                    const skills = candidate.Skills ? candidate.Skills.split(',').map(s => s.trim()) : []
-                    
-                    return (
-                      <TableRow key={candidate["Cadndidate_ID"]} className="border-glass-border hover:bg-glass-primary transition-colors">
-                        <TableCell>
-                          <div className="flex items-center space-x-3">
-                            <Avatar className="w-10 h-10">
-                              <AvatarFallback className="bg-gradient-primary text-white">
-                                {initials}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <div className="font-medium">{fullName || "N/A"}</div>
-                              <div className="text-sm text-muted-foreground">{candidate.Email || "N/A"}</div>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8">
+                        Loading candidates...
+                      </TableCell>
+                    </TableRow>
+                  ) : filteredCandidates.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8">
+                        No candidates found
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredCandidates.map((candidate) => {
+                      const fullName = `${candidate["First Name"] || ""} ${candidate["Last Name"] || ""}`.trim()
+                      const initials = `${candidate["First Name"]?.[0] || ""}${candidate["Last Name"]?.[0] || ""}`
+                      const skills = candidate.Skills ? candidate.Skills.split(',').map(s => s.trim()) : []
+                      
+                      return (
+                        <TableRow key={candidate["Cadndidate_ID"]} className="border-glass-border hover:bg-glass-primary transition-colors">
+                          <TableCell>
+                            <div className="flex items-center space-x-3">
+                              <Avatar className="w-10 h-10">
+                                <AvatarFallback className="bg-gradient-primary text-white">
+                                  {initials}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <div className="font-medium">{fullName || "N/A"}</div>
+                                <div className="text-sm text-muted-foreground break-words">{candidate.Email || "N/A"}</div>
+                              </div>
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-2">
-                            <Briefcase className="w-4 h-4 text-muted-foreground" />
-                            <span>{candidate.Title || "N/A"}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap gap-1">
-                            {Array.isArray(candidate["Applied for"]) && candidate["Applied for"].length > 0 
-                              ? candidate["Applied for"].map((jobId) => (
-                                  <Badge key={jobId} variant="secondary" className="capitalize text-xs">
-                                    {jobId}
-                                  </Badge>
-                                ))
-                              : <Badge variant="secondary" className="capitalize">Not Applied</Badge>
-                            }
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-2">
-                            <MapPin className="w-4 h-4 text-muted-foreground" />
-                            <span>{candidate.Location || "N/A"}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-2">
-                            <Calendar className="w-4 h-4 text-muted-foreground" />
-                            <span>{candidate.Timestamp ? formatDate(candidate.Timestamp) : "N/A"}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end space-x-1">
-                            <Button variant="outline" size="sm" asChild title="View Candidate">
-                              <Link to={`/candidate/${candidate["Cadndidate_ID"]}`}>
-                                👁️
-                              </Link>
-                            </Button>
-                            <Button variant="outline" size="sm" asChild title="Edit Candidate">
-                              <Link to={`/candidate/edit/${candidate["Cadndidate_ID"]}`}>
-                                ✏️
-                              </Link>
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })
-                )}
-              </TableBody>
-            </Table>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-2">
+                              <Briefcase className="w-4 h-4 text-muted-foreground" />
+                              <span className="break-words">{candidate.Title || "N/A"}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-wrap gap-1">
+                              {Array.isArray(candidate["Applied for"]) && candidate["Applied for"].length > 0 
+                                ? candidate["Applied for"].map((jobId) => (
+                                    <Badge key={jobId} variant="secondary" className="capitalize text-xs">
+                                      {jobId}
+                                    </Badge>
+                                  ))
+                                : <Badge variant="secondary" className="capitalize">Not Applied</Badge>
+                              }
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-2">
+                              <MapPin className="w-4 h-4 text-muted-foreground" />
+                              <span className="break-words">{candidate.Location || "N/A"}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-2">
+                              <Calendar className="w-4 h-4 text-muted-foreground" />
+                              <span>{candidate.Timestamp ? formatDate(candidate.Timestamp) : "N/A"}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end space-x-1">
+                              <Button variant="outline" size="sm" asChild title="View Candidate">
+                                <Link to={`/candidate/${candidate["Cadndidate_ID"]}`}>
+                                  👁️
+                                </Link>
+                              </Button>
+                              <Button variant="outline" size="sm" asChild title="Edit Candidate">
+                                <Link to={`/candidate/edit/${candidate["Cadndidate_ID"]}`}>
+                                  ✏️
+                                </Link>
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       </div>

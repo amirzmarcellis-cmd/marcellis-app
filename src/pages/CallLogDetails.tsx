@@ -170,14 +170,14 @@ export default function CallLogDetails() {
   const scoreColorClass = score >= 80 ? "text-primary" : score >= 50 ? "text-foreground" : "text-destructive"
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-4 sm:p-6 space-y-6 overflow-x-auto">
       {/* Header */}
-      <div className="flex items-center space-x-4 mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6">
         <Button variant="outline" onClick={() => navigate('/jobs')}>
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Jobs
         </Button>
-        <h1 className="text-3xl font-bold">Call Details</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Call Details</h1>
       </div>
 
       {/* Candidate Header */}
@@ -196,7 +196,7 @@ export default function CallLogDetails() {
               <Badge variant="outline" className="mt-2">
                 Score: {callLog["Success Score"]}/100
               </Badge>
-              <p className="text-sm text-muted-foreground mt-1 truncate">
+              <p className="text-sm text-muted-foreground mt-1 break-words">
                 Latest Note: {callLog["Notes"] || '—'}
               </p>
             </div>
@@ -240,7 +240,7 @@ export default function CallLogDetails() {
                 <label className="text-sm font-medium text-muted-foreground">Call Recording Link</label>
                 <p className="text-lg">
                   {callLog["recording"] ? (
-                    <a href={callLog["recording"]} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                    <a href={callLog["recording"]} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">
                       View Recording
                     </a>
                   ) : 'N/A'}
@@ -323,7 +323,7 @@ export default function CallLogDetails() {
             <CardTitle className="text-green-600">Pros</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="whitespace-pre-wrap">{callLog["pros"] || 'No pros available'}</p>
+            <p className="whitespace-pre-wrap break-words">{callLog["pros"] || 'No pros available'}</p>
           </CardContent>
         </Card>
 
@@ -332,7 +332,7 @@ export default function CallLogDetails() {
             <CardTitle className="text-red-600">Cons</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="whitespace-pre-wrap">{callLog["cons"] || 'No cons available'}</p>
+            <p className="whitespace-pre-wrap break-words">{callLog["cons"] || 'No cons available'}</p>
           </CardContent>
         </Card>
       </div>
@@ -344,7 +344,7 @@ export default function CallLogDetails() {
             <CardTitle>Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="whitespace-pre-wrap">{callLog["Summary"] || 'No summary available'}</p>
+            <p className="whitespace-pre-wrap break-words">{callLog["Summary"] || 'No summary available'}</p>
           </CardContent>
         </Card>
 
@@ -365,7 +365,7 @@ export default function CallLogDetails() {
               </div>
               <div className="max-h-60 overflow-y-auto text-sm leading-relaxed">
                 {callLog["Transcript"] ? (
-                  <div className="whitespace-pre-wrap">{highlightedTranscript}</div>
+                  <div className="whitespace-pre-wrap break-words">{highlightedTranscript}</div>
                 ) : (
                   <p className="text-muted-foreground">No transcript available</p>
                 )}
