@@ -53,13 +53,13 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
   useEffect(() => {
     if (job) {
       setFormData({
-        title: job["Job Title"] || "",
-        description: job["Job Description"] || "",
-        clientDescription: job["Client Description"] || "",
-        location: job["Job Location"] || "",
-        salaryRange: job["Job Salary Range (ex: 15000 AED)"] || "",
-        thingsToLookFor: job["Things to look for"] || "",
-        summary: job["JD Summary"] || "",
+        title: job.job_title || "",
+        description: job.job_description || "",
+        clientDescription: job.client_description || "",
+        location: job.job_location || "",
+        salaryRange: job.job_salary_range || "",
+        thingsToLookFor: job.things_to_look_for || "",
+        summary: job.jd_summary || "",
         musttohave: job.musttohave || "",
         nicetohave: job.nicetohave || "",
         status: job["Processed"] || "No",
@@ -112,18 +112,18 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
     setLoading(true);
     try {
       const jobData = {
-        "Job ID": job?.["Job ID"] || generateJobId(),
-        "Job Title": formData.title,
-        "Job Description": formData.description,
-        "Client Description": formData.clientDescription,
-        "Job Location": formData.location,
-        "Job Salary Range (ex: 15000 AED)": formData.salaryRange,
-        "Processed": formData.status,
-        "Things to look for": formData.thingsToLookFor,
-        "JD Summary": formData.summary,
+        job_id: (job as any)?.job_id || generateJobId(),
+        job_title: formData.title,
+        job_description: formData.description,
+        client_description: formData.clientDescription,
+        job_location: formData.location,
+        job_salary_range: formData.salaryRange,
+        Processed: formData.status,
+        things_to_look_for: formData.thingsToLookFor,
+        jd_summary: formData.summary,
         musttohave: formData.musttohave,
         nicetohave: formData.nicetohave,
-        "Timestamp": job?.Timestamp || new Date().toISOString(),
+        Timestamp: (job as any)?.Timestamp || new Date().toISOString(),
       };
 
       if (job) {
@@ -131,7 +131,7 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
         const { error } = await supabase
           .from('Jobs')
           .update(jobData)
-          .eq('Job ID', job["Job ID"]);
+          .eq('job_id', (job as any).job_id);
 
         if (error) throw error;
 

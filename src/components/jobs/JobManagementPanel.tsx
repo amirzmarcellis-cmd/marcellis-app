@@ -341,7 +341,7 @@ const { toast } = useToast();
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => onDelete(job["Job ID"])}
+                  onClick={() => onDelete(job.job_id)}
                   className="h-8 px-2 hover:bg-destructive hover:text-destructive-foreground"
                 >
                   <Trash2 className="h-3 w-3" />
@@ -349,7 +349,7 @@ const { toast } = useToast();
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => handleStartAutomation(job["Job ID"])}
+                  onClick={() => handleStartAutomation(job.job_id)}
                   className="h-8 px-2 bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
                 >
                   <Zap className="h-3 w-3" />
@@ -359,7 +359,7 @@ const { toast } = useToast();
               <Button 
                 size="sm" 
                 className="h-8"
-                onClick={() => navigate(`/job/${job["Job ID"]}`)}
+                onClick={() => navigate(`/job/${job.job_id}`)}
               >
                 <Users className="h-3 w-3 mr-1" />
                 Open Job

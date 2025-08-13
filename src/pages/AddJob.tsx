@@ -82,12 +82,12 @@ export default function AddJob() {
     try {
       const { data: jobs } = await supabase
         .from('Jobs')
-        .select('"Job ID"')
-        .order('"Job ID"', { ascending: false })
+        .select('job_id')
+        .order('job_id', { ascending: false })
         .limit(1);
 
       if (jobs && jobs.length > 0) {
-        const lastJobId = jobs[0]["Job ID"];
+        const lastJobId = jobs[0]["job_id"];
         const match = lastJobId.match(/DMS-J-(\d+)/);
         if (match) {
           const nextNumber = parseInt(match[1]) + 1;
@@ -119,20 +119,20 @@ export default function AddJob() {
       const { error } = await supabase
         .from('Jobs')
         .insert({
-          "Job ID": jobId,
-          "Job Title": formData.jobTitle,
-          "Job Description": formData.jobDescription,
-          "Client Description": formData.clientDescription,
-          "Job Location": formData.jobLocation,
-          "Job Salary Range (ex: 15000 AED)": formData.jobSalaryRange[0].toString(),
-          "assignment": formData.hasAssignment ? formData.assignmentLink : null,
-          "Notice Period": formData.noticePeriod,
-          "Nationality to include": formData.nationalityToInclude.join(", "),
-          "Nationality to Exclude": formData.nationalityToExclude.join(", "),
-          "Type": formData.type,
-          "Contract Length": formData.type === "Contract" ? formData.contractLength : null,
-          "Currency": formData.currency,
-          "Timestamp": new Date().toISOString()
+          job_id: jobId,
+          job_title: formData.jobTitle,
+          job_description: formData.jobDescription,
+          client_description: formData.clientDescription,
+          job_location: formData.jobLocation,
+          job_salary_range: formData.jobSalaryRange[0].toString(),
+          assignment: formData.hasAssignment ? formData.assignmentLink : null,
+          notice_period: formData.noticePeriod,
+          nationality_to_include: formData.nationalityToInclude.join(", "),
+          nationality_to_exclude: formData.nationalityToExclude.join(", "),
+          Type: formData.type,
+          contract_length: formData.type === "Contract" ? formData.contractLength : null,
+          Currency: formData.currency,
+          Timestamp: new Date().toISOString()
         });
 
       if (error) {
