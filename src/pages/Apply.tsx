@@ -182,7 +182,7 @@ export default function Apply() {
         cv_summary: cleanText(`Salary Expectations: ${data.salaryExpectations} AED/month, Notice Period: ${data.noticePeriod} days`),
       };
 
-      // Try primary (snake_case) insert first, then legacy shape as fallback
+      // Try primary (snake_case) insert first, then legacy shape, then minimal fallback
       const { error: primaryError } = await supabase
         .from("CVs")
         .insert([cvData]);
@@ -211,7 +211,24 @@ export default function Apply() {
           .from("CVs")
           .insert([legacyCvData]);
 
-        if (fallbackError) throw fallbackError;
+        if (fallbackError) {
+          console.error("Legacy insert failed, retrying with minimal columns:", fallbackError);
+          const minimalCvData = {
+            candidate_id: candidateId,
+            Email: cleanText(data.email),
+            first_name: cleanText(data.fullName.split(" ")[0] || ""),
+            last_name: cleanText(data.fullName.split(" ").slice(1).join(" ") || ""),
+            phone_number: cleanText(data.phoneNumber),
+            Title: cleanText(data.title),
+            Timestamp: new Date().toISOString(),
+          } as any;
+
+          const { error: minimalError } = await supabase
+            .from("CVs")
+            .insert([minimalCvData]);
+
+          if (minimalError) throw minimalError;
+        }
       }
 
       toast({
