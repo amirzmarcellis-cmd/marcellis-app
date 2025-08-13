@@ -216,7 +216,7 @@ export default function Index() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground p-4 sm:p-6 relative overflow-hidden mx-auto max-w-screen-2xl">
       
       <div className="mb-8 relative z-10">
         <div className="rounded-2xl border border-border/50 bg-gradient-card backdrop-blur-xl p-6 shadow-card animate-fade-in">
@@ -276,9 +276,9 @@ export default function Index() {
         </div>
       </div>
 
-      <div className="flex gap-6 relative z-10">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
         {/* Left Side - Job Control Panels - 30% width */}
-        <div className="w-[30%] space-y-4">
+        <div className="space-y-4 lg:col-span-1">
           <h2 className="text-lg font-bold text-cyan-300 mb-4 flex items-center">
             <Target className="h-5 w-5 mr-2" />
             Active Jobs Funnel
@@ -326,7 +326,7 @@ export default function Index() {
         </div>
 
         {/* Right Side - Live Candidate Feed & Action Center - 60% width */}
-        <div className="w-[60%] space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           <ActivityTicker items={enrichedCandidates.slice(0,10).map(c => `${c['Candidate Name']} • ${c['Job Title']} • ${parseFloat(c['Success Score']) || 0}`)} />
           {/* Live Candidate Feed */}
           <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20">
@@ -481,7 +481,7 @@ export default function Index() {
               <CardTitle className="text-lg text-purple-300">My Next Moves</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-400/30">
                   <h4 className="font-semibold text-purple-300 mb-2">Candidates Needing Review</h4>
                   <div className="text-2xl font-bold text-purple-400">{highScoreActiveCount || 0}</div>

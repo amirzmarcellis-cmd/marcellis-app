@@ -4,6 +4,7 @@ import { DashboardSidebar } from "./Sidebar"
 import { MissionBackground } from "@/components/layout/MissionBackground"
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -11,6 +12,7 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user, loading } = useAuth();
+  const isMobile = useIsMobile();
 
   if (loading) {
     return (
@@ -24,14 +26,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     return <Navigate to="/auth" replace />;
   }
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="min-h-screen flex w-full bg-background">
+    <SidebarProvider defaultOpen={!isMobile}>
+      <div className="min-h-screen flex w-full bg-background overflow-x-hidden">
         <DashboardSidebar />
         <SidebarInset className="flex-1 relative">
           <MissionBackground>
             {/* Header */}
             <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-              <div className="flex h-16 items-center gap-4 px-6">
+              <div className="flex h-16 items-center gap-4 px-4 sm:px-6">
                 <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
                 <div className="flex-1" />
                 <div className="flex items-center space-x-4">
@@ -44,7 +46,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </header>
 
             {/* Main Content */}
-            <main className="flex-1 p-6">
+            <main className="flex-1 p-4 sm:p-6">
               {children}
             </main>
           </MissionBackground>
