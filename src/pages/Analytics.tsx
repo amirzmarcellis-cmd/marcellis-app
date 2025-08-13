@@ -285,7 +285,7 @@ export default function Analytics() {
 
       {/* Top Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:border-cyan-400/50 transition-all">
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -300,7 +300,7 @@ export default function Analytics() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:border-cyan-400/50 transition-all">
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -315,7 +315,7 @@ export default function Analytics() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:border-cyan-400/50 transition-all">
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -334,7 +334,7 @@ export default function Analytics() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:border-cyan-400/50 transition-all">
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -349,7 +349,7 @@ export default function Analytics() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:border-cyan-400/50 transition-all">
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -368,7 +368,7 @@ export default function Analytics() {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Score Distribution */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
           <CardHeader>
             <CardTitle className="text-foreground flex items-center">
               <TrendingUp className="w-5 h-5 mr-2" />
@@ -414,7 +414,7 @@ export default function Analytics() {
         </Card>
 
         {/* Contact Status */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
           <CardHeader>
             <CardTitle className="text-foreground flex items-center">
               <PhoneCall className="w-5 h-5 mr-2" />
@@ -463,7 +463,7 @@ export default function Analytics() {
       {/* Bottom Section */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Candidates per Job */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
           <CardHeader>
             <CardTitle className="text-foreground flex items-center">
               <Users className="w-5 h-5 mr-2" />
@@ -496,7 +496,7 @@ export default function Analytics() {
         </Card>
 
         {/* Top Performing Jobs */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
           <CardHeader>
             <CardTitle className="text-foreground flex items-center">
               <Star className="w-5 h-5 mr-2" />
@@ -509,10 +509,10 @@ export default function Analytics() {
                 {data?.topPerformingJobs.map((job, index) => (
                   <div 
                     key={index}
-                    className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10 hover:border-cyan-400/30 transition-all"
+                    className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border hover:border-primary/30 transition-all"
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                      <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center text-foreground font-bold text-sm">
                         #{job.rank}
                       </div>
                       <div>
@@ -534,7 +534,7 @@ export default function Analytics() {
         </Card>
 
         {/* Average Scores by Job */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
           <CardHeader>
             <CardTitle className="text-foreground flex items-center">
               <TrendingUp className="w-5 h-5 mr-2" />
@@ -567,7 +567,7 @@ export default function Analytics() {
         </Card>
 
         {/* Average Salaries by Job */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
           <CardHeader>
             <CardTitle className="text-foreground flex items-center">
               <TrendingUp className="w-5 h-5 mr-2" />
@@ -603,7 +603,7 @@ export default function Analytics() {
 
       {/* Bottom Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
           <CardContent className="p-6 text-center">
             <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
             <p className="text-green-400 text-sm font-medium">Call Success Rate</p>
@@ -612,7 +612,7 @@ export default function Analytics() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
           <CardContent className="p-6 text-center">
             <Phone className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
             <p className="text-cyan-400 text-sm font-medium">Contact Rate</p>
@@ -621,7 +621,7 @@ export default function Analytics() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
           <CardContent className="p-6 text-center">
             <Clock className="w-12 h-12 text-purple-400 mx-auto mb-4" />
             <p className="text-purple-400 text-sm font-medium">Avg Candidates/Job</p>

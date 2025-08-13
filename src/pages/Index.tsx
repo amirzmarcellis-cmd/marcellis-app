@@ -286,7 +286,7 @@ export default function Index() {
           <ScrollArea className="h-[600px]">
             <div className="space-y-3">
               {data?.activeJobs?.map((job) => (
-                <Card key={job['Job ID']} className="bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-lg border-white/20 hover:border-cyan-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 hover:scale-[1.02]">
+                <Card key={job['Job ID']} className="bg-card border-border dark:bg-gradient-to-br dark:from-white/5 dark:via-white/3 dark:to-white/5 dark:backdrop-blur-lg dark:border-white/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 hover:scale-[1.02]">
                   <CardContent className="p-4">
                     <div className="flex items-center mb-3">
                       <h3 className="font-semibold text-sm truncate">{job['Job Title']}</h3>
@@ -476,7 +476,7 @@ export default function Index() {
           </Card>
 
           {/* Action Center */}
-          <Card className="bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-lg border-white/20 shadow-xl shadow-purple-500/20">
+          <Card className="bg-card border-border dark:bg-gradient-to-br dark:from-white/5 dark:via-white/3 dark:to-white/5 dark:backdrop-blur-lg dark:border-white/20 shadow-xl shadow-purple-500/20">
             <CardHeader>
               <CardTitle className="text-lg text-purple-300">My Next Moves</CardTitle>
             </CardHeader>

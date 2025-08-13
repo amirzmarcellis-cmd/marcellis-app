@@ -99,11 +99,11 @@ export function DashboardSidebar() {
                       to={item.url}
                       className={`
                         flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200
-                        ${
-                          isActive(item.url)
-                            ? "bg-primary text-primary-foreground shadow-medium"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                        }
+                          ${
+                            isActive(item.url)
+                              ? "bg-muted text-foreground shadow-medium dark:bg-primary dark:text-primary-foreground"
+                              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          }
                         ${isMini ? "justify-center" : ""}
                       `}
                     >

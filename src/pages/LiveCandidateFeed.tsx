@@ -190,7 +190,7 @@ export default function LiveCandidateFeed() {
       </div>
 
       {/* Enhanced Filters */}
-      <Card className="mb-8 bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-xl border-white/20 shadow-2xl shadow-purple-500/10">
+      <Card className="mb-8 bg-card border-border dark:bg-gradient-to-r dark:from-white/10 dark:to-white/5 dark:backdrop-blur-xl dark:border-white/20 shadow-2xl shadow-purple-500/10">
         <CardHeader>
           <CardTitle className="text-foreground flex items-center">
             <Filter className="w-5 h-5 mr-2 text-cyan-400" />
@@ -254,7 +254,7 @@ export default function LiveCandidateFeed() {
       </Card>
 
       {/* Candidate Feed */}
-      <Card className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border-white/20 shadow-2xl">
+      <Card className="bg-card border-border dark:bg-gradient-to-br dark:from-white/10 dark:to-white/5 dark:backdrop-blur-xl dark:border-white/20 shadow-2xl">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl text-foreground flex items-center">
@@ -279,7 +279,7 @@ export default function LiveCandidateFeed() {
                   <div 
                     key={index} 
                     className={`group relative p-6 rounded-2xl border transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer
-                      bg-gradient-to-r ${index < 3 ? 'from-yellow-400/30 to-amber-500/50' : getScoreGradient(score)} ${index < 3 ? 'border-yellow-400/50 hover:border-yellow-400/60' : 'border-white/20 hover:border-cyan-400/40'}
+                      bg-gradient-to-r ${index < 3 ? 'from-yellow-400/30 to-amber-500/50' : getScoreGradient(score)} ${index < 3 ? 'border-yellow-400/50 hover:border-yellow-400/60' : 'border-border hover:border-primary/40 dark:border-white/20'}
                       backdrop-blur-sm animate-fade-in`}
                     style={{ animationDelay: `${index * 0.1}s` }}
                     onClick={() => window.location.href = `/call-log-details?candidate=${candidate["Candidate_ID"]}&job=${candidate["Job ID"]}`}
@@ -356,7 +356,7 @@ export default function LiveCandidateFeed() {
                     </div>
 
                     {/* Score Reason */}
-                    <div className="bg-black/20 rounded-xl p-4 mb-4 border border-white/10">
+                    <div className="bg-black/20 rounded-xl p-4 mb-4 border border-border dark:border-white/10">
                       <h4 className="text-cyan-300 font-medium mb-2">AI Assessment</h4>
                       <p className="text-foreground/90 text-sm leading-relaxed">
                         {candidate['Score and Reason']?.slice(0, 200)}...
