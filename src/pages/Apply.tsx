@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import FileUpload from "@/components/upload/FileUpload";
 import { MissionBackground } from "@/components/layout/MissionBackground";
+import { useParams } from "react-router-dom";
 const applicationSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
   title: z.string().min(2, "Title must be at least 2 characters"),
@@ -71,6 +72,7 @@ export default function Apply() {
   const [cvFile, setCvFile] = useState<string>("");
   const [cvText, setCvText] = useState<string>("");
   const { toast } = useToast();
+  const { id: jobIdParam } = useParams<{ id?: string }>();
 
   const form = useForm<ApplicationForm>({
     resolver: zodResolver(applicationSchema),
@@ -79,7 +81,7 @@ export default function Apply() {
       title: "",
       phoneNumber: "",
       email: "",
-      jobApplied: "",
+      jobApplied: jobIdParam || "",
       portfolioLink: "",
       agencyExperience: "",
       overallExperience: "",
@@ -93,6 +95,13 @@ export default function Apply() {
   useEffect(() => {
     fetchJobs();
   }, []);
+
+  // If we came via /job/:id/apply, preselect that Job ID
+  useEffect(() => {
+    if (jobIdParam) {
+      form.setValue("jobApplied", jobIdParam);
+    }
+  }, [jobIdParam, form]);
 
   const fetchJobs = async () => {
     try {
@@ -307,7 +316,7 @@ export default function Apply() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Job Applied</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a job position" />

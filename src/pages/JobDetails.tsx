@@ -411,6 +411,11 @@ export default function JobDetails() {
               <FileText className="w-4 h-4 mr-2" />
               Edit Job
             </Button>
+            <Button variant="outline" asChild>
+              <Link to={`/job/${job["Job ID"]}/apply`}>
+                Apply Link
+              </Link>
+            </Button>
           </div>
         </div>
 
