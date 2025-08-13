@@ -33,9 +33,9 @@ const applicationSchema = z.object({
 type ApplicationForm = z.infer<typeof applicationSchema>;
 
 interface Job {
-  "Job ID": string;
-  "Job Title": string;
-  "Job Location": string;
+  job_id: string;
+  job_title: string | null;
+  job_location: string | null;
 }
 
 const countries = [
@@ -107,8 +107,8 @@ export default function Apply() {
     try {
       const { data, error } = await supabase
         .from("Jobs")
-        .select('"Job ID", "Job Title", "Job Location"')
-        .order('"Job Title"');
+        .select('job_id, job_title, job_location')
+        .order('job_title');
 
       if (error) throw error;
       setJobs(data || []);
@@ -127,16 +127,16 @@ export default function Apply() {
       // Get the latest candidate ID to determine the next number
       const { data, error } = await supabase
         .from("CVs")
-        .select('"Cadndidate_ID"')
-        .like('"Cadndidate_ID"', 'DMS-C-%')
-        .order('"Cadndidate_ID"', { ascending: false })
+        .select('candidate_id')
+        .like('candidate_id', 'DMS-C-%')
+        .order('candidate_id', { ascending: false })
         .limit(1);
 
       if (error) throw error;
 
       let nextNumber = 659; // Starting number
       if (data && data.length > 0) {
-        const lastId = data[0]["Cadndidate_ID"];
+        const lastId = data[0].candidate_id;
         const match = lastId.match(/DMS-C-(\d+)/);
         if (match) {
           nextNumber = parseInt(match[1]) + 1;
@@ -165,21 +165,21 @@ export default function Apply() {
       const candidateId = await generateCandidateId();
       
       const cvData = {
-        "Cadndidate_ID": candidateId,
-        "Title": cleanText(data.title),
-        "First Name": cleanText(data.fullName.split(" ")[0] || ""),
-        "Last Name": cleanText(data.fullName.split(" ").slice(1).join(" ") || ""),
-        "Phone Number": cleanText(data.phoneNumber),
-        "Email": cleanText(data.email),
-        "Applied for": [data.jobApplied],
-        "CV_Link": cleanText(cvFile),
-        "cv_text": cleanText(cvText),
-        "Linkedin": cleanText(data.portfolioLink || ""),
-        "Other Notes": cleanText(data.notes || ""),
-        "Timestamp": new Date().toISOString(),
-        "Experience": cleanText(`Agency: ${data.agencyExperience}, Overall: ${data.overallExperience}`),
-        "Location": cleanText(data.currentLocation),
-        "CV Summary": cleanText(`Salary Expectations: ${data.salaryExpectations} AED/month, Notice Period: ${data.noticePeriod} days`),
+        candidate_id: candidateId,
+        Title: cleanText(data.title),
+        first_name: cleanText(data.fullName.split(" ")[0] || ""),
+        last_name: cleanText(data.fullName.split(" ").slice(1).join(" ") || ""),
+        phone_number: cleanText(data.phoneNumber),
+        Email: cleanText(data.email),
+        applied_for: [data.jobApplied],
+        CV_Link: cleanText(cvFile),
+        cv_text: cleanText(cvText),
+        Linkedin: cleanText(data.portfolioLink || ""),
+        other_notes: cleanText(data.notes || ""),
+        Timestamp: new Date().toISOString(),
+        Experience: cleanText(`Agency: ${data.agencyExperience}, Overall: ${data.overallExperience}`),
+        Location: cleanText(data.currentLocation),
+        cv_summary: cleanText(`Salary Expectations: ${data.salaryExpectations} AED/month, Notice Period: ${data.noticePeriod} days`),
       };
 
       const { error } = await supabase
@@ -324,8 +324,8 @@ export default function Apply() {
                         </FormControl>
                         <SelectContent className="bg-background z-50">
                           {jobs.map((job) => (
-                            <SelectItem key={job["Job ID"]} value={job["Job ID"]}>
-                              {job["Job Title"]} - {job["Job Location"]}
+                            <SelectItem key={job.job_id} value={job.job_id}>
+                              {job.job_title} - {job.job_location}
                             </SelectItem>
                           ))}
                         </SelectContent>
