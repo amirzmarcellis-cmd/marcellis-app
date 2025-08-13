@@ -316,13 +316,13 @@ export default function Apply() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Job Applied</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
+                      <Select disabled={!!jobIdParam} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className={jobIdParam ? "opacity-80 cursor-not-allowed" : ""}>
                             <SelectValue placeholder="Select a job position" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="bg-background z-50">
                           {jobs.map((job) => (
                             <SelectItem key={job["Job ID"]} value={job["Job ID"]}>
                               {job["Job Title"]} - {job["Job Location"]}
