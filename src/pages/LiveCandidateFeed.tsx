@@ -156,10 +156,10 @@ export default function LiveCandidateFeed() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900 p-4 sm:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900 p-6">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="relative">
               <div className="w-16 h-16 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center animate-pulse shadow-2xl shadow-cyan-400/25">
@@ -170,7 +170,7 @@ export default function LiveCandidateFeed() {
               </div>
             </div>
             <div>
-              <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                 LIVE CANDIDATE FEED
               </h1>
               <p className="text-purple-200 text-lg">Real-time AI-powered candidate monitoring system</p>
@@ -226,7 +226,7 @@ export default function LiveCandidateFeed() {
                 <SelectTrigger className="bg-black/20 border-pink-400/30 text-white focus:border-pink-400">
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-pink-400/30 backdrop-blur-xl z-50">
+                <SelectContent className="bg-slate-800 border-pink-400/30 backdrop-blur-xl">
                   <SelectItem value="all" className="text-white hover:bg-pink-600/20">All Candidates</SelectItem>
                   <SelectItem value="high-score" className="text-white hover:bg-pink-600/20">High Score (74+)</SelectItem>
                   <SelectItem value="contacted" className="text-white hover:bg-pink-600/20">Contacted</SelectItem>
@@ -241,7 +241,7 @@ export default function LiveCandidateFeed() {
                 <SelectTrigger className="bg-black/20 border-emerald-400/30 text-white focus:border-emerald-400">
                   <SelectValue placeholder="All Scores" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-emerald-400/30 backdrop-blur-xl z-50">
+                <SelectContent className="bg-slate-800 border-emerald-400/30 backdrop-blur-xl">
                   <SelectItem value="all" className="text-white hover:bg-emerald-600/20">All Scores</SelectItem>
                   <SelectItem value="high" className="text-white hover:bg-emerald-600/20">Excellent (75+)</SelectItem>
                   <SelectItem value="medium" className="text-white hover:bg-emerald-600/20">Good (50-74)</SelectItem>
@@ -271,7 +271,7 @@ export default function LiveCandidateFeed() {
           </div>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[60vh] md:h-[600px] pr-0 md:pr-4">
+          <ScrollArea className="h-[600px] pr-4">
             <div className="space-y-4">
               {sortedCandidates.map((candidate, index) => {
                 const score = parseFloat(candidate['Success Score']) || 0;

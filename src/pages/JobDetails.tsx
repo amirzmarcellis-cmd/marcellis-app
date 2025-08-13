@@ -379,7 +379,7 @@ export default function JobDetails() {
   return (
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Button variant="ghost" onClick={() => navigate('/jobs')}>
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -408,7 +408,7 @@ export default function JobDetails() {
         <Card>
           <CardContent className="pt-6">
             <div className="space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+              <div className="flex items-start justify-between">
               <div className="space-y-2">
                 <h2 className="text-2xl font-bold">{job["Job Title"]}</h2>
                 <p className="text-lg text-muted-foreground">{job["Client Description"] || "Client Description"}</p>
@@ -421,7 +421,7 @@ export default function JobDetails() {
               </Badge>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t">
                 <div className="flex items-center space-x-2 text-sm">
                   <MapPin className="w-4 h-4 text-muted-foreground" />
                   <span>{job["Job Location"]}</span>
@@ -441,15 +441,13 @@ export default function JobDetails() {
 
         {/* Detailed Information Tabs */}
          <Tabs defaultValue="overview" className="space-y-4">
-           <div className="overflow-x-auto -mx-1">
-             <TabsList className="min-w-max grid grid-flow-col auto-cols-max gap-2 px-1">
-               <TabsTrigger value="overview">Overview</TabsTrigger>
-               <TabsTrigger value="description">Job Description</TabsTrigger>
-               <TabsTrigger value="requirements">AI Requirements</TabsTrigger>
-               <TabsTrigger value="candidates">Long List</TabsTrigger>
-               <TabsTrigger value="shortlist">Short List</TabsTrigger>
-             </TabsList>
-           </div>
+           <TabsList className="grid w-full grid-cols-5">
+             <TabsTrigger value="overview">Overview</TabsTrigger>
+             <TabsTrigger value="description">Job Description</TabsTrigger>
+             <TabsTrigger value="requirements">AI Requirements</TabsTrigger>
+             <TabsTrigger value="candidates">Long List</TabsTrigger>
+             <TabsTrigger value="shortlist">Short List</TabsTrigger>
+           </TabsList>
 
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -707,7 +705,7 @@ export default function JobDetails() {
                            <SelectTrigger className="h-8">
                              <SelectValue placeholder="Score" />
                            </SelectTrigger>
-                            <SelectContent className="bg-background z-50">
+                           <SelectContent>
                              <SelectItem value="all">All Scores</SelectItem>
                              <SelectItem value="high">High (75+)</SelectItem>
                              <SelectItem value="moderate">Moderate (50-74)</SelectItem>
@@ -719,7 +717,7 @@ export default function JobDetails() {
                             <SelectTrigger className="h-8">
                               <SelectValue placeholder="Status" />
                             </SelectTrigger>
-                             <SelectContent className="bg-background z-50">
+                             <SelectContent>
                                <SelectItem value="all">All Status</SelectItem>
                                <SelectItem value="Not Contacted">Not Contacted</SelectItem>
                                <SelectItem value="Ready to Call">Ready to Call</SelectItem>

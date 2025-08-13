@@ -153,7 +153,7 @@ export default function Candidates() {
               <SelectTrigger className="w-[200px] bg-background/50 border-glass-border">
                 <SelectValue placeholder="Job Title" />
               </SelectTrigger>
-              <SelectContent className="bg-background border-glass-border z-50">
+              <SelectContent>
                 <SelectItem value="all">All Job Titles</SelectItem>
                 {uniqueJobTitles.map(jobTitle => (
                   <SelectItem key={jobTitle} value={jobTitle}>{jobTitle}</SelectItem>
@@ -172,8 +172,7 @@ export default function Candidates() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="w-full overflow-x-auto">
-              <Table className="min-w-[720px]">
+            <Table>
               <TableHeader>
                 <TableRow className="border-glass-border">
                   <TableHead>Candidate</TableHead>
@@ -268,7 +267,6 @@ export default function Candidates() {
                 )}
               </TableBody>
             </Table>
-            </div>
           </CardContent>
         </Card>
       </div>
