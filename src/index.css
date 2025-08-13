@@ -139,13 +139,10 @@
   }
 
   body {
-    @apply bg-background text-foreground dark;
+    @apply bg-background text-foreground;
   }
   
-  /* Global dark mode activation */
-  html {
-    @apply dark;
-  }
+  /* Dark mode is controlled by ThemeProvider (next-themes). Do not force here. */
 }
 
 @layer components {
