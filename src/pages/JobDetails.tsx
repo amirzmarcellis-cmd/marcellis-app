@@ -908,7 +908,7 @@ export default function JobDetails() {
                                           >
                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}`}>
                                              <Phone className="w-3 h-3 mr-1" />
-                                             {candidateContacts.length > 1 ? `Call ${contactIndex + 1}` : 'Call Log'}
+                                             {candidateContacts.length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}
                                            </Link>
                                           </Button>
                                         ))}
@@ -1052,7 +1052,7 @@ export default function JobDetails() {
                                         >
                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}`}>
                                              <Phone className="w-3 h-3 mr-1" />
-                                             {candidateContacts.length > 1 ? `Call ${contactIndex + 1}` : 'Call Log'}
+                                             {candidateContacts.length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}
                                            </Link>
                                         </Button>
                                       ))}
