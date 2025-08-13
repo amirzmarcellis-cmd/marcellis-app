@@ -44,6 +44,7 @@ export default function CallLogDetails() {
   const [searchParams] = useSearchParams()
   const candidateId = searchParams.get('candidate')
   const jobId = searchParams.get('job')
+  const callid = searchParams.get('callid')
   const navigate = useNavigate()
   const [callLog, setCallLog] = useState<CallLogDetail | null>(null)
   const [loading, setLoading] = useState(true)
@@ -68,15 +69,30 @@ export default function CallLogDetails() {
 
   useEffect(() => {
     fetchCallLogDetail()
-  }, [candidateId, jobId])
+  }, [candidateId, jobId, callid])
 
   const fetchCallLogDetail = async () => {
     try {
-      const { data, error } = await supabase
-        .from('Jobs_CVs')
-        .select('*')
-        .or(`and(candidate_id.eq.${candidateId},job_id.eq.${jobId}),and("Candidate_ID".eq.${candidateId},"Job ID".eq.${jobId}),and("Candidate_ID".eq.${candidateId},job_id.eq.${jobId}),and(candidate_id.eq.${candidateId},"Job ID".eq.${jobId})`)
-        .maybeSingle()
+      let data: any = null
+      let error: any = null
+
+      if (callid) {
+        const resp = await supabase
+          .from('Jobs_CVs')
+          .select('*')
+          .eq('callid', callid)
+          .maybeSingle()
+        data = resp.data
+        error = resp.error
+      } else {
+        const resp = await supabase
+          .from('Jobs_CVs')
+          .select('*')
+          .or(`and(candidate_id.eq.${candidateId},job_id.eq.${jobId}),and("Candidate_ID".eq.${candidateId},"Job ID".eq.${jobId}),and("Candidate_ID".eq.${candidateId},job_id.eq.${jobId}),and(candidate_id.eq.${candidateId},"Job ID".eq.${jobId})`)
+          .maybeSingle()
+        data = resp.data
+        error = resp.error
+      }
 
       if (error) throw error
       
@@ -86,10 +102,11 @@ export default function CallLogDetails() {
         return
       }
 
+      const jobIdForLookup = (data as any)?.job_id ?? (data as any)?.["Job ID"] ?? jobId
       const { data: jobData } = await supabase
         .from('Jobs')
         .select('*')
-        .or(`job_id.eq.${jobId},"Job ID".eq.${jobId}`)
+        .or(`job_id.eq.${jobIdForLookup},"Job ID".eq.${jobIdForLookup}`)
         .maybeSingle()
 
       const enrichedData: CallLogDetail = {
@@ -131,10 +148,16 @@ export default function CallLogDetails() {
     
     setSaving(true)
     try {
-      const { error } = await supabase
+      let updateQuery: any = supabase
         .from('Jobs_CVs')
         .update({ 'Notes': notes })
-        .or(`and(candidate_id.eq.${candidateId},job_id.eq.${jobId}),and("Candidate_ID".eq.${candidateId},"Job ID".eq.${jobId}),and("Candidate_ID".eq.${candidateId},job_id.eq.${jobId}),and(candidate_id.eq.${candidateId},"Job ID".eq.${jobId})`)
+      if (callid) {
+        updateQuery = updateQuery.eq('callid', callid)
+      } else {
+        updateQuery = updateQuery.or(`and(candidate_id.eq.${candidateId},job_id.eq.${jobId}),and("Candidate_ID".eq.${candidateId},"Job ID".eq.${jobId}),and("Candidate_ID".eq.${candidateId},job_id.eq.${jobId}),and(candidate_id.eq.${candidateId},"Job ID".eq.${jobId})`)
+      }
+
+      const { error } = await updateQuery
 
       if (error) throw error
       

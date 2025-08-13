@@ -906,7 +906,7 @@ export default function JobDetails() {
                                             asChild
                                             className="flex-1 min-w-[100px]"
                                           >
-                                           <Link to={`/call-log-details?candidate=${candidateId}&job=${id}`}>
+                                           <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${contact.callid}`}>
                                              <Phone className="w-3 h-3 mr-1" />
                                              {candidateContacts.length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}
                                            </Link>
@@ -1050,7 +1050,7 @@ export default function JobDetails() {
                                           asChild
                                           className="flex-1 min-w-[100px]"
                                         >
-                                           <Link to={`/call-log-details?candidate=${candidateId}&job=${id}`}>
+                                           <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${contact.callid}`}>
                                              <Phone className="w-3 h-3 mr-1" />
                                              {candidateContacts.length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}
                                            </Link>
