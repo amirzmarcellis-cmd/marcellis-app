@@ -182,11 +182,37 @@ export default function Apply() {
         cv_summary: cleanText(`Salary Expectations: ${data.salaryExpectations} AED/month, Notice Period: ${data.noticePeriod} days`),
       };
 
-      const { error } = await supabase
+      // Try primary (snake_case) insert first, then legacy shape as fallback
+      const { error: primaryError } = await supabase
         .from("CVs")
         .insert([cvData]);
 
-      if (error) throw error;
+      if (primaryError) {
+        console.error("Primary insert failed, retrying with legacy columns:", primaryError);
+        const legacyCvData = {
+          "Cadndidate_ID": candidateId,
+          "Title": cleanText(data.title),
+          "First Name": cleanText(data.fullName.split(" ")[0] || ""),
+          "Last Name": cleanText(data.fullName.split(" ").slice(1).join(" ") || ""),
+          "Phone Number": cleanText(data.phoneNumber),
+          "Email": cleanText(data.email),
+          "Applied for": [data.jobApplied],
+          "CV_Link": cleanText(cvFile),
+          "cv_text": cleanText(cvText),
+          "Linkedin": cleanText(data.portfolioLink || ""),
+          "Other Notes": cleanText(data.notes || ""),
+          "Timestamp": new Date().toISOString(),
+          "Experience": cleanText(`Agency: ${data.agencyExperience}, Overall: ${data.overallExperience}`),
+          "Location": cleanText(data.currentLocation),
+          "CV Summary": cleanText(`Salary Expectations: ${data.salaryExpectations} AED/month, Notice Period: ${data.noticePeriod} days`),
+        } as any;
+
+        const { error: fallbackError } = await supabase
+          .from("CVs")
+          .insert([legacyCvData]);
+
+        if (fallbackError) throw fallbackError;
+      }
 
       toast({
         title: "Application Submitted",
