@@ -170,9 +170,9 @@ export default function CallLogDetails() {
   const scoreColorClass = score >= 80 ? "text-primary" : score >= 50 ? "text-foreground" : "text-destructive"
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-4 sm:p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center space-x-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-start gap-3 mb-6">
         <Button variant="outline" onClick={() => navigate('/jobs')}>
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Jobs

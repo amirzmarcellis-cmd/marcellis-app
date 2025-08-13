@@ -226,7 +226,7 @@ export default function LiveCandidateFeed() {
                 <SelectTrigger className="bg-black/20 border-pink-400/30 text-white focus:border-pink-400">
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-pink-400/30 backdrop-blur-xl">
+                <SelectContent className="bg-slate-800 border-pink-400/30 backdrop-blur-xl z-50">
                   <SelectItem value="all" className="text-white hover:bg-pink-600/20">All Candidates</SelectItem>
                   <SelectItem value="high-score" className="text-white hover:bg-pink-600/20">High Score (74+)</SelectItem>
                   <SelectItem value="contacted" className="text-white hover:bg-pink-600/20">Contacted</SelectItem>
@@ -241,7 +241,7 @@ export default function LiveCandidateFeed() {
                 <SelectTrigger className="bg-black/20 border-emerald-400/30 text-white focus:border-emerald-400">
                   <SelectValue placeholder="All Scores" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-emerald-400/30 backdrop-blur-xl">
+                <SelectContent className="bg-slate-800 border-emerald-400/30 backdrop-blur-xl z-50">
                   <SelectItem value="all" className="text-white hover:bg-emerald-600/20">All Scores</SelectItem>
                   <SelectItem value="high" className="text-white hover:bg-emerald-600/20">Excellent (75+)</SelectItem>
                   <SelectItem value="medium" className="text-white hover:bg-emerald-600/20">Good (50-74)</SelectItem>
@@ -271,7 +271,7 @@ export default function LiveCandidateFeed() {
           </div>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[600px] pr-4">
+          <ScrollArea className="h-[60vh] md:h-[600px] pr-0 md:pr-4">
             <div className="space-y-4">
               {sortedCandidates.map((candidate, index) => {
                 const score = parseFloat(candidate['Success Score']) || 0;

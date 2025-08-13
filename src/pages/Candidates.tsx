@@ -153,7 +153,7 @@ export default function Candidates() {
               <SelectTrigger className="w-[200px] bg-background/50 border-glass-border">
                 <SelectValue placeholder="Job Title" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background border-glass-border z-50">
                 <SelectItem value="all">All Job Titles</SelectItem>
                 {uniqueJobTitles.map(jobTitle => (
                   <SelectItem key={jobTitle} value={jobTitle}>{jobTitle}</SelectItem>
