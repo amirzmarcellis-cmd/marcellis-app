@@ -10,8 +10,10 @@ import { Loader2, Phone } from 'lucide-react';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
 import defaultLogo from '@/assets/default-logo.png';
 import { MissionBackground } from '@/components/layout/MissionBackground';
+import { useTheme } from 'next-themes';
 export default function Auth() {
   const { settings } = useAppSettings();
+  const { theme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
@@ -68,7 +70,9 @@ export default function Auth() {
               <div className="flex items-center justify-center">
                 <div className="w-48 h-48 flex items-center justify-center">
                   <img 
-                    src={settings.logo || defaultLogo} 
+                    src={theme === 'dark' 
+                      ? (settings.logoLight || settings.logo || defaultLogo)
+                      : (settings.logoDark || settings.logo || defaultLogo)} 
                     alt="Company Logo" 
                     className="w-full h-full object-contain rounded-lg"
                   />

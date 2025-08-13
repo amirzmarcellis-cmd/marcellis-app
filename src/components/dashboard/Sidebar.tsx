@@ -73,15 +73,20 @@ export function DashboardSidebar() {
         <div className="p-6 border-b border-border">
           <div className="flex items-center justify-center">
             <div className={`${isMini ? 'w-12 h-12' : 'w-32 h-32'} flex items-center justify-center transition-all duration-200`}>
-              {settings.logo ? (
-                <img 
-                  src={settings.logo} 
-                  alt="Company Logo" 
-                  className="w-full h-full object-contain rounded-lg"
-                />
-              ) : (
-                <Phone className={`${isMini ? 'w-8 h-8' : 'w-16 h-16'} text-primary`} />
-              )}
+              {(() => {
+                const displayLogo = theme === 'dark'
+                  ? (settings.logoLight || settings.logo || settings.primaryColor)
+                  : (settings.logoDark || settings.logo || settings.primaryColor);
+                return displayLogo ? (
+                  <img 
+                    src={displayLogo as string}
+                    alt="Company Logo" 
+                    className="w-full h-full object-contain rounded-lg"
+                  />
+                ) : (
+                  <Phone className={`${isMini ? 'w-8 h-8' : 'w-16 h-16'} text-primary`} />
+                );
+              })()}
             </div>
           </div>
         </div>

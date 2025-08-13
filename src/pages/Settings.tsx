@@ -7,22 +7,37 @@ import { Upload, Settings as SettingsIcon, Palette } from "lucide-react"
 import { useState } from "react"
 import { useAppSettings } from "@/contexts/AppSettingsContext"
 import { toast } from "sonner"
+import { useTheme } from "next-themes"
 
 export default function Settings() {
   const { settings, updateSettings } = useAppSettings();
   const [systemName, setSystemName] = useState(settings.systemName)
   const [primaryColor, setPrimaryColor] = useState(settings.primaryColor)
-  const [logo, setLogo] = useState<File | null>(null)
+  const [lightLogo, setLightLogo] = useState<File | null>(null)
+  const [darkLogo, setDarkLogo] = useState<File | null>(null)
+  const { theme } = useTheme()
 
-  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLightLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      setLogo(file)
-      // Convert file to base64 for storage
+      setLightLogo(file)
       const reader = new FileReader()
       reader.onload = (e) => {
         const result = e.target?.result as string
-        updateSettings({ logo: result })
+        updateSettings({ logoLight: result })
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleDarkLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      setDarkLogo(file)
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const result = e.target?.result as string
+        updateSettings({ logoDark: result })
       }
       reader.readAsDataURL(file)
     }
@@ -59,38 +74,73 @@ export default function Settings() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Logo Upload */}
-              <div className="space-y-2">
-                <Label htmlFor="logo">System Logo</Label>
-                <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 rounded-lg bg-gradient-primary flex items-center justify-center">
-                  {settings.logo ? (
-                    <img 
-                      src={settings.logo} 
-                      alt="Logo preview" 
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  ) : logo ? (
-                    <img 
-                      src={URL.createObjectURL(logo)} 
-                      alt="Logo preview" 
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  ) : (
-                    <Upload className="w-6 h-6 text-white" />
-                  )}
+              {/* Logo Uploads */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {/* Light Logo (used in Dark mode) */}
+                <div className="space-y-2">
+                  <Label htmlFor="logoLight">Light Logo (used in Dark Mode)</Label>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 rounded-lg bg-gradient-primary flex items-center justify-center">
+                      {settings.logoLight ? (
+                        <img
+                          src={settings.logoLight}
+                          alt="Light logo preview"
+                          className="w-full h-full object-contain rounded-lg"
+                        />
+                      ) : lightLogo ? (
+                        <img
+                          src={URL.createObjectURL(lightLogo)}
+                          alt="Light logo preview"
+                          className="w-full h-full object-contain rounded-lg"
+                        />
+                      ) : (
+                        <Upload className="w-6 h-6 text-white" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <Input
+                        id="logoLight"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLightLogoUpload}
+                        className="bg-background/50 border-glass-border"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">Recommended: 64x64px, PNG or SVG</p>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <Input
-                      id="logo"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleLogoUpload}
-                      className="bg-background/50 border-glass-border"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Recommended: 64x64px, PNG or SVG format
-                    </p>
+                </div>
+
+                {/* Dark Logo (used in Light mode) */}
+                <div className="space-y-2">
+                  <Label htmlFor="logoDark">Dark Logo (used in Light Mode)</Label>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 rounded-lg bg-gradient-primary flex items-center justify-center">
+                      {settings.logoDark ? (
+                        <img
+                          src={settings.logoDark}
+                          alt="Dark logo preview"
+                          className="w-full h-full object-contain rounded-lg"
+                        />
+                      ) : darkLogo ? (
+                        <img
+                          src={URL.createObjectURL(darkLogo)}
+                          alt="Dark logo preview"
+                          className="w-full h-full object-contain rounded-lg"
+                        />
+                      ) : (
+                        <Upload className="w-6 h-6 text-white" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <Input
+                        id="logoDark"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleDarkLogoUpload}
+                        className="bg-background/50 border-glass-border"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">Recommended: 64x64px, PNG or SVG</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -177,21 +227,20 @@ export default function Settings() {
                     className="w-10 h-10 rounded-lg flex items-center justify-center"
                     style={{ backgroundColor: primaryColor }}
                   >
-                    {settings.logo ? (
-                      <img 
-                        src={settings.logo} 
-                        alt="Logo" 
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    ) : logo ? (
-                      <img 
-                        src={URL.createObjectURL(logo)} 
-                        alt="Logo" 
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    ) : (
-                      <Upload className="w-5 h-5 text-white" />
-                    )}
+                    {(() => {
+                      const previewSrc = theme === 'dark'
+                        ? (settings.logoLight || (lightLogo ? URL.createObjectURL(lightLogo) : ''))
+                        : (settings.logoDark || (darkLogo ? URL.createObjectURL(darkLogo) : ''));
+                      return previewSrc ? (
+                        <img
+                          src={previewSrc}
+                          alt="Logo"
+                          className="w-full h-full object-contain rounded-lg"
+                        />
+                      ) : (
+                        <Upload className="w-5 h-5 text-white" />
+                      );
+                    })()}
                   </div>
                   <h3 className="font-semibold text-lg">{systemName}</h3>
                 </div>

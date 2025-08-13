@@ -1,7 +1,9 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface AppSettings {
-  logo: string | null;
+  logo?: string | null; // deprecated, kept for backward compatibility
+  logoLight?: string | null; // for dark mode (light logo)
+  logoDark?: string | null;  // for light mode (dark logo)
   systemName: string;
   primaryColor: string;
   motion?: 'auto' | 'high' | 'low';
@@ -16,6 +18,8 @@ const AppSettingsContext = createContext<AppSettingsContextType | undefined>(und
 
 const DEFAULT_SETTINGS: AppSettings = {
   logo: "/lovable-uploads/a03c55f4-3de8-4dda-ba14-2e39d9d68b67.png",
+  logoLight: "/lovable-uploads/a03c55f4-3de8-4dda-ba14-2e39d9d68b67.png",
+  logoDark: "/lovable-uploads/a03c55f4-3de8-4dda-ba14-2e39d9d68b67.png",
   systemName: "Onyx - Marc Ellis",
   primaryColor: "#00FFFF", // Cyan color
   motion: 'auto',
@@ -30,7 +34,13 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
     if (savedSettings) {
       try {
         const parsed = JSON.parse(savedSettings);
-        setSettings(prev => ({ ...prev, ...parsed }));
+        // Backward compatibility: if only legacy `logo` exists, use it for both variants
+        const migrated = {
+          ...parsed,
+          logoLight: parsed.logoLight ?? parsed.logo ?? DEFAULT_SETTINGS.logoLight,
+          logoDark: parsed.logoDark ?? parsed.logo ?? DEFAULT_SETTINGS.logoDark,
+        };
+        setSettings(prev => ({ ...prev, ...migrated }));
       } catch (error) {
         console.error('Failed to parse saved settings:', error);
       }
