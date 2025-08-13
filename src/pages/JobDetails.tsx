@@ -111,10 +111,21 @@ export default function JobDetails() {
           "Client Description": (data as any).client_description ?? (data as any)["Client Description"],
           "Job Location": (data as any).job_location ?? (data as any)["Job Location"],
           "Job Salary Range (ex: 15000 AED)": (data as any).job_salary_range ?? (data as any)["Job Salary Range (ex: 15000 AED)"],
+          "Job Description": (data as any).job_description ?? (data as any)["Job Description"],
+          "JD Summary": (data as any).jd_summary ?? (data as any)["JD Summary"],
+          "Things to look for": (data as any).things_to_look_for ?? (data as any)["Things to look for"],
+          "Type": (data as any).Type ?? (data as any)["Type"],
+          "Contract Length": (data as any).contract_length ?? (data as any)["Contract Length"],
+          "Notice Period": (data as any).notice_period ?? (data as any)["Notice Period"],
+          "Nationality to include": (data as any).nationality_to_include ?? (data as any)["Nationality to include"],
+          "Nationality to Exclude": (data as any).nationality_to_exclude ?? (data as any)["Nationality to Exclude"],
           Processed: (data as any).Processed ?? (data as any).processed ?? (data as any).Processed,
           Currency: (data as any).Currency ?? (data as any).currency ?? null,
           Timestamp: (data as any).Timestamp ?? (data as any).timestamp ?? null,
           longlist: (data as any).longlist ?? 0,
+          assignment: (data as any).assignment ?? (data as any)["assignment"] ?? null,
+          musttohave: (data as any).musttohave ?? (data as any)["musttohave"] ?? null,
+          nicetohave: (data as any).nicetohave ?? (data as any)["nicetohave"] ?? null,
         } as any;
         setJob(legacy)
       } else {
@@ -418,7 +429,7 @@ export default function JobDetails() {
 
   // Get CV status for a candidate
   const getCandidateStatus = (candidateId: string) => {
-    const cvRecord = cvData.find(cv => cv['Cadndidate_ID'] === candidateId)
+    const cvRecord = cvData.find(cv => cv['candidate_id'] === candidateId)
     return cvRecord?.['CandidateStatus'] || null
   }
 
