@@ -239,7 +239,7 @@ export type Database = {
           client_description: string | null
           contract_length: string | null
           Currency: string | null
-          "JD Summary": string | null
+          jd_summary: string | null
           job_description: string | null
           job_id: string
           job_location: string | null
@@ -261,7 +261,7 @@ export type Database = {
           client_description?: string | null
           contract_length?: string | null
           Currency?: string | null
-          "JD Summary"?: string | null
+          jd_summary?: string | null
           job_description?: string | null
           job_id: string
           job_location?: string | null
@@ -283,7 +283,7 @@ export type Database = {
           client_description?: string | null
           contract_length?: string | null
           Currency?: string | null
-          "JD Summary"?: string | null
+          jd_summary?: string | null
           job_description?: string | null
           job_id?: string
           job_location?: string | null

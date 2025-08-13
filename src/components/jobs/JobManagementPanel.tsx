@@ -10,16 +10,16 @@ import { useToast } from "@/components/ui/use-toast";
 import { JobDialog } from "./JobDialog";
 
 interface Job {
-  "Job ID": string;
-  "Job Title": string | null;
-  "Job Description": string | null;
-  "Client Description": string | null;
-  "Job Location": string | null;
-  "Job Salary Range (ex: 15000 AED)": string | null;
-  "Currency"?: string | null;
-  "Processed": string | null;
-  "Things to look for": string | null;
-  "JD Summary": string | null;
+  job_id: string;
+  job_title: string | null;
+  job_description: string | null;
+  client_description: string | null;
+  job_location: string | null;
+  job_salary_range: string | null;
+  Currency?: string | null;
+  Processed: string | null;
+  things_to_look_for: string | null;
+  jd_summary: string | null;
   musttohave?: string | null;
   nicetohave?: string | null;
   Timestamp: string | null;
@@ -65,7 +65,7 @@ export function JobManagementPanel() {
       const { error } = await supabase
         .from('Jobs')
         .update({ Processed: newStatus })
-        .eq('Job ID', jobId);
+        .eq('job_id', jobId);
 
       if (error) throw error;
       
@@ -91,7 +91,7 @@ export function JobManagementPanel() {
       const { error } = await supabase
         .from('Jobs')
         .delete()
-        .eq('Job ID', jobId);
+        .eq('job_id', jobId);
 
       if (error) throw error;
       
@@ -268,17 +268,17 @@ const { toast } = useToast();
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {jobs.map((job) => (
-        <Card key={job["Job ID"]} className="mission-card group">
+        <Card key={job.job_id} className="mission-card group">
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <CardTitle className="text-lg font-semibold line-clamp-2 mb-2">
-                  {job["Job Title"] || "Untitled Position"}
+                  {job.job_title || "Untitled Position"}
                 </CardTitle>
                 <div className="flex items-center space-x-2">
                   {getStatusBadge(job.Processed)}
                   <Badge variant="outline" className="text-xs">
-                    ID: {job["Job ID"]}
+                    ID: {job.job_id}
                   </Badge>
                 </div>
               </div>
@@ -287,31 +287,31 @@ const { toast } = useToast();
           
           <CardContent className="space-y-4">
             <div className="space-y-2 text-sm">
-              {job["Job Location"] && (
+              {job.job_location && (
                 <div className="flex items-center text-muted-foreground">
                   <MapPin className="h-4 w-4 mr-2 text-cyan" />
-                  {job["Job Location"]}
+                  {job.job_location}
                 </div>
               )}
               
-{job["Job Salary Range (ex: 15000 AED)"] && (
+              {job.job_salary_range && (
                 <div className="flex items-center text-muted-foreground">
                   <Banknote className="h-4 w-4 mr-2 text-green" />
-                  {formatCurrency(job["Job Salary Range (ex: 15000 AED)"], job["Currency"] as string | null)}
+                  {formatCurrency(job.job_salary_range, job["Currency"] as string | null)}
                 </div>
               )}
               
-              {job["Client Description"] && (
+              {job.client_description && (
                 <div className="flex items-center text-muted-foreground">
                   <Building2 className="h-4 w-4 mr-2 text-blue" />
-                  <span className="line-clamp-1">{job["Client Description"]}</span>
+                  <span className="line-clamp-1">{job.client_description}</span>
                 </div>
               )}
             </div>
 
-            {job["JD Summary"] && (
+            {job.jd_summary && (
               <p className="text-sm text-muted-foreground line-clamp-3">
-                {job["JD Summary"]}
+                {job.jd_summary}
               </p>
             )}
 
@@ -320,7 +320,7 @@ const { toast } = useToast();
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)}
+                  onClick={() => navigate(`/jobs/edit/${job.job_id}`)}
                   className="h-8 px-2"
                 >
                   <Edit className="h-3 w-3" />
@@ -328,7 +328,7 @@ const { toast } = useToast();
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => onStatusToggle(job["Job ID"], job.Processed)}
+                  onClick={() => onStatusToggle(job.job_id, job.Processed)}
                   className="h-8 px-2"
                 >
                   {job.Processed === "Yes" ? (
