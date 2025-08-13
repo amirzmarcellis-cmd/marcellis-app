@@ -72,7 +72,7 @@ export function DashboardSidebar() {
         {/* Header */}
         <div className="p-6 border-b border-border">
           <div className="flex items-center justify-center">
-            <div className={`${isMini ? 'w-12 h-12' : 'w-32 h-32'} flex items-center justify-center transition-all duration-200`}>
+            <div className={`${isMini ? 'w-16 h-16' : 'w-40 h-40'} flex items-center justify-center transition-all duration-200`}>
               {(() => {
                 const displayLogo = theme === 'dark'
                   ? (settings.logoLight || settings.logo || settings.primaryColor)
@@ -84,7 +84,7 @@ export function DashboardSidebar() {
                     className="w-full h-full object-contain rounded-lg"
                   />
                 ) : (
-                  <Phone className={`${isMini ? 'w-8 h-8' : 'w-16 h-16'} text-primary`} />
+                  <Phone className={`${isMini ? 'w-10 h-10' : 'w-20 h-20'} text-primary`} />
                 );
               })()}
             </div>
