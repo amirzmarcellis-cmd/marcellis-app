@@ -365,8 +365,14 @@ export default function JobDetails() {
     
     let contactedMatch = true
     if (contactedFilter !== "all") {
-      const contacted = candidate["Contacted"] || ""
-      contactedMatch = contacted === contactedFilter
+      const raw = (candidate["Contacted"] || "").toString().trim()
+      const norm = raw.toLowerCase()
+      if (contactedFilter === "Not Contacted") {
+        // Treat empty/undefined and case variations as "Not Contacted"
+        contactedMatch = raw === "" || norm === "not contacted"
+      } else {
+        contactedMatch = norm === contactedFilter.toLowerCase()
+      }
     }
     
     return nameMatch && emailMatch && phoneMatch && scoreMatch && contactedMatch
