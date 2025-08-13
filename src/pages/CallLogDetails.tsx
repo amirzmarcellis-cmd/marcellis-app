@@ -75,7 +75,7 @@ export default function CallLogDetails() {
       const { data, error } = await supabase
         .from('Jobs_CVs')
         .select('*')
-        .or(`and(candidate_id.eq.${candidateId},job_id.eq.${jobId}),and("Candidate_ID".eq.${candidateId},"Job ID".eq.${jobId})`)
+        .or(`and(candidate_id.eq.${candidateId},job_id.eq.${jobId}),and("Candidate_ID".eq.${candidateId},"Job ID".eq.${jobId}),and("Candidate_ID".eq.${candidateId},job_id.eq.${jobId}),and(candidate_id.eq.${candidateId},"Job ID".eq.${jobId})`)
         .maybeSingle()
 
       if (error) throw error
@@ -134,7 +134,7 @@ export default function CallLogDetails() {
       const { error } = await supabase
         .from('Jobs_CVs')
         .update({ 'Notes': notes })
-        .or(`and(candidate_id.eq.${candidateId},job_id.eq.${jobId}),and("Candidate_ID".eq.${candidateId},"Job ID".eq.${jobId})`)
+        .or(`and(candidate_id.eq.${candidateId},job_id.eq.${jobId}),and("Candidate_ID".eq.${candidateId},"Job ID".eq.${jobId}),and("Candidate_ID".eq.${candidateId},job_id.eq.${jobId}),and(candidate_id.eq.${candidateId},"Job ID".eq.${jobId})`)
 
       if (error) throw error
       
