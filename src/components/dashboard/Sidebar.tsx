@@ -20,6 +20,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 import {
   Sidebar,
@@ -52,6 +53,8 @@ export function DashboardSidebar() {
   const location = useLocation()
   const currentPath = location.pathname
   const isCollapsed = state === "collapsed"
+  const isMobile = useIsMobile()
+  const isMini = isCollapsed && !isMobile
 
   const isActive = (path: string) => currentPath === path
   const hasActiveItem = navigationItems.some((item) => isActive(item.url))
@@ -63,13 +66,13 @@ export function DashboardSidebar() {
   return (
     <Sidebar
       className="border-r border-border bg-card/50 backdrop-blur-sm"
-      collapsible="icon"
+      collapsible={isMobile ? "offcanvas" : "icon"}
     >
       <SidebarContent className="bg-transparent">
         {/* Header */}
         <div className="p-6 border-b border-border">
           <div className="flex items-center justify-center">
-            <div className={`${isCollapsed ? 'w-12 h-12' : 'w-32 h-32'} flex items-center justify-center transition-all duration-200`}>
+            <div className={`${isMini ? 'w-12 h-12' : 'w-32 h-32'} flex items-center justify-center transition-all duration-200`}>
               {settings.logo ? (
                 <img 
                   src={settings.logo} 
@@ -77,14 +80,14 @@ export function DashboardSidebar() {
                   className="w-full h-full object-contain rounded-lg"
                 />
               ) : (
-                <Phone className={`${isCollapsed ? 'w-8 h-8' : 'w-16 h-16'} text-primary`} />
+                <Phone className={`${isMini ? 'w-8 h-8' : 'w-16 h-16'} text-primary`} />
               )}
             </div>
           </div>
         </div>
 
         <SidebarGroup className="flex-1">
-          <SidebarGroupLabel className={isCollapsed ? "sr-only" : ""}>
+          <SidebarGroupLabel className={isMini ? "sr-only" : ""}>
             Navigation
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -101,13 +104,13 @@ export function DashboardSidebar() {
                             ? "bg-primary text-primary-foreground shadow-medium"
                             : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         }
-                        ${isCollapsed ? "justify-center" : ""}
+                        ${isMini ? "justify-center" : ""}
                       `}
                     >
                       <item.icon 
-                        className={`w-5 h-5 ${isCollapsed ? "" : "mr-3"}`} 
+                        className={`w-5 h-5 ${isMini ? "" : "mr-3"}`} 
                       />
-                      {!isCollapsed && (
+                      {!isMini && (
                         <span className="font-medium">{item.title}</span>
                       )}
                     </Link>
@@ -120,7 +123,7 @@ export function DashboardSidebar() {
 
         {/* Status indicator and sign out */}
         <div className="p-4 border-t border-border space-y-3">
-          {!isCollapsed && (
+          {!isMini && (
             <>
               <div className="flex items-center space-x-2 text-sm">
                 <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
@@ -151,7 +154,7 @@ export function DashboardSidebar() {
               </Button>
             </>
           )}
-          {isCollapsed && (
+          {isMini && (
             <div className="flex flex-col items-center space-y-3">
               <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
               
