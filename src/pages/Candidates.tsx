@@ -138,7 +138,7 @@ export default function Candidates() {
         </div>
 
         {/* Filters */}
-        <Card className="p-6 bg-gradient-card backdrop-blur-glass border-glass-border">
+        <Card className="p-6 bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass">
           <div className="flex flex-wrap gap-4">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -146,14 +146,14 @@ export default function Candidates() {
                 placeholder="Search candidates..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-background/50 border-glass-border"
+                className="pl-10 bg-background/50 border-border"
               />
             </div>
             <Select value={jobTitleFilter} onValueChange={setJobTitleFilter}>
-              <SelectTrigger className="w-[200px] bg-background/50 border-glass-border">
+              <SelectTrigger className="w-[200px] bg-background/50 border-border">
                 <SelectValue placeholder="Job Title" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background border-border z-50">
                 <SelectItem value="all">All Job Titles</SelectItem>
                 {uniqueJobTitles.map(jobTitle => (
                   <SelectItem key={jobTitle} value={jobTitle}>{jobTitle}</SelectItem>
@@ -164,7 +164,7 @@ export default function Candidates() {
         </Card>
 
         {/* Candidates Table */}
-        <Card className="bg-gradient-card backdrop-blur-glass border-glass-border shadow-card">
+        <Card className="bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass shadow-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="w-5 h-5" />
@@ -175,7 +175,7 @@ export default function Candidates() {
             <div className="w-full overflow-x-auto">
               <Table className="min-w-[800px]">
                 <TableHeader>
-                  <TableRow className="border-glass-border">
+                  <TableRow className="border-border">
                     <TableHead>Candidate</TableHead>
                     <TableHead>Position</TableHead>
                     <TableHead>Status</TableHead>
@@ -204,7 +204,7 @@ export default function Candidates() {
                       const skills = candidate.Skills ? candidate.Skills.split(',').map(s => s.trim()) : []
                       
                       return (
-                        <TableRow key={candidate["Cadndidate_ID"]} className="border-glass-border hover:bg-glass-primary transition-colors">
+                        <TableRow key={candidate["Cadndidate_ID"]} className="border-border hover:bg-glass-primary transition-colors">
                           <TableCell>
                             <div className="flex items-center space-x-3">
                               <Avatar className="w-10 h-10">

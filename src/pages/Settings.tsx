@@ -147,13 +147,13 @@ export default function Settings() {
                     <button
                       key={color}
                       className={`relative w-10 h-10 rounded-lg border-2 hover:scale-110 transition-all duration-200 hover:shadow-lg ${
-                        primaryColor === color ? 'border-white shadow-white/30 shadow-md' : 'border-glass-border'
+                        primaryColor === color ? 'border-border shadow-primary/30 shadow-md' : 'border-glass-border'
                       }`}
                       style={{ backgroundColor: color }}
                       onClick={() => handleColorChange(color)}
                     >
                       {primaryColor === color && (
-                        <div className="absolute inset-0 rounded-lg border-2 border-white animate-pulse" />
+                        <div className="absolute inset-0 rounded-lg border-2 border-primary animate-pulse" />
                       )}
                     </button>
                   ))}

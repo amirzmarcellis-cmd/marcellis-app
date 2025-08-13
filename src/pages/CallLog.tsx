@@ -213,7 +213,7 @@ export default function CallLog() {
         </div>
 
         {/* Filters */}
-        <Card className="p-6 bg-gradient-card backdrop-blur-glass border-glass-border">
+        <Card className="p-6 bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass">
           <div className="flex flex-wrap gap-4">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -221,14 +221,14 @@ export default function CallLog() {
                 placeholder="Search calls..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-background/50 border-glass-border"
+                className="pl-10 bg-background/50 border-border"
               />
             </div>
             <Select value={jobFilter} onValueChange={setJobFilter}>
-              <SelectTrigger className="w-[200px] bg-background/50 border-glass-border">
+              <SelectTrigger className="w-[200px] bg-background/50 border-border">
                 <SelectValue placeholder="Job" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background border-border z-50">
                 <SelectItem value="all">All Jobs</SelectItem>
                 {jobs.map((job) => (
                   <SelectItem key={job["Job ID"]} value={job["Job ID"]}>
@@ -238,10 +238,10 @@ export default function CallLog() {
               </SelectContent>
             </Select>
             <Select value={contactedFilter} onValueChange={setContactedFilter}>
-              <SelectTrigger className="w-[150px] bg-background/50 border-glass-border">
+              <SelectTrigger className="w-[150px] bg-background/50 border-border">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
-              <SelectContent className="bg-background border-glass-border backdrop-blur-sm z-50">
+              <SelectContent className="bg-background border-border z-50">
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="not-contacted">Not Contacted</SelectItem>
                 <SelectItem value="ready-to-call">Ready to Call</SelectItem>
@@ -255,10 +255,10 @@ export default function CallLog() {
               </SelectContent>
             </Select>
             <Select value={scoreFilter} onValueChange={setScoreFilter}>
-              <SelectTrigger className="w-[150px] bg-background/50 border-glass-border">
+              <SelectTrigger className="w-[150px] bg-background/50 border-border">
                 <SelectValue placeholder="Score" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background border-border z-50">
                 <SelectItem value="all">All Scores</SelectItem>
                 <SelectItem value="high">+75</SelectItem>
                 <SelectItem value="medium">50-74</SelectItem>
@@ -269,7 +269,7 @@ export default function CallLog() {
         </Card>
 
         {/* Call Log Table */}
-        <Card className="bg-gradient-card backdrop-blur-glass border-glass-border shadow-card">
+        <Card className="bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass shadow-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Phone className="w-5 h-5" />
@@ -279,7 +279,7 @@ export default function CallLog() {
           <CardContent>
             <Table>
               <TableHeader>
-                <TableRow className="border-glass-border">
+                <TableRow className="border-border">
                   <TableHead>Candidate</TableHead>
                   <TableHead>Job</TableHead>
                   <TableHead>Contacted</TableHead>
@@ -311,7 +311,7 @@ export default function CallLog() {
                       .toUpperCase()
                     
                     return (
-                      <TableRow key={index} className="border-glass-border hover:bg-glass-primary transition-colors">
+                      <TableRow key={index} className="border-border hover:bg-glass-primary transition-colors">
                         <TableCell>
                           <div className="flex items-center space-x-3">
                             <Avatar className="w-10 h-10">
