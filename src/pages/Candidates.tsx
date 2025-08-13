@@ -172,7 +172,8 @@ export default function Candidates() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
+            <div className="w-full overflow-x-auto">
+              <Table className="min-w-[720px]">
               <TableHeader>
                 <TableRow className="border-glass-border">
                   <TableHead>Candidate</TableHead>
@@ -267,6 +268,7 @@ export default function Candidates() {
                 )}
               </TableBody>
             </Table>
+            </div>
           </CardContent>
         </Card>
       </div>

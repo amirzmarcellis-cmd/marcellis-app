@@ -277,7 +277,8 @@ export default function CallLog() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
+            <div className="w-full overflow-x-auto">
+              <Table className="min-w-[720px]">
               <TableHeader>
                 <TableRow className="border-glass-border">
                   <TableHead>Candidate</TableHead>
@@ -389,6 +390,7 @@ export default function CallLog() {
                 )}
               </TableBody>
             </Table>
+            </div>
           </CardContent>
         </Card>
       </div>
