@@ -70,9 +70,9 @@ export function DashboardSidebar() {
     >
       <SidebarContent className="bg-transparent">
         {/* Header */}
-        <div className="p-6 border-b border-border">
+        <div className="py-6 px-0 border-b border-border">
           <div className="flex items-center justify-center">
-            <div className={`${isMini ? 'w-16 h-16' : 'w-40 h-40'} flex items-center justify-center transition-all duration-200`}>
+            <div className={`${isMini ? 'w-full h-16' : 'w-full h-28'} flex items-center justify-center transition-all duration-200`}>
               {(() => {
                 const displayLogo = theme === 'dark'
                   ? (settings.logoLight || settings.logo || settings.primaryColor)
