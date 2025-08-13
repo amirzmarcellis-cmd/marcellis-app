@@ -273,8 +273,8 @@ export default function Analytics() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Analytics Dashboard</h1>
-            <p className="text-blue-200">Comprehensive recruitment performance insights</p>
+            <h1 className="text-4xl font-bold text-foreground mb-2">Analytics Dashboard</h1>
+            <p className="text-muted-foreground">Comprehensive recruitment performance insights</p>
           </div>
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
@@ -290,7 +290,7 @@ export default function Analytics() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-blue-200 text-sm font-medium">Total Candidates</p>
-                <p className="text-4xl font-bold text-white mt-2">{data?.totalCandidates || 0}</p>
+                <p className="text-4xl font-bold text-foreground mt-2">{data?.totalCandidates || 0}</p>
                 <p className="text-xs text-blue-300 mt-1">Active candidates in pipeline</p>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
@@ -305,7 +305,7 @@ export default function Analytics() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-blue-200 text-sm font-medium">Active Jobs</p>
-                <p className="text-4xl font-bold text-white mt-2">{data?.activeJobs || 0}</p>
+                <p className="text-4xl font-bold text-foreground mt-2">{data?.activeJobs || 0}</p>
                 <p className="text-xs text-blue-300 mt-1">Open job openings</p>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-xl flex items-center justify-center">
@@ -320,7 +320,7 @@ export default function Analytics() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-blue-200 text-sm font-medium">Total Call Logs</p>
-                <p className="text-4xl font-bold text-white mt-2">{data?.totalCallLogs || 0}</p>
+                <p className="text-4xl font-bold text-foreground mt-2">{data?.totalCallLogs || 0}</p>
                 <p className="text-xs text-cyan-300 mt-1">
                   <Badge className="bg-cyan-400/20 text-cyan-400 border-cyan-400/30">
                     {data?.contactedCount || 0} Contacted
@@ -339,7 +339,7 @@ export default function Analytics() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-blue-200 text-sm font-medium">Average Score</p>
-                <p className="text-4xl font-bold text-white mt-2">{data?.averageScore || 0}</p>
+                <p className="text-4xl font-bold text-foreground mt-2">{data?.averageScore || 0}</p>
                 <p className="text-xs text-blue-300 mt-1">/100</p>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center">
@@ -354,7 +354,7 @@ export default function Analytics() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-blue-200 text-sm font-medium">Avg Days to Hire</p>
-                <p className="text-4xl font-bold text-white mt-2">{data?.avgDaysToHire || 0}</p>
+                <p className="text-4xl font-bold text-foreground mt-2">{data?.avgDaysToHire || 0}</p>
                 <p className="text-xs text-blue-300 mt-1">days</p>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center">
@@ -370,7 +370,7 @@ export default function Analytics() {
         {/* Score Distribution */}
         <Card className="bg-white/10 backdrop-blur-md border-white/20">
           <CardHeader>
-            <CardTitle className="text-white flex items-center">
+            <CardTitle className="text-foreground flex items-center">
               <TrendingUp className="w-5 h-5 mr-2" />
               Score Distribution
             </CardTitle>
@@ -403,9 +403,9 @@ export default function Analytics() {
                         className="w-3 h-3 rounded-full mr-2" 
                         style={{ backgroundColor: item.color }}
                       ></div>
-                      <span className="text-white text-sm">{item.name}</span>
+                      <span className="text-foreground text-sm">{item.name}</span>
                     </div>
-                    <span className="text-white font-bold">{item.value}</span>
+                    <span className="text-foreground font-bold">{item.value}</span>
                   </div>
                 ))}
               </div>
@@ -416,7 +416,7 @@ export default function Analytics() {
         {/* Contact Status */}
         <Card className="bg-white/10 backdrop-blur-md border-white/20">
           <CardHeader>
-            <CardTitle className="text-white flex items-center">
+            <CardTitle className="text-foreground flex items-center">
               <PhoneCall className="w-5 h-5 mr-2" />
               Contact Status
             </CardTitle>
@@ -449,9 +449,9 @@ export default function Analytics() {
                         className="w-3 h-3 rounded-full mr-2" 
                         style={{ backgroundColor: item.color }}
                       ></div>
-                      <span className="text-white text-sm">{item.name}</span>
+                      <span className="text-foreground text-sm">{item.name}</span>
                     </div>
-                    <span className="text-white font-bold">{item.value}</span>
+                    <span className="text-foreground font-bold">{item.value}</span>
                   </div>
                 ))}
               </div>
@@ -465,7 +465,7 @@ export default function Analytics() {
         {/* Candidates per Job */}
         <Card className="bg-white/10 backdrop-blur-md border-white/20">
           <CardHeader>
-            <CardTitle className="text-white flex items-center">
+            <CardTitle className="text-foreground flex items-center">
               <Users className="w-5 h-5 mr-2" />
               Candidates per Job
             </CardTitle>
@@ -498,7 +498,7 @@ export default function Analytics() {
         {/* Top Performing Jobs */}
         <Card className="bg-white/10 backdrop-blur-md border-white/20">
           <CardHeader>
-            <CardTitle className="text-white flex items-center">
+            <CardTitle className="text-foreground flex items-center">
               <Star className="w-5 h-5 mr-2" />
               Top Performing Jobs
             </CardTitle>
@@ -516,7 +516,7 @@ export default function Analytics() {
                         #{job.rank}
                       </div>
                       <div>
-                        <p className="text-white font-medium text-sm">{job.jobTitle}</p>
+                        <p className="text-foreground font-medium text-sm">{job.jobTitle}</p>
                         <p className="text-blue-300 text-xs">{job.candidateCount} candidates</p>
                       </div>
                     </div>
@@ -536,7 +536,7 @@ export default function Analytics() {
         {/* Average Scores by Job */}
         <Card className="bg-white/10 backdrop-blur-md border-white/20">
           <CardHeader>
-            <CardTitle className="text-white flex items-center">
+            <CardTitle className="text-foreground flex items-center">
               <TrendingUp className="w-5 h-5 mr-2" />
               Average Scores by Job
             </CardTitle>
@@ -569,7 +569,7 @@ export default function Analytics() {
         {/* Average Salaries by Job */}
         <Card className="bg-white/10 backdrop-blur-md border-white/20">
           <CardHeader>
-            <CardTitle className="text-white flex items-center">
+            <CardTitle className="text-foreground flex items-center">
               <TrendingUp className="w-5 h-5 mr-2" />
               Average Salaries by Job
             </CardTitle>
@@ -607,7 +607,7 @@ export default function Analytics() {
           <CardContent className="p-6 text-center">
             <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
             <p className="text-green-400 text-sm font-medium">Call Success Rate</p>
-            <p className="text-4xl font-bold text-white mt-2">{data?.callSuccessRate || 0}%</p>
+            <p className="text-4xl font-bold text-foreground mt-2">{data?.callSuccessRate || 0}%</p>
             <p className="text-xs text-green-300 mt-1">Score +50</p>
           </CardContent>
         </Card>
@@ -616,7 +616,7 @@ export default function Analytics() {
           <CardContent className="p-6 text-center">
             <Phone className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
             <p className="text-cyan-400 text-sm font-medium">Contact Rate</p>
-            <p className="text-4xl font-bold text-white mt-2">{data?.contactRate || 0}%</p>
+            <p className="text-4xl font-bold text-foreground mt-2">{data?.contactRate || 0}%</p>
             <p className="text-xs text-cyan-300 mt-1">{data?.contactedCount || 0} of {data?.totalCandidates || 0}</p>
           </CardContent>
         </Card>
@@ -625,7 +625,7 @@ export default function Analytics() {
           <CardContent className="p-6 text-center">
             <Clock className="w-12 h-12 text-purple-400 mx-auto mb-4" />
             <p className="text-purple-400 text-sm font-medium">Avg Candidates/Job</p>
-            <p className="text-4xl font-bold text-white mt-2">{data?.avgCandidatesPerJob || 0}</p>
+            <p className="text-4xl font-bold text-foreground mt-2">{data?.avgCandidatesPerJob || 0}</p>
             <p className="text-xs text-purple-300 mt-1">Per job opening</p>
           </CardContent>
         </Card>

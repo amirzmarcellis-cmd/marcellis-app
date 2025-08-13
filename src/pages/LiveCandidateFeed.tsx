@@ -192,7 +192,7 @@ export default function LiveCandidateFeed() {
       {/* Enhanced Filters */}
       <Card className="mb-8 bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-xl border-white/20 shadow-2xl shadow-purple-500/10">
         <CardHeader>
-          <CardTitle className="text-white flex items-center">
+          <CardTitle className="text-foreground flex items-center">
             <Filter className="w-5 h-5 mr-2 text-cyan-400" />
             Advanced Filtering System
           </CardTitle>
@@ -207,14 +207,14 @@ export default function LiveCandidateFeed() {
                   placeholder="Name or position..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-black/20 border-cyan-400/30 text-white placeholder-gray-400 focus:border-cyan-400 focus:ring-cyan-400/20"
+                  className="pl-10 bg-black/20 border-cyan-400/30 text-foreground placeholder-muted-foreground focus:border-cyan-400 focus:ring-cyan-400/20"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-purple-300">Active Job</label>
-              <div className="flex items-center gap-2 bg-black/20 border border-purple-400/30 text-white px-3 py-2 rounded-md">
+              <div className="flex items-center gap-2 bg-black/20 border border-purple-400/30 text-foreground px-3 py-2 rounded-md">
                 <Briefcase className="w-4 h-4 text-purple-300" />
                 <span>{selectedJob === 'all' ? 'All Jobs' : (jobs.find(j => j['Job ID'] === selectedJob)?.['Job Title'] || '—')}</span>
               </div>
@@ -223,7 +223,7 @@ export default function LiveCandidateFeed() {
             <div className="space-y-2">
               <label className="text-sm font-medium text-purple-300">Status Filter</label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="bg-black/20 border-pink-400/30 text-white focus:border-pink-400">
+                <SelectTrigger className="bg-black/20 border-pink-400/30 text-foreground focus:border-pink-400">
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-pink-400/30 backdrop-blur-xl">
@@ -238,7 +238,7 @@ export default function LiveCandidateFeed() {
             <div className="space-y-2">
               <label className="text-sm font-medium text-purple-300">Score Range</label>
               <Select value={scoreFilter} onValueChange={setScoreFilter}>
-                <SelectTrigger className="bg-black/20 border-emerald-400/30 text-white focus:border-emerald-400">
+                <SelectTrigger className="bg-black/20 border-emerald-400/30 text-foreground focus:border-emerald-400">
                   <SelectValue placeholder="All Scores" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-emerald-400/30 backdrop-blur-xl">
@@ -257,7 +257,7 @@ export default function LiveCandidateFeed() {
       <Card className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border-white/20 shadow-2xl">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-2xl text-white flex items-center">
+            <CardTitle className="text-2xl text-foreground flex items-center">
               <Users className="w-6 h-6 mr-3 text-cyan-400" />
               Active Candidate Stream
               <Badge className="ml-4 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 text-cyan-300 border-cyan-400/40">
@@ -302,7 +302,7 @@ export default function LiveCandidateFeed() {
                       
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-xl font-bold text-white">{candidate['Candidate Name']}</h3>
+                          <h3 className="text-xl font-bold text-foreground">{candidate['Candidate Name']}</h3>
                           <div className="flex items-center space-x-2">
                             <StatusDropdown
                               currentStatus={candidate['Contacted']}
@@ -358,7 +358,7 @@ export default function LiveCandidateFeed() {
                     {/* Score Reason */}
                     <div className="bg-black/20 rounded-xl p-4 mb-4 border border-white/10">
                       <h4 className="text-cyan-300 font-medium mb-2">AI Assessment</h4>
-                      <p className="text-white/90 text-sm leading-relaxed">
+                      <p className="text-foreground/90 text-sm leading-relaxed">
                         {candidate['Score and Reason']?.slice(0, 200)}...
                       </p>
                     </div>
@@ -397,7 +397,7 @@ export default function LiveCandidateFeed() {
               {filteredCandidates.length === 0 && (
                 <div className="text-center py-16">
                   <Users className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-white mb-2">No candidates found</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">No candidates found</h3>
                   <p className="text-gray-400">Try adjusting your filters or search criteria</p>
                 </div>
               )}
