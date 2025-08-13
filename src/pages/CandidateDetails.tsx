@@ -28,8 +28,8 @@ export default function CandidateDetails() {
       const { data, error } = await supabase
         .from('CVs')
         .select('*')
-        .eq('Cadndidate_ID', candidateId)
-        .single()
+        .eq('candidate_id', candidateId)
+        .maybeSingle()
 
       if (error) throw error
       setCandidate(data)
@@ -134,20 +134,20 @@ export default function CandidateDetails() {
             <div className="flex items-start space-x-6">
               <Avatar className="w-20 h-20">
                 <AvatarFallback className="text-2xl">
-                  {`${candidate["First Name"] || ""} ${candidate["Last Name"] || ""}`.trim().split(' ').map(n => n[0]).join('')}
+                  {`${(candidate["First Name"] || candidate.first_name || "")} ${(candidate["Last Name"] || candidate.last_name || "")}`.trim().split(' ').map((n: string) => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-2xl font-bold">{`${candidate["First Name"] || ""} ${candidate["Last Name"] || ""}`.trim()}</h2>
+                    <h2 className="text-2xl font-bold">{`${(candidate["First Name"] || candidate.first_name || "")} ${(candidate["Last Name"] || candidate.last_name || "")}`.trim()}</h2>
                     <p className="text-lg text-muted-foreground">{candidate.Title}</p>
                   </div>
                   <Badge 
                     variant="outline"
                     className="text-sm px-3 py-1"
                   >
-                    {candidate["Applied for"] || "N/A"}
+                    {candidate["Applied for"] || (Array.isArray(candidate.applied_for) ? candidate.applied_for.join(', ') : candidate.applied_for) || "N/A"}
                   </Badge>
                 </div>
                 <div className="flex items-center space-x-6 mt-4 text-sm text-muted-foreground">
@@ -157,7 +157,7 @@ export default function CandidateDetails() {
                   </div>
                   <div className="flex items-center">
                     <Phone className="w-4 h-4 mr-1" />
-                    {candidate["Phone Number"]}
+                    {candidate["Phone Number"] || candidate.phone_number}
                   </div>
                   <div className="flex items-center">
                     <MapPin className="w-4 h-4 mr-1" />
@@ -165,7 +165,7 @@ export default function CandidateDetails() {
                   </div>
                   <div className="flex items-center">
                     <Calendar className="w-4 h-4 mr-1" />
-                    Current Company: {candidate["Current Company"] || "N/A"}
+                    Current Company: {candidate["Current Company"] || candidate.current_company || "N/A"}
                   </div>
                 </div>
               </div>
@@ -220,11 +220,11 @@ export default function CandidateDetails() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Current Company:</span>
-                    <span>{candidate["Current Company"] || "N/A"}</span>
+                    <span>{candidate["Current Company"] || candidate.current_company || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Candidate ID:</span>
-                    <span className="font-mono text-sm">{candidate.Cadndidate_ID}</span>
+                    <span className="font-mono text-sm">{candidate.candidate_id || candidate.Cadndidate_ID}</span>
                   </div>
                 </CardContent>
               </Card>
