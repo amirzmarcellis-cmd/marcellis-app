@@ -328,6 +328,16 @@ export default function JobDetails() {
     return null
   }
 
+  const formatCurrency = (amountStr: string | null | undefined, currency?: string | null) => {
+    const amount = parseFloat((amountStr || "").toString().replace(/[^0-9.]/g, ""));
+    if (!amount || !currency) return amountStr || "N/A";
+    try {
+      return new Intl.NumberFormat("en", { style: "currency", currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
+    } catch {
+      return `${currency} ${isNaN(amount) ? amountStr : amount.toLocaleString()}`;
+    }
+  };
+
   // Filtered candidates based on all filters
   const filteredCandidates = candidates.filter(candidate => {
     const nameMatch = !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase())
@@ -473,7 +483,7 @@ export default function JobDetails() {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Salary Range:</span>
                     <span className="font-medium">
-                      {job["Job Salary Range (ex: 15000 AED)"] || "N/A"} {job["Currency"] && `(${job["Currency"]})`}
+                      {formatCurrency(job["Job Salary Range (ex: 15000 AED)"], job["Currency"])}
                     </span>
                   </div>
                   <div className="flex justify-between">
