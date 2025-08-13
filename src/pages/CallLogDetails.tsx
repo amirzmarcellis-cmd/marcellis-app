@@ -75,8 +75,7 @@ export default function CallLogDetails() {
       const { data, error } = await supabase
         .from('Jobs_CVs')
         .select('*')
-        .eq('Candidate_ID', candidateId)
-        .eq('Job ID', jobId)
+        .or(`and(candidate_id.eq.${candidateId},job_id.eq.${jobId}),and("Candidate_ID".eq.${candidateId},"Job ID".eq.${jobId})`)
         .maybeSingle()
 
       if (error) throw error
@@ -87,36 +86,35 @@ export default function CallLogDetails() {
         return
       }
 
-      // Fetch job title
       const { data: jobData } = await supabase
         .from('Jobs')
         .select('*')
-        .eq('Job ID', jobId)
-        .single()
+        .or(`job_id.eq.${jobId},"Job ID".eq.${jobId}`)
+        .maybeSingle()
 
       const enrichedData: CallLogDetail = {
-        "Job ID": data["Job ID"],
-        "Candidate_ID": data["Candidate_ID"],
-        "Contacted": data["Contacted"],
-        "Transcript": data["Transcript"],
-        "Summary": data["Summary"],
-        "Success Score": data["Success Score"],
-        "Score and Reason": data["Score and Reason"],
-        "Candidate Name": data["Candidate Name"],
-        "Candidate Email": data["Candidate Email"],
-        "Candidate Phone Number": data["Candidate Phone Number"],
-        "pros": data["pros"],
-        "cons": data["cons"],
-        "Notice Period": data["Notice Period"],
-        "Salary Expectations": data["Salary Expectations"],
-        "current_salary": data["current_salary"],
-        "Agency Experience": data["Agency Experience"],
-        "Job Title": jobData?.["Job Title"] || null,
-        "Notes": data["Notes"],
-        "lastcalltime": data["lastcalltime"],
-        "callcount": data["callcount"],
-        "duration": data["duration"],
-        "recording": data["recording"]
+        "Job ID": (data as any).job_id ?? (data as any)["Job ID"],
+        "Candidate_ID": (data as any).candidate_id ?? (data as any)["Candidate_ID"],
+        "Contacted": (data as any).contacted ?? (data as any)["Contacted"],
+        "Transcript": (data as any).transcript ?? (data as any)["Transcript"],
+        "Summary": (data as any).summary ?? (data as any)["Summary"],
+        "Success Score": (data as any).success_score ?? (data as any)["Success Score"],
+        "Score and Reason": (data as any).score_and_reason ?? (data as any)["Score and Reason"],
+        "Candidate Name": (data as any).candidate_name ?? (data as any)["Candidate Name"],
+        "Candidate Email": (data as any).candidate_email ?? (data as any)["Candidate Email"],
+        "Candidate Phone Number": (data as any).candidate_phone_number ?? (data as any)["Candidate Phone Number"],
+        "pros": (data as any).pros ?? (data as any)["pros"],
+        "cons": (data as any).cons ?? (data as any)["cons"],
+        "Notice Period": (data as any).notice_period ?? (data as any)["Notice Period"],
+        "Salary Expectations": (data as any).salary_expectations ?? (data as any)["Salary Expectations"],
+        "current_salary": (data as any).current_salary ?? (data as any)["current_salary"],
+        "Agency Experience": (data as any).agency_experience ?? (data as any)["Agency Experience"],
+        "Job Title": (jobData as any)?.job_title ?? (jobData as any)?.["Job Title"] ?? null,
+        "Notes": (data as any).notes ?? (data as any)["Notes"],
+        "lastcalltime": (data as any).lastcalltime ?? (data as any)["lastcalltime"],
+        "callcount": (data as any).callcount ?? (data as any)["callcount"],
+        "duration": (data as any).duration ?? (data as any)["duration"],
+        "recording": (data as any).recording ?? (data as any)["recording"]
       }
 
       setCallLog(enrichedData)
@@ -136,8 +134,7 @@ export default function CallLogDetails() {
       const { error } = await supabase
         .from('Jobs_CVs')
         .update({ 'Notes': notes })
-        .eq('Candidate_ID', candidateId)
-        .eq('Job ID', jobId)
+        .or(`and(candidate_id.eq.${candidateId},job_id.eq.${jobId}),and("Candidate_ID".eq.${candidateId},"Job ID".eq.${jobId})`)
 
       if (error) throw error
       

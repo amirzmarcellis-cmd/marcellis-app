@@ -366,7 +366,7 @@ export default function CallLog() {
                         <TableCell className="text-right">
                           <div className="flex justify-end space-x-2">
                             <Button variant="outline" size="sm" asChild>
-                              <Link to={`/call-log-details?candidate=${log["Candidate_ID"]}&job=${log["Job ID"]}`}>
+                              <Link to={`/call-log-details?candidate=${log["Candidate_ID"] || (log as any)["candidate_id"]}&job=${log["Job ID"] || (log as any)["job_id"]}`}>
                                 <FileText className="w-4 h-4 mr-1" />
                                 See Call Log
                               </Link>
