@@ -312,7 +312,7 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="musttohave">Must to Have</Label>
+                <Label htmlFor="musttohave">Must have</Label>
                 <Textarea
                   id="musttohave"
                   value={formData.musttohave}

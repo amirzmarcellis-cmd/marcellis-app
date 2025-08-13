@@ -446,8 +446,8 @@ export default function JobDetails() {
                <TabsTrigger value="overview">Overview</TabsTrigger>
                <TabsTrigger value="description">Job Description</TabsTrigger>
                <TabsTrigger value="requirements">AI Requirements</TabsTrigger>
-               <TabsTrigger value="candidates">Long List</TabsTrigger>
-               <TabsTrigger value="shortlist">Short List</TabsTrigger>
+               <TabsTrigger value="candidates">AI Long List</TabsTrigger>
+               <TabsTrigger value="shortlist">AI Short List</TabsTrigger>
              </TabsList>
            </div>
 
@@ -616,7 +616,7 @@ export default function JobDetails() {
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-2">Must to Have:</h4>
+                    <h4 className="font-semibold mb-2">Must have:</h4>
                     <p className="leading-relaxed whitespace-pre-wrap">
                       {job.musttohave || "No must-have requirements specified."}
                     </p>
