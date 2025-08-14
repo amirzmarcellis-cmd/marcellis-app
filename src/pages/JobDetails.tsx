@@ -483,49 +483,51 @@ export default function JobDetails() {
       <div className="space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden">
         {/* Header */}
         <div className="flex flex-col gap-4">
-          <div className="flex items-center space-x-2 md:space-x-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/jobs')}>
-              <ArrowLeft className="w-4 h-4 mr-1 md:mr-2" />
-              <span className="hidden sm:inline">Back to Jobs</span>
-              <span className="sm:hidden">Back</span>
-            </Button>
-            <div className="h-6 w-px bg-border hidden sm:block" />
-            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-2">
-            {job?.longlist && job.longlist > 0 ? (
-              <Button 
-                onClick={handleSearchMoreCandidates}
-                className="bg-green-600 hover:bg-green-700 text-white text-sm w-full sm:w-auto"
-                size="sm"
-              >
-                <Search className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Search for more candidates</span>
-                <span className="sm:hidden">Search More</span>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex items-center space-x-2 md:space-x-4">
+              <Button variant="ghost" size="sm" onClick={() => navigate('/jobs')}>
+                <ArrowLeft className="w-4 h-4 mr-1 md:mr-2" />
+                <span className="hidden sm:inline">Back to Jobs</span>
+                <span className="sm:hidden">Back</span>
               </Button>
-            ) : (
-              <Button 
-                onClick={handleButtonClick}
-                disabled={job?.longlist === 3}
-                className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm w-full sm:w-auto"
-                size="sm"
-              >
-                <Zap className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Generate Long List</span>
-                <span className="sm:hidden">Generate List</span>
+              <div className="h-6 w-px bg-border hidden sm:block" />
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2">
+              {job?.longlist && job.longlist > 0 ? (
+                <Button 
+                  onClick={handleSearchMoreCandidates}
+                  className="bg-foreground text-background hover:bg-foreground/90 text-sm w-full sm:w-auto"
+                  size="sm"
+                >
+                  <Search className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Search for more candidates</span>
+                  <span className="sm:hidden">Search More</span>
+                </Button>
+              ) : (
+                <Button 
+                  onClick={handleButtonClick}
+                  disabled={job?.longlist === 3}
+                  className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm w-full sm:w-auto"
+                  size="sm"
+                >
+                  <Zap className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Generate Long List</span>
+                  <span className="sm:hidden">Generate List</span>
+                </Button>
+              )}
+              <Button onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)} size="sm" className="w-full sm:w-auto">
+                <FileText className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Edit Job</span>
+                <span className="sm:hidden">Edit</span>
               </Button>
-            )}
-            <Button onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)} size="sm" className="w-full sm:w-auto">
-              <FileText className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Edit Job</span>
-              <span className="sm:hidden">Edit</span>
-            </Button>
-            <Button variant="outline" asChild size="sm" className="w-full sm:w-auto">
-              <Link to={`/job/${job["Job ID"]}/apply`}>
-                <span className="hidden sm:inline">Apply Link</span>
-                <span className="sm:hidden">Apply</span>
-              </Link>
-            </Button>
+              <Button variant="outline" asChild size="sm" className="w-full sm:w-auto">
+                <Link to={`/job/${job["Job ID"]}/apply`}>
+                  <span className="hidden sm:inline">Apply Link</span>
+                  <span className="sm:hidden">Apply</span>
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
 
