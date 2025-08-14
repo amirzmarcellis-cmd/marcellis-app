@@ -38,6 +38,7 @@ interface CallLogDetail {
   "callcount": number | null
   "duration": string | null
   "recording": string | null
+  "cv_link": string | null
 }
 
 export default function CallLogDetails() {
@@ -131,7 +132,8 @@ export default function CallLogDetails() {
         "lastcalltime": (data as any).lastcalltime ?? (data as any)["lastcalltime"],
         "callcount": (data as any).callcount ?? (data as any)["callcount"],
         "duration": (data as any).duration ?? (data as any)["duration"],
-        "recording": (data as any).recording ?? (data as any)["recording"]
+        "recording": (data as any).recording ?? (data as any)["recording"],
+        "cv_link": (data as any).cv_link ?? (data as any)["cv_link"]
       }
 
       setCallLog(enrichedData)
@@ -194,9 +196,9 @@ export default function CallLogDetails() {
     <div className="container mx-auto p-4 sm:p-6 space-y-6 overflow-x-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6">
-        <Button variant="outline" onClick={() => navigate('/jobs')}>
+        <Button variant="outline" onClick={() => navigate(-1)}>
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Jobs
+          Back
         </Button>
         <h1 className="text-2xl sm:text-3xl font-bold">Call Details</h1>
       </div>
@@ -217,9 +219,23 @@ export default function CallLogDetails() {
               <Badge variant="outline" className="mt-2">
                 Score: {callLog["Success Score"]}/100
               </Badge>
-              <p className="text-sm text-muted-foreground mt-1 break-words">
-                Latest Note: {callLog["Notes"] || '—'}
-              </p>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  const cvLink = callLog["cv_link"];
+                  if (cvLink) {
+                    window.open(cvLink, '_blank');
+                  } else {
+                    // Navigate to candidate details if no direct CV link
+                    navigate(`/candidate/${callLog["Candidate_ID"]}`);
+                  }
+                }}
+                className="mt-2"
+              >
+                <Link2 className="w-4 h-4 mr-2" />
+                View CV
+              </Button>
             </div>
             <StatusDropdown
               currentStatus={callLog["Contacted"]}
