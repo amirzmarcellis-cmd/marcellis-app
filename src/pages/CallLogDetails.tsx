@@ -175,7 +175,7 @@ export default function CallLogDetails() {
       let updateQuery: any = supabase
         .from('Jobs_CVs')
         .update({ 
-          'Notes': notes,
+          'notes': notes,
           'notes_updated_by': user?.id,
           'notes_updated_at': new Date().toISOString()
         })
