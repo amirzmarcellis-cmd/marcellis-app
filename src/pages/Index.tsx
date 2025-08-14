@@ -134,10 +134,10 @@ export default function Index() {
         const cvsForJob = cvs.filter((cv: any) => jobLinks.some((jc: any) => jc.Candidate_ID === cv.candidate_id))
 
         stats[jobId] = {
-          longlist: jobLinks.filter((jc: any) => jc.contacted && String(jc.contacted).trim() !== '').length,
-          shortlist:
-            jobLinks.filter((jc: any) => Boolean(jc.shortlisted_at)).length ||
-            cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Shortlisted').length,
+          longlist: jobLinks.length,
+          contacted: jobLinks.filter((jc: any) => jc.contacted && ['Contacted', 'Call Done', '1st No Answer', '2nd No Answer', '3rd No Answer'].includes(jc.contacted)).length,
+          lowScored: jobLinks.filter((jc: any) => jc.contacted === 'Low Scored').length,
+          shortlist: cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Shortlisted').length,
           tasked: cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Tasked').length,
           hired: cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Hired').length,
         }
@@ -292,11 +292,21 @@ export default function Index() {
                       <h3 className="font-semibold text-sm truncate">{job.job_title}</h3>
                     </div>
                     <p className="text-xs text-gray-400 mb-3">{job.job_location}</p>
-                    <div className="grid grid-cols-4 gap-1 text-xs">
+                    <div className="grid grid-cols-3 gap-1 text-xs mb-2">
                       <div className="text-center">
                         <div className="text-cyan-300 font-bold">{jobStats[job.job_id]?.longlist || 0}</div>
                         <div className="text-gray-500">Longlist</div>
                       </div>
+                      <div className="text-center">
+                        <div className="text-orange-300 font-bold">{jobStats[job.job_id]?.contacted || 0}</div>
+                        <div className="text-gray-500">Contacted</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-red-300 font-bold">{jobStats[job.job_id]?.lowScored || 0}</div>
+                        <div className="text-gray-500">Low Scored</div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-1 text-xs">
                       <div className="text-center">
                         <div className="text-purple-300 font-bold">{jobStats[job.job_id]?.shortlist || 0}</div>
                         <div className="text-gray-500">Shortlist</div>
