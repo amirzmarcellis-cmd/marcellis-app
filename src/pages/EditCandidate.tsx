@@ -12,23 +12,23 @@ import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 
 interface Candidate {
-  "Cadndidate_ID": string
-  "First Name": string | null
-  "Last Name": string | null
-  "Email": string | null
-  "Phone Number": string | null
-  "Title": string | null
-  "Location": string | null
-  "Skills": string | null
-  "Experience": string | null
-  "Current Company": string | null
-  "Applied for": string[] | null
-  "CV_Link": string | null
-  "CV Summary": string | null
-  "Education": string | null
-  "Language": string | null
-  "Certifications": string | null
-  "Other Notes": string | null
+  candidate_id: string
+  first_name: string | null
+  last_name: string | null
+  Email: string | null
+  phone_number: string | null
+  Title: string | null
+  Location: string | null
+  Skills: string | null
+  Experience: string | null
+  current_company: string | null
+  applied_for: string[] | null
+  CV_Link: string | null
+  cv_summary: string | null
+  Education: string | null
+  Language: string | null
+  Certifications: string | null
+  other_notes: string | null
 }
 
 export default function EditCandidate() {
@@ -50,8 +50,8 @@ export default function EditCandidate() {
       const { data, error } = await supabase
         .from('CVs')
         .select('*')
-        .eq('Cadndidate_ID', id)
-        .single()
+        .eq('candidate_id', id)
+        .maybeSingle()
 
       if (error) throw error
       setCandidate(data)
@@ -75,7 +75,7 @@ export default function EditCandidate() {
       const { error } = await supabase
         .from('CVs')
         .update(candidate)
-        .eq('Cadndidate_ID', id)
+        .eq('candidate_id', id)
 
       if (error) throw error
 
@@ -142,7 +142,7 @@ export default function EditCandidate() {
                 Edit Candidate
               </h1>
               <p className="text-muted-foreground">
-                {candidate["First Name"]} {candidate["Last Name"]}
+                {candidate.first_name} {candidate.last_name}
               </p>
             </div>
           </div>
@@ -167,8 +167,8 @@ export default function EditCandidate() {
                   <Label htmlFor="firstName">First Name</Label>
                   <Input
                     id="firstName"
-                    value={candidate["First Name"] || ""}
-                    onChange={(e) => updateField("First Name", e.target.value)}
+                    value={candidate.first_name || ""}
+                    onChange={(e) => updateField("first_name", e.target.value)}
                     className="bg-background/50 border-glass-border"
                   />
                 </div>
@@ -176,8 +176,8 @@ export default function EditCandidate() {
                   <Label htmlFor="lastName">Last Name</Label>
                   <Input
                     id="lastName"
-                    value={candidate["Last Name"] || ""}
-                    onChange={(e) => updateField("Last Name", e.target.value)}
+                    value={candidate.last_name || ""}
+                    onChange={(e) => updateField("last_name", e.target.value)}
                     className="bg-background/50 border-glass-border"
                   />
                 </div>
@@ -200,8 +200,8 @@ export default function EditCandidate() {
                 <Label htmlFor="currentCompany">Current Company</Label>
                 <Input
                   id="currentCompany"
-                  value={candidate["Current Company"] || ""}
-                  onChange={(e) => updateField("Current Company", e.target.value)}
+                  value={candidate.current_company || ""}
+                  onChange={(e) => updateField("current_company", e.target.value)}
                   className="bg-background/50 border-glass-border"
                 />
               </div>
@@ -238,8 +238,8 @@ export default function EditCandidate() {
                 </Label>
                 <Input
                   id="phone"
-                  value={candidate["Phone Number"] || ""}
-                  onChange={(e) => updateField("Phone Number", e.target.value)}
+                  value={candidate.phone_number || ""}
+                  onChange={(e) => updateField("phone_number", e.target.value)}
                   className="bg-background/50 border-glass-border"
                 />
               </div>
@@ -303,11 +303,11 @@ export default function EditCandidate() {
                 <Label htmlFor="appliedFor">Applied For Jobs</Label>
                 <div className="space-y-2">
                   <Input
-                    value={Array.isArray(candidate["Applied for"]) ? candidate["Applied for"].join(", ") : (candidate["Applied for"] || "")}
+                    value={Array.isArray(candidate.applied_for) ? candidate.applied_for.join(", ") : (candidate.applied_for || "")}
                     onChange={(e) => {
                       const value = e.target.value;
                       const jobIds = value.split(',').map(id => id.trim()).filter(id => id);
-                      updateField("Applied for", jobIds);
+                      updateField("applied_for", jobIds);
                     }}
                     placeholder="Enter job IDs separated by commas"
                     className="bg-background/50 border-glass-border"
@@ -380,8 +380,8 @@ export default function EditCandidate() {
                 <Label htmlFor="cvSummary">CV Summary</Label>
                 <Textarea
                   id="cvSummary"
-                  value={candidate["CV Summary"] || ""}
-                  onChange={(e) => updateField("CV Summary", e.target.value)}
+                  value={candidate.cv_summary || ""}
+                  onChange={(e) => updateField("cv_summary", e.target.value)}
                   rows={4}
                   className="bg-background/50 border-glass-border"
                 />
@@ -391,8 +391,8 @@ export default function EditCandidate() {
                 <Label htmlFor="otherNotes">Other Notes</Label>
                 <Textarea
                   id="otherNotes"
-                  value={candidate["Other Notes"] || ""}
-                  onChange={(e) => updateField("Other Notes", e.target.value)}
+                  value={candidate.other_notes || ""}
+                  onChange={(e) => updateField("other_notes", e.target.value)}
                   rows={3}
                   className="bg-background/50 border-glass-border"
                 />
