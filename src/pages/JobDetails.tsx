@@ -957,9 +957,9 @@ export default function JobDetails() {
                                             className="flex-1 min-w-[100px]"
                                           >
                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${contact.callid}`}>
-                                             <Phone className="w-3 h-3 mr-1" />
-                                             {candidateContacts.length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}
-                                           </Link>
+                                              <FileText className="w-3 h-3 mr-1" />
+                                              {candidateContacts.length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}
+                                            </Link>
                                           </Button>
                                         ))}
                                         <Button
@@ -1093,18 +1093,18 @@ export default function JobDetails() {
                                   <div className="space-y-2 pt-2 border-t">
                                     <div className="flex flex-wrap gap-2">
                                       {candidateContacts.map((contact, contactIndex) => (
-                                        <Button
-                                          key={contactIndex}
-                                          variant="outline"
-                                          size="sm"
-                                          asChild
-                                          className="flex-1 min-w-[100px]"
-                                        >
+                                         <Button
+                                           key={contactIndex}
+                                           variant="outline"
+                                           size="sm"
+                                           asChild
+                                           className="flex-1 min-w-[100px]"
+                                         >
                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${contact.callid}`}>
-                                             <Phone className="w-3 h-3 mr-1" />
+                                             <FileText className="w-3 h-3 mr-1" />
                                              {candidateContacts.length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}
                                            </Link>
-                                        </Button>
+                                         </Button>
                                       ))}
                                       <Button
                                         variant="ghost"
