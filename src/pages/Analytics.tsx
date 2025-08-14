@@ -109,11 +109,11 @@ export default function Analytics() {
       
       // Calculate contacted count
       const contactedCount = jobsCvsData?.filter(item => 
-        item.Contacted && item.Contacted !== 'Not Contacted'
+        item.contacted && item.contacted !== 'Not Contacted'
       ).length || 0;
 
       // Calculate average score
-      const scores = jobsCvsData?.map(item => parseFloat(item['Success Score']) || 0).filter(score => score > 0) || [];
+      const scores = jobsCvsData?.map(item => parseFloat(item.success_score) || 0).filter(score => score > 0) || [];
       const averageScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
 
       // Score distribution
@@ -123,34 +123,34 @@ export default function Analytics() {
 
       // Contact status distribution
       const contactStatus = {
-        callDone: jobsCvsData?.filter(item => item.Contacted === 'Call Done').length || 0,
-        contacted: jobsCvsData?.filter(item => item.Contacted === 'Contacted').length || 0,
-        readyToContact: jobsCvsData?.filter(item => item.Contacted === 'Ready to Call').length || 0,
-        notContacted: jobsCvsData?.filter(item => !item.Contacted || item.Contacted === 'Not Contacted').length || 0,
-        rejected: jobsCvsData?.filter(item => item.Contacted === 'Rejected').length || 0,
-        shortlisted: jobsCvsData?.filter(item => item.Contacted === 'Shortlisted').length || 0,
-        tasked: jobsCvsData?.filter(item => item.Contacted === 'Tasked').length || 0,
-        interview: jobsCvsData?.filter(item => item.Contacted === 'Interview').length || 0,
-        hired: jobsCvsData?.filter(item => item.Contacted === 'Hired').length || 0,
+        callDone: jobsCvsData?.filter(item => item.contacted === 'Call Done').length || 0,
+        contacted: jobsCvsData?.filter(item => item.contacted === 'Contacted').length || 0,
+        readyToContact: jobsCvsData?.filter(item => item.contacted === 'Ready to Call').length || 0,
+        notContacted: jobsCvsData?.filter(item => !item.contacted || item.contacted === 'Not Contacted').length || 0,
+        rejected: jobsCvsData?.filter(item => item.contacted === 'Rejected').length || 0,
+        shortlisted: jobsCvsData?.filter(item => item.contacted === 'Shortlisted').length || 0,
+        tasked: jobsCvsData?.filter(item => item.contacted === 'Tasked').length || 0,
+        interview: jobsCvsData?.filter(item => item.contacted === 'Interview').length || 0,
+        hired: jobsCvsData?.filter(item => item.contacted === 'Hired').length || 0,
       };
 
       // Candidates per job
       const jobCandidateCounts = jobsData?.map(job => {
-        const count = jobsCvsData?.filter(item => item['Job ID'] === job['Job ID']).length || 0;
+        const count = jobsCvsData?.filter(item => item.job_id === job.job_id).length || 0;
         return {
-          jobTitle: job['Job Title'] || job['Job ID'] || 'Unknown',
+          jobTitle: job.job_title || job.job_id || 'Unknown',
           count
         };
       }).sort((a, b) => b.count - a.count) || [];
 
       // Top performing jobs (by average score)
       const topPerformingJobs = jobsData?.map(job => {
-        const jobCandidates = jobsCvsData?.filter(item => item['Job ID'] === job['Job ID']) || [];
-        const jobScores = jobCandidates.map(item => parseFloat(item['Success Score']) || 0).filter(score => score > 0);
+        const jobCandidates = jobsCvsData?.filter(item => item.job_id === job.job_id) || [];
+        const jobScores = jobCandidates.map(item => parseFloat(item.success_score) || 0).filter(score => score > 0);
         const avgScore = jobScores.length > 0 ? Math.round(jobScores.reduce((a, b) => a + b, 0) / jobScores.length) : 0;
         
         return {
-          jobTitle: job['Job Title'] || job['Job ID'] || 'Unknown',
+          jobTitle: job.job_title || job.job_id || 'Unknown',
           candidateCount: jobCandidates.length,
           averageScore: avgScore,
           rank: 0
@@ -162,19 +162,19 @@ export default function Analytics() {
 
       // Average scores by job
       const averageScoresByJob = jobsData?.map(job => {
-        const jobCandidates = jobsCvsData?.filter(item => item['Job ID'] === job['Job ID']) || [];
-        const jobScores = jobCandidates.map(item => parseFloat(item['Success Score']) || 0).filter(score => score > 0);
+        const jobCandidates = jobsCvsData?.filter(item => item.job_id === job.job_id) || [];
+        const jobScores = jobCandidates.map(item => parseFloat(item.success_score) || 0).filter(score => score > 0);
         const avgScore = jobScores.length > 0 ? Math.round(jobScores.reduce((a, b) => a + b, 0) / jobScores.length) : 0;
         
         return {
-          jobTitle: (job['Job Title'] || job['Job ID'] || 'Unknown').substring(0, 15),
+          jobTitle: (job.job_title || job.job_id || 'Unknown').substring(0, 15),
           averageScore: avgScore
         };
       }).filter(job => job.averageScore > 0).slice(0, 4) || [];
 
       // Average salaries by job - include all non-null values (including zeros)
       const averageSalariesByJob = jobsData?.map(job => {
-        const jobCandidates = jobsCvsData?.filter(item => item['Job ID'] === job['Job ID']) || [];
+        const jobCandidates = jobsCvsData?.filter(item => item.job_id === job.job_id) || [];
 
         const parseSalary = (val: any) => {
           if (val === null || val === undefined) return NaN;
@@ -189,18 +189,18 @@ export default function Analytics() {
         };
 
         const expectedVals = jobCandidates
-          .map(item => parseSalary(item['Salary Expectations']))
+          .map(item => parseSalary(item.salary_expectations))
           .filter((n: number) => !Number.isNaN(n));
 
         const currentVals = jobCandidates
-          .map(item => parseSalary(item['current_salary']))
+          .map(item => parseSalary(item.current_salary))
           .filter((n: number) => !Number.isNaN(n));
 
         const avgExpected = expectedVals.length ? Math.round(expectedVals.reduce((a: number, b: number) => a + b, 0) / expectedVals.length) : 0;
         const avgCurrent = currentVals.length ? Math.round(currentVals.reduce((a: number, b: number) => a + b, 0) / currentVals.length) : 0;
 
         return {
-          jobTitle: (job['Job Title'] || job['Job ID'] || 'Unknown').substring(0, 15),
+          jobTitle: (job.job_title || job.job_id || 'Unknown').substring(0, 15),
           avgExpected,
           avgCurrent,
         };
@@ -211,7 +211,7 @@ export default function Analytics() {
       const avgCandidatesPerJob = activeJobs > 0 ? Math.round(totalCandidates / activeJobs) : 0;
       
       // Calculate average days to hire (mock calculation based on available data)
-      const hiredCandidates = jobsCvsData?.filter(item => item.Contacted === 'Hired') || [];
+      const hiredCandidates = jobsCvsData?.filter(item => item.contacted === 'Hired') || [];
       const avgDaysToHire = hiredCandidates.length > 0 ? Math.round(Math.random() * 20 + 15) : 0; // Mock calculation
 
       setData({

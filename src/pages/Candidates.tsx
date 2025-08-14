@@ -15,24 +15,24 @@ import { toast } from "sonner"
 import { formatDate } from "@/lib/utils"
 
 interface Candidate {
-  "Cadndidate_ID": string
-  "First Name": string | null
-  "Last Name": string | null
-  "Email": string | null
-  "Phone Number": string | null
-  "Title": string | null
-  "Location": string | null
-  "Skills": string | null
-  "Experience": string | null
-  "Current Company": string | null
-  "Applied for": string[] | null
-  "CV_Link": string | null
-  "CV Summary": string | null
-  "Education": string | null
-  "Language": string | null
-  "Certifications": string | null
-  "Other Notes": string | null
-  "Timestamp": string | null
+  candidate_id: string
+  first_name: string | null
+  last_name: string | null
+  Email: string | null
+  phone_number: string | null
+  Title: string | null
+  Location: string | null
+  Skills: string | null
+  Experience: string | null
+  current_company: string | null
+  applied_for: string[] | null
+  CV_Link: string | null
+  cv_summary: string | null
+  Education: string | null
+  Language: string | null
+  Certifications: string | null
+  other_notes: string | null
+  Timestamp: string | null
 }
 
 export default function Candidates() {
@@ -82,7 +82,7 @@ export default function Candidates() {
   }
 
   const filteredCandidates = candidates.filter(candidate => {
-    const fullName = `${candidate["First Name"] || ""} ${candidate["Last Name"] || ""}`.trim()
+    const fullName = `${candidate.first_name || ""} ${candidate.last_name || ""}`.trim()
     const matchesSearch = fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (candidate.Title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (candidate.Email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -91,22 +91,22 @@ export default function Candidates() {
     // Job title filter - check if candidate applied to jobs with this title
     let matchesJobTitle = true
     if (jobTitleFilter !== "all") {
-      const candidateJobApplications = jobsCVs.filter(jc => jc["Candidate_ID"] === candidate["Cadndidate_ID"])
-      const candidateJobIds = candidateJobApplications.map(jc => jc["Job ID"])
-      const candidateJobs = jobs.filter(job => candidateJobIds.includes(job["Job ID"]))
-      matchesJobTitle = candidateJobs.some(job => job["Job Title"] === jobTitleFilter)
+      const candidateJobApplications = jobsCVs.filter(jc => jc.Candidate_ID === candidate.candidate_id)
+      const candidateJobIds = candidateJobApplications.map(jc => jc.job_id)
+      const candidateJobs = jobs.filter(job => candidateJobIds.includes(job.job_id))
+      matchesJobTitle = candidateJobs.some(job => job.job_title === jobTitleFilter)
     }
     
     return matchesSearch && matchesJobTitle
   })
 
-  const uniqueJobTitles = [...new Set(jobs.map(j => j["Job Title"]).filter(Boolean))]
+  const uniqueJobTitles = [...new Set(jobs.map(j => j.job_title).filter(Boolean))]
 
   const handleCallCandidate = async (candidateID: string) => {
     try {
-      const candidate = candidates.find(c => c["Cadndidate_ID"] === candidateID)
-      const jobID = Array.isArray(candidate?.["Applied for"]) && candidate["Applied for"].length > 0 
-        ? candidate["Applied for"][0] 
+      const candidate = candidates.find(c => c.candidate_id === candidateID)
+      const jobID = Array.isArray(candidate?.applied_for) && candidate.applied_for.length > 0 
+        ? candidate.applied_for[0] 
         : ""
       
       const response = await fetch('https://hook.eu2.make.com/i3owa6dmu1mstug4tsfb0dnhhjfh4arj', {
@@ -200,12 +200,12 @@ export default function Candidates() {
                     </TableRow>
                   ) : (
                     filteredCandidates.map((candidate) => {
-                      const fullName = `${candidate["First Name"] || ""} ${candidate["Last Name"] || ""}`.trim()
-                      const initials = `${candidate["First Name"]?.[0] || ""}${candidate["Last Name"]?.[0] || ""}`
+                      const fullName = `${candidate.first_name || ""} ${candidate.last_name || ""}`.trim()
+                      const initials = `${candidate.first_name?.[0] || ""}${candidate.last_name?.[0] || ""}`
                       const skills = candidate.Skills ? candidate.Skills.split(',').map(s => s.trim()) : []
                       
                       return (
-                        <TableRow key={candidate["Cadndidate_ID"]} className="border-border hover:bg-glass-primary transition-colors">
+                        <TableRow key={candidate.candidate_id} className="border-border hover:bg-glass-primary transition-colors">
                           <TableCell>
                             <div className="flex items-center space-x-3">
                               <Avatar className="w-10 h-10">
@@ -227,8 +227,8 @@ export default function Candidates() {
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-wrap gap-1">
-                              {Array.isArray(candidate["Applied for"]) && candidate["Applied for"].length > 0 
-                                ? candidate["Applied for"].map((jobId) => (
+                              {Array.isArray(candidate.applied_for) && candidate.applied_for.length > 0 
+                                ? candidate.applied_for.map((jobId) => (
                                     <Badge key={jobId} variant="secondary" className="capitalize text-xs">
                                       {jobId}
                                     </Badge>
@@ -252,12 +252,12 @@ export default function Candidates() {
                           <TableCell className="text-right">
                             <div className="flex justify-end space-x-1">
                               <Button variant="outline" size="sm" asChild title="View Candidate">
-                                <Link to={`/candidate/${candidate["Cadndidate_ID"]}`}>
+                                <Link to={`/candidate/${candidate.candidate_id}`}>
                                   👁️
                                 </Link>
                               </Button>
                               <Button variant="outline" size="sm" asChild title="Edit Candidate">
-                                <Link to={`/candidate/edit/${candidate["Cadndidate_ID"]}`}>
+                                <Link to={`/candidate/edit/${candidate.candidate_id}`}>
                                   ✏️
                                 </Link>
                               </Button>

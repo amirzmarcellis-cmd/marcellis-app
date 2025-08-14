@@ -16,24 +16,24 @@ import { StatusDropdown } from "@/components/candidates/StatusDropdown"
 import { formatDate } from "@/lib/utils"
 
 interface CallLog {
-  "Job ID": string | null
-  "Candidate_ID": string | null
-  "Contacted": string | null
-  "Transcript": string | null
-  "Summary": string | null
-  "Success Score": string | null
-  "Score and Reason": string | null
-  "Candidate Name": string | null
-  "Candidate Email": string | null
-  "Candidate Phone Number": string | null
-  "pros": string | null
-  "cons": string | null
-  "Notice Period": string | null
-  "Salary Expectations": string | null
-  "Agency Experience": string | null
-  "Job Title": string | null
-  "2 Questions of Interview": string | null
-  "Notes": string | null
+  job_id: string | null
+  Candidate_ID: string | null
+  contacted: string | null
+  transcript: string | null
+  summary: string | null
+  success_score: string | null
+  score_and_reason: string | null
+  candidate_name: string | null
+  candidate_email: string | null
+  candidate_phone_number: string | null
+  pros: string | null
+  cons: string | null
+  notice_period: string | null
+  salary_expectations: string | null
+  agency_experience: string | null
+  job_title: string | null
+  two_questions_of_interview: string | null
+  notes: string | null
 }
 
 const formatPhoneNumber = (phone: string | null) => {
@@ -89,7 +89,7 @@ export default function CallLog() {
       const { data: callLogsData, error: callLogsError } = await supabase
         .from('Jobs_CVs')
         .select('*')
-        .order('"Candidate Name"', { ascending: true })
+        .order('candidate_name', { ascending: true })
 
       if (callLogsError) throw callLogsError
 
@@ -102,10 +102,10 @@ export default function CallLog() {
 
       // Match job titles with call logs
       const enrichedCallLogs = (callLogsData || []).map(log => {
-        const job = (jobsData || []).find(j => j["Job ID"] === log["Job ID"])
+        const job = (jobsData || []).find(j => j.job_id === log.job_id)
         return {
           ...log,
-          "Job Title": job?.["Job Title"] || null
+          job_title: job?.job_title || null
         }
       })
 
@@ -123,24 +123,24 @@ export default function CallLog() {
   }
 
   const saveNotes = async (log: CallLog) => {
-    const logKey = `${log["Candidate_ID"]}-${log["Job ID"]}`
-    const notes = editingNotes[logKey] || log["Notes"] || ""
+    const logKey = `${log.Candidate_ID}-${log.job_id}`
+    const notes = editingNotes[logKey] || log.notes || ""
     
     setSavingNotes(prev => ({ ...prev, [logKey]: true }))
     
     try {
       const { error } = await supabase
         .from('Jobs_CVs')
-        .update({ 'Notes': notes })
-        .eq('Candidate_ID', log["Candidate_ID"])
-        .eq('Job ID', log["Job ID"])
+        .update({ notes: notes })
+        .eq('Candidate_ID', log.Candidate_ID)
+        .eq('job_id', log.job_id)
 
       if (error) throw error
 
       // Update local state
       setCallLogs(prev => prev.map(l => 
-        l["Candidate_ID"] === log["Candidate_ID"] && l["Job ID"] === log["Job ID"]
-          ? { ...l, Notes: notes }
+        l.Candidate_ID === log.Candidate_ID && l.job_id === log.job_id
+          ? { ...l, notes: notes }
           : l
       ))
 
@@ -157,12 +157,12 @@ export default function CallLog() {
   }
 
   const filteredCallLogs = callLogs.filter(log => {
-    const matchesSearch = (log["Candidate Name"] || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (log["Candidate Email"] || "").toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = (log.candidate_name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (log.candidate_email || "").toLowerCase().includes(searchTerm.toLowerCase())
     
     let matchesContacted = true
     if (contactedFilter !== "all") {
-      const contacted = log.Contacted || ""
+      const contacted = log.contacted || ""
       switch (contactedFilter) {
         case "not-contacted":
           matchesContacted = contacted === "Not Contacted" || !contacted
@@ -194,14 +194,14 @@ export default function CallLog() {
       }
     }
     const matchesScore = scoreFilter === "all" || 
-                        (scoreFilter === "high" && parseInt(log["Success Score"] || "0") >= 75) ||
-                        (scoreFilter === "medium" && parseInt(log["Success Score"] || "0") >= 50 && parseInt(log["Success Score"] || "0") <= 74) ||
-                        (scoreFilter === "low" && parseInt(log["Success Score"] || "0") >= 1 && parseInt(log["Success Score"] || "0") <= 49)
-    const matchesJob = jobFilter === "all" || log["Job ID"] === jobFilter
+                        (scoreFilter === "high" && parseInt(log.success_score || "0") >= 75) ||
+                        (scoreFilter === "medium" && parseInt(log.success_score || "0") >= 50 && parseInt(log.success_score || "0") <= 74) ||
+                        (scoreFilter === "low" && parseInt(log.success_score || "0") >= 1 && parseInt(log.success_score || "0") <= 49)
+    const matchesJob = jobFilter === "all" || log.job_id === jobFilter
     
     // URL parameter filtering
-    const matchesCandidate = !candidateParam || log["Candidate_ID"] === candidateParam
-    const matchesJobParam = !jobParam || log["Job ID"] === jobParam
+    const matchesCandidate = !candidateParam || log.Candidate_ID === candidateParam
+    const matchesJobParam = !jobParam || log.job_id === jobParam
     
     return matchesSearch && matchesContacted && matchesScore && matchesJob && matchesCandidate && matchesJobParam
   })
@@ -232,8 +232,8 @@ export default function CallLog() {
               <SelectContent className="bg-background border-border z-50">
                 <SelectItem value="all">All Jobs</SelectItem>
                 {jobs.map((job) => (
-                  <SelectItem key={job["Job ID"]} value={job["Job ID"]}>
-                    {job["Job Title"] || job["Job ID"]}
+                  <SelectItem key={job.job_id} value={job.job_id}>
+                    {job.job_title || job.job_id}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -305,7 +305,7 @@ export default function CallLog() {
                   </TableRow>
                 ) : (
                   filteredCallLogs.map((log, index) => {
-                    const initials = (log["Candidate Name"] || "")
+                    const initials = (log.candidate_name || "")
                       .split(' ')
                       .map(n => n[0])
                       .join('')
@@ -321,68 +321,68 @@ export default function CallLog() {
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <div className="font-medium">{log["Candidate Name"] || "N/A"}</div>
-                              <div className="text-sm text-muted-foreground">{log["Candidate Email"] || "N/A"}</div>
+                              <div className="font-medium">{log.candidate_name || "N/A"}</div>
+                              <div className="text-sm text-muted-foreground">{log.candidate_email || "N/A"}</div>
                             </div>
                           </div>
                         </TableCell>
                         <TableCell>
                           <div>
-                            <div className="font-medium">{log["Job Title"] || "N/A"}</div>
+                            <div className="font-medium">{log.job_title || "N/A"}</div>
                             <Badge variant="outline" className="font-mono text-xs">
-                              {log["Job ID"] || "N/A"}
+                              {log.job_id || "N/A"}
                             </Badge>
                           </div>
                         </TableCell>
                         <TableCell>
                           <StatusDropdown
-                            currentStatus={log.Contacted}
-                            candidateId={log["Candidate_ID"] || ""}
-                            jobId={log["Job ID"]}
-                            statusType="contacted"
-                            onStatusChange={(newStatus) => {
-                              setCallLogs(prev => prev.map(l => 
-                                l["Candidate_ID"] === log["Candidate_ID"] && l["Job ID"] === log["Job ID"]
-                                  ? { ...l, Contacted: newStatus }
-                                  : l
-                              ))
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={getScoreBadgeVariant(log["Success Score"])}>
-                            {log["Success Score"] ? `${log["Success Score"]}/100` : "N/A"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-2">
-                            <Clock className="w-4 h-4 text-muted-foreground" />
-                            <span>{log["Notice Period"] || "N/A"}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <span>{log["Salary Expectations"] || "N/A"}</span>
-                        </TableCell>
+                            currentStatus={log.contacted}
+            candidateId={log.Candidate_ID || ""}
+            jobId={log.job_id}
+            statusType="contacted"
+            onStatusChange={(newStatus) => {
+              setCallLogs(prev => prev.map(l => 
+                l.Candidate_ID === log.Candidate_ID && l.job_id === log.job_id
+                  ? { ...l, contacted: newStatus }
+                  : l
+              ))
+            }}
+          />
+        </TableCell>
+        <TableCell>
+          <Badge variant={getScoreBadgeVariant(log.success_score)}>
+            {log.success_score ? `${log.success_score}/100` : "N/A"}
+          </Badge>
+        </TableCell>
+        <TableCell>
+          <div className="flex items-center space-x-2">
+            <Clock className="w-4 h-4 text-muted-foreground" />
+            <span>{log.notice_period || "N/A"}</span>
+          </div>
+        </TableCell>
+        <TableCell>
+          <span>{log.salary_expectations || "N/A"}</span>
+        </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex justify-end space-x-2">
-                            <Button variant="outline" size="sm" asChild>
-                              <Link to={`/call-log-details?candidate=${log["Candidate_ID"] || (log as any)["candidate_id"]}&job=${log["Job ID"] || (log as any)["job_id"]}&callid=${(log as any).callid}`}> 
-                                <FileText className="w-4 h-4 mr-1" />
-                                See Log
-                              </Link>
-                            </Button>
-                            <Button variant="outline" size="sm" asChild>
-                              <Link to={`/candidate/${log["Candidate_ID"]}`}>
-                                <Eye className="w-4 h-4 mr-1" />
-                                View Candidate
-                              </Link>
-                            </Button>
-                            <Button variant="outline" size="sm" asChild>
-                              <Link to={`/job/${log["Job ID"]}`}>
-                                View Job
-                              </Link>
-                            </Button>
-                          </div>
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" size="sm" asChild>
+              <Link to={`/call-log-details?candidate=${log.Candidate_ID || (log as any)["candidate_id"]}&job=${log.job_id || (log as any)["job_id"]}&callid=${(log as any).callid}`}> 
+                <FileText className="w-4 h-4 mr-1" />
+                See Log
+              </Link>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link to={`/candidate/${log.Candidate_ID}`}>
+                <Eye className="w-4 h-4 mr-1" />
+                View Candidate
+              </Link>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link to={`/job/${log.job_id}`}>
+                View Job
+              </Link>
+            </Button>
+          </div>
                         </TableCell>
                       </TableRow>
                     )
