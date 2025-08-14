@@ -492,12 +492,18 @@ export default function Index() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-400/30">
+                <div 
+                  className="bg-purple-500/10 rounded-lg p-4 border border-purple-400/30 cursor-pointer hover:bg-purple-500/20 hover:border-purple-400/50 transition-all duration-300 hover:scale-[1.02]"
+                  onClick={() => navigate('/jobs')}
+                >
                   <h4 className="font-semibold text-purple-300 mb-2">Candidates Needing Review</h4>
                   <div className="text-2xl font-bold text-purple-400">{highScoreActiveCount || 0}</div>
                   <p className="text-sm text-purple-200">Score &gt; 74</p>
                 </div>
-                <div className="bg-cyan-500/10 rounded-lg p-4 border border-cyan-400/30">
+                <div 
+                  className="bg-cyan-500/10 rounded-lg p-4 border border-cyan-400/30 cursor-pointer hover:bg-cyan-500/20 hover:border-cyan-400/50 transition-all duration-300 hover:scale-[1.02]"
+                  onClick={() => navigate('/jobs')}
+                >
                   <h4 className="font-semibold text-cyan-300 mb-2">Upcoming Interviews</h4>
                   <div className="text-2xl font-bold text-cyan-400">{data?.interviewsThisWeek || 0}</div>
                   <p className="text-sm text-cyan-200">This week</p>
