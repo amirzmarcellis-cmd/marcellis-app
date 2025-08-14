@@ -88,7 +88,7 @@ export default function CallLogDetails() {
         const resp = await supabase
           .from('Jobs_CVs')
           .select('*')
-          .or(`and(candidate_id.eq.${candidateId},job_id.eq.${jobId}),and("Candidate_ID".eq.${candidateId},"Job ID".eq.${jobId}),and("Candidate_ID".eq.${candidateId},job_id.eq.${jobId}),and(candidate_id.eq.${candidateId},"Job ID".eq.${jobId})`)
+          .or(`and(Candidate_ID.eq.${candidateId},job_id.eq.${jobId}),and("Candidate_ID".eq.${candidateId},"Job ID".eq.${jobId})`)
           .maybeSingle()
         data = resp.data
         error = resp.error

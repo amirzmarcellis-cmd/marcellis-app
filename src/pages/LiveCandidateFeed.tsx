@@ -107,10 +107,10 @@ export default function LiveCandidateFeed() {
     
     const matchesStatus = statusFilter === 'all' || 
       statusFilter === candidate.contacted ||
-      (statusFilter === 'Shortlisted' && getCandidateStatus(candidate.Candidate_ID) === 'Shortlisted') ||
-      (statusFilter === 'Interview' && getCandidateStatus(candidate.Candidate_ID) === 'Interview') ||
-      (statusFilter === 'Hired' && getCandidateStatus(candidate.Candidate_ID) === 'Hired') ||
-      (statusFilter === 'Rejected' && getCandidateStatus(candidate.Candidate_ID) === 'Rejected');
+      (statusFilter === 'Shortlisted' && getCandidateStatus(candidate.Candidate_ID || candidate.candidate_id) === 'Shortlisted') ||
+      (statusFilter === 'Interview' && getCandidateStatus(candidate.Candidate_ID || candidate.candidate_id) === 'Interview') ||
+      (statusFilter === 'Hired' && getCandidateStatus(candidate.Candidate_ID || candidate.candidate_id) === 'Hired') ||
+      (statusFilter === 'Rejected' && getCandidateStatus(candidate.Candidate_ID || candidate.candidate_id) === 'Rejected');
     
     const matchesScoreFilter = scoreFilter === 'all' ||
       (scoreFilter === '50-74' && parseFloat(candidate.success_score || '0') >= 50 && parseFloat(candidate.success_score || '0') <= 74) ||
@@ -142,7 +142,7 @@ export default function LiveCandidateFeed() {
 
   // Get CV status for a candidate
   const getCandidateStatus = (candidateId: string) => {
-    const cvRecord = cvData.find(cv => cv.candidate_id === candidateId)
+    const cvRecord = cvData.find(cv => cv.candidate_id === candidateId || cv.Candidate_ID === candidateId)
     return cvRecord?.CandidateStatus || null
   }
 
@@ -301,7 +301,7 @@ export default function LiveCandidateFeed() {
                       bg-gradient-to-r ${index < 3 ? 'from-yellow-400/30 to-amber-500/50' : getScoreGradient(score)} ${index < 3 ? 'border-yellow-400/50 hover:border-yellow-400/60' : 'border-border hover:border-primary/40 dark:border-white/20'}
                       backdrop-blur-sm animate-fade-in`}
                     style={{ animationDelay: `${index * 0.1}s` }}
-                    onClick={() => window.location.href = `/call-log-details?candidate=${candidate.Candidate_ID}&job=${candidate.job_id}`}
+                    onClick={() => window.location.href = `/call-log-details?candidate=${candidate.Candidate_ID || candidate.candidate_id}&job=${candidate.job_id}&callid=${candidate.callid || ''}`}
                   >
                     {/* Score Badge */}
                     <div className="absolute top-4 right-4">
@@ -325,12 +325,12 @@ export default function LiveCandidateFeed() {
                           <div className="flex items-center space-x-2">
                             <StatusDropdown
                               currentStatus={candidate.contacted}
-                              candidateId={candidate.Candidate_ID}
+                              candidateId={candidate.Candidate_ID || candidate.candidate_id}
                               jobId={candidate.job_id}
                               statusType="contacted"
                               onStatusChange={(newStatus) => {
                                 setCandidates(prev => prev.map(c => 
-                                  c.Candidate_ID === candidate.Candidate_ID 
+                                  (c.Candidate_ID || c.candidate_id) === (candidate.Candidate_ID || candidate.candidate_id)
                                     ? { ...c, contacted: newStatus }
                                     : c
                                 ))
@@ -338,12 +338,12 @@ export default function LiveCandidateFeed() {
                               variant="badge"
                             />
                             <StatusDropdown
-                              currentStatus={getCandidateStatus(candidate.Candidate_ID)}
-                              candidateId={candidate.Candidate_ID}
+                              currentStatus={getCandidateStatus(candidate.Candidate_ID || candidate.candidate_id)}
+                              candidateId={candidate.Candidate_ID || candidate.candidate_id}
                               statusType="candidate"
                               onStatusChange={(newStatus) => {
                                 setCvData(prev => prev.map(cv => 
-                                  cv.candidate_id === candidate.Candidate_ID 
+                                  (cv.candidate_id || cv.Candidate_ID) === (candidate.Candidate_ID || candidate.candidate_id)
                                     ? { ...cv, CandidateStatus: newStatus }
                                     : cv
                                 ))
