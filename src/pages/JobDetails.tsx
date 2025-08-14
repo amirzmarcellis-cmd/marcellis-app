@@ -572,9 +572,9 @@ export default function JobDetails() {
               <TabsList className="w-full min-w-[400px] grid grid-cols-5 h-auto p-1">
                 <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">Overview</TabsTrigger>
                 <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2">Description</TabsTrigger>
-                <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">Requirements</TabsTrigger>
-                <TabsTrigger value="candidates" className="text-xs md:text-sm px-2 py-2">Long List</TabsTrigger>
-                <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">Short List</TabsTrigger>
+                <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">AI Requirements</TabsTrigger>
+                <TabsTrigger value="candidates" className="text-xs md:text-sm px-2 py-2">AI Long List</TabsTrigger>
+                <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">AI Short List</TabsTrigger>
               </TabsList>
             </div>
 
@@ -957,20 +957,22 @@ export default function JobDetails() {
                                            <Phone className="w-3 h-3 mr-1" />
                                            {callingCandidateId === candidateId ? 'Calling...' : 'Call Candidate'}
                                          </Button>
-                                         {candidateContacts.map((contact, contactIndex) => (
-                                           <Button
-                                             key={contactIndex}
-                                             variant="outline"
-                                             size="sm"
-                                             asChild
-                                             className="flex-1 min-w-0 text-xs md:text-sm"
-                                           >
-                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${contact.callid}`} className="truncate">
-                                              <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
-                                              <span className="truncate">{candidateContacts.length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}</span>
-                                            </Link>
-                                           </Button>
-                                         ))}
+                                          {candidateContacts
+                                            .filter(contact => contact.callcount > 0)
+                                            .map((contact, contactIndex) => (
+                                            <Button
+                                              key={contactIndex}
+                                              variant="outline"
+                                              size="sm"
+                                              asChild
+                                              className="flex-1 min-w-0 text-xs md:text-sm"
+                                            >
+                                             <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${contact.callid}`} className="truncate">
+                                               <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
+                                               <span className="truncate">{candidateContacts.filter(c => c.callcount > 0).length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}</span>
+                                             </Link>
+                                            </Button>
+                                          ))}
                                        </div>
                                        <Button
                                          variant="ghost"
@@ -1002,7 +1004,7 @@ export default function JobDetails() {
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Star className="w-5 h-5 mr-2" />
-                    Short List ({shortListCandidates.length} candidates with 74+ score)
+                    AI Short List ({shortListCandidates.length} candidates with 74+ score)
                   </CardTitle>
                   <CardDescription>
                     High-scoring candidates (74+) who have passed the initial screening
@@ -1101,20 +1103,22 @@ export default function JobDetails() {
                                   {/* Call Log Buttons */}
                                   <div className="space-y-2 pt-2 border-t">
                                     <div className="flex flex-wrap gap-2">
-                                      {candidateContacts.map((contact, contactIndex) => (
-                                         <Button
-                                           key={contactIndex}
-                                           variant="outline"
-                                           size="sm"
-                                           asChild
-                                           className="flex-1 min-w-[100px]"
-                                         >
-                                           <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${contact.callid}`}>
-                                             <FileText className="w-3 h-3 mr-1" />
-                                             {candidateContacts.length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}
-                                           </Link>
-                                         </Button>
-                                      ))}
+                                       {candidateContacts
+                                         .filter(contact => contact.callcount > 0)
+                                         .map((contact, contactIndex) => (
+                                          <Button
+                                            key={contactIndex}
+                                            variant="outline"
+                                            size="sm"
+                                            asChild
+                                            className="flex-1 min-w-[100px]"
+                                          >
+                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${contact.callid}`}>
+                                              <FileText className="w-3 h-3 mr-1" />
+                                              {candidateContacts.filter(c => c.callcount > 0).length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}
+                                            </Link>
+                                          </Button>
+                                       ))}
                                       <Button
                                         variant="ghost"
                                         size="sm"
