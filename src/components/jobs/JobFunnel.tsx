@@ -68,15 +68,15 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
   const counts = getCounts();
   
   const stages = [
-    { name: "Longlist", count: counts.longlist, color: "bg-blue-500 text-white" },
-    { name: "1st No Answer", count: counts.firstNoAnswer, color: "bg-orange-400 text-white" },
-    { name: "2nd No Answer", count: counts.secondNoAnswer, color: "bg-orange-500 text-white" },
-    { name: "3rd No Answer", count: counts.thirdNoAnswer, color: "bg-orange-600 text-white" },
-    { name: "Contacted", count: counts.contacted, color: "bg-green-500 text-white" },
-    { name: "Low Scored", count: counts.lowScored, color: "bg-red-500 text-white" },
-    { name: "Shortlist", count: counts.shortlist, color: "bg-emerald-500 text-white" },
-    ...(jobAssignment ? [{ name: "Tasked", count: counts.tasked, color: "bg-purple-500 text-white" }] : []),
-    { name: "Hired", count: counts.hired, color: "bg-primary text-primary-foreground" }
+    { name: "Longlist", count: counts.longlist, bgColor: "bg-blue-600", textColor: "text-white" },
+    { name: "1st No Answer", count: counts.firstNoAnswer, bgColor: "bg-orange-500", textColor: "text-white" },
+    { name: "2nd No Answer", count: counts.secondNoAnswer, bgColor: "bg-orange-600", textColor: "text-white" },
+    { name: "3rd No Answer", count: counts.thirdNoAnswer, bgColor: "bg-orange-700", textColor: "text-white" },
+    { name: "Contacted", count: counts.contacted, bgColor: "bg-green-600", textColor: "text-white" },
+    { name: "Low Scored", count: counts.lowScored, bgColor: "bg-red-600", textColor: "text-white" },
+    { name: "Shortlist", count: counts.shortlist, bgColor: "bg-emerald-600", textColor: "text-white" },
+    ...(jobAssignment ? [{ name: "Tasked", count: counts.tasked, bgColor: "bg-purple-600", textColor: "text-white" }] : []),
+    { name: "Hired", count: counts.hired, bgColor: "bg-slate-800", textColor: "text-white" }
   ];
 
   return (
@@ -95,7 +95,7 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
           {stages.map((stage, index) => (
             <div key={stage.name} className="flex items-center space-x-2">
               <div className="flex flex-col items-center space-y-1 min-w-0 flex-1">
-                <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium", stage.color)}>
+                <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold", stage.bgColor, stage.textColor)}>
                   {stage.count}
                 </div>
                 <span className="text-xs text-center text-muted-foreground truncate w-full">
