@@ -54,7 +54,7 @@ export default function LiveCandidateFeed() {
       const { data: jobsCvsData, error: jobsCvsError } = await supabase
         .from('Jobs_CVs')
         .select('*')
-        .order('"Success Score"', { ascending: false });
+        .order('success_score', { ascending: false });
 
       if (jobsCvsError) throw jobsCvsError;
 
@@ -74,18 +74,18 @@ export default function LiveCandidateFeed() {
 
       // Enrich candidates with job titles
       const enrichedCandidates = (jobsCvsData || []).map(candidate => {
-        const job = (jobsData || []).find(j => j['Job ID'] === candidate['Job ID']);
+        const job = (jobsData || []).find(j => j.job_id === candidate.job_id);
         return {
           ...candidate,
-          'Job Title': job?.['Job Title'] || 'Unknown Position'
+          'Job Title': job?.job_title || 'Unknown Position'
         };
       });
 
       // Filter: only score >= 74 and ACTIVE jobs
-      const activeJobIds = new Set((jobsData || []).filter(j => j.Processed === 'Yes').map(j => j['Job ID']))
+      const activeJobIds = new Set((jobsData || []).filter(j => j.Processed === 'Yes').map(j => j.job_id))
       const filteredHighScoreActive = enrichedCandidates.filter(c => {
-        const score = parseFloat(c['Success Score'] || '0');
-        return Number.isFinite(score) && score >= 74 && activeJobIds.has(c['Job ID']);
+        const score = parseFloat(c.success_score || '0');
+        return Number.isFinite(score) && score >= 74 && activeJobIds.has(c.job_id);
       });
 
       setCandidates(filteredHighScoreActive);
@@ -100,28 +100,28 @@ export default function LiveCandidateFeed() {
 
   const filteredCandidates = candidates.filter(candidate => {
     const matchesSearch = 
-      (candidate['Candidate Name'] || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (candidate.candidate_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (candidate['Job Title'] || '').toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesJob = selectedJob === 'all' || candidate['Job ID'] === selectedJob;
+    const matchesJob = selectedJob === 'all' || candidate.job_id === selectedJob;
     
     const matchesStatus = statusFilter === 'all' || 
-      (statusFilter === 'high-score' && parseFloat(candidate['Success Score'] || '0') >= 74) ||
-      (statusFilter === 'contacted' && candidate['Contacted'] && candidate['Contacted'] !== 'Not Contacted') ||
-      (statusFilter === 'new' && (!candidate['Contacted'] || candidate['Contacted'] === 'Not Contacted'));
+      (statusFilter === 'high-score' && parseFloat(candidate.success_score || '0') >= 74) ||
+      (statusFilter === 'contacted' && candidate.contacted && candidate.contacted !== 'Not Contacted') ||
+      (statusFilter === 'new' && (!candidate.contacted || candidate.contacted === 'Not Contacted'));
     
     const matchesScoreFilter = scoreFilter === 'all' ||
-      (scoreFilter === 'high' && parseFloat(candidate['Success Score'] || '0') >= 75) ||
-      (scoreFilter === 'medium' && parseFloat(candidate['Success Score'] || '0') >= 50 && parseFloat(candidate['Success Score'] || '0') < 75) ||
-      (scoreFilter === 'low' && parseFloat(candidate['Success Score'] || '0') < 50 && parseFloat(candidate['Success Score'] || '0') > 0);
+      (scoreFilter === 'high' && parseFloat(candidate.success_score || '0') >= 75) ||
+      (scoreFilter === 'medium' && parseFloat(candidate.success_score || '0') >= 50 && parseFloat(candidate.success_score || '0') < 75) ||
+      (scoreFilter === 'low' && parseFloat(candidate.success_score || '0') < 50 && parseFloat(candidate.success_score || '0') > 0);
 
     return matchesSearch && matchesJob && matchesStatus && matchesScoreFilter;
   });
 
   // Ensure highest scores are shown first regardless of fetch order
   const sortedCandidates = [...filteredCandidates].sort((a, b) => {
-    const sa = parseFloat(a['Success Score'] || '0') || 0;
-    const sb = parseFloat(b['Success Score'] || '0') || 0;
+    const sa = parseFloat(a.success_score || '0') || 0;
+    const sb = parseFloat(b.success_score || '0') || 0;
     return sb - sa;
   });
 
@@ -141,8 +141,8 @@ export default function LiveCandidateFeed() {
 
   // Get CV status for a candidate
   const getCandidateStatus = (candidateId: string) => {
-    const cvRecord = cvData.find(cv => cv['Cadndidate_ID'] === candidateId)
-    return cvRecord?.['CandidateStatus'] || null
+    const cvRecord = cvData.find(cv => cv.candidate_id === candidateId)
+    return cvRecord?.CandidateStatus || null
   }
 
   if (loading) {
@@ -222,7 +222,7 @@ export default function LiveCandidateFeed() {
               <label className="text-sm font-medium text-purple-300">Active Job</label>
               <div className="flex items-center gap-2 bg-black/20 border border-purple-400/30 text-foreground px-3 py-2 rounded-md">
                 <Briefcase className="w-4 h-4 text-purple-300" />
-                <span>{selectedJob === 'all' ? 'All Jobs' : (jobs.find(j => j['Job ID'] === selectedJob)?.['Job Title'] || '—')}</span>
+                <span>{selectedJob === 'all' ? 'All Jobs' : (jobs.find(j => j.job_id === selectedJob)?.job_title || '—')}</span>
               </div>
             </div>
 
@@ -280,7 +280,7 @@ export default function LiveCandidateFeed() {
           <ScrollArea className="h-[600px] pr-4">
             <div className="space-y-4">
               {sortedCandidates.map((candidate, index) => {
-                const score = parseFloat(candidate['Success Score']) || 0;
+                const score = parseFloat(candidate.success_score) || 0;
                 return (
                   <div 
                     key={index} 
@@ -288,7 +288,7 @@ export default function LiveCandidateFeed() {
                       bg-gradient-to-r ${index < 3 ? 'from-yellow-400/30 to-amber-500/50' : getScoreGradient(score)} ${index < 3 ? 'border-yellow-400/50 hover:border-yellow-400/60' : 'border-border hover:border-primary/40 dark:border-white/20'}
                       backdrop-blur-sm animate-fade-in`}
                     style={{ animationDelay: `${index * 0.1}s` }}
-                    onClick={() => window.location.href = `/call-log-details?candidate=${candidate["Candidate_ID"]}&job=${candidate["Job ID"]}`}
+                    onClick={() => window.location.href = `/call-log-details?candidate=${candidate.Candidate_ID}&job=${candidate.job_id}`}
                   >
                     {/* Score Badge */}
                     <div className="absolute top-4 right-4">
@@ -302,35 +302,35 @@ export default function LiveCandidateFeed() {
                     <div className="flex items-start space-x-4 mb-4">
                       <Avatar className="w-16 h-16 border-2 border-cyan-400/50">
                         <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-purple-600 text-white text-lg font-bold">
-                          {candidate['Candidate Name']?.charAt(0) || 'C'}
+                          {candidate.candidate_name?.charAt(0) || 'C'}
                         </AvatarFallback>
                       </Avatar>
                       
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-xl font-bold text-foreground">{candidate['Candidate Name']}</h3>
+                          <h3 className="text-xl font-bold text-foreground">{candidate.candidate_name}</h3>
                           <div className="flex items-center space-x-2">
                             <StatusDropdown
-                              currentStatus={candidate['Contacted']}
-                              candidateId={candidate["Candidate_ID"]}
-                              jobId={candidate["Job ID"]}
+                              currentStatus={candidate.contacted}
+                              candidateId={candidate.Candidate_ID}
+                              jobId={candidate.job_id}
                               statusType="contacted"
                               onStatusChange={(newStatus) => {
                                 setCandidates(prev => prev.map(c => 
-                                  c["Candidate_ID"] === candidate["Candidate_ID"] 
-                                    ? { ...c, Contacted: newStatus }
+                                  c.Candidate_ID === candidate.Candidate_ID 
+                                    ? { ...c, contacted: newStatus }
                                     : c
                                 ))
                               }}
                               variant="badge"
                             />
                             <StatusDropdown
-                              currentStatus={getCandidateStatus(candidate["Candidate_ID"])}
-                              candidateId={candidate["Candidate_ID"]}
+                              currentStatus={getCandidateStatus(candidate.Candidate_ID)}
+                              candidateId={candidate.Candidate_ID}
                               statusType="candidate"
                               onStatusChange={(newStatus) => {
                                 setCvData(prev => prev.map(cv => 
-                                  cv['Cadndidate_ID'] === candidate["Candidate_ID"] 
+                                  cv.candidate_id === candidate.Candidate_ID 
                                     ? { ...cv, CandidateStatus: newStatus }
                                     : cv
                                 ))
@@ -347,11 +347,11 @@ export default function LiveCandidateFeed() {
                           </div>
                           <div className="flex items-center text-purple-300">
                             <Mail className="w-4 h-4 mr-2 text-cyan-400" />
-                            <span>{candidate['Candidate Email']}</span>
+                            <span>{candidate.candidate_email}</span>
                           </div>
                           <div className="flex items-center text-purple-300">
                             <Phone className="w-4 h-4 mr-2 text-green-400" />
-                            <span>{candidate['Candidate Phone Number']}</span>
+                            <span>{candidate.candidate_phone_number}</span>
                           </div>
                           <div className="flex items-center text-purple-300">
                             <Clock className="w-4 h-4 mr-2 text-orange-400" />
