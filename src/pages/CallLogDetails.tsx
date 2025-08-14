@@ -258,7 +258,7 @@ export default function CallLogDetails() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Duration</label>
                 <p className="text-lg">{callLog["duration"] || 'N/A'}</p>
@@ -270,16 +270,6 @@ export default function CallLogDetails() {
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Call Count</label>
                 <p className="text-lg">{callLog["callcount"] || 0}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Call Recording Link</label>
-                <p className="text-lg">
-                  {callLog["recording"] ? (
-                    <a href={callLog["recording"]} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">
-                      View Recording
-                    </a>
-                  ) : 'N/A'}
-                </p>
               </div>
             </div>
             {callLog["recording"] && (
