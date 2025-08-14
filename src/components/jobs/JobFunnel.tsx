@@ -30,18 +30,14 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
     const thirdNoAnswer = candidates.filter(c => c["Contacted"] === "3rd No Answer").length;
     const contacted = candidates.filter(c => c["Contacted"] === "Contacted").length;
     
-    // Low scored (score >= 1 and < 50) - Debug this calculation
-    const lowScoredCandidates = candidates.filter(c => {
-      const score = parseInt(c["Success Score"] || "0");
-      return score >= 1 && score < 50;
-    });
-    const lowScored = lowScoredCandidates.length;
+    // Low scored (contacted status is "Low Scored")
+    const lowScored = candidates.filter(c => c["Contacted"] === "Low Scored").length;
     
     // Debug: log low scored calculation
-    console.log('Low scored candidates:', lowScoredCandidates.length, 'Sample:', lowScoredCandidates.slice(0, 5).map(c => ({
+    const lowScoredCandidates = candidates.filter(c => c["Contacted"] === "Low Scored");
+    console.log('Low scored candidates:', lowScored, 'Sample:', lowScoredCandidates.slice(0, 5).map(c => ({
       id: c["Candidate_ID"],
-      score: c["Success Score"],
-      parsedScore: parseInt(c["Success Score"] || "0")
+      contacted: c["Contacted"]
     })));
     
     // Shortlist (score >= 74)
