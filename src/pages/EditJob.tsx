@@ -58,24 +58,24 @@ const contractLengths = [
 ];
 
 interface JobData {
-  "Job ID": string;
-  "Job Title": string;
-  "Job Description": string;
-  "Client Description": string;
-  "Job Location": string;
-  "Job Salary Range (ex: 15000 AED)": string;
-  "Things to look for": string;
-  "JD Summary": string;
+  job_id: string;
+  job_title: string;
+  job_description: string;
+  client_description: string;
+  job_location: string;
+  job_salary_range: string;
+  things_to_look_for: string;
+  jd_summary: string;
   musttohave?: string;
   nicetohave?: string;
-  "assignment": string;
-  "Processed": string;
-  "Notice Period": string;
-  "Nationality to include": string;
-  "Nationality to Exclude": string;
-  "Type": string;
-  "Contract Length": string | null;
-  "Currency": string;
+  assignment: string;
+  Processed: string;
+  notice_period: string;
+  nationality_to_include: string;
+  nationality_to_exclude: string;
+  Type: string;
+  contract_length: string | null;
+  Currency: string;
 }
 
 export default function EditJob() {
@@ -90,24 +90,24 @@ export default function EditJob() {
   const [uploadedFiles, setUploadedFiles] = useState<Array<{ id: string; file_name: string; file_url: string; file_type: string; file_size: number }>>([]);
   
   const [formData, setFormData] = useState<JobData>({
-    "Job ID": "",
-    "Job Title": "",
-    "Job Description": "",
-    "Client Description": "",
-    "Job Location": "",
-    "Job Salary Range (ex: 15000 AED)": "",
-    "Things to look for": "",
-    "JD Summary": "",
+    job_id: "",
+    job_title: "",
+    job_description: "",
+    client_description: "",
+    job_location: "",
+    job_salary_range: "",
+    things_to_look_for: "",
+    jd_summary: "",
     musttohave: "",
     nicetohave: "",
-    "assignment": "",
-    "Processed": "Yes",
-    "Notice Period": "",
-    "Nationality to include": "",
-    "Nationality to Exclude": "",
-    "Type": "",
-    "Contract Length": "",
-    "Currency": ""
+    assignment: "",
+    Processed: "Yes",
+    notice_period: "",
+    nationality_to_include: "",
+    nationality_to_exclude: "",
+    Type: "",
+    contract_length: "",
+    Currency: ""
   });
 
   useEffect(() => {
@@ -121,7 +121,7 @@ export default function EditJob() {
       const { data, error } = await supabase
         .from('Jobs')
         .select('*')
-        .eq('Job ID', id)
+        .eq('job_id', id)
         .single();
 
       if (error) throw error;
@@ -131,7 +131,7 @@ export default function EditJob() {
         setHasAssignment(!!data.assignment);
         
         // Parse salary range
-        const salaryStr = data["Job Salary Range (ex: 15000 AED)"];
+        const salaryStr = data.job_salary_range;
         if (salaryStr) {
           const salaryNum = parseInt(salaryStr.replace(/[^\d]/g, ''));
           if (!isNaN(salaryNum)) {
@@ -140,11 +140,11 @@ export default function EditJob() {
         }
         
         // Parse nationality arrays
-        if (data["Nationality to include"]) {
-          setNationalityToInclude(data["Nationality to include"].split(", ").filter(Boolean));
+        if (data.nationality_to_include) {
+          setNationalityToInclude(data.nationality_to_include.split(", ").filter(Boolean));
         }
-        if (data["Nationality to Exclude"]) {
-          setNationalityToExclude(data["Nationality to Exclude"].split(", ").filter(Boolean));
+        if (data.nationality_to_exclude) {
+          setNationalityToExclude(data.nationality_to_exclude.split(", ").filter(Boolean));
         }
       }
     } catch (error) {
@@ -168,7 +168,7 @@ export default function EditJob() {
     setSaving(true);
 
     // Basic validation
-    if (!formData["Job Title"] || !formData["Job Description"]) {
+    if (!formData.job_title || !formData.job_description) {
       toast.error("Please fill in all required fields");
       setSaving(false);
       return;
@@ -177,17 +177,17 @@ export default function EditJob() {
     try {
       const jobDataToUpdate = {
         ...formData,
-        "Job Salary Range (ex: 15000 AED)": salaryRange[0].toString(),
-        "Nationality to include": nationalityToInclude.join(", "),
-        "Nationality to Exclude": nationalityToExclude.join(", "),
-        "Contract Length": formData["Type"] === "Contract" ? formData["Contract Length"] : null,
+        job_salary_range: salaryRange[0].toString(),
+        nationality_to_include: nationalityToInclude.join(", "),
+        nationality_to_exclude: nationalityToExclude.join(", "),
+        contract_length: formData.Type === "Contract" ? formData.contract_length : null,
         assignment: hasAssignment ? formData.assignment : null
       };
 
       const { error } = await supabase
         .from('Jobs')
         .update(jobDataToUpdate)
-        .eq('Job ID', id);
+        .eq('job_id', id);
 
       if (error) throw error;
 
@@ -250,11 +250,11 @@ export default function EditJob() {
               <TabsContent value="details" className="space-y-6">
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="Job Title">Job Title *</Label>
+                    <Label htmlFor="job_title">Job Title *</Label>
                     <Input
-                      id="Job Title"
-                      name="Job Title"
-                      value={formData["Job Title"]}
+                      id="job_title"
+                      name="job_title"
+                      value={formData.job_title}
                       onChange={handleInputChange}
                       placeholder="e.g., Senior Software Engineer"
                       required
@@ -262,11 +262,11 @@ export default function EditJob() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="Job Description">Job Description *</Label>
+                    <Label htmlFor="job_description">Job Description *</Label>
                     <Textarea
-                      id="Job Description"
-                      name="Job Description"
-                      value={formData["Job Description"]}
+                      id="job_description"
+                      name="job_description"
+                      value={formData.job_description}
                       onChange={handleInputChange}
                       rows={6}
                       placeholder="Enter detailed job description"
@@ -275,11 +275,11 @@ export default function EditJob() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="Client Description">Client Description</Label>
+                    <Label htmlFor="client_description">Client Description</Label>
                     <Textarea
-                      id="Client Description"
-                      name="Client Description"
-                      value={formData["Client Description"]}
+                      id="client_description"
+                      name="client_description"
+                      value={formData.client_description}
                       onChange={handleInputChange}
                       placeholder="Enter client description"
                       rows={4}
@@ -288,11 +288,11 @@ export default function EditJob() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="Job Location">Job Location</Label>
+                      <Label htmlFor="job_location">Job Location</Label>
                       <Input
-                        id="Job Location"
-                        name="Job Location"
-                        value={formData["Job Location"]}
+                        id="job_location"
+                        name="job_location"
+                        value={formData.job_location}
                         onChange={handleInputChange}
                         placeholder="Enter job location"
                       />
@@ -316,8 +316,8 @@ export default function EditJob() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="Notice Period">Notice Period</Label>
-                      <Select value={formData["Notice Period"]} onValueChange={(value) => setFormData(prev => ({ ...prev, "Notice Period": value }))}>
+                      <Label htmlFor="notice_period">Notice Period</Label>
+                      <Select value={formData.notice_period} onValueChange={(value) => setFormData(prev => ({ ...prev, notice_period: value }))}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select notice period" />
                         </SelectTrigger>
@@ -332,7 +332,7 @@ export default function EditJob() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="Currency">Currency</Label>
-                      <Select value={formData["Currency"]} onValueChange={(value) => setFormData(prev => ({ ...prev, "Currency": value }))}>
+                      <Select value={formData.Currency} onValueChange={(value) => setFormData(prev => ({ ...prev, Currency: value }))}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select currency" />
                         </SelectTrigger>
@@ -437,7 +437,7 @@ export default function EditJob() {
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="Type">Job Type</Label>
-                      <Select value={formData["Type"]} onValueChange={(value) => setFormData(prev => ({ ...prev, "Type": value }))}>
+                      <Select value={formData.Type} onValueChange={(value) => setFormData(prev => ({ ...prev, Type: value }))}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select job type" />
                         </SelectTrigger>
@@ -448,10 +448,10 @@ export default function EditJob() {
                       </Select>
                     </div>
                     
-                    {formData["Type"] === "Contract" && (
+                    {formData.Type === "Contract" && (
                       <div className="space-y-2">
-                        <Label htmlFor="Contract Length">Contract Length</Label>
-                        <Select value={formData["Contract Length"]} onValueChange={(value) => setFormData(prev => ({ ...prev, "Contract Length": value }))}>
+                        <Label htmlFor="contract_length">Contract Length</Label>
+                        <Select value={formData.contract_length || ""} onValueChange={(value) => setFormData(prev => ({ ...prev, contract_length: value }))}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select contract length" />
                           </SelectTrigger>
@@ -504,7 +504,7 @@ export default function EditJob() {
                     <FileUpload
                       onUploadComplete={handleFileUpload}
                       entityType="job"
-                      entityId={formData["Job ID"]}
+                      entityId={formData.job_id}
                       multiple={true}
                     />
                   </div>
