@@ -221,10 +221,19 @@ export default function LiveCandidateFeed() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-purple-300">Active Job</label>
-              <div className="flex items-center gap-2 bg-black/20 border border-purple-400/30 text-foreground px-3 py-2 rounded-md">
-                <Briefcase className="w-4 h-4 text-purple-300" />
-                <span>{selectedJob === 'all' ? 'All Jobs' : (jobs.find(j => j.job_id === selectedJob)?.job_title || '—')}</span>
-              </div>
+              <Select value={selectedJob} onValueChange={setSelectedJob}>
+                <SelectTrigger className="bg-black/20 border-purple-400/30 text-foreground focus:border-purple-400">
+                  <SelectValue placeholder="All Jobs" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-purple-400/30 backdrop-blur-xl z-50">
+                  <SelectItem value="all" className="text-white hover:bg-purple-600/20">All Jobs</SelectItem>
+                  {jobs.filter(job => job.Processed === 'Yes').map((job) => (
+                    <SelectItem key={job.job_id} value={job.job_id} className="text-white hover:bg-purple-600/20">
+                      {job.job_title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
