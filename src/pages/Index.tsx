@@ -222,7 +222,7 @@ export default function Index() {
         <div className="rounded-2xl border border-border/50 bg-gradient-card backdrop-blur-xl p-6 shadow-card animate-fade-in">
           <HeroHeader
             title="Mission Control"
-            subtitle={`Welcome back, ${profile?.first_name || 'Commander'}. Your day at a glance.`}
+            subtitle={`Welcome back, ${profile?.name || 'Commander'}. Your day at a glance.`}
           />
 
           <BentoKpis>

@@ -1,75 +1,101 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect } from 'react'
+import { supabase } from '@/integrations/supabase/client'
+import { useToast } from '@/hooks/use-toast'
 
-export interface UserProfile {
-  id: string;
-  user_id: string;
-  first_name: string | null;
-  last_name: string | null;
-  email: string | null;
-  phone: string | null;
-  role: 'admin' | 'manager' | 'recruiter' | 'user';
-  department: string | null;
-  avatar_url: string | null;
-  created_at: string;
-  updated_at: string;
+interface Profile {
+  id: string
+  user_id: string
+  name: string | null
+  created_at: string
+  updated_at: string
 }
 
 export function useProfile() {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [loading, setLoading] = useState(true)
+  const { toast } = useToast()
 
-  useEffect(() => {
-    if (user) {
-      // For now, create a mock profile since the profiles table doesn't exist yet
-      setProfile({
-        id: user.id,
-        user_id: user.id,
-        first_name: user.user_metadata?.first_name || user.email?.split('@')[0] || 'User',
-        last_name: user.user_metadata?.last_name || '',
-        email: user.email || null,
-        phone: user.user_metadata?.phone || null,
-        role: 'recruiter',
-        department: 'Recruitment',
-        avatar_url: user.user_metadata?.avatar_url || null,
-        created_at: user.created_at || new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
-      setLoading(false);
-    }
-  }, [user]);
-
-  const updateProfile = async (updates: Partial<UserProfile>) => {
+  const fetchProfile = async () => {
     try {
-      // For now, just update the local state since the profiles table doesn't exist
-      setProfile(prev => prev ? { ...prev, ...updates } : null);
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (!user) {
+        setProfile(null)
+        setLoading(false)
+        return
+      }
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (error) throw error
+
+      // If no profile exists, create one
+      if (!data) {
+        const { data: newProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert([{ user_id: user.id, name: null }])
+          .select()
+          .single()
+
+        if (createError) throw createError
+        setProfile(newProfile)
+      } else {
+        setProfile(data)
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error)
+      toast({
+        title: "Error",
+        description: "Failed to load profile",
+        variant: "destructive"
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const updateProfile = async (updates: Partial<Pick<Profile, 'name'>>) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (!user) throw new Error('No user found')
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('user_id', user.id)
+        .select()
+        .single()
+
+      if (error) throw error
+
+      setProfile(data)
       toast({
         title: "Success",
-        description: "Profile updated successfully",
-      });
+        description: "Profile updated successfully"
+      })
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error('Error updating profile:', error)
       toast({
         title: "Error",
         description: "Failed to update profile",
-        variant: "destructive",
-      });
+        variant: "destructive"
+      })
     }
-  };
+  }
 
-  const fetchProfile = async () => {
-    // Mock function for now
-    setLoading(false);
-  };
+  useEffect(() => {
+    fetchProfile()
+  }, [])
 
   return {
     profile,
     loading,
     updateProfile,
-    refetch: fetchProfile,
-  };
+    refetch: fetchProfile
+  }
 }

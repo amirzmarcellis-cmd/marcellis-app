@@ -34,26 +34,24 @@ export function WelcomeHeader() {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Avatar className="h-16 w-16 ring-2 ring-primary/20 ring-offset-2 ring-offset-background">
-            <AvatarImage src={profile?.avatar_url || undefined} />
+            <AvatarImage src={undefined} />
             <AvatarFallback className="bg-gradient-primary text-primary-foreground text-lg font-semibold">
-              {profile?.first_name?.[0]}{profile?.last_name?.[0] || 'U'}
+              {profile?.name?.[0] || 'U'}
             </AvatarFallback>
           </Avatar>
           
           <div>
-            <h1 className="text-3xl font-bold text-glow mb-1">
-              Welcome back, {profile?.first_name || 'Recruiter'}
+            <h1 className="text-3xl font-bold mb-1">
+              <span className="text-glow">Welcome back, </span>
+              <span className="bg-gradient-primary bg-clip-text text-transparent">
+                {profile?.name || 'Recruiter'}
+              </span>
             </h1>
             <p className="text-muted-foreground text-lg mb-2">{currentDate}</p>
             <div className="flex items-center space-x-3">
-              <Badge className={getRoleColor(profile?.role || 'user')}>
-                {profile?.role || 'User'}
+              <Badge className="bg-primary text-primary-foreground">
+                User
               </Badge>
-              {profile?.department && (
-                <Badge variant="outline" className="border-border/40">
-                  {profile.department}
-                </Badge>
-              )}
             </div>
           </div>
         </div>

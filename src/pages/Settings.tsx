@@ -3,19 +3,29 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { Upload, Settings as SettingsIcon, Palette } from "lucide-react"
-import { useState } from "react"
+import { Upload, Settings as SettingsIcon, Palette, User } from "lucide-react"
+import { useState, useEffect } from "react"
 import { useAppSettings } from "@/contexts/AppSettingsContext"
+import { useProfile } from "@/hooks/useProfile"
 import { toast } from "sonner"
 import { useTheme } from "next-themes"
 
 export default function Settings() {
   const { settings, updateSettings } = useAppSettings();
+  const { profile, loading: profileLoading, updateProfile } = useProfile();
   const [systemName, setSystemName] = useState(settings.systemName)
   const [primaryColor, setPrimaryColor] = useState(settings.primaryColor)
+  const [userName, setUserName] = useState(profile?.name || "")
   const [lightLogo, setLightLogo] = useState<File | null>(null)
   const [darkLogo, setDarkLogo] = useState<File | null>(null)
   const { theme } = useTheme()
+
+  // Update userName when profile loads
+  useEffect(() => {
+    if (profile?.name && userName !== profile.name) {
+      setUserName(profile.name)
+    }
+  }, [profile?.name])
 
   const handleLightLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -43,11 +53,18 @@ export default function Settings() {
     }
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    // Save system settings
     updateSettings({ 
       systemName, 
       primaryColor
     })
+    
+    // Save user profile if name changed
+    if (userName !== profile?.name) {
+      await updateProfile({ name: userName || null })
+    }
+    
     toast.success("Settings saved successfully!")
   }
 
@@ -65,6 +82,30 @@ export default function Settings() {
         </div>
 
         <div className="max-w-2xl space-y-6">
+          {/* User Profile */}
+          <Card className="bg-gradient-card backdrop-blur-glass border-glass-border shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="w-5 h-5" />
+                User Profile
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="userName">Your Name</Label>
+                <Input
+                  id="userName"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  placeholder="Enter your name"
+                  className="bg-background/50 border-glass-border"
+                  disabled={profileLoading}
+                />
+                <p className="text-xs text-muted-foreground">This name will be used to greet you on the dashboard</p>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* System Branding */}
           <Card className="bg-gradient-card backdrop-blur-glass border-glass-border shadow-card">
             <CardHeader>
