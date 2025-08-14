@@ -279,18 +279,18 @@ export default function CallLog() {
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
-              <Table className="min-w-[1200px]">
-              <TableHeader>
-                <TableRow className="border-border">
-                  <TableHead>Candidate</TableHead>
-                  <TableHead>Job</TableHead>
-                  <TableHead>Contacted</TableHead>
-                  <TableHead>Success Score</TableHead>
-                  <TableHead>Notice Period</TableHead>
-                  <TableHead>Salary Expectations</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-border">
+                    <TableHead className="w-[200px]">Candidate</TableHead>
+                    <TableHead className="w-[150px]">Job</TableHead>
+                    <TableHead className="w-[120px]">Contacted</TableHead>
+                    <TableHead className="w-[100px]">Score</TableHead>
+                    <TableHead className="w-[120px]">Notice Period</TableHead>
+                    <TableHead className="w-[140px]">Salary Expectations</TableHead>
+                    <TableHead className="w-[200px] text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
@@ -312,79 +312,72 @@ export default function CallLog() {
                       .join('')
                       .toUpperCase()
                     
-                    return (
-                      <TableRow key={index} className="border-border hover:bg-glass-primary transition-colors">
-                        <TableCell>
-                          <div className="flex items-center space-x-3">
-                            <Avatar className="w-10 h-10">
-                              <AvatarFallback className="bg-gradient-primary text-white">
-                                {initials}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <div className="font-medium">{log.candidate_name || "N/A"}</div>
-                              <div className="text-sm text-muted-foreground">{log.candidate_email || "N/A"}</div>
+                      return (
+                        <TableRow key={index} className="border-border hover:bg-glass-primary transition-colors">
+                          <TableCell className="max-w-[200px]">
+                            <div className="flex items-center space-x-3">
+                              <Avatar className="w-8 h-8 flex-shrink-0">
+                                <AvatarFallback className="bg-gradient-primary text-white text-sm">
+                                  {initials}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="min-w-0 flex-1">
+                                <div className="font-medium truncate">{log.candidate_name || "N/A"}</div>
+                                <div className="text-sm text-muted-foreground truncate">{log.candidate_email || "N/A"}</div>
+                              </div>
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{log.job_title || "N/A"}</div>
-                            <Badge variant="outline" className="font-mono text-xs">
-                              {log.job_id || "N/A"}
+                          </TableCell>
+                          <TableCell className="max-w-[150px]">
+                            <div className="min-w-0">
+                              <div className="font-medium truncate">{log.job_title || "N/A"}</div>
+                              <Badge variant="outline" className="font-mono text-xs mt-1">
+                                {(log.job_id || "N/A").substring(0, 8)}...
+                              </Badge>
+                            </div>
+                          </TableCell>
+                          <TableCell className="max-w-[120px]">
+                            <StatusDropdown
+                              currentStatus={log.contacted}
+                              candidateId={log.Candidate_ID || ""}
+                              jobId={log.job_id}
+                              statusType="contacted"
+                              onStatusChange={(newStatus) => {
+                                setCallLogs(prev => prev.map(l => 
+                                  l.Candidate_ID === log.Candidate_ID && l.job_id === log.job_id
+                                    ? { ...l, contacted: newStatus }
+                                    : l
+                                ))
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell className="max-w-[100px]">
+                            <Badge variant={getScoreBadgeVariant(log.success_score)} className="whitespace-nowrap">
+                              {log.success_score ? `${log.success_score}/100` : "N/A"}
                             </Badge>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <StatusDropdown
-                            currentStatus={log.contacted}
-            candidateId={log.Candidate_ID || ""}
-            jobId={log.job_id}
-            statusType="contacted"
-            onStatusChange={(newStatus) => {
-              setCallLogs(prev => prev.map(l => 
-                l.Candidate_ID === log.Candidate_ID && l.job_id === log.job_id
-                  ? { ...l, contacted: newStatus }
-                  : l
-              ))
-            }}
-          />
-        </TableCell>
-        <TableCell>
-          <Badge variant={getScoreBadgeVariant(log.success_score)}>
-            {log.success_score ? `${log.success_score}/100` : "N/A"}
-          </Badge>
-        </TableCell>
-        <TableCell>
-          <div className="flex items-center space-x-2">
-            <Clock className="w-4 h-4 text-muted-foreground" />
-            <span>{log.notice_period || "N/A"}</span>
-          </div>
-        </TableCell>
-        <TableCell>
-          <span>{log.salary_expectations || "N/A"}</span>
-        </TableCell>
-                        <TableCell className="text-right">
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link to={`/call-log-details?candidate=${log.Candidate_ID || (log as any)["candidate_id"]}&job=${log.job_id || (log as any)["job_id"]}&callid=${(log as any).callid}`}> 
-                <FileText className="w-4 h-4 mr-1" />
-                See Log
-              </Link>
-            </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link to={`/candidate/${log.Candidate_ID}`}>
-                <Eye className="w-4 h-4 mr-1" />
-                View Candidate
-              </Link>
-            </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link to={`/job/${log.job_id}`}>
-                View Job
-              </Link>
-            </Button>
-          </div>
-                        </TableCell>
+                          </TableCell>
+                          <TableCell className="max-w-[120px]">
+                            <div className="flex items-center space-x-2">
+                              <Clock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                              <span className="truncate">{log.notice_period || "N/A"}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="max-w-[140px]">
+                            <span className="truncate">{log.salary_expectations || "N/A"}</span>
+                          </TableCell>
+                          <TableCell className="text-right max-w-[200px]">
+                            <div className="flex justify-end space-x-1">
+                              <Button variant="outline" size="sm" asChild className="h-8 px-2">
+                                <Link to={`/call-log-details?candidate=${log.Candidate_ID || (log as any)["candidate_id"]}&job=${log.job_id || (log as any)["job_id"]}&callid=${(log as any).callid}`}> 
+                                  <FileText className="w-3 h-3" />
+                                </Link>
+                              </Button>
+                              <Button variant="outline" size="sm" asChild className="h-8 px-2">
+                                <Link to={`/candidate/${log.Candidate_ID}`}>
+                                  <Eye className="w-3 h-3" />
+                                </Link>
+                              </Button>
+                            </div>
+                          </TableCell>
                       </TableRow>
                     )
                   })

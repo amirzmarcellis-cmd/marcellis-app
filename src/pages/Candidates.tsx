@@ -174,15 +174,15 @@ export default function Candidates() {
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
-              <Table className="min-w-[800px]">
+              <Table>
                 <TableHeader>
                   <TableRow className="border-border">
-                    <TableHead>Candidate</TableHead>
-                    <TableHead>Position</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Location</TableHead>
-                    <TableHead>Last Contact</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="w-[250px]">Candidate</TableHead>
+                    <TableHead className="w-[200px]">Position</TableHead>
+                    <TableHead className="w-[150px]">Status</TableHead>
+                    <TableHead className="w-[150px]">Location</TableHead>
+                    <TableHead className="w-[120px]">Last Contact</TableHead>
+                    <TableHead className="w-[150px] text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -206,59 +206,64 @@ export default function Candidates() {
                       
                       return (
                         <TableRow key={candidate.candidate_id} className="border-border hover:bg-glass-primary transition-colors">
-                          <TableCell>
+                          <TableCell className="max-w-[250px]">
                             <div className="flex items-center space-x-3">
-                              <Avatar className="w-10 h-10">
-                                <AvatarFallback className="bg-gradient-primary text-white">
+                              <Avatar className="w-8 h-8 flex-shrink-0">
+                                <AvatarFallback className="bg-gradient-primary text-white text-sm">
                                   {initials}
                                 </AvatarFallback>
                               </Avatar>
-                              <div>
-                                <div className="font-medium">{fullName || "N/A"}</div>
-                                <div className="text-sm text-muted-foreground break-words">{candidate.Email || "N/A"}</div>
+                              <div className="min-w-0 flex-1">
+                                <div className="font-medium truncate">{fullName || "N/A"}</div>
+                                <div className="text-sm text-muted-foreground truncate">{candidate.Email || "N/A"}</div>
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="max-w-[200px]">
                             <div className="flex items-center space-x-2">
-                              <Briefcase className="w-4 h-4 text-muted-foreground" />
-                              <span className="break-words">{candidate.Title || "N/A"}</span>
+                              <Briefcase className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                              <span className="truncate">{candidate.Title || "N/A"}</span>
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="max-w-[150px]">
                             <div className="flex flex-wrap gap-1">
                               {Array.isArray(candidate.applied_for) && candidate.applied_for.length > 0 
-                                ? candidate.applied_for.map((jobId) => (
-                                    <Badge key={jobId} variant="secondary" className="capitalize text-xs">
+                                ? candidate.applied_for.slice(0, 2).map((jobId) => (
+                                    <Badge key={jobId} variant="secondary" className="text-xs truncate max-w-[60px]">
                                       {jobId}
                                     </Badge>
                                   ))
-                                : <Badge variant="secondary" className="capitalize">Not Applied</Badge>
+                                : <Badge variant="secondary" className="text-xs">Not Applied</Badge>
                               }
+                              {Array.isArray(candidate.applied_for) && candidate.applied_for.length > 2 && (
+                                <Badge variant="outline" className="text-xs">
+                                  +{candidate.applied_for.length - 2}
+                                </Badge>
+                              )}
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="max-w-[150px]">
                             <div className="flex items-center space-x-2">
-                              <MapPin className="w-4 h-4 text-muted-foreground" />
-                              <span className="break-words">{candidate.Location || "N/A"}</span>
+                              <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                              <span className="truncate">{candidate.Location || "N/A"}</span>
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="max-w-[120px]">
                             <div className="flex items-center space-x-2">
-                              <Calendar className="w-4 h-4 text-muted-foreground" />
-                              <span>{candidate.Timestamp ? formatDate(candidate.Timestamp) : "N/A"}</span>
+                              <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                              <span className="text-sm truncate">{candidate.Timestamp ? formatDate(candidate.Timestamp) : "N/A"}</span>
                             </div>
                           </TableCell>
-                          <TableCell className="text-right">
+                          <TableCell className="text-right max-w-[150px]">
                             <div className="flex justify-end space-x-1">
-                              <Button variant="outline" size="sm" asChild title="View Candidate">
+                              <Button variant="outline" size="sm" asChild title="View Candidate" className="h-8 px-2">
                                 <Link to={`/candidate/${candidate.candidate_id}`}>
-                                  👁️
+                                  <Eye className="w-3 h-3" />
                                 </Link>
                               </Button>
-                              <Button variant="outline" size="sm" asChild title="Edit Candidate">
+                              <Button variant="outline" size="sm" asChild title="Edit Candidate" className="h-8 px-2">
                                 <Link to={`/candidate/edit/${candidate.candidate_id}`}>
-                                  ✏️
+                                  <Edit className="w-3 h-3" />
                                 </Link>
                               </Button>
                             </div>
