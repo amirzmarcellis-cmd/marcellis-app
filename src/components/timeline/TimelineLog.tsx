@@ -86,6 +86,23 @@ export function TimelineLog({ candidateId, jobId }: TimelineLogProps) {
       const filtered: TimelineEvent[] = []
 
       if (history && Array.isArray(history)) {
+        // Get unique user IDs
+        const userIds = Array.from(new Set(history.map(row => row.user_id).filter(Boolean)))
+        
+        // Fetch user names for all user IDs
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('user_id, name')
+          .in('user_id', userIds)
+
+        // Create a map for quick lookup
+        const userNameMap = new Map()
+        if (profiles) {
+          profiles.forEach(profile => {
+            userNameMap.set(profile.user_id, profile.name)
+          })
+        }
+
         for (const row of history) {
           if (!allowedTypes.has(row.change_type)) continue
 
@@ -100,6 +117,7 @@ export function TimelineLog({ candidateId, jobId }: TimelineLogProps) {
               timestamp: row.created_at,
               description: buildHistoryDescription(row),
               user_id: row.user_id,
+              user_name: userNameMap.get(row.user_id) || undefined,
               icon: iconForHistory(row)
             })
           }
@@ -176,7 +194,9 @@ export function TimelineLog({ candidateId, jobId }: TimelineLogProps) {
                       {format(new Date(event.timestamp), 'MMM dd, yyyy HH:mm')}
                     </p>
                     {event.user_name && (
-                      <span className="text-xs text-muted-foreground">By {event.user_name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        By <span className="text-primary font-medium">{event.user_name}</span>
+                      </span>
                     )}
                   </div>
                 </div>
