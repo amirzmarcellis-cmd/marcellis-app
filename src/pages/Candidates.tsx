@@ -173,7 +173,7 @@ export default function Candidates() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="w-full overflow-x-auto">
+            <div className="overflow-x-auto">
               <Table className="min-w-[800px]">
                 <TableHeader>
                   <TableRow className="border-border">
