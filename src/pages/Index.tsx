@@ -171,8 +171,8 @@ export default function Index() {
     setData(prev => prev ? { ...prev, tasksToday: count } : null);
   };
 
-  const handleCandidateClick = (candidateId: string, jobId: string) => {
-    navigate(`/call-log-details?candidate=${candidateId}&job=${jobId}`);
+  const handleCandidateClick = (candidateId: string, jobId: string, callid?: number) => {
+    navigate(`/call-log-details?candidate=${candidateId}&job=${jobId}&callid=${callid || ''}`);
   };
 
   const getScoreColor = (score: number) => {
@@ -376,7 +376,7 @@ export default function Index() {
                       <div 
                         key={index} 
                         className={`bg-gradient-to-r rounded-xl p-4 border ${index < 3 ? 'from-amber-400/20 to-yellow-500/20 border-yellow-400/40' : 'from-white/5 to-white/10 border-white/20'} hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group cursor-pointer`}
-                        onClick={() => handleCandidateClick(candidate.Candidate_ID, candidate.job_id)}
+                        onClick={() => handleCandidateClick(candidate.Candidate_ID, candidate.job_id, candidate.callid)}
                       >
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center space-x-3">
