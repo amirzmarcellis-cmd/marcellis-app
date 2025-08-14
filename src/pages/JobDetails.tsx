@@ -779,7 +779,7 @@ export default function JobDetails() {
                     </div>
                     <Button 
                       variant="default" 
-                      className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-green-600 hover:bg-green-700 text-white dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={handleGenerateShortList}
                       disabled={isGeneratingShortList || shortListButtonDisabled}
                     >
