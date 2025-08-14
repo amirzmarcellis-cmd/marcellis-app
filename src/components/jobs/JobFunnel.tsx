@@ -14,17 +14,32 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
   const getCounts = () => {
     const longlist = candidates.length;
     
+    // Debug: log some candidate data to understand the structure
+    console.log('Sample candidates for debugging:', candidates.slice(0, 3).map(c => ({
+      id: c["Candidate_ID"],
+      contacted: c["Contacted"],
+      score: c["Success Score"]
+    })));
+    
     // Count by contacted status
     const firstNoAnswer = candidates.filter(c => c["Contacted"] === "1st No Answer").length;
     const secondNoAnswer = candidates.filter(c => c["Contacted"] === "2nd No Answer").length;
     const thirdNoAnswer = candidates.filter(c => c["Contacted"] === "3rd No Answer").length;
     const contacted = candidates.filter(c => c["Contacted"] === "Contacted").length;
     
-    // Low scored (score >= 1 and < 50)
-    const lowScored = candidates.filter(c => {
+    // Low scored (score >= 1 and < 50) - Debug this calculation
+    const lowScoredCandidates = candidates.filter(c => {
       const score = parseInt(c["Success Score"] || "0");
       return score >= 1 && score < 50;
-    }).length;
+    });
+    const lowScored = lowScoredCandidates.length;
+    
+    // Debug: log low scored calculation
+    console.log('Low scored candidates:', lowScoredCandidates.length, 'Sample:', lowScoredCandidates.slice(0, 5).map(c => ({
+      id: c["Candidate_ID"],
+      score: c["Success Score"],
+      parsedScore: parseInt(c["Success Score"] || "0")
+    })));
     
     // Shortlist (score >= 74)
     const shortlist = candidates.filter(c => {
@@ -79,7 +94,7 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
         {/* Horizontal funnel layout */}
         <div className="flex items-center justify-between space-x-2 mb-4">
           {stages.map((stage, index) => (
-            <React.Fragment key={stage.name}>
+            <div key={stage.name} className="flex items-center space-x-2">
               <div className="flex flex-col items-center space-y-1 min-w-0 flex-1">
                 <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium", stage.color)}>
                   {stage.count}
@@ -91,7 +106,7 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
               {index < stages.length - 1 && (
                 <ChevronRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
               )}
-            </React.Fragment>
+            </div>
           ))}
         </div>
         
