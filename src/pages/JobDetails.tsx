@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
+import { JobFunnel } from "@/components/jobs/JobFunnel"
 import { JobDialog } from "@/components/jobs/JobDialog"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
 import { useToast } from "@/components/ui/use-toast"
@@ -579,7 +580,11 @@ export default function JobDetails() {
             </div>
 
           <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Job Funnel */}
+              <div className="md:col-span-1">
+                <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
+              </div>
               <Card>
                 <CardHeader>
                   <CardTitle>Job Information</CardTitle>
@@ -610,6 +615,7 @@ export default function JobDetails() {
                 </CardContent>
               </Card>
 
+              <div className="md:col-span-2 space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Job Requirements & Details</CardTitle>
@@ -653,6 +659,7 @@ export default function JobDetails() {
                   </div>
                 </CardContent>
               </Card>
+              </div>
             </div>
           </TabsContent>
 
