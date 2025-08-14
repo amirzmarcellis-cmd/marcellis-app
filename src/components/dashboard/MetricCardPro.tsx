@@ -39,7 +39,6 @@ export function MetricCardPro({
             <p className="text-xs text-muted-foreground">{title}</p>
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-semibold text-foreground">{value}</span>
-              {delta}
             </div>
           </div>
           <div className={cn("relative flex-shrink-0 text-primary", accentMap[accent])}>
