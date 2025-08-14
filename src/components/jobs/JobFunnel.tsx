@@ -20,10 +20,10 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
     const thirdNoAnswer = candidates.filter(c => c["Contacted"] === "3rd No Answer").length;
     const contacted = candidates.filter(c => c["Contacted"] === "Contacted").length;
     
-    // Low scored (score < 50)
+    // Low scored (score >= 1 and < 50)
     const lowScored = candidates.filter(c => {
       const score = parseInt(c["Success Score"] || "0");
-      return score > 0 && score < 50;
+      return score >= 1 && score < 50;
     }).length;
     
     // Shortlist (score >= 74)
