@@ -14,6 +14,7 @@ import { StatusDropdown } from "@/components/candidates/StatusDropdown"
 import { TimelineLog } from "@/components/timeline/TimelineLog"
 import WaveformPlayer from "@/components/calls/WaveformPlayer"
 import RulerScore from "@/components/ui/ruler-score"
+import { useProfile } from "@/hooks/useProfile"
 
 interface CallLogDetail {
   "Job ID": string | null
@@ -39,6 +40,8 @@ interface CallLogDetail {
   "duration": string | null
   "recording": string | null
   "cv_link": string | null
+  "notes_updated_by": string | null
+  "notes_updated_at": string | null
 }
 
 export default function CallLogDetails() {
@@ -52,6 +55,8 @@ export default function CallLogDetails() {
   const [notes, setNotes] = useState("")
   const [saving, setSaving] = useState(false)
   const [search, setSearch] = useState("")
+  const [notesUpdatedByName, setNotesUpdatedByName] = useState<string | null>(null)
+  const { profile } = useProfile()
 
   const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
   const highlightedTranscript = useMemo(() => {
@@ -133,7 +138,22 @@ export default function CallLogDetails() {
         "callcount": (data as any).callcount ?? (data as any)["callcount"],
         "duration": (data as any).duration ?? (data as any)["duration"],
         "recording": (data as any).recording ?? (data as any)["recording"],
-        "cv_link": (data as any).cv_link ?? (data as any)["cv_link"]
+        "cv_link": (data as any).cv_link ?? (data as any)["cv_link"],
+        "notes_updated_by": (data as any).notes_updated_by ?? (data as any)["notes_updated_by"],
+        "notes_updated_at": (data as any).notes_updated_at ?? (data as any)["notes_updated_at"]
+      }
+
+      // If there's a notes_updated_by user ID, fetch their profile
+      if (enrichedData["notes_updated_by"]) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('name')
+          .eq('user_id', enrichedData["notes_updated_by"])
+          .maybeSingle()
+        
+        if (profileData?.name) {
+          setNotesUpdatedByName(profileData.name)
+        }
       }
 
       setCallLog(enrichedData)
@@ -150,9 +170,15 @@ export default function CallLogDetails() {
     
     setSaving(true)
     try {
+      const { data: { user } } = await supabase.auth.getUser()
+      
       let updateQuery: any = supabase
         .from('Jobs_CVs')
-        .update({ 'Notes': notes })
+        .update({ 
+          'Notes': notes,
+          'notes_updated_by': user?.id,
+          'notes_updated_at': new Date().toISOString()
+        })
       if (callid) {
         updateQuery = updateQuery.eq('callid', callid)
       } else {
@@ -164,6 +190,7 @@ export default function CallLogDetails() {
       if (error) throw error
       
       setCallLog(prev => prev ? { ...prev, Notes: notes } : null)
+      setNotesUpdatedByName(profile?.name || null)
       // Refresh the page after successful save to reflect timeline updates
       window.location.reload()
     } catch (error) {
@@ -333,6 +360,14 @@ export default function CallLogDetails() {
               onChange={(e) => setNotes(e.target.value)}
               className="min-h-[100px]"
             />
+            {notesUpdatedByName && callLog?.["Notes"] && (
+              <p className="text-xs text-muted-foreground">
+                Added by <span className="text-primary font-medium">{notesUpdatedByName}</span>
+                {callLog?.["notes_updated_at"] && (
+                  <span> on {new Date(callLog["notes_updated_at"]).toLocaleDateString()}</span>
+                )}
+              </p>
+            )}
             <Button onClick={saveNotes} disabled={saving} className="w-full">
               <Save className="w-4 h-4 mr-2" />
               {saving ? "Saving..." : "Save Notes"}

@@ -321,6 +321,8 @@ export type Database = {
           lastcalltime: string | null
           longlisted_at: string | null
           notes: string | null
+          notes_updated_at: string | null
+          notes_updated_by: string | null
           notice_period: string | null
           pros: string | null
           recording: string | null
@@ -351,6 +353,8 @@ export type Database = {
           lastcalltime?: string | null
           longlisted_at?: string | null
           notes?: string | null
+          notes_updated_at?: string | null
+          notes_updated_by?: string | null
           notice_period?: string | null
           pros?: string | null
           recording?: string | null
@@ -381,6 +385,8 @@ export type Database = {
           lastcalltime?: string | null
           longlisted_at?: string | null
           notes?: string | null
+          notes_updated_at?: string | null
+          notes_updated_by?: string | null
           notice_period?: string | null
           pros?: string | null
           recording?: string | null
