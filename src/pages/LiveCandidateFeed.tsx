@@ -106,14 +106,15 @@ export default function LiveCandidateFeed() {
     const matchesJob = selectedJob === 'all' || candidate.job_id === selectedJob;
     
     const matchesStatus = statusFilter === 'all' || 
-      (statusFilter === 'high-score' && parseFloat(candidate.success_score || '0') >= 74) ||
-      (statusFilter === 'contacted' && candidate.contacted && candidate.contacted !== 'Not Contacted') ||
-      (statusFilter === 'new' && (!candidate.contacted || candidate.contacted === 'Not Contacted'));
+      statusFilter === candidate.contacted ||
+      (statusFilter === 'Shortlisted' && getCandidateStatus(candidate.Candidate_ID) === 'Shortlisted') ||
+      (statusFilter === 'Interview' && getCandidateStatus(candidate.Candidate_ID) === 'Interview') ||
+      (statusFilter === 'Hired' && getCandidateStatus(candidate.Candidate_ID) === 'Hired') ||
+      (statusFilter === 'Rejected' && getCandidateStatus(candidate.Candidate_ID) === 'Rejected');
     
     const matchesScoreFilter = scoreFilter === 'all' ||
-      (scoreFilter === 'high' && parseFloat(candidate.success_score || '0') >= 75) ||
-      (scoreFilter === 'medium' && parseFloat(candidate.success_score || '0') >= 50 && parseFloat(candidate.success_score || '0') < 75) ||
-      (scoreFilter === 'low' && parseFloat(candidate.success_score || '0') < 50 && parseFloat(candidate.success_score || '0') > 0);
+      (scoreFilter === '50-74' && parseFloat(candidate.success_score || '0') >= 50 && parseFloat(candidate.success_score || '0') <= 74) ||
+      (scoreFilter === '75-100' && parseFloat(candidate.success_score || '0') >= 75 && parseFloat(candidate.success_score || '0') <= 100);
 
     return matchesSearch && matchesJob && matchesStatus && matchesScoreFilter;
   });
@@ -227,16 +228,20 @@ export default function LiveCandidateFeed() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-purple-300">Status Filter</label>
+              <label className="text-sm font-medium text-purple-300">Status</label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="bg-black/20 border-pink-400/30 text-foreground focus:border-pink-400">
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-pink-400/30 backdrop-blur-xl">
-                  <SelectItem value="all" className="text-white hover:bg-pink-600/20">All Candidates</SelectItem>
-                  <SelectItem value="high-score" className="text-white hover:bg-pink-600/20">High Score (74+)</SelectItem>
-                  <SelectItem value="contacted" className="text-white hover:bg-pink-600/20">Contacted</SelectItem>
-                  <SelectItem value="new" className="text-white hover:bg-pink-600/20">New/Uncontacted</SelectItem>
+                <SelectContent className="bg-slate-800 border-pink-400/30 backdrop-blur-xl z-50">
+                  <SelectItem value="all" className="text-white hover:bg-pink-600/20">All Status</SelectItem>
+                  <SelectItem value="Contacted" className="text-white hover:bg-pink-600/20">Contacted</SelectItem>
+                  <SelectItem value="Call Done" className="text-white hover:bg-pink-600/20">Call Done</SelectItem>
+                  <SelectItem value="Low Scored" className="text-white hover:bg-pink-600/20">Low Scored</SelectItem>
+                  <SelectItem value="Shortlisted" className="text-white hover:bg-pink-600/20">Shortlisted</SelectItem>
+                  <SelectItem value="Interview" className="text-white hover:bg-pink-600/20">Interview</SelectItem>
+                  <SelectItem value="Hired" className="text-white hover:bg-pink-600/20">Hired</SelectItem>
+                  <SelectItem value="Rejected" className="text-white hover:bg-pink-600/20">Rejected</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -247,11 +252,10 @@ export default function LiveCandidateFeed() {
                 <SelectTrigger className="bg-black/20 border-emerald-400/30 text-foreground focus:border-emerald-400">
                   <SelectValue placeholder="All Scores" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-emerald-400/30 backdrop-blur-xl">
+                <SelectContent className="bg-slate-800 border-emerald-400/30 backdrop-blur-xl z-50">
                   <SelectItem value="all" className="text-white hover:bg-emerald-600/20">All Scores</SelectItem>
-                  <SelectItem value="high" className="text-white hover:bg-emerald-600/20">Excellent (75+)</SelectItem>
-                  <SelectItem value="medium" className="text-white hover:bg-emerald-600/20">Good (50-74)</SelectItem>
-                  <SelectItem value="low" className="text-white hover:bg-emerald-600/20">Fair (&lt;50)</SelectItem>
+                  <SelectItem value="50-74" className="text-white hover:bg-emerald-600/20">50-74</SelectItem>
+                  <SelectItem value="75-100" className="text-white hover:bg-emerald-600/20">75-100</SelectItem>
                 </SelectContent>
               </Select>
             </div>
