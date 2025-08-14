@@ -15,6 +15,13 @@ export default function RulerScore({ value, className }: RulerScoreProps) {
   const pct = clamp(value)
   const ticks = Array.from({ length: 11 }, (_, i) => i)
 
+  // Dynamic color based on score ranges
+  const getScoreColor = (score: number) => {
+    if (score >= 75) return "bg-green-500"
+    if (score >= 50) return "bg-blue-500"
+    return "bg-red-500"
+  }
+
   return (
     <div
       className={cn(
@@ -26,7 +33,7 @@ export default function RulerScore({ value, className }: RulerScoreProps) {
     >
       {/* Fill */}
       <div
-        className="absolute inset-y-0 left-0 bg-gradient-primary bg-primary/70"
+        className={cn("absolute inset-y-0 left-0 transition-all duration-500", getScoreColor(pct))}
         style={{ width: `${pct}%` }}
       />
 
