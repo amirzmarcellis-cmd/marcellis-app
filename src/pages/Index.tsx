@@ -102,7 +102,7 @@ export default function Index() {
       const links = linksRes.data || []
 
       const activeJobs = jobsData.filter((job: any) => job.Processed === 'Yes')
-      const activeJobIds = new Set(activeJobs.map((j: any) => j['Job ID']))
+      const activeJobIds = new Set(activeJobs.map((j: any) => j.job_id))
 
       // Keep 'all' to show candidates across all jobs by default
 
@@ -113,13 +113,13 @@ export default function Index() {
 
       // High score candidates from Job-Candidate links for ACTIVE jobs only (score >= 74)
       const highScoreActiveCandidates = links.filter((jc: any) => {
-        const scoreNum = parseFloat(jc['Success Score'])
-        return Number.isFinite(scoreNum) && scoreNum >= 74 && activeJobIds.has(jc['Job ID'])
+        const scoreNum = parseFloat(jc.success_score)
+        return Number.isFinite(scoreNum) && scoreNum >= 74 && activeJobIds.has(jc.job_id)
       })
 
       const recentCandidates = highScoreActiveCandidates
         .sort(
-          (a: any, b: any) => new Date(b['lastcalltime'] || 0).getTime() - new Date(a['lastcalltime'] || 0).getTime()
+          (a: any, b: any) => new Date(b.lastcalltime || 0).getTime() - new Date(a.lastcalltime || 0).getTime()
         )
         .slice(0, 10)
 
@@ -129,12 +129,12 @@ export default function Index() {
       // Per-job stats (for Active Jobs Funnel)
       const stats: Record<string, any> = {}
       activeJobs.forEach((job: any) => {
-        const jobId = job['Job ID']
-        const jobLinks = links.filter((jc: any) => jc['Job ID'] === jobId)
-        const cvsForJob = cvs.filter((cv: any) => jobLinks.some((jc: any) => jc['Candidate_ID'] === cv['Cadndidate_ID']))
+        const jobId = job.job_id
+        const jobLinks = links.filter((jc: any) => jc.job_id === jobId)
+        const cvsForJob = cvs.filter((cv: any) => jobLinks.some((jc: any) => jc.Candidate_ID === cv.candidate_id))
 
         stats[jobId] = {
-          longlist: jobLinks.filter((jc: any) => jc['Contacted'] && String(jc['Contacted']).trim() !== '').length,
+          longlist: jobLinks.filter((jc: any) => jc.contacted && String(jc.contacted).trim() !== '').length,
           shortlist:
             jobLinks.filter((jc: any) => Boolean(jc.shortlisted_at)).length ||
             cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Shortlisted').length,
@@ -193,14 +193,14 @@ export default function Index() {
   // Filter candidates based on selected job
   const filteredCandidates = selectedJobFilter === 'all' 
     ? candidates || []
-    : candidates?.filter(c => c['Job ID'] === selectedJobFilter) || [];
+    : candidates?.filter(c => c.job_id === selectedJobFilter) || [];
 
   // Enrich candidates with job titles
   const enrichedCandidates = filteredCandidates.map(candidate => {
-    const job = jobs.find(j => j['Job ID'] === candidate['Job ID']);
+    const job = jobs.find(j => j.job_id === candidate.job_id);
     return {
       ...candidate,
-      'Job Title': job?.['Job Title'] || 'Unknown Position'
+      job_title: job?.job_title || 'Unknown Position'
     };
   });
 
@@ -286,34 +286,34 @@ export default function Index() {
           <ScrollArea className="h-[600px]">
             <div className="space-y-3">
               {data?.activeJobs?.map((job) => (
-                <Card key={job['Job ID']} className="bg-card border-border dark:bg-gradient-to-br dark:from-white/5 dark:via-white/3 dark:to-white/5 dark:backdrop-blur-lg dark:border-white/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 hover:scale-[1.02]">
+                <Card key={job.job_id} className="bg-card border-border dark:bg-gradient-to-br dark:from-white/5 dark:via-white/3 dark:to-white/5 dark:backdrop-blur-lg dark:border-white/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 hover:scale-[1.02]">
                   <CardContent className="p-4">
                     <div className="flex items-center mb-3">
-                      <h3 className="font-semibold text-sm truncate">{job['Job Title']}</h3>
+                      <h3 className="font-semibold text-sm truncate">{job.job_title}</h3>
                     </div>
-                    <p className="text-xs text-gray-400 mb-3">{job['Job Location']}</p>
+                    <p className="text-xs text-gray-400 mb-3">{job.job_location}</p>
                     <div className="grid grid-cols-4 gap-1 text-xs">
                       <div className="text-center">
-                        <div className="text-cyan-300 font-bold">{jobStats[job['Job ID']]?.longlist || 0}</div>
+                        <div className="text-cyan-300 font-bold">{jobStats[job.job_id]?.longlist || 0}</div>
                         <div className="text-gray-500">Longlist</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-purple-300 font-bold">{jobStats[job['Job ID']]?.shortlist || 0}</div>
+                        <div className="text-purple-300 font-bold">{jobStats[job.job_id]?.shortlist || 0}</div>
                         <div className="text-gray-500">Shortlist</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-blue-300 font-bold">{jobStats[job['Job ID']]?.tasked || 0}</div>
+                        <div className="text-blue-300 font-bold">{jobStats[job.job_id]?.tasked || 0}</div>
                         <div className="text-gray-500">Tasked</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-emerald-300 font-bold">{jobStats[job['Job ID']]?.hired || 0}</div>
+                        <div className="text-emerald-300 font-bold">{jobStats[job.job_id]?.hired || 0}</div>
                         <div className="text-gray-500">Hired</div>
                       </div>
                     </div>
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => navigate(`/job/${job['Job ID']}`)}
+                      onClick={() => navigate(`/job/${job.job_id}`)}
                       className="w-full mt-2 text-xs text-cyan-400 hover:bg-cyan-400/10"
                     >
                       Open Job
@@ -327,7 +327,7 @@ export default function Index() {
 
         {/* Right Side - Live Candidate Feed & Action Center - 60% width */}
         <div className="space-y-6 lg:col-span-2">
-          <ActivityTicker items={enrichedCandidates.slice(0,10).map(c => `${c['Candidate Name']} • ${c['Job Title']} • ${parseFloat(c['Success Score']) || 0}`)} />
+          <ActivityTicker items={enrichedCandidates.slice(0,10).map(c => `${c.candidate_name} • ${c.job_title} • ${parseFloat(c.success_score) || 0}`)} />
           {/* Live Candidate Feed */}
           <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20">
             <CardHeader>
@@ -359,28 +359,28 @@ export default function Index() {
               <ScrollArea className="h-[400px]">
                 <div className="space-y-4">
                   {enrichedCandidates.slice(0, 5).map((candidate, index) => {
-                    const score = parseFloat(candidate['Success Score']) || 0;
-                    const jobTitle = candidate['Job Title'] || 'Unknown Position';
+                    const score = parseFloat(candidate.success_score) || 0;
+                    const jobTitle = candidate.job_title || 'Unknown Position';
                     
                     return (
                       <div 
                         key={index} 
                         className={`bg-gradient-to-r rounded-xl p-4 border ${index < 3 ? 'from-amber-400/20 to-yellow-500/20 border-yellow-400/40' : 'from-white/5 to-white/10 border-white/20'} hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group cursor-pointer`}
-                        onClick={() => handleCandidateClick(candidate["Candidate_ID"], candidate["Job ID"])}
+                        onClick={() => handleCandidateClick(candidate.Candidate_ID, candidate.job_id)}
                       >
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center space-x-3">
                             <div className="relative">
                               <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                                {candidate['Candidate Name']?.charAt(0) || 'C'}
+                                {candidate.candidate_name?.charAt(0) || 'C'}
                               </div>
                               <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border-2 border-white animate-pulse"></div>
                             </div>
                             <div>
-                              <h4 className="font-semibold text-foreground text-lg group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors">{candidate['Candidate Name']}</h4>
+                              <h4 className="font-semibold text-foreground text-lg group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors">{candidate.candidate_name}</h4>
                               <p className="text-sm text-purple-300 font-medium">{jobTitle}</p>
                               <Badge variant="outline" className="mt-1 text-xs border-cyan-400/50 text-cyan-400 bg-cyan-400/10">
-                                ID: {candidate['Job ID']}
+                                ID: {candidate.job_id}
                               </Badge>
                             </div>
                           </div>
@@ -390,26 +390,26 @@ export default function Index() {
                             </div>
                             <div className="flex flex-col space-y-1">
                               <StatusDropdown
-                                currentStatus={candidate['Contacted']}
-                                candidateId={candidate["Candidate_ID"]}
-                                jobId={candidate["Job ID"]}
+                                currentStatus={candidate.contacted}
+                                candidateId={candidate.Candidate_ID}
+                                jobId={candidate.job_id}
                                 statusType="contacted"
                                 onStatusChange={(newStatus) => {
                                   setCandidates(prev => prev.map(c => 
-                                    c["Candidate_ID"] === candidate["Candidate_ID"] 
-                                      ? { ...c, Contacted: newStatus }
+                                    c.Candidate_ID === candidate.Candidate_ID 
+                                      ? { ...c, contacted: newStatus }
                                       : c
                                   ))
                                 }}
                                 variant="badge"
                               />
                               <StatusDropdown
-                                currentStatus={candidate['CandidateStatus']}
-                                candidateId={candidate["Candidate_ID"]}
+                                currentStatus={candidate.CandidateStatus}
+                                candidateId={candidate.Candidate_ID}
                                 statusType="candidate"
                                 onStatusChange={(newStatus) => {
                                   setCandidates(prev => prev.map(c => 
-                                    c["Candidate_ID"] === candidate["Candidate_ID"] 
+                                    c.Candidate_ID === candidate.Candidate_ID 
                                       ? { ...c, CandidateStatus: newStatus }
                                       : c
                                   ))
@@ -420,30 +420,30 @@ export default function Index() {
                           </div>
                         </div>
                         <p className="text-sm text-gray-300 mb-4 leading-relaxed bg-black/20 p-3 rounded-lg">
-                          {candidate['Score and Reason']?.slice(0, 120)}...
+                          {candidate.score_and_reason?.slice(0, 120)}...
                         </p>
                         <div className="flex items-center justify-between">
                         <div className="flex space-x-2">
                             <StatusDropdown
-                              currentStatus={candidate['Contacted']}
-                              candidateId={candidate["Candidate_ID"]}
-                              jobId={candidate["Job ID"]}
+                              currentStatus={candidate.contacted}
+                              candidateId={candidate.Candidate_ID}
+                              jobId={candidate.job_id}
                               statusType="contacted"
                               onStatusChange={(newStatus) => {
                                 setCandidates(prev => prev.map(c => 
-                                  c["Candidate_ID"] === candidate["Candidate_ID"] 
-                                    ? { ...c, Contacted: newStatus }
+                                  c.Candidate_ID === candidate.Candidate_ID 
+                                    ? { ...c, contacted: newStatus }
                                     : c
                                 ))
                               }}
                             />
                             <StatusDropdown
-                              currentStatus={candidate['CandidateStatus']}
-                              candidateId={candidate["Candidate_ID"]}
+                              currentStatus={candidate.CandidateStatus}
+                              candidateId={candidate.Candidate_ID}
                               statusType="candidate"
                               onStatusChange={(newStatus) => {
                                 setCandidates(prev => prev.map(c => 
-                                  c["Candidate_ID"] === candidate["Candidate_ID"] 
+                                  c.Candidate_ID === candidate.Candidate_ID 
                                     ? { ...c, CandidateStatus: newStatus }
                                     : c
                                 ))
