@@ -15,11 +15,11 @@ export default function RulerScore({ value, className }: RulerScoreProps) {
   const pct = clamp(value)
   const ticks = Array.from({ length: 11 }, (_, i) => i)
 
-  // Dynamic color based on score ranges
+  // Dynamic color based on score ranges using design system colors
   const getScoreColor = (score: number) => {
-    if (score >= 75) return "bg-green-500"
-    if (score >= 50) return "bg-blue-500"
-    return "bg-red-500"
+    if (score >= 75) return "bg-green"
+    if (score >= 50) return "bg-blue"
+    return "bg-destructive"
   }
 
   return (
