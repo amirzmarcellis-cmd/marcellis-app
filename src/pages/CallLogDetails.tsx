@@ -389,7 +389,7 @@ export default function CallLogDetails() {
                 />
               </div>
               <div className="max-h-60 overflow-y-auto text-sm leading-relaxed">
-                {callLog["Transcript"] ? (
+                {callLog?.["Transcript"] ? (
                   <div className="whitespace-pre-wrap break-words">{highlightedTranscript}</div>
                 ) : (
                   <p className="text-muted-foreground">No transcript available</p>
