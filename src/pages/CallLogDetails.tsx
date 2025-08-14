@@ -226,11 +226,9 @@ export default function CallLogDetails() {
                   const cvLink = callLog["cv_link"];
                   if (cvLink) {
                     window.open(cvLink, '_blank');
-                  } else {
-                    // Navigate to candidate details if no direct CV link
-                    navigate(`/candidate/${callLog["Candidate_ID"]}`);
                   }
                 }}
+                disabled={!callLog["cv_link"]}
                 className="mt-2"
               >
                 <Link2 className="w-4 h-4 mr-2" />
