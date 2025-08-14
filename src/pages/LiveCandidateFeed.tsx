@@ -374,33 +374,39 @@ export default function LiveCandidateFeed() {
                       </div>
                     </div>
 
-                    {/* Score Reason */}
-                    <div className="bg-black/20 rounded-xl p-4 mb-4 border border-border dark:border-white/10">
-                      <h4 className="text-cyan-300 font-medium mb-2">AI Assessment</h4>
-                      <p className="text-foreground/90 text-sm leading-relaxed">
-                        {candidate['Score and Reason']?.slice(0, 200)}...
-                      </p>
-                    </div>
-
-                    {/* Action Buttons */}
+                    {/* Status Dropdowns */}
                     <div className="flex items-center justify-between">
-                      <StatusDropdown
-                        currentStatus={candidate['Contacted']}
-                        candidateId={candidate["Candidate_ID"]}
-                        jobId={candidate["Job ID"]}
-                        statusType="contacted"
-                        onStatusChange={(newStatus) => {
-                          setCandidates(prev => prev.map(c => 
-                            c["Candidate_ID"] === candidate["Candidate_ID"] 
-                              ? { ...c, Contacted: newStatus }
-                              : c
-                          ))
-                        }}
-                      />
+                      <div className="flex items-center space-x-3">
+                        <StatusDropdown
+                          currentStatus={candidate.contacted}
+                          candidateId={candidate.Candidate_ID || candidate.candidate_id}
+                          jobId={candidate.job_id}
+                          statusType="contacted"
+                          onStatusChange={(newStatus) => {
+                            setCandidates(prev => prev.map(c => 
+                              (c.Candidate_ID || c.candidate_id) === (candidate.Candidate_ID || candidate.candidate_id)
+                                ? { ...c, contacted: newStatus }
+                                : c
+                            ))
+                          }}
+                        />
+                        <StatusDropdown
+                          currentStatus={getCandidateStatus(candidate.Candidate_ID || candidate.candidate_id)}
+                          candidateId={candidate.Candidate_ID || candidate.candidate_id}
+                          statusType="candidate"
+                          onStatusChange={(newStatus) => {
+                            setCvData(prev => prev.map(cv => 
+                              (cv.candidate_id || cv.Candidate_ID) === (candidate.Candidate_ID || candidate.candidate_id)
+                                ? { ...cv, CandidateStatus: newStatus }
+                                : cv
+                            ))
+                          }}
+                        />
+                      </div>
                       
                       <div className="flex items-center space-x-2">
                         <Badge className="bg-purple-500/20 text-purple-300 border-purple-400/40">
-                          💰 {candidate['Salary Expectations'] || 'Negotiable'}
+                          💰 {candidate.salary_expectations || 'Negotiable'}
                         </Badge>
                         {score >= 74 && (
                           <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-400/40 animate-pulse">
