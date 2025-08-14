@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { StatusDropdown } from '@/components/candidates/StatusDropdown';
-import { ActiveJobsFunnel } from '@/components/dashboard/ActiveJobsFunnel';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Search, Filter, Users, Zap, Activity, Star, Clock, Mail, Phone, MapPin, Briefcase } from 'lucide-react';
 
@@ -195,11 +194,6 @@ export default function LiveCandidateFeed() {
             </Badge>
           </div>
         </div>
-      </div>
-
-      {/* Active Jobs Funnel */}
-      <div className="mb-8">
-        <ActiveJobsFunnel />
       </div>
 
       {/* Enhanced Filters */}
