@@ -480,43 +480,50 @@ export default function JobDetails() {
   })
 
   return (
-      <div className="space-y-6 overflow-x-auto">
+      <div className="space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate('/jobs')}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Jobs
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/jobs')}>
+              <ArrowLeft className="w-4 h-4 mr-1 md:mr-2" />
+              <span className="hidden sm:inline">Back to Jobs</span>
+              <span className="sm:hidden">Back</span>
             </Button>
             <div className="h-6 w-px bg-border hidden sm:block" />
-            <h1 className="text-2xl sm:text-3xl font-bold">Job Details</h1>
+            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             {job?.longlist && job.longlist > 0 ? (
               <Button 
                 onClick={handleSearchMoreCandidates}
-                className="bg-green-600 hover:bg-green-700 text-white"
+                className="bg-green-600 hover:bg-green-700 text-white text-sm w-full sm:w-auto"
+                size="sm"
               >
                 <Search className="w-4 h-4 mr-2" />
-                Search for more candidates
+                <span className="hidden sm:inline">Search for more candidates</span>
+                <span className="sm:hidden">Search More</span>
               </Button>
             ) : (
               <Button 
                 onClick={handleButtonClick}
                 disabled={job?.longlist === 3}
-                className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm w-full sm:w-auto"
+                size="sm"
               >
                 <Zap className="w-4 h-4 mr-2" />
-                Generate Long List
+                <span className="hidden sm:inline">Generate Long List</span>
+                <span className="sm:hidden">Generate List</span>
               </Button>
             )}
-            <Button onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)}>
+            <Button onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)} size="sm" className="w-full sm:w-auto">
               <FileText className="w-4 h-4 mr-2" />
-              Edit Job
+              <span className="hidden sm:inline">Edit Job</span>
+              <span className="sm:hidden">Edit</span>
             </Button>
-            <Button variant="outline" asChild>
+            <Button variant="outline" asChild size="sm" className="w-full sm:w-auto">
               <Link to={`/job/${job["Job ID"]}/apply`}>
-                Apply Link
+                <span className="hidden sm:inline">Apply Link</span>
+                <span className="sm:hidden">Apply</span>
               </Link>
             </Button>
           </div>
@@ -524,50 +531,50 @@ export default function JobDetails() {
 
         {/* Job Header Card */}
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="p-4 md:p-6">
             <div className="space-y-4">
-              <div className="flex items-start justify-between">
-              <div className="space-y-2">
-                <h2 className="text-2xl font-bold">{job["Job Title"]}</h2>
-                <p className="text-lg text-muted-foreground">{job["Client Description"] || "Client Description"}</p>
-              </div>
-              <Badge 
-                variant={job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "default" : "destructive"}
-                className={`text-sm px-3 py-1 ${job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "bg-green-600 text-white border-0" : "bg-red-600 text-white border-0"}`}
-              >
-                {job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "Active" : "Not Active"}
-              </Badge>
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                <div className="space-y-2 flex-1 min-w-0">
+                  <h2 className="text-xl md:text-2xl font-bold break-words">{job["Job Title"]}</h2>
+                  <p className="text-base md:text-lg text-muted-foreground break-words">{job["Client Description"] || "Client Description"}</p>
+                </div>
+                <Badge 
+                  variant={job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "default" : "destructive"}
+                  className={`text-xs md:text-sm px-2 md:px-3 py-1 whitespace-nowrap ${job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "bg-green-600 text-white border-0" : "bg-red-600 text-white border-0"}`}
+                >
+                  {job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "Active" : "Not Active"}
+                </Badge>
               </div>
               
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t">
-                <div className="flex items-center space-x-2 text-sm">
-                  <MapPin className="w-4 h-4 text-muted-foreground" />
-                  <span>{job["Job Location"]}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 pt-4 border-t">
+                <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0">
+                  <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                  <span className="truncate">{job["Job Location"]}</span>
                 </div>
-<div className="flex items-center space-x-2 text-sm">
-                  <Banknote className="w-4 h-4 text-muted-foreground" />
-                  <span>{formatCurrency(job["Job Salary Range (ex: 15000 AED)"], job["Currency"])}</span>
+                <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0">
+                  <Banknote className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                  <span className="truncate">{formatCurrency(job["Job Salary Range (ex: 15000 AED)"], job["Currency"])}</span>
                 </div>
-                <div className="flex items-center space-x-2 text-sm">
-                  <Calendar className="w-4 h-4 text-muted-foreground" />
-                  <span>Posted: {formatDate(job.Timestamp)}</span>
+                <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0 sm:col-span-2 lg:col-span-1">
+                  <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                  <span className="truncate">Posted: {formatDate(job.Timestamp)}</span>
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Detailed Information Tabs */}
-         <Tabs defaultValue="overview" className="space-y-4">
-           <div className="overflow-x-auto">
-             <TabsList className="min-w-[560px] inline-flex">
-               <TabsTrigger value="overview">Overview</TabsTrigger>
-               <TabsTrigger value="description">Job Description</TabsTrigger>
-               <TabsTrigger value="requirements">AI Requirements</TabsTrigger>
-               <TabsTrigger value="candidates">AI Long List</TabsTrigger>
-               <TabsTrigger value="shortlist">AI Short List</TabsTrigger>
-             </TabsList>
-           </div>
+         {/* Detailed Information Tabs */}
+          <Tabs defaultValue="overview" className="space-y-4">
+            <div className="w-full overflow-x-auto">
+              <TabsList className="w-full min-w-[400px] grid grid-cols-5 h-auto p-1">
+                <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">Overview</TabsTrigger>
+                <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2">Description</TabsTrigger>
+                <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">Requirements</TabsTrigger>
+                <TabsTrigger value="candidates" className="text-xs md:text-sm px-2 py-2">Long List</TabsTrigger>
+                <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">Short List</TabsTrigger>
+              </TabsList>
+            </div>
 
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -793,66 +800,66 @@ export default function JobDetails() {
                    </div>
                  ) : (
                    <>
-                     {/* Filters */}
-                     <Card className="p-4 mb-4 bg-muted/50">
-                       <div className="flex items-center gap-2 mb-3">
-                         <Filter className="w-4 h-4" />
-                         <h4 className="font-medium">Filters</h4>
-                       </div>
-                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-                         <div className="relative">
-                           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                           <Input
-                             placeholder="Filter by name..."
-                             value={nameFilter}
-                             onChange={(e) => setNameFilter(e.target.value)}
-                             className="pl-10 h-8"
-                           />
-                         </div>
-                         <Input
-                           placeholder="Filter by email..."
-                           value={emailFilter}
-                           onChange={(e) => setEmailFilter(e.target.value)}
-                           className="h-8"
-                         />
-                         <Input
-                           placeholder="Filter by phone..."
-                           value={phoneFilter}
-                           onChange={(e) => setPhoneFilter(e.target.value)}
-                           className="h-8"
-                         />
-                         <Select value={scoreFilter} onValueChange={setScoreFilter}>
-                           <SelectTrigger className="h-8">
-                             <SelectValue placeholder="Score" />
-                           </SelectTrigger>
-                           <SelectContent>
-                             <SelectItem value="all">All Scores</SelectItem>
-                             <SelectItem value="high">High (75+)</SelectItem>
-                             <SelectItem value="moderate">Moderate (50-74)</SelectItem>
-                             <SelectItem value="poor">Poor (1-49)</SelectItem>
-                             <SelectItem value="none">No Score</SelectItem>
-                           </SelectContent>
-                         </Select>
-                          <Select value={contactedFilter} onValueChange={setContactedFilter}>
-                            <SelectTrigger className="h-8">
-                              <SelectValue placeholder="Status" />
+                      {/* Filters */}
+                      <Card className="p-3 md:p-4 mb-4 bg-muted/50">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Filter className="w-4 h-4" />
+                          <h4 className="font-medium text-sm md:text-base">Filters</h4>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                            <Input
+                              placeholder="Name..."
+                              value={nameFilter}
+                              onChange={(e) => setNameFilter(e.target.value)}
+                              className="pl-10 h-9 text-sm"
+                            />
+                          </div>
+                          <Input
+                            placeholder="Email..."
+                            value={emailFilter}
+                            onChange={(e) => setEmailFilter(e.target.value)}
+                            className="h-9 text-sm"
+                          />
+                          <Input
+                            placeholder="Phone..."
+                            value={phoneFilter}
+                            onChange={(e) => setPhoneFilter(e.target.value)}
+                            className="h-9 text-sm"
+                          />
+                          <Select value={scoreFilter} onValueChange={setScoreFilter}>
+                            <SelectTrigger className="h-9 text-sm">
+                              <SelectValue placeholder="Score" />
                             </SelectTrigger>
-                             <SelectContent>
-                               <SelectItem value="all">All Status</SelectItem>
-                               <SelectItem value="Not Contacted">Not Contacted</SelectItem>
-                               <SelectItem value="Ready to Call">Ready to Call</SelectItem>
-                               <SelectItem value="Contacted">Contacted</SelectItem>
-                               <SelectItem value="Call Done">Call Done</SelectItem>
-                               <SelectItem value="1st No Answer">1st No Answer</SelectItem>
-                               <SelectItem value="2nd No Answer">2nd No Answer</SelectItem>
-                               <SelectItem value="3rd No Answer">3rd No Answer</SelectItem>
-                               <SelectItem value="Low Scored">Low Scored</SelectItem>
-                             </SelectContent>
+                            <SelectContent>
+                              <SelectItem value="all">All Scores</SelectItem>
+                              <SelectItem value="high">High (75+)</SelectItem>
+                              <SelectItem value="moderate">Moderate (50-74)</SelectItem>
+                              <SelectItem value="poor">Poor (1-49)</SelectItem>
+                              <SelectItem value="none">No Score</SelectItem>
+                            </SelectContent>
                           </Select>
-                       </div>
-                     </Card>
+                           <Select value={contactedFilter} onValueChange={setContactedFilter}>
+                             <SelectTrigger className="h-9 text-sm">
+                               <SelectValue placeholder="Status" />
+                             </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All Status</SelectItem>
+                                <SelectItem value="Not Contacted">Not Contacted</SelectItem>
+                                <SelectItem value="Ready to Call">Ready to Call</SelectItem>
+                                <SelectItem value="Contacted">Contacted</SelectItem>
+                                <SelectItem value="Call Done">Call Done</SelectItem>
+                                <SelectItem value="1st No Answer">1st No Answer</SelectItem>
+                                <SelectItem value="2nd No Answer">2nd No Answer</SelectItem>
+                                <SelectItem value="3rd No Answer">3rd No Answer</SelectItem>
+                                <SelectItem value="Low Scored">Low Scored</SelectItem>
+                              </SelectContent>
+                           </Select>
+                        </div>
+                      </Card>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                         {(() => {
                           // Group candidates by Candidate_ID to handle multiple contacts
                           const groupedCandidates = filteredCandidates.reduce((acc, candidate) => {
@@ -869,111 +876,111 @@ export default function JobDetails() {
                             const mainCandidate = candidateContacts[0]
                             
                             return (
-                              <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
-                                <CardContent className="p-4">
-                                  <div className="space-y-3">
-                                    <div className="flex items-start justify-between">
-                                      <div>
-                                        <h4 className="font-semibold">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
-                                        <p className="text-sm text-muted-foreground">{candidateId}</p>
-                                      </div>
-                                    </div>
-                                    
-                                    <div className="space-y-2 text-sm">
-                                      {mainCandidate["Candidate Email"] && (
-                                        <div className="flex items-center text-muted-foreground">
-                                          <Mail className="w-4 h-4 mr-2" />
-                                          <span className="truncate">{mainCandidate["Candidate Email"]}</span>
-                                        </div>
-                                      )}
-                                      
-                                      {mainCandidate["Candidate Phone Number"] && (
-                                        <div className="flex items-center text-muted-foreground">
-                                          <Phone className="w-4 h-4 mr-2" />
-                                          <span>{mainCandidate["Candidate Phone Number"]}</span>
-                                        </div>
-                                      )}
-                                    </div>
-
-                                    {mainCandidate["Summary"] && (
-                                      <p className="text-sm text-muted-foreground line-clamp-3">
-                                        {mainCandidate["Summary"]}
-                                      </p>
-                                    )}
-
-                                     <div className="flex items-center justify-between pt-2 border-t">
-                                       <div className="flex items-center space-x-2">
-                                         <StatusDropdown
-                                           currentStatus={mainCandidate["Contacted"]}
-                                           candidateId={mainCandidate["Candidate_ID"]}
-                                           jobId={id!}
-                                           onStatusChange={(newStatus) => {
-                                             setCandidates(prev => prev.map(c => 
-                                               c["Candidate_ID"] === mainCandidate["Candidate_ID"] 
-                                                 ? { ...c, Contacted: newStatus }
-                                                 : c
-                                             ))
-                                           }}
-                                           variant="badge"
-                                         />
-                                         {getCandidateStatus(mainCandidate["Candidate_ID"]) && (
-                                           <StatusDropdown
-                                             currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
-                                             candidateId={mainCandidate["Candidate_ID"]}
-                                             jobId={null}
-                                             onStatusChange={(newStatus) => {
-                                               setCvData(prev => prev.map(cv => 
-                                                 cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] 
-                                                   ? { ...cv, CandidateStatus: newStatus }
-                                                   : cv
-                                               ))
-                                             }}
-                                             variant="badge"
-                                           />
-                                         )}
+                               <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
+                                 <CardContent className="p-3 md:p-4">
+                                   <div className="space-y-3">
+                                     <div className="flex items-start justify-between">
+                                       <div className="min-w-0 flex-1">
+                                         <h4 className="font-semibold text-sm md:text-base truncate">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
+                                         <p className="text-xs md:text-sm text-muted-foreground truncate">{candidateId}</p>
                                        </div>
-                                       {getScoreBadge(mainCandidate["Success Score"])}
+                                     </div>
+                                     
+                                     <div className="space-y-2 text-xs md:text-sm">
+                                       {mainCandidate["Candidate Email"] && (
+                                         <div className="flex items-center text-muted-foreground min-w-0">
+                                           <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+                                           <span className="truncate">{mainCandidate["Candidate Email"]}</span>
+                                         </div>
+                                       )}
+                                       
+                                       {mainCandidate["Candidate Phone Number"] && (
+                                         <div className="flex items-center text-muted-foreground min-w-0">
+                                           <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
+                                           <span className="truncate">{mainCandidate["Candidate Phone Number"]}</span>
+                                         </div>
+                                       )}
                                      </div>
 
-                                    {/* Call Log Buttons */}
-                                    <div className="space-y-2 pt-2 border-t">
-                                      <div className="flex flex-wrap gap-2">
-                                        <Button
-                                          variant="default"
-                                          size="sm"
-                                          onClick={() => handleCallCandidate(mainCandidate["Candidate_ID"], id!, mainCandidate["callid"])}
-                                          disabled={callingCandidateId === candidateId}
-                                          className="flex-1 min-w-[120px] bg-green-600 hover:bg-green-700 text-white disabled:opacity-50"
-                                        >
-                                          <Phone className="w-3 h-3 mr-1" />
-                                          {callingCandidateId === candidateId ? 'Calling...' : 'Call Candidate'}
-                                        </Button>
-                                        {candidateContacts.map((contact, contactIndex) => (
-                                          <Button
-                                            key={contactIndex}
-                                            variant="outline"
-                                            size="sm"
-                                            asChild
-                                            className="flex-1 min-w-[100px]"
-                                          >
-                                           <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${contact.callid}`}>
-                                              <FileText className="w-3 h-3 mr-1" />
-                                              {candidateContacts.length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}
-                                            </Link>
-                                          </Button>
-                                        ))}
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          asChild
-                                          className="flex-1 min-w-[100px]"
-                                        >
-                                          <Link to={`/candidate/${candidateId}`}>
-                                            <Users className="w-3 h-3 mr-1" />
-                                            View Profile
-                                          </Link>
-                                        </Button>
+                                     {mainCandidate["Summary"] && (
+                                       <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
+                                         {mainCandidate["Summary"]}
+                                       </p>
+                                     )}
+
+                                      <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t gap-2">
+                                        <div className="flex flex-wrap items-center gap-1">
+                                          <StatusDropdown
+                                            currentStatus={mainCandidate["Contacted"]}
+                                            candidateId={mainCandidate["Candidate_ID"]}
+                                            jobId={id!}
+                                            onStatusChange={(newStatus) => {
+                                              setCandidates(prev => prev.map(c => 
+                                                c["Candidate_ID"] === mainCandidate["Candidate_ID"] 
+                                                  ? { ...c, Contacted: newStatus }
+                                                  : c
+                                              ))
+                                            }}
+                                            variant="badge"
+                                          />
+                                          {getCandidateStatus(mainCandidate["Candidate_ID"]) && (
+                                            <StatusDropdown
+                                              currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
+                                              candidateId={mainCandidate["Candidate_ID"]}
+                                              jobId={null}
+                                              onStatusChange={(newStatus) => {
+                                                setCvData(prev => prev.map(cv => 
+                                                  cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] 
+                                                    ? { ...cv, CandidateStatus: newStatus }
+                                                    : cv
+                                                ))
+                                              }}
+                                              variant="badge"
+                                            />
+                                          )}
+                                        </div>
+                                        {getScoreBadge(mainCandidate["Success Score"])}
                                       </div>
+
+                                     {/* Call Log Buttons */}
+                                     <div className="space-y-2 pt-2 border-t">
+                                       <div className="flex flex-col sm:flex-row gap-2">
+                                         <Button
+                                           variant="default"
+                                           size="sm"
+                                           onClick={() => handleCallCandidate(mainCandidate["Candidate_ID"], id!, mainCandidate["callid"])}
+                                           disabled={callingCandidateId === candidateId}
+                                           className="w-full sm:flex-1 bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 text-xs md:text-sm"
+                                         >
+                                           <Phone className="w-3 h-3 mr-1" />
+                                           {callingCandidateId === candidateId ? 'Calling...' : 'Call Candidate'}
+                                         </Button>
+                                         {candidateContacts.map((contact, contactIndex) => (
+                                           <Button
+                                             key={contactIndex}
+                                             variant="outline"
+                                             size="sm"
+                                             asChild
+                                             className="flex-1 min-w-0 text-xs md:text-sm"
+                                           >
+                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${contact.callid}`} className="truncate">
+                                              <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
+                                              <span className="truncate">{candidateContacts.length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}</span>
+                                            </Link>
+                                           </Button>
+                                         ))}
+                                       </div>
+                                       <Button
+                                         variant="ghost"
+                                         size="sm"
+                                         asChild
+                                         className="w-full text-xs md:text-sm"
+                                       >
+                                         <Link to={`/candidate/${candidateId}`}>
+                                           <Users className="w-3 h-3 mr-1" />
+                                           View Profile
+                                         </Link>
+                                       </Button>
                                     </div>
                                   </div>
                                 </CardContent>
@@ -1007,7 +1014,7 @@ export default function JobDetails() {
                       <p className="text-muted-foreground">Candidates with scores of 74+ will appear here automatically</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                       {(() => {
                         // Group short list candidates by Candidate_ID
                         const groupedShortList = shortListCandidates.reduce((acc, candidate) => {
