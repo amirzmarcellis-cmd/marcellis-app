@@ -68,15 +68,15 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
   const counts = getCounts();
   
   const stages = [
-    { name: "Longlist", count: counts.longlist, bgColor: "bg-blue-600", textColor: "text-white" },
-    { name: "1st No Answer", count: counts.firstNoAnswer, bgColor: "bg-orange-500", textColor: "text-white" },
-    { name: "2nd No Answer", count: counts.secondNoAnswer, bgColor: "bg-orange-600", textColor: "text-white" },
-    { name: "3rd No Answer", count: counts.thirdNoAnswer, bgColor: "bg-orange-700", textColor: "text-white" },
-    { name: "Contacted", count: counts.contacted, bgColor: "bg-green-600", textColor: "text-white" },
-    { name: "Low Scored", count: counts.lowScored, bgColor: "bg-red-600", textColor: "text-white" },
-    { name: "Shortlist", count: counts.shortlist, bgColor: "bg-emerald-600", textColor: "text-white" },
-    ...(jobAssignment ? [{ name: "Tasked", count: counts.tasked, bgColor: "bg-purple-600", textColor: "text-white" }] : []),
-    { name: "Hired", count: counts.hired, bgColor: "bg-slate-800", textColor: "text-white" }
+    { name: "Longlist", count: counts.longlist, bgColor: "bg-blue-600", textColor: "text-black dark:text-white" },
+    { name: "1st No Answer", count: counts.firstNoAnswer, bgColor: "bg-orange-500", textColor: "text-black dark:text-white" },
+    { name: "2nd No Answer", count: counts.secondNoAnswer, bgColor: "bg-orange-600", textColor: "text-black dark:text-white" },
+    { name: "3rd No Answer", count: counts.thirdNoAnswer, bgColor: "bg-orange-700", textColor: "text-black dark:text-white" },
+    { name: "Contacted", count: counts.contacted, bgColor: "bg-green-600", textColor: "text-black dark:text-white" },
+    { name: "Low Scored", count: counts.lowScored, bgColor: "bg-red-600", textColor: "text-black dark:text-white" },
+    { name: "Shortlist", count: counts.shortlist, bgColor: "bg-emerald-600", textColor: "text-black dark:text-white" },
+    ...(jobAssignment ? [{ name: "Tasked", count: counts.tasked, bgColor: "bg-purple-600", textColor: "text-black dark:text-white" }] : []),
+    { name: "Hired", count: counts.hired, bgColor: "bg-slate-800", textColor: "text-black dark:text-white" }
   ];
 
   return (
