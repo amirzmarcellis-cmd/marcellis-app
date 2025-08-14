@@ -567,24 +567,23 @@ export default function JobDetails() {
           </CardContent>
         </Card>
 
-         {/* Detailed Information Tabs */}
-          <Tabs defaultValue="overview" className="space-y-4">
-            <div className="w-full overflow-x-auto">
-              <TabsList className="w-full min-w-[400px] grid grid-cols-5 h-auto p-1">
-                <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">Overview</TabsTrigger>
-                <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2">Description</TabsTrigger>
-                <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">AI Requirements</TabsTrigger>
-                <TabsTrigger value="candidates" className="text-xs md:text-sm px-2 py-2">AI Long List</TabsTrigger>
-                <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">AI Short List</TabsTrigger>
-              </TabsList>
-            </div>
+          {/* Job Funnel */}
+          <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
+
+          {/* Detailed Information Tabs */}
+           <Tabs defaultValue="overview" className="space-y-4">
+             <div className="w-full overflow-x-auto">
+               <TabsList className="w-full min-w-[400px] grid grid-cols-5 h-auto p-1">
+                 <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">Overview</TabsTrigger>
+                 <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2">Description</TabsTrigger>
+                 <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">AI Requirements</TabsTrigger>
+                 <TabsTrigger value="candidates" className="text-xs md:text-sm px-2 py-2">AI Long List</TabsTrigger>
+                 <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">AI Short List</TabsTrigger>
+               </TabsList>
+             </div>
 
           <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Job Funnel */}
-              <div className="md:col-span-1">
-                <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Job Information</CardTitle>
@@ -615,7 +614,6 @@ export default function JobDetails() {
                 </CardContent>
               </Card>
 
-              <div className="md:col-span-2 space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Job Requirements & Details</CardTitle>
@@ -659,7 +657,6 @@ export default function JobDetails() {
                   </div>
                 </CardContent>
               </Card>
-              </div>
             </div>
           </TabsContent>
 
