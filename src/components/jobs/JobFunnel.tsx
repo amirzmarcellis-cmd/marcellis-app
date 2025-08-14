@@ -14,12 +14,15 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
   const getCounts = () => {
     const longlist = candidates.length;
     
-    // Debug: log some candidate data to understand the structure
-    console.log('Sample candidates for debugging:', candidates.slice(0, 3).map(c => ({
+    // Debug: log all candidate scores to understand the data
+    const allScores = candidates.map(c => ({
       id: c["Candidate_ID"],
-      contacted: c["Contacted"],
-      score: c["Success Score"]
-    })));
+      score: c["Success Score"],
+      parsedScore: parseInt(c["Success Score"] || "0")
+    }));
+    
+    console.log('Total candidates:', candidates.length);
+    console.log('All candidate scores:', allScores);
     
     // Count by contacted status
     const firstNoAnswer = candidates.filter(c => c["Contacted"] === "1st No Answer").length;
