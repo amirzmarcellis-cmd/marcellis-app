@@ -203,6 +203,45 @@ export default function JobDetails() {
     }
   };
 
+  const handleSearchMoreCandidates = async () => {
+    try {
+      // Prepare the payload with current candidates
+      const candidatesData = candidates.map(candidate => ({
+        candidateID: candidate["Candidate_ID"],
+        callid: candidate["callid"]
+      }));
+
+      const payload = {
+        jobID: job?.["Job ID"],
+        candidates: candidatesData
+      };
+
+      const response = await fetch('https://hook.eu2.make.com/j9objo7b05yubvv25fsvpxl3zrynl7dh', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      toast({
+        title: "Success",
+        description: "Search for more candidates initiated successfully",
+      });
+    } catch (error) {
+      console.error('Error searching for more candidates:', error);
+      toast({
+        title: "Error",
+        description: "Failed to search for more candidates",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleGenerateLongList = async () => {
     try {
       // First, increment the longlist count in the database
@@ -452,14 +491,24 @@ export default function JobDetails() {
             <h1 className="text-2xl sm:text-3xl font-bold">Job Details</h1>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button 
-              onClick={handleButtonClick}
-              disabled={job?.longlist === 3}
-              className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Zap className="w-4 h-4 mr-2" />
-              {job?.longlist && job.longlist > 0 ? "Re-generate Long List" : "Generate Long List"}
-            </Button>
+            {job?.longlist && job.longlist > 0 ? (
+              <Button 
+                onClick={handleSearchMoreCandidates}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Search className="w-4 h-4 mr-2" />
+                Search for more candidates
+              </Button>
+            ) : (
+              <Button 
+                onClick={handleButtonClick}
+                disabled={job?.longlist === 3}
+                className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                Generate Long List
+              </Button>
+            )}
             <Button onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)}>
               <FileText className="w-4 h-4 mr-2" />
               Edit Job
