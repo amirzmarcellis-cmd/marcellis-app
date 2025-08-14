@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { ChevronDown } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 interface JobFunnelProps {
   candidates: any[];
@@ -65,56 +65,40 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
     { name: "Hired", count: counts.hired, color: "bg-primary" }
   ];
 
-  const getWidthPercentage = (count: number) => {
-    const maxCount = Math.max(...stages.map(s => s.count));
-    if (maxCount === 0) return 10; // Minimum width for visibility
-    return Math.max(10, (count / maxCount) * 100);
-  };
-
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <span>Job Funnel</span>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg">Job Funnel</CardTitle>
           <Badge variant="outline" className="text-xs">
-            {candidates.length} Total Candidates
+            {candidates.length} Total
           </Badge>
-        </CardTitle>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {stages.map((stage, index) => (
-          <div key={stage.name} className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className={cn("w-3 h-3 rounded-full", stage.color)} />
-                <span className="text-sm font-medium">{stage.name}</span>
+      <CardContent className="pt-0">
+        {/* Horizontal funnel layout */}
+        <div className="flex items-center justify-between space-x-2 mb-4">
+          {stages.map((stage, index) => (
+            <React.Fragment key={stage.name}>
+              <div className="flex flex-col items-center space-y-1 min-w-0 flex-1">
+                <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium", stage.color)}>
+                  {stage.count}
+                </div>
+                <span className="text-xs text-center text-muted-foreground truncate w-full">
+                  {stage.name}
+                </span>
               </div>
-              <Badge variant="secondary" className="text-xs">
-                {stage.count}
-              </Badge>
-            </div>
-            
-            {/* Progress bar */}
-            <div className="w-full bg-muted rounded-full h-2">
-              <div
-                className={cn("h-2 rounded-full transition-all duration-300", stage.color)}
-                style={{ width: `${getWidthPercentage(stage.count)}%` }}
-              />
-            </div>
-            
-            {/* Arrow connector (except for last item) */}
-            {index < stages.length - 1 && (
-              <div className="flex justify-center py-1">
-                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-              </div>
-            )}
-          </div>
-        ))}
+              {index < stages.length - 1 && (
+                <ChevronRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
         
         {/* Summary stats */}
-        <div className="mt-6 pt-4 border-t border-border grid grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-2 gap-4 pt-3 border-t border-border text-sm">
           <div className="text-center">
-            <div className="font-medium text-foreground">Conversion Rate</div>
+            <div className="font-medium text-foreground">Conversion</div>
             <div className="text-muted-foreground">
               {counts.longlist > 0 ? Math.round((counts.shortlist / counts.longlist) * 100) : 0}%
             </div>
