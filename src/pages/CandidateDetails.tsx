@@ -52,9 +52,9 @@ export default function CandidateDetails() {
     return (
         <div className="flex flex-col items-center justify-center h-64 space-y-4">
           <h2 className="text-2xl font-bold text-muted-foreground">Candidate not found</h2>
-          <Button onClick={() => navigate('/candidates')}>
+          <Button onClick={() => navigate(-1)}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Candidates
+            Back
           </Button>
         </div>
     )
@@ -119,9 +119,9 @@ export default function CandidateDetails() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate('/candidates')}>
+            <Button variant="ghost" onClick={() => navigate(-1)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Candidates
+              Back
             </Button>
             <div className="h-6 w-px bg-border" />
             <h1 className="text-3xl font-bold">Candidate Details</h1>
