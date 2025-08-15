@@ -1056,18 +1056,19 @@ export default function JobDetails() {
                              <SelectTrigger className="h-9 text-sm">
                                <SelectValue placeholder="Status" />
                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="all">All Status</SelectItem>
-                                <SelectItem value="Not Contacted">Not Contacted</SelectItem>
-                                <SelectItem value="Ready to Call">Ready to Call</SelectItem>
-                                <SelectItem value="Contacted">Contacted</SelectItem>
-                                <SelectItem value="Call Done">Call Done</SelectItem>
-                                <SelectItem value="1st No Answer">1st No Answer</SelectItem>
-                                <SelectItem value="2nd No Answer">2nd No Answer</SelectItem>
-                                <SelectItem value="3rd No Answer">3rd No Answer</SelectItem>
-                                <SelectItem value="Low Scored">Low Scored</SelectItem>
-                                <SelectItem value="Tasked">Tasked</SelectItem>
-                              </SelectContent>
+                               <SelectContent>
+                                 <SelectItem value="all">All Status</SelectItem>
+                                 <SelectItem value="Not Contacted">Not Contacted</SelectItem>
+                                 <SelectItem value="Ready to Call">Ready to Call</SelectItem>
+                                 <SelectItem value="Contacted">Contacted</SelectItem>
+                                 <SelectItem value="Call Done">Call Done</SelectItem>
+                                 <SelectItem value="1st No Answer">1st No Answer</SelectItem>
+                                 <SelectItem value="2nd No Answer">2nd No Answer</SelectItem>
+                                 <SelectItem value="3rd No Answer">3rd No Answer</SelectItem>
+                                 <SelectItem value="Low Scored">Low Scored</SelectItem>
+                                 <SelectItem value="Tasked">Tasked</SelectItem>
+                                 <SelectItem value="Rejected">Rejected</SelectItem>
+                               </SelectContent>
                            </Select>
                         </div>
                       </Card>
@@ -1342,18 +1343,30 @@ export default function JobDetails() {
                                          </Link>
                                        </Button>
                                      </div>
-                                     {/* Reject Button in separate row */}
-                                     <div className="flex">
-                                       <Button
-                                         variant="destructive"
-                                         size="sm"
-                                         className="w-full bg-red-600 hover:bg-red-700"
-                                         onClick={() => handleRejectCandidate(id!, candidateId, candidateContacts[0].callid)}
-                                       >
-                                         <X className="w-3 h-3 mr-1" />
-                                         Reject Candidate
-                                       </Button>
-                                     </div>
+                                      {/* Reject Button in separate row */}
+                                      <div className="flex">
+                                        {mainCandidate["Contacted"] === "Rejected" ? (
+                                          <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            className="w-full bg-gray-600 hover:bg-gray-600 cursor-not-allowed"
+                                            disabled
+                                          >
+                                            <X className="w-3 h-3 mr-1" />
+                                            Candidate Rejected
+                                          </Button>
+                                        ) : (
+                                          <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            className="w-full bg-red-600 hover:bg-red-700"
+                                            onClick={() => handleRejectCandidate(id!, candidateId, candidateContacts[0].callid)}
+                                          >
+                                            <X className="w-3 h-3 mr-1" />
+                                            Reject Candidate
+                                          </Button>
+                                        )}
+                                      </div>
                                    </div>
                                 </div>
                               </CardContent>
