@@ -7,6 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import { StatusDropdown } from '@/components/candidates/StatusDropdown';
 import { useProfile } from '@/hooks/useProfile';
 import { useNavigate } from 'react-router-dom';
@@ -41,6 +46,13 @@ export default function Index() {
   const [openTasksCount, setOpenTasksCount] = useState(0);
   const [jobStats, setJobStats] = useState<Record<string, any>>({});
   const [highScoreActiveCount, setHighScoreActiveCount] = useState(0);
+  const [interviewDialogOpen, setInterviewDialogOpen] = useState(false);
+  const [selectedCandidate, setSelectedCandidate] = useState<{candidateId: string, jobId: string, callid: number} | null>(null);
+  const [interviewSlots, setInterviewSlots] = useState<{date: Date | undefined, time: string}[]>([
+    { date: undefined, time: '' },
+    { date: undefined, time: '' },
+    { date: undefined, time: '' }
+  ]);
   useEffect(() => {
     // SEO
     document.title = 'AI CRM Mission Control | Dashboard';
@@ -175,18 +187,87 @@ export default function Index() {
       console.error('Error rejecting candidate:', error);
     }
   };
-  const handleArrangeInterview = async (candidateId: string, jobId: string) => {
-    try {
-      await supabase.from('CVs').update({
-        CandidateStatus: 'Interview'
-      }).eq('candidate_id', candidateId);
-
-      // Refresh data
-      fetchDashboardData();
-    } catch (error) {
-      console.error('Error arranging interview:', error);
+  const handleArrangeInterview = (candidateId: string, jobId: string) => {
+    const candidate = candidates.find(c => c.Candidate_ID === candidateId);
+    if (candidate) {
+      setSelectedCandidate({
+        candidateId,
+        jobId,
+        callid: candidate.callid
+      });
+      setInterviewDialogOpen(true);
+      // Reset slots
+      setInterviewSlots([
+        { date: undefined, time: '' },
+        { date: undefined, time: '' },
+        { date: undefined, time: '' }
+      ]);
     }
   };
+
+  const handleScheduleInterview = async () => {
+    if (!selectedCandidate) return;
+
+    // Validate that all slots are filled
+    const validSlots = interviewSlots.filter(slot => slot.date && slot.time);
+    if (validSlots.length !== 3) {
+      alert('Please fill in all 3 interview slots');
+      return;
+    }
+
+    try {
+      // Update candidate status
+      await supabase.from('CVs').update({
+        CandidateStatus: 'Interview'
+      }).eq('candidate_id', selectedCandidate.candidateId);
+
+      // Format appointments for webhook
+      const appointments = interviewSlots.map(slot => {
+        if (slot.date && slot.time) {
+          return `${format(slot.date, 'yyyy-MM-dd')} ${slot.time}`;
+        }
+        return '';
+      });
+
+      // Send webhook to Make.com
+      await fetch('https://hook.eu2.make.com/3t88lby79dnf6x6hgm1i828yhen75omb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          job_id: selectedCandidate.jobId,
+          candidate_id: selectedCandidate.candidateId,
+          callid: selectedCandidate.callid,
+          appoint1: appointments[0],
+          appoint2: appointments[1],
+          appoint3: appointments[2]
+        })
+      });
+
+      // Close dialog and refresh data
+      setInterviewDialogOpen(false);
+      setSelectedCandidate(null);
+      fetchDashboardData();
+    } catch (error) {
+      console.error('Error scheduling interview:', error);
+      alert('Error scheduling interview. Please try again.');
+    }
+  };
+
+  const updateInterviewSlot = (index: number, field: 'date' | 'time', value: Date | string) => {
+    setInterviewSlots(prev => {
+      const newSlots = [...prev];
+      if (field === 'date') {
+        newSlots[index] = { ...newSlots[index], date: value as Date };
+      } else {
+        newSlots[index] = { ...newSlots[index], time: value as string };
+      }
+      return newSlots;
+    });
+  };
+
+  const timeOptions = ['00', '15', '30', '45'];
   const getScoreColor = (score: number) => {
     if (score >= 90) return 'text-emerald-400';
     if (score >= 80) return 'text-blue-400';
@@ -416,6 +497,112 @@ export default function Index() {
         </div>
 
       </div>
+
+      {/* Interview Scheduling Dialog */}
+      <Dialog open={interviewDialogOpen} onOpenChange={setInterviewDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Schedule Interview Slots</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            <p className="text-sm text-muted-foreground">
+              Please select 3 preferred interview slots. Only future dates are allowed, and times must be in 15-minute intervals.
+            </p>
+            
+            {interviewSlots.map((slot, index) => (
+              <div key={index} className="space-y-4 p-4 border rounded-lg">
+                <h4 className="font-medium">Slot {index + 1}</h4>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Date Picker */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Date</label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !slot.date && "text-muted-foreground"
+                          )}
+                        >
+                          <Calendar className="mr-2 h-4 w-4" />
+                          {slot.date ? format(slot.date, "PPP") : <span>Pick a date</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <CalendarComponent
+                          mode="single"
+                          selected={slot.date}
+                          onSelect={(date) => updateInterviewSlot(index, 'date', date!)}
+                          disabled={(date) => date <= new Date()}
+                          initialFocus
+                          className="p-3 pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  {/* Time Picker */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Time</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {/* Hours */}
+                      <Select
+                        value={slot.time.split(':')[0] || ''}
+                        onValueChange={(hour) => {
+                          const minute = slot.time.split(':')[1] || '00';
+                          updateInterviewSlot(index, 'time', `${hour}:${minute}`);
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Hour" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: 24 }, (_, i) => (
+                            <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                              {i.toString().padStart(2, '0')}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      {/* Minutes */}
+                      <Select
+                        value={slot.time.split(':')[1] || ''}
+                        onValueChange={(minute) => {
+                          const hour = slot.time.split(':')[0] || '09';
+                          updateInterviewSlot(index, 'time', `${hour}:${minute}`);
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Min" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {timeOptions.map((minute) => (
+                            <SelectItem key={minute} value={minute}>
+                              {minute}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button variant="outline" onClick={() => setInterviewDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleScheduleInterview} className="bg-emerald-600 hover:bg-emerald-700">
+                Schedule Interview
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
     </div>;
 }
