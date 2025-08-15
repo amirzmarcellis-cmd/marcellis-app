@@ -233,6 +233,51 @@ export type Database = {
         }
         Relationships: []
       }
+      interview: {
+        Row: {
+          appoint1: string | null
+          appoint2: string | null
+          appoint3: string | null
+          callid: number
+          candidate_id: string
+          created_at: string | null
+          intid: string
+          intlink: string | null
+          intstatus: string | null
+          inttype: string
+          job_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          appoint1?: string | null
+          appoint2?: string | null
+          appoint3?: string | null
+          callid: number
+          candidate_id: string
+          created_at?: string | null
+          intid?: string
+          intlink?: string | null
+          intstatus?: string | null
+          inttype: string
+          job_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          appoint1?: string | null
+          appoint2?: string | null
+          appoint3?: string | null
+          callid?: number
+          candidate_id?: string
+          created_at?: string | null
+          intid?: string
+          intlink?: string | null
+          intstatus?: string | null
+          inttype?: string
+          job_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       Jobs: {
         Row: {
           assignment: string | null
@@ -619,6 +664,10 @@ export type Database = {
       }
     }
     Functions: {
+      generate_interview_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

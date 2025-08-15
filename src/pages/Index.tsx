@@ -53,6 +53,7 @@ export default function Index() {
     { date: undefined, time: '' },
     { date: undefined, time: '' }
   ]);
+  const [interviewType, setInterviewType] = useState<string>('Phone');
   useEffect(() => {
     // SEO
     document.title = 'AI CRM Mission Control | Dashboard';
@@ -196,12 +197,13 @@ export default function Index() {
         callid: candidate.callid
       });
       setInterviewDialogOpen(true);
-      // Reset slots
+      // Reset slots and type
       setInterviewSlots([
         { date: undefined, time: '' },
         { date: undefined, time: '' },
         { date: undefined, time: '' }
       ]);
+      setInterviewType('Phone');
     }
   };
 
@@ -242,6 +244,17 @@ export default function Index() {
         return '';
       });
 
+      // Save interview to database
+      await supabase.from('interview').insert({
+        candidate_id: selectedCandidate.candidateId,
+        job_id: selectedCandidate.jobId,
+        callid: selectedCandidate.callid,
+        appoint1: appointments[0],
+        appoint2: appointments[1],
+        appoint3: appointments[2],
+        inttype: interviewType
+      });
+
       // Send webhook to Make.com
       await fetch('https://hook.eu2.make.com/3t88lby79dnf6x6hgm1i828yhen75omb', {
         method: 'POST',
@@ -254,13 +267,15 @@ export default function Index() {
           callid: selectedCandidate.callid,
           appoint1: appointments[0],
           appoint2: appointments[1],
-          appoint3: appointments[2]
+          appoint3: appointments[2],
+          inttype: interviewType
         })
       });
 
       // Close dialog and refresh data
       setInterviewDialogOpen(false);
       setSelectedCandidate(null);
+      setInterviewType('Phone');
       fetchDashboardData();
     } catch (error) {
       console.error('Error scheduling interview:', error);
@@ -517,10 +532,24 @@ export default function Index() {
           <DialogHeader>
             <DialogTitle>Schedule Interview Slots</DialogTitle>
           </DialogHeader>
-          <div className="space-y-6">
+            <div className="space-y-6">
             <p className="text-sm text-muted-foreground">
-              Please select 3 preferred interview slots. Only future dates are allowed, and times must be in 15-minute intervals.
+              Please select 3 preferred interview slots and interview type. Only future dates are allowed, and times must be in 15-minute intervals.
             </p>
+            
+            {/* Interview Type Selection */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Interview Type</label>
+              <Select value={interviewType} onValueChange={setInterviewType}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select interview type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Phone">Phone</SelectItem>
+                  <SelectItem value="Online Meeting">Online Meeting</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             
             {interviewSlots.map((slot, index) => (
               <div key={index} className="space-y-4 p-4 border rounded-lg">
