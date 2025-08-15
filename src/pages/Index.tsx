@@ -138,7 +138,7 @@ export default function Index() {
           contacted: jobLinks.filter((jc: any) => jc.contacted && ['Contacted', 'Call Done', '1st No Answer', '2nd No Answer', '3rd No Answer'].includes(jc.contacted)).length,
           lowScored: jobLinks.filter((jc: any) => jc.contacted === 'Low Scored').length,
           shortlist: jobLinks.filter((jc: any) => jc.shortlisted_at !== null).length,
-          tasked: cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Tasked').length,
+          tasked: jobLinks.filter((jc: any) => jc.contacted === 'Tasked').length,
           hired: cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Hired').length,
         }
       })

@@ -48,6 +48,7 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
     
     // Tasked (contacted status is "Tasked")
     const tasked = candidates.filter(c => c["contacted"] === "Tasked").length;
+    console.log('Tasked calculation:', { tasked, total: candidates.length, taskedCandidates: candidates.filter(c => c["contacted"] === "Tasked") });
     
     // Hired (this would need to be tracked separately)
     const hired = candidates.filter(c => c["hired"] === true).length; // Placeholder
