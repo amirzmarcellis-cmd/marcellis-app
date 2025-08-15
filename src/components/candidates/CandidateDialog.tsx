@@ -8,22 +8,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Upload } from "lucide-react";
+import { Users, Upload, FileText, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 interface Candidate {
-  Cadndidate_ID: string;
-  "First Name": string | null;
-  "Last Name": string | null;
+  candidate_id: string;
+  first_name: string | null;
+  last_name: string | null;
   Email: string | null;
-  "Phone Number": string | null;
+  phone_number: string | null;
   Title: string | null;
   Location: string | null;
-  "Current Company": string | null;
+  current_company: string | null;
   Skills: string | null;
-  "Applied for": string[] | null;
-  "CV Summary": string | null;
+  applied_for: string[] | null;
+  cv_summary: string | null;
   Experience: string | null;
   Education: string | null;
   Certifications: string | null;
@@ -31,6 +31,10 @@ interface Candidate {
   Linkedin: string | null;
   CV_Link: string | null;
   Timestamp: string | null;
+  CandidateStatus: string | null;
+  cv_text: string | null;
+  other_notes: string | null;
+  done_questions: string | null;
 }
 
 interface CandidateDialogProps {
@@ -58,33 +62,42 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
     certifications: "",
     language: "",
     linkedin: "",
-    status: "Not Reached",
-    source: "Direct Apply",
+    candidateStatus: "",
+    cvText: "",
+    otherNotes: "",
+    doneQuestions: "",
   });
+  
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [cvUrl, setCvUrl] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
     if (candidate) {
       setFormData({
-        firstName: candidate["First Name"] || "",
-        lastName: candidate["Last Name"] || "",
+        firstName: candidate.first_name || "",
+        lastName: candidate.last_name || "",
         email: candidate.Email || "",
-        phone: candidate["Phone Number"] || "",
+        phone: candidate.phone_number || "",
         title: candidate.Title || "",
         location: candidate.Location || "",
-        currentCompany: candidate["Current Company"] || "",
+        currentCompany: candidate.current_company || "",
         skills: candidate.Skills || "",
-        appliedFor: candidate["Applied for"] || [],
-        cvSummary: candidate["CV Summary"] || "",
+        appliedFor: candidate.applied_for || [],
+        cvSummary: candidate.cv_summary || "",
         experience: candidate.Experience || "",
         education: candidate.Education || "",
         certifications: candidate.Certifications || "",
         language: candidate.Language || "",
         linkedin: candidate.Linkedin || "",
-        status: "Not Reached", // Default since we don't have this field yet
-        source: "Direct Apply", // Default since we don't have this field yet
+        candidateStatus: candidate.CandidateStatus || "",
+        cvText: candidate.cv_text || "",
+        otherNotes: candidate.other_notes || "",
+        doneQuestions: candidate.done_questions || "",
       });
+      setCvUrl(candidate.CV_Link || "");
     } else {
       setFormData({
         firstName: "",
@@ -102,14 +115,76 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
         certifications: "",
         language: "",
         linkedin: "",
-        status: "Not Reached",
-        source: "Direct Apply",
+        candidateStatus: "",
+        cvText: "",
+        otherNotes: "",
+        doneQuestions: "",
       });
+      setCvUrl("");
+      setCvFile(null);
     }
   }, [candidate, open]);
 
   const generateCandidateId = () => {
     return `CAND-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf' && !file.type.includes('document')) {
+      toast({
+        title: "Invalid File Type",
+        description: "Please upload a PDF or document file",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) { // 10MB limit
+      toast({
+        title: "File Too Large",
+        description: "Please upload a file smaller than 10MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setCvFile(file);
+    setUploading(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `cv-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('cvs')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('cvs')
+        .getPublicUrl(filePath);
+
+      setCvUrl(publicUrl);
+      
+      toast({
+        title: "Success",
+        description: "CV uploaded successfully",
+      });
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast({
+        title: "Upload Failed",
+        description: "Failed to upload CV file",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSave = async () => {
@@ -125,22 +200,27 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
     setLoading(true);
     try {
       const candidateData = {
-        Cadndidate_ID: candidate?.Cadndidate_ID || generateCandidateId(),
-        "First Name": formData.firstName,
-        "Last Name": formData.lastName,
+        candidate_id: candidate?.candidate_id || generateCandidateId(),
+        first_name: formData.firstName,
+        last_name: formData.lastName,
         Email: formData.email,
-        "Phone Number": formData.phone,
+        phone_number: formData.phone,
         Title: formData.title,
         Location: formData.location,
-        "Current Company": formData.currentCompany,
+        current_company: formData.currentCompany,
         Skills: formData.skills,
-        "Applied for": formData.appliedFor.length > 0 ? formData.appliedFor : null,
-        "CV Summary": formData.cvSummary,
+        applied_for: formData.appliedFor.length > 0 ? formData.appliedFor : null,
+        cv_summary: formData.cvSummary,
         Experience: formData.experience,
         Education: formData.education,
         Certifications: formData.certifications,
         Language: formData.language,
         Linkedin: formData.linkedin,
+        CV_Link: cvUrl,
+        CandidateStatus: formData.candidateStatus,
+        cv_text: formData.cvText,
+        other_notes: formData.otherNotes,
+        done_questions: formData.doneQuestions,
         Timestamp: candidate?.Timestamp || new Date().toISOString(),
       };
 
@@ -149,7 +229,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
         const { error } = await supabase
           .from('CVs')
           .update(candidateData)
-          .eq('Cadndidate_ID', candidate.Cadndidate_ID);
+          .eq('candidate_id', candidate.candidate_id);
 
         if (error) throw error;
 
@@ -186,7 +266,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto glass-card">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto glass-card">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2 text-xl">
             <Users className="h-5 w-5 text-primary" />
@@ -260,6 +340,23 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
                   className="bg-background/50"
                 />
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="candidateStatus">Candidate Status</Label>
+                <Select value={formData.candidateStatus} onValueChange={(value) => setFormData(prev => ({ ...prev, candidateStatus: value }))}>
+                  <SelectTrigger className="bg-background/50">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Not Reached">Not Reached</SelectItem>
+                    <SelectItem value="Called">Called</SelectItem>
+                    <SelectItem value="Rejected">Rejected</SelectItem>
+                    <SelectItem value="Shortlisted">Shortlisted</SelectItem>
+                    <SelectItem value="Interviewed">Interviewed</SelectItem>
+                    <SelectItem value="Hired">Hired</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </CardContent>
           </Card>
 
@@ -321,10 +418,10 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
                     </SelectTrigger>
                     <SelectContent>
                       {jobs
-                        .filter(job => !formData.appliedFor.includes(job["Job ID"]))
+                        .filter(job => !formData.appliedFor.includes(job.job_id))
                         .map((job) => (
-                          <SelectItem key={job["Job ID"]} value={job["Job ID"]}>
-                            {job["Job Title"]} (ID: {job["Job ID"]})
+                          <SelectItem key={job.job_id} value={job.job_id}>
+                            {job.job_title} (ID: {job.job_id})
                           </SelectItem>
                         ))
                       }
@@ -334,7 +431,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
                   {formData.appliedFor.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                       {formData.appliedFor.map((jobId) => {
-                        const job = jobs.find(j => j["Job ID"] === jobId);
+                        const job = jobs.find(j => j.job_id === jobId);
                         return (
                           <Badge 
                             key={jobId} 
@@ -347,7 +444,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
                               }));
                             }}
                           >
-                            {job ? job["Job Title"] : jobId} ×
+                            {job ? job.job_title : jobId} <X className="w-3 h-3 ml-1" />
                           </Badge>
                         );
                       })}
@@ -355,38 +452,66 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
                   )}
                 </div>
               </div>
+            </CardContent>
+          </Card>
 
-              <div className="grid grid-cols-2 gap-4">
+          {/* CV Upload Section */}
+          <Card className="mission-card lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                CV Upload & Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="cvUpload">Upload CV</Label>
+                <div className="flex items-center gap-4">
+                  <div className="flex-1">
+                    <Input
+                      id="cvUpload"
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={handleFileUpload}
+                      className="bg-background/50"
+                      disabled={uploading}
+                    />
+                  </div>
+                  {uploading && (
+                    <div className="flex items-center gap-2">
+                      <Upload className="w-4 h-4 animate-spin" />
+                      <span className="text-sm">Uploading...</span>
+                    </div>
+                  )}
+                </div>
+                {cvUrl && (
+                  <div className="text-sm text-muted-foreground">
+                    CV uploaded: <a href={cvUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">View CV</a>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="status">Status</Label>
-                  <Select value={formData.status} onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}>
-                    <SelectTrigger className="bg-background/50">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Not Reached">Not Reached</SelectItem>
-                      <SelectItem value="Called">Called</SelectItem>
-                      <SelectItem value="Rejected">Rejected</SelectItem>
-                      <SelectItem value="Shortlisted">Shortlisted</SelectItem>
-                      <SelectItem value="Interviewed">Interviewed</SelectItem>
-                      <SelectItem value="Hired">Hired</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="cvSummary">CV Summary</Label>
+                  <Textarea
+                    id="cvSummary"
+                    value={formData.cvSummary}
+                    onChange={(e) => setFormData(prev => ({ ...prev, cvSummary: e.target.value }))}
+                    placeholder="Brief summary of the candidate..."
+                    className="bg-background/50 min-h-[100px]"
+                  />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="source">Source</Label>
-                  <Select value={formData.source} onValueChange={(value) => setFormData(prev => ({ ...prev, source: value }))}>
-                    <SelectTrigger className="bg-background/50">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="LinkedIn">LinkedIn</SelectItem>
-                      <SelectItem value="Job Board">Job Board</SelectItem>
-                      <SelectItem value="Referral">Referral</SelectItem>
-                      <SelectItem value="Direct Apply">Direct Apply</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="cvText">CV Text Content</Label>
+                  <Textarea
+                    id="cvText"
+                    value={formData.cvText}
+                    onChange={(e) => setFormData(prev => ({ ...prev, cvText: e.target.value }))}
+                    placeholder="Extracted text from CV..."
+                    className="bg-background/50 min-h-[100px]"
+                  />
                 </div>
               </div>
             </CardContent>
@@ -454,13 +579,32 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="cvSummary">CV Summary</Label>
+                <Label htmlFor="doneQuestions">Interview Questions</Label>
                 <Textarea
-                  id="cvSummary"
-                  value={formData.cvSummary}
-                  onChange={(e) => setFormData(prev => ({ ...prev, cvSummary: e.target.value }))}
-                  placeholder="Brief summary of the candidate..."
+                  id="doneQuestions"
+                  value={formData.doneQuestions}
+                  onChange={(e) => setFormData(prev => ({ ...prev, doneQuestions: e.target.value }))}
+                  placeholder="Questions asked during interview..."
                   className="bg-background/50 min-h-[80px]"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Notes Section */}
+          <Card className="mission-card lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="text-lg">Additional Notes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Label htmlFor="otherNotes">Other Notes</Label>
+                <Textarea
+                  id="otherNotes"
+                  value={formData.otherNotes}
+                  onChange={(e) => setFormData(prev => ({ ...prev, otherNotes: e.target.value }))}
+                  placeholder="Any additional notes about the candidate..."
+                  className="bg-background/50 min-h-[100px]"
                 />
               </div>
             </CardContent>
@@ -471,7 +615,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={loading} className="action-button bg-gradient-primary">
+          <Button onClick={handleSave} disabled={loading || uploading} className="action-button bg-gradient-primary">
             {loading ? "Saving..." : candidate ? "Update Candidate" : "Add Candidate"}
           </Button>
         </div>
