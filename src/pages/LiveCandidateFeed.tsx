@@ -44,11 +44,32 @@ export default function LiveCandidateFeed() {
 
   const handleRejectCandidate = async (candidateId: string, jobId: string) => {
     try {
+      // Update database
       await supabase
         .from('Jobs_CVs')
         .update({ contacted: 'Rejected' })
         .eq('Candidate_ID', candidateId)
         .eq('job_id', jobId);
+      
+      // Send webhook to Make.com
+      const candidate = candidates.find(c => (c.Candidate_ID || c.candidate_id) === candidateId);
+      if (candidate) {
+        try {
+          await fetch('https://hook.eu2.make.com/castzb5q0mllr7eq9zzyqll4ffcpet7j', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              job_id: jobId,
+              candidate_id: candidateId,
+              callid: candidate.callid
+            }),
+          });
+        } catch (webhookError) {
+          console.error('Webhook error:', webhookError);
+        }
+      }
       
       // Refresh data
       fetchData();

@@ -181,11 +181,32 @@ export default function Index() {
 
   const handleRejectCandidate = async (candidateId: string, jobId: string) => {
     try {
+      // Update database
       await supabase
         .from('Jobs_CVs')
         .update({ contacted: 'Rejected' })
         .eq('Candidate_ID', candidateId)
         .eq('job_id', jobId);
+      
+      // Send webhook to Make.com
+      const candidate = candidates.find(c => c.Candidate_ID === candidateId);
+      if (candidate) {
+        try {
+          await fetch('https://hook.eu2.make.com/castzb5q0mllr7eq9zzyqll4ffcpet7j', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              job_id: jobId,
+              candidate_id: candidateId,
+              callid: candidate.callid
+            }),
+          });
+        } catch (webhookError) {
+          console.error('Webhook error:', webhookError);
+        }
+      }
       
       // Refresh data
       fetchDashboardData();
@@ -447,7 +468,7 @@ export default function Index() {
                                 className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                               >
                                 <XCircle className="w-4 h-4 mr-1" />
-                                Reject
+                                Reject Candidate
                               </Button>
                               <Button
                                 size="sm"
@@ -459,7 +480,7 @@ export default function Index() {
                                 className="bg-green-600 hover:bg-green-700 text-white"
                               >
                                 <Calendar className="w-4 h-4 mr-1" />
-                                Interview
+                                Arrange an Interview
                               </Button>
                             </div>
                           </div>
