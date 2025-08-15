@@ -81,12 +81,13 @@ export function StatusDropdown({
             "2nd No Answer",
             "3rd No Answer",
             "Low Scored",
-            "Tasked"
+            "Tasked",
+            "Rejected"
           ]
           if (!active) return
           setOptions(allowed)
         } else {
-          const allowed = ["Shortlisted", "Interview", "Hired", "Rejected"]
+          const allowed = ["Shortlisted", "Interview", "Hired"]
           if (!active) return
           setOptions(allowed)
         }
@@ -96,8 +97,8 @@ export function StatusDropdown({
         // Fallback to a sensible default list if lookup fetch fails
         setOptions(
           statusType === "contacted"
-            ? ["Not Contacted", "Ready to Call", "Contacted", "Call Done", "1st No Answer", "2nd No Answer", "3rd No Answer", "Low Scored", "Tasked"]
-            : ["Applied", "Longlisted", "Shortlisted", "Interview", "Offer", "Hired", "Rejected", "On Hold"]
+            ? ["Not Contacted", "Ready to Call", "Contacted", "Call Done", "1st No Answer", "2nd No Answer", "3rd No Answer", "Low Scored", "Tasked", "Rejected"]
+            : ["Applied", "Longlisted", "Shortlisted", "Interview", "Offer", "Hired", "On Hold"]
         )
       } finally {
         if (active) setLoadingOptions(false)
@@ -130,7 +131,7 @@ export function StatusDropdown({
         const { error } = await supabase
           .from('CVs')
           .update({ CandidateStatus: newStatus } as any)
-          .eq('Cadndidate_ID', candidateId)
+          .eq('candidate_id', candidateId)
         if (error) throw error
       }
 
