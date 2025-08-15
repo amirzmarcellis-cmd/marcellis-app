@@ -1126,13 +1126,13 @@ export default function JobDetails() {
                                      {/* Call Log Buttons */}
                                      <div className="space-y-2 pt-2 border-t">
                                        <div className="flex flex-col sm:flex-row gap-2">
-                                         <Button
-                                           variant="default"
-                                           size="sm"
-                                           onClick={() => handleCallCandidate(mainCandidate["Candidate_ID"], id!, mainCandidate["callid"])}
-                                           disabled={callingCandidateId === candidateId}
-                                           className="w-full sm:flex-1 bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 text-xs md:text-sm"
-                                         >
+                                          <Button
+                                            variant="default"
+                                            size="sm"
+                                            onClick={() => handleCallCandidate(mainCandidate["Candidate_ID"], id!, mainCandidate["callid"])}
+                                            disabled={callingCandidateId === candidateId}
+                                            className="w-full sm:flex-1 bg-foreground hover:bg-foreground/90 text-background disabled:opacity-50 text-xs md:text-sm"
+                                          >
                                            <Phone className="w-3 h-3 mr-1" />
                                            {callingCandidateId === candidateId ? 'Calling...' : 'Call Candidate'}
                                          </Button>
