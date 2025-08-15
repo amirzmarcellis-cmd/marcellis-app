@@ -314,9 +314,17 @@ export default function LiveCandidateFeed() {
                             <span>{candidate.candidate_phone_number}</span>
                           </div>
                            <div className="flex items-center text-purple-300">
-                            <Briefcase className="w-4 h-4 mr-2 text-orange-400" />
-                            <span>💰 {candidate.salary_expectations || 'Negotiable'}</span>
-                          </div>
+                             <Briefcase className="w-4 h-4 mr-2 text-orange-400" />
+                             <span>💰 {candidate.salary_expectations || 'Negotiable'}</span>
+                           </div>
+                           {getCandidateStatus(candidate.Candidate_ID || candidate.candidate_id) && (
+                             <div className="flex items-center text-purple-300">
+                               <Clock className="w-4 h-4 mr-2 text-blue-400" />
+                               <Badge className="text-xs px-2 py-1 bg-blue-500/20 text-blue-300 border-blue-400/40">
+                                 {getCandidateStatus(candidate.Candidate_ID || candidate.candidate_id)}
+                               </Badge>
+                             </div>
+                           )}
                         </div>
                       </div>
                     </div>

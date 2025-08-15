@@ -423,9 +423,14 @@ export default function Index() {
                             <div>
                               <h4 className="font-semibold text-foreground text-lg group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors">{candidate.candidate_name}</h4>
                               <p className="text-sm text-purple-300 font-medium">{jobTitle}</p>
-                              <Badge variant="outline" className="mt-1 text-xs border-cyan-400/50 text-cyan-400 bg-cyan-400/10">
-                                ID: {candidate.job_id}
-                              </Badge>
+                               <Badge variant="outline" className="mt-1 text-xs border-cyan-400/50 text-cyan-400 bg-cyan-400/10">
+                                 ID: {candidate.job_id}
+                               </Badge>
+                               {getCandidateStatus(candidate.Candidate_ID) && (
+                                 <Badge className="mt-1 text-xs px-2 py-1 bg-blue-500/20 text-blue-300 border-blue-400/40">
+                                   {getCandidateStatus(candidate.Candidate_ID)}
+                                 </Badge>
+                               )}
                             </div>
                           </div>
                           <div className="text-right">
