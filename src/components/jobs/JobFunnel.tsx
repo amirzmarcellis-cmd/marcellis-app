@@ -46,8 +46,8 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
       return score >= 74;
     }).length;
     
-    // Tasked (if there's an assignment - this would need to be tracked separately)
-    const tasked = candidates.filter(c => c["assignment_completed"] === true).length; // Placeholder
+    // Tasked (contacted status is "Tasked")
+    const tasked = candidates.filter(c => c["Contacted"] === "Tasked").length;
     
     // Hired (this would need to be tracked separately)
     const hired = candidates.filter(c => c["hired"] === true).length; // Placeholder

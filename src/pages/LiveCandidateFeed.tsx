@@ -247,6 +247,7 @@ export default function LiveCandidateFeed() {
                   <SelectItem value="Contacted" className="text-white hover:bg-pink-600/20">Contacted</SelectItem>
                   <SelectItem value="Call Done" className="text-white hover:bg-pink-600/20">Call Done</SelectItem>
                   <SelectItem value="Low Scored" className="text-white hover:bg-pink-600/20">Low Scored</SelectItem>
+                  <SelectItem value="Tasked" className="text-white hover:bg-pink-600/20">Tasked</SelectItem>
                   <SelectItem value="Shortlisted" className="text-white hover:bg-pink-600/20">Shortlisted</SelectItem>
                   <SelectItem value="Interview" className="text-white hover:bg-pink-600/20">Interview</SelectItem>
                   <SelectItem value="Hired" className="text-white hover:bg-pink-600/20">Hired</SelectItem>

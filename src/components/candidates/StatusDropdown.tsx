@@ -80,7 +80,8 @@ export function StatusDropdown({
             "1st No Answer",
             "2nd No Answer",
             "3rd No Answer",
-            "Low Scored"
+            "Low Scored",
+            "Tasked"
           ]
           if (!active) return
           setOptions(allowed)
@@ -95,7 +96,7 @@ export function StatusDropdown({
         // Fallback to a sensible default list if lookup fetch fails
         setOptions(
           statusType === "contacted"
-            ? ["Not Contacted", "Ready to Call", "Contacted", "Call Done", "1st No Answer", "2nd No Answer", "3rd No Answer", "Low Scored"]
+            ? ["Not Contacted", "Ready to Call", "Contacted", "Call Done", "1st No Answer", "2nd No Answer", "3rd No Answer", "Low Scored", "Tasked"]
             : ["Applied", "Longlisted", "Shortlisted", "Interview", "Offer", "Hired", "Rejected", "On Hold"]
         )
       } finally {

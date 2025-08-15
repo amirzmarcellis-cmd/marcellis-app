@@ -860,6 +860,7 @@ export default function JobDetails() {
                                 <SelectItem value="2nd No Answer">2nd No Answer</SelectItem>
                                 <SelectItem value="3rd No Answer">3rd No Answer</SelectItem>
                                 <SelectItem value="Low Scored">Low Scored</SelectItem>
+                                <SelectItem value="Tasked">Tasked</SelectItem>
                               </SelectContent>
                            </Select>
                         </div>
