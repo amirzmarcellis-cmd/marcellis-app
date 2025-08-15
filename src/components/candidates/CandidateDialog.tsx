@@ -179,10 +179,10 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
   };
 
   const handleSave = async () => {
-    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+    if (!cvUrl.trim()) {
       toast({
         title: "Validation Error",
-        description: "First name and last name are required",
+        description: "CV upload is required",
         variant: "destructive",
       });
       return;
@@ -274,7 +274,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name *</Label>
+                  <Label htmlFor="firstName">First Name</Label>
                   <Input
                     id="firstName"
                     value={formData.firstName}
@@ -284,7 +284,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name *</Label>
+                  <Label htmlFor="lastName">Last Name</Label>
                   <Input
                     id="lastName"
                     value={formData.lastName}
@@ -453,7 +453,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="cvUpload">Upload CV</Label>
+                <Label htmlFor="cvUpload">Upload CV *</Label>
                 <div className="flex items-center gap-4">
                   <div className="flex-1">
                     <Input
@@ -481,68 +481,6 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
             </CardContent>
           </Card>
 
-          {/* Skills & Experience */}
-          <Card className="mission-card lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="text-lg">Skills & Experience</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="skills">Skills (comma separated)</Label>
-                <Textarea
-                  id="skills"
-                  value={formData.skills}
-                  onChange={(e) => setFormData(prev => ({ ...prev, skills: e.target.value }))}
-                  placeholder="React, TypeScript, Node.js, AWS"
-                  className="bg-background/50 min-h-[80px]"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="language">Languages</Label>
-                <Textarea
-                  id="language"
-                  value={formData.language}
-                  onChange={(e) => setFormData(prev => ({ ...prev, language: e.target.value }))}
-                  placeholder="English (Fluent), Arabic (Native)"
-                  className="bg-background/50 min-h-[80px]"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="experience">Experience</Label>
-                <Textarea
-                  id="experience"
-                  value={formData.experience}
-                  onChange={(e) => setFormData(prev => ({ ...prev, experience: e.target.value }))}
-                  placeholder="5+ years in software development..."
-                  className="bg-background/50 min-h-[100px]"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="education">Education</Label>
-                <Textarea
-                  id="education"
-                  value={formData.education}
-                  onChange={(e) => setFormData(prev => ({ ...prev, education: e.target.value }))}
-                  placeholder="Computer Science degree..."
-                  className="bg-background/50 min-h-[100px]"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="certifications">Certifications</Label>
-                <Textarea
-                  id="certifications"
-                  value={formData.certifications}
-                  onChange={(e) => setFormData(prev => ({ ...prev, certifications: e.target.value }))}
-                  placeholder="AWS Certified, Google Cloud..."
-                  className="bg-background/50 min-h-[80px]"
-                />
-              </div>
-            </CardContent>
-          </Card>
 
           {/* Notes Section */}
           <Card className="mission-card lg:col-span-2">
