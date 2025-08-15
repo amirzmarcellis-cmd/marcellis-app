@@ -308,9 +308,10 @@ export default function Interviews() {
                       size="sm"
                       variant="outline"
                       onClick={() => window.open(`tel:${candidate.phone_number}`, '_self')}
-                      className="px-3"
+                      className="px-3 gap-2"
                     >
                       <PhoneCall className="w-4 h-4" />
+                      Call Candidate
                     </Button>
                   )}
                 </div>
