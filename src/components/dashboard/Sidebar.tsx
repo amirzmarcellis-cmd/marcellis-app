@@ -15,8 +15,6 @@ import {
   Activity,
   Sun,
   Moon,
-  ChevronDown,
-  ChevronRight,
 } from "lucide-react"
 import { useAuth } from '@/contexts/AuthContext';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
@@ -38,16 +36,10 @@ import {
 
 const navigationItems = [
   { title: "Dashboard", url: "/", icon: Home },
-  { 
-    title: "Live Feed", 
-    url: "/live-feed", 
-    icon: Activity,
-    children: [
-      { title: "Interviews", url: "/interviews", icon: Calendar }
-    ]
-  },
+  { title: "Live Feed", url: "/live-feed", icon: Activity },
   { title: "Jobs", url: "/jobs", icon: Briefcase },
   { title: "Candidates", url: "/candidates", icon: Users },
+  { title: "Interviews", url: "/interviews", icon: Calendar },
   { title: "Call Log", url: "/call-log", icon: PhoneCall },
   { title: "Analytics", url: "/analytics", icon: BarChart3 },
   { title: "Reports", url: "/reports", icon: FileText },
@@ -65,19 +57,8 @@ export function DashboardSidebar() {
   const isMobile = useIsMobile()
   const isMini = isCollapsed && !isMobile
 
-  const [expandedItems, setExpandedItems] = useState<string[]>(['Live Feed']);
   const isActive = (path: string) => currentPath === path
-  const hasActiveItem = navigationItems.some((item) => isActive(item.url) || item.children?.some(child => isActive(child.url)))
-
-  const toggleExpanded = (title: string) => {
-    setExpandedItems(prev => 
-      prev.includes(title) 
-        ? prev.filter(item => item !== title)
-        : [...prev, title]
-    );
-  };
-
-  const isExpanded = (title: string) => expandedItems.includes(title);
+  const hasActiveItem = navigationItems.some((item) => isActive(item.url))
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -119,96 +100,27 @@ export function DashboardSidebar() {
             <SidebarMenu className="space-y-1">
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  {item.children ? (
-                    // Parent item with children
-                    <div>
-                      <SidebarMenuButton asChild>
-                        <div
-                          className={`
-                            flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer
-                            ${
-                              isActive(item.url) || item.children.some(child => isActive(child.url))
-                                ? "bg-muted text-foreground shadow-medium dark:bg-primary dark:text-primary-foreground"
-                                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                            }
-                            ${isMini ? "justify-center" : ""}
-                          `}
-                          onClick={() => {
-                            if (item.children && !isMini) {
-                              toggleExpanded(item.title);
-                            } else {
-                              window.location.href = item.url;
-                            }
-                          }}
-                        >
-                          <item.icon 
-                            className={`w-5 h-5 ${isMini ? "" : "mr-3"}`} 
-                          />
-                          {!isMini && (
-                            <>
-                              <span className="font-medium flex-1">{item.title}</span>
-                              {item.children && (
-                                <div className="ml-auto">
-                                  {isExpanded(item.title) ? (
-                                    <ChevronDown className="w-4 h-4" />
-                                  ) : (
-                                    <ChevronRight className="w-4 h-4" />
-                                  )}
-                                </div>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      </SidebarMenuButton>
-                      
-                      {/* Children items */}
-                      {item.children && !isMini && isExpanded(item.title) && (
-                        <div className="ml-6 mt-1 space-y-1">
-                          {item.children.map((child) => (
-                            <SidebarMenuButton key={child.title} asChild>
-                              <Link
-                                to={child.url}
-                                className={`
-                                  flex items-center space-x-3 px-3 py-1.5 rounded-lg transition-all duration-200 text-sm
-                                  ${
-                                    isActive(child.url)
-                                      ? "bg-muted text-foreground shadow-medium dark:bg-primary/80 dark:text-primary-foreground"
-                                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                                  }
-                                `}
-                              >
-                                <child.icon className="w-4 h-4 mr-2" />
-                                <span className="font-medium">{child.title}</span>
-                              </Link>
-                            </SidebarMenuButton>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    // Regular item without children
-                    <SidebarMenuButton asChild>
-                      <Link
-                        to={item.url}
-                        className={`
-                          flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200
+                  <SidebarMenuButton asChild>
+                    <Link
+                      to={item.url}
+                      className={`
+                        flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200
                           ${
                             isActive(item.url)
                               ? "bg-muted text-foreground shadow-medium dark:bg-primary dark:text-primary-foreground"
                               : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                           }
-                          ${isMini ? "justify-center" : ""}
-                        `}
-                      >
-                        <item.icon 
-                          className={`w-5 h-5 ${isMini ? "" : "mr-3"}`} 
-                        />
-                        {!isMini && (
-                          <span className="font-medium">{item.title}</span>
-                        )}
-                      </Link>
-                    </SidebarMenuButton>
-                  )}
+                        ${isMini ? "justify-center" : ""}
+                      `}
+                    >
+                      <item.icon 
+                        className={`w-5 h-5 ${isMini ? "" : "mr-3"}`} 
+                      />
+                      {!isMini && (
+                        <span className="font-medium">{item.title}</span>
+                      )}
+                    </Link>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
