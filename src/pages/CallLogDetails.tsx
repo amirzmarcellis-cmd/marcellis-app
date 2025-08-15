@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState, useMemo, useRef } from "react"
 import { useSearchParams, useNavigate } from "react-router-dom"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -56,6 +56,7 @@ export default function CallLogDetails() {
   const [saving, setSaving] = useState(false)
   const [search, setSearch] = useState("")
   const [notesUpdatedByName, setNotesUpdatedByName] = useState<string | null>(null)
+  const firstMatchRef = useRef<HTMLElement | null>(null)
   const { profile } = useProfile()
 
   const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
@@ -64,14 +65,36 @@ export default function CallLogDetails() {
     if (!search.trim()) return t
     const regex = new RegExp(`(${escapeRegExp(search.trim())})`, "gi")
     const parts = t.split(regex)
+    let isFirstMatch = true
     return parts.map((part, i) =>
       regex.test(part) ? (
-        <mark key={i} className="bg-yellow-200 dark:bg-yellow-900 text-black dark:text-yellow-100 px-0.5 rounded">{part}</mark>
+        <mark 
+          key={i} 
+          ref={isFirstMatch ? (el) => {
+            firstMatchRef.current = el
+            isFirstMatch = false
+          } : undefined}
+          className="bg-yellow-200 dark:bg-yellow-900 text-black dark:text-yellow-100 px-0.5 rounded"
+        >
+          {part}
+        </mark>
       ) : (
         <span key={i}>{part}</span>
       )
     )
   }, [callLog, search])
+
+  // Auto-scroll to first match when search changes
+  useEffect(() => {
+    if (search.trim() && firstMatchRef.current) {
+      setTimeout(() => {
+        firstMatchRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        })
+      }, 100)
+    }
+  }, [search, highlightedTranscript])
 
   useEffect(() => {
     fetchCallLogDetail()
