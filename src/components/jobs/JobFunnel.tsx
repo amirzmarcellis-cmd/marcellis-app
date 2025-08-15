@@ -75,7 +75,7 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
     { name: "Contacted", count: counts.contacted, bgColor: "bg-green-600", textColor: "text-black dark:text-white" },
     { name: "Low Scored", count: counts.lowScored, bgColor: "bg-red-600", textColor: "text-black dark:text-white" },
     { name: "Shortlist", count: counts.shortlist, bgColor: "bg-emerald-600", textColor: "text-black dark:text-white" },
-    ...(jobAssignment ? [{ name: "Tasked", count: counts.tasked, bgColor: "bg-purple-600", textColor: "text-black dark:text-white" }] : []),
+    { name: "Tasked", count: counts.tasked, bgColor: "bg-purple-600", textColor: "text-black dark:text-white" },
     { name: "Hired", count: counts.hired, bgColor: "bg-amber-500", textColor: "text-black dark:text-white" }
   ];
 
