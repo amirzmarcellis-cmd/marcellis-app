@@ -43,6 +43,10 @@ export default function JobDetails() {
   const [phoneFilter, setPhoneFilter] = useState("")
   const [scoreFilter, setScoreFilter] = useState("all")
   const [contactedFilter, setContactedFilter] = useState("all")
+  // Application filters
+  const [appNameFilter, setAppNameFilter] = useState("")
+  const [appEmailFilter, setAppEmailFilter] = useState("")
+  const [appPhoneFilter, setAppPhoneFilter] = useState("")
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [isGeneratingShortList, setIsGeneratingShortList] = useState(false)
@@ -799,19 +803,75 @@ export default function JobDetails() {
                      </CardDescription>
                    </div>
                  </div>
-               </CardHeader>
-               <CardContent>
-                 {applicationsLoading ? (
-                   <div className="flex items-center justify-center py-8">
-                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                   </div>
-                 ) : applications.length === 0 ? (
-                   <div className="text-center py-8 text-muted-foreground">
-                     No applications found for this job.
-                   </div>
-                 ) : (
-                   <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                     {applications.map((application) => (
+                </CardHeader>
+                <CardContent>
+                  {/* Application Filters */}
+                  <Card className="mb-4">
+                    <CardContent className="pt-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Name</label>
+                          <Input
+                            placeholder="Filter by name..."
+                            value={appNameFilter}
+                            onChange={(e) => setAppNameFilter(e.target.value)}
+                            className="h-9"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Email</label>
+                          <Input
+                            placeholder="Filter by email..."
+                            value={appEmailFilter}
+                            onChange={(e) => setAppEmailFilter(e.target.value)}
+                            className="h-9"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Phone</label>
+                          <Input
+                            placeholder="Filter by phone..."
+                            value={appPhoneFilter}
+                            onChange={(e) => setAppPhoneFilter(e.target.value)}
+                            className="h-9"
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {applicationsLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    </div>
+                  ) : applications.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No applications found for this job.
+                    </div>
+                  ) : (
+                    (() => {
+                      // Filter applications based on name, email, and phone
+                      const filteredApplications = applications.filter(application => {
+                        const fullName = application.first_name && application.last_name 
+                          ? `${application.first_name} ${application.last_name}` 
+                          : application.first_name || application.last_name || "";
+                        const email = application.Email || "";
+                        const phone = application.phone_number || "";
+
+                        const nameMatch = !appNameFilter || fullName.toLowerCase().includes(appNameFilter.toLowerCase());
+                        const emailMatch = !appEmailFilter || email.toLowerCase().includes(appEmailFilter.toLowerCase());
+                        const phoneMatch = !appPhoneFilter || phone.includes(appPhoneFilter);
+
+                        return nameMatch && emailMatch && phoneMatch;
+                      });
+
+                      return (
+                        <div>
+                          <div className="mb-4 text-sm text-muted-foreground">
+                            Showing {filteredApplications.length} of {applications.length} applications
+                          </div>
+                          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                            {filteredApplications.map((application) => (
                        <Card key={application.candidate_id} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
                          <CardContent className="p-3 md:p-4">
                            <div className="space-y-3">
@@ -867,12 +927,15 @@ export default function JobDetails() {
                              </div>
                            </div>
                          </CardContent>
-                       </Card>
-                     ))}
-                   </div>
-                 )}
-               </CardContent>
-             </Card>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                    );
+                  })()
+                  )}
+                </CardContent>
+              </Card>
            </TabsContent>
 
            <TabsContent value="candidates" className="space-y-4">
