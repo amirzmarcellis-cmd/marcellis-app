@@ -61,12 +61,12 @@ export default function CallLogDetails() {
   const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
   const highlightedTranscript = useMemo(() => {
     const t = callLog?.["Transcript"] || ""
-    if (!search) return t
-    const regex = new RegExp(`(${escapeRegExp(search)})`, "gi")
+    if (!search.trim()) return t
+    const regex = new RegExp(`(${escapeRegExp(search.trim())})`, "gi")
     const parts = t.split(regex)
     return parts.map((part, i) =>
-      part.toLowerCase() === search.toLowerCase() ? (
-        <mark key={i} className="bg-primary/20 text-primary px-0.5 rounded">{part}</mark>
+      regex.test(part) ? (
+        <mark key={i} className="bg-yellow-200 dark:bg-yellow-900 text-black dark:text-yellow-100 px-0.5 rounded">{part}</mark>
       ) : (
         <span key={i}>{part}</span>
       )
