@@ -296,24 +296,8 @@ export default function LiveCandidateFeed() {
                       </Avatar>
                       
                       <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
+                        <div className="mb-3">
                           <h3 className="text-xl font-bold text-foreground">{candidate.candidate_name}</h3>
-                        <div className="flex items-center space-x-2">
-                            <Button size="sm" variant="destructive" onClick={e => {
-                          e.stopPropagation();
-                          handleRejectCandidate(candidate.Candidate_ID || candidate.candidate_id, candidate.job_id);
-                        }} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
-                              <XCircle className="w-4 h-4 mr-1" />
-                              Reject Candidate
-                            </Button>
-                            <Button size="sm" variant="default" onClick={e => {
-                          e.stopPropagation();
-                          handleArrangeInterview(candidate.Candidate_ID || candidate.candidate_id);
-                        }} className="bg-green-600 hover:bg-green-700 text-white bg-emerald-700 hover:bg-emerald-600">
-                              <Calendar className="w-4 h-4 mr-1" />
-                              Arrange an Interview
-                            </Button>
-                          </div>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
@@ -329,25 +313,39 @@ export default function LiveCandidateFeed() {
                             <Phone className="w-4 h-4 mr-2 text-green-400" />
                             <span>{candidate.candidate_phone_number}</span>
                           </div>
-                          <div className="flex items-center text-purple-300">
-                            <Clock className="w-4 h-4 mr-2 text-orange-400" />
-                            <span>{candidate['Notice Period'] || 'Not specified'}</span>
+                           <div className="flex items-center text-purple-300">
+                            <Briefcase className="w-4 h-4 mr-2 text-orange-400" />
+                            <span>💰 {candidate.salary_expectations || 'Negotiable'}</span>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* Status Dropdowns */}
-                    <div className="flex items-center justify-between">
-                      
-                      
-                      <div className="flex items-center space-x-2">
-                        <Badge className="bg-purple-500/20 text-purple-300 border-purple-400/40">
-                          💰 {candidate.salary_expectations || 'Negotiable'}
-                        </Badge>
-                        {score >= 74 && <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-400/40 animate-pulse">
-                            ⭐ High Priority
-                          </Badge>}
+                    {/* Action Buttons */}
+                    <div className="mt-4 pt-4 border-t border-border/20">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Badge className="bg-purple-500/20 text-purple-300 border-purple-400/40">
+                            Notice: {candidate['Notice Period'] || 'Not specified'}
+                          </Badge>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2">
+                          <Button size="sm" variant="destructive" onClick={e => {
+                            e.stopPropagation();
+                            handleRejectCandidate(candidate.Candidate_ID || candidate.candidate_id, candidate.job_id);
+                          }} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                            <XCircle className="w-4 h-4 mr-1" />
+                            Reject Candidate
+                          </Button>
+                          <Button size="sm" variant="default" onClick={e => {
+                            e.stopPropagation();
+                            handleArrangeInterview(candidate.Candidate_ID || candidate.candidate_id);
+                          }} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                            <Calendar className="w-4 h-4 mr-1" />
+                            Arrange an Interview
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>;
