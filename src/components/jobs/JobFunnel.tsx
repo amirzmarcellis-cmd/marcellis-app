@@ -25,29 +25,29 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
     console.log('All candidate scores:', allScores);
     
     // Count by contacted status
-    const firstNoAnswer = candidates.filter(c => c["Contacted"] === "1st No Answer").length;
-    const secondNoAnswer = candidates.filter(c => c["Contacted"] === "2nd No Answer").length;
-    const thirdNoAnswer = candidates.filter(c => c["Contacted"] === "3rd No Answer").length;
-    const contacted = candidates.filter(c => c["Contacted"] === "Contacted").length;
+    const firstNoAnswer = candidates.filter(c => c["contacted"] === "1st No Answer").length;
+    const secondNoAnswer = candidates.filter(c => c["contacted"] === "2nd No Answer").length;
+    const thirdNoAnswer = candidates.filter(c => c["contacted"] === "3rd No Answer").length;
+    const contacted = candidates.filter(c => c["contacted"] === "Contacted").length;
     
     // Low scored (contacted status is "Low Scored")
-    const lowScored = candidates.filter(c => c["Contacted"] === "Low Scored").length;
+    const lowScored = candidates.filter(c => c["contacted"] === "Low Scored").length;
     
     // Debug: log low scored calculation
-    const lowScoredCandidates = candidates.filter(c => c["Contacted"] === "Low Scored");
+    const lowScoredCandidates = candidates.filter(c => c["contacted"] === "Low Scored");
     console.log('Low scored candidates:', lowScored, 'Sample:', lowScoredCandidates.slice(0, 5).map(c => ({
       id: c["Candidate_ID"],
-      contacted: c["Contacted"]
+      contacted: c["contacted"]
     })));
     
     // Shortlist (score >= 74)
     const shortlist = candidates.filter(c => {
-      const score = parseInt(c["Success Score"] || "0");
+      const score = parseInt(c["success_score"] || "0");
       return score >= 74;
     }).length;
     
     // Tasked (contacted status is "Tasked")
-    const tasked = candidates.filter(c => c["Contacted"] === "Tasked").length;
+    const tasked = candidates.filter(c => c["contacted"] === "Tasked").length;
     
     // Hired (this would need to be tracked separately)
     const hired = candidates.filter(c => c["hired"] === true).length; // Placeholder
