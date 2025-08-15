@@ -7,12 +7,14 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User, MapPin, Briefcase, Mail, Phone, Search, Filter, Eye, Download, Calendar, Clock, ExternalLink, Edit } from "lucide-react"
+import { User, MapPin, Briefcase, Mail, Phone, Search, Filter, Eye, Download, Calendar, Clock, ExternalLink, Edit, UserPlus } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 import { formatDate } from "@/lib/utils"
+import { HeroHeader } from "@/components/dashboard/HeroHeader"
+import { CandidateDialog } from "@/components/candidates/CandidateDialog"
 
 interface Candidate {
   candidate_id: string
@@ -42,6 +44,8 @@ export default function Candidates() {
   const [jobs, setJobs] = useState<any[]>([])
   const [jobsCVs, setJobsCVs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [selectedCandidate, setSelectedCandidate] = useState<any>(null)
 
   useEffect(() => {
     fetchCandidates()
@@ -131,12 +135,28 @@ export default function Candidates() {
     }
   }
 
+  const handleAddCandidate = () => {
+    setSelectedCandidate(null)
+    setDialogOpen(true)
+  }
+
+  const handleSaveCandidate = () => {
+    setDialogOpen(false)
+    fetchCandidates() // Refresh the candidates list
+  }
+
   return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">Candidates</h1>
-          <p className="text-muted-foreground">Manage your recruitment pipeline</p>
-        </div>
+        <HeroHeader
+          title="Candidates"
+          subtitle="Manage your recruitment pipeline"
+          actions={
+            <Button onClick={handleAddCandidate} className="gap-2">
+              <UserPlus className="w-4 h-4" />
+              Add Candidate
+            </Button>
+          }
+        />
 
         {/* Filters */}
         <Card className="p-6 bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass">
@@ -277,6 +297,14 @@ export default function Candidates() {
             </div>
           </CardContent>
         </Card>
+
+        <CandidateDialog
+          candidate={selectedCandidate}
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          onSave={handleSaveCandidate}
+          jobs={jobs}
+        />
       </div>
   )
 }
