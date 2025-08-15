@@ -56,16 +56,13 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
     currentCompany: "",
     skills: "",
     appliedFor: [],
-    cvSummary: "",
     experience: "",
     education: "",
     certifications: "",
     language: "",
     linkedin: "",
     candidateStatus: "",
-    cvText: "",
     otherNotes: "",
-    doneQuestions: "",
   });
   
   const [loading, setLoading] = useState(false);
@@ -86,16 +83,13 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
         currentCompany: candidate.current_company || "",
         skills: candidate.Skills || "",
         appliedFor: candidate.applied_for || [],
-        cvSummary: candidate.cv_summary || "",
         experience: candidate.Experience || "",
         education: candidate.Education || "",
         certifications: candidate.Certifications || "",
         language: candidate.Language || "",
         linkedin: candidate.Linkedin || "",
         candidateStatus: candidate.CandidateStatus || "",
-        cvText: candidate.cv_text || "",
         otherNotes: candidate.other_notes || "",
-        doneQuestions: candidate.done_questions || "",
       });
       setCvUrl(candidate.CV_Link || "");
     } else {
@@ -109,16 +103,13 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
         currentCompany: "",
         skills: "",
         appliedFor: [],
-        cvSummary: "",
         experience: "",
         education: "",
         certifications: "",
         language: "",
         linkedin: "",
         candidateStatus: "",
-        cvText: "",
         otherNotes: "",
-        doneQuestions: "",
       });
       setCvUrl("");
       setCvFile(null);
@@ -210,7 +201,6 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
         current_company: formData.currentCompany,
         Skills: formData.skills,
         applied_for: formData.appliedFor.length > 0 ? formData.appliedFor : null,
-        cv_summary: formData.cvSummary,
         Experience: formData.experience,
         Education: formData.education,
         Certifications: formData.certifications,
@@ -218,9 +208,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
         Linkedin: formData.linkedin,
         CV_Link: cvUrl,
         CandidateStatus: formData.candidateStatus,
-        cv_text: formData.cvText,
         other_notes: formData.otherNotes,
-        done_questions: formData.doneQuestions,
         Timestamp: candidate?.Timestamp || new Date().toISOString(),
       };
 
@@ -490,30 +478,6 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
                   </div>
                 )}
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="cvSummary">CV Summary</Label>
-                  <Textarea
-                    id="cvSummary"
-                    value={formData.cvSummary}
-                    onChange={(e) => setFormData(prev => ({ ...prev, cvSummary: e.target.value }))}
-                    placeholder="Brief summary of the candidate..."
-                    className="bg-background/50 min-h-[100px]"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="cvText">CV Text Content</Label>
-                  <Textarea
-                    id="cvText"
-                    value={formData.cvText}
-                    onChange={(e) => setFormData(prev => ({ ...prev, cvText: e.target.value }))}
-                    placeholder="Extracted text from CV..."
-                    className="bg-background/50 min-h-[100px]"
-                  />
-                </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -574,17 +538,6 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
                   value={formData.certifications}
                   onChange={(e) => setFormData(prev => ({ ...prev, certifications: e.target.value }))}
                   placeholder="AWS Certified, Google Cloud..."
-                  className="bg-background/50 min-h-[80px]"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="doneQuestions">Interview Questions</Label>
-                <Textarea
-                  id="doneQuestions"
-                  value={formData.doneQuestions}
-                  onChange={(e) => setFormData(prev => ({ ...prev, doneQuestions: e.target.value }))}
-                  placeholder="Questions asked during interview..."
                   className="bg-background/50 min-h-[80px]"
                 />
               </div>
