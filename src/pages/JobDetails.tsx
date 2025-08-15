@@ -205,7 +205,7 @@ export default function JobDetails() {
       const { data, error } = await supabase
         .from('CVs')
         .select('*')
-        .contains('applied_for', [jobId])
+        .filter('applied_for', 'cs', `{${jobId}}`)
 
       if (error) throw error
       setApplications(data || [])
