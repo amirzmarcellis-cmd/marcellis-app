@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap } from "lucide-react"
+import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { JobFunnel } from "@/components/jobs/JobFunnel"
 import { JobDialog } from "@/components/jobs/JobDialog"
@@ -310,6 +310,38 @@ export default function JobDetails() {
       });
     }
   };
+
+  const handleRejectCandidate = async (jobId: string, candidateId: string, callid: number) => {
+    try {
+      const response = await fetch('https://hook.eu2.make.com/castzb5q0mllr7eq9zzyqll4ffcpet7j', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          job_id: jobId,
+          candidate_id: candidateId,
+          callid: callid
+        })
+      })
+
+      if (response.ok) {
+        toast({
+          title: "Candidate Rejected",
+          description: "The candidate has been successfully rejected.",
+        })
+      } else {
+        throw new Error('Failed to reject candidate')
+      }
+    } catch (error) {
+      console.error('Error rejecting candidate:', error)
+      toast({
+        title: "Error",
+        description: "Failed to reject candidate. Please try again.",
+        variant: "destructive"
+      })
+    }
+  }
 
   const handleGenerateShortList = async () => {
     if (!job?.["Job ID"] || candidates.length === 0) {
@@ -1298,17 +1330,26 @@ export default function JobDetails() {
                                             </Link>
                                           </Button>
                                        ))}
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        asChild
-                                        className="flex-1 min-w-[100px]"
-                                      >
-                                        <Link to={`/candidate/${candidateId}`}>
-                                          <Users className="w-3 h-3 mr-1" />
-                                          View Profile
-                                        </Link>
-                                      </Button>
+                                       <Button
+                                         variant="ghost"
+                                         size="sm"
+                                         asChild
+                                         className="flex-1 min-w-[100px]"
+                                       >
+                                         <Link to={`/candidate/${candidateId}`}>
+                                           <Users className="w-3 h-3 mr-1" />
+                                           View Profile
+                                         </Link>
+                                       </Button>
+                                       <Button
+                                         variant="destructive"
+                                         size="sm"
+                                         className="flex-1 min-w-[100px] bg-red-600 hover:bg-red-700"
+                                         onClick={() => handleRejectCandidate(id!, candidateId, candidateContacts[0].callid)}
+                                       >
+                                         <X className="w-3 h-3 mr-1" />
+                                         Reject Candidate
+                                       </Button>
                                     </div>
                                   </div>
                                 </div>
