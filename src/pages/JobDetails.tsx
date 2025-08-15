@@ -36,6 +36,8 @@ export default function JobDetails() {
   const [candidates, setCandidates] = useState<any[]>([])
   const [candidatesLoading, setCandidatesLoading] = useState(true)
   const [cvData, setCvData] = useState<any[]>([])
+  const [applications, setApplications] = useState<any[]>([])
+  const [applicationsLoading, setApplicationsLoading] = useState(false)
   const [nameFilter, setNameFilter] = useState("")
   const [emailFilter, setEmailFilter] = useState("")
   const [phoneFilter, setPhoneFilter] = useState("")
@@ -54,6 +56,7 @@ export default function JobDetails() {
       fetchJob(id)
       fetchCandidates(id)
       fetchCvData()
+      fetchApplications(id)
       checkShortListButtonStatus()
     }
   }, [id])
@@ -193,6 +196,24 @@ export default function JobDetails() {
     } catch (error) {
       console.error('Error fetching CV data:', error)
       setCvData([])
+    }
+  }
+
+  const fetchApplications = async (jobId: string) => {
+    setApplicationsLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('CVs')
+        .select('*')
+        .contains('applied_for', [jobId])
+
+      if (error) throw error
+      setApplications(data || [])
+    } catch (error) {
+      console.error('Error fetching applications:', error)
+      setApplications([])
+    } finally {
+      setApplicationsLoading(false)
     }
   }
 
@@ -571,12 +592,13 @@ export default function JobDetails() {
           <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
 
           {/* Detailed Information Tabs */}
-           <Tabs defaultValue="overview" className="space-y-4">
+            <Tabs defaultValue="overview" className="space-y-4">
              <div className="w-full overflow-x-auto">
-               <TabsList className="w-full min-w-[400px] grid grid-cols-5 h-auto p-1">
+               <TabsList className="w-full min-w-[400px] grid grid-cols-6 h-auto p-1">
                  <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">Overview</TabsTrigger>
                  <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2">Description</TabsTrigger>
                  <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">AI Requirements</TabsTrigger>
+                 <TabsTrigger value="applications" className="text-xs md:text-sm px-2 py-2">Applications</TabsTrigger>
                  <TabsTrigger value="candidates" className="text-xs md:text-sm px-2 py-2">AI Long List</TabsTrigger>
                  <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">AI Short List</TabsTrigger>
                </TabsList>
@@ -763,6 +785,91 @@ export default function JobDetails() {
             </Card>
            </TabsContent>
 
+           <TabsContent value="applications" className="space-y-4">
+             <Card>
+               <CardHeader>
+                 <div className="flex items-center justify-between">
+                   <div>
+                     <CardTitle className="flex items-center">
+                       <FileText className="w-5 h-5 mr-2" />
+                       Applications ({applications.length})
+                     </CardTitle>
+                     <CardDescription>
+                       Candidates who have applied for this position
+                     </CardDescription>
+                   </div>
+                 </div>
+               </CardHeader>
+               <CardContent>
+                 {applicationsLoading ? (
+                   <div className="flex items-center justify-center py-8">
+                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                   </div>
+                 ) : applications.length === 0 ? (
+                   <div className="text-center py-8 text-muted-foreground">
+                     No applications found for this job.
+                   </div>
+                 ) : (
+                   <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                     {applications.map((application) => (
+                       <Card key={application.candidate_id} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
+                         <CardContent className="p-3 md:p-4">
+                           <div className="space-y-3">
+                             <div className="flex items-start justify-between">
+                               <div className="min-w-0 flex-1">
+                                 <h4 className="font-semibold text-sm md:text-base truncate">{application.name || "Unknown"}</h4>
+                                 <p className="text-xs md:text-sm text-muted-foreground truncate">{application.candidate_id}</p>
+                               </div>
+                             </div>
+                             
+                             <div className="space-y-2 text-xs md:text-sm">
+                               {application.email && (
+                                 <div className="flex items-center text-muted-foreground min-w-0">
+                                   <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+                                   <span className="truncate">{application.email}</span>
+                                 </div>
+                               )}
+                               
+                               {application.phone && (
+                                 <div className="flex items-center text-muted-foreground min-w-0">
+                                   <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
+                                   <span className="truncate">{application.phone}</span>
+                                 </div>
+                               )}
+                             </div>
+
+                             {application.cv_summary && (
+                               <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
+                                 {application.cv_summary}
+                               </p>
+                             )}
+
+                             <div className="flex items-center justify-between pt-2 border-t gap-2">
+                               <div className="flex items-center gap-2">
+                                 {application.cv_url && (
+                                   <Button variant="outline" size="sm" asChild>
+                                     <a href={application.cv_url} target="_blank" rel="noopener noreferrer">
+                                       <FileText className="w-4 h-4 mr-1" />
+                                       CV
+                                     </a>
+                                   </Button>
+                                 )}
+                                 <Button variant="outline" size="sm" asChild>
+                                   <Link to={`/candidates/${application.candidate_id}`}>
+                                     View Profile
+                                   </Link>
+                                 </Button>
+                               </div>
+                             </div>
+                           </div>
+                         </CardContent>
+                       </Card>
+                     ))}
+                   </div>
+                 )}
+               </CardContent>
+             </Card>
+           </TabsContent>
 
            <TabsContent value="candidates" className="space-y-4">
              <Card>
