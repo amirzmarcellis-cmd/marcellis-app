@@ -39,6 +39,7 @@ const navigationItems = [
   { title: "Live Feed", url: "/live-feed", icon: Activity },
   { title: "Jobs", url: "/jobs", icon: Briefcase },
   { title: "Candidates", url: "/candidates", icon: Users },
+  { title: "Interviews", url: "/interviews", icon: Calendar },
   { title: "Call Log", url: "/call-log", icon: PhoneCall },
   { title: "Analytics", url: "/analytics", icon: BarChart3 },
   { title: "Reports", url: "/reports", icon: FileText },

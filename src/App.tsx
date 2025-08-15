@@ -26,6 +26,7 @@ import Performance from "./pages/Performance";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import LiveCandidateFeed from "./pages/LiveCandidateFeed";
+import Interviews from "./pages/Interviews";
 import Apply from "./pages/Apply";
 import NotFound from "./pages/NotFound";
 
@@ -52,6 +53,7 @@ const App = () => (
               <Route path="/job/:id" element={<DashboardLayout><JobDetails /></DashboardLayout>} />
               <Route path="/job/:id/apply" element={<Apply />} />
               <Route path="/candidates" element={<DashboardLayout><Candidates /></DashboardLayout>} />
+              <Route path="/interviews" element={<DashboardLayout><Interviews /></DashboardLayout>} />
               <Route path="/candidate/:id" element={<DashboardLayout><CandidateDetails /></DashboardLayout>} />
               <Route path="/candidate/edit/:id" element={<DashboardLayout><EditCandidate /></DashboardLayout>} />
               <Route path="/calls" element={<DashboardLayout><Calls /></DashboardLayout>} />
