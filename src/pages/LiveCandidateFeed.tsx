@@ -10,7 +10,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { StatusDropdown } from '@/components/candidates/StatusDropdown';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Search, Filter, Users, Zap, Activity, Star, Clock, Mail, Phone, MapPin, Briefcase, XCircle, Calendar } from 'lucide-react';
-
 interface Candidate {
   'Candidate_ID': string;
   'Candidate Name': string;
@@ -27,13 +26,11 @@ interface Candidate {
   'Notice Period': string;
   'Salary Expectations': string;
 }
-
 interface Job {
   'Job ID': string;
   'Job Title': string;
   'Processed'?: string | null;
 }
-
 export default function LiveCandidateFeed() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -41,22 +38,18 @@ export default function LiveCandidateFeed() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState<string>('all');
-
   const handleRejectCandidate = async (candidateId: string, jobId: string) => {
     // Show confirmation alert
     const confirmed = window.confirm('Are you sure you want to Reject Candidate?');
     if (!confirmed) {
       return; // User cancelled, don't proceed
     }
-
     try {
       // Update database
-      await supabase
-        .from('Jobs_CVs')
-        .update({ contacted: 'Rejected' })
-        .eq('Candidate_ID', candidateId)
-        .eq('job_id', jobId);
-      
+      await supabase.from('Jobs_CVs').update({
+        contacted: 'Rejected'
+      }).eq('Candidate_ID', candidateId).eq('job_id', jobId);
+
       // Send webhook to Make.com
       const candidate = candidates.find(c => (c.Candidate_ID || c.candidate_id) === candidateId);
       if (candidate) {
@@ -64,66 +57,63 @@ export default function LiveCandidateFeed() {
           await fetch('https://hook.eu2.make.com/castzb5q0mllr7eq9zzyqll4ffcpet7j', {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
+              'Content-Type': 'application/json'
             },
             body: JSON.stringify({
               job_id: jobId,
               candidate_id: candidateId,
               callid: candidate.callid
-            }),
+            })
           });
         } catch (webhookError) {
           console.error('Webhook error:', webhookError);
         }
       }
-      
+
       // Reload the page
       window.location.reload();
     } catch (error) {
       console.error('Error rejecting candidate:', error);
     }
   };
-
   const handleArrangeInterview = async (candidateId: string) => {
     try {
-      await supabase
-        .from('CVs')
-        .update({ CandidateStatus: 'Interview' })
-        .eq('candidate_id', candidateId);
-      
+      await supabase.from('CVs').update({
+        CandidateStatus: 'Interview'
+      }).eq('candidate_id', candidateId);
+
       // Refresh data
       fetchData();
     } catch (error) {
       console.error('Error arranging interview:', error);
     }
   };
-
   useEffect(() => {
     fetchData();
   }, []);
-
   const fetchData = async () => {
     try {
       // Fetch Jobs_CVs data with job titles
-      const { data: jobsCvsData, error: jobsCvsError } = await supabase
-        .from('Jobs_CVs')
-        .select('*')
-        .order('success_score', { ascending: false });
-
+      const {
+        data: jobsCvsData,
+        error: jobsCvsError
+      } = await supabase.from('Jobs_CVs').select('*').order('success_score', {
+        ascending: false
+      });
       if (jobsCvsError) throw jobsCvsError;
 
       // Fetch Jobs data
-      const { data: jobsData, error: jobsError } = await supabase
-        .from('Jobs')
-        .select('*');
-
+      const {
+        data: jobsData,
+        error: jobsError
+      } = await supabase.from('Jobs').select('*');
       if (jobsError) throw jobsError;
 
       // Fetch CVs data for candidate status
-      const { data: cvsData, error: cvsError } = await supabase
-        .from('CVs')
-        .select('*');
-
+      const {
+        data: cvsData,
+        error: cvsError
+      } = await supabase.from('CVs').select('*');
       if (cvsError) throw cvsError;
 
       // Enrich candidates with job titles
@@ -136,12 +126,11 @@ export default function LiveCandidateFeed() {
       });
 
       // Filter: only Shortlisted candidates from ACTIVE jobs
-      const activeJobIds = new Set((jobsData || []).filter(j => j.Processed === 'Yes').map(j => j.job_id))
-      const shortlistedCandidateIds = new Set((cvsData || []).filter(c => c.CandidateStatus === 'Shortlisted').map(c => c.candidate_id))
+      const activeJobIds = new Set((jobsData || []).filter(j => j.Processed === 'Yes').map(j => j.job_id));
+      const shortlistedCandidateIds = new Set((cvsData || []).filter(c => c.CandidateStatus === 'Shortlisted').map(c => c.candidate_id));
       const filteredShortlistedActive = enrichedCandidates.filter(c => {
         return shortlistedCandidateIds.has(c.Candidate_ID || c.candidate_id) && activeJobIds.has(c.job_id);
       });
-
       setCandidates(filteredShortlistedActive);
       setJobs(jobsData || []);
       setCvData(cvsData || []);
@@ -151,14 +140,9 @@ export default function LiveCandidateFeed() {
       setLoading(false);
     }
   };
-
   const filteredCandidates = candidates.filter(candidate => {
-    const matchesSearch = 
-      (candidate.candidate_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (candidate['Job Title'] || '').toLowerCase().includes(searchTerm.toLowerCase());
-    
+    const matchesSearch = (candidate.candidate_name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (candidate['Job Title'] || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesJob = selectedJob === 'all' || candidate.job_id === selectedJob;
-
     return matchesSearch && matchesJob;
   });
 
@@ -168,14 +152,12 @@ export default function LiveCandidateFeed() {
     const sb = parseFloat(b.success_score || '0') || 0;
     return sb - sa;
   });
-
   const getScoreColor = (score: number) => {
     if (score >= 90) return 'text-emerald-400 bg-emerald-400/20 border-emerald-400/40';
     if (score >= 75) return 'text-cyan-400 bg-cyan-400/20 border-cyan-400/40';
     if (score >= 50) return 'text-yellow-400 bg-yellow-400/20 border-yellow-400/40';
     return 'text-red-400 bg-red-400/20 border-red-400/40';
   };
-
   const getScoreGradient = (score: number) => {
     if (score >= 90) return 'from-emerald-400/20 to-emerald-600/40';
     if (score >= 75) return 'from-cyan-400/20 to-cyan-600/40';
@@ -185,13 +167,11 @@ export default function LiveCandidateFeed() {
 
   // Get CV status for a candidate
   const getCandidateStatus = (candidateId: string) => {
-    const cvRecord = cvData.find(cv => cv.candidate_id === candidateId || cv.Candidate_ID === candidateId)
-    return cvRecord?.CandidateStatus || null
-  }
-
+    const cvRecord = cvData.find(cv => cv.candidate_id === candidateId || cv.Candidate_ID === candidateId);
+    return cvRecord?.CandidateStatus || null;
+  };
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900 dark:to-blue-900 flex items-center justify-center">
+    return <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900 dark:to-blue-900 flex items-center justify-center">
         <div className="text-center">
           <div className="relative">
             <div className="w-20 h-20 border-4 border-cyan-400/30 rounded-full animate-spin"></div>
@@ -201,12 +181,9 @@ export default function LiveCandidateFeed() {
             Initializing Live Feed...
           </p>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900 dark:to-blue-900 p-4 sm:p-6 overflow-x-auto">
+  return <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900 dark:to-blue-900 p-4 sm:p-6 overflow-x-auto">
       {/* Header */}
       <div className="mb-8">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -253,12 +230,7 @@ export default function LiveCandidateFeed() {
               <label className="text-sm font-medium text-purple-300">Search Candidates</label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 w-4 h-4" />
-                <Input
-                  placeholder="Name or position..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-black/20 border-cyan-400/30 text-foreground placeholder-muted-foreground focus:border-cyan-400 focus:ring-cyan-400/20"
-                />
+                <Input placeholder="Name or position..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10 bg-black/20 border-cyan-400/30 text-foreground placeholder-muted-foreground focus:border-cyan-400 focus:ring-cyan-400/20" />
               </div>
             </div>
 
@@ -270,11 +242,9 @@ export default function LiveCandidateFeed() {
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-purple-400/30 backdrop-blur-xl z-50">
                   <SelectItem value="all" className="text-white hover:bg-purple-600/20">All Jobs</SelectItem>
-                  {jobs.filter(job => job.Processed === 'Yes').map((job) => (
-                    <SelectItem key={job.job_id} value={job.job_id} className="text-white hover:bg-purple-600/20">
+                  {jobs.filter(job => job.Processed === 'Yes').map(job => <SelectItem key={job.job_id} value={job.job_id} className="text-white hover:bg-purple-600/20">
                       {job.job_title}
-                    </SelectItem>
-                  ))}
+                    </SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -303,16 +273,12 @@ export default function LiveCandidateFeed() {
           <ScrollArea className="h-[600px] pr-4">
             <div className="space-y-4">
               {sortedCandidates.map((candidate, index) => {
-                const score = parseFloat(candidate.success_score) || 0;
-                return (
-                  <div 
-                    key={index} 
-                    className={`group relative p-6 rounded-2xl border transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer
+              const score = parseFloat(candidate.success_score) || 0;
+              return <div key={index} className={`group relative p-6 rounded-2xl border transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer
                       bg-gradient-to-r ${index < 3 ? 'from-yellow-400/30 to-amber-500/50' : getScoreGradient(score)} ${index < 3 ? 'border-yellow-400/50 hover:border-yellow-400/60' : 'border-border hover:border-primary/40 dark:border-white/20'}
-                      backdrop-blur-sm animate-fade-in`}
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                    onClick={() => window.location.href = `/call-log-details?candidate=${candidate.Candidate_ID || candidate.candidate_id}&job=${candidate.job_id}&callid=${candidate.callid}`}
-                  >
+                      backdrop-blur-sm animate-fade-in`} style={{
+                animationDelay: `${index * 0.1}s`
+              }} onClick={() => window.location.href = `/call-log-details?candidate=${candidate.Candidate_ID || candidate.candidate_id}&job=${candidate.job_id}&callid=${candidate.callid}`}>
                     {/* Score Badge */}
                     <div className="absolute top-4 right-4">
                       <Badge className={`text-lg font-bold px-3 py-1 ${getScoreColor(score)} border`}>
@@ -333,27 +299,17 @@ export default function LiveCandidateFeed() {
                         <div className="flex items-center space-x-3 mb-2">
                           <h3 className="text-xl font-bold text-foreground">{candidate.candidate_name}</h3>
                         <div className="flex items-center space-x-2">
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRejectCandidate(candidate.Candidate_ID || candidate.candidate_id, candidate.job_id);
-                              }}
-                              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-                            >
+                            <Button size="sm" variant="destructive" onClick={e => {
+                          e.stopPropagation();
+                          handleRejectCandidate(candidate.Candidate_ID || candidate.candidate_id, candidate.job_id);
+                        }} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
                               <XCircle className="w-4 h-4 mr-1" />
                               Reject Candidate
                             </Button>
-                            <Button
-                              size="sm"
-                              variant="default"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleArrangeInterview(candidate.Candidate_ID || candidate.candidate_id);
-                              }}
-                              className="bg-green-600 hover:bg-green-700 text-white"
-                            >
+                            <Button size="sm" variant="default" onClick={e => {
+                          e.stopPropagation();
+                          handleArrangeInterview(candidate.Candidate_ID || candidate.candidate_id);
+                        }} className="bg-green-600 hover:bg-green-700 text-white bg-emerald-700 hover:bg-emerald-600">
                               <Calendar className="w-4 h-4 mr-1" />
                               Arrange an Interview
                             </Button>
@@ -383,60 +339,28 @@ export default function LiveCandidateFeed() {
 
                     {/* Status Dropdowns */}
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <StatusDropdown
-                          currentStatus={candidate.contacted}
-                          candidateId={candidate.Candidate_ID || candidate.candidate_id}
-                          jobId={candidate.job_id}
-                          statusType="contacted"
-                          onStatusChange={(newStatus) => {
-                            setCandidates(prev => prev.map(c => 
-                              (c.Candidate_ID || c.candidate_id) === (candidate.Candidate_ID || candidate.candidate_id)
-                                ? { ...c, contacted: newStatus }
-                                : c
-                            ))
-                          }}
-                        />
-                        <StatusDropdown
-                          currentStatus={getCandidateStatus(candidate.Candidate_ID || candidate.candidate_id)}
-                          candidateId={candidate.Candidate_ID || candidate.candidate_id}
-                          statusType="candidate"
-                          onStatusChange={(newStatus) => {
-                            setCvData(prev => prev.map(cv => 
-                              (cv.candidate_id || cv.Candidate_ID) === (candidate.Candidate_ID || candidate.candidate_id)
-                                ? { ...cv, CandidateStatus: newStatus }
-                                : cv
-                            ))
-                          }}
-                        />
-                      </div>
+                      
                       
                       <div className="flex items-center space-x-2">
                         <Badge className="bg-purple-500/20 text-purple-300 border-purple-400/40">
                           💰 {candidate.salary_expectations || 'Negotiable'}
                         </Badge>
-                        {score >= 74 && (
-                          <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-400/40 animate-pulse">
+                        {score >= 74 && <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-400/40 animate-pulse">
                             ⭐ High Priority
-                          </Badge>
-                        )}
+                          </Badge>}
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  </div>;
+            })}
               
-              {filteredCandidates.length === 0 && (
-                <div className="text-center py-16">
+              {filteredCandidates.length === 0 && <div className="text-center py-16">
                   <Users className="w-16 h-16 text-gray-500 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-foreground mb-2">No candidates found</h3>
                   <p className="text-gray-400">Try adjusting your filters or search criteria</p>
-                </div>
-              )}
+                </div>}
             </div>
           </ScrollArea>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
 }
