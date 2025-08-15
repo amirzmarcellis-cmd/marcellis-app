@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { StatusDropdown } from '@/components/candidates/StatusDropdown';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Search, Filter, Users, Zap, Activity, Star, Clock, Mail, Phone, MapPin, Briefcase } from 'lucide-react';
+import { Search, Filter, Users, Zap, Activity, Star, Clock, Mail, Phone, MapPin, Briefcase, XCircle, Calendar } from 'lucide-react';
 
 interface Candidate {
   'Candidate_ID': string;
@@ -41,8 +41,35 @@ export default function LiveCandidateFeed() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [scoreFilter, setScoreFilter] = useState<string>('all');
+
+  const handleRejectCandidate = async (candidateId: string, jobId: string) => {
+    try {
+      await supabase
+        .from('Jobs_CVs')
+        .update({ contacted: 'Rejected' })
+        .eq('Candidate_ID', candidateId)
+        .eq('job_id', jobId);
+      
+      // Refresh data
+      fetchData();
+    } catch (error) {
+      console.error('Error rejecting candidate:', error);
+    }
+  };
+
+  const handleArrangeInterview = async (candidateId: string) => {
+    try {
+      await supabase
+        .from('CVs')
+        .update({ CandidateStatus: 'Interview' })
+        .eq('candidate_id', candidateId);
+      
+      // Refresh data
+      fetchData();
+    } catch (error) {
+      console.error('Error arranging interview:', error);
+    }
+  };
 
   useEffect(() => {
     fetchData();
@@ -81,14 +108,14 @@ export default function LiveCandidateFeed() {
         };
       });
 
-      // Filter: only score >= 74 and ACTIVE jobs
+      // Filter: only Shortlisted candidates from ACTIVE jobs
       const activeJobIds = new Set((jobsData || []).filter(j => j.Processed === 'Yes').map(j => j.job_id))
-      const filteredHighScoreActive = enrichedCandidates.filter(c => {
-        const score = parseFloat(c.success_score || '0');
-        return Number.isFinite(score) && score >= 74 && activeJobIds.has(c.job_id);
+      const shortlistedCandidateIds = new Set((cvsData || []).filter(c => c.CandidateStatus === 'Shortlisted').map(c => c.candidate_id))
+      const filteredShortlistedActive = enrichedCandidates.filter(c => {
+        return shortlistedCandidateIds.has(c.Candidate_ID || c.candidate_id) && activeJobIds.has(c.job_id);
       });
 
-      setCandidates(filteredHighScoreActive);
+      setCandidates(filteredShortlistedActive);
       setJobs(jobsData || []);
       setCvData(cvsData || []);
     } catch (error) {
@@ -104,19 +131,8 @@ export default function LiveCandidateFeed() {
       (candidate['Job Title'] || '').toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesJob = selectedJob === 'all' || candidate.job_id === selectedJob;
-    
-    const matchesStatus = statusFilter === 'all' || 
-      statusFilter === candidate.contacted ||
-      (statusFilter === 'Shortlisted' && getCandidateStatus(candidate.Candidate_ID || candidate.candidate_id) === 'Shortlisted') ||
-      (statusFilter === 'Interview' && getCandidateStatus(candidate.Candidate_ID || candidate.candidate_id) === 'Interview') ||
-      (statusFilter === 'Hired' && getCandidateStatus(candidate.Candidate_ID || candidate.candidate_id) === 'Hired') ||
-      (statusFilter === 'Rejected' && getCandidateStatus(candidate.Candidate_ID || candidate.candidate_id) === 'Rejected');
-    
-    const matchesScoreFilter = scoreFilter === 'all' ||
-      (scoreFilter === '50-74' && parseFloat(candidate.success_score || '0') >= 50 && parseFloat(candidate.success_score || '0') <= 74) ||
-      (scoreFilter === '75-100' && parseFloat(candidate.success_score || '0') >= 75 && parseFloat(candidate.success_score || '0') <= 100);
 
-    return matchesSearch && matchesJob && matchesStatus && matchesScoreFilter;
+    return matchesSearch && matchesJob;
   });
 
   // Ensure highest scores are shown first regardless of fetch order
@@ -205,7 +221,7 @@ export default function LiveCandidateFeed() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-sm font-medium text-purple-300">Search Candidates</label>
               <div className="relative">
@@ -232,40 +248,6 @@ export default function LiveCandidateFeed() {
                       {job.job_title}
                     </SelectItem>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-purple-300">Status</label>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="bg-black/20 border-pink-400/30 text-foreground focus:border-pink-400">
-                  <SelectValue placeholder="All Status" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-pink-400/30 backdrop-blur-xl z-50">
-                  <SelectItem value="all" className="text-white hover:bg-pink-600/20">All Status</SelectItem>
-                  <SelectItem value="Contacted" className="text-white hover:bg-pink-600/20">Contacted</SelectItem>
-                  <SelectItem value="Call Done" className="text-white hover:bg-pink-600/20">Call Done</SelectItem>
-                  <SelectItem value="Low Scored" className="text-white hover:bg-pink-600/20">Low Scored</SelectItem>
-                  <SelectItem value="Tasked" className="text-white hover:bg-pink-600/20">Tasked</SelectItem>
-                  <SelectItem value="Shortlisted" className="text-white hover:bg-pink-600/20">Shortlisted</SelectItem>
-                  <SelectItem value="Interview" className="text-white hover:bg-pink-600/20">Interview</SelectItem>
-                  <SelectItem value="Hired" className="text-white hover:bg-pink-600/20">Hired</SelectItem>
-                  <SelectItem value="Rejected" className="text-white hover:bg-pink-600/20">Rejected</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-purple-300">Score Range</label>
-              <Select value={scoreFilter} onValueChange={setScoreFilter}>
-                <SelectTrigger className="bg-black/20 border-emerald-400/30 text-foreground focus:border-emerald-400">
-                  <SelectValue placeholder="All Scores" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-emerald-400/30 backdrop-blur-xl z-50">
-                  <SelectItem value="all" className="text-white hover:bg-emerald-600/20">All Scores</SelectItem>
-                  <SelectItem value="50-74" className="text-white hover:bg-emerald-600/20">50-74</SelectItem>
-                  <SelectItem value="75-100" className="text-white hover:bg-emerald-600/20">75-100</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -323,34 +305,31 @@ export default function LiveCandidateFeed() {
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
                           <h3 className="text-xl font-bold text-foreground">{candidate.candidate_name}</h3>
-                          <div className="flex items-center space-x-2">
-                            <StatusDropdown
-                              currentStatus={candidate.contacted}
-                              candidateId={candidate.Candidate_ID || candidate.candidate_id}
-                              jobId={candidate.job_id}
-                              statusType="contacted"
-                              onStatusChange={(newStatus) => {
-                                setCandidates(prev => prev.map(c => 
-                                  (c.Candidate_ID || c.candidate_id) === (candidate.Candidate_ID || candidate.candidate_id)
-                                    ? { ...c, contacted: newStatus }
-                                    : c
-                                ))
+                        <div className="flex items-center space-x-2">
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRejectCandidate(candidate.Candidate_ID || candidate.candidate_id, candidate.job_id);
                               }}
-                              variant="badge"
-                            />
-                            <StatusDropdown
-                              currentStatus={getCandidateStatus(candidate.Candidate_ID || candidate.candidate_id)}
-                              candidateId={candidate.Candidate_ID || candidate.candidate_id}
-                              statusType="candidate"
-                              onStatusChange={(newStatus) => {
-                                setCvData(prev => prev.map(cv => 
-                                  (cv.candidate_id || cv.Candidate_ID) === (candidate.Candidate_ID || candidate.candidate_id)
-                                    ? { ...cv, CandidateStatus: newStatus }
-                                    : cv
-                                ))
+                              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                            >
+                              <XCircle className="w-4 h-4 mr-1" />
+                              Reject Candidate
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="default"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleArrangeInterview(candidate.Candidate_ID || candidate.candidate_id);
                               }}
-                              variant="badge"
-                            />
+                              className="bg-green-600 hover:bg-green-700 text-white"
+                            >
+                              <Calendar className="w-4 h-4 mr-1" />
+                              Arrange an Interview
+                            </Button>
                           </div>
                         </div>
                         

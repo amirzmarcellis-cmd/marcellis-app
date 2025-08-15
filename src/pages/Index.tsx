@@ -63,6 +63,7 @@ export default function Index() {
   
   const [candidates, setCandidates] = useState<any[]>([]);
   const [jobs, setJobs] = useState<any[]>([]);
+  const [cvData, setCvData] = useState<any[]>([]);
   const [openTasksCount, setOpenTasksCount] = useState(0);
   const [jobStats, setJobStats] = useState<Record<string, any>>({});
   const [highScoreActiveCount, setHighScoreActiveCount] = useState(0);
@@ -111,20 +112,23 @@ export default function Index() {
       const interviewCandidates = cvs.filter((c: any) => c.CandidateStatus === 'Interview')
       const taskedCandidates = cvs.filter((c: any) => c.CandidateStatus === 'Tasked')
 
-      // High score candidates from Job-Candidate links for ACTIVE jobs only (score >= 74)
-      const highScoreActiveCandidates = links.filter((jc: any) => {
-        const scoreNum = parseFloat(jc.success_score)
-        return Number.isFinite(scoreNum) && scoreNum >= 74 && activeJobIds.has(jc.job_id)
+      // Show only shortlisted candidates from ACTIVE jobs, sorted by highest score
+      const shortlistedCandidateIds = new Set(cvs.filter(c => c.CandidateStatus === 'Shortlisted').map(c => c.candidate_id))
+      const shortlistedActiveCandidates = links.filter((jc: any) => {
+        return shortlistedCandidateIds.has(jc.Candidate_ID) && activeJobIds.has(jc.job_id)
       })
 
-      const recentCandidates = highScoreActiveCandidates
-        .sort(
-          (a: any, b: any) => new Date(b.lastcalltime || 0).getTime() - new Date(a.lastcalltime || 0).getTime()
-        )
+      const recentCandidates = shortlistedActiveCandidates
+        .sort((a: any, b: any) => {
+          const scoreA = parseFloat(a.success_score) || 0
+          const scoreB = parseFloat(b.success_score) || 0
+          return scoreB - scoreA // Highest score first
+        })
         .slice(0, 10)
 
       setCandidates(recentCandidates)
       setJobs(jobsData)
+      setCvData(cvs)
 
       // Per-job stats (for Active Jobs Funnel)
       const stats: Record<string, any> = {}
@@ -145,8 +149,8 @@ export default function Index() {
 
       setJobStats(stats)
 
-      // Candidates needing review: Score >= 74 across active jobs only
-      const highScoreActiveCountVal = highScoreActiveCandidates.length
+      // Candidates needing review: Shortlisted candidates count
+      const highScoreActiveCountVal = shortlistedActiveCandidates.length
       setHighScoreActiveCount(highScoreActiveCountVal)
 
       setData({
@@ -175,11 +179,45 @@ export default function Index() {
     navigate(`/call-log-details?candidate=${candidateId}&job=${jobId}&callid=${callid || ''}`);
   };
 
+  const handleRejectCandidate = async (candidateId: string, jobId: string) => {
+    try {
+      await supabase
+        .from('Jobs_CVs')
+        .update({ contacted: 'Rejected' })
+        .eq('Candidate_ID', candidateId)
+        .eq('job_id', jobId);
+      
+      // Refresh data
+      fetchDashboardData();
+    } catch (error) {
+      console.error('Error rejecting candidate:', error);
+    }
+  };
+
+  const handleArrangeInterview = async (candidateId: string, jobId: string) => {
+    try {
+      await supabase
+        .from('CVs')
+        .update({ CandidateStatus: 'Interview' })
+        .eq('candidate_id', candidateId);
+      
+      // Refresh data
+      fetchDashboardData();
+    } catch (error) {
+      console.error('Error arranging interview:', error);
+    }
+  };
+
   const getScoreColor = (score: number) => {
     if (score >= 90) return 'text-emerald-400';
     if (score >= 80) return 'text-blue-400';
     if (score >= 75) return 'text-purple-400';
     return 'text-muted-foreground';
+  };
+
+  const getCandidateStatus = (candidateId: string) => {
+    const cvRecord = cvData.find(cv => cv.candidate_id === candidateId);
+    return cvRecord?.CandidateStatus || null;
   };
 
 
@@ -398,73 +436,44 @@ export default function Index() {
                             <div className={`text-2xl font-bold mb-2 ${getScoreColor(score)}`}>
                               {score}
                             </div>
-                            <div className="flex flex-col space-y-1">
-                              <StatusDropdown
-                                currentStatus={candidate.contacted}
-                                candidateId={candidate.Candidate_ID}
-                                jobId={candidate.job_id}
-                                statusType="contacted"
-                                onStatusChange={(newStatus) => {
-                                  setCandidates(prev => prev.map(c => 
-                                    c.Candidate_ID === candidate.Candidate_ID 
-                                      ? { ...c, contacted: newStatus }
-                                      : c
-                                  ))
+                            <div className="flex flex-col space-y-2">
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRejectCandidate(candidate.Candidate_ID, candidate.job_id);
                                 }}
-                                variant="badge"
-                              />
-                              <StatusDropdown
-                                currentStatus={candidate.CandidateStatus}
-                                candidateId={candidate.Candidate_ID}
-                                statusType="candidate"
-                                onStatusChange={(newStatus) => {
-                                  setCandidates(prev => prev.map(c => 
-                                    c.Candidate_ID === candidate.Candidate_ID 
-                                      ? { ...c, CandidateStatus: newStatus }
-                                      : c
-                                  ))
+                                className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                              >
+                                <XCircle className="w-4 h-4 mr-1" />
+                                Reject
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="default"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleArrangeInterview(candidate.Candidate_ID, candidate.job_id);
                                 }}
-                                variant="badge"
-                              />
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                              >
+                                <Calendar className="w-4 h-4 mr-1" />
+                                Interview
+                              </Button>
                             </div>
                           </div>
                         </div>
                         <p className="text-sm text-gray-300 mb-4 leading-relaxed bg-black/20 p-3 rounded-lg">
                           {candidate.score_and_reason?.slice(0, 120)}...
                         </p>
-                        <div className="flex items-center justify-between">
-                        <div className="flex space-x-2">
-                            <StatusDropdown
-                              currentStatus={candidate.contacted}
-                              candidateId={candidate.Candidate_ID}
-                              jobId={candidate.job_id}
-                              statusType="contacted"
-                              onStatusChange={(newStatus) => {
-                                setCandidates(prev => prev.map(c => 
-                                  c.Candidate_ID === candidate.Candidate_ID 
-                                    ? { ...c, contacted: newStatus }
-                                    : c
-                                ))
-                              }}
-                            />
-                            <StatusDropdown
-                              currentStatus={candidate.CandidateStatus}
-                              candidateId={candidate.Candidate_ID}
-                              statusType="candidate"
-                              onStatusChange={(newStatus) => {
-                                setCandidates(prev => prev.map(c => 
-                                  c.Candidate_ID === candidate.Candidate_ID 
-                                    ? { ...c, CandidateStatus: newStatus }
-                                    : c
-                                ))
-                              }}
-                            />
+                         <div className="flex items-center justify-between">
+                          <div className="text-sm text-gray-400">
+                            Updated: {new Date(candidate.lastcalltime || Date.now()).toLocaleDateString()}
                           </div>
-                          {score >= 74 && (
-                            <Badge className="bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-300 border-emerald-400/40 animate-pulse">
-                              ⭐ Priority
-                            </Badge>
-                          )}
+                          <Badge className="bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-300 border-emerald-400/40 animate-pulse">
+                            ⭐ Shortlisted
+                          </Badge>
                         </div>
                       </div>
                     );
