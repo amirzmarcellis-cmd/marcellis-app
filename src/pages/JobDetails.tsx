@@ -817,23 +817,27 @@ export default function JobDetails() {
                            <div className="space-y-3">
                              <div className="flex items-start justify-between">
                                <div className="min-w-0 flex-1">
-                                 <h4 className="font-semibold text-sm md:text-base truncate">{application.name || "Unknown"}</h4>
+                                 <h4 className="font-semibold text-sm md:text-base truncate">
+                                   {application.first_name && application.last_name 
+                                     ? `${application.first_name} ${application.last_name}` 
+                                     : application.first_name || application.last_name || "Unknown"}
+                                 </h4>
                                  <p className="text-xs md:text-sm text-muted-foreground truncate">{application.candidate_id}</p>
                                </div>
                              </div>
                              
                              <div className="space-y-2 text-xs md:text-sm">
-                               {application.email && (
+                               {application.Email && (
                                  <div className="flex items-center text-muted-foreground min-w-0">
                                    <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
-                                   <span className="truncate">{application.email}</span>
+                                   <span className="truncate">{application.Email}</span>
                                  </div>
                                )}
                                
-                               {application.phone && (
+                               {application.phone_number && (
                                  <div className="flex items-center text-muted-foreground min-w-0">
                                    <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
-                                   <span className="truncate">{application.phone}</span>
+                                   <span className="truncate">{application.phone_number}</span>
                                  </div>
                                )}
                              </div>
@@ -846,16 +850,16 @@ export default function JobDetails() {
 
                              <div className="flex items-center justify-between pt-2 border-t gap-2">
                                <div className="flex items-center gap-2">
-                                 {application.cv_url && (
+                                 {application.CV_Link && (
                                    <Button variant="outline" size="sm" asChild>
-                                     <a href={application.cv_url} target="_blank" rel="noopener noreferrer">
+                                     <a href={application.CV_Link} target="_blank" rel="noopener noreferrer">
                                        <FileText className="w-4 h-4 mr-1" />
                                        CV
                                      </a>
                                    </Button>
                                  )}
                                  <Button variant="outline" size="sm" asChild>
-                                   <Link to={`/candidates/${application.candidate_id}`}>
+                                   <Link to={`/candidate/${application.candidate_id}`}>
                                      View Profile
                                    </Link>
                                  </Button>
