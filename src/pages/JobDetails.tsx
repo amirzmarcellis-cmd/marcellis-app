@@ -36,8 +36,6 @@ export default function JobDetails() {
   const [candidates, setCandidates] = useState<any[]>([])
   const [candidatesLoading, setCandidatesLoading] = useState(true)
   const [cvData, setCvData] = useState<any[]>([])
-  const [applications, setApplications] = useState<any[]>([])
-  const [applicationsLoading, setApplicationsLoading] = useState(true)
   const [nameFilter, setNameFilter] = useState("")
   const [emailFilter, setEmailFilter] = useState("")
   const [phoneFilter, setPhoneFilter] = useState("")
@@ -56,7 +54,6 @@ export default function JobDetails() {
       fetchJob(id)
       fetchCandidates(id)
       fetchCvData()
-      fetchApplications(id)
       checkShortListButtonStatus()
     }
   }, [id])
@@ -196,25 +193,6 @@ export default function JobDetails() {
     } catch (error) {
       console.error('Error fetching CV data:', error)
       setCvData([])
-    }
-  }
-
-  const fetchApplications = async (jobId: string) => {
-    try {
-      setApplicationsLoading(true)
-      const { data, error } = await supabase
-        .from('CVs')
-        .select('*')
-        .contains('applied_for', [jobId])
-        .order('Timestamp', { ascending: false })
-
-      if (error) throw error
-      setApplications(data || [])
-    } catch (error) {
-      console.error('Error fetching applications:', error)
-      setApplications([])
-    } finally {
-      setApplicationsLoading(false)
     }
   }
 
@@ -516,8 +494,29 @@ export default function JobDetails() {
               <div className="h-6 w-px bg-border hidden sm:block" />
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
             </div>
-            
-            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row gap-2">
+              {job?.longlist && job.longlist > 0 ? (
+                <Button 
+                  onClick={handleSearchMoreCandidates}
+                  className="bg-foreground text-background hover:bg-foreground/90 text-sm w-full sm:w-auto"
+                  size="sm"
+                >
+                  <Search className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Search for more candidates</span>
+                  <span className="sm:hidden">Search More</span>
+                </Button>
+              ) : (
+                <Button 
+                  onClick={handleButtonClick}
+                  disabled={job?.longlist === 3}
+                  className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm w-full sm:w-auto"
+                  size="sm"
+                >
+                  <Zap className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Generate Long List</span>
+                  <span className="sm:hidden">Generate List</span>
+                </Button>
+              )}
               <Button onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)} size="sm" className="w-full sm:w-auto">
                 <FileText className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Edit Job</span>
@@ -542,199 +541,646 @@ export default function JobDetails() {
                   <h2 className="text-xl md:text-2xl font-bold break-words">{job["Job Title"]}</h2>
                   <p className="text-base md:text-lg text-muted-foreground break-words">{job["Client Description"] || "Client Description"}</p>
                 </div>
+                <Badge 
+                  variant={job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "default" : "destructive"}
+                  className={`text-xs md:text-sm px-2 md:px-3 py-1 whitespace-nowrap ${job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "bg-green-600 text-white border-0" : "bg-red-600 text-white border-0"}`}
+                >
+                  {job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "Active" : "Not Active"}
+                </Badge>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 pt-4 border-t">
+                <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0">
+                  <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                  <span className="truncate">{job["Job Location"]}</span>
+                </div>
+                <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0">
+                  <Banknote className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                  <span className="truncate">{formatCurrency(job["Job Salary Range (ex: 15000 AED)"], job["Currency"])}</span>
+                </div>
+                <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0 sm:col-span-2 lg:col-span-1">
+                  <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                  <span className="truncate">Posted: {formatDate(job.Timestamp)}</span>
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Job Funnel */}
-        <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
+          {/* Job Funnel */}
+          <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
 
-        {/* Detailed Information Tabs */}
-        <Tabs defaultValue="overview" className="space-y-4">
-          <div className="w-full overflow-x-auto">
-            <TabsList className="w-full min-w-[400px] grid grid-cols-6 h-auto p-1">
-              <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">Overview</TabsTrigger>
-              <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2">Description</TabsTrigger>
-              <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">AI Requirements</TabsTrigger>
-              <TabsTrigger value="applications" className="text-xs md:text-sm px-2 py-2">Applications</TabsTrigger>
-              <TabsTrigger value="candidates" className="text-xs md:text-sm px-2 py-2">AI Long List</TabsTrigger>
-              <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">AI Short List</TabsTrigger>
-            </TabsList>
-          </div>
+          {/* Detailed Information Tabs */}
+           <Tabs defaultValue="overview" className="space-y-4">
+             <div className="w-full overflow-x-auto">
+               <TabsList className="w-full min-w-[400px] grid grid-cols-5 h-auto p-1">
+                 <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">Overview</TabsTrigger>
+                 <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2">Description</TabsTrigger>
+                 <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">AI Requirements</TabsTrigger>
+                 <TabsTrigger value="candidates" className="text-xs md:text-sm px-2 py-2">AI Long List</TabsTrigger>
+                 <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">AI Short List</TabsTrigger>
+               </TabsList>
+             </div>
 
           <TabsContent value="overview" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Job Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Job ID:</span>
-                  <span className="font-mono text-sm">{job["Job ID"]}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Client:</span>
-                  <span>{job["Client Description"] || "N/A"}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Location:</span>
-                  <span>{job["Job Location"] || "N/A"}</span>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Job Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Job ID:</span>
+                    <span className="font-mono text-sm">{job["Job ID"]}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Client:</span>
+                    <span>{job["Client Description"] || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Location:</span>
+                    <span>{job["Job Location"] || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Salary Range:</span>
+                    <span className="font-medium">
+                      {formatCurrency(job["Job Salary Range (ex: 15000 AED)"], job["Currency"])}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Notice Period:</span>
+                    <span>{job["Notice Period"] || "N/A"}</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Job Requirements & Details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Nationality to Include:</span>
+                    <span>{job["Nationality to include"] || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Nationality to Exclude:</span>
+                    <span>{job["Nationality to Exclude"] || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Job Type:</span>
+                    <span>
+                      {job["Type"] || "N/A"}
+                      {job["Contract Length"] && job["Type"] === "Contract" && ` (${job["Contract Length"]})`}
+                    </span>
+                  </div>
+                  {job["assignment"] && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Assignment Link:</span>
+                      <a 
+                        href={job["assignment"]} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline break-all"
+                      >
+                        View Assignment
+                      </a>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Posted Date:</span>
+                    <span>{job.Timestamp ? formatDate(job.Timestamp) : "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">JD Summary:</span>
+                    <span>{job["JD Summary"] || "N/A"}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
-          <TabsContent value="description" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Job Description</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="whitespace-pre-wrap">{job["Job Description"] || "No description available"}</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="requirements" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>AI Requirements</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold mb-2">Things to look for:</h4>
-                    <p>{job["Things to look for"] || "No specific criteria listed."}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2">Must have:</h4>
-                    <p>{job.musttohave || "No must-have requirements specified."}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2">Nice to Have:</h4>
-                    <p>{job.nicetohave || "No nice-to-have requirements specified."}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="applications" className="space-y-4">
+           <TabsContent value="description" className="space-y-4">
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="flex items-center">
-                      <Users className="w-5 h-5 mr-2" />
-                      Applications ({applications.length})
+                      <FileText className="w-5 h-5 mr-2" />
+                      Job Description
                     </CardTitle>
                     <CardDescription>
-                      Candidates who applied for this position
+                      Detailed overview of the role and responsibilities
                     </CardDescription>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button variant="outline" size="sm">
+                      <Upload className="w-4 h-4 mr-2" />
+                      Upload File
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)}>
+                      <FileText className="w-4 h-4 mr-2" />
+                      Edit Job
+                    </Button>
                   </div>
                 </div>
               </CardHeader>
+               <CardContent>
+                 <div className="prose prose-sm max-w-none">
+                   <p className="leading-relaxed whitespace-pre-wrap">
+                     {job["Job Description"] || "No description available for this position."}
+                   </p>
+                 </div>
+               </CardContent>
+             </Card>
+
+             {/* Job Documents Section */}
+             <Card>
+               <CardHeader>
+                 <CardTitle className="flex items-center">
+                   <FileText className="w-5 h-5 mr-2" />
+                   Job Documents
+                 </CardTitle>
+                 <CardDescription>
+                   Uploaded job description files and related documents
+                 </CardDescription>
+               </CardHeader>
+               <CardContent>
+                 <div className="text-center py-8">
+                   <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                   <h3 className="text-lg font-semibold mb-2">No documents uploaded</h3>
+                   <p className="text-muted-foreground">Upload job description files when creating or editing this job</p>
+                   <Button variant="outline" className="mt-4" onClick={() => setIsEditDialogOpen(true)}>
+                     <Upload className="w-4 h-4 mr-2" />
+                     Upload Documents
+                   </Button>
+                 </div>
+               </CardContent>
+             </Card>
+           </TabsContent>
+
+           <TabsContent value="requirements" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center">
+                      <Target className="w-5 h-5 mr-2" />
+                      AI Requirements
+                    </CardTitle>
+                    <CardDescription>
+                      Skills, experience, and qualifications needed for this role
+                    </CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)}>
+                    <FileText className="w-4 h-4 mr-2" />
+                    Amend
+                  </Button>
+                </div>
+              </CardHeader>
               <CardContent>
-                {applicationsLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <div className="prose prose-sm max-w-none space-y-4">
+                  <div>
+                    <h4 className="font-semibold mb-2">Things to look for:</h4>
+                    <p className="leading-relaxed whitespace-pre-wrap">
+                      {job["Things to look for"] || "No specific criteria listed."}
+                    </p>
                   </div>
-                ) : applications.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No applications yet</h3>
-                    <p className="text-muted-foreground">No candidates have applied for this position yet</p>
+                  <div>
+                    <h4 className="font-semibold mb-2">Must have:</h4>
+                    <p className="leading-relaxed whitespace-pre-wrap">
+                      {job.musttohave || "No must-have requirements specified."}
+                    </p>
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    {applications.map((application) => (
-                      <Card key={application.candidate_id} className="p-4 hover:shadow-md transition-shadow">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                          <div className="flex-1 space-y-2">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center text-white font-semibold">
-                                {(application.first_name?.[0] || "") + (application.last_name?.[0] || "")}
-                              </div>
-                              <div>
-                                <h4 className="font-semibold text-lg">
-                                  {`${application.first_name || ""} ${application.last_name || ""}`.trim() || "N/A"}
-                                </h4>
-                                <p className="text-sm text-muted-foreground">{application.Title || "No title specified"}</p>
-                              </div>
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                              <div className="flex items-center gap-2">
-                                <Mail className="w-4 h-4 text-muted-foreground" />
-                                <span>{application.Email || "No email"}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Phone className="w-4 h-4 text-muted-foreground" />
-                                <span>{application.phone_number || "No phone"}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <MapPin className="w-4 h-4 text-muted-foreground" />
-                                <span>{application.Location || "No location"}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-muted-foreground" />
-                                <span>Applied: {formatDate(application.Timestamp)}</span>
-                              </div>
-                            </div>
-                            {application.cv_summary && (
-                              <div className="text-sm text-muted-foreground">
-                                <strong>Summary:</strong> {application.cv_summary}
-                              </div>
-                            )}
+                  <div>
+                    <h4 className="font-semibold mb-2">Nice to Have:</h4>
+                    <p className="leading-relaxed whitespace-pre-wrap">
+                      {job.nicetohave || "No nice-to-have requirements specified."}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+           </TabsContent>
+
+
+           <TabsContent value="candidates" className="space-y-4">
+             <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center">
+                        <Users className="w-5 h-5 mr-2" />
+                        Contacted Candidates ({filteredCandidates.length} of {candidates.length})
+                      </CardTitle>
+                      <CardDescription>
+                        Candidates who have been contacted for this position
+                      </CardDescription>
+                    </div>
+                    <Button 
+                      variant="default" 
+                      className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={handleGenerateShortList}
+                      disabled={isGeneratingShortList || shortListButtonDisabled}
+                    >
+                      <Phone className="w-4 h-4 mr-2" />
+                      {isGeneratingShortList 
+                        ? "Generating..." 
+                        : shortListButtonDisabled 
+                          ? `Short List is being processed (${Math.floor(shortListTimeRemaining / 60)}:${(shortListTimeRemaining % 60).toString().padStart(2, '0')})`
+                          : "Call & Generate Short List"
+                      }
+                    </Button>
+                  </div>
+                </CardHeader>
+               <CardContent>
+                 {candidatesLoading ? (
+                   <div className="flex items-center justify-center py-8">
+                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                   </div>
+                 ) : candidates.length === 0 ? (
+                   <div className="text-center py-8">
+                     <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                     <h3 className="text-lg font-semibold mb-2">No candidates contacted yet</h3>
+                     <p className="text-muted-foreground">Start reaching out to potential candidates for this position</p>
+                   </div>
+                 ) : (
+                   <>
+                      {/* Filters */}
+                      <Card className="p-3 md:p-4 mb-4 bg-muted/50">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Filter className="w-4 h-4" />
+                          <h4 className="font-medium text-sm md:text-base">Filters</h4>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                            <Input
+                              placeholder="Name..."
+                              value={nameFilter}
+                              onChange={(e) => setNameFilter(e.target.value)}
+                              className="pl-10 h-9 text-sm"
+                            />
                           </div>
-                          <div className="flex flex-col sm:flex-row gap-2">
-                            {application.CV_Link && (
-                              <Button variant="outline" size="sm" asChild>
-                                <a href={application.CV_Link} target="_blank" rel="noopener noreferrer">
-                                  <FileText className="w-4 h-4 mr-2" />
-                                  View CV
-                                </a>
-                              </Button>
-                            )}
-                            <Button variant="outline" size="sm" asChild>
-                              <Link to={`/candidate/${application.candidate_id}`}>
-                                <Users className="w-4 h-4 mr-2" />
-                                View Profile
-                              </Link>
-                            </Button>
-                          </div>
+                          <Input
+                            placeholder="Email..."
+                            value={emailFilter}
+                            onChange={(e) => setEmailFilter(e.target.value)}
+                            className="h-9 text-sm"
+                          />
+                          <Input
+                            placeholder="Phone..."
+                            value={phoneFilter}
+                            onChange={(e) => setPhoneFilter(e.target.value)}
+                            className="h-9 text-sm"
+                          />
+                          <Select value={scoreFilter} onValueChange={setScoreFilter}>
+                            <SelectTrigger className="h-9 text-sm">
+                              <SelectValue placeholder="Score" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Scores</SelectItem>
+                              <SelectItem value="high">High (75+)</SelectItem>
+                              <SelectItem value="moderate">Moderate (50-74)</SelectItem>
+                              <SelectItem value="poor">Poor (1-49)</SelectItem>
+                              <SelectItem value="none">No Score</SelectItem>
+                            </SelectContent>
+                          </Select>
+                           <Select value={contactedFilter} onValueChange={setContactedFilter}>
+                             <SelectTrigger className="h-9 text-sm">
+                               <SelectValue placeholder="Status" />
+                             </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All Status</SelectItem>
+                                <SelectItem value="Not Contacted">Not Contacted</SelectItem>
+                                <SelectItem value="Ready to Call">Ready to Call</SelectItem>
+                                <SelectItem value="Contacted">Contacted</SelectItem>
+                                <SelectItem value="Call Done">Call Done</SelectItem>
+                                <SelectItem value="1st No Answer">1st No Answer</SelectItem>
+                                <SelectItem value="2nd No Answer">2nd No Answer</SelectItem>
+                                <SelectItem value="3rd No Answer">3rd No Answer</SelectItem>
+                                <SelectItem value="Low Scored">Low Scored</SelectItem>
+                                <SelectItem value="Tasked">Tasked</SelectItem>
+                              </SelectContent>
+                           </Select>
                         </div>
                       </Card>
-                    ))
-                    }
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
 
-          <TabsContent value="candidates" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>AI Long List</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Long list candidates content here...</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {(() => {
+                          // Group candidates by Candidate_ID to handle multiple contacts
+                          const groupedCandidates = filteredCandidates.reduce((acc, candidate) => {
+                            const candidateId = candidate["Candidate_ID"]
+                            if (!acc[candidateId]) {
+                              acc[candidateId] = []
+                            }
+                            acc[candidateId].push(candidate)
+                            return acc
+                          }, {} as Record<string, any[]>)
 
-          <TabsContent value="shortlist" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>AI Short List</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Short list candidates content here...</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-  )
-}
+                          return Object.entries(groupedCandidates).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                            // Use the first contact for display info
+                            const mainCandidate = candidateContacts[0]
+                            
+                            return (
+                               <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
+                                 <CardContent className="p-3 md:p-4">
+                                   <div className="space-y-3">
+                                     <div className="flex items-start justify-between">
+                                       <div className="min-w-0 flex-1">
+                                         <h4 className="font-semibold text-sm md:text-base truncate">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
+                                         <p className="text-xs md:text-sm text-muted-foreground truncate">{candidateId}</p>
+                                       </div>
+                                     </div>
+                                     
+                                     <div className="space-y-2 text-xs md:text-sm">
+                                       {mainCandidate["Candidate Email"] && (
+                                         <div className="flex items-center text-muted-foreground min-w-0">
+                                           <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+                                           <span className="truncate">{mainCandidate["Candidate Email"]}</span>
+                                         </div>
+                                       )}
+                                       
+                                       {mainCandidate["Candidate Phone Number"] && (
+                                         <div className="flex items-center text-muted-foreground min-w-0">
+                                           <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
+                                           <span className="truncate">{mainCandidate["Candidate Phone Number"]}</span>
+                                         </div>
+                                       )}
+                                     </div>
+
+                                     {mainCandidate["Summary"] && (
+                                       <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
+                                         {mainCandidate["Summary"]}
+                                       </p>
+                                     )}
+
+                                      <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t gap-2">
+                                        <div className="flex flex-wrap items-center gap-1">
+                                          <StatusDropdown
+                                            currentStatus={mainCandidate["Contacted"]}
+                                            candidateId={mainCandidate["Candidate_ID"]}
+                                            jobId={id!}
+                                            onStatusChange={(newStatus) => {
+                                              setCandidates(prev => prev.map(c => 
+                                                c["Candidate_ID"] === mainCandidate["Candidate_ID"] 
+                                                  ? { ...c, Contacted: newStatus }
+                                                  : c
+                                              ))
+                                            }}
+                                            variant="badge"
+                                          />
+                                          {getCandidateStatus(mainCandidate["Candidate_ID"]) && (
+                                            <StatusDropdown
+                                              currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
+                                              candidateId={mainCandidate["Candidate_ID"]}
+                                              jobId={null}
+                                              onStatusChange={(newStatus) => {
+                                                setCvData(prev => prev.map(cv => 
+                                                  cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] 
+                                                    ? { ...cv, CandidateStatus: newStatus }
+                                                    : cv
+                                                ))
+                                              }}
+                                              variant="badge"
+                                            />
+                                          )}
+                                        </div>
+                                        {getScoreBadge(mainCandidate["Success Score"])}
+                                      </div>
+
+                                     {/* Call Log Buttons */}
+                                     <div className="space-y-2 pt-2 border-t">
+                                       <div className="flex flex-col sm:flex-row gap-2">
+                                         <Button
+                                           variant="default"
+                                           size="sm"
+                                           onClick={() => handleCallCandidate(mainCandidate["Candidate_ID"], id!, mainCandidate["callid"])}
+                                           disabled={callingCandidateId === candidateId}
+                                           className="w-full sm:flex-1 bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 text-xs md:text-sm"
+                                         >
+                                           <Phone className="w-3 h-3 mr-1" />
+                                           {callingCandidateId === candidateId ? 'Calling...' : 'Call Candidate'}
+                                         </Button>
+                                          {candidateContacts
+                                            .filter(contact => contact.callcount > 0)
+                                            .map((contact, contactIndex) => (
+                                            <Button
+                                              key={contactIndex}
+                                              variant="outline"
+                                              size="sm"
+                                              asChild
+                                              className="flex-1 min-w-0 text-xs md:text-sm"
+                                            >
+                                             <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${contact.callid}`} className="truncate">
+                                               <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
+                                               <span className="truncate">{candidateContacts.filter(c => c.callcount > 0).length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}</span>
+                                             </Link>
+                                            </Button>
+                                          ))}
+                                       </div>
+                                       <Button
+                                         variant="ghost"
+                                         size="sm"
+                                         asChild
+                                         className="w-full text-xs md:text-sm"
+                                       >
+                                         <Link to={`/candidate/${candidateId}`}>
+                                           <Users className="w-3 h-3 mr-1" />
+                                           View Profile
+                                         </Link>
+                                       </Button>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            )
+                          })
+                        })()}
+                      </div>
+                   </>
+                 )}
+               </CardContent>
+             </Card>
+            </TabsContent>
+
+           <TabsContent value="shortlist" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Star className="w-5 h-5 mr-2" />
+                    AI Short List ({shortListCandidates.length} candidates with 74+ score)
+                  </CardTitle>
+                  <CardDescription>
+                    High-scoring candidates (74+) who have passed the initial screening
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {shortListCandidates.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">No high-scoring candidates yet</h3>
+                      <p className="text-muted-foreground">Candidates with scores of 74+ will appear here automatically</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                      {(() => {
+                        // Group short list candidates by Candidate_ID
+                        const groupedShortList = shortListCandidates.reduce((acc, candidate) => {
+                          const candidateId = candidate["Candidate_ID"]
+                          if (!acc[candidateId]) {
+                            acc[candidateId] = []
+                          }
+                          acc[candidateId].push(candidate)
+                          return acc
+                        }, {} as Record<string, any[]>)
+
+                        return Object.entries(groupedShortList).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                          const mainCandidate = candidateContacts[0]
+                          
+                          return (
+                            <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20">
+                              <CardContent className="p-4">
+                                <div className="space-y-3">
+                                  <div className="flex items-start justify-between">
+                                    <div>
+                                      <h4 className="font-semibold">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
+                                      <p className="text-sm text-muted-foreground">{candidateId}</p>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="space-y-2 text-sm">
+                                    {mainCandidate["Candidate Email"] && (
+                                      <div className="flex items-center text-muted-foreground">
+                                        <Mail className="w-4 h-4 mr-2" />
+                                        <span className="truncate">{mainCandidate["Candidate Email"]}</span>
+                                      </div>
+                                    )}
+                                    
+                                    {mainCandidate["Candidate Phone Number"] && (
+                                      <div className="flex items-center text-muted-foreground">
+                                        <Phone className="w-4 h-4 mr-2" />
+                                        <span>{mainCandidate["Candidate Phone Number"]}</span>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {mainCandidate["Summary"] && (
+                                    <p className="text-sm text-muted-foreground line-clamp-3">
+                                      {mainCandidate["Summary"]}
+                                    </p>
+                                  )}
+
+                                   <div className="flex items-center justify-between pt-2 border-t">
+                                     <div className="flex items-center space-x-2">
+                                       <StatusDropdown
+                                         currentStatus={mainCandidate["Contacted"]}
+                                         candidateId={mainCandidate["Candidate_ID"]}
+                                         jobId={id!}
+                                         onStatusChange={(newStatus) => {
+                                           setCandidates(prev => prev.map(c => 
+                                             c["Candidate_ID"] === mainCandidate["Candidate_ID"] 
+                                               ? { ...c, Contacted: newStatus }
+                                               : c
+                                           ))
+                                         }}
+                                         variant="badge"
+                                       />
+                                       {getCandidateStatus(mainCandidate["Candidate_ID"]) && (
+                                         <StatusDropdown
+                                           currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
+                                           candidateId={mainCandidate["Candidate_ID"]}
+                                           jobId={null}
+                                           onStatusChange={(newStatus) => {
+                                             setCvData(prev => prev.map(cv => 
+                                               cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] 
+                                                 ? { ...cv, CandidateStatus: newStatus }
+                                                 : cv
+                                             ))
+                                           }}
+                                           variant="badge"
+                                         />
+                                       )}
+                                     </div>
+                                     {getScoreBadge(mainCandidate["Success Score"])}
+                                   </div>
+
+                                  {/* Call Log Buttons */}
+                                  <div className="space-y-2 pt-2 border-t">
+                                    <div className="flex flex-wrap gap-2">
+                                       {candidateContacts
+                                         .filter(contact => contact.callcount > 0)
+                                         .map((contact, contactIndex) => (
+                                          <Button
+                                            key={contactIndex}
+                                            variant="outline"
+                                            size="sm"
+                                            asChild
+                                            className="flex-1 min-w-[100px]"
+                                          >
+                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${contact.callid}`}>
+                                              <FileText className="w-3 h-3 mr-1" />
+                                              {candidateContacts.filter(c => c.callcount > 0).length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}
+                                            </Link>
+                                          </Button>
+                                       ))}
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        asChild
+                                        className="flex-1 min-w-[100px]"
+                                      >
+                                        <Link to={`/candidate/${candidateId}`}>
+                                          <Users className="w-3 h-3 mr-1" />
+                                          View Profile
+                                        </Link>
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          )
+                        })
+                      })()}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+         
+         <JobDialog
+           job={job}
+           open={isEditDialogOpen}
+           onOpenChange={setIsEditDialogOpen}
+           onSave={() => {
+             fetchJob(id!)
+             setIsEditDialogOpen(false)
+           }}
+         />
+
+         <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+           <AlertDialogContent>
+             <AlertDialogHeader>
+               <AlertDialogTitle>Regenerate Long List</AlertDialogTitle>
+               <AlertDialogDescription>
+                 Are you sure you want to regenerate Long List?
+               </AlertDialogDescription>
+             </AlertDialogHeader>
+             <AlertDialogFooter>
+               <AlertDialogCancel>Cancel</AlertDialogCancel>
+               <AlertDialogAction 
+                 onClick={() => {
+                   setShowConfirmDialog(false);
+                   handleGenerateLongList();
+                 }}
+               >
+                 Yes, Regenerate
+               </AlertDialogAction>
+             </AlertDialogFooter>
+           </AlertDialogContent>
+         </AlertDialog>
+       </div>
+   )
+ }
