@@ -352,18 +352,18 @@ export default function Index() {
                               {score}
                             </div>
                             <div className="flex flex-col space-y-2">
-                              <Button size="sm" variant="destructive" onClick={e => {
+                              <Button size="xs" variant="destructive" onClick={e => {
                             e.stopPropagation();
                             handleRejectCandidate(candidate.Candidate_ID, candidate.job_id);
-                          }} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
-                                <XCircle className="w-4 h-4 mr-1" />
+                          }} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground text-xs">
+                                <XCircle className="w-3 h-3 mr-1" />
                                 Reject Candidate
                               </Button>
-                              <Button size="sm" variant="default" onClick={e => {
+                              <Button size="xs" variant="default" onClick={e => {
                             e.stopPropagation();
                             handleArrangeInterview(candidate.Candidate_ID, candidate.job_id);
-                          }} className="bg-green-600 hover:bg-green-700 text-white bg-emerald-700 hover:bg-emerald-600">
-                                <Calendar className="w-4 h-4 mr-1" />
+                          }} className="bg-green-600 hover:bg-green-700 text-white bg-emerald-700 hover:bg-emerald-600 text-xs">
+                                <Calendar className="w-3 h-3 mr-1" />
                                 Arrange an Interview
                               </Button>
                             </div>
