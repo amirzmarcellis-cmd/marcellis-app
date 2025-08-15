@@ -215,6 +215,19 @@ export default function Index() {
       return;
     }
 
+    // Validate that times are not in the past for today's date
+    const now = new Date();
+    const currentDate = format(now, 'yyyy-MM-dd');
+    const currentTime = format(now, 'HH:mm');
+    
+    for (const slot of validSlots) {
+      const slotDate = format(slot.date!, 'yyyy-MM-dd');
+      if (slotDate === currentDate && slot.time <= currentTime) {
+        alert('Cannot schedule interview times in the past for today. Please select a future time.');
+        return;
+      }
+    }
+
     try {
       // Update candidate status
       await supabase.from('CVs').update({
@@ -535,7 +548,11 @@ export default function Index() {
                           mode="single"
                           selected={slot.date}
                           onSelect={(date) => updateInterviewSlot(index, 'date', date!)}
-                          disabled={(date) => date <= new Date()}
+                          disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            return date < today;
+                          }}
                           initialFocus
                           className="p-3 pointer-events-auto"
                         />
@@ -552,7 +569,22 @@ export default function Index() {
                         value={slot.time.split(':')[0] || ''}
                         onValueChange={(hour) => {
                           const minute = slot.time.split(':')[1] || '00';
-                          updateInterviewSlot(index, 'time', `${hour}:${minute}`);
+                          const newTime = `${hour}:${minute}`;
+                          
+                          // Validate time is not in the past for today
+                          if (slot.date) {
+                            const today = new Date();
+                            const slotDate = format(slot.date, 'yyyy-MM-dd');
+                            const currentDate = format(today, 'yyyy-MM-dd');
+                            const currentTime = format(today, 'HH:mm');
+                            
+                            if (slotDate === currentDate && newTime <= currentTime) {
+                              alert('Cannot select a time in the past for today');
+                              return;
+                            }
+                          }
+                          
+                          updateInterviewSlot(index, 'time', newTime);
                         }}
                       >
                         <SelectTrigger>
@@ -572,7 +604,22 @@ export default function Index() {
                         value={slot.time.split(':')[1] || ''}
                         onValueChange={(minute) => {
                           const hour = slot.time.split(':')[0] || '09';
-                          updateInterviewSlot(index, 'time', `${hour}:${minute}`);
+                          const newTime = `${hour}:${minute}`;
+                          
+                          // Validate time is not in the past for today
+                          if (slot.date) {
+                            const today = new Date();
+                            const slotDate = format(slot.date, 'yyyy-MM-dd');
+                            const currentDate = format(today, 'yyyy-MM-dd');
+                            const currentTime = format(today, 'HH:mm');
+                            
+                            if (slotDate === currentDate && newTime <= currentTime) {
+                              alert('Cannot select a time in the past for today');
+                              return;
+                            }
+                          }
+                          
+                          updateInterviewSlot(index, 'time', newTime);
                         }}
                       >
                         <SelectTrigger>
