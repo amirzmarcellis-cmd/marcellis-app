@@ -432,11 +432,11 @@ export default function JobDetails() {
     
     const numScore = parseInt(score)
     if (numScore >= 75) {
-      return <Badge className="bg-green-600 text-white border-0">{score} - High</Badge>
+      return <Badge className="bg-green-600 text-foreground border-0">{score} - High</Badge>
     } else if (numScore >= 50) {
-      return <Badge className="bg-blue-600 text-white border-0">{score} - Moderate</Badge>
+      return <Badge className="bg-blue-600 text-foreground border-0">{score} - Moderate</Badge>
     } else if (numScore >= 1) {
-      return <Badge className="bg-red-600 text-white border-0">{score} - Low</Badge>
+      return <Badge className="bg-red-600 text-foreground border-0">{score} - Low</Badge>
     }
     return null
   }
