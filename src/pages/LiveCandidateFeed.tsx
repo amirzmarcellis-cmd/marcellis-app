@@ -125,11 +125,11 @@ export default function LiveCandidateFeed() {
         };
       });
 
-      // Filter: only Shortlisted candidates from ACTIVE jobs
+      // Filter: Shortlisted and Interview candidates from ACTIVE jobs
       const activeJobIds = new Set((jobsData || []).filter(j => j.Processed === 'Yes').map(j => j.job_id));
-      const shortlistedCandidateIds = new Set((cvsData || []).filter(c => c.CandidateStatus === 'Shortlisted').map(c => c.candidate_id));
+      const shortlistedAndInterviewCandidateIds = new Set((cvsData || []).filter(c => c.CandidateStatus === 'Shortlisted' || c.CandidateStatus === 'Interview').map(c => c.candidate_id));
       const filteredShortlistedActive = enrichedCandidates.filter(c => {
-        return shortlistedCandidateIds.has(c.Candidate_ID || c.candidate_id) && activeJobIds.has(c.job_id);
+        return shortlistedAndInterviewCandidateIds.has(c.Candidate_ID || c.candidate_id) && activeJobIds.has(c.job_id);
       });
       setCandidates(filteredShortlistedActive);
       setJobs(jobsData || []);

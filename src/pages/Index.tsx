@@ -88,10 +88,10 @@ export default function Index() {
       const interviewCandidates = cvs.filter((c: any) => c.CandidateStatus === 'Interview');
       const taskedCandidates = cvs.filter((c: any) => c.CandidateStatus === 'Tasked');
 
-      // Show only shortlisted candidates from ACTIVE jobs, sorted by highest score
-      const shortlistedCandidateIds = new Set(cvs.filter(c => c.CandidateStatus === 'Shortlisted').map(c => c.candidate_id));
+      // Show shortlisted and interview candidates from ACTIVE jobs, sorted by highest score
+      const shortlistedAndInterviewCandidateIds = new Set(cvs.filter(c => c.CandidateStatus === 'Shortlisted' || c.CandidateStatus === 'Interview').map(c => c.candidate_id));
       const shortlistedActiveCandidates = links.filter((jc: any) => {
-        return shortlistedCandidateIds.has(jc.Candidate_ID) && activeJobIds.has(jc.job_id);
+        return shortlistedAndInterviewCandidateIds.has(jc.Candidate_ID) && activeJobIds.has(jc.job_id);
       });
       const recentCandidates = shortlistedActiveCandidates.sort((a: any, b: any) => {
         const scoreA = parseFloat(a.success_score) || 0;
