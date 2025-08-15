@@ -122,9 +122,9 @@ export function StatusDropdown({
       if (statusType === "contacted" && jobId) {
         const { error } = await supabase
           .from('Jobs_CVs')
-          .update({ 'Contacted': newStatus })
+          .update({ 'contacted': newStatus })
           .eq('Candidate_ID', candidateId)
-          .eq('Job ID', jobId)
+          .eq('job_id', jobId)
         if (error) throw error
       } else if (statusType === "candidate") {
         const { error } = await supabase
