@@ -1311,25 +1311,25 @@ export default function JobDetails() {
                                      {getScoreBadge(mainCandidate["Success Score"])}
                                    </div>
 
-                                  {/* Call Log Buttons */}
-                                  <div className="space-y-2 pt-2 border-t">
-                                    <div className="flex flex-wrap gap-2">
-                                       {candidateContacts
-                                         .filter(contact => contact.callcount > 0)
-                                         .map((contact, contactIndex) => (
-                                          <Button
-                                            key={contactIndex}
-                                            variant="outline"
-                                            size="sm"
-                                            asChild
-                                            className="flex-1 min-w-[100px]"
-                                          >
-                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${contact.callid}`}>
-                                              <FileText className="w-3 h-3 mr-1" />
-                                              {candidateContacts.filter(c => c.callcount > 0).length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}
-                                            </Link>
-                                          </Button>
-                                       ))}
+                                   {/* Call Log Buttons */}
+                                   <div className="space-y-2 pt-2 border-t">
+                                     <div className="flex flex-wrap gap-2">
+                                        {candidateContacts
+                                          .filter(contact => contact.callcount > 0)
+                                          .map((contact, contactIndex) => (
+                                           <Button
+                                             key={contactIndex}
+                                             variant="outline"
+                                             size="sm"
+                                             asChild
+                                             className="flex-1 min-w-[100px]"
+                                           >
+                                             <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${contact.callid}`}>
+                                               <FileText className="w-3 h-3 mr-1" />
+                                               {candidateContacts.filter(c => c.callcount > 0).length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}
+                                             </Link>
+                                           </Button>
+                                        ))}
                                        <Button
                                          variant="ghost"
                                          size="sm"
@@ -1341,17 +1341,20 @@ export default function JobDetails() {
                                            View Profile
                                          </Link>
                                        </Button>
+                                     </div>
+                                     {/* Reject Button in separate row */}
+                                     <div className="flex">
                                        <Button
                                          variant="destructive"
                                          size="sm"
-                                         className="flex-1 min-w-[100px] bg-red-600 hover:bg-red-700"
+                                         className="w-full bg-red-600 hover:bg-red-700"
                                          onClick={() => handleRejectCandidate(id!, candidateId, candidateContacts[0].callid)}
                                        >
                                          <X className="w-3 h-3 mr-1" />
                                          Reject Candidate
                                        </Button>
-                                    </div>
-                                  </div>
+                                     </div>
+                                   </div>
                                 </div>
                               </CardContent>
                             </Card>
