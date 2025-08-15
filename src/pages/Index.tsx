@@ -180,6 +180,12 @@ export default function Index() {
   };
 
   const handleRejectCandidate = async (candidateId: string, jobId: string) => {
+    // Show confirmation alert
+    const confirmed = window.confirm('Are you sure you want to Reject Candidate?');
+    if (!confirmed) {
+      return; // User cancelled, don't proceed
+    }
+
     try {
       // Update database
       await supabase
@@ -208,8 +214,8 @@ export default function Index() {
         }
       }
       
-      // Refresh data
-      fetchDashboardData();
+      // Reload the page
+      window.location.reload();
     } catch (error) {
       console.error('Error rejecting candidate:', error);
     }
