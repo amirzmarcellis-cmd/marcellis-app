@@ -116,8 +116,35 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
     }
   }, [candidate, open]);
 
-  const generateCandidateId = () => {
-    return `CAND-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+  const generateCandidateId = async () => {
+    try {
+      // Get all existing candidate IDs that follow the DMS-C-XXXX pattern
+      const { data: candidates, error } = await supabase
+        .from('CVs')
+        .select('candidate_id')
+        .like('candidate_id', 'DMS-C-%')
+        .order('candidate_id', { ascending: false })
+        .limit(1);
+
+      if (error) throw error;
+
+      let nextNumber = 6145; // Default starting number if no candidates exist
+
+      if (candidates && candidates.length > 0) {
+        // Extract the number from the last candidate ID (e.g., "DMS-C-6144" -> 6144)
+        const lastId = candidates[0].candidate_id;
+        const match = lastId.match(/DMS-C-(\d+)/);
+        if (match) {
+          nextNumber = parseInt(match[1]) + 1;
+        }
+      }
+
+      return `DMS-C-${nextNumber}`;
+    } catch (error) {
+      console.error('Error generating candidate ID:', error);
+      // Fallback to timestamp-based ID if query fails
+      return `DMS-C-${Date.now()}`;
+    }
   };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -191,7 +218,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
     setLoading(true);
     try {
       const candidateData = {
-        candidate_id: candidate?.candidate_id || generateCandidateId(),
+        candidate_id: candidate?.candidate_id || await generateCandidateId(),
         first_name: formData.firstName || null,
         last_name: formData.lastName || null,
         Email: formData.email || null,
