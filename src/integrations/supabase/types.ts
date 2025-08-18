@@ -590,11 +590,10 @@ export type Database = {
           candidate_id: string
           created_at: string
           created_by: string | null
-          id: string
           job_id: string
           status: string
-          taskid: string
-          timestamp: string
+          taskid: number
+          tasklink: string | null
           updated_at: string
         }
         Insert: {
@@ -602,11 +601,10 @@ export type Database = {
           candidate_id: string
           created_at?: string
           created_by?: string | null
-          id?: string
           job_id: string
           status?: string
-          taskid: string
-          timestamp?: string
+          taskid?: number
+          tasklink?: string | null
           updated_at?: string
         }
         Update: {
@@ -614,11 +612,10 @@ export type Database = {
           candidate_id?: string
           created_at?: string
           created_by?: string | null
-          id?: string
           job_id?: string
           status?: string
-          taskid?: string
-          timestamp?: string
+          taskid?: number
+          tasklink?: string | null
           updated_at?: string
         }
         Relationships: []

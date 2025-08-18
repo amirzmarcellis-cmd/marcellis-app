@@ -1,25 +1,25 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Filter, Plus } from "lucide-react";
+import { Search, Filter, ExternalLink, Phone } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 
 interface TaskCandidate {
-  id: string;
-  timestamp: string;
-  taskid: string;
+  taskid: number;
+  created_at: string;
   callid: number | null;
   candidate_id: string;
   job_id: string;
+  tasklink: string | null;
   status: 'Pending' | 'Received' | 'Reviewed';
-  created_at: string;
   updated_at: string;
 }
 
@@ -46,6 +46,7 @@ interface JobCVData {
 export default function Tasks() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [taskCandidates, setTaskCandidates] = useState<TaskCandidate[]>([]);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -93,7 +94,7 @@ export default function Tasks() {
       if (jobsError) throw jobsError;
       setJobs(jobsData || []);
 
-      // Fetch Jobs_CVs data for contacted status
+      // Fetch Jobs_CVs data for candidate names and emails
       const { data: jobCVsData, error: jobCVsError } = await supabase
         .from('Jobs_CVs')
         .select('Candidate_ID, job_id, contacted, candidate_name, candidate_email');
@@ -113,18 +114,18 @@ export default function Tasks() {
     }
   };
 
-  const updateTaskStatus = async (taskId: string, newStatus: 'Pending' | 'Received' | 'Reviewed') => {
+  const updateTaskStatus = async (taskId: number, newStatus: 'Pending' | 'Received' | 'Reviewed') => {
     try {
       const { error } = await supabase
         .from('task_candidates')
         .update({ status: newStatus })
-        .eq('id', taskId);
+        .eq('taskid', taskId);
 
       if (error) throw error;
 
       setTaskCandidates(prev => 
         prev.map(task => 
-          task.id === taskId ? { ...task, status: newStatus } : task
+          task.taskid === taskId ? { ...task, status: newStatus } : task
         )
       );
 
@@ -167,13 +168,6 @@ export default function Tasks() {
     return job?.job_title || jobId;
   };
 
-  const getContactedStatus = (candidateId: string, jobId: string) => {
-    const jobCV = jobCVData.find(jc => 
-      jc.Candidate_ID === candidateId && jc.job_id === jobId
-    );
-    return jobCV?.contacted || 'Unknown';
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Pending':
@@ -185,6 +179,10 @@ export default function Tasks() {
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
+  };
+
+  const openCallLog = (callId: number) => {
+    navigate(`/call-log-details?callid=${callId}`);
   };
 
   const filteredTasks = taskCandidates.filter(task => {
@@ -276,50 +274,51 @@ export default function Tasks() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Timestamp</TableHead>
-                <TableHead>Task ID</TableHead>
-                <TableHead>Call ID</TableHead>
-                <TableHead>Candidate</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Job</TableHead>
-                <TableHead>Contacted Status</TableHead>
+                <TableHead>Created At</TableHead>
+                <TableHead>Candidate Name</TableHead>
+                <TableHead>Candidate Email</TableHead>
+                <TableHead>Job Title</TableHead>
+                <TableHead>Task Link</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredTasks.map((task) => (
-                <TableRow key={task.id}>
+                <TableRow key={task.taskid}>
                   <TableCell>
-                    {format(new Date(task.timestamp), 'MMM dd, yyyy HH:mm')}
+                    {format(new Date(task.created_at), 'MMM dd, yyyy HH:mm')}
                   </TableCell>
-                  <TableCell className="font-mono text-sm">{task.taskid}</TableCell>
-                  <TableCell>{task.callid || 'N/A'}</TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div className="font-medium">{getCandidateName(task.candidate_id)}</div>
-                      <div className="text-sm text-muted-foreground">ID: {task.candidate_id}</div>
-                    </div>
+                  <TableCell className="font-medium">
+                    {getCandidateName(task.candidate_id)}
                   </TableCell>
                   <TableCell>{getCandidateEmail(task.candidate_id)}</TableCell>
                   <TableCell>{getJobTitle(task.job_id)}</TableCell>
                   <TableCell>
-                    <Badge variant="outline">
-                      {getContactedStatus(task.candidate_id, task.job_id)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(task.status)}>
-                      {task.status}
-                    </Badge>
+                    {task.tasklink ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => window.open(task.tasklink!, '_blank')}
+                        className="p-1 h-auto"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Button>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Select
                       value={task.status}
-                      onValueChange={(value) => updateTaskStatus(task.id, value as any)}
+                      onValueChange={(value) => updateTaskStatus(task.taskid, value as any)}
                     >
                       <SelectTrigger className="w-32">
-                        <SelectValue />
+                        <SelectValue>
+                          <Badge className={getStatusColor(task.status)}>
+                            {task.status}
+                          </Badge>
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Pending">Pending</SelectItem>
@@ -328,11 +327,26 @@ export default function Tasks() {
                       </SelectContent>
                     </Select>
                   </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      {task.callid && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openCallLog(task.callid!)}
+                          className="flex items-center gap-1"
+                        >
+                          <Phone className="h-4 w-4" />
+                          Call Log
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))}
               {filteredTasks.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8">
+                  <TableCell colSpan={7} className="text-center py-8">
                     No tasks found matching your filters.
                   </TableCell>
                 </TableRow>
