@@ -673,6 +673,17 @@ export type Database = {
         }
         Relationships: []
       }
+      users_with_roles: {
+        Row: {
+          email: string | null
+          last_sign_in_at: string | null
+          name: string | null
+          roles: Database["public"]["Enums"]["app_role"][] | null
+          user_created_at: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       v_time_to_shortlist: {
         Row: {
           avg_hours_to_shortlist: number | null
