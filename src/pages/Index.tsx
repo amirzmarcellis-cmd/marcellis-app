@@ -10,12 +10,13 @@ import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
 import { StatusDropdown } from '@/components/candidates/StatusDropdown';
 import { useProfile } from '@/hooks/useProfile';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Play, Pause, Search, FileText, Upload, Users, Briefcase, Clock, Star, TrendingUp, Calendar, CheckCircle, XCircle, ClipboardList, Video, Target, Activity, Timer, Phone } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { MetricCardPro } from '@/components/dashboard/MetricCardPro';
 import { ScoreRing } from '@/components/ui/ScoreRing';
 import { HeroHeader } from '@/components/dashboard/HeroHeader';
@@ -31,6 +32,22 @@ interface DashboardData {
   averageTimeToHire: number;
   recentCandidates: any[];
   activeJobs: any[];
+}
+
+interface Interview {
+  intid: string;
+  candidate_id: string;
+  job_id: string;
+  callid: number;
+  appoint1: string;
+  appoint2: string;
+  appoint3: string;
+  chosen_time: string | null;
+  inttype: string;
+  intlink: string | null;
+  intstatus: string;
+  created_at: string;
+  updated_at: string;
 }
 export default function Index() {
   const {
@@ -54,6 +71,7 @@ export default function Index() {
     { date: undefined, time: '' }
   ]);
   const [interviewType, setInterviewType] = useState<string>('Phone');
+  const [interviews, setInterviews] = useState<Interview[]>([]);
   useEffect(() => {
     // SEO
     document.title = 'AI CRM Mission Control | Dashboard';
@@ -68,6 +86,7 @@ export default function Index() {
 
     // Fetch initial data
     fetchDashboardData();
+    fetchInterviews();
   }, []);
   const fetchDashboardData = async () => {
     try {
@@ -142,6 +161,50 @@ export default function Index() {
       setLoading(false);
     }
   };
+
+  const fetchInterviews = async () => {
+    try {
+      const { data: interviewsData, error: interviewsError } = await supabase
+        .from('interview')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (interviewsError) throw interviewsError;
+
+      setInterviews((interviewsData as Interview[]) || []);
+    } catch (error) {
+      console.error('Error fetching interviews:', error);
+    }
+  };
+
+  const getCandidate = (candidateId: string) => {
+    return cvData.find(c => c.candidate_id === candidateId);
+  };
+
+  const getJob = (jobId: string) => {
+    return jobs.find(j => j.job_id === jobId);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-400/40';
+      case 'scheduled':
+        return 'bg-blue-500/20 text-blue-400 border-blue-400/40';
+      case 'completed':
+        return 'bg-green-500/20 text-green-400 border-green-400/40';
+      case 'cancelled':
+        return 'bg-red-500/20 text-red-400 border-red-400/40';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-400/40';
+    }
+  };
+
+  const getTypeIcon = (type: string) => {
+    return type === 'Phone' ? <Phone className="w-4 h-4" /> : <Video className="w-4 h-4" />;
+  };
+
   const handleTaskCountChange = (count: number) => {
     // This function is no longer needed for task count since we're tracking tasked candidates
     // But keeping it for potential future use
@@ -365,6 +428,82 @@ export default function Index() {
             </TiltCard>
           </BentoKpis>
         </div>
+      </div>
+
+      {/* Interviews Section */}
+      <div className="mb-6 relative z-10">
+        <Card className="bg-card border-border dark:bg-gradient-to-br dark:from-white/5 dark:via-white/3 dark:to-white/5 dark:backdrop-blur-lg dark:border-white/20">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg font-bold text-cyan-300 flex items-center">
+                <Calendar className="h-5 w-5 mr-2" />
+                Recent Interviews
+              </CardTitle>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/interviews')}
+                className="text-cyan-400 border-cyan-400/40 hover:bg-cyan-400/10"
+              >
+                View All
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {interviews.slice(0, 5).map((interview) => {
+                const candidate = getCandidate(interview.candidate_id);
+                const job = getJob(interview.job_id);
+                const candidateName = `${candidate?.first_name || ''} ${candidate?.last_name || ''}`.trim();
+                const candidateInitials = `${candidate?.first_name?.[0] || ''}${candidate?.last_name?.[0] || ''}`;
+
+                return (
+                  <div key={interview.intid} className="flex items-center justify-between p-3 bg-background/50 rounded-lg border border-border hover:border-primary/40 transition-all duration-300">
+                    <div className="flex items-center space-x-3">
+                      <Avatar className="w-10 h-10 border-2 border-cyan-400/50">
+                        <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-purple-600 text-white font-bold text-sm">
+                          {candidateInitials || 'C'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-foreground truncate">
+                          {candidateName || 'Unknown Candidate'}
+                        </h4>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {job?.job_title || 'Unknown Position'}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-3">
+                      <div className="flex items-center space-x-2">
+                        {getTypeIcon(interview.inttype)}
+                        <span className="text-sm text-muted-foreground">{interview.inttype}</span>
+                      </div>
+                      
+                      <Badge className={getStatusColor(interview.intstatus)} variant="outline">
+                        {interview.intstatus}
+                      </Badge>
+                      
+                      {interview.chosen_time && (
+                        <div className="text-sm font-medium text-cyan-400">
+                          {format(parseISO(interview.chosen_time), 'MMM d, HH:mm')}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+              
+              {interviews.length === 0 && (
+                <div className="text-center py-8">
+                  <Calendar className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
+                  <p className="text-muted-foreground">No interviews scheduled yet</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
