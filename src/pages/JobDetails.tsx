@@ -1312,25 +1312,33 @@ export default function JobDetails() {
                                      {getScoreBadge(mainCandidate["Success Score"])}
                                    </div>
 
-                                   {/* Call Log Buttons */}
-                                   <div className="space-y-2 pt-2 border-t">
-                                     <div className="flex flex-wrap gap-2">
-                                        {candidateContacts
-                                          .filter(contact => contact.callcount > 0)
-                                          .map((contact, contactIndex) => (
-                                           <Button
-                                             key={contactIndex}
-                                             variant="outline"
-                                             size="sm"
-                                             asChild
-                                             className="flex-1 min-w-[100px]"
-                                           >
-                                             <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${contact.callid}`}>
-                                               <FileText className="w-3 h-3 mr-1" />
-                                               {candidateContacts.filter(c => c.callcount > 0).length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}
-                                             </Link>
-                                           </Button>
-                                        ))}
+                                    {/* Call Log Buttons */}
+                                    <div className="space-y-2 pt-2 border-t">
+                                      <div className="flex flex-wrap gap-2">
+                                         {(() => {
+                                           const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
+                                           if (contactsWithCalls.length === 0) return null;
+                                           
+                                           // Get the latest call log (highest callid)
+                                           const latestContact = contactsWithCalls.reduce((latest, current) => 
+                                             current.callid > latest.callid ? current : latest
+                                           );
+                                           
+                                           return (
+                                            <Button
+                                              key={latestContact.callid}
+                                              variant="outline"
+                                              size="sm"
+                                              asChild
+                                              className="flex-1 min-w-[100px]"
+                                            >
+                                              <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`}>
+                                                <FileText className="w-3 h-3 mr-1" />
+                                                Call Log
+                                              </Link>
+                                            </Button>
+                                           );
+                                         })()}
                                        <Button
                                          variant="ghost"
                                          size="sm"

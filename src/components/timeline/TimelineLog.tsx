@@ -73,6 +73,8 @@ export function TimelineLog({ candidateId, jobId }: TimelineLogProps) {
         'contacted_status_change',
         'candidate_status_change',
         'note_saved',
+        'call_logged',
+        'hired'
       ])
 
       const { data: history, error } = await supabase
