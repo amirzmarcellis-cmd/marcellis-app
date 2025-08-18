@@ -482,46 +482,38 @@ export default function JobDetails() {
 
   const handleArrangeInterview = (candidateId: string) => {
     console.log('handleArrangeInterview called with candidateId:', candidateId);
-    console.log('Available candidates:', candidates);
-    console.log('filteredCandidates:', filteredCandidates);
     
-    // Try to find candidate in both candidates and filteredCandidates arrays
-    let candidate = candidates.find(c => c["Candidate ID"] === candidateId || c["Candidate_ID"] === candidateId);
-    
-    if (!candidate) {
-      // If not found in candidates, try in the current filtered view
-      const currentFilteredCandidates = candidates.filter(candidate => {
-        const nameMatch = nameFilter === "" || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
-        const emailMatch = emailFilter === "" || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
-        const phoneMatch = phoneFilter === "" || (candidate["Candidate Phone Number"] || "").toLowerCase().includes(phoneFilter.toLowerCase());
-        const scoreMatch = scoreFilter === "all" || (candidate["Success Score"] && candidate["Success Score"].toString() === scoreFilter);
-        const statusMatch = contactedFilter === "all" || candidate["Contacted"] === contactedFilter;
-        return nameMatch && emailMatch && phoneMatch && scoreMatch && statusMatch;
-      });
-      candidate = currentFilteredCandidates.find(c => c["Candidate ID"] === candidateId || c["Candidate_ID"] === candidateId);
-    }
+    // Try to find candidate in the candidates array
+    let candidate = candidates.find(c => 
+      c["Candidate ID"] === candidateId || 
+      c["Candidate_ID"] === candidateId ||
+      c.candidate_id === candidateId
+    );
     
     console.log('Found candidate:', candidate);
+    console.log('All candidates:', candidates);
     
-    if (candidate) {
-      setSelectedCandidate({
-        candidateId,
-        jobId: jobId!,
-        callid: candidate.callid || 0
-      });
-      setInterviewDialogOpen(true);
-      // Reset slots and type
-      setInterviewSlots([
-        { date: undefined, time: '' },
-        { date: undefined, time: '' },
-        { date: undefined, time: '' }
-      ]);
-      setInterviewType('Phone');
-      setInterviewLink('');
-    } else {
-      console.error('Candidate not found for ID:', candidateId);
-      alert(`Candidate not found for ID: ${candidateId}. Please check the console for debugging info.`);
-    }
+    // Always set the selected candidate and open dialog - even if candidate not found
+    // We'll use default values if needed
+    setSelectedCandidate({
+      candidateId: candidateId,
+      jobId: jobId || id || '',
+      callid: candidate?.callid || candidate?.Callid || 0
+    });
+    
+    // Always open the dialog
+    setInterviewDialogOpen(true);
+    
+    // Reset slots and type
+    setInterviewSlots([
+      { date: undefined, time: '' },
+      { date: undefined, time: '' },
+      { date: undefined, time: '' }
+    ]);
+    setInterviewType('Phone');
+    setInterviewLink('');
+    
+    console.log('Dialog should now be open. interviewDialogOpen state set to true');
   };
 
   const handleScheduleInterview = async () => {
@@ -1661,7 +1653,10 @@ export default function JobDetails() {
                                          <Button
                                            variant="outline"
                                            size="sm"
-                                           onClick={() => handleArrangeInterview(candidateId)}
+                                            onClick={() => {
+                                              console.log('Button clicked! candidateId:', candidateId);
+                                              handleArrangeInterview(candidateId);
+                                            }}
                                            className="flex-1 min-w-[100px] bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200"
                                          >
                                            <Calendar className="w-3 h-3 mr-1" />
