@@ -127,26 +127,19 @@ export default function UsersPanel() {
       }
 
       // Call edge function to create user
-      const response = await fetch('/functions/v1/admin-user-management', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data: result, error } = await supabase.functions.invoke('admin-user-management', {
+        body: {
           action: 'create_user',
           userData: {
             email: formData.email,
             password: formData.password,
             name: formData.name
           }
-        })
+        }
       })
 
-      const result = await response.json()
-      
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to create user')
+      if (error) {
+        throw new Error(error.message || 'Failed to create user')
       }
 
       // Add roles if any selected
@@ -186,13 +179,8 @@ export default function UsersPanel() {
       }
 
       // Call edge function to update user
-      const response = await fetch('/functions/v1/admin-user-management', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data: result, error } = await supabase.functions.invoke('admin-user-management', {
+        body: {
           action: 'update_user',
           userId: selectedUser.user_id,
           userData: {
@@ -200,13 +188,11 @@ export default function UsersPanel() {
             password: formData.password || undefined,
             name: formData.name
           }
-        })
+        }
       })
 
-      const result = await response.json()
-      
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to update user')
+      if (error) {
+        throw new Error(error.message || 'Failed to update user')
       }
 
       // Update roles
@@ -269,22 +255,15 @@ export default function UsersPanel() {
       }
 
       // Call edge function to delete user
-      const response = await fetch('/functions/v1/admin-user-management', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('admin-user-management', {
+        body: {
           action: 'delete_user',
           userId: userId
-        })
+        }
       })
 
-      const result = await response.json()
-      
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to delete user')
+      if (error) {
+        throw new Error(error.message || 'Failed to delete user')
       }
 
       toast.success('User deleted successfully')
