@@ -535,33 +535,29 @@ export default function JobDetails() {
         CandidateStatus: 'Interview'
       }).eq('candidate_id', selectedCandidate.candidateId);
 
-      // Format appointments
-      const appointments = validSlots.map(slot => 
-        `${format(slot.date!, 'yyyy-MM-dd')} ${slot.time}`
-      );
+      // Format appointments for webhook (same as Dashboard)
+      const appointments = interviewSlots.map(slot => {
+        if (slot.date && slot.time) {
+          return `${format(slot.date, 'yyyy-MM-dd')} ${slot.time}`;
+        }
+        return '';
+      });
 
-      // Create interview record
-      const { data: interviewData, error: interviewError } = await supabase
-        .from('interview')
-        .insert({
-          candidate_id: selectedCandidate.candidateId,
-          job_id: selectedCandidate.jobId,
-          callid: selectedCandidate.callid,
-          appoint1: appointments[0],
-          appoint2: appointments[1],
-          appoint3: appointments[2],
-          inttype: interviewType,
-          intlink: interviewType === 'Online Meeting' ? interviewLink : null
-        })
-        .select('intid')
-        .maybeSingle();
+      // Save interview to database and get the generated intid (same as Dashboard)
+      const { data: interviewData, error: insertError } = await supabase.from('interview').insert({
+        candidate_id: selectedCandidate.candidateId,
+        job_id: selectedCandidate.jobId,
+        callid: selectedCandidate.callid,
+        appoint1: appointments[0],
+        appoint2: appointments[1],
+        appoint3: appointments[2],
+        inttype: interviewType,
+        intlink: interviewType === 'Online Meeting' ? interviewLink : null
+      }).select('intid').single();
 
-      if (interviewError) {
-        console.error('Interview creation error:', interviewError);
-        throw interviewError;
-      }
+      if (insertError) throw insertError;
 
-      // Send webhook to Make.com
+      // Send webhook to Make.com (exact same as Dashboard)
       await fetch('https://hook.eu2.make.com/3t88lby79dnf6x6hgm1i828yhen75omb', {
         method: 'POST',
         headers: {
@@ -572,9 +568,9 @@ export default function JobDetails() {
           candidate_id: selectedCandidate.candidateId,
           callid: selectedCandidate.callid,
           intid: interviewData?.intid,
-          appointment1: appointments[0],
-          appointment2: appointments[1],
-          appointment3: appointments[2],
+          appoint1: appointments[0],
+          appoint2: appointments[1],
+          appoint3: appointments[2],
           inttype: interviewType,
           intlink: interviewType === 'Online Meeting' ? interviewLink : null
         })
