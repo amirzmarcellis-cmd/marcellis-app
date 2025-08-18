@@ -92,7 +92,23 @@ export default function UsersPanel() {
     }
   }
 
+  const canEditUser = (user: UserWithRoles) => {
+    // Super admins can edit anyone
+    if (isSuperAdmin) return true
+    
+    // Managers cannot edit super admins
+    if (isManager && user.roles?.includes('super_admin')) return false
+    
+    // Regular users based on canManageUsers permission
+    return canManageUsers
+  }
+
   const handleEditUser = (user: UserWithRoles) => {
+    if (!canEditUser(user)) {
+      toast.error('You do not have permission to edit this user')
+      return
+    }
+    
     setSelectedUser(user)
     setUserRoles(user.roles || [])
     setFormData({
@@ -425,6 +441,8 @@ export default function UsersPanel() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleEditUser(user)}
+                        disabled={!canEditUser(user)}
+                        title={!canEditUser(user) ? "You cannot edit this user" : "Edit user"}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
