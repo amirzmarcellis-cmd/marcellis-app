@@ -408,7 +408,7 @@ export default function LiveCandidateFeed() {
                           <Button size="sm" variant="default" onClick={e => {
                             e.stopPropagation();
                             handleHireCandidate(candidate.Candidate_ID || candidate.candidate_id);
-                          }} className="bg-green-600 hover:bg-green-700 text-white border-2 border-green-500 hover:border-green-400 shadow-md hover:shadow-lg transition-all duration-200">
+                          }} className="bg-amber-500 hover:bg-amber-600 text-white border-2 border-amber-400 hover:border-amber-300 shadow-md hover:shadow-lg transition-all duration-200">
                             <UserCheck className="w-4 h-4 mr-1" />
                             Hire Candidate
                           </Button>
