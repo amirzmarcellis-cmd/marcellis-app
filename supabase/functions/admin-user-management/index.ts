@@ -80,12 +80,18 @@ serve(async (req) => {
 
         // Create profile - always create one to ensure data consistency
         if (newUser.user) {
-          await supabaseAdmin
+          const { error: profileError } = await supabaseAdmin
             .from('profiles')
             .upsert({
               user_id: newUser.user.id,
               name: name || ''
+            }, {
+              onConflict: 'user_id'
             })
+
+          if (profileError) {
+            console.error('Profile creation error:', profileError)
+          }
         }
 
         return new Response(
@@ -123,12 +129,18 @@ serve(async (req) => {
         }
 
         // Update profile - ensure it exists and update the name
-        await supabaseAdmin
+        const { error: profileError } = await supabaseAdmin
           .from('profiles')
           .upsert({
             user_id: userId,
             name: name || ''
+          }, {
+            onConflict: 'user_id'
           })
+
+        if (profileError) {
+          console.error('Profile update error:', profileError)
+        }
 
         return new Response(
           JSON.stringify({ success: true, user: updatedUser }),
