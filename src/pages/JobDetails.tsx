@@ -63,6 +63,24 @@ export default function JobDetails() {
   const [callingCandidateId, setCallingCandidateId] = useState<string | null>(null)
   const [newApplicationsCount, setNewApplicationsCount] = useState(0)
   const [lastViewedApplications, setLastViewedApplications] = useState<string | null>(null)
+  
+  // Interview scheduling state variables
+  const [interviewDialogOpen, setInterviewDialogOpen] = useState(false)
+  const [selectedCandidate, setSelectedCandidate] = useState<{
+    candidateId: string;
+    jobId: string;
+    callid: number;
+  } | null>(null)
+  const [interviewSlots, setInterviewSlots] = useState<{
+    date: Date | undefined;
+    time: string;
+  }[]>([
+    { date: undefined, time: '' },
+    { date: undefined, time: '' },
+    { date: undefined, time: '' }
+  ])
+  const [interviewType, setInterviewType] = useState<'Phone' | 'Online Meeting'>('Phone')
+  const [interviewLink, setInterviewLink] = useState('')
 
   useEffect(() => {
     if (id) {
