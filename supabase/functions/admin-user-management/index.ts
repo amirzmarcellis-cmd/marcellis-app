@@ -78,13 +78,13 @@ serve(async (req) => {
           throw createError
         }
 
-        // Create profile
-        if (name && newUser.user) {
+        // Create profile - always create one to ensure data consistency
+        if (newUser.user) {
           await supabaseAdmin
             .from('profiles')
             .upsert({
               user_id: newUser.user.id,
-              name: name
+              name: name || ''
             })
         }
 
@@ -122,12 +122,12 @@ serve(async (req) => {
           throw updateError
         }
 
-        // Update profile
+        // Update profile - ensure it exists and update the name
         await supabaseAdmin
           .from('profiles')
           .upsert({
             user_id: userId,
-            name: name || null
+            name: name || ''
           })
 
         return new Response(

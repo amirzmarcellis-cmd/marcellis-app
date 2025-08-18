@@ -275,17 +275,8 @@ export default function UsersPanel() {
   }
 
   const toggleRole = (role: string) => {
-    // For adding new users, only allow one role selection
-    if (!selectedUser) {
-      setUserRoles([role])
-    } else {
-      // For editing existing users, allow multiple roles
-      setUserRoles(prev => 
-        prev.includes(role) 
-          ? prev.filter(r => r !== role)
-          : [...prev, role]
-      )
-    }
+    // Only allow one role selection for both adding and editing users
+    setUserRoles([role])
   }
 
   const resetForm = () => {
