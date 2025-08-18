@@ -497,7 +497,7 @@ export default function JobDetails() {
     // We'll use default values if needed
     setSelectedCandidate({
       candidateId: candidateId,
-      jobId: jobId || id || '',
+      jobId: job?.["Job ID"] || id || '',
       callid: candidate?.callid || candidate?.Callid || 0
     });
     
