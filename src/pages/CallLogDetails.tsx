@@ -269,21 +269,30 @@ export default function CallLogDetails() {
               <Badge variant="outline" className="mt-2">
                 Score: {callLog["Success Score"]}/100
               </Badge>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => {
-                  const cvLink = callLog["cv_link"];
-                  if (cvLink) {
-                    window.open(cvLink, '_blank');
-                  }
-                }}
-                disabled={!callLog["cv_link"]}
-                className="mt-2"
-              >
-                <Link2 className="w-4 h-4 mr-2" />
-                View CV
-              </Button>
+              <div className="flex items-center space-x-2 mt-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    const cvLink = callLog["cv_link"];
+                    if (cvLink) {
+                      window.open(cvLink, '_blank');
+                    }
+                  }}
+                  disabled={!callLog["cv_link"]}
+                >
+                  <Link2 className="w-4 h-4 mr-2" />
+                  View CV
+                </Button>
+                <Button 
+                  variant="default" 
+                  size="sm"
+                  onClick={() => navigate(`/candidate-details/${callLog["Candidate_ID"]}`)}
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  View Profile
+                </Button>
+              </div>
             </div>
             <StatusDropdown
               currentStatus={callLog["Contacted"]}
