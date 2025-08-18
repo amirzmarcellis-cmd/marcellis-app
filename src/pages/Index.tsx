@@ -47,7 +47,7 @@ export default function Index() {
   const [jobStats, setJobStats] = useState<Record<string, any>>({});
   const [highScoreActiveCount, setHighScoreActiveCount] = useState(0);
   const [interviewDialogOpen, setInterviewDialogOpen] = useState(false);
-  const [selectedCandidate, setSelectedCandidate] = useState<{candidateId: string, jobId: string, callid: number} | null>(null);
+  const [selectedCandidate, setSelectedCandidate] = useState<{candidateId: string, jobId: string, callid: number, intid?: string} | null>(null);
   const [interviewSlots, setInterviewSlots] = useState<{date: Date | undefined, time: string}[]>([
     { date: undefined, time: '' },
     { date: undefined, time: '' },
@@ -188,13 +188,14 @@ export default function Index() {
       console.error('Error rejecting candidate:', error);
     }
   };
-  const handleArrangeInterview = (candidateId: string, jobId: string) => {
+  const handleArrangeInterview = (candidateId: string, jobId: string, intid?: string) => {
     const candidate = candidates.find(c => c.Candidate_ID === candidateId);
     if (candidate) {
       setSelectedCandidate({
         candidateId,
         jobId,
-        callid: candidate.callid
+        callid: candidate.callid,
+        intid
       });
       setInterviewDialogOpen(true);
       // Reset slots and type
@@ -265,6 +266,7 @@ export default function Index() {
           job_id: selectedCandidate.jobId,
           candidate_id: selectedCandidate.candidateId,
           callid: selectedCandidate.callid,
+          intid: selectedCandidate.intid,
           appoint1: appointments[0],
           appoint2: appointments[1],
           appoint3: appointments[2],
