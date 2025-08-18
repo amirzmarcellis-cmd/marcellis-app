@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User, MapPin, Briefcase, Mail, Phone, Search, Filter, Eye, Download, Calendar, Clock, ExternalLink, Edit, UserPlus } from "lucide-react"
+import { User, MapPin, Briefcase, Mail, Phone, Search, Filter, Eye, Download, Calendar, Clock, ExternalLink, Edit, UserPlus, Upload } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
@@ -15,6 +15,7 @@ import { toast } from "sonner"
 import { formatDate } from "@/lib/utils"
 import { HeroHeader } from "@/components/dashboard/HeroHeader"
 import { CandidateDialog } from "@/components/candidates/CandidateDialog"
+import { BulkCandidateUpload } from "@/components/candidates/BulkCandidateUpload"
 
 interface Candidate {
   candidate_id: string
@@ -45,6 +46,7 @@ export default function Candidates() {
   const [jobsCVs, setJobsCVs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [bulkUploadOpen, setBulkUploadOpen] = useState(false)
   const [selectedCandidate, setSelectedCandidate] = useState<any>(null)
 
   useEffect(() => {
@@ -143,6 +145,7 @@ export default function Candidates() {
 
   const handleSaveCandidate = () => {
     setDialogOpen(false)
+    setBulkUploadOpen(false)
     fetchCandidates() // Refresh the candidates list
   }
 
@@ -152,10 +155,16 @@ export default function Candidates() {
           title="Candidates"
           subtitle="Manage your recruitment pipeline"
           actions={
-            <Button onClick={handleAddCandidate} className="gap-2">
-              <UserPlus className="w-4 h-4" />
-              Add Candidate
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => setBulkUploadOpen(true)} variant="outline" className="gap-2">
+                <Upload className="w-4 h-4" />
+                Add Multiple Candidates
+              </Button>
+              <Button onClick={handleAddCandidate} className="gap-2">
+                <UserPlus className="w-4 h-4" />
+                Add Candidate
+              </Button>
+            </div>
           }
         />
 
@@ -305,6 +314,12 @@ export default function Candidates() {
           onOpenChange={setDialogOpen}
           onSave={handleSaveCandidate}
           jobs={jobs}
+        />
+
+        <BulkCandidateUpload
+          open={bulkUploadOpen}
+          onOpenChange={setBulkUploadOpen}
+          onSuccess={handleSaveCandidate}
         />
       </div>
   )
