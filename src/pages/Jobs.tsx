@@ -6,10 +6,8 @@ export default function Jobs() {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-6 overflow-x-auto">
-      <div>
-        <JobManagementPanel />
-      </div>
+    <div className="space-y-6">
+      <JobManagementPanel />
     </div>
   );
 }
