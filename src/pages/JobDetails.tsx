@@ -515,6 +515,9 @@ export default function JobDetails() {
       if (contactedFilter === "Not Contacted") {
         // Treat empty/undefined and case variations as "Not Contacted"
         contactedMatch = raw === "" || norm === "not contacted"
+      } else if (contactedFilter === "Ready to Call") {
+        // For "Ready to Contact", match both "Ready to Contact" and "Ready to Contact contacted"
+        contactedMatch = norm.includes("ready to contact") || norm.includes("ready to call")
       } else {
         contactedMatch = norm === contactedFilter.toLowerCase()
       }
