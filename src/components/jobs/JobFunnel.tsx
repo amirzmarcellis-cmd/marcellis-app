@@ -109,22 +109,6 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
             </div>
           ))}
         </div>
-        
-        {/* Summary stats */}
-        <div className="grid grid-cols-2 gap-4 pt-3 border-t border-border text-sm">
-          <div className="text-center">
-            <div className="font-medium text-foreground">Conversion</div>
-            <div className="text-muted-foreground">
-              {counts.longlist > 0 ? Math.round((counts.shortlist / counts.longlist) * 100) : 0}%
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="font-medium text-foreground">Contact Rate</div>
-            <div className="text-muted-foreground">
-              {counts.longlist > 0 ? Math.round((counts.contacted / counts.longlist) * 100) : 0}%
-            </div>
-          </div>
-        </div>
       </CardContent>
     </Card>
   );
