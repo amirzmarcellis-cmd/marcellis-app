@@ -7,6 +7,7 @@ import { Upload, Settings as SettingsIcon, Palette, User, Users } from "lucide-r
 import { useState, useEffect } from "react"
 import { useAppSettings } from "@/contexts/AppSettingsContext"
 import { useProfile } from "@/hooks/useProfile"
+import { useUserRole } from "@/hooks/useUserRole"
 import { toast } from "sonner"
 import { useTheme } from "next-themes"
 import { useNavigate } from "react-router-dom"
@@ -15,6 +16,7 @@ export default function Settings() {
   const navigate = useNavigate()
   const { settings, updateSettings } = useAppSettings();
   const { profile, loading: profileLoading, updateProfile } = useProfile();
+  const { canAccessUsersPanel } = useUserRole();
   const [systemName, setSystemName] = useState(settings.systemName)
   const [primaryColor, setPrimaryColor] = useState(settings.primaryColor)
   const [userName, setUserName] = useState(profile?.name || "")
@@ -109,26 +111,28 @@ export default function Settings() {
           </Card>
 
           {/* Users Panel - Admin Only */}
-          <Card className="bg-gradient-card backdrop-blur-glass border-glass-border shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                User Management
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">
-                Manage user accounts and assign roles to control access levels throughout the system.
-              </p>
-              <Button 
-                onClick={() => navigate('/users-panel')} 
-                className="bg-gradient-primary hover:bg-gradient-primary/90"
-              >
-                <Users className="w-4 h-4 mr-2" />
-                Open Users Panel
-              </Button>
-            </CardContent>
-          </Card>
+          {canAccessUsersPanel && (
+            <Card className="bg-gradient-card backdrop-blur-glass border-glass-border shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  User Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-muted-foreground">
+                  Manage user accounts and assign roles to control access levels throughout the system.
+                </p>
+                <Button 
+                  onClick={() => navigate('/users-panel')} 
+                  className="bg-gradient-primary hover:bg-gradient-primary/90"
+                >
+                  <Users className="w-4 h-4 mr-2" />
+                  Open Users Panel
+                </Button>
+              </CardContent>
+            </Card>
+          )}
 
           {/* System Branding */}
           <Card className="bg-gradient-card backdrop-blur-glass border-glass-border shadow-card">

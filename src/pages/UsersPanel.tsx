@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useUserRole } from "@/hooks/useUserRole"
 import { 
   Table, 
   TableBody, 
@@ -53,6 +54,7 @@ const ROLE_OPTIONS = [
 
 export default function UsersPanel() {
   const navigate = useNavigate()
+  const { canManageUsers, canDeleteUsers, isSuperAdmin, isManager, loading: roleLoading } = useUserRole()
   const [users, setUsers] = useState<UserWithRoles[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
@@ -299,10 +301,32 @@ export default function UsersPanel() {
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  if (loading) {
+  if (loading || roleLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+
+  // Check if user has permission to access this panel
+  if (!canManageUsers) {
+    return (
+      <div className="flex items-center justify-center min-h-[200px]">
+        <div className="text-center">
+          <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+            <Shield className="w-8 h-8 text-destructive" />
+          </div>
+          <h3 className="text-lg font-semibold mb-2">Access Denied</h3>
+          <p className="text-muted-foreground">You don't have permission to access the Users Panel.</p>
+          <Button 
+            onClick={() => navigate(-1)} 
+            variant="outline" 
+            className="mt-4"
+          >
+            Go Back
+          </Button>
+        </div>
       </div>
     )
   }
@@ -340,10 +364,12 @@ export default function UsersPanel() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-64"
               />
-              <Button onClick={handleAddUser} className="bg-gradient-primary hover:bg-gradient-primary/90">
-                <Plus className="w-4 h-4 mr-2" />
-                Add User
-              </Button>
+              {canManageUsers && (
+                <Button onClick={handleAddUser} className="bg-gradient-primary hover:bg-gradient-primary/90">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add User
+                </Button>
+              )}
             </div>
           </div>
         </CardHeader>
@@ -402,12 +428,13 @@ export default function UsersPanel() {
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="outline" size="sm">
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </AlertDialogTrigger>
+                      {canDeleteUsers && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>Delete User</AlertDialogTitle>
@@ -426,7 +453,8 @@ export default function UsersPanel() {
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
-                      </AlertDialog>
+                        </AlertDialog>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
@@ -482,7 +510,13 @@ export default function UsersPanel() {
             
             <div className="space-y-3">
               <h4 className="font-medium">Assign Roles:</h4>
-              {ROLE_OPTIONS.map((roleOption) => {
+              {ROLE_OPTIONS.filter(roleOption => {
+                // Managers can only assign Manager and Recruiter roles
+                if (isManager && !isSuperAdmin) {
+                  return roleOption.value === 'manager' || roleOption.value === 'recruiter';
+                }
+                return true;
+              }).map((roleOption) => {
                 const Icon = roleOption.icon
                 const isSelected = userRoles.includes(roleOption.value)
                 

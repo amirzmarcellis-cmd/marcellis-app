@@ -18,6 +18,7 @@ import {
 } from "lucide-react"
 import { useAuth } from '@/contexts/AuthContext';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
+import { useUserRole } from '@/hooks/useUserRole';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -50,6 +51,7 @@ export function DashboardSidebar() {
   const { state } = useSidebar()
   const { signOut } = useAuth();
   const { settings } = useAppSettings();
+  const { canAccessAnalytics } = useUserRole();
   const { theme, setTheme } = useTheme();
   const location = useLocation()
   const currentPath = location.pathname
@@ -98,7 +100,15 @@ export function DashboardSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {navigationItems.map((item) => (
+              {navigationItems
+                .filter((item) => {
+                  // Filter out Analytics and Reports for recruiters
+                  if ((item.title === 'Analytics' || item.title === 'Reports') && !canAccessAnalytics) {
+                    return false;
+                  }
+                  return true;
+                })
+                .map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <Link

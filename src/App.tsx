@@ -30,6 +30,7 @@ import Interviews from "./pages/Interviews";
 import Apply from "./pages/Apply";
 import UsersPanel from "./pages/UsersPanel";
 import NotFound from "./pages/NotFound";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -60,11 +61,23 @@ const App = () => (
               <Route path="/calls" element={<DashboardLayout><Calls /></DashboardLayout>} />
               <Route path="/call-log" element={<DashboardLayout><CallLog /></DashboardLayout>} />
               <Route path="/call-log-details" element={<DashboardLayout><CallLogDetails /></DashboardLayout>} />
-              <Route path="/analytics" element={<DashboardLayout><Analytics /></DashboardLayout>} />
+              <Route path="/analytics" element={
+                <ProtectedRoute requiresAnalytics={true}>
+                  <DashboardLayout><Analytics /></DashboardLayout>
+                </ProtectedRoute>
+              } />
               <Route path="/performance" element={<DashboardLayout><Performance /></DashboardLayout>} />
-              <Route path="/reports" element={<DashboardLayout><Reports /></DashboardLayout>} />
+              <Route path="/reports" element={
+                <ProtectedRoute requiresAnalytics={true}>
+                  <DashboardLayout><Reports /></DashboardLayout>
+                </ProtectedRoute>
+              } />
               <Route path="/settings" element={<DashboardLayout><Settings /></DashboardLayout>} />
-              <Route path="/users-panel" element={<DashboardLayout><UsersPanel /></DashboardLayout>} />
+              <Route path="/users-panel" element={
+                <ProtectedRoute requiresUsersPanel={true}>
+                  <DashboardLayout><UsersPanel /></DashboardLayout>
+                </ProtectedRoute>
+              } />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </SidebarProvider>
