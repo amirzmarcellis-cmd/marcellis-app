@@ -223,23 +223,26 @@ export default function Interviews() {
                 <h3 className="font-semibold text-foreground">Interview Calendar</h3>
               </div>
               
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                className="pointer-events-auto rounded-lg"
-                modifiers={{
-                  hasInterview: (date) => hasInterviewsOnDate(date)
-                }}
-                modifiersStyles={{
-                  hasInterview: {
-                    backgroundColor: 'rgb(6 182 212 / 0.2)',
-                    color: 'rgb(6 182 212)',
-                    fontWeight: 'bold',
-                    borderRadius: '4px'
-                  }
-                }}
-              />
+              <div className="border border-border rounded-lg bg-background/30 p-3">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={setSelectedDate}
+                  className="pointer-events-auto w-full"
+                  modifiers={{
+                    hasInterview: (date) => hasInterviewsOnDate(date)
+                  }}
+                  modifiersStyles={{
+                    hasInterview: {
+                      backgroundColor: 'hsl(var(--primary) / 0.2)',
+                      color: 'hsl(var(--primary))',
+                      fontWeight: 'bold',
+                      borderRadius: '6px',
+                      border: '2px solid hsl(var(--primary) / 0.4)'
+                    }
+                  }}
+                />
+              </div>
               
               {selectedDate && (
                 <div className="mt-6 p-4 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-400/20 rounded-lg">
