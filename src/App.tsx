@@ -39,50 +39,50 @@ const App = () => (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <AuthProvider>
         <AppSettingsProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <SidebarProvider>
-            <Routes>
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/apply" element={<Apply />} />
-              <Route path="/" element={<DashboardLayout><Index /></DashboardLayout>} />
-              <Route path="/live-feed" element={<DashboardLayout><LiveCandidateFeed /></DashboardLayout>} />
-              <Route path="/jobs" element={<DashboardLayout><Jobs /></DashboardLayout>} />
-              <Route path="/jobs/add" element={<DashboardLayout><AddJob /></DashboardLayout>} />
-              <Route path="/jobs/edit/:id" element={<DashboardLayout><EditJob /></DashboardLayout>} />
-              <Route path="/job/:id" element={<DashboardLayout><JobDetails /></DashboardLayout>} />
-              <Route path="/job/:id/apply" element={<Apply />} />
-              <Route path="/candidates" element={<DashboardLayout><Candidates /></DashboardLayout>} />
-              <Route path="/interviews" element={<DashboardLayout><Interviews /></DashboardLayout>} />
-              <Route path="/candidate/:id" element={<DashboardLayout><CandidateDetails /></DashboardLayout>} />
-              <Route path="/candidate/edit/:id" element={<DashboardLayout><EditCandidate /></DashboardLayout>} />
-              <Route path="/calls" element={<DashboardLayout><Calls /></DashboardLayout>} />
-              <Route path="/call-log" element={<DashboardLayout><CallLog /></DashboardLayout>} />
-              <Route path="/call-log-details" element={<DashboardLayout><CallLogDetails /></DashboardLayout>} />
-              <Route path="/analytics" element={
-                <ProtectedRoute requiresAnalytics={true}>
-                  <DashboardLayout><Analytics /></DashboardLayout>
-                </ProtectedRoute>
-              } />
-              <Route path="/performance" element={<DashboardLayout><Performance /></DashboardLayout>} />
-              <Route path="/reports" element={
-                <ProtectedRoute requiresAnalytics={true}>
-                  <DashboardLayout><Reports /></DashboardLayout>
-                </ProtectedRoute>
-              } />
-              <Route path="/settings" element={<DashboardLayout><Settings /></DashboardLayout>} />
-              <Route path="/users-panel" element={
-                <ProtectedRoute requiresUsersPanel={true}>
-                  <DashboardLayout><UsersPanel /></DashboardLayout>
-                </ProtectedRoute>
-              } />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </SidebarProvider>
-        </BrowserRouter>
-        </TooltipProvider>
+          <TooltipProvider delayDuration={200} skipDelayDuration={300}>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <SidebarProvider>
+                <Routes>
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/apply" element={<Apply />} />
+                  <Route path="/" element={<DashboardLayout><Index /></DashboardLayout>} />
+                  <Route path="/live-feed" element={<DashboardLayout><LiveCandidateFeed /></DashboardLayout>} />
+                  <Route path="/jobs" element={<DashboardLayout><Jobs /></DashboardLayout>} />
+                  <Route path="/jobs/add" element={<DashboardLayout><AddJob /></DashboardLayout>} />
+                  <Route path="/jobs/edit/:id" element={<DashboardLayout><EditJob /></DashboardLayout>} />
+                  <Route path="/job/:id" element={<DashboardLayout><JobDetails /></DashboardLayout>} />
+                  <Route path="/job/:id/apply" element={<Apply />} />
+                  <Route path="/candidates" element={<DashboardLayout><Candidates /></DashboardLayout>} />
+                  <Route path="/interviews" element={<DashboardLayout><Interviews /></DashboardLayout>} />
+                  <Route path="/candidate/:id" element={<DashboardLayout><CandidateDetails /></DashboardLayout>} />
+                  <Route path="/candidate/edit/:id" element={<DashboardLayout><EditCandidate /></DashboardLayout>} />
+                  <Route path="/calls" element={<DashboardLayout><Calls /></DashboardLayout>} />
+                  <Route path="/call-log" element={<DashboardLayout><CallLog /></DashboardLayout>} />
+                  <Route path="/call-log-details" element={<DashboardLayout><CallLogDetails /></DashboardLayout>} />
+                  <Route path="/analytics" element={
+                    <ProtectedRoute requiresAnalytics={true}>
+                      <DashboardLayout><Analytics /></DashboardLayout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/performance" element={<DashboardLayout><Performance /></DashboardLayout>} />
+                  <Route path="/reports" element={
+                    <ProtectedRoute requiresAnalytics={true}>
+                      <DashboardLayout><Reports /></DashboardLayout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/settings" element={<DashboardLayout><Settings /></DashboardLayout>} />
+                  <Route path="/users-panel" element={
+                    <ProtectedRoute requiresUsersPanel={true}>
+                      <DashboardLayout><UsersPanel /></DashboardLayout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </SidebarProvider>
+            </BrowserRouter>
+          </TooltipProvider>
         </AppSettingsProvider>
       </AuthProvider>
     </ThemeProvider>
