@@ -35,6 +35,7 @@ export default function LiveCandidateFeed() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [cvData, setCvData] = useState<any[]>([]);
+  const [interviews, setInterviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState<string>('all');
@@ -88,6 +89,15 @@ export default function LiveCandidateFeed() {
       console.error('Error arranging interview:', error);
     }
   };
+
+  // Check if candidate has pending or scheduled interview
+  const getCandidateInterviewStatus = (candidateId: string) => {
+    const candidateInterviews = interviews.filter(interview => 
+      interview.candidate_id === candidateId && 
+      (interview.intstatus === 'Scheduled' || interview.intstatus === 'Pending')
+    );
+    return candidateInterviews.length > 0 ? candidateInterviews[0].intstatus : null;
+  };
   useEffect(() => {
     fetchData();
   }, []);
@@ -116,6 +126,13 @@ export default function LiveCandidateFeed() {
       } = await supabase.from('CVs').select('*');
       if (cvsError) throw cvsError;
 
+      // Fetch interviews data
+      const {
+        data: interviewsData,
+        error: interviewsError
+      } = await supabase.from('interview').select('*');
+      if (interviewsError) throw interviewsError;
+
       // Enrich candidates with job titles
       const enrichedCandidates = (jobsCvsData || []).map(candidate => {
         const job = (jobsData || []).find(j => j.job_id === candidate.job_id);
@@ -134,6 +151,7 @@ export default function LiveCandidateFeed() {
       setCandidates(filteredShortlistedActive);
       setJobs(jobsData || []);
       setCvData(cvsData || []);
+      setInterviews(interviewsData || []);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -338,13 +356,27 @@ export default function LiveCandidateFeed() {
                             <XCircle className="w-4 h-4 mr-1" />
                             Reject Candidate
                           </Button>
-                          <Button size="sm" variant="default" onClick={e => {
-                            e.stopPropagation();
-                            handleArrangeInterview(candidate.Candidate_ID || candidate.candidate_id);
-                          }} className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                            <Calendar className="w-4 h-4 mr-1" />
-                            Arrange an Interview
-                          </Button>
+                          
+                          {(() => {
+                            const interviewStatus = getCandidateInterviewStatus(candidate.Candidate_ID || candidate.candidate_id);
+                            if (interviewStatus) {
+                              return (
+                                <Button size="sm" variant="outline" disabled className="border-blue-400/40 text-blue-400">
+                                  <Calendar className="w-4 h-4 mr-1" />
+                                  {interviewStatus}
+                                </Button>
+                              );
+                            }
+                            return (
+                              <Button size="sm" variant="default" onClick={e => {
+                                e.stopPropagation();
+                                handleArrangeInterview(candidate.Candidate_ID || candidate.candidate_id);
+                              }} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                                <Calendar className="w-4 h-4 mr-1" />
+                                Arrange an Interview
+                              </Button>
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>

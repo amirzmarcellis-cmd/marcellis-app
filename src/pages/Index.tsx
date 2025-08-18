@@ -458,7 +458,11 @@ export default function Index() {
                 const candidateInitials = `${candidate?.first_name?.[0] || ''}${candidate?.last_name?.[0] || ''}`;
 
                 return (
-                  <div key={interview.intid} className="flex items-center justify-between p-3 bg-background/50 rounded-lg border border-border hover:border-primary/40 transition-all duration-300">
+                  <div 
+                    key={interview.intid} 
+                    className="flex items-center justify-between p-3 bg-background/50 rounded-lg border border-border hover:border-primary/40 transition-all duration-300 cursor-pointer"
+                    onClick={() => handleCandidateClick(interview.candidate_id, interview.job_id, interview.callid)}
+                  >
                     <div className="flex items-center space-x-3">
                       <Avatar className="w-10 h-10 border-2 border-cyan-400/50">
                         <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-purple-600 text-white font-bold text-sm">
