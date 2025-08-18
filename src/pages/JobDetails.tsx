@@ -1059,7 +1059,7 @@ export default function JobDetails() {
                                <SelectContent>
                                  <SelectItem value="all">All Status</SelectItem>
                                  <SelectItem value="Not Contacted">Not Contacted</SelectItem>
-                                 <SelectItem value="Ready to Call">Ready to Call</SelectItem>
+                                 <SelectItem value="Ready to Call">Ready to Contact</SelectItem>
                                  <SelectItem value="Contacted">Contacted</SelectItem>
                                  <SelectItem value="Call Done">Call Done</SelectItem>
                                  <SelectItem value="1st No Answer">1st No Answer</SelectItem>
