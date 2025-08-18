@@ -167,7 +167,7 @@ export default function LiveCandidateFeed() {
       // Debug: Log all candidate statuses to see what we have
       console.log('All CV statuses:', (cvsData || []).map(c => ({ id: c.candidate_id, status: c.CandidateStatus })));
       
-      const shortlistedAndInterviewCandidateIds = new Set((cvsData || []).filter(c => c.CandidateStatus === 'Shortlisted' || c.CandidateStatus === 'Interview').map(c => c.candidate_id));
+      const shortlistedAndInterviewCandidateIds = new Set((cvsData || []).filter(c => (c.CandidateStatus === 'Shortlisted' || c.CandidateStatus === 'Interview') && c.CandidateStatus !== 'Hired').map(c => c.candidate_id));
       
       console.log('Shortlisted/Interview candidate IDs:', Array.from(shortlistedAndInterviewCandidateIds));
       console.log('Active job IDs:', Array.from(activeJobIds));
