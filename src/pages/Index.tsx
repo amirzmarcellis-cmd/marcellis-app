@@ -72,6 +72,7 @@ export default function Index() {
     { date: undefined, time: '' }
   ]);
   const [interviewType, setInterviewType] = useState<string>('Phone');
+  const [interviewLink, setInterviewLink] = useState<string>('');
   const [interviews, setInterviews] = useState<Interview[]>([]);
   useEffect(() => {
     // SEO
@@ -269,6 +270,7 @@ export default function Index() {
         { date: undefined, time: '' }
       ]);
       setInterviewType('Phone');
+      setInterviewLink('');
     }
   };
 
@@ -295,6 +297,12 @@ export default function Index() {
       }
     }
 
+    // Validate interview link for online meetings
+    if (interviewType === 'Online Meeting' && !interviewLink.trim()) {
+      alert('Please provide an interview link for online meetings');
+      return;
+    }
+
     try {
       // Update candidate status
       await supabase.from('CVs').update({
@@ -317,7 +325,8 @@ export default function Index() {
         appoint1: appointments[0],
         appoint2: appointments[1],
         appoint3: appointments[2],
-        inttype: interviewType
+        inttype: interviewType,
+        intlink: interviewType === 'Online Meeting' ? interviewLink : null
       }).select('intid').single();
 
       if (insertError) throw insertError;
@@ -344,6 +353,7 @@ export default function Index() {
       setInterviewDialogOpen(false);
       setSelectedCandidate(null);
       setInterviewType('Phone');
+      setInterviewLink('');
       fetchDashboardData();
     } catch (error) {
       console.error('Error scheduling interview:', error);
@@ -731,11 +741,11 @@ export default function Index() {
 
       {/* Interview Scheduling Dialog */}
       <Dialog open={interviewDialogOpen} onOpenChange={setInterviewDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Schedule Interview Slots</DialogTitle>
           </DialogHeader>
-            <div className="space-y-6">
+          <div className="space-y-6 overflow-y-auto max-h-[70vh] px-1">
             <p className="text-sm text-muted-foreground">
               Please select 3 preferred interview slots and interview type. Only future dates are allowed, and times must be in 15-minute intervals.
             </p>
@@ -753,6 +763,20 @@ export default function Index() {
                 </SelectContent>
               </Select>
             </div>
+            
+            {/* Conditional Interview Link Input */}
+            {interviewType === 'Online Meeting' && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Interview Link</label>
+                <Input
+                  type="url"
+                  placeholder="https://zoom.us/j/... or https://meet.google.com/..."
+                  value={interviewLink}
+                  onChange={(e) => setInterviewLink(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+            )}
             
             {interviewSlots.map((slot, index) => (
               <div key={index} className="space-y-4 p-4 border rounded-lg">
@@ -871,7 +895,7 @@ export default function Index() {
               </div>
             ))}
 
-            <div className="flex justify-end space-x-2 pt-4">
+            <div className="flex justify-end space-x-2 pt-4 sticky bottom-0 bg-background border-t">
               <Button variant="outline" onClick={() => setInterviewDialogOpen(false)}>
                 Cancel
               </Button>
