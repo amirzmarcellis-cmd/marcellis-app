@@ -481,9 +481,9 @@ export default function JobDetails() {
   };
 
   const handleArrangeInterview = (candidateId: string) => {
-    console.log('handleArrangeInterview called with candidateId:', candidateId);
-    
-    // Try to find candidate in the candidates array
+    console.log('🔥 handleArrangeInterview called with candidateId:', candidateId);
+    alert('handleArrangeInterview function called!');
+    console.log('🔥 Current interviewDialogOpen state:', interviewDialogOpen);
     let candidate = candidates.find(c => 
       c["Candidate ID"] === candidateId || 
       c["Candidate_ID"] === candidateId ||
@@ -502,7 +502,9 @@ export default function JobDetails() {
     });
     
     // Always open the dialog
+    console.log('🔥 Setting interviewDialogOpen to TRUE');
     setInterviewDialogOpen(true);
+    console.log('🔥 After setting - interviewDialogOpen should be true');
     
     // Reset slots and type
     setInterviewSlots([
@@ -1654,7 +1656,8 @@ export default function JobDetails() {
                                            variant="outline"
                                            size="sm"
                                             onClick={() => {
-                                              console.log('Button clicked! candidateId:', candidateId);
+                                              console.log('🔴 BUTTON CLICKED! candidateId:', candidateId);
+                                              alert('Button clicked! Check console for details.');
                                               handleArrangeInterview(candidateId);
                                             }}
                                            className="flex-1 min-w-[100px] bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200"
@@ -1731,10 +1734,11 @@ export default function JobDetails() {
           </AlertDialog>
 
           {/* Interview Scheduling Dialog */}
+          {console.log('🔥 Rendering Dialog. interviewDialogOpen =', interviewDialogOpen)}
           <Dialog open={interviewDialogOpen} onOpenChange={setInterviewDialogOpen}>
             <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Schedule Interview Slots</DialogTitle>
+                <DialogTitle>🔥 DEBUG: Schedule Interview Slots</DialogTitle>
               </DialogHeader>
               <div className="space-y-6 overflow-y-auto max-h-[70vh] px-1">
                 <p className="text-sm text-muted-foreground">
