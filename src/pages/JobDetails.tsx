@@ -481,7 +481,7 @@ export default function JobDetails() {
   };
 
   const handleArrangeInterview = (candidateId: string) => {
-    const candidate = candidates.find(c => c["Candidate ID"] === candidateId);
+    const candidate = candidates.find(c => c["Candidate ID"] === candidateId || c["Candidate_ID"] === candidateId);
     if (candidate) {
       setSelectedCandidate({
         candidateId,
