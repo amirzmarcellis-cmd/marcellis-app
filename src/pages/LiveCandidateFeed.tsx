@@ -53,6 +53,7 @@ export default function LiveCandidateFeed() {
     { date: undefined, time: '' }
   ]);
   const [interviewType, setInterviewType] = useState<string>('Phone');
+  const [interviewLink, setInterviewLink] = useState<string>('');
   const handleRejectCandidate = async (candidateId: string, jobId: string) => {
     // Show confirmation alert
     const confirmed = window.confirm('Are you sure you want to Reject Candidate?');
@@ -107,6 +108,7 @@ export default function LiveCandidateFeed() {
         { date: undefined, time: '' }
       ]);
       setInterviewType('Phone');
+      setInterviewLink('');
     }
   };
 
@@ -133,6 +135,12 @@ export default function LiveCandidateFeed() {
       }
     }
 
+    // Validate interview link for online meetings
+    if (interviewType === 'Online Meeting' && !interviewLink.trim()) {
+      alert('Please provide an interview link for online meetings');
+      return;
+    }
+
     try {
       // Update candidate status
       await supabase.from('CVs').update({
@@ -154,7 +162,8 @@ export default function LiveCandidateFeed() {
           appoint1: appointments[0],
           appoint2: appointments[1],
           appoint3: appointments[2],
-          inttype: interviewType
+          inttype: interviewType,
+          intlink: interviewType === 'Online Meeting' ? interviewLink : null
         })
         .select('intid')
         .maybeSingle();
@@ -168,6 +177,7 @@ export default function LiveCandidateFeed() {
       setInterviewDialogOpen(false);
       setSelectedCandidate(null);
       setInterviewType('Phone');
+      setInterviewLink('');
       fetchData();
       
       toast("Interview scheduled successfully!");
@@ -542,6 +552,20 @@ export default function LiveCandidateFeed() {
                 </SelectContent>
               </Select>
             </div>
+            
+            {/* Conditional Interview Link Input */}
+            {interviewType === 'Online Meeting' && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Interview Link</label>
+                <Input
+                  type="url"
+                  placeholder="https://zoom.us/j/... or https://meet.google.com/..."
+                  value={interviewLink}
+                  onChange={(e) => setInterviewLink(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+            )}
             
             {interviewSlots.map((slot, index) => (
               <div key={index} className="space-y-4 p-4 border rounded-lg">

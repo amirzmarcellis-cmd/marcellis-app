@@ -478,6 +478,7 @@ export default function JobDetails() {
         { date: undefined, time: '' }
       ]);
       setInterviewType('Phone');
+      setInterviewLink('');
     }
   };
 
@@ -504,6 +505,12 @@ export default function JobDetails() {
       }
     }
 
+    // Validate interview link for online meetings
+    if (interviewType === 'Online Meeting' && !interviewLink.trim()) {
+      alert('Please provide an interview link for online meetings');
+      return;
+    }
+
     try {
       // Update candidate status
       await supabase.from('CVs').update({
@@ -525,7 +532,8 @@ export default function JobDetails() {
           appoint1: appointments[0],
           appoint2: appointments[1],
           appoint3: appointments[2],
-          inttype: interviewType
+          inttype: interviewType,
+          intlink: interviewType === 'Online Meeting' ? interviewLink : null
         })
         .select('intid')
         .maybeSingle();
@@ -546,6 +554,7 @@ export default function JobDetails() {
       setInterviewDialogOpen(false);
       setSelectedCandidate(null);
       setInterviewType('Phone');
+      setInterviewLink('');
       
       toast({
         title: "Interview Scheduled",
@@ -1693,6 +1702,20 @@ export default function JobDetails() {
                     </SelectContent>
                   </Select>
                 </div>
+                
+                {/* Conditional Interview Link Input */}
+                {interviewType === 'Online Meeting' && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Interview Link</label>
+                    <Input
+                      type="url"
+                      placeholder="https://zoom.us/j/... or https://meet.google.com/..."
+                      value={interviewLink}
+                      onChange={(e) => setInterviewLink(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                )}
                 
                 {interviewSlots.map((slot, index) => (
                   <div key={index} className="space-y-4 p-4 border rounded-lg">
