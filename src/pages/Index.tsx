@@ -674,7 +674,7 @@ export default function Index() {
                               <Button size="xs" variant="default" onClick={e => {
                                 e.stopPropagation();
                                 handleHireCandidate(candidate.Candidate_ID, candidate.job_id);
-                              }} className="bg-green-600 hover:bg-green-700 text-white text-xs">
+                              }} className="bg-amber-500 hover:bg-amber-600 text-white text-xs">
                                 <UserCheck className="w-3 h-3 mr-1" />
                                 Hire Candidate
                               </Button>
