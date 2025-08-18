@@ -31,6 +31,7 @@ import {
 export default function JobDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState("overview")
   const [job, setJob] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [candidates, setCandidates] = useState<any[]>([])
@@ -67,6 +68,13 @@ export default function JobDetails() {
       // Load last viewed timestamp for applications
       const lastViewed = localStorage.getItem(`lastViewedApplications_${id}`)
       setLastViewedApplications(lastViewed)
+    }
+    
+    // Check for tab in URL hash
+    const hash = window.location.hash
+    if (hash.startsWith('#tab=')) {
+      const tab = hash.substring(5)
+      setActiveTab(tab)
     }
   }, [id])
 
@@ -663,7 +671,7 @@ export default function JobDetails() {
           <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
 
           {/* Detailed Information Tabs */}
-            <Tabs defaultValue="overview" className="space-y-4">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
              <div className="w-full overflow-x-auto">
                <TabsList className="w-full min-w-[400px] grid grid-cols-6 h-auto p-1">
                  <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">Overview</TabsTrigger>
@@ -1243,10 +1251,17 @@ export default function JobDetails() {
                                 asChild
                                 className="flex-1 min-w-0 text-xs md:text-sm"
                               >
-                               <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} className="truncate">
-                                 <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
-                                 <span className="truncate">Call Log</span>
-                               </Link>
+                               <Link 
+                                 to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} 
+                                 className="truncate"
+                                 onClick={() => {
+                                   // Store current tab in URL hash for back navigation
+                                   window.location.hash = 'tab=candidates';
+                                 }}
+                               >
+                                  <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
+                                  <span className="truncate">Call Log</span>
+                                </Link>
                               </Button>
                              );
                            })()}
@@ -1412,10 +1427,16 @@ export default function JobDetails() {
                                               asChild
                                               className="flex-1 min-w-[100px]"
                                             >
-                                              <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`}>
-                                                <FileText className="w-3 h-3 mr-1" />
-                                                Call Log
-                                              </Link>
+                               <Link 
+                                 to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`}
+                                 onClick={() => {
+                                   // Store current tab in URL hash for back navigation
+                                   window.location.hash = 'tab=shortlist';
+                                 }}
+                               >
+                                 <FileText className="w-3 h-3 mr-1" />
+                                 Call Log
+                               </Link>
                                             </Button>
                                            );
                                          })()}
