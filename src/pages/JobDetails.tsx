@@ -481,7 +481,28 @@ export default function JobDetails() {
   };
 
   const handleArrangeInterview = (candidateId: string) => {
-    const candidate = candidates.find(c => c["Candidate ID"] === candidateId || c["Candidate_ID"] === candidateId);
+    console.log('handleArrangeInterview called with candidateId:', candidateId);
+    console.log('Available candidates:', candidates);
+    console.log('filteredCandidates:', filteredCandidates);
+    
+    // Try to find candidate in both candidates and filteredCandidates arrays
+    let candidate = candidates.find(c => c["Candidate ID"] === candidateId || c["Candidate_ID"] === candidateId);
+    
+    if (!candidate) {
+      // If not found in candidates, try in the current filtered view
+      const currentFilteredCandidates = candidates.filter(candidate => {
+        const nameMatch = nameFilter === "" || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
+        const emailMatch = emailFilter === "" || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
+        const phoneMatch = phoneFilter === "" || (candidate["Candidate Phone Number"] || "").toLowerCase().includes(phoneFilter.toLowerCase());
+        const scoreMatch = scoreFilter === "all" || (candidate["Success Score"] && candidate["Success Score"].toString() === scoreFilter);
+        const statusMatch = contactedFilter === "all" || candidate["Contacted"] === contactedFilter;
+        return nameMatch && emailMatch && phoneMatch && scoreMatch && statusMatch;
+      });
+      candidate = currentFilteredCandidates.find(c => c["Candidate ID"] === candidateId || c["Candidate_ID"] === candidateId);
+    }
+    
+    console.log('Found candidate:', candidate);
+    
     if (candidate) {
       setSelectedCandidate({
         candidateId,
@@ -497,6 +518,9 @@ export default function JobDetails() {
       ]);
       setInterviewType('Phone');
       setInterviewLink('');
+    } else {
+      console.error('Candidate not found for ID:', candidateId);
+      alert(`Candidate not found for ID: ${candidateId}. Please check the console for debugging info.`);
     }
   };
 
@@ -1880,4 +1904,4 @@ export default function JobDetails() {
           </Dialog>
         </div>
     )
-  }
+}
