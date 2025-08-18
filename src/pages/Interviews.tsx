@@ -208,113 +208,121 @@ export default function Interviews() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <HeroHeader
-          title="Interviews"
-          subtitle="Manage scheduled interviews with candidates"
-        />
-        
-        <div className="flex items-center gap-2">
-          <Popover open={showCalendar} onOpenChange={setShowCalendar}>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                <CalendarIcon className="w-4 h-4" />
-                Calendar View
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <div className="p-4">
-                <h3 className="font-semibold mb-3">Upcoming Interviews</h3>
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  className="pointer-events-auto"
-                  modifiers={{
-                    hasInterview: (date) => hasInterviewsOnDate(date)
-                  }}
-                  modifiersStyles={{
-                    hasInterview: {
-                      backgroundColor: 'rgb(59 130 246 / 0.2)',
-                      color: 'rgb(59 130 246)',
-                      fontWeight: 'bold'
-                    }
-                  }}
-                />
-                
-                {selectedDate && (
-                  <div className="mt-4 p-3 bg-muted rounded-lg">
-                    <h4 className="font-medium mb-2">
-                      {format(selectedDate, 'MMMM d, yyyy')}
-                    </h4>
-                    {getInterviewsForDate(selectedDate).map((interview) => {
-                      const candidate = getCandidate(interview.candidate_id);
-                      const job = getJob(interview.job_id);
-                      const candidateName = `${candidate?.first_name || ''} ${candidate?.last_name || ''}`.trim();
-                      
-                      return (
-                        <div key={interview.intid} className="flex items-center gap-2 text-sm py-1">
-                          {getTypeIcon(interview.inttype)}
-                          <span className="font-medium">{candidateName}</span>
-                          <span className="text-muted-foreground">-</span>
-                          <span className="text-muted-foreground">{job?.job_title}</span>
-                          <span className="text-cyan-500 ml-auto">
-                            {interview.chosen_time ? format(parseISO(interview.chosen_time), 'HH:mm') : ''}
-                          </span>
-                        </div>
-                      );
-                    })}
-                    {getInterviewsForDate(selectedDate).length === 0 && (
-                      <p className="text-sm text-muted-foreground">No interviews scheduled for this date</p>
-                    )}
-                  </div>
-                )}
+      <HeroHeader
+        title="Interviews"
+        subtitle="Manage scheduled interviews with candidates"
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Calendar Section */}
+        <div className="lg:col-span-1">
+          <Card className="p-6 bg-card border-border dark:bg-gradient-to-br dark:from-white/5 dark:via-white/3 dark:to-white/5 dark:backdrop-blur-lg dark:border-white/20 sticky top-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <CalendarIcon className="w-5 h-5 text-cyan-400" />
+                <h3 className="font-semibold text-foreground">Interview Calendar</h3>
               </div>
-            </PopoverContent>
-          </Popover>
+              
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                className="pointer-events-auto rounded-lg"
+                modifiers={{
+                  hasInterview: (date) => hasInterviewsOnDate(date)
+                }}
+                modifiersStyles={{
+                  hasInterview: {
+                    backgroundColor: 'rgb(6 182 212 / 0.2)',
+                    color: 'rgb(6 182 212)',
+                    fontWeight: 'bold',
+                    borderRadius: '4px'
+                  }
+                }}
+              />
+              
+              {selectedDate && (
+                <div className="mt-6 p-4 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-400/20 rounded-lg">
+                  <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-cyan-400" />
+                    {format(selectedDate, 'MMMM d, yyyy')}
+                  </h4>
+                  <ScrollArea className="max-h-48">
+                    <div className="space-y-2">
+                      {getInterviewsForDate(selectedDate).map((interview) => {
+                        const candidate = getCandidate(interview.candidate_id);
+                        const job = getJob(interview.job_id);
+                        const candidateName = `${candidate?.first_name || ''} ${candidate?.last_name || ''}`.trim();
+                        
+                        return (
+                          <div key={interview.intid} className="p-2 bg-background/50 rounded border border-border">
+                            <div className="flex items-center gap-2 text-sm">
+                              {getTypeIcon(interview.inttype)}
+                              <span className="font-medium text-foreground truncate">{candidateName}</span>
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1 truncate">{job?.job_title}</div>
+                            <div className="text-xs font-medium text-cyan-400 mt-1">
+                              {interview.chosen_time ? format(parseISO(interview.chosen_time), 'HH:mm') : ''}
+                            </div>
+                          </div>
+                        );
+                      })}
+                      {getInterviewsForDate(selectedDate).length === 0 && (
+                        <div className="text-center py-4">
+                          <CalendarIcon className="w-8 h-8 text-muted-foreground/50 mx-auto mb-2" />
+                          <p className="text-sm text-muted-foreground">No interviews scheduled</p>
+                        </div>
+                      )}
+                    </div>
+                  </ScrollArea>
+                </div>
+              )}
+            </div>
+          </Card>
         </div>
-      </div>
 
-      {/* Filters */}
-      <Card className="p-6 bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass">
-        <div className="flex flex-wrap gap-4">
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder="Search by candidate name, job title, or interview ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-background/50 border-border"
-            />
-          </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[150px] bg-background/50 border-border">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent className="bg-background border-border z-50">
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="Pending">Pending</SelectItem>
-              <SelectItem value="Scheduled">Scheduled</SelectItem>
-              <SelectItem value="Completed">Completed</SelectItem>
-              <SelectItem value="Cancelled">Cancelled</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-[150px] bg-background/50 border-border">
-              <SelectValue placeholder="Type" />
-            </SelectTrigger>
-            <SelectContent className="bg-background border-border z-50">
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="Phone">Phone</SelectItem>
-              <SelectItem value="Online Meeting">Online Meeting</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </Card>
+        {/* Filters and Interviews Section */}
+        <div className="lg:col-span-3 space-y-6">
+          {/* Filters */}
+          <Card className="p-6 bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass">
+            <div className="flex flex-wrap gap-4">
+              <div className="relative flex-1 min-w-[200px]">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Search by candidate name, job title, or interview ID..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 bg-background/50 border-border"
+                />
+              </div>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[150px] bg-background/50 border-border">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent className="bg-background border-border z-50">
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Scheduled">Scheduled</SelectItem>
+                  <SelectItem value="Completed">Completed</SelectItem>
+                  <SelectItem value="Cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="w-[150px] bg-background/50 border-border">
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent className="bg-background border-border z-50">
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="Phone">Phone</SelectItem>
+                  <SelectItem value="Online Meeting">Online Meeting</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </Card>
 
-      {/* Interviews Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredInterviews.map((interview) => {
+          {/* Interviews Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {filteredInterviews.map((interview) => {
           const candidate = getCandidate(interview.candidate_id);
           const job = getJob(interview.job_id);
           const candidateName = `${candidate?.first_name || ''} ${candidate?.last_name || ''}`.trim();
@@ -451,19 +459,23 @@ export default function Interviews() {
               </CardContent>
             </Card>
           );
-        })}
+            })}
+          </div>
+        </div>
       </div>
 
       {filteredInterviews.length === 0 && !loading && (
-        <Card className="p-12 text-center bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass">
-          <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-foreground mb-2">No Interviews Found</h3>
-          <p className="text-muted-foreground">
-            {searchTerm || statusFilter !== 'all' || typeFilter !== 'all'
-              ? 'Try adjusting your filters to see more results.'
-              : 'No interviews have been scheduled yet.'}
-          </p>
-        </Card>
+        <div className="lg:col-span-3 lg:col-start-2">
+          <Card className="p-12 text-center bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass">
+            <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-foreground mb-2">No Interviews Found</h3>
+            <p className="text-muted-foreground">
+              {searchTerm || statusFilter !== 'all' || typeFilter !== 'all'
+                ? 'Try adjusting your filters to see more results.'
+                : 'No interviews have been scheduled yet.'}
+            </p>
+          </Card>
+        </div>
       )}
     </div>
   );
