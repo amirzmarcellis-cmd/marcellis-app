@@ -197,6 +197,21 @@ export type Database = {
         }
         Relationships: []
       }
+      deleted_jobs_cvs_audit: {
+        Row: {
+          deleted_at: string | null
+          original_record: Json | null
+        }
+        Insert: {
+          deleted_at?: string | null
+          original_record?: Json | null
+        }
+        Update: {
+          deleted_at?: string | null
+          original_record?: Json | null
+        }
+        Relationships: []
+      }
       file_uploads: {
         Row: {
           created_at: string
@@ -238,42 +253,45 @@ export type Database = {
           appoint1: string | null
           appoint2: string | null
           appoint3: string | null
-          callid: number
-          candidate_id: string
+          callid: number | null
+          candidate_id: string | null
+          chosen_time: string | null
           created_at: string | null
           intid: string
           intlink: string | null
           intstatus: string | null
-          inttype: string
-          job_id: string
+          inttype: string | null
+          job_id: string | null
           updated_at: string | null
         }
         Insert: {
           appoint1?: string | null
           appoint2?: string | null
           appoint3?: string | null
-          callid: number
-          candidate_id: string
+          callid?: number | null
+          candidate_id?: string | null
+          chosen_time?: string | null
           created_at?: string | null
           intid?: string
           intlink?: string | null
           intstatus?: string | null
-          inttype: string
-          job_id: string
+          inttype?: string | null
+          job_id?: string | null
           updated_at?: string | null
         }
         Update: {
           appoint1?: string | null
           appoint2?: string | null
           appoint3?: string | null
-          callid?: number
-          candidate_id?: string
+          callid?: number | null
+          candidate_id?: string | null
+          chosen_time?: string | null
           created_at?: string | null
           intid?: string
           intlink?: string | null
           intstatus?: string | null
-          inttype?: string
-          job_id?: string
+          inttype?: string | null
+          job_id?: string | null
           updated_at?: string | null
         }
         Relationships: []
