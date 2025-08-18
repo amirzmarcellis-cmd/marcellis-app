@@ -8,6 +8,12 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar as CalendarComponent } from "@/components/ui/calendar"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
 import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { JobFunnel } from "@/components/jobs/JobFunnel"
@@ -456,32 +462,116 @@ export default function JobDetails() {
     }
   };
 
-  const handleArrangeInterview = async (candidateId: string) => {
+  const handleArrangeInterview = (candidateId: string) => {
+    const candidate = candidates.find(c => c["Candidate ID"] === candidateId);
+    if (candidate) {
+      setSelectedCandidate({
+        candidateId,
+        jobId: jobId!,
+        callid: candidate.callid || 0
+      });
+      setInterviewDialogOpen(true);
+      // Reset slots and type
+      setInterviewSlots([
+        { date: undefined, time: '' },
+        { date: undefined, time: '' },
+        { date: undefined, time: '' }
+      ]);
+      setInterviewType('Phone');
+    }
+  };
+
+  const handleScheduleInterview = async () => {
+    if (!selectedCandidate) return;
+
+    // Validate that all slots are filled
+    const validSlots = interviewSlots.filter(slot => slot.date && slot.time);
+    if (validSlots.length !== 3) {
+      alert('Please fill in all 3 interview slots');
+      return;
+    }
+
+    // Validate that times are not in the past for today's date
+    const now = new Date();
+    const currentDate = format(now, 'yyyy-MM-dd');
+    const currentTime = format(now, 'HH:mm');
+    
+    for (const slot of validSlots) {
+      const slotDate = format(slot.date!, 'yyyy-MM-dd');
+      if (slotDate === currentDate && slot.time <= currentTime) {
+        alert('Cannot schedule interview times in the past for today. Please select a future time.');
+        return;
+      }
+    }
+
     try {
+      // Update candidate status
       await supabase.from('CVs').update({
         CandidateStatus: 'Interview'
-      }).eq('candidate_id', candidateId);
+      }).eq('candidate_id', selectedCandidate.candidateId);
+
+      // Format appointments
+      const appointments = validSlots.map(slot => 
+        `${format(slot.date!, 'yyyy-MM-dd')} ${slot.time}`
+      );
+
+      // Create interview record
+      const { data: interviewData, error: interviewError } = await supabase
+        .from('interviews')
+        .insert({
+          candidate_id: selectedCandidate.candidateId,
+          job_id: selectedCandidate.jobId,
+          callid: selectedCandidate.callid,
+          intid: selectedCandidate.intid,
+          appoint1: appointments[0],
+          appoint2: appointments[1],
+          appoint3: appointments[2],
+          inttype: interviewType
+        })
+        .select()
+        .single();
+
+      if (interviewError) throw interviewError;
 
       // Update local state
       setCvData(prev => prev.map(cv => 
-        cv.candidate_id === candidateId 
+        cv.candidate_id === selectedCandidate.candidateId 
           ? { ...cv, CandidateStatus: 'Interview' }
           : cv
       ));
 
+      // Close dialog and show success message
+      setInterviewDialogOpen(false);
+      setSelectedCandidate(null);
+      setInterviewType('Phone');
+      
       toast({
-        title: "Interview Arranged",
+        title: "Interview Scheduled",
         description: "The candidate has been scheduled for an interview.",
       });
     } catch (error) {
-      console.error('Error arranging interview:', error);
+      console.error('Error scheduling interview:', error);
       toast({
         title: "Error",
-        description: "Failed to arrange interview. Please try again.",
-        variant: "destructive"
+        description: "Failed to schedule interview. Please try again.",
+        variant: "destructive",
       });
     }
   };
+
+  const updateInterviewSlot = (index: number, field: 'date' | 'time', value: Date | string) => {
+    setInterviewSlots(prev => {
+      const newSlots = [...prev];
+      if (field === 'date') {
+        newSlots[index] = { ...newSlots[index], date: value as Date };
+      } else {
+        newSlots[index] = { ...newSlots[index], time: value as string };
+      }
+      return newSlots;
+    });
+  };
+
+  const timeOptions = ['00', '15', '30', '45'];
 
   const handleApplicationsTabClick = () => {
     // Reset notification count and update last viewed timestamp
@@ -1575,7 +1665,161 @@ export default function JobDetails() {
                </AlertDialogAction>
              </AlertDialogFooter>
            </AlertDialogContent>
-         </AlertDialog>
-       </div>
-   )
- }
+          </AlertDialog>
+
+          {/* Interview Scheduling Dialog */}
+          <Dialog open={interviewDialogOpen} onOpenChange={setInterviewDialogOpen}>
+            <DialogContent className="sm:max-w-[600px]">
+              <DialogHeader>
+                <DialogTitle>Schedule Interview Slots</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-6">
+                <p className="text-sm text-muted-foreground">
+                  Please select 3 preferred interview slots and interview type. Only future dates are allowed, and times must be in 15-minute intervals.
+                </p>
+                
+                {/* Interview Type Selection */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Interview Type</label>
+                  <Select value={interviewType} onValueChange={setInterviewType}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select interview type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Phone">Phone</SelectItem>
+                      <SelectItem value="Online Meeting">Online Meeting</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {interviewSlots.map((slot, index) => (
+                  <div key={index} className="space-y-4 p-4 border rounded-lg">
+                    <h4 className="font-medium">Slot {index + 1}</h4>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      {/* Date Picker */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Date</label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "w-full justify-start text-left font-normal",
+                                !slot.date && "text-muted-foreground"
+                              )}
+                            >
+                              <Calendar className="mr-2 h-4 w-4" />
+                              {slot.date ? format(slot.date, "PPP") : <span>Pick a date</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <CalendarComponent
+                              mode="single"
+                              selected={slot.date}
+                              onSelect={(date) => updateInterviewSlot(index, 'date', date!)}
+                              disabled={(date) => {
+                                const today = new Date();
+                                today.setHours(0, 0, 0, 0);
+                                return date < today;
+                              }}
+                              initialFocus
+                              className="p-3 pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
+                      {/* Time Picker */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Time</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {/* Hours */}
+                          <Select
+                            value={slot.time.split(':')[0] || ''}
+                            onValueChange={(hour) => {
+                              const minute = slot.time.split(':')[1] || '00';
+                              const newTime = `${hour}:${minute}`;
+                              
+                              // Validate time is not in the past for today
+                              if (slot.date) {
+                                const today = new Date();
+                                const slotDate = format(slot.date, 'yyyy-MM-dd');
+                                const currentDate = format(today, 'yyyy-MM-dd');
+                                const currentTime = format(today, 'HH:mm');
+                                
+                                if (slotDate === currentDate && newTime <= currentTime) {
+                                  alert('Cannot select a time in the past for today');
+                                  return;
+                                }
+                              }
+                              
+                              updateInterviewSlot(index, 'time', newTime);
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Hour" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 24 }, (_, i) => (
+                                <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                                  {i.toString().padStart(2, '0')}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+
+                          {/* Minutes */}
+                          <Select
+                            value={slot.time.split(':')[1] || ''}
+                            onValueChange={(minute) => {
+                              const hour = slot.time.split(':')[0] || '09';
+                              const newTime = `${hour}:${minute}`;
+                              
+                              // Validate time is not in the past for today
+                              if (slot.date) {
+                                const today = new Date();
+                                const slotDate = format(slot.date, 'yyyy-MM-dd');
+                                const currentDate = format(today, 'yyyy-MM-dd');
+                                const currentTime = format(today, 'HH:mm');
+                                
+                                if (slotDate === currentDate && newTime <= currentTime) {
+                                  alert('Cannot select a time in the past for today');
+                                  return;
+                                }
+                              }
+                              
+                              updateInterviewSlot(index, 'time', newTime);
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Min" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {timeOptions.map((minute) => (
+                                <SelectItem key={minute} value={minute}>
+                                  {minute}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <div className="flex justify-end space-x-2 pt-4">
+                  <Button variant="outline" onClick={() => setInterviewDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleScheduleInterview} className="bg-emerald-600 hover:bg-emerald-700">
+                    Schedule Interview
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+    )
+  }
