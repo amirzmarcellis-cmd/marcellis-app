@@ -1052,7 +1052,7 @@ export default function JobDetails() {
                 <CardContent>
                   {(() => {
                     const readyToContactCount = candidates.filter(
-                      candidate => candidate["Contacted"] === "Ready to Call"
+                      candidate => candidate["Contacted"] === "Ready to Contact"
                     ).length;
                     
                     if (readyToContactCount > 0) {
