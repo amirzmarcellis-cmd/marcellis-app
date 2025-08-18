@@ -7,9 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Search, Filter, Video, Phone, Calendar, Clock, MapPin, Briefcase, Mail, PhoneCall, User, Users } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Search, Filter, Video, Phone, Calendar as CalendarIcon, Clock, MapPin, Briefcase, Mail, PhoneCall, User, Users } from 'lucide-react';
 import { HeroHeader } from '@/components/dashboard/HeroHeader';
 import { toast } from 'sonner';
+import { format, parseISO, isSameDay } from 'date-fns';
 
 interface Interview {
   intid: string;
@@ -52,6 +55,8 @@ export default function Interviews() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [showCalendar, setShowCalendar] = useState(false);
 
   useEffect(() => {
     fetchInterviews();
@@ -158,6 +163,33 @@ export default function Interviews() {
     }
   };
 
+  // Get interviews with confirmed times for calendar
+  const getConfirmedInterviews = () => {
+    return interviews.filter(interview => 
+      interview.chosen_time && 
+      interview.intstatus === 'Scheduled'
+    );
+  };
+
+  // Get interviews for a specific date
+  const getInterviewsForDate = (date: Date) => {
+    const confirmedInterviews = getConfirmedInterviews();
+    return confirmedInterviews.filter(interview => {
+      if (!interview.chosen_time) return false;
+      try {
+        const interviewDate = parseISO(interview.chosen_time);
+        return isSameDay(interviewDate, date);
+      } catch {
+        return false;
+      }
+    });
+  };
+
+  // Check if a date has interviews
+  const hasInterviewsOnDate = (date: Date) => {
+    return getInterviewsForDate(date).length > 0;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900 dark:to-blue-900 flex items-center justify-center">
@@ -176,10 +208,72 @@ export default function Interviews() {
 
   return (
     <div className="space-y-6">
-      <HeroHeader
-        title="Interviews"
-        subtitle="Manage scheduled interviews with candidates"
-      />
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <HeroHeader
+          title="Interviews"
+          subtitle="Manage scheduled interviews with candidates"
+        />
+        
+        <div className="flex items-center gap-2">
+          <Popover open={showCalendar} onOpenChange={setShowCalendar}>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <CalendarIcon className="w-4 h-4" />
+                Calendar View
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <div className="p-4">
+                <h3 className="font-semibold mb-3">Upcoming Interviews</h3>
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={setSelectedDate}
+                  className="pointer-events-auto"
+                  modifiers={{
+                    hasInterview: (date) => hasInterviewsOnDate(date)
+                  }}
+                  modifiersStyles={{
+                    hasInterview: {
+                      backgroundColor: 'rgb(59 130 246 / 0.2)',
+                      color: 'rgb(59 130 246)',
+                      fontWeight: 'bold'
+                    }
+                  }}
+                />
+                
+                {selectedDate && (
+                  <div className="mt-4 p-3 bg-muted rounded-lg">
+                    <h4 className="font-medium mb-2">
+                      {format(selectedDate, 'MMMM d, yyyy')}
+                    </h4>
+                    {getInterviewsForDate(selectedDate).map((interview) => {
+                      const candidate = getCandidate(interview.candidate_id);
+                      const job = getJob(interview.job_id);
+                      const candidateName = `${candidate?.first_name || ''} ${candidate?.last_name || ''}`.trim();
+                      
+                      return (
+                        <div key={interview.intid} className="flex items-center gap-2 text-sm py-1">
+                          {getTypeIcon(interview.inttype)}
+                          <span className="font-medium">{candidateName}</span>
+                          <span className="text-muted-foreground">-</span>
+                          <span className="text-muted-foreground">{job?.job_title}</span>
+                          <span className="text-cyan-500 ml-auto">
+                            {interview.chosen_time ? format(parseISO(interview.chosen_time), 'HH:mm') : ''}
+                          </span>
+                        </div>
+                      );
+                    })}
+                    {getInterviewsForDate(selectedDate).length === 0 && (
+                      <p className="text-sm text-muted-foreground">No interviews scheduled for this date</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+      </div>
 
       {/* Filters */}
       <Card className="p-6 bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass">
@@ -290,7 +384,7 @@ export default function Interviews() {
                     {[interview.appoint1, interview.appoint2, interview.appoint3].map((slot, index) => (
                       slot && (
                         <div key={index} className="flex items-center space-x-2 text-xs text-muted-foreground">
-                          <Calendar className="w-3 h-3 text-cyan-400" />
+                          <CalendarIcon className="w-3 h-3 text-cyan-400" />
                           <span>{slot}</span>
                         </div>
                       )
