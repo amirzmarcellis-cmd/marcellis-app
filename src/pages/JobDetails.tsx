@@ -1029,11 +1029,30 @@ export default function JobDetails() {
                         <Users className="w-5 h-5 mr-2" />
                         Contacted Candidates ({filteredCandidates.length} of {candidates.length})
                       </CardTitle>
-                      <CardDescription>
-                        Candidates who have been contacted for this position
-                      </CardDescription>
-                    </div>
-                    <Button 
+                       <CardDescription>
+                         Candidates who have been contacted for this position
+                       </CardDescription>
+                     </div>
+                     {(() => {
+                       const readyToContactCount = candidates.filter(
+                         candidate => candidate["Contacted"]?.toLowerCase() === "ready to call"
+                       ).length;
+                       
+                       if (readyToContactCount > 0) {
+                         return (
+                           <div className="mb-4 p-3 bg-yellow-100/80 dark:bg-yellow-950/20 border border-yellow-300 dark:border-yellow-700 rounded-lg">
+                             <div className="flex items-center">
+                               <Target className="w-4 h-4 mr-2 text-yellow-700 dark:text-yellow-400" />
+                               <span className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
+                                 You have {readyToContactCount} Candidate{readyToContactCount > 1 ? 's' : ''} Ready to Contact
+                               </span>
+                             </div>
+                           </div>
+                         );
+                       }
+                       return null;
+                     })()}
+                     <Button
                       variant="default" 
                       className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={handleGenerateShortList}
