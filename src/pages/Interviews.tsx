@@ -216,68 +216,112 @@ export default function Interviews() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Calendar Section */}
         <div className="lg:col-span-1">
-          <Card className="p-6 bg-card border-border dark:bg-gradient-to-br dark:from-white/5 dark:via-white/3 dark:to-white/5 dark:backdrop-blur-lg dark:border-white/20 sticky top-6">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-4">
-                <CalendarIcon className="w-5 h-5 text-cyan-400" />
-                <h3 className="font-semibold text-foreground">Interview Calendar</h3>
+          <Card className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-purple-500/5 to-cyan-500/5 backdrop-blur-xl border border-primary/20 sticky top-6 shadow-2xl shadow-primary/10">
+            {/* Futuristic background pattern */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(6,182,212,0.1),transparent_50%)] pointer-events-none" />
+            <div className="absolute top-0 left-0 w-full h-full bg-grid-white/[0.02] pointer-events-none" />
+            
+            <div className="relative p-6 space-y-6">
+              {/* Header with futuristic styling */}
+              <div className="flex items-center gap-3 mb-6">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-primary/20 rounded-full blur-sm animate-pulse" />
+                  <CalendarIcon className="relative w-6 h-6 text-primary drop-shadow-lg" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
+                    Interview Calendar
+                  </h3>
+                  <p className="text-xs text-muted-foreground/80">Select a date to view scheduled interviews</p>
+                </div>
               </div>
               
-              <div className="border border-border rounded-lg bg-background/30 p-3">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  className="pointer-events-auto w-full"
-                  modifiers={{
-                    hasInterview: (date) => hasInterviewsOnDate(date)
-                  }}
-                  modifiersStyles={{
-                    hasInterview: {
-                      backgroundColor: 'hsl(var(--primary) / 0.2)',
-                      color: 'hsl(var(--primary))',
-                      fontWeight: 'bold',
-                      borderRadius: '6px',
-                      border: '2px solid hsl(var(--primary) / 0.4)'
-                    }
-                  }}
-                />
+              {/* Enhanced Calendar Container */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-purple-500 rounded-xl blur-sm opacity-30 group-hover:opacity-50 transition-opacity duration-500" />
+                <div className="relative bg-background/80 backdrop-blur-sm rounded-xl border border-primary/30 p-4 shadow-inner">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    className="pointer-events-auto w-full [&_.rdp-months]:justify-center [&_.rdp-caption_label]:text-primary [&_.rdp-caption_label]:font-semibold [&_.rdp-head_cell]:text-muted-foreground/80 [&_.rdp-head_cell]:font-medium [&_.rdp-nav_button]:border-primary/20 [&_.rdp-nav_button]:hover:bg-primary/10 [&_.rdp-nav_button]:hover:border-primary/40 [&_.rdp-nav_button]:transition-all [&_.rdp-day]:transition-all [&_.rdp-day]:hover:bg-primary/10 [&_.rdp-day]:hover:scale-105 [&_.rdp-day_selected]:bg-primary [&_.rdp-day_selected]:text-primary-foreground [&_.rdp-day_selected]:shadow-lg [&_.rdp-day_selected]:shadow-primary/30 [&_.rdp-day_today]:bg-secondary/50 [&_.rdp-day_today]:text-secondary-foreground [&_.rdp-day_today]:font-bold [&_.rdp-day_today]:ring-2 [&_.rdp-day_today]:ring-primary/30"
+                    modifiers={{
+                      hasInterview: (date) => hasInterviewsOnDate(date)
+                    }}
+                    modifiersStyles={{
+                      hasInterview: {
+                        background: 'linear-gradient(135deg, hsl(var(--primary) / 0.3), hsl(var(--secondary) / 0.2))',
+                        color: 'hsl(var(--primary))',
+                        fontWeight: 'bold',
+                        borderRadius: '8px',
+                        border: '2px solid hsl(var(--primary) / 0.6)',
+                        boxShadow: '0 0 20px hsl(var(--primary) / 0.3), inset 0 0 10px hsl(var(--primary) / 0.1)',
+                        transform: 'scale(1.05)',
+                        position: 'relative',
+                        zIndex: 10
+                      }
+                    }}
+                  />
+                </div>
               </div>
               
+              {/* Enhanced Selected Date Info */}
               {selectedDate && (
-                <div className="mt-6 p-4 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-400/20 rounded-lg">
-                  <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-cyan-400" />
-                    {format(selectedDate, 'MMMM d, yyyy')}
-                  </h4>
-                  <ScrollArea className="max-h-48">
-                    <div className="space-y-2">
-                      {getInterviewsForDate(selectedDate).map((interview) => {
-                        const candidate = getCandidate(interview.candidate_id);
-                        const job = getJob(interview.job_id);
-                        const candidateName = `${candidate?.first_name || ''} ${candidate?.last_name || ''}`.trim();
-                        
-                        return (
-                          <div key={interview.intid} className="p-2 bg-background/50 rounded border border-border">
-                            <div className="flex items-center gap-2 text-sm">
-                              {getTypeIcon(interview.inttype)}
-                              <span className="font-medium text-foreground truncate">{candidateName}</span>
-                            </div>
-                            <div className="text-xs text-muted-foreground mt-1 truncate">{job?.job_title}</div>
-                            <div className="text-xs font-medium text-cyan-400 mt-1">
-                              {interview.chosen_time ? format(parseISO(interview.chosen_time), 'HH:mm') : ''}
-                            </div>
-                          </div>
-                        );
-                      })}
-                      {getInterviewsForDate(selectedDate).length === 0 && (
-                        <div className="text-center py-4">
-                          <CalendarIcon className="w-8 h-8 text-muted-foreground/50 mx-auto mb-2" />
-                          <p className="text-sm text-muted-foreground">No interviews scheduled</p>
-                        </div>
-                      )}
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-xl blur-sm opacity-40 group-hover:opacity-60 transition-opacity duration-500" />
+                  <div className="relative bg-gradient-to-br from-primary/10 via-purple-500/5 to-cyan-500/10 backdrop-blur-sm border border-primary/30 rounded-xl p-5 shadow-xl">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-cyan-400/30 rounded-full blur-sm animate-pulse" />
+                        <Clock className="relative w-5 h-5 text-cyan-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-foreground text-lg">{format(selectedDate, 'MMMM d, yyyy')}</h4>
+                        <p className="text-xs text-muted-foreground/80">Scheduled interviews for this date</p>
+                      </div>
                     </div>
-                  </ScrollArea>
+                    
+                    <ScrollArea className="max-h-56">
+                      <div className="space-y-3">
+                        {getInterviewsForDate(selectedDate).map((interview) => {
+                          const candidate = getCandidate(interview.candidate_id);
+                          const job = getJob(interview.job_id);
+                          const candidateName = `${candidate?.first_name || ''} ${candidate?.last_name || ''}`.trim();
+                          
+                          return (
+                            <div key={interview.intid} className="relative group/item">
+                              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-lg blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity duration-300" />
+                              <div className="relative bg-background/60 backdrop-blur-sm rounded-lg border border-primary/20 p-3 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <div className="p-1.5 bg-primary/20 rounded-full">
+                                    {getTypeIcon(interview.inttype)}
+                                  </div>
+                                  <span className="font-semibold text-foreground text-sm truncate">{candidateName}</span>
+                                </div>
+                                <div className="text-xs text-muted-foreground/90 mb-2 truncate pl-8">{job?.job_title}</div>
+                                <div className="flex items-center gap-2 pl-8">
+                                  <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+                                  <span className="text-xs font-bold text-cyan-400">
+                                    {interview.chosen_time ? format(parseISO(interview.chosen_time), 'HH:mm') : 'TBD'}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                        {getInterviewsForDate(selectedDate).length === 0 && (
+                          <div className="text-center py-8">
+                            <div className="relative">
+                              <div className="absolute inset-0 bg-muted-foreground/10 rounded-full blur-xl" />
+                              <CalendarIcon className="relative w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+                            </div>
+                            <p className="text-sm text-muted-foreground/70 font-medium">No interviews scheduled</p>
+                            <p className="text-xs text-muted-foreground/50 mt-1">Select another date to view interviews</p>
+                          </div>
+                        )}
+                      </div>
+                    </ScrollArea>
+                  </div>
                 </div>
               )}
             </div>
