@@ -1169,22 +1169,30 @@ export default function JobDetails() {
                                            <Phone className="w-3 h-3 mr-1" />
                                            {callingCandidateId === candidateId ? 'Calling...' : 'Call Candidate'}
                                          </Button>
-                                          {candidateContacts
-                                            .filter(contact => contact.callcount > 0)
-                                            .map((contact, contactIndex) => (
-                                            <Button
-                                              key={contactIndex}
-                                              variant="outline"
-                                              size="sm"
-                                              asChild
-                                              className="flex-1 min-w-0 text-xs md:text-sm"
-                                            >
-                                             <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${contact.callid}`} className="truncate">
-                                               <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
-                                               <span className="truncate">{candidateContacts.filter(c => c.callcount > 0).length > 1 ? (contactIndex === 0 ? 'Log' : `Log ${contactIndex + 1}`) : 'Log'}</span>
-                                             </Link>
-                                            </Button>
-                                          ))}
+                           {(() => {
+                             const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
+                             if (contactsWithCalls.length === 0) return null;
+                             
+                             // Get the latest call log (highest callid)
+                             const latestContact = contactsWithCalls.reduce((latest, current) => 
+                               current.callid > latest.callid ? current : latest
+                             );
+                             
+                             return (
+                              <Button
+                                key={latestContact.callid}
+                                variant="outline"
+                                size="sm"
+                                asChild
+                                className="flex-1 min-w-0 text-xs md:text-sm"
+                              >
+                               <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} className="truncate">
+                                 <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
+                                 <span className="truncate">Call Log</span>
+                               </Link>
+                              </Button>
+                             );
+                           })()}
                                        </div>
                                        <Button
                                          variant="ghost"
