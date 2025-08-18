@@ -1504,7 +1504,7 @@ export default function JobDetails() {
                                            variant="outline"
                                            size="sm"
                                            onClick={() => handleArrangeInterview(candidateId)}
-                                           className="flex-1 min-w-[100px] bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-50 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/20"
+                                           className="flex-1 min-w-[100px] bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200"
                                          >
                                            <Calendar className="w-3 h-3 mr-1" />
                                            Arrange Interview
@@ -1523,7 +1523,7 @@ export default function JobDetails() {
                                            <Button
                                              variant="outline"
                                              size="sm"
-                                             className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-50 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/20"
+                                             className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200"
                                              onClick={() => handleRejectCandidate(id!, candidateId, candidateContacts[0].callid)}
                                            >
                                              <X className="w-3 h-3 mr-1" />

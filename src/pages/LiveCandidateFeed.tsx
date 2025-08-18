@@ -395,10 +395,10 @@ export default function LiveCandidateFeed() {
                               );
                             }
                             return (
-                              <Button size="sm" variant="default" onClick={e => {
+                              <Button size="sm" variant="outline" onClick={e => {
                                 e.stopPropagation();
                                 handleArrangeInterview(candidate.Candidate_ID || candidate.candidate_id);
-                              }} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                              }} className="bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200">
                                 <Calendar className="w-4 h-4 mr-1" />
                                 Arrange an Interview
                               </Button>

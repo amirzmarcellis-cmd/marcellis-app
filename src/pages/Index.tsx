@@ -644,10 +644,10 @@ export default function Index() {
                               {score}
                             </div>
                             <div className="flex flex-col space-y-2">
-                              <Button size="xs" variant="destructive" onClick={e => {
-                            e.stopPropagation();
-                            handleRejectCandidate(candidate.Candidate_ID, candidate.job_id);
-                          }} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground text-xs">
+                              <Button size="xs" variant="outline" onClick={e => {
+                                e.stopPropagation();
+                                handleRejectCandidate(candidate.Candidate_ID, candidate.job_id);
+                              }} className="bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200 text-xs">
                                 <XCircle className="w-3 h-3 mr-1" />
                                 Reject Candidate
                               </Button>
@@ -662,10 +662,10 @@ export default function Index() {
                                   );
                                 }
                                 return (
-                                  <Button size="xs" variant="default" onClick={e => {
+                                  <Button size="xs" variant="outline" onClick={e => {
                                     e.stopPropagation();
                                     handleArrangeInterview(candidate.Candidate_ID, candidate.job_id);
-                                  }} className="bg-green-600 hover:bg-green-700 text-white bg-emerald-700 hover:bg-emerald-600 text-xs">
+                                  }} className="bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200 text-xs">
                                     <Calendar className="w-3 h-3 mr-1" />
                                     Arrange an Interview
                                   </Button>
