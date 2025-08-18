@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { StatusDropdown } from '@/components/candidates/StatusDropdown';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Search, Filter, Users, Zap, Activity, Star, Clock, Mail, Phone, MapPin, Briefcase, XCircle, Calendar } from 'lucide-react';
+import { Search, Filter, Users, Zap, Activity, Star, Clock, Mail, Phone, MapPin, Briefcase, XCircle, Calendar, UserCheck } from 'lucide-react';
+import { toast } from 'sonner';
 interface Candidate {
   'Candidate_ID': string;
   'Candidate Name': string;
@@ -97,6 +98,24 @@ export default function LiveCandidateFeed() {
       (interview.intstatus === 'Scheduled' || interview.intstatus === 'Pending')
     );
     return candidateInterviews.length > 0 ? candidateInterviews[0].intstatus : null;
+  };
+
+  const handleHireCandidate = async (candidateId: string) => {
+    try {
+      const { error } = await supabase
+        .from('CVs')
+        .update({ CandidateStatus: 'Hired' })
+        .eq('candidate_id', candidateId);
+
+      if (error) throw error;
+
+      // Refresh data
+      fetchData();
+      toast.success('Candidate hired successfully!');
+    } catch (error) {
+      console.error('Error hiring candidate:', error);
+      toast.error('Failed to hire candidate');
+    }
   };
   useEffect(() => {
     fetchData();
@@ -377,6 +396,14 @@ export default function LiveCandidateFeed() {
                               </Button>
                             );
                           })()}
+                          
+                          <Button size="sm" variant="default" onClick={e => {
+                            e.stopPropagation();
+                            handleHireCandidate(candidate.Candidate_ID || candidate.candidate_id);
+                          }} className="bg-green-600 hover:bg-green-700 text-white">
+                            <UserCheck className="w-4 h-4 mr-1" />
+                            Hire Candidate
+                          </Button>
                         </div>
                       </div>
                     </div>

@@ -15,8 +15,9 @@ import { cn } from "@/lib/utils";
 import { StatusDropdown } from '@/components/candidates/StatusDropdown';
 import { useProfile } from '@/hooks/useProfile';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Play, Pause, Search, FileText, Upload, Users, Briefcase, Clock, Star, TrendingUp, Calendar, CheckCircle, XCircle, ClipboardList, Video, Target, Activity, Timer, Phone } from 'lucide-react';
+import { Plus, Play, Pause, Search, FileText, Upload, Users, Briefcase, Clock, Star, TrendingUp, Calendar, CheckCircle, XCircle, ClipboardList, Video, Target, Activity, Timer, Phone, UserCheck } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { toast } from 'sonner';
 import { MetricCardPro } from '@/components/dashboard/MetricCardPro';
 import { ScoreRing } from '@/components/ui/ScoreRing';
 import { HeroHeader } from '@/components/dashboard/HeroHeader';
@@ -382,6 +383,24 @@ export default function Index() {
     );
     return candidateInterviews.length > 0 ? candidateInterviews[0].intstatus : null;
   };
+
+  const handleHireCandidate = async (candidateId: string, jobId: string) => {
+    try {
+      const { error } = await supabase
+        .from('CVs')
+        .update({ CandidateStatus: 'Hired' })
+        .eq('candidate_id', candidateId);
+
+      if (error) throw error;
+
+      // Refresh dashboard data
+      fetchDashboardData();
+      toast.success('Candidate hired successfully!');
+    } catch (error) {
+      console.error('Error hiring candidate:', error);
+      toast.error('Failed to hire candidate');
+    }
+  };
   const getCurrentTimeGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good Morning';
@@ -652,6 +671,13 @@ export default function Index() {
                                   </Button>
                                 );
                               })()}
+                              <Button size="xs" variant="default" onClick={e => {
+                                e.stopPropagation();
+                                handleHireCandidate(candidate.Candidate_ID, candidate.job_id);
+                              }} className="bg-green-600 hover:bg-green-700 text-white text-xs">
+                                <UserCheck className="w-3 h-3 mr-1" />
+                                Hire Candidate
+                              </Button>
                             </div>
                           </div>
                         </div>
