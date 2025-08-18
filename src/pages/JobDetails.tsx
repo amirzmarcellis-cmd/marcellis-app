@@ -1142,7 +1142,8 @@ export default function JobDetails() {
                                         </div>
                                         {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || 
                                           mainCandidate["Contacted"]?.toLowerCase() === "contacted" || 
-                                          mainCandidate["Contacted"]?.toLowerCase() === "low scored") && 
+                                          mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
+                                          mainCandidate["Contacted"]?.toLowerCase() === "tasked") && 
                                           mainCandidate["lastcalltime"] && (
                                           <div className="text-xs text-muted-foreground text-right">
                                             <div className="flex items-center">
@@ -1320,7 +1321,8 @@ export default function JobDetails() {
                                     </div>
                                     {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || 
                                       mainCandidate["Contacted"]?.toLowerCase() === "contacted" || 
-                                      mainCandidate["Contacted"]?.toLowerCase() === "low scored") && 
+                                      mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
+                                      mainCandidate["Contacted"]?.toLowerCase() === "tasked") && 
                                       mainCandidate["lastcalltime"] && (
                                       <div className="text-xs text-muted-foreground text-right">
                                         <div className="flex items-center">
