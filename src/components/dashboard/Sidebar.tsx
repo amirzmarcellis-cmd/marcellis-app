@@ -15,6 +15,7 @@ import {
   Activity,
   Sun,
   Moon,
+  ClipboardList,
 } from "lucide-react"
 import { useAuth } from '@/contexts/AuthContext';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
@@ -39,6 +40,7 @@ const navigationItems = [
   { title: "Dashboard", url: "/", icon: Home },
   { title: "Interviews", url: "/interviews", icon: Calendar },
   { title: "Live Feed", url: "/live-feed", icon: Activity },
+  { title: "Tasks", url: "/tasks", icon: ClipboardList },
   { title: "Jobs", url: "/jobs", icon: Briefcase },
   { title: "Candidates", url: "/candidates", icon: Users },
   { title: "Call Log", url: "/call-log", icon: PhoneCall },

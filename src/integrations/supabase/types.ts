@@ -584,6 +584,45 @@ export type Database = {
         }
         Relationships: []
       }
+      task_candidates: {
+        Row: {
+          callid: number | null
+          candidate_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          job_id: string
+          status: string
+          taskid: string
+          timestamp: string
+          updated_at: string
+        }
+        Insert: {
+          callid?: number | null
+          candidate_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          job_id: string
+          status?: string
+          taskid: string
+          timestamp?: string
+          updated_at?: string
+        }
+        Update: {
+          callid?: number | null
+          candidate_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          job_id?: string
+          status?: string
+          taskid?: string
+          timestamp?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
           completed: boolean
