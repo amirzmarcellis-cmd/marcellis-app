@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X } from "lucide-react"
+import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { JobFunnel } from "@/components/jobs/JobFunnel"
 import { JobDialog } from "@/components/jobs/JobDialog"
@@ -453,6 +453,33 @@ export default function JobDetails() {
       toast({ title: 'Error', description: 'Failed to initiate call', variant: 'destructive' });
     } finally {
       setCallingCandidateId(null);
+    }
+  };
+
+  const handleArrangeInterview = async (candidateId: string) => {
+    try {
+      await supabase.from('CVs').update({
+        CandidateStatus: 'Interview'
+      }).eq('candidate_id', candidateId);
+
+      // Update local state
+      setCvData(prev => prev.map(cv => 
+        cv.candidate_id === candidateId 
+          ? { ...cv, CandidateStatus: 'Interview' }
+          : cv
+      ));
+
+      toast({
+        title: "Interview Arranged",
+        description: "The candidate has been scheduled for an interview.",
+      });
+    } catch (error) {
+      console.error('Error arranging interview:', error);
+      toast({
+        title: "Error",
+        description: "Failed to arrange interview. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -1426,76 +1453,85 @@ export default function JobDetails() {
                                      {getScoreBadge(mainCandidate["Success Score"])}
                                    </div>
 
-                                    {/* Call Log Buttons */}
-                                    <div className="space-y-2 pt-2 border-t">
-                                      <div className="flex flex-wrap gap-2">
-                                         {(() => {
-                                           const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
-                                           if (contactsWithCalls.length === 0) return null;
-                                           
-                                           // Get the latest call log (highest callid)
-                                           const latestContact = contactsWithCalls.reduce((latest, current) => 
-                                             current.callid > latest.callid ? current : latest
-                                           );
-                                           
-                                           return (
-                                            <Button
-                                              key={latestContact.callid}
-                                              variant="outline"
-                                              size="sm"
-                                              asChild
-                                              className="flex-1 min-w-[100px]"
-                                            >
-                               <Link 
-                                 to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`}
-                                 onClick={() => {
-                                   // Store current tab in URL hash for back navigation
-                                   window.location.hash = 'tab=shortlist';
-                                 }}
-                               >
-                                 <FileText className="w-3 h-3 mr-1" />
-                                 Call Log
-                               </Link>
-                                            </Button>
-                                           );
-                                         })()}
-                                       <Button
-                                         variant="ghost"
-                                         size="sm"
-                                         asChild
-                                         className="flex-1 min-w-[100px]"
-                                       >
-                                         <Link to={`/candidate/${candidateId}`}>
-                                           <Users className="w-3 h-3 mr-1" />
-                                           View Profile
-                                         </Link>
-                                       </Button>
-                                     </div>
-                                      {/* Reject Button in separate row */}
-                                      <div className="flex">
-                                        {mainCandidate["Contacted"] === "Rejected" ? (
-                                          <Button
-                                            variant="destructive"
-                                            size="sm"
-                                            className="w-full bg-gray-600 hover:bg-gray-600 cursor-not-allowed"
-                                            disabled
-                                          >
-                                            <X className="w-3 h-3 mr-1" />
-                                            Candidate Rejected
-                                          </Button>
-                                        ) : (
-                                          <Button
-                                            variant="destructive"
-                                            size="sm"
-                                            className="w-full bg-red-600 hover:bg-red-700"
-                                            onClick={() => handleRejectCandidate(id!, candidateId, candidateContacts[0].callid)}
-                                          >
-                                            <X className="w-3 h-3 mr-1" />
-                                            Reject Candidate
-                                          </Button>
-                                        )}
+                                     {/* Call Log Buttons */}
+                                     <div className="space-y-2 pt-2 border-t">
+                                       <div className="flex flex-wrap gap-2">
+                                          {(() => {
+                                            const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
+                                            if (contactsWithCalls.length === 0) return null;
+                                            
+                                            // Get the latest call log (highest callid)
+                                            const latestContact = contactsWithCalls.reduce((latest, current) => 
+                                              current.callid > latest.callid ? current : latest
+                                            );
+                                            
+                                            return (
+                                             <Button
+                                               key={latestContact.callid}
+                                               variant="outline"
+                                               size="sm"
+                                               asChild
+                                               className="flex-1 min-w-[100px]"
+                                             >
+                                <Link 
+                                  to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`}
+                                  onClick={() => {
+                                    // Store current tab in URL hash for back navigation
+                                    window.location.hash = 'tab=shortlist';
+                                  }}
+                                >
+                                  <FileText className="w-3 h-3 mr-1" />
+                                  Call Log
+                                </Link>
+                                             </Button>
+                                            );
+                                          })()}
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          asChild
+                                          className="flex-1 min-w-[100px]"
+                                        >
+                                          <Link to={`/candidate/${candidateId}`}>
+                                            <Users className="w-3 h-3 mr-1" />
+                                            View Profile
+                                          </Link>
+                                        </Button>
                                       </div>
-                                   </div>
+                                       {/* Action Buttons - Arrange Interview and Reject */}
+                                       <div className="flex gap-2">
+                                         <Button
+                                           variant="outline"
+                                           size="sm"
+                                           onClick={() => handleArrangeInterview(candidateId)}
+                                           className="flex-1 min-w-[100px] bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-50 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/20"
+                                         >
+                                           <Calendar className="w-3 h-3 mr-1" />
+                                           Arrange Interview
+                                         </Button>
+                                         {mainCandidate["Contacted"] === "Rejected" ? (
+                                           <Button
+                                             variant="outline"
+                                             size="sm"
+                                             className="flex-1 min-w-[100px] bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed"
+                                             disabled
+                                           >
+                                             <X className="w-3 h-3 mr-1" />
+                                             Rejected
+                                           </Button>
+                                         ) : (
+                                           <Button
+                                             variant="outline"
+                                             size="sm"
+                                             className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-50 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/20"
+                                             onClick={() => handleRejectCandidate(id!, candidateId, candidateContacts[0].callid)}
+                                           >
+                                             <X className="w-3 h-3 mr-1" />
+                                             Reject Candidate
+                                           </Button>
+                                         )}
+                                       </div>
+                                    </div>
                                 </div>
                               </CardContent>
                             </Card>
