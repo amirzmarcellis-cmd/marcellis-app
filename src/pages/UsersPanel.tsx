@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { 
@@ -57,7 +58,16 @@ export default function UsersPanel() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedUser, setSelectedUser] = useState<UserWithRoles | null>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [userRoles, setUserRoles] = useState<string[]>([])
+  
+  // Form states for add/edit user
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: ''
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     fetchUsers()
@@ -83,7 +93,131 @@ export default function UsersPanel() {
   const handleEditUser = (user: UserWithRoles) => {
     setSelectedUser(user)
     setUserRoles(user.roles || [])
+    setFormData({
+      name: user.name || '',
+      email: user.email,
+      password: '' // Don't pre-fill password for security
+    })
     setIsEditDialogOpen(true)
+  }
+
+  const handleAddUser = () => {
+    setSelectedUser(null)
+    setUserRoles([])
+    setFormData({
+      name: '',
+      email: '',
+      password: ''
+    })
+    setIsAddDialogOpen(true)
+  }
+
+  const handleCreateUser = async () => {
+    if (!formData.email || !formData.password) {
+      toast.error('Email and password are required')
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      // Create user via Supabase Admin API
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        email: formData.email,
+        password: formData.password,
+        user_metadata: {
+          full_name: formData.name
+        },
+        email_confirm: true // Auto-confirm email
+      })
+
+      if (authError) throw authError
+
+      // Update profile name if provided
+      if (formData.name && authData.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            user_id: authData.user.id,
+            name: formData.name
+          })
+
+        if (profileError) console.error('Profile update error:', profileError)
+      }
+
+      // Add roles if any selected
+      if (userRoles.length > 0 && authData.user) {
+        const rolesToInsert = userRoles.map(role => ({
+          user_id: authData.user.id,
+          role: role as 'super_admin' | 'manager' | 'admin' | 'recruiter'
+        }))
+
+        const { error: rolesError } = await supabase
+          .from('user_roles')
+          .insert(rolesToInsert)
+
+        if (rolesError) console.error('Roles assignment error:', rolesError)
+      }
+
+      toast.success('User created successfully')
+      setIsAddDialogOpen(false)
+      fetchUsers()
+    } catch (error: any) {
+      console.error('Error creating user:', error)
+      toast.error(error.message || 'Failed to create user')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleUpdateUser = async () => {
+    if (!selectedUser) return
+
+    setIsSubmitting(true)
+    try {
+      // Update user metadata and password if provided
+      const updateData: any = {
+        user_metadata: {
+          full_name: formData.name
+        }
+      }
+
+      if (formData.password) {
+        updateData.password = formData.password
+      }
+
+      if (formData.email !== selectedUser.email) {
+        updateData.email = formData.email
+      }
+
+      const { error: authError } = await supabase.auth.admin.updateUserById(
+        selectedUser.user_id,
+        updateData
+      )
+
+      if (authError) throw authError
+
+      // Update profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          user_id: selectedUser.user_id,
+          name: formData.name || null
+        })
+
+      if (profileError) throw profileError
+
+      // Update roles
+      await handleSaveUserRoles()
+
+      toast.success('User updated successfully')
+      setIsEditDialogOpen(false)
+      fetchUsers()
+    } catch (error: any) {
+      console.error('Error updating user:', error)
+      toast.error(error.message || 'Failed to update user')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleSaveUserRoles = async () => {
@@ -110,30 +244,31 @@ export default function UsersPanel() {
         if (insertError) throw insertError
       }
 
-      toast.success('User roles updated successfully')
-      setIsEditDialogOpen(false)
-      fetchUsers()
+      if (!isSubmitting) {
+        toast.success('User roles updated successfully')
+        setIsEditDialogOpen(false)
+        fetchUsers()
+      }
     } catch (error) {
       console.error('Error updating user roles:', error)
-      toast.error('Failed to update user roles')
+      if (!isSubmitting) {
+        toast.error('Failed to update user roles')
+      }
     }
   }
 
-  const handleRemoveUser = async (userId: string) => {
+  const handleDeleteUser = async (userId: string) => {
     try {
-      // Remove all roles for this user
-      const { error } = await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', userId)
+      // Delete user via Supabase Admin API
+      const { error } = await supabase.auth.admin.deleteUser(userId)
 
       if (error) throw error
 
-      toast.success('User roles removed successfully')
+      toast.success('User deleted successfully')
       fetchUsers()
-    } catch (error) {
-      console.error('Error removing user:', error)
-      toast.error('Failed to remove user roles')
+    } catch (error: any) {
+      console.error('Error deleting user:', error)
+      toast.error(error.message || 'Failed to delete user')
     }
   }
 
@@ -143,6 +278,11 @@ export default function UsersPanel() {
         ? prev.filter(r => r !== role)
         : [...prev, role]
     )
+  }
+
+  const resetForm = () => {
+    setFormData({ name: '', email: '', password: '' })
+    setUserRoles([])
   }
 
   const getRoleBadgeVariant = (role: string) => {
@@ -201,6 +341,10 @@ export default function UsersPanel() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-64"
               />
+              <Button onClick={handleAddUser} className="bg-gradient-primary hover:bg-gradient-primary/90">
+                <Plus className="w-4 h-4 mr-2" />
+                Add User
+              </Button>
             </div>
           </div>
         </CardHeader>
@@ -267,16 +411,19 @@ export default function UsersPanel() {
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Remove User Roles</AlertDialogTitle>
+                            <AlertDialogTitle>Delete User</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Are you sure you want to remove all roles from {user.name || user.email}? 
-                              This will revoke all their permissions in the system.
+                              Are you sure you want to permanently delete {user.name || user.email}? 
+                              This action cannot be undone and will remove the user from the system entirely.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleRemoveUser(user.user_id)}>
-                              Remove Roles
+                            <AlertDialogAction 
+                              onClick={() => handleDeleteUser(user.user_id)}
+                              className="bg-destructive hover:bg-destructive/90"
+                            >
+                              Delete User
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -290,26 +437,49 @@ export default function UsersPanel() {
         </CardContent>
       </Card>
 
-      {/* Edit User Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+      {/* Add User Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
+        setIsAddDialogOpen(open)
+        if (!open) resetForm()
+      }}>
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit User Roles</DialogTitle>
+            <DialogTitle>Add New User</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            {selectedUser && (
-              <div className="p-4 bg-muted rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-white font-medium">
-                    {selectedUser.name?.charAt(0)?.toUpperCase() || selectedUser.email.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <div className="font-medium">{selectedUser.name || 'Unnamed User'}</div>
-                    <div className="text-sm text-muted-foreground">{selectedUser.email}</div>
-                  </div>
-                </div>
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="add-name">Full Name</Label>
+                <Input
+                  id="add-name"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Enter full name"
+                />
               </div>
-            )}
+              <div>
+                <Label htmlFor="add-email">Email *</Label>
+                <Input
+                  id="add-email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder="Enter email address"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="add-password">Password *</Label>
+                <Input
+                  id="add-password"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                  placeholder="Enter password"
+                  required
+                />
+              </div>
+            </div>
             
             <div className="space-y-3">
               <h4 className="font-medium">Assign Roles:</h4>
@@ -353,11 +523,106 @@ export default function UsersPanel() {
             </div>
             
             <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button onClick={handleSaveUserRoles}>
-                Save Changes
+              <Button onClick={handleCreateUser} disabled={isSubmitting}>
+                {isSubmitting ? 'Creating...' : 'Create User'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit User Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="edit-name">Full Name</Label>
+                <Input
+                  id="edit-name"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Enter full name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-email">Email</Label>
+                <Input
+                  id="edit-email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder="Enter email address"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-password">New Password</Label>
+                <Input
+                  id="edit-password"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                  placeholder="Leave empty to keep current password"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Leave empty to keep the current password
+                </p>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <h4 className="font-medium">Assign Roles:</h4>
+              {ROLE_OPTIONS.map((roleOption) => {
+                const Icon = roleOption.icon
+                const isSelected = userRoles.includes(roleOption.value)
+                
+                return (
+                  <div
+                    key={roleOption.value}
+                    className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors ${
+                      isSelected 
+                        ? 'border-primary bg-primary/10' 
+                        : 'border-border hover:bg-muted'
+                    }`}
+                    onClick={() => toggleRole(roleOption.value)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon className="w-5 h-5" />
+                      <div>
+                        <div className="font-medium">{roleOption.label}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {roleOption.value === 'super_admin' && 'Full system access and user management'}
+                          {roleOption.value === 'manager' && 'Manage candidates and jobs'}
+                          {roleOption.value === 'recruiter' && 'Basic access to view and edit data'}
+                        </div>
+                      </div>
+                    </div>
+                    <div className={`w-4 h-4 rounded border ${
+                      isSelected ? 'bg-primary border-primary' : 'border-border'
+                    }`}>
+                      {isSelected && (
+                        <div className="w-full h-full flex items-center justify-center text-white text-xs">
+                          ✓
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} disabled={isSubmitting}>
+                Cancel
+              </Button>
+              <Button onClick={handleUpdateUser} disabled={isSubmitting}>
+                {isSubmitting ? 'Updating...' : 'Update User'}
               </Button>
             </div>
           </div>
