@@ -319,7 +319,34 @@ export default function Interviews() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => window.open(`tel:${candidate.phone_number}`, '_self')}
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('https://hook.eu2.make.com/iqzrkr3av3h6j5t6kqy45043kytq8t6s', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                              inttype: interview.inttype,
+                              job_id: interview.job_id,
+                              candidate_id: interview.candidate_id,
+                              callid: interview.callid,
+                              appoint1: interview.appoint1,
+                              appoint2: interview.appoint2,
+                              appoint3: interview.appoint3
+                            })
+                          });
+                          
+                          if (response.ok) {
+                            toast.success('Call request sent successfully');
+                          } else {
+                            toast.error('Failed to send call request');
+                          }
+                        } catch (error) {
+                          console.error('Error sending call request:', error);
+                          toast.error('Failed to send call request');
+                        }
+                      }}
                       className="px-3 gap-2"
                     >
                       <PhoneCall className="w-4 h-4" />
