@@ -245,8 +245,8 @@ export default function Index() {
         return '';
       });
 
-      // Save interview to database
-      await supabase.from('interview').insert({
+      // Save interview to database and get the generated intid
+      const { data: interviewData, error: insertError } = await supabase.from('interview').insert({
         candidate_id: selectedCandidate.candidateId,
         job_id: selectedCandidate.jobId,
         callid: selectedCandidate.callid,
@@ -254,7 +254,9 @@ export default function Index() {
         appoint2: appointments[1],
         appoint3: appointments[2],
         inttype: interviewType
-      });
+      }).select('intid').single();
+
+      if (insertError) throw insertError;
 
       // Send webhook to Make.com
       await fetch('https://hook.eu2.make.com/3t88lby79dnf6x6hgm1i828yhen75omb', {
@@ -266,7 +268,7 @@ export default function Index() {
           job_id: selectedCandidate.jobId,
           candidate_id: selectedCandidate.candidateId,
           callid: selectedCandidate.callid,
-          intid: selectedCandidate.intid,
+          intid: interviewData?.intid,
           appoint1: appointments[0],
           appoint2: appointments[1],
           appoint3: appointments[2],
