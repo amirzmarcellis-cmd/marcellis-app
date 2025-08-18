@@ -373,6 +373,15 @@ export default function Index() {
     const cvRecord = cvData.find(cv => cv.candidate_id === candidateId);
     return cvRecord?.CandidateStatus || null;
   };
+
+  // Check if candidate has pending or scheduled interview
+  const getCandidateInterviewStatus = (candidateId: string) => {
+    const candidateInterviews = interviews.filter(interview => 
+      interview.candidate_id === candidateId && 
+      (interview.intstatus === 'Scheduled' || interview.intstatus === 'Pending')
+    );
+    return candidateInterviews.length > 0 ? candidateInterviews[0].intstatus : null;
+  };
   const getCurrentTimeGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good Morning';
@@ -623,13 +632,26 @@ export default function Index() {
                                 <XCircle className="w-3 h-3 mr-1" />
                                 Reject Candidate
                               </Button>
-                              <Button size="xs" variant="default" onClick={e => {
-                            e.stopPropagation();
-                            handleArrangeInterview(candidate.Candidate_ID, candidate.job_id);
-                          }} className="bg-green-600 hover:bg-green-700 text-white bg-emerald-700 hover:bg-emerald-600 text-xs">
-                                <Calendar className="w-3 h-3 mr-1" />
-                                Arrange an Interview
-                              </Button>
+                              {(() => {
+                                const interviewStatus = getCandidateInterviewStatus(candidate.Candidate_ID);
+                                if (interviewStatus) {
+                                  return (
+                                    <Button size="xs" variant="outline" disabled className="border-blue-400/40 text-blue-400 text-xs">
+                                      <Calendar className="w-3 h-3 mr-1" />
+                                      {interviewStatus}
+                                    </Button>
+                                  );
+                                }
+                                return (
+                                  <Button size="xs" variant="default" onClick={e => {
+                                    e.stopPropagation();
+                                    handleArrangeInterview(candidate.Candidate_ID, candidate.job_id);
+                                  }} className="bg-green-600 hover:bg-green-700 text-white bg-emerald-700 hover:bg-emerald-600 text-xs">
+                                    <Calendar className="w-3 h-3 mr-1" />
+                                    Arrange an Interview
+                                  </Button>
+                                );
+                              })()}
                             </div>
                           </div>
                         </div>
