@@ -54,6 +54,8 @@ export default function JobDetails() {
   const [shortListTimeRemaining, setShortListTimeRemaining] = useState(0)
   const { toast } = useToast()
   const [callingCandidateId, setCallingCandidateId] = useState<string | null>(null)
+  const [newApplicationsCount, setNewApplicationsCount] = useState(0)
+  const [lastViewedApplications, setLastViewedApplications] = useState<string | null>(null)
 
   useEffect(() => {
     if (id) {
@@ -62,6 +64,9 @@ export default function JobDetails() {
       fetchCvData()
       fetchApplications(id)
       checkShortListButtonStatus()
+      // Load last viewed timestamp for applications
+      const lastViewed = localStorage.getItem(`lastViewedApplications_${id}`)
+      setLastViewedApplications(lastViewed)
     }
   }, [id])
 
@@ -82,6 +87,23 @@ export default function JobDetails() {
     }
     return () => clearInterval(interval)
   }, [shortListButtonDisabled, shortListTimeRemaining, id])
+
+  // Calculate new applications count
+  useEffect(() => {
+    if (applications.length > 0 && lastViewedApplications) {
+      const lastViewedTimestamp = new Date(lastViewedApplications)
+      const newApps = applications.filter(app => {
+        const appTimestamp = new Date(app.Timestamp)
+        return appTimestamp > lastViewedTimestamp
+      })
+      setNewApplicationsCount(newApps.length)
+    } else if (applications.length > 0 && !lastViewedApplications) {
+      // If never viewed, all applications are new
+      setNewApplicationsCount(applications.length)
+    } else {
+      setNewApplicationsCount(0)
+    }
+  }, [applications, lastViewedApplications])
 
   const checkShortListButtonStatus = () => {
     if (!id) return
@@ -426,6 +448,16 @@ export default function JobDetails() {
     }
   };
 
+  const handleApplicationsTabClick = () => {
+    // Reset notification count and update last viewed timestamp
+    if (id) {
+      const now = new Date().toISOString()
+      localStorage.setItem(`lastViewedApplications_${id}`, now)
+      setLastViewedApplications(now)
+      setNewApplicationsCount(0)
+    }
+  }
+
   if (loading) {
     return (
         <div className="flex items-center justify-center h-64">
@@ -637,7 +669,14 @@ export default function JobDetails() {
                  <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">Overview</TabsTrigger>
                  <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2">Description</TabsTrigger>
                  <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">AI Requirements</TabsTrigger>
-                 <TabsTrigger value="applications" className="text-xs md:text-sm px-2 py-2">Applications</TabsTrigger>
+                  <TabsTrigger value="applications" className="text-xs md:text-sm px-2 py-2 relative" onClick={handleApplicationsTabClick}>
+                    Applications
+                    {newApplicationsCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-[20px] z-10">
+                        {newApplicationsCount > 99 ? '99+' : newApplicationsCount}
+                      </span>
+                    )}
+                  </TabsTrigger>
                  <TabsTrigger value="candidates" className="text-xs md:text-sm px-2 py-2">AI Long List</TabsTrigger>
                  <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">AI Short List</TabsTrigger>
                </TabsList>
