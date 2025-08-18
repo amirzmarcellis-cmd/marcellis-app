@@ -120,34 +120,39 @@ export default function UsersPanel() {
 
     setIsSubmitting(true)
     try {
-      // Create user via Supabase Admin API
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: formData.email,
-        password: formData.password,
-        user_metadata: {
-          full_name: formData.name
+      // Get auth token
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error('Not authenticated')
+      }
+
+      // Call edge function to create user
+      const response = await fetch('/functions/v1/admin-user-management', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
         },
-        email_confirm: true // Auto-confirm email
+        body: JSON.stringify({
+          action: 'create_user',
+          userData: {
+            email: formData.email,
+            password: formData.password,
+            name: formData.name
+          }
+        })
       })
 
-      if (authError) throw authError
-
-      // Update profile name if provided
-      if (formData.name && authData.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            user_id: authData.user.id,
-            name: formData.name
-          })
-
-        if (profileError) console.error('Profile update error:', profileError)
+      const result = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to create user')
       }
 
       // Add roles if any selected
-      if (userRoles.length > 0 && authData.user) {
+      if (userRoles.length > 0 && result.user?.user) {
         const rolesToInsert = userRoles.map(role => ({
-          user_id: authData.user.id,
+          user_id: result.user.user.id,
           role: role as 'super_admin' | 'manager' | 'admin' | 'recruiter'
         }))
 
@@ -174,37 +179,35 @@ export default function UsersPanel() {
 
     setIsSubmitting(true)
     try {
-      // Update user metadata and password if provided
-      const updateData: any = {
-        user_metadata: {
-          full_name: formData.name
-        }
+      // Get auth token
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error('Not authenticated')
       }
 
-      if (formData.password) {
-        updateData.password = formData.password
-      }
-
-      if (formData.email !== selectedUser.email) {
-        updateData.email = formData.email
-      }
-
-      const { error: authError } = await supabase.auth.admin.updateUserById(
-        selectedUser.user_id,
-        updateData
-      )
-
-      if (authError) throw authError
-
-      // Update profile
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert({
-          user_id: selectedUser.user_id,
-          name: formData.name || null
+      // Call edge function to update user
+      const response = await fetch('/functions/v1/admin-user-management', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'update_user',
+          userId: selectedUser.user_id,
+          userData: {
+            email: formData.email,
+            password: formData.password || undefined,
+            name: formData.name
+          }
         })
+      })
 
-      if (profileError) throw profileError
+      const result = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to update user')
+      }
 
       // Update roles
       await handleSaveUserRoles()
@@ -259,10 +262,30 @@ export default function UsersPanel() {
 
   const handleDeleteUser = async (userId: string) => {
     try {
-      // Delete user via Supabase Admin API
-      const { error } = await supabase.auth.admin.deleteUser(userId)
+      // Get auth token
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error('Not authenticated')
+      }
 
-      if (error) throw error
+      // Call edge function to delete user
+      const response = await fetch('/functions/v1/admin-user-management', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'delete_user',
+          userId: userId
+        })
+      })
+
+      const result = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to delete user')
+      }
 
       toast.success('User deleted successfully')
       fetchUsers()
