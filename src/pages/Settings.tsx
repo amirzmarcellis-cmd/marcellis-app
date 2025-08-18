@@ -3,14 +3,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { Upload, Settings as SettingsIcon, Palette, User } from "lucide-react"
+import { Upload, Settings as SettingsIcon, Palette, User, Users } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useAppSettings } from "@/contexts/AppSettingsContext"
 import { useProfile } from "@/hooks/useProfile"
 import { toast } from "sonner"
 import { useTheme } from "next-themes"
+import { useNavigate } from "react-router-dom"
 
 export default function Settings() {
+  const navigate = useNavigate()
   const { settings, updateSettings } = useAppSettings();
   const { profile, loading: profileLoading, updateProfile } = useProfile();
   const [systemName, setSystemName] = useState(settings.systemName)
@@ -103,6 +105,28 @@ export default function Settings() {
                 />
                 <p className="text-xs text-muted-foreground">This name will be used to greet you on the dashboard</p>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Users Panel - Admin Only */}
+          <Card className="bg-gradient-card backdrop-blur-glass border-glass-border shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                User Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                Manage user accounts and assign roles to control access levels throughout the system.
+              </p>
+              <Button 
+                onClick={() => navigate('/users-panel')} 
+                className="bg-gradient-primary hover:bg-gradient-primary/90"
+              >
+                <Users className="w-4 h-4 mr-2" />
+                Open Users Panel
+              </Button>
             </CardContent>
           </Card>
 

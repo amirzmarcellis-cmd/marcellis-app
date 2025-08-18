@@ -1,0 +1,368 @@
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table"
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger 
+} from "@/components/ui/dialog"
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Users, Plus, Edit, Trash2, ArrowLeft, Shield, Crown, User as UserIcon } from "lucide-react"
+import { supabase } from "@/integrations/supabase/client"
+import { toast } from "sonner"
+import { useNavigate } from "react-router-dom"
+
+interface UserWithRoles {
+  user_id: string
+  name: string | null
+  email: string
+  user_created_at: string
+  last_sign_in_at: string | null
+  roles: string[]
+}
+
+const ROLE_OPTIONS = [
+  { value: 'super_admin', label: 'Super Admin', icon: Crown, color: 'destructive' },
+  { value: 'manager', label: 'Manager', icon: Shield, color: 'default' },
+  { value: 'recruiter', label: 'Recruiter', icon: UserIcon, color: 'secondary' }
+]
+
+export default function UsersPanel() {
+  const navigate = useNavigate()
+  const [users, setUsers] = useState<UserWithRoles[]>([])
+  const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedUser, setSelectedUser] = useState<UserWithRoles | null>(null)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [userRoles, setUserRoles] = useState<string[]>([])
+
+  useEffect(() => {
+    fetchUsers()
+  }, [])
+
+  const fetchUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('users_with_roles')
+        .select('*')
+        .order('user_created_at', { ascending: false })
+
+      if (error) throw error
+      setUsers(data || [])
+    } catch (error) {
+      console.error('Error fetching users:', error)
+      toast.error('Failed to fetch users')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleEditUser = (user: UserWithRoles) => {
+    setSelectedUser(user)
+    setUserRoles(user.roles || [])
+    setIsEditDialogOpen(true)
+  }
+
+  const handleSaveUserRoles = async () => {
+    if (!selectedUser) return
+
+    try {
+      // First, remove all existing roles for this user
+      await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', selectedUser.user_id)
+
+      // Then add the new roles
+      if (userRoles.length > 0) {
+        const rolesToInsert = userRoles.map(role => ({
+          user_id: selectedUser.user_id,
+          role: role as 'super_admin' | 'manager' | 'admin' | 'recruiter'
+        }))
+
+        const { error: insertError } = await supabase
+          .from('user_roles')
+          .insert(rolesToInsert)
+
+        if (insertError) throw insertError
+      }
+
+      toast.success('User roles updated successfully')
+      setIsEditDialogOpen(false)
+      fetchUsers()
+    } catch (error) {
+      console.error('Error updating user roles:', error)
+      toast.error('Failed to update user roles')
+    }
+  }
+
+  const handleRemoveUser = async (userId: string) => {
+    try {
+      // Remove all roles for this user
+      const { error } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId)
+
+      if (error) throw error
+
+      toast.success('User roles removed successfully')
+      fetchUsers()
+    } catch (error) {
+      console.error('Error removing user:', error)
+      toast.error('Failed to remove user roles')
+    }
+  }
+
+  const toggleRole = (role: string) => {
+    setUserRoles(prev => 
+      prev.includes(role) 
+        ? prev.filter(r => r !== role)
+        : [...prev, role]
+    )
+  }
+
+  const getRoleBadgeVariant = (role: string) => {
+    const roleConfig = ROLE_OPTIONS.find(r => r.value === role)
+    return roleConfig?.color as any || 'default'
+  }
+
+  const getRoleIcon = (role: string) => {
+    const roleConfig = ROLE_OPTIONS.find(r => r.value === role)
+    return roleConfig?.icon || UserIcon
+  }
+
+  const filteredUsers = users.filter(user =>
+    user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" onClick={() => navigate('/settings')}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Settings
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              Users Panel
+            </h1>
+            <p className="text-muted-foreground">Manage user roles and permissions</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Users Table */}
+      <Card className="bg-gradient-card backdrop-blur-glass border-glass-border shadow-card">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              All Users ({filteredUsers.length})
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <Input
+                placeholder="Search users..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-64"
+              />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Roles</TableHead>
+                <TableHead>Last Sign In</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredUsers.map((user) => (
+                <TableRow key={user.user_id}>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-white text-sm font-medium">
+                        {user.name?.charAt(0)?.toUpperCase() || user.email.charAt(0).toUpperCase()}
+                      </div>
+                      {user.name || 'Unnamed User'}
+                    </div>
+                  </TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {user.roles?.length > 0 ? (
+                        user.roles.map((role) => {
+                          const Icon = getRoleIcon(role)
+                          return (
+                            <Badge key={role} variant={getRoleBadgeVariant(role)} className="flex items-center gap-1">
+                              <Icon className="w-3 h-3" />
+                              {ROLE_OPTIONS.find(r => r.value === role)?.label || role}
+                            </Badge>
+                          )
+                        })
+                      ) : (
+                        <Badge variant="outline">No Roles</Badge>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {user.last_sign_in_at 
+                      ? new Date(user.last_sign_in_at).toLocaleDateString()
+                      : 'Never'
+                    }
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditUser(user)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Remove User Roles</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to remove all roles from {user.name || user.email}? 
+                              This will revoke all their permissions in the system.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleRemoveUser(user.user_id)}>
+                              Remove Roles
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Edit User Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit User Roles</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedUser && (
+              <div className="p-4 bg-muted rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-white font-medium">
+                    {selectedUser.name?.charAt(0)?.toUpperCase() || selectedUser.email.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <div className="font-medium">{selectedUser.name || 'Unnamed User'}</div>
+                    <div className="text-sm text-muted-foreground">{selectedUser.email}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div className="space-y-3">
+              <h4 className="font-medium">Assign Roles:</h4>
+              {ROLE_OPTIONS.map((roleOption) => {
+                const Icon = roleOption.icon
+                const isSelected = userRoles.includes(roleOption.value)
+                
+                return (
+                  <div
+                    key={roleOption.value}
+                    className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors ${
+                      isSelected 
+                        ? 'border-primary bg-primary/10' 
+                        : 'border-border hover:bg-muted'
+                    }`}
+                    onClick={() => toggleRole(roleOption.value)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon className="w-5 h-5" />
+                      <div>
+                        <div className="font-medium">{roleOption.label}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {roleOption.value === 'super_admin' && 'Full system access and user management'}
+                          {roleOption.value === 'manager' && 'Manage candidates and jobs'}
+                          {roleOption.value === 'recruiter' && 'Basic access to view and edit data'}
+                        </div>
+                      </div>
+                    </div>
+                    <div className={`w-4 h-4 rounded border ${
+                      isSelected ? 'bg-primary border-primary' : 'border-border'
+                    }`}>
+                      {isSelected && (
+                        <div className="w-full h-full flex items-center justify-center text-white text-xs">
+                          ✓
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSaveUserRoles}>
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}

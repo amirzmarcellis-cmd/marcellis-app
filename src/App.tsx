@@ -28,6 +28,7 @@ import Settings from "./pages/Settings";
 import LiveCandidateFeed from "./pages/LiveCandidateFeed";
 import Interviews from "./pages/Interviews";
 import Apply from "./pages/Apply";
+import UsersPanel from "./pages/UsersPanel";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -63,6 +64,7 @@ const App = () => (
               <Route path="/performance" element={<DashboardLayout><Performance /></DashboardLayout>} />
               <Route path="/reports" element={<DashboardLayout><Reports /></DashboardLayout>} />
               <Route path="/settings" element={<DashboardLayout><Settings /></DashboardLayout>} />
+              <Route path="/users-panel" element={<DashboardLayout><UsersPanel /></DashboardLayout>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </SidebarProvider>
