@@ -146,21 +146,23 @@ export default function LiveCandidateFeed() {
 
       // Create interview record
       const { data: interviewData, error: interviewError } = await supabase
-        .from('interviews')
+        .from('interview')
         .insert({
           candidate_id: selectedCandidate.candidateId,
           job_id: selectedCandidate.jobId,
           callid: selectedCandidate.callid,
-          intid: selectedCandidate.intid,
           appoint1: appointments[0],
           appoint2: appointments[1],
           appoint3: appointments[2],
           inttype: interviewType
         })
-        .select()
-        .single();
+        .select('intid')
+        .maybeSingle();
 
-      if (interviewError) throw interviewError;
+      if (interviewError) {
+        console.error('Interview creation error:', interviewError);
+        throw interviewError;
+      }
 
       // Close dialog and refresh data
       setInterviewDialogOpen(false);
