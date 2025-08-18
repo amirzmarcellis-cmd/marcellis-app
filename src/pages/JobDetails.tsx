@@ -481,30 +481,20 @@ export default function JobDetails() {
   };
 
   const handleArrangeInterview = (candidateId: string) => {
-    console.log('🔥 handleArrangeInterview called with candidateId:', candidateId);
-    alert('handleArrangeInterview function called!');
-    console.log('🔥 Current interviewDialogOpen state:', interviewDialogOpen);
-    let candidate = candidates.find(c => 
-      c["Candidate ID"] === candidateId || 
-      c["Candidate_ID"] === candidateId ||
-      c.candidate_id === candidateId
+    // Find the candidate object
+    const candidate = candidates.find(c => 
+      c["Candidate_ID"] === candidateId || 
+      c.candidate_id === candidateId ||
+      c.Candidate_ID === candidateId
     );
     
-    console.log('Found candidate:', candidate);
-    console.log('All candidates:', candidates);
-    
-    // Always set the selected candidate and open dialog - even if candidate not found
-    // We'll use default values if needed
     setSelectedCandidate({
       candidateId: candidateId,
       jobId: job?.["Job ID"] || id || '',
       callid: candidate?.callid || candidate?.Callid || 0
     });
     
-    // Always open the dialog
-    console.log('🔥 Setting interviewDialogOpen to TRUE');
     setInterviewDialogOpen(true);
-    console.log('🔥 After setting - interviewDialogOpen should be true');
     
     // Reset slots and type
     setInterviewSlots([
