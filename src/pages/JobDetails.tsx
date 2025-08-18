@@ -1132,15 +1132,29 @@ export default function JobDetails() {
                             const mainCandidate = candidateContacts[0]
                             
                             return (
-                               <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
-                                 <CardContent className="p-3 md:p-4">
-                                   <div className="space-y-3">
-                                     <div className="flex items-start justify-between">
-                                       <div className="min-w-0 flex-1">
-                                         <h4 className="font-semibold text-sm md:text-base truncate">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
-                                         <p className="text-xs md:text-sm text-muted-foreground truncate">{candidateId}</p>
-                                       </div>
-                                     </div>
+                                <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
+                                  <CardContent className="p-3 md:p-4">
+                                    <div className="space-y-3">
+                                      <div className="flex items-start justify-between">
+                                        <div className="min-w-0 flex-1">
+                                          <h4 className="font-semibold text-sm md:text-base truncate">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
+                                          <p className="text-xs md:text-sm text-muted-foreground truncate">{candidateId}</p>
+                                        </div>
+                                        {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || 
+                                          mainCandidate["Contacted"]?.toLowerCase() === "contacted" || 
+                                          mainCandidate["Contacted"]?.toLowerCase() === "low scored") && 
+                                          mainCandidate["lastcalltime"] && (
+                                          <div className="text-xs text-muted-foreground text-right">
+                                            <div className="flex items-center">
+                                              <Clock className="w-3 h-3 mr-1" />
+                                              {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
+                                            </div>
+                                            <div className="text-xs">
+                                              {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
                                      
                                      <div className="space-y-2 text-xs md:text-sm">
                                        {mainCandidate["Candidate Email"] && (
@@ -1300,10 +1314,24 @@ export default function JobDetails() {
                               <CardContent className="p-4">
                                 <div className="space-y-3">
                                   <div className="flex items-start justify-between">
-                                    <div>
+                                    <div className="min-w-0 flex-1">
                                       <h4 className="font-semibold">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
                                       <p className="text-sm text-muted-foreground">{candidateId}</p>
                                     </div>
+                                    {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || 
+                                      mainCandidate["Contacted"]?.toLowerCase() === "contacted" || 
+                                      mainCandidate["Contacted"]?.toLowerCase() === "low scored") && 
+                                      mainCandidate["lastcalltime"] && (
+                                      <div className="text-xs text-muted-foreground text-right">
+                                        <div className="flex items-center">
+                                          <Clock className="w-3 h-3 mr-1" />
+                                          {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
+                                        </div>
+                                        <div className="text-xs">
+                                          {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
                                   
                                   <div className="space-y-2 text-sm">
