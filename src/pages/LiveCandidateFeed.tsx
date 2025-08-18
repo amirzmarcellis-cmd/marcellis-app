@@ -93,20 +93,16 @@ export default function LiveCandidateFeed() {
 
   // Check if candidate has pending or scheduled interview
   const getCandidateInterviewStatus = (candidateId: string) => {
-    const candidateInterviews = interviews.filter(interview => 
-      interview.candidate_id === candidateId && 
-      (interview.intstatus === 'Scheduled' || interview.intstatus === 'Pending')
-    );
+    const candidateInterviews = interviews.filter(interview => interview.candidate_id === candidateId && (interview.intstatus === 'Scheduled' || interview.intstatus === 'Pending'));
     return candidateInterviews.length > 0 ? candidateInterviews[0].intstatus : null;
   };
-
   const handleHireCandidate = async (candidateId: string) => {
     try {
-      const { error } = await supabase
-        .from('CVs')
-        .update({ CandidateStatus: 'Hired' })
-        .eq('candidate_id', candidateId);
-
+      const {
+        error
+      } = await supabase.from('CVs').update({
+        CandidateStatus: 'Hired'
+      }).eq('candidate_id', candidateId);
       if (error) throw error;
 
       // Refresh data
@@ -163,15 +159,15 @@ export default function LiveCandidateFeed() {
 
       // Filter: Shortlisted and Interview candidates from ACTIVE jobs
       const activeJobIds = new Set((jobsData || []).filter(j => j.Processed === 'Yes').map(j => j.job_id));
-      
+
       // Debug: Log all candidate statuses to see what we have
-      console.log('All CV statuses:', (cvsData || []).map(c => ({ id: c.candidate_id, status: c.CandidateStatus })));
-      
+      console.log('All CV statuses:', (cvsData || []).map(c => ({
+        id: c.candidate_id,
+        status: c.CandidateStatus
+      })));
       const shortlistedAndInterviewCandidateIds = new Set((cvsData || []).filter(c => (c.CandidateStatus === 'Shortlisted' || c.CandidateStatus === 'Interview') && c.CandidateStatus !== 'Hired').map(c => c.candidate_id));
-      
       console.log('Shortlisted/Interview candidate IDs:', Array.from(shortlistedAndInterviewCandidateIds));
       console.log('Active job IDs:', Array.from(activeJobIds));
-      
       const filteredShortlistedActive = enrichedCandidates.filter(c => {
         return shortlistedAndInterviewCandidateIds.has(c.Candidate_ID || c.candidate_id) && activeJobIds.has(c.job_id);
       });
@@ -370,45 +366,39 @@ export default function LiveCandidateFeed() {
                     <div className="mt-4 pt-4 border-t border-border/20">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <Badge className="bg-purple-500/20 text-purple-300 border-purple-400/40">
-                            Notice: {candidate['Notice Period'] || 'Not specified'}
-                          </Badge>
+                          
                         </div>
                         
                         <div className="flex items-center space-x-2">
                           <Button size="sm" variant="destructive" onClick={e => {
-                            e.stopPropagation();
-                            handleRejectCandidate(candidate.Candidate_ID || candidate.candidate_id, candidate.job_id);
-                          }} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                        e.stopPropagation();
+                        handleRejectCandidate(candidate.Candidate_ID || candidate.candidate_id, candidate.job_id);
+                      }} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
                             <XCircle className="w-4 h-4 mr-1" />
                             Reject Candidate
                           </Button>
                           
                           {(() => {
-                            const interviewStatus = getCandidateInterviewStatus(candidate.Candidate_ID || candidate.candidate_id);
-                            if (interviewStatus) {
-                              return (
-                                <Button size="sm" variant="outline" disabled className="border-blue-400/40 text-blue-400">
+                        const interviewStatus = getCandidateInterviewStatus(candidate.Candidate_ID || candidate.candidate_id);
+                        if (interviewStatus) {
+                          return <Button size="sm" variant="outline" disabled className="border-blue-400/40 text-blue-400">
                                   <Calendar className="w-4 h-4 mr-1" />
                                   {interviewStatus}
-                                </Button>
-                              );
-                            }
-                            return (
-                              <Button size="sm" variant="outline" onClick={e => {
-                                e.stopPropagation();
-                                handleArrangeInterview(candidate.Candidate_ID || candidate.candidate_id);
-                              }} className="bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200">
+                                </Button>;
+                        }
+                        return <Button size="sm" variant="outline" onClick={e => {
+                          e.stopPropagation();
+                          handleArrangeInterview(candidate.Candidate_ID || candidate.candidate_id);
+                        }} className="bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200">
                                 <Calendar className="w-4 h-4 mr-1" />
                                 Arrange an Interview
-                              </Button>
-                            );
-                          })()}
+                              </Button>;
+                      })()}
                           
                           <Button size="sm" variant="default" onClick={e => {
-                            e.stopPropagation();
-                            handleHireCandidate(candidate.Candidate_ID || candidate.candidate_id);
-                          }} className="bg-amber-500 hover:bg-amber-600 text-white border-2 border-amber-400 hover:border-amber-300 shadow-md hover:shadow-lg transition-all duration-200">
+                        e.stopPropagation();
+                        handleHireCandidate(candidate.Candidate_ID || candidate.candidate_id);
+                      }} className="bg-amber-500 hover:bg-amber-600 text-white border-2 border-amber-400 hover:border-amber-300 shadow-md hover:shadow-lg transition-all duration-200">
                             <UserCheck className="w-4 h-4 mr-1" />
                             Hire Candidate
                           </Button>
