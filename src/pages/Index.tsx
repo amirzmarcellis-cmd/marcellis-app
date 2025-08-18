@@ -120,6 +120,9 @@ export default function Index() {
       });
       setJobStats(stats);
 
+      // Calculate total tasked candidates across all active jobs
+      const totalTaskedCandidates = Object.values(stats).reduce((sum: number, jobStat: any) => sum + jobStat.tasked, 0);
+
       // Candidates needing review: Shortlisted candidates count
       const highScoreActiveCountVal = shortlistedActiveCandidates.length;
       setHighScoreActiveCount(highScoreActiveCountVal);
@@ -127,7 +130,7 @@ export default function Index() {
         totalCandidates: cvs.length,
         totalJobs: activeJobs.length,
         candidatesAwaitingReview: taskedCandidates.length,
-        tasksToday: openTasksCount,
+        tasksToday: totalTaskedCandidates, // Changed to show tasked candidates count
         interviewsThisWeek: interviewCandidates.length,
         averageTimeToHire: 14,
         recentCandidates,
@@ -140,12 +143,9 @@ export default function Index() {
     }
   };
   const handleTaskCountChange = (count: number) => {
+    // This function is no longer needed for task count since we're tracking tasked candidates
+    // But keeping it for potential future use
     setOpenTasksCount(count);
-    // Update the dashboard data to reflect the new task count
-    setData(prev => prev ? {
-      ...prev,
-      tasksToday: count
-    } : null);
   };
   const handleCandidateClick = (candidateId: string, jobId: string, callid?: number) => {
     navigate(`/call-log-details?candidate=${candidateId}&job=${jobId}&callid=${callid || ''}`);
@@ -350,10 +350,10 @@ export default function Index() {
               <MetricCardPro title="Awaiting Review" value={highScoreActiveCount || 0} delta="-12%" icon={ClipboardList} accent="purple" trend={[12, 10, 11, 9, 8, 7, 8, 6]} progress={Math.min(100, highScoreActiveCount || 0)} className="border-2 border-primary/60 glow-cyan" />
             </TiltCard>
             <TiltCard>
-              <MetricCardPro title="Interviews" value={data?.interviewsThisWeek ?? 0} delta="+8%" icon={Video} accent="cyan" trend={[2, 3, 3, 4, 5, 6, 6, 7]} progress={Math.min(100, (data?.interviewsThisWeek ?? 0) * 15)} />
+              <MetricCardPro title="Tasked" value={data?.tasksToday ?? 0} delta={data?.tasksToday ? `${data.tasksToday > 0 ? '+' : ''}${data.tasksToday}` : undefined} icon={Target} accent="emerald" trend={[1, 2, 1, 3, 2, 4, 3, 5]} progress={Math.min(100, (data?.tasksToday ?? 0) * 10)} />
             </TiltCard>
             <TiltCard>
-              <MetricCardPro title="Tasks Today" value={data?.tasksToday ?? 0} delta={data?.tasksToday ? `${data.tasksToday > 0 ? '+' : ''}${data.tasksToday}%` : undefined} icon={Target} accent="emerald" trend={[1, 2, 1, 3, 2, 4, 3, 5]} progress={Math.min(100, (data?.tasksToday ?? 0) * 10)} />
+              <MetricCardPro title="Interviews" value={data?.interviewsThisWeek ?? 0} delta="+8%" icon={Video} accent="cyan" trend={[2, 3, 3, 4, 5, 6, 6, 7]} progress={Math.min(100, (data?.interviewsThisWeek ?? 0) * 15)} />
             </TiltCard>
           </BentoKpis>
         </div>
