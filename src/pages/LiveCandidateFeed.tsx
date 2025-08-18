@@ -173,6 +173,25 @@ export default function LiveCandidateFeed() {
         throw interviewError;
       }
 
+      // Send webhook to Make.com
+      await fetch('https://hook.eu2.make.com/3t88lby79dnf6x6hgm1i828yhen75omb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          job_id: selectedCandidate.jobId,
+          candidate_id: selectedCandidate.candidateId,
+          callid: selectedCandidate.callid,
+          intid: interviewData?.intid,
+          appointment1: appointments[0],
+          appointment2: appointments[1],
+          appointment3: appointments[2],
+          inttype: interviewType,
+          intlink: interviewType === 'Online Meeting' ? interviewLink : null
+        })
+      });
+
       // Close dialog and refresh data
       setInterviewDialogOpen(false);
       setSelectedCandidate(null);

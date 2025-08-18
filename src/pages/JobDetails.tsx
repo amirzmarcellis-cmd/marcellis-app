@@ -543,6 +543,25 @@ export default function JobDetails() {
         throw interviewError;
       }
 
+      // Send webhook to Make.com
+      await fetch('https://hook.eu2.make.com/3t88lby79dnf6x6hgm1i828yhen75omb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          job_id: selectedCandidate.jobId,
+          candidate_id: selectedCandidate.candidateId,
+          callid: selectedCandidate.callid,
+          intid: interviewData?.intid,
+          appointment1: appointments[0],
+          appointment2: appointments[1],
+          appointment3: appointments[2],
+          inttype: interviewType,
+          intlink: interviewType === 'Online Meeting' ? interviewLink : null
+        })
+      });
+
       // Update local state
       setCvData(prev => prev.map(cv => 
         cv.candidate_id === selectedCandidate.candidateId 
