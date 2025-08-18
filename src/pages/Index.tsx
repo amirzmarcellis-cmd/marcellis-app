@@ -344,16 +344,24 @@ export default function Index() {
 
           <BentoKpis>
             <TiltCard>
-              <MetricCardPro title="Active Jobs" value={data?.totalJobs ?? 0} delta="+3 this week" icon={Briefcase} accent="primary" trend={[3, 5, 4, 6, 7, 8, 7, 9]} progress={Math.min(100, (data?.totalJobs ?? 0) * 12)} />
+              <div onClick={() => navigate('/jobs')} className="cursor-pointer">
+                <MetricCardPro title="Active Jobs" value={data?.totalJobs ?? 0} delta="+3 this week" icon={Briefcase} accent="primary" trend={[3, 5, 4, 6, 7, 8, 7, 9]} progress={Math.min(100, (data?.totalJobs ?? 0) * 12)} />
+              </div>
             </TiltCard>
             <TiltCard>
-              <MetricCardPro title="Awaiting Review" value={highScoreActiveCount || 0} delta="-12%" icon={ClipboardList} accent="purple" trend={[12, 10, 11, 9, 8, 7, 8, 6]} progress={Math.min(100, highScoreActiveCount || 0)} className="border-2 border-primary/60 glow-cyan" />
+              <div onClick={() => navigate('/live-candidate-feed')} className="cursor-pointer">
+                <MetricCardPro title="Awaiting Review" value={highScoreActiveCount || 0} delta="-12%" icon={ClipboardList} accent="purple" trend={[12, 10, 11, 9, 8, 7, 8, 6]} progress={Math.min(100, highScoreActiveCount || 0)} className="border-2 border-primary/60 glow-cyan" />
+              </div>
             </TiltCard>
             <TiltCard>
-              <MetricCardPro title="Tasked" value={data?.tasksToday ?? 0} delta={data?.tasksToday ? `${data.tasksToday > 0 ? '+' : ''}${data.tasksToday}` : undefined} icon={Target} accent="emerald" trend={[1, 2, 1, 3, 2, 4, 3, 5]} progress={Math.min(100, (data?.tasksToday ?? 0) * 10)} />
+              <div onClick={() => navigate('/jobs')} className="cursor-pointer">
+                <MetricCardPro title="Tasked" value={data?.tasksToday ?? 0} delta={data?.tasksToday ? `${data.tasksToday > 0 ? '+' : ''}${data.tasksToday}` : undefined} icon={Target} accent="emerald" trend={[1, 2, 1, 3, 2, 4, 3, 5]} progress={Math.min(100, (data?.tasksToday ?? 0) * 10)} />
+              </div>
             </TiltCard>
             <TiltCard>
-              <MetricCardPro title="Interviews" value={data?.interviewsThisWeek ?? 0} delta="+8%" icon={Video} accent="cyan" trend={[2, 3, 3, 4, 5, 6, 6, 7]} progress={Math.min(100, (data?.interviewsThisWeek ?? 0) * 15)} />
+              <div onClick={() => navigate('/interviews')} className="cursor-pointer">
+                <MetricCardPro title="Interviews" value={data?.interviewsThisWeek ?? 0} delta="+8%" icon={Video} accent="cyan" trend={[2, 3, 3, 4, 5, 6, 6, 7]} progress={Math.min(100, (data?.interviewsThisWeek ?? 0) * 15)} />
+              </div>
             </TiltCard>
           </BentoKpis>
         </div>
