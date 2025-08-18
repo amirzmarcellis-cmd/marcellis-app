@@ -1652,14 +1652,10 @@ export default function JobDetails() {
                                       </div>
                                        {/* Action Buttons - Arrange Interview and Reject */}
                                        <div className="flex gap-2">
-                                         <Button
-                                           variant="outline"
-                                           size="sm"
-                                            onClick={() => {
-                                              console.log('🔴 BUTTON CLICKED! candidateId:', candidateId);
-                                              alert('Button clicked! Check console for details.');
-                                              handleArrangeInterview(candidateId);
-                                            }}
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => handleArrangeInterview(candidateId)}
                                            className="flex-1 min-w-[100px] bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200"
                                          >
                                            <Calendar className="w-3 h-3 mr-1" />
@@ -1733,13 +1729,12 @@ export default function JobDetails() {
            </AlertDialogContent>
           </AlertDialog>
 
-          {/* Interview Scheduling Dialog */}
-          {console.log('🔥 Rendering Dialog. interviewDialogOpen =', interviewDialogOpen)}
-          <Dialog open={interviewDialogOpen} onOpenChange={setInterviewDialogOpen}>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>🔥 DEBUG: Schedule Interview Slots</DialogTitle>
-              </DialogHeader>
+           {/* Interview Scheduling Dialog */}
+           <Dialog open={interviewDialogOpen} onOpenChange={setInterviewDialogOpen}>
+             <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+               <DialogHeader>
+                 <DialogTitle>Schedule Interview Slots</DialogTitle>
+               </DialogHeader>
               <div className="space-y-6 overflow-y-auto max-h-[70vh] px-1">
                 <p className="text-sm text-muted-foreground">
                   Please select 3 preferred interview slots and interview type. Only future dates are allowed, and times must be in 15-minute intervals.
