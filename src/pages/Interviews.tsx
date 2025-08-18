@@ -19,6 +19,7 @@ interface Interview {
   appoint1: string;
   appoint2: string;
   appoint3: string;
+  chosen_time: string | null;
   inttype: string;
   intlink: string | null;
   intstatus: string;
@@ -80,7 +81,7 @@ export default function Interviews() {
 
       if (jobsError) throw jobsError;
 
-      setInterviews(interviewsData || []);
+      setInterviews((interviewsData as Interview[]) || []);
       setCandidates(candidatesData || []);
       setJobs(jobsData || []);
     } catch (error) {
@@ -270,6 +271,17 @@ export default function Interviews() {
                   {getTypeIcon(interview.inttype)}
                   <span>{interview.inttype}</span>
                 </div>
+
+                {/* Chosen Time */}
+                {interview.chosen_time && (
+                  <div className="p-3 rounded-lg bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/30">
+                    <div className="flex items-center space-x-2">
+                      <Clock className="w-4 h-4 text-cyan-400" />
+                      <span className="font-semibold text-foreground">Chosen Time:</span>
+                    </div>
+                    <p className="text-sm font-medium text-cyan-400 mt-1">{interview.chosen_time}</p>
+                  </div>
+                )}
 
                 {/* Interview Slots */}
                 <div className="space-y-2">
