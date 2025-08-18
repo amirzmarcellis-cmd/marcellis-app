@@ -1033,42 +1033,42 @@ export default function JobDetails() {
                          Candidates who have been contacted for this position
                        </CardDescription>
                      </div>
-                     {(() => {
-                       const readyToContactCount = candidates.filter(
-                         candidate => candidate["Contacted"]?.toLowerCase() === "ready to call"
-                       ).length;
-                       
-                       if (readyToContactCount > 0) {
-                         return (
-                           <div className="mb-4 p-3 bg-yellow-100/80 dark:bg-yellow-950/20 border border-yellow-300 dark:border-yellow-700 rounded-lg">
-                             <div className="flex items-center">
-                               <Target className="w-4 h-4 mr-2 text-yellow-700 dark:text-yellow-400" />
-                               <span className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
-                                 You have {readyToContactCount} Candidate{readyToContactCount > 1 ? 's' : ''} Ready to Contact
-                               </span>
-                             </div>
-                           </div>
-                         );
-                       }
-                       return null;
-                     })()}
                      <Button
-                      variant="default" 
-                      className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={handleGenerateShortList}
-                      disabled={isGeneratingShortList || shortListButtonDisabled}
-                    >
-                      <Phone className="w-4 h-4 mr-2" />
-                      {isGeneratingShortList 
-                        ? "Generating..." 
-                        : shortListButtonDisabled 
-                          ? `Short List is being processed (${Math.floor(shortListTimeRemaining / 60)}:${(shortListTimeRemaining % 60).toString().padStart(2, '0')})`
-                          : "Call & Generate Short List"
-                      }
-                    </Button>
-                  </div>
-                </CardHeader>
-               <CardContent>
+                       variant="default" 
+                       className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                       onClick={handleGenerateShortList}
+                       disabled={isGeneratingShortList || shortListButtonDisabled}
+                     >
+                       <Phone className="w-4 h-4 mr-2" />
+                       {isGeneratingShortList 
+                         ? "Generating..." 
+                         : shortListButtonDisabled 
+                           ? `Short List is being processed (${Math.floor(shortListTimeRemaining / 60)}:${(shortListTimeRemaining % 60).toString().padStart(2, '0')})`
+                           : "Call & Generate Short List"
+                       }
+                     </Button>
+                   </div>
+                 </CardHeader>
+                <CardContent>
+                  {(() => {
+                    const readyToContactCount = candidates.filter(
+                      candidate => candidate["Contacted"] === "Ready to Call"
+                    ).length;
+                    
+                    if (readyToContactCount > 0) {
+                      return (
+                        <div className="mb-4 p-3 bg-yellow-100/80 dark:bg-yellow-950/20 border border-yellow-300 dark:border-yellow-700 rounded-lg">
+                          <div className="flex items-center">
+                            <Target className="w-4 h-4 mr-2 text-yellow-700 dark:text-yellow-400" />
+                            <span className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
+                              You have {readyToContactCount} Candidate{readyToContactCount > 1 ? 's' : ''} Ready to Contact
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
                  {candidatesLoading ? (
                    <div className="flex items-center justify-center py-8">
                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
