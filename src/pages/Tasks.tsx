@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Filter, ExternalLink, Phone } from "lucide-react";
+import { Search, Filter, ExternalLink, Phone, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 
@@ -185,6 +185,31 @@ export default function Tasks() {
     navigate(`/call-log-details?callid=${callId}`);
   };
 
+  const deleteTask = async (taskId: number) => {
+    try {
+      const { error } = await supabase
+        .from('task_candidates')
+        .delete()
+        .eq('taskid', taskId);
+
+      if (error) throw error;
+
+      setTaskCandidates(prev => prev.filter(task => task.taskid !== taskId));
+
+      toast({
+        title: "Success",
+        description: "Task deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete task",
+        variant: "destructive",
+      });
+    }
+  };
+
   const filteredTasks = taskCandidates.filter(task => {
     const candidateName = getCandidateName(task.candidate_id).toLowerCase();
     const candidateEmail = getCandidateEmail(task.candidate_id).toLowerCase();
@@ -340,6 +365,15 @@ export default function Tasks() {
                           Call Log
                         </Button>
                       )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => deleteTask(task.taskid)}
+                        className="flex items-center gap-1 text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Remove
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
