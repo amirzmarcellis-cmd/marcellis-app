@@ -301,7 +301,7 @@ export default function CallLogDetails() {
                 <Button 
                   variant="default" 
                   size="sm"
-                  onClick={() => navigate(`/candidate-details/${callLog["Candidate_ID"]}`)}
+                  onClick={() => navigate(`/candidate/${callLog["Candidate_ID"]}`)}
                 >
                   <User className="w-4 h-4 mr-2" />
                   View Profile
