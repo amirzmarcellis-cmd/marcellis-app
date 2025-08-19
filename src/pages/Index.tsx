@@ -450,7 +450,7 @@ export default function Index() {
               </div>
             </TiltCard>
             <TiltCard>
-              <div onClick={() => navigate('/live-candidate-feed')} className="cursor-pointer">
+              <div onClick={() => navigate('/live-feed')} className="cursor-pointer">
                 <MetricCardPro title="Awaiting Review" value={highScoreActiveCount || 0} delta="-12%" icon={ClipboardList} accent="purple" trend={[12, 10, 11, 9, 8, 7, 8, 6]} progress={Math.min(100, highScoreActiveCount || 0)} className="border-2 border-primary/60 glow-cyan" />
               </div>
             </TiltCard>
