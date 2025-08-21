@@ -90,7 +90,7 @@ export function DashboardSidebar() {
       className="border-r border-border"
       collapsible={isMobile ? "offcanvas" : "icon"}
     >
-      <SidebarContent className="bg-transparent">
+      <SidebarContent className="bg-sidebar-background">
         {/* Header */}
         <div className="py-6 px-0 border-b border-border">
           <div className="space-y-4">
