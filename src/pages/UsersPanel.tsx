@@ -78,32 +78,33 @@ export default function UsersPanel() {
 
   const fetchUsers = async () => {
     try {
-      // Fetch users with their company roles
-      const { data, error } = await supabase
+      // Get users with roles - simplified approach using separate queries
+      const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select(`
-          user_id,
-          name,
-          created_at,
-          company_users!inner(
-            role,
-            company_id,
-            companies(name)
-          )
-        `)
+        .select('user_id, name, created_at')
         .order('created_at', { ascending: false })
 
-      if (error) throw error
-      
-      // Transform data to match UserWithRoles interface
-      const usersData: UserWithRoles[] = data?.map(profile => ({
-        user_id: profile.user_id,
-        name: profile.name,
-        email: '', // Will be populated from auth in real implementation
-        user_created_at: profile.created_at,
-        last_sign_in_at: null,
-        roles: profile.company_users?.map((cu: any) => cu.role) || []
-      })) || []
+      if (profilesError) throw profilesError
+
+      // Get user roles for all users
+      const { data: userRoles, error: rolesError } = await supabase
+        .from('company_users')
+        .select('user_id, role')
+
+      if (rolesError) throw rolesError
+
+      // Combine the data
+      const usersData: UserWithRoles[] = profiles?.map(profile => {
+        const roles = userRoles?.filter(ur => ur.user_id === profile.user_id).map(ur => ur.role) || []
+        return {
+          user_id: profile.user_id,
+          name: profile.name,
+          email: profile.user_id, // Using user_id as placeholder for email
+          user_created_at: profile.created_at,
+          last_sign_in_at: null,
+          roles
+        }
+      }) || []
 
       setUsers(usersData)
     } catch (error) {
