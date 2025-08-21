@@ -86,15 +86,23 @@ export function useCompany() {
         return acc;
       }, {}) || {};
 
-      // If platform admin, get all companies and add platform_admin role
-      if (isPlatformAdminFromProfile) {
-        // Fetch all companies for platform admin
+      // Always set user's assigned companies first
+      setCompanies(companiesData);
+      setUserRoles(rolesData);
+
+      // Set current company - use the first company the user belongs to
+      if (companiesData.length > 0 && !currentCompany) {
+        setCurrentCompany(companiesData[0]);
+      }
+
+      // If platform admin, additionally get all companies for management purposes
+      if (isPlatformAdminFromProfile && companiesData.length === 0) {
+        // Only fetch all companies if user has no specific company assignments
         const { data: allCompanies } = await supabase
           .from('companies')
           .select('id, name, subdomain, plan_type, logo_url, settings, created_at, updated_at');
 
         if (allCompanies) {
-          // Set all companies for platform admin
           setCompanies(allCompanies);
           
           // Add platform_admin role for all companies
@@ -108,14 +116,6 @@ export function useCompany() {
           if (allCompanies.length > 0 && !currentCompany) {
             setCurrentCompany(allCompanies[0]);
           }
-        }
-      } else {
-        setCompanies(companiesData);
-        setUserRoles(rolesData);
-
-        // Set current company - use the first company the user belongs to
-        if (companiesData.length > 0 && !currentCompany) {
-          setCurrentCompany(companiesData[0]);
         }
       }
     } catch (error) {
