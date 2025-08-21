@@ -87,7 +87,7 @@ export function DashboardSidebar() {
 
   return (
     <Sidebar
-      className="border-r border-border bg-card/50 backdrop-blur-sm"
+      className="border-r border-border"
       collapsible={isMobile ? "offcanvas" : "icon"}
     >
       <SidebarContent className="bg-transparent">
