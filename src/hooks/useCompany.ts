@@ -39,6 +39,7 @@ export function useCompany() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [currentCompany, setCurrentCompany] = useState<Company | null>(null);
   const [userRoles, setUserRoles] = useState<Record<string, string[]>>({});
+  const [isPlatformAdminUser, setIsPlatformAdminUser] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchCompanies = async () => {
@@ -52,7 +53,8 @@ export function useCompany() {
         .eq('user_id', user.id)
         .single();
 
-      const isPlatformAdminUser = profileData?.is_platform_admin || false;
+      const isPlatformAdminFromProfile = profileData?.is_platform_admin || false;
+      setIsPlatformAdminUser(isPlatformAdminFromProfile);
 
       // Get user's companies
       const { data: companyUsers, error: companyUsersError } = await supabase
@@ -84,20 +86,37 @@ export function useCompany() {
         return acc;
       }, {}) || {};
 
-      // If platform admin, add platform_admin role for all companies
-      if (isPlatformAdminUser) {
-        companiesData.forEach(company => {
-          if (!rolesData[company.id]) rolesData[company.id] = [];
-          rolesData[company.id].push('platform_admin');
-        });
-      }
+      // If platform admin, get all companies and add platform_admin role
+      if (isPlatformAdminFromProfile) {
+        // Fetch all companies for platform admin
+        const { data: allCompanies } = await supabase
+          .from('companies')
+          .select('id, name, subdomain, plan_type, logo_url, settings, created_at, updated_at');
 
-      setCompanies(companiesData);
-      setUserRoles(rolesData);
+        if (allCompanies) {
+          // Set all companies for platform admin
+          setCompanies(allCompanies);
+          
+          // Add platform_admin role for all companies
+          const platformAdminRoles: Record<string, string[]> = {};
+          allCompanies.forEach(company => {
+            platformAdminRoles[company.id] = ['platform_admin'];
+          });
+          setUserRoles(platformAdminRoles);
+          
+          // Set first company as current if no current company
+          if (allCompanies.length > 0 && !currentCompany) {
+            setCurrentCompany(allCompanies[0]);
+          }
+        }
+      } else {
+        setCompanies(companiesData);
+        setUserRoles(rolesData);
 
-      // Set current company - use the first company the user belongs to
-      if (companiesData.length > 0 && !currentCompany) {
-        setCurrentCompany(companiesData[0]);
+        // Set current company - use the first company the user belongs to
+        if (companiesData.length > 0 && !currentCompany) {
+          setCurrentCompany(companiesData[0]);
+        }
       }
     } catch (error) {
       console.error('Error fetching companies:', error);
@@ -117,7 +136,7 @@ export function useCompany() {
   };
 
   const isPlatformAdmin = (): boolean => {
-    return Object.values(userRoles).some(roles => roles.includes('platform_admin'));
+    return isPlatformAdminUser;
   };
 
   const isCompanyAdmin = (companyId?: string): boolean => {
