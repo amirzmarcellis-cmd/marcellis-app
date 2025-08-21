@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
-export type UserRole = 'super_admin' | 'admin' | 'manager' | 'recruiter';
+export type UserRole = 'platform_admin' | 'company_admin' | 'manager' | 'recruiter';
 
 interface UserRoleData {
   roles: UserRole[];
@@ -33,7 +33,7 @@ export function useUserRole(): UserRoleData {
 
       try {
         const { data, error } = await supabase
-          .from('user_roles')
+          .from('company_users')
           .select('role')
           .eq('user_id', user.id);
 
@@ -57,16 +57,20 @@ export function useUserRole(): UserRoleData {
   const hasRole = (role: UserRole) => roles.includes(role);
   
   // Role checks
-  const isSuperAdmin = hasRole('super_admin');
-  const isAdmin = hasRole('admin');
+  const isPlatformAdmin = hasRole('platform_admin');
+  const isCompanyAdmin = hasRole('company_admin');
   const isManager = hasRole('manager');
   const isRecruiter = hasRole('recruiter');
 
+  // Legacy compatibility
+  const isSuperAdmin = isPlatformAdmin;
+  const isAdmin = isCompanyAdmin;
+
   // Permission checks based on RBAC rules
-  const canManageUsers = isSuperAdmin || isAdmin || isManager;
-  const canDeleteUsers = isSuperAdmin || isAdmin; // Only super admin and admin can delete
-  const canAccessAnalytics = isSuperAdmin || isAdmin || isManager; // Recruiters cannot access
-  const canAccessUsersPanel = isSuperAdmin || isAdmin || isManager; // Recruiters cannot access
+  const canManageUsers = isPlatformAdmin || isCompanyAdmin || isManager;
+  const canDeleteUsers = isPlatformAdmin || isCompanyAdmin; // Only platform admin and company admin can delete
+  const canAccessAnalytics = isPlatformAdmin || isCompanyAdmin || isManager; // Recruiters cannot access
+  const canAccessUsersPanel = isPlatformAdmin || isCompanyAdmin || isManager; // Recruiters cannot access
 
   return {
     roles,

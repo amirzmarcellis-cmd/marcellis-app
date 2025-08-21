@@ -16,8 +16,11 @@ import {
   Sun,
   Moon,
   ClipboardList,
+  Building2,
 } from "lucide-react"
 import { useAuth } from '@/contexts/AuthContext';
+import { useCompanyContext } from '@/contexts/CompanyContext';
+import { CompanySwitcher } from '@/components/company/CompanySwitcher';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { Button } from '@/components/ui/button';
@@ -36,30 +39,34 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
-const navigationItems = [
-  { title: "Dashboard", url: "/", icon: Home },
-  { title: "Interviews", url: "/interviews", icon: Calendar },
-  { title: "Live Feed", url: "/live-feed", icon: Activity },
-  { title: "Tasks", url: "/tasks", icon: ClipboardList },
-  { title: "Jobs", url: "/jobs", icon: Briefcase },
-  { title: "Candidates", url: "/candidates", icon: Users },
-  { title: "Call Log", url: "/call-log", icon: PhoneCall },
-  { title: "Analytics", url: "/analytics", icon: BarChart3 },
-  { title: "Reports", url: "/reports", icon: FileText },
-  { title: "Settings", url: "/settings", icon: Settings },
-]
+// Moved navigationItems inside component to access context hooks
 
 export function DashboardSidebar() {
   const { state } = useSidebar()
   const { signOut } = useAuth();
   const { settings } = useAppSettings();
   const { canAccessAnalytics } = useUserRole();
+  const { canManageUsers, isPlatformAdmin } = useCompanyContext();
   const { theme, setTheme } = useTheme();
   const location = useLocation()
   const currentPath = location.pathname
   const isCollapsed = state === "collapsed"
   const isMobile = useIsMobile()
   const isMini = isCollapsed && !isMobile
+
+  const navigationItems = [
+    { title: "Dashboard", url: "/", icon: Home },
+    { title: "Interviews", url: "/interviews", icon: Calendar },
+    { title: "Live Feed", url: "/live-feed", icon: Activity },
+    { title: "Tasks", url: "/tasks", icon: ClipboardList },
+    { title: "Jobs", url: "/jobs", icon: Briefcase },
+    { title: "Candidates", url: "/candidates", icon: Users },
+    { title: "Call Log", url: "/call-log", icon: PhoneCall },
+    { title: "Analytics", url: "/analytics", icon: BarChart3 },
+    { title: "Reports", url: "/reports", icon: FileText },
+    ...(canManageUsers() || isPlatformAdmin() ? [{ title: "Company Settings", url: "/company-settings", icon: Building2 }] : []),
+    { title: "Settings", url: "/settings", icon: Settings },
+  ]
 
   const isActive = (path: string) => currentPath === path
   const hasActiveItem = navigationItems.some((item) => isActive(item.url))
@@ -76,23 +83,30 @@ export function DashboardSidebar() {
       <SidebarContent className="bg-transparent">
         {/* Header */}
         <div className="py-6 px-0 border-b border-border">
-          <div className="flex items-center justify-center">
-            <div className={`${isMini ? 'w-full h-16' : 'w-full h-28'} flex items-center justify-center transition-all duration-200`}>
-              {(() => {
-                const displayLogo = theme === 'dark'
-                  ? (settings.logoLight || settings.logo || settings.primaryColor)
-                  : (settings.logoDark || settings.logo || settings.primaryColor);
-                return displayLogo ? (
-                  <img 
-                    src={displayLogo as string}
-                    alt="Company Logo" 
-                    className="w-full h-full object-contain rounded-lg"
-                  />
-                ) : (
-                  <Phone className={`${isMini ? 'w-10 h-10' : 'w-20 h-20'} text-primary`} />
-                );
-              })()}
+          <div className="space-y-4">
+            <div className="flex items-center justify-center">
+              <div className={`${isMini ? 'w-full h-16' : 'w-full h-20'} flex items-center justify-center transition-all duration-200`}>
+                {(() => {
+                  const displayLogo = theme === 'dark'
+                    ? (settings.logoLight || settings.logo || settings.primaryColor)
+                    : (settings.logoDark || settings.logo || settings.primaryColor);
+                  return displayLogo ? (
+                    <img 
+                      src={displayLogo as string}
+                      alt="Company Logo" 
+                      className="w-full h-full object-contain rounded-lg"
+                    />
+                  ) : (
+                    <Phone className={`${isMini ? 'w-10 h-10' : 'w-16 h-16'} text-primary`} />
+                  );
+                })()}
+              </div>
             </div>
+            {!isMini && (
+              <div className="px-3">
+                <CompanySwitcher />
+              </div>
+            )}
           </div>
         </div>
 

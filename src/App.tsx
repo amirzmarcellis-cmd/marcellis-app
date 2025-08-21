@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { CompanyProvider } from "@/contexts/CompanyContext";
 import { AppSettingsProvider } from "@/contexts/AppSettingsContext";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -32,6 +33,7 @@ import Apply from "./pages/Apply";
 import UsersPanel from "./pages/UsersPanel";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import CompanySettings from "./pages/CompanySettings";
 
 const queryClient = new QueryClient();
 
@@ -39,13 +41,14 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <AuthProvider>
-        <AppSettingsProvider>
-          <TooltipProvider delayDuration={200} skipDelayDuration={300}>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <SidebarProvider>
-                <Routes>
+        <CompanyProvider>
+          <AppSettingsProvider>
+            <TooltipProvider delayDuration={200} skipDelayDuration={300}>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <SidebarProvider>
+                  <Routes>
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/apply" element={<Apply />} />
                   <Route path="/" element={<DashboardLayout><Index /></DashboardLayout>} />
@@ -80,12 +83,18 @@ const App = () => (
                       <DashboardLayout><UsersPanel /></DashboardLayout>
                     </ProtectedRoute>
                   } />
+                  <Route path="/company-settings" element={
+                    <ProtectedRoute>
+                      <DashboardLayout><CompanySettings /></DashboardLayout>
+                    </ProtectedRoute>
+                  } />
                   <Route path="*" element={<NotFound />} />
-                </Routes>
-              </SidebarProvider>
-            </BrowserRouter>
-          </TooltipProvider>
-        </AppSettingsProvider>
+                  </Routes>
+                </SidebarProvider>
+              </BrowserRouter>
+            </TooltipProvider>
+          </AppSettingsProvider>
+        </CompanyProvider>
       </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>

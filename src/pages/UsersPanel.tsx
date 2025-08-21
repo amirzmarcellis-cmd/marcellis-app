@@ -47,7 +47,8 @@ interface UserWithRoles {
 }
 
 const ROLE_OPTIONS = [
-  { value: 'super_admin', label: 'Super Admin', icon: Crown, color: 'destructive' },
+  { value: 'platform_admin', label: 'Platform Admin', icon: Crown, color: 'destructive' },
+  { value: 'company_admin', label: 'Company Admin', icon: Shield, color: 'default' },
   { value: 'manager', label: 'Manager', icon: Shield, color: 'default' },
   { value: 'recruiter', label: 'Recruiter', icon: UserIcon, color: 'secondary' }
 ]
@@ -77,13 +78,26 @@ export default function UsersPanel() {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('users_with_roles')
+      // For now, fetch from profiles and manually get roles
+      // TODO: Create a proper view for users with roles in multi-tenant context
+      const { data: profiles, error } = await supabase
+        .from('profiles')
         .select('*')
-        .order('user_created_at', { ascending: false })
+        .order('created_at', { ascending: false })
 
       if (error) throw error
-      setUsers(data || [])
+      
+      // Transform data to match UserWithRoles interface
+      const usersData: UserWithRoles[] = profiles?.map(profile => ({
+        user_id: profile.user_id,
+        name: profile.name,
+        email: '', // TODO: Get from auth.users via RPC or view
+        user_created_at: profile.created_at,
+        last_sign_in_at: null, // TODO: Get from auth.users
+        roles: [] // TODO: Get from company_users
+      })) || []
+
+      setUsers(usersData)
     } catch (error) {
       console.error('Error fetching users:', error)
       toast.error('Failed to fetch users')
