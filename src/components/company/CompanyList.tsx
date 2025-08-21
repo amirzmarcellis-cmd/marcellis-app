@@ -4,9 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Building2, Users, Settings, Plus } from 'lucide-react';
+import { Building2, Users, Settings, Plus, Edit } from 'lucide-react';
 import { CreateCompanyDialog } from './CreateCompanyDialog';
+import { CompanyManagementPanel } from './CompanyManagementPanel';
 import { Company } from '@/hooks/useCompany';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 interface CompanyWithStats extends Company {
   user_count?: number;
@@ -17,7 +19,9 @@ export function CompanyList() {
   const [companies, setCompanies] = useState<CompanyWithStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const { toast } = useToast();
+  const { switchCompany } = useCompanyContext();
 
   const fetchCompanies = async () => {
     try {
@@ -65,6 +69,19 @@ export function CompanyList() {
     setShowCreateDialog(false);
   };
 
+  const handleManageCompany = (company: Company) => {
+    setSelectedCompany(company);
+  };
+
+  const handleBackToList = () => {
+    setSelectedCompany(null);
+  };
+
+  const handleCompanyUpdated = () => {
+    fetchCompanies();
+    setSelectedCompany(null);
+  };
+
   if (loading) {
     return (
       <Card>
@@ -72,6 +89,17 @@ export function CompanyList() {
           <p className="text-muted-foreground">Loading companies...</p>
         </CardContent>
       </Card>
+    );
+  }
+
+  // Show company management panel if a company is selected
+  if (selectedCompany) {
+    return (
+      <CompanyManagementPanel
+        company={selectedCompany}
+        onBack={handleBackToList}
+        onCompanyUpdated={handleCompanyUpdated}
+      />
     );
   }
 
@@ -125,7 +153,13 @@ export function CompanyList() {
                 Created: {new Date(company.created_at).toLocaleDateString()}
               </div>
 
-              <Button variant="outline" size="sm" className="w-full">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full"
+                onClick={() => handleManageCompany(company)}
+              >
+                <Edit className="h-4 w-4 mr-2" />
                 Manage Company
               </Button>
             </CardContent>
