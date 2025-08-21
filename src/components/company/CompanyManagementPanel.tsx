@@ -60,17 +60,17 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
       const userIds = data?.map(u => u.user_id) || [];
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('user_id, name')
+        .select('user_id, name, email')
         .in('user_id', userIds);
 
-      // For each user, try to get their email - we'll store it in profiles table for better access
+      // Combine user data with profiles including email
       const usersWithProfiles = (data || []).map((user) => {
         const profile = profiles?.find(p => p.user_id === user.user_id);
         
         return {
           ...user,
           profiles: profile || null,
-          email: 'Email not available' // We'll need to store emails in profiles for full access
+          email: profile?.email || 'Email not available'
         };
       });
 
