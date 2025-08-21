@@ -86,16 +86,16 @@ export function useCompany() {
         return acc;
       }, {}) || {};
 
-      // Always set user's assigned companies first
+      // Always prioritize user's specific company assignments
       setCompanies(companiesData);
       setUserRoles(rolesData);
 
       // Set current company - use the first company the user belongs to
-      if (companiesData.length > 0 && !currentCompany) {
+      if (companiesData.length > 0) {
         setCurrentCompany(companiesData[0]);
       }
 
-      // If platform admin, additionally get all companies for management purposes
+      // If platform admin and no specific companies, then get all companies
       if (isPlatformAdminFromProfile && companiesData.length === 0) {
         // Only fetch all companies if user has no specific company assignments
         const { data: allCompanies } = await supabase
@@ -112,8 +112,8 @@ export function useCompany() {
           });
           setUserRoles(platformAdminRoles);
           
-          // Set first company as current if no current company
-          if (allCompanies.length > 0 && !currentCompany) {
+          // Set first company as current
+          if (allCompanies.length > 0) {
             setCurrentCompany(allCompanies[0]);
           }
         }
