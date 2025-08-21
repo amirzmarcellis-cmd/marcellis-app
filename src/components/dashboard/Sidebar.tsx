@@ -54,7 +54,14 @@ export function DashboardSidebar() {
   const isMobile = useIsMobile()
   const isMini = isCollapsed && !isMobile
 
-  const navigationItems = [
+  // Platform admin gets different navigation
+  const platformAdminNavigation = [
+    { title: "Companies", url: "/company-settings", icon: Building2 },
+    { title: "Settings", url: "/settings", icon: Settings },
+  ];
+
+  // Regular company navigation
+  const companyNavigation = [
     { title: "Dashboard", url: "/", icon: Home },
     { title: "Interviews", url: "/interviews", icon: Calendar },
     { title: "Live Feed", url: "/live-feed", icon: Activity },
@@ -64,9 +71,12 @@ export function DashboardSidebar() {
     { title: "Call Log", url: "/call-log", icon: PhoneCall },
     { title: "Analytics", url: "/analytics", icon: BarChart3 },
     { title: "Reports", url: "/reports", icon: FileText },
-    ...(canManageUsers() || isPlatformAdmin() ? [{ title: "Company Settings", url: "/company-settings", icon: Building2 }] : []),
+    ...(canManageUsers() ? [{ title: "Company Settings", url: "/company-settings", icon: Building2 }] : []),
+    ...(canManageUsers() ? [{ title: "Users", url: "/users-panel", icon: Users }] : []),
     { title: "Settings", url: "/settings", icon: Settings },
-  ]
+  ];
+
+  const navigationItems = isPlatformAdmin() ? platformAdminNavigation : companyNavigation;
 
   const isActive = (path: string) => currentPath === path
   const hasActiveItem = navigationItems.some((item) => isActive(item.url))
@@ -102,9 +112,15 @@ export function DashboardSidebar() {
                 })()}
               </div>
             </div>
-            {!isMini && (
+            {!isMini && !isPlatformAdmin() && (
               <div className="px-3">
                 <CompanySwitcher />
+              </div>
+            )}
+            {!isMini && isPlatformAdmin() && (
+              <div className="px-3 text-center">
+                <div className="text-sm font-medium text-foreground">Platform Admin</div>
+                <div className="text-xs text-muted-foreground">System Management</div>
               </div>
             )}
           </div>

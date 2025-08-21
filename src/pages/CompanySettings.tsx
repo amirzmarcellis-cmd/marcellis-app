@@ -8,19 +8,35 @@ import { Building2, Plus, Users, Settings } from "lucide-react";
 export default function CompanySettings() {
   const { isPlatformAdmin, canManageUsers } = useCompanyContext();
 
+  // Redirect platform admins to their dedicated interface
+  if (isPlatformAdmin()) {
+    return (
+      <DashboardLayout>
+        <div className="space-y-6">
+          <div className="flex items-center gap-3">
+            <Building2 className="h-8 w-8 text-primary" />
+            <div>
+              <h1 className="text-3xl font-bold">Platform Administration</h1>
+              <p className="text-muted-foreground">
+                Manage all companies and platform-wide settings
+              </p>
+            </div>
+          </div>
+
+          <CompanyManagement />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">
-              {isPlatformAdmin() ? 'Platform Administration' : 'Company Settings'}
-            </h1>
+            <h1 className="text-3xl font-bold">Company Settings</h1>
             <p className="text-muted-foreground">
-              {isPlatformAdmin() 
-                ? 'Manage all companies and platform settings'
-                : 'Manage your company information and settings'
-              }
+              Manage your company information and settings
             </p>
           </div>
         </div>

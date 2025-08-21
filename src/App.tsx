@@ -34,6 +34,7 @@ import UsersPanel from "./pages/UsersPanel";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import CompanySettings from "./pages/CompanySettings";
+import PlatformAdmin from "./pages/PlatformAdmin";
 
 const queryClient = new QueryClient();
 
@@ -83,11 +84,16 @@ const App = () => (
                       <DashboardLayout><UsersPanel /></DashboardLayout>
                     </ProtectedRoute>
                   } />
-                  <Route path="/company-settings" element={
-                    <ProtectedRoute>
-                      <DashboardLayout><CompanySettings /></DashboardLayout>
-                    </ProtectedRoute>
-                  } />
+                   <Route path="/company-settings" element={
+                     <ProtectedRoute>
+                       <DashboardLayout><CompanySettings /></DashboardLayout>
+                     </ProtectedRoute>
+                   } />
+                   <Route path="/platform-admin" element={
+                     <ProtectedRoute>
+                       <DashboardLayout><PlatformAdmin /></DashboardLayout>
+                     </ProtectedRoute>
+                   } />
                   <Route path="*" element={<NotFound />} />
                   </Routes>
                 </SidebarProvider>
