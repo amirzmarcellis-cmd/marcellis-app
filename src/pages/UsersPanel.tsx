@@ -78,23 +78,31 @@ export default function UsersPanel() {
 
   const fetchUsers = async () => {
     try {
-      // For now, fetch from profiles and manually get roles
-      // TODO: Create a proper view for users with roles in multi-tenant context
-      const { data: profiles, error } = await supabase
+      // Fetch users with their company roles
+      const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select(`
+          user_id,
+          name,
+          created_at,
+          company_users!inner(
+            role,
+            company_id,
+            companies(name)
+          )
+        `)
         .order('created_at', { ascending: false })
 
       if (error) throw error
       
       // Transform data to match UserWithRoles interface
-      const usersData: UserWithRoles[] = profiles?.map(profile => ({
+      const usersData: UserWithRoles[] = data?.map(profile => ({
         user_id: profile.user_id,
         name: profile.name,
-        email: '', // TODO: Get from auth.users via RPC or view
+        email: '', // Will be populated from auth in real implementation
         user_created_at: profile.created_at,
-        last_sign_in_at: null, // TODO: Get from auth.users
-        roles: [] // TODO: Get from company_users
+        last_sign_in_at: null,
+        roles: profile.company_users?.map((cu: any) => cu.role) || []
       })) || []
 
       setUsers(usersData)
@@ -176,13 +184,17 @@ export default function UsersPanel() {
 
       // Add roles if any selected
       if (userRoles.length > 0 && result.user?.user) {
+        const { data: { session } } = await supabase.auth.getSession()
+        const { data: companies } = await supabase.from('companies').select('id').limit(1).single()
+        
         const rolesToInsert = userRoles.map(role => ({
           user_id: result.user.user.id,
-          role: role as 'super_admin' | 'manager' | 'admin' | 'recruiter'
+          company_id: companies?.id,
+          role: role as any
         }))
 
         const { error: rolesError } = await supabase
-          .from('user_roles')
+          .from('company_users')
           .insert(rolesToInsert)
 
         if (rolesError) console.error('Roles assignment error:', rolesError)
@@ -247,19 +259,22 @@ export default function UsersPanel() {
     try {
       // First, remove all existing roles for this user
       await supabase
-        .from('user_roles')
+        .from('company_users')
         .delete()
         .eq('user_id', selectedUser.user_id)
 
       // Then add the new roles
       if (userRoles.length > 0) {
+        const { data: companies } = await supabase.from('companies').select('id').limit(1).single()
+        
         const rolesToInsert = userRoles.map(role => ({
           user_id: selectedUser.user_id,
-          role: role as 'super_admin' | 'manager' | 'admin' | 'recruiter'
+          company_id: companies?.id,
+          role: role as any
         }))
 
         const { error: insertError } = await supabase
-          .from('user_roles')
+          .from('company_users')
           .insert(rolesToInsert)
 
         if (insertError) throw insertError
