@@ -22,7 +22,7 @@ interface CompanyManagementPanelProps {
 interface CompanyUser {
   id: string;
   user_id: string;
-  role: 'company_admin' | 'platform_admin' | 'manager' | 'recruiter';
+  role: 'company_admin' | 'manager' | 'recruiter'; // Removed platform_admin
   profiles: {
     name: string;
   } | null;
@@ -41,12 +41,12 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
     name: string;
     email: string;
     password: string;
-    role: 'company_admin' | 'platform_admin' | 'manager' | 'recruiter';
+    role: 'company_admin' | 'manager' | 'recruiter'; // Removed platform_admin
   }>({
     name: '',
     email: '',
     password: '',
-    role: 'company_admin',
+    role: 'recruiter', // Default to recruiter instead of company_admin
   });
   const [companyData, setCompanyData] = useState({
     name: company.name,
@@ -68,7 +68,8 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
           user_id,
           role
         `)
-        .eq('company_id', company.id);
+        .eq('company_id', company.id)
+        .neq('role', 'platform_admin'); // Exclude platform admins
 
       if (error) throw error;
 
@@ -87,7 +88,7 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
           ...user,
           profiles: profile || null,
           email: profile?.email || 'Email not available'
-        };
+        } as CompanyUser; // Type assertion since we filtered out platform_admin
       });
 
       setUsers(usersWithProfiles);
@@ -223,7 +224,7 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
       });
 
       setShowAddUserDialog(false);
-      setUserFormData({ name: '', email: '', password: '', role: 'company_admin' });
+      setUserFormData({ name: '', email: '', password: '', role: 'recruiter' });
       fetchCompanyUsers();
     } catch (error: any) {
       toast({
@@ -283,7 +284,7 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
 
       setShowEditUserDialog(false);
       setSelectedUser(null);
-      setUserFormData({ name: '', email: '', password: '', role: 'company_admin' });
+      setUserFormData({ name: '', email: '', password: '', role: 'recruiter' });
       fetchCompanyUsers();
     } catch (error: any) {
       toast({
@@ -574,7 +575,7 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
               <Label htmlFor="add-role">Role</Label>
               <Select 
                 value={userFormData.role} 
-                onValueChange={(value: 'company_admin' | 'platform_admin' | 'manager' | 'recruiter') => 
+                onValueChange={(value: 'company_admin' | 'manager' | 'recruiter') => 
                   setUserFormData({ ...userFormData, role: value })
                 }
               >
@@ -585,7 +586,6 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
                   <SelectItem value="company_admin">Company Admin</SelectItem>
                   <SelectItem value="manager">Manager</SelectItem>
                   <SelectItem value="recruiter">Recruiter</SelectItem>
-                  <SelectItem value="platform_admin">Platform Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -659,7 +659,7 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
               <Label htmlFor="edit-role">Role</Label>
               <Select 
                 value={userFormData.role} 
-                onValueChange={(value: 'company_admin' | 'platform_admin' | 'manager' | 'recruiter') => 
+                onValueChange={(value: 'company_admin' | 'manager' | 'recruiter') => 
                   setUserFormData({ ...userFormData, role: value })
                 }
               >
@@ -670,7 +670,6 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
                   <SelectItem value="company_admin">Company Admin</SelectItem>
                   <SelectItem value="manager">Manager</SelectItem>
                   <SelectItem value="recruiter">Recruiter</SelectItem>
-                  <SelectItem value="platform_admin">Platform Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -682,7 +681,7 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
                 onClick={() => {
                   setShowEditUserDialog(false);
                   setSelectedUser(null);
-                  setUserFormData({ name: '', email: '', password: '', role: 'company_admin' });
+                  setUserFormData({ name: '', email: '', password: '', role: 'recruiter' });
                 }} 
                 className="flex-1"
               >
