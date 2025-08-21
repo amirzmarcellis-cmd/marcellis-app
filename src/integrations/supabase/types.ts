@@ -971,6 +971,14 @@ export type Database = {
       }
     }
     Functions: {
+      assign_platform_admin_by_email: {
+        Args: { user_email: string }
+        Returns: string
+      }
+      assign_platform_admin_by_user_id: {
+        Args: { target_user_id: string }
+        Returns: string
+      }
       generate_interview_id: {
         Args: Record<PropertyKey, never>
         Returns: string

@@ -1,179 +1,185 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+const supabaseAdmin = createClient(
+  Deno.env.get('SUPABASE_URL') ?? '',
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+)
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Create admin client with service role key
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
-      }
-    )
-
-    // Get the authorization header
-    const authHeader = req.headers.get('Authorization')
+    const authHeader = req.headers.get('authorization');
     if (!authHeader) {
-      throw new Error('No authorization header')
+      console.error('No authorization header');
+      return new Response(
+        JSON.stringify({ error: 'Authorization header required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    // Verify the user is authenticated
-    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(
-      authHeader.replace('Bearer ', '')
-    )
-
+    // Verify the JWT token and get the user
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    
     if (authError || !user) {
-      throw new Error('Unauthorized')
+      console.error('Auth error:', authError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid authentication' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    // Check if user has admin or super_admin role
+    // Check if user has admin privileges using the new company_users table
     const { data: userRoles, error: roleError } = await supabaseAdmin
-      .from('user_roles')
+      .from('company_users')
       .select('role')
-      .eq('user_id', user.id)
+      .eq('user_id', user.id);
 
     if (roleError) {
-      throw new Error('Failed to check user roles')
+      console.error('Error checking user roles:', roleError);
+      return new Response(
+        JSON.stringify({ error: 'Failed to check user roles' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    const hasAdminRole = userRoles?.some(r => 
-      r.role === 'admin' || r.role === 'super_admin'
-    )
+    const hasAdminRole = userRoles?.some(role => 
+      role.role === 'platform_admin' || role.role === 'company_admin'
+    );
 
     if (!hasAdminRole) {
-      throw new Error('Insufficient permissions')
+      console.error('User does not have admin role');
+      return new Response(
+        JSON.stringify({ error: 'Insufficient permissions' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    const { action, userId, userData } = await req.json()
+    const { action, userId, userData } = await req.json();
 
     switch (action) {
       case 'create_user': {
-        const { email, password, name } = userData
+        console.log('Creating user:', userData.email);
         
-        // Create user
         const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
-          email,
-          password,
+          email: userData.email,
+          password: userData.password,
           user_metadata: {
-            full_name: name
+            name: userData.name
           },
           email_confirm: true
-        })
+        });
 
         if (createError) {
-          throw createError
+          console.error('User creation error:', createError);
+          return new Response(
+            JSON.stringify({ error: createError.message }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
         }
 
-        // Create profile - always create one to ensure data consistency
+        // Create profile entry
         if (newUser.user) {
           const { error: profileError } = await supabaseAdmin
             .from('profiles')
-            .upsert({
+            .insert({
               user_id: newUser.user.id,
-              name: name || ''
-            }, {
-              onConflict: 'user_id'
-            })
+              name: userData.name
+            });
 
           if (profileError) {
-            console.error('Profile creation error:', profileError)
+            console.error('Profile creation error:', profileError);
           }
         }
 
         return new Response(
-          JSON.stringify({ success: true, user: newUser }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
+          JSON.stringify({ user: newUser, success: true }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
 
       case 'update_user': {
-        const { email, password, name } = userData
+        console.log('Updating user:', userId);
         
-        // Prepare update data
-        const updateData: any = {
-          user_metadata: {
-            full_name: name
-          }
+        const updateData: any = {};
+        if (userData.email) updateData.email = userData.email;
+        if (userData.password) updateData.password = userData.password;
+        if (userData.name) {
+          updateData.user_metadata = { name: userData.name };
         }
 
-        if (password) {
-          updateData.password = password
-        }
-
-        if (email) {
-          updateData.email = email
-        }
-
-        // Update user
         const { data: updatedUser, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
           userId,
           updateData
-        )
+        );
 
         if (updateError) {
-          throw updateError
+          console.error('User update error:', updateError);
+          return new Response(
+            JSON.stringify({ error: updateError.message }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
         }
 
-        // Update profile - ensure it exists and update the name
-        const { error: profileError } = await supabaseAdmin
-          .from('profiles')
-          .upsert({
-            user_id: userId,
-            name: name || ''
-          }, {
-            onConflict: 'user_id'
-          })
+        // Update profile
+        if (userData.name) {
+          const { error: profileError } = await supabaseAdmin
+            .from('profiles')
+            .update({ name: userData.name })
+            .eq('user_id', userId);
 
-        if (profileError) {
-          console.error('Profile update error:', profileError)
+          if (profileError) {
+            console.error('Profile update error:', profileError);
+          }
         }
 
         return new Response(
-          JSON.stringify({ success: true, user: updatedUser }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
+          JSON.stringify({ user: updatedUser, success: true }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
 
       case 'delete_user': {
-        // Delete user
-        const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId)
+        console.log('Deleting user:', userId);
+        
+        const { data: deletedUser, error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId);
 
         if (deleteError) {
-          throw deleteError
+          console.error('User deletion error:', deleteError);
+          return new Response(
+            JSON.stringify({ error: deleteError.message }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
         }
 
         return new Response(
-          JSON.stringify({ success: true }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
+          JSON.stringify({ user: deletedUser, success: true }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
 
       default:
-        throw new Error('Invalid action')
+        return new Response(
+          JSON.stringify({ error: 'Invalid action' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
     }
 
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Function error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    )
+      JSON.stringify({ error: 'Internal server error' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
-})
+});
