@@ -985,6 +985,10 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: string
       }
+      check_platform_admin_status: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       generate_interview_id: {
         Args: Record<PropertyKey, never>
         Returns: string
