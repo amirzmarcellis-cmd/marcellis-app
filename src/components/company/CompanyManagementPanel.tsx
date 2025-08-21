@@ -6,10 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Building2, Users, CreditCard, ArrowLeft, Trash2, UserPlus } from 'lucide-react';
+import { Building2, Users, CreditCard, ArrowLeft, Trash2, UserPlus, Edit, Mail, User, Shield } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Company } from '@/hooks/useCompany';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface CompanyManagementPanelProps {
   company: Company;
@@ -20,11 +22,11 @@ interface CompanyManagementPanelProps {
 interface CompanyUser {
   id: string;
   user_id: string;
-  role: string;
+  role: 'company_admin' | 'platform_admin' | 'manager' | 'recruiter';
   profiles: {
     name: string;
   } | null;
-  email?: string; // Add email field
+  email?: string;
 }
 
 export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: CompanyManagementPanelProps) {
@@ -32,6 +34,20 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [users, setUsers] = useState<CompanyUser[]>([]);
+  const [showAddUserDialog, setShowAddUserDialog] = useState(false);
+  const [showEditUserDialog, setShowEditUserDialog] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<CompanyUser | null>(null);
+  const [userFormData, setUserFormData] = useState<{
+    name: string;
+    email: string;
+    password: string;
+    role: 'company_admin' | 'platform_admin' | 'manager' | 'recruiter';
+  }>({
+    name: '',
+    email: '',
+    password: '',
+    role: 'company_admin',
+  });
   const [companyData, setCompanyData] = useState({
     name: company.name,
     subdomain: company.subdomain,
@@ -159,6 +175,184 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
     }
   };
 
+  const handleAddUser = async () => {
+    if (!userFormData.name || !userFormData.email || !userFormData.password) {
+      toast({
+        title: 'Error',
+        description: 'Please fill in all required fields',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Create user using the admin edge function
+      const { data: adminResult, error: adminError } = await supabase.functions.invoke('admin-user-management', {
+        body: {
+          action: 'create_user',
+          userData: {
+            email: userFormData.email,
+            password: userFormData.password,
+            name: userFormData.name,
+          },
+        },
+      });
+
+      if (adminError) throw adminError;
+
+      if (!adminResult.user?.user) {
+        throw new Error('Failed to create user');
+      }
+
+      // Assign user to this company
+      const { error: roleError } = await supabase
+        .from('company_users')
+        .insert({
+          user_id: adminResult.user.user.id,
+          company_id: company.id,
+          role: userFormData.role,
+          joined_at: new Date().toISOString(),
+        });
+
+      if (roleError) throw roleError;
+
+      toast({
+        title: 'Success',
+        description: `User "${userFormData.name}" added successfully`,
+      });
+
+      setShowAddUserDialog(false);
+      setUserFormData({ name: '', email: '', password: '', role: 'company_admin' });
+      fetchCompanyUsers();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to add user',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditUser = async () => {
+    if (!selectedUser || !userFormData.name || !userFormData.email) {
+      toast({
+        title: 'Error',
+        description: 'Please fill in all required fields',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Update user using the admin edge function
+      const updateData: any = {
+        email: userFormData.email,
+        name: userFormData.name,
+      };
+
+      if (userFormData.password) {
+        updateData.password = userFormData.password;
+      }
+
+      const { error: adminError } = await supabase.functions.invoke('admin-user-management', {
+        body: {
+          action: 'update_user',
+          userId: selectedUser.user_id,
+          userData: updateData,
+        },
+      });
+
+      if (adminError) throw adminError;
+
+      // Update role if changed
+      const { error: roleError } = await supabase
+        .from('company_users')
+        .update({ role: userFormData.role })
+        .eq('id', selectedUser.id);
+
+      if (roleError) throw roleError;
+
+      toast({
+        title: 'Success',
+        description: `User "${userFormData.name}" updated successfully`,
+      });
+
+      setShowEditUserDialog(false);
+      setSelectedUser(null);
+      setUserFormData({ name: '', email: '', password: '', role: 'company_admin' });
+      fetchCompanyUsers();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to update user',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async (user: CompanyUser) => {
+    setLoading(true);
+    try {
+      // First remove from company
+      const { error: companyError } = await supabase
+        .from('company_users')
+        .delete()
+        .eq('id', user.id);
+
+      if (companyError) throw companyError;
+
+      // Check if user belongs to any other companies
+      const { data: otherCompanies } = await supabase
+        .from('company_users')
+        .select('id')
+        .eq('user_id', user.user_id);
+
+      // If user doesn't belong to any other companies, delete the user entirely
+      if (!otherCompanies || otherCompanies.length === 0) {
+        const { error: deleteError } = await supabase.functions.invoke('admin-user-management', {
+          body: {
+            action: 'delete_user',
+            userId: user.user_id,
+          },
+        });
+
+        if (deleteError) throw deleteError;
+      }
+
+      toast({
+        title: 'Success',
+        description: `User "${user.profiles?.name}" removed successfully`,
+      });
+
+      fetchCompanyUsers();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to remove user',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openEditDialog = (user: CompanyUser) => {
+    setSelectedUser(user);
+    setUserFormData({
+      name: user.profiles?.name || '',
+      email: user.email || '',
+      password: '',
+      role: user.role,
+    });
+    setShowEditUserDialog(true);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -273,11 +467,47 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
             <div className="space-y-2">
               {users.map((user) => (
                 <div key={user.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <p className="font-medium">{user.profiles?.name || 'Unknown User'}</p>
-                    <p className="text-sm text-muted-foreground">{user.email}</p>
+                  <div className="flex items-center gap-3">
+                    <User className="h-8 w-8 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">{user.profiles?.name || 'Unknown User'}</p>
+                      <p className="text-sm text-muted-foreground">{user.email}</p>
+                    </div>
                   </div>
-                  <Badge variant="secondary">{user.role}</Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary">{user.role}</Badge>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openEditDialog(user)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Remove User</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to remove "{user.profiles?.name}" from this company?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction 
+                            onClick={() => handleDeleteUser(user)}
+                            className="bg-destructive text-destructive-foreground"
+                          >
+                            Remove User
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
               ))}
             </div>
@@ -285,12 +515,190 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
             <p className="text-muted-foreground text-center py-4">No users found for this company</p>
           )}
           
-          <Button variant="outline" className="w-full">
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => setShowAddUserDialog(true)}
+          >
             <UserPlus className="h-4 w-4 mr-2" />
             Add User to Company
           </Button>
         </CardContent>
       </Card>
+
+      {/* Add User Dialog */}
+      <Dialog open={showAddUserDialog} onOpenChange={setShowAddUserDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <UserPlus className="h-5 w-5" />
+              Add User to {company.name}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="add-name">Full Name</Label>
+              <Input
+                id="add-name"
+                value={userFormData.name}
+                onChange={(e) => setUserFormData({ ...userFormData, name: e.target.value })}
+                placeholder="Enter full name"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="add-email">Email</Label>
+              <Input
+                id="add-email"
+                type="email"
+                value={userFormData.email}
+                onChange={(e) => setUserFormData({ ...userFormData, email: e.target.value })}
+                placeholder="user@example.com"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="add-password">Password</Label>
+              <Input
+                id="add-password"
+                type="password"
+                value={userFormData.password}
+                onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
+                placeholder="Enter password"
+                minLength={6}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="add-role">Role</Label>
+              <Select 
+                value={userFormData.role} 
+                onValueChange={(value: 'company_admin' | 'platform_admin' | 'manager' | 'recruiter') => 
+                  setUserFormData({ ...userFormData, role: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="company_admin">Company Admin</SelectItem>
+                  <SelectItem value="manager">Manager</SelectItem>
+                  <SelectItem value="recruiter">Recruiter</SelectItem>
+                  <SelectItem value="platform_admin">Platform Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex gap-2 pt-4">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setShowAddUserDialog(false)} 
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleAddUser} 
+                disabled={loading} 
+                className="flex-1"
+              >
+                {loading ? 'Adding...' : 'Add User'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit User Dialog */}
+      <Dialog open={showEditUserDialog} onOpenChange={setShowEditUserDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit className="h-5 w-5" />
+              Edit User
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="edit-name">Full Name</Label>
+              <Input
+                id="edit-name"
+                value={userFormData.name}
+                onChange={(e) => setUserFormData({ ...userFormData, name: e.target.value })}
+                placeholder="Enter full name"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="edit-email">Email</Label>
+              <Input
+                id="edit-email"
+                type="email"
+                value={userFormData.email}
+                onChange={(e) => setUserFormData({ ...userFormData, email: e.target.value })}
+                placeholder="user@example.com"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="edit-password">New Password (optional)</Label>
+              <Input
+                id="edit-password"
+                type="password"
+                value={userFormData.password}
+                onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
+                placeholder="Leave blank to keep current password"
+                minLength={6}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="edit-role">Role</Label>
+              <Select 
+                value={userFormData.role} 
+                onValueChange={(value: 'company_admin' | 'platform_admin' | 'manager' | 'recruiter') => 
+                  setUserFormData({ ...userFormData, role: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="company_admin">Company Admin</SelectItem>
+                  <SelectItem value="manager">Manager</SelectItem>
+                  <SelectItem value="recruiter">Recruiter</SelectItem>
+                  <SelectItem value="platform_admin">Platform Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex gap-2 pt-4">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => {
+                  setShowEditUserDialog(false);
+                  setSelectedUser(null);
+                  setUserFormData({ name: '', email: '', password: '', role: 'company_admin' });
+                }} 
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleEditUser} 
+                disabled={loading} 
+                className="flex-1"
+              >
+                {loading ? 'Updating...' : 'Update User'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
