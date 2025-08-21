@@ -56,7 +56,7 @@ export function DashboardSidebar() {
 
   // Platform admin gets different navigation
   const platformAdminNavigation = [
-    { title: "Companies", url: "/company-settings", icon: Building2 },
+    { title: "Companies", url: "/platform-admin", icon: Building2 },
     { title: "Settings", url: "/settings", icon: Settings },
   ];
 
