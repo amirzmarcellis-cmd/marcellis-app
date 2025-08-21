@@ -32,16 +32,28 @@ export function useUserRole(): UserRoleData {
       }
 
       try {
+        // Check if user is platform admin from profiles table
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('is_platform_admin')
+          .eq('user_id', user.id)
+          .single();
+
+        const isPlatformAdmin = profileData?.is_platform_admin || false;
+
+        // Get company-specific roles
         const { data, error } = await supabase
           .from('company_users')
           .select('role')
           .eq('user_id', user.id);
 
-        if (error) {
+        if (error && !error.message.includes('No rows found')) {
           console.error('Error fetching user roles:', error);
-          setRoles([]);
+          setRoles(isPlatformAdmin ? ['platform_admin'] : []);
         } else {
-          setRoles(data?.map(r => r.role as UserRole) || []);
+          const companyRoles = data?.map(r => r.role as UserRole) || [];
+          const allRoles = isPlatformAdmin ? ['platform_admin' as UserRole, ...companyRoles] : companyRoles;
+          setRoles(allRoles);
         }
       } catch (error) {
         console.error('Error fetching user roles:', error);

@@ -45,6 +45,15 @@ export function useCompany() {
     if (!user) return;
 
     try {
+      // Check if user is platform admin from profiles table
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('is_platform_admin')
+        .eq('user_id', user.id)
+        .single();
+
+      const isPlatformAdminUser = profileData?.is_platform_admin || false;
+
       // Get user's companies
       const { data: companyUsers, error: companyUsersError } = await supabase
         .from('company_users')
@@ -64,7 +73,9 @@ export function useCompany() {
         `)
         .eq('user_id', user.id);
 
-      if (companyUsersError) throw companyUsersError;
+      if (companyUsersError && !companyUsersError.message.includes('No rows found')) {
+        throw companyUsersError;
+      }
 
       const companiesData = companyUsers?.map((cu: any) => cu.companies).filter(Boolean) || [];
       const rolesData = companyUsers?.reduce((acc: any, cu: any) => {
@@ -72,6 +83,14 @@ export function useCompany() {
         acc[cu.company_id].push(cu.role);
         return acc;
       }, {}) || {};
+
+      // If platform admin, add platform_admin role for all companies
+      if (isPlatformAdminUser) {
+        companiesData.forEach(company => {
+          if (!rolesData[company.id]) rolesData[company.id] = [];
+          rolesData[company.id].push('platform_admin');
+        });
+      }
 
       setCompanies(companiesData);
       setUserRoles(rolesData);

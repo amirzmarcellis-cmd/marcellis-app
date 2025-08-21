@@ -676,6 +676,7 @@ export type Database = {
           created_at: string
           email: string | null
           id: string
+          is_platform_admin: boolean | null
           name: string | null
           updated_at: string
           user_id: string
@@ -685,6 +686,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          is_platform_admin?: boolean | null
           name?: string | null
           updated_at?: string
           user_id: string
@@ -694,6 +696,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          is_platform_admin?: boolean | null
           name?: string | null
           updated_at?: string
           user_id?: string
