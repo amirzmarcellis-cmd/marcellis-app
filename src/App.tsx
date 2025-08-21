@@ -7,7 +7,6 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CompanyProvider } from "@/contexts/CompanyContext";
 import { AppSettingsProvider } from "@/contexts/AppSettingsContext";
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 
 import Index from "./pages/Index";
@@ -48,8 +47,7 @@ const App = () => (
               <Toaster />
               <Sonner />
               <BrowserRouter>
-                <SidebarProvider>
-                  <Routes>
+                <Routes>
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/apply" element={<Apply />} />
                   <Route path="/" element={<DashboardLayout><Index /></DashboardLayout>} />
@@ -95,8 +93,7 @@ const App = () => (
                      </ProtectedRoute>
                    } />
                   <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </SidebarProvider>
+                </Routes>
               </BrowserRouter>
             </TooltipProvider>
           </AppSettingsProvider>
