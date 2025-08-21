@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Building2, Users, CreditCard, Settings } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { CompanyList } from './CompanyList';
 
 export function CompanyManagement() {
   const { currentCompany, isPlatformAdmin, isCompanyAdmin, refetch } = useCompanyContext();
@@ -72,6 +73,11 @@ export function CompanyManagement() {
       setLoading(false);
     }
   };
+
+  // If platform admin, show company list instead
+  if (isPlatformAdmin()) {
+    return <CompanyList />;
+  }
 
   if (!currentCompany) {
     return (

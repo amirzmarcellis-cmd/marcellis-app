@@ -13,17 +13,16 @@ export default function CompanySettings() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Company Settings</h1>
+            <h1 className="text-3xl font-bold">
+              {isPlatformAdmin() ? 'Platform Administration' : 'Company Settings'}
+            </h1>
             <p className="text-muted-foreground">
-              Manage your company information and settings
+              {isPlatformAdmin() 
+                ? 'Manage all companies and platform settings'
+                : 'Manage your company information and settings'
+              }
             </p>
           </div>
-          {isPlatformAdmin() && (
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Company
-            </Button>
-          )}
         </div>
 
         <CompanyManagement />
