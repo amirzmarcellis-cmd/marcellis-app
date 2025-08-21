@@ -86,12 +86,20 @@ export function useCompany() {
         return acc;
       }, {}) || {};
 
+      console.log('useCompany: User companies data:', {
+        userEmail: user.email,
+        companiesCount: companiesData.length,
+        companies: companiesData.map(c => c.name),
+        isPlatformAdmin: isPlatformAdminFromProfile
+      });
+
       // Always prioritize user's specific company assignments
       setCompanies(companiesData);
       setUserRoles(rolesData);
 
       // Set current company - use the first company the user belongs to
       if (companiesData.length > 0) {
+        console.log('useCompany: Setting current company to:', companiesData[0].name);
         setCurrentCompany(companiesData[0]);
       }
 
@@ -126,8 +134,18 @@ export function useCompany() {
   };
 
   useEffect(() => {
-    fetchCompanies();
-  }, [user]);
+    if (user) {
+      console.log('useCompany: Fetching companies for user:', user.email);
+      fetchCompanies();
+    } else {
+      // Reset state when user logs out
+      setCompanies([]);
+      setCurrentCompany(null);
+      setUserRoles({});
+      setIsPlatformAdminUser(false);
+      setLoading(false);
+    }
+  }, [user?.id]); // Only depend on user ID to prevent unnecessary refetches
 
   const hasRole = (role: string, companyId?: string): boolean => {
     const targetCompanyId = companyId || currentCompany?.id;
