@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, X, CheckCircle, Clock, User, Briefcase } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { formatDate } from '@/lib/utils';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 interface Task {
   id: string;
@@ -54,11 +55,14 @@ export function TaskManager({ showAddForm = true, onTaskCountChange }: TaskManag
     due_date: ''
   });
   const { toast } = useToast();
+  const { currentCompany } = useCompanyContext();
 
   useEffect(() => {
-    fetchTasks();
-    fetchCandidatesAndJobs();
-  }, []);
+    if (currentCompany?.id) {
+      fetchTasks();
+      fetchCandidatesAndJobs();
+    }
+  }, [currentCompany?.id]);
 
   useEffect(() => {
     const openTasks = tasks.filter(task => !task.completed).length;
@@ -66,10 +70,13 @@ export function TaskManager({ showAddForm = true, onTaskCountChange }: TaskManag
   }, [tasks, onTaskCountChange]);
 
   const fetchTasks = async () => {
+    if (!currentCompany?.id) return;
+    
     try {
       const { data, error } = await supabase
         .from('tasks')
         .select('*')
+        .eq('company_id', currentCompany.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -87,10 +94,12 @@ export function TaskManager({ showAddForm = true, onTaskCountChange }: TaskManag
   };
 
   const fetchCandidatesAndJobs = async () => {
+    if (!currentCompany?.id) return;
+    
     try {
       const [candidatesResponse, jobsResponse] = await Promise.all([
-        supabase.from('CVs').select('Cadndidate_ID, "First Name", "Last Name"'),
-        supabase.from('Jobs').select('"Job ID", "Job Title"')
+        supabase.from('CVs').select('Cadndidate_ID, "First Name", "Last Name"').eq('company_id', currentCompany.id),
+        supabase.from('Jobs').select('"Job ID", "Job Title"').eq('company_id', currentCompany.id)
       ]);
 
       if (candidatesResponse.error) throw candidatesResponse.error;
@@ -135,7 +144,8 @@ export function TaskManager({ showAddForm = true, onTaskCountChange }: TaskManag
           entity_id: newTask.entity_id || null,
           entity_name: entityName || null,
           due_date: newTask.due_date || null,
-          created_by: user.id
+          created_by: user.id,
+          company_id: currentCompany?.id
         }]);
 
       if (error) throw error;

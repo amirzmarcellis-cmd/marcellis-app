@@ -11,6 +11,7 @@ import { Plus, Search, Filter, Phone, Mail, MapPin, Building2, Users, Eye, Calen
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { CandidateDialog } from "./CandidateDialog";
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 interface Candidate {
   Cadndidate_ID: string;
@@ -44,16 +45,21 @@ export function CandidateManagementPanel() {
   const [salaryFilter, setSalaryFilter] = useState("all");
   const [sourceFilter, setSourceFilter] = useState("all");
   const { toast } = useToast();
+  const { currentCompany } = useCompanyContext();
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (currentCompany?.id) {
+      fetchData();
+    }
+  }, [currentCompany?.id]);
 
   const fetchData = async () => {
+    if (!currentCompany?.id) return;
+    
     try {
       const [candidatesResult, jobsResult] = await Promise.all([
-        supabase.from('CVs').select('*').order('Timestamp', { ascending: false }),
-        supabase.from('Jobs').select('*')
+        supabase.from('CVs').select('*').eq('company_id', currentCompany.id).order('Timestamp', { ascending: false }),
+        supabase.from('Jobs').select('*').eq('company_id', currentCompany.id)
       ]);
 
       if (candidatesResult.error) throw candidatesResult.error;

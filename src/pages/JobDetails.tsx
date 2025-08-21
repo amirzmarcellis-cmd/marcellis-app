@@ -21,6 +21,7 @@ import { JobDialog } from "@/components/jobs/JobDialog"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDate } from "@/lib/utils"
+import { useCompanyContext } from '@/contexts/CompanyContext'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,6 +39,7 @@ export default function JobDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("overview")
+  const { currentCompany } = useCompanyContext()
   const [job, setJob] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [candidates, setCandidates] = useState<any[]>([])
@@ -83,7 +85,7 @@ export default function JobDetails() {
   const [interviewLink, setInterviewLink] = useState('')
 
   useEffect(() => {
-    if (id) {
+    if (id && currentCompany?.id) {
       fetchJob(id)
       fetchCandidates(id)
       fetchCvData()
@@ -157,11 +159,14 @@ export default function JobDetails() {
   }
 
   const fetchJob = async (jobId: string) => {
+    if (!currentCompany?.id) return;
+    
     try {
       const { data, error } = await supabase
         .from('Jobs')
         .select('*')
         .eq('job_id', jobId)
+        .eq('company_id', currentCompany.id)
         .maybeSingle()
 
       if (error) throw error
@@ -202,11 +207,14 @@ export default function JobDetails() {
   }
 
   const fetchCandidates = async (jobId: string) => {
+    if (!currentCompany?.id) return;
+    
     try {
       const { data, error } = await supabase
         .from('Jobs_CVs')
         .select('*')
         .eq('job_id', jobId)
+        .eq('company_id', currentCompany.id)
         .order('callid', { ascending: false })
 
       if (error) throw error
@@ -244,10 +252,13 @@ export default function JobDetails() {
   }
 
   const fetchCvData = async () => {
+    if (!currentCompany?.id) return;
+    
     try {
       const { data, error } = await supabase
         .from('CVs')
         .select('*')
+        .eq('company_id', currentCompany.id)
 
       if (error) throw error
       setCvData(data || [])
@@ -258,11 +269,14 @@ export default function JobDetails() {
   }
 
   const fetchApplications = async (jobId: string) => {
+    if (!currentCompany?.id) return;
+    
     setApplicationsLoading(true)
     try {
       const { data, error } = await supabase
         .from('CVs')
         .select('*')
+        .eq('company_id', currentCompany.id)
         .filter('applied_for', 'cs', `{${jobId}}`)
 
       if (error) throw error
@@ -560,7 +574,8 @@ export default function JobDetails() {
         appoint2: appointments[1],
         appoint3: appointments[2],
         inttype: interviewType,
-        intlink: interviewType === 'Online Meeting' ? interviewLink : null
+        intlink: interviewType === 'Online Meeting' ? interviewLink : null,
+        company_id: currentCompany?.id
       }).select('intid').single();
 
       if (insertError) throw insertError;

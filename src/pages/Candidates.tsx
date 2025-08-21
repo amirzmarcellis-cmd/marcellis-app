@@ -16,6 +16,7 @@ import { formatDate } from "@/lib/utils"
 import { HeroHeader } from "@/components/dashboard/HeroHeader"
 import { CandidateDialog } from "@/components/candidates/CandidateDialog"
 import { BulkCandidateUpload } from "@/components/candidates/BulkCandidateUpload"
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 interface Candidate {
   candidate_id: string
@@ -48,17 +49,23 @@ export default function Candidates() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [bulkUploadOpen, setBulkUploadOpen] = useState(false)
   const [selectedCandidate, setSelectedCandidate] = useState<any>(null)
+  const { currentCompany } = useCompanyContext()
 
   useEffect(() => {
-    fetchCandidates()
-  }, [])
+    if (currentCompany?.id) {
+      fetchCandidates()
+    }
+  }, [currentCompany?.id])
 
   const fetchCandidates = async () => {
+    if (!currentCompany?.id) return;
+    
     try {
       // Fetch CVs data with company filtering
       const { data: candidatesData, error: candidatesError } = await supabase
         .from('CVs')
         .select('*')
+        .eq('company_id', currentCompany.id)
         .order('Timestamp', { ascending: false })
 
       if (candidatesError) throw candidatesError
@@ -67,6 +74,7 @@ export default function Candidates() {
       const { data: jobsData, error: jobsError } = await supabase
         .from('Jobs')
         .select('*')
+        .eq('company_id', currentCompany.id)
 
       if (jobsError) throw jobsError
 
@@ -74,6 +82,7 @@ export default function Candidates() {
       const { data: jobsCVsData, error: jobsCVsError } = await supabase
         .from('Jobs_CVs')
         .select('*')
+        .eq('company_id', currentCompany.id)
 
       if (jobsCVsError) throw jobsCVsError
 

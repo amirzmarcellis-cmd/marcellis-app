@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Search, Filter, Users, Zap, Activity, Star, Clock, Mail, Phone, MapPin, Briefcase, XCircle, Calendar, UserCheck } from 'lucide-react';
 import { toast } from 'sonner';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 interface Candidate {
   'Candidate_ID': string;
   'Candidate Name': string;
@@ -54,6 +55,7 @@ export default function LiveCandidateFeed() {
   ]);
   const [interviewType, setInterviewType] = useState<string>('Phone');
   const [interviewLink, setInterviewLink] = useState<string>('');
+  const { currentCompany } = useCompanyContext();
   const handleRejectCandidate = async (candidateId: string, jobId: string) => {
     // Show confirmation alert
     const confirmed = window.confirm('Are you sure you want to Reject Candidate?');
@@ -163,7 +165,8 @@ export default function LiveCandidateFeed() {
           appoint2: appointments[1],
           appoint3: appointments[2],
           inttype: interviewType,
-          intlink: interviewType === 'Online Meeting' ? interviewLink : null
+          intlink: interviewType === 'Online Meeting' ? interviewLink : null,
+          company_id: currentCompany?.id
         })
         .select('intid')
         .maybeSingle();
@@ -243,15 +246,19 @@ export default function LiveCandidateFeed() {
     }
   };
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (currentCompany?.id) {
+      fetchData();
+    }
+  }, [currentCompany?.id]);
   const fetchData = async () => {
+    if (!currentCompany?.id) return;
+    
     try {
       // Fetch Jobs_CVs data with company filtering
       const {
         data: jobsCvsData,
         error: jobsCvsError
-      } = await supabase.from('Jobs_CVs').select('*').order('success_score', {
+      } = await supabase.from('Jobs_CVs').select('*').eq('company_id', currentCompany.id).order('success_score', {
         ascending: false
       });
       if (jobsCvsError) throw jobsCvsError;
@@ -260,21 +267,21 @@ export default function LiveCandidateFeed() {
       const {
         data: jobsData,
         error: jobsError
-      } = await supabase.from('Jobs').select('*');
+      } = await supabase.from('Jobs').select('*').eq('company_id', currentCompany.id);
       if (jobsError) throw jobsError;
 
       // Fetch CVs data for candidate status with company filtering
       const {
         data: cvsData,
         error: cvsError
-      } = await supabase.from('CVs').select('*');
+      } = await supabase.from('CVs').select('*').eq('company_id', currentCompany.id);
       if (cvsError) throw cvsError;
 
       // Fetch interviews data with company filtering
       const {
         data: interviewsData,
         error: interviewsError
-      } = await supabase.from('interview').select('*');
+      } = await supabase.from('interview').select('*').eq('company_id', currentCompany.id);
       if (interviewsError) throw interviewsError;
 
       // Enrich candidates with job titles

@@ -56,7 +56,7 @@ export default function Index() {
   const {
     profile
   } = useProfile();
-  const { isPlatformAdmin } = useCompanyContext();
+  const { isPlatformAdmin, currentCompany } = useCompanyContext();
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -90,16 +90,20 @@ export default function Index() {
     }
 
     // Fetch initial data
-    fetchDashboardData();
-    fetchInterviews();
-  }, []);
+    if (currentCompany?.id) {
+      fetchDashboardData();
+      fetchInterviews();
+    }
+  }, [currentCompany?.id]);
   const fetchDashboardData = async () => {
+    if (!currentCompany?.id) return;
+    
     try {
-      // Fetch base tables with company filtering (RLS policies handle this automatically)
+      // Fetch base tables with company filtering
       const [cvsRes, jobsRes, linksRes] = await Promise.all([
-        supabase.from('CVs').select('*'), 
-        supabase.from('Jobs').select('*'), 
-        supabase.from('Jobs_CVs').select('*')
+        supabase.from('CVs').select('*').eq('company_id', currentCompany.id), 
+        supabase.from('Jobs').select('*').eq('company_id', currentCompany.id), 
+        supabase.from('Jobs_CVs').select('*').eq('company_id', currentCompany.id)
       ]);
       if (cvsRes.error) throw cvsRes.error;
       if (jobsRes.error) throw jobsRes.error;
@@ -172,10 +176,13 @@ export default function Index() {
   };
 
   const fetchInterviews = async () => {
+    if (!currentCompany?.id) return;
+    
     try {
       const { data: interviewsData, error: interviewsError } = await supabase
         .from('interview')
         .select('*')
+        .eq('company_id', currentCompany.id)
         .order('created_at', { ascending: false })
         .limit(10);
 
@@ -333,7 +340,8 @@ export default function Index() {
         appoint2: appointments[1],
         appoint3: appointments[2],
         inttype: interviewType,
-        intlink: interviewType === 'Online Meeting' ? interviewLink : null
+        intlink: interviewType === 'Online Meeting' ? interviewLink : null,
+        company_id: currentCompany?.id
       }).select('intid').single();
 
       if (insertError) throw insertError;
