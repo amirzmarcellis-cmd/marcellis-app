@@ -76,9 +76,11 @@ export function useCompany() {
       setCompanies(companiesData);
       setUserRoles(rolesData);
 
-      // Set current company (first one for now)
+      // Set current company - prioritize DMS company if available, otherwise first one
       if (companiesData.length > 0 && !currentCompany) {
-        setCurrentCompany(companiesData[0]);
+        const dmsCompany = companiesData.find(c => c.name === 'DMS');
+        const defaultCompany = dmsCompany || companiesData[0];
+        setCurrentCompany(defaultCompany);
       }
     } catch (error) {
       console.error('Error fetching companies:', error);
