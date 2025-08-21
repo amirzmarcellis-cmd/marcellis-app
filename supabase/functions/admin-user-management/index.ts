@@ -111,7 +111,8 @@ serve(async (req) => {
               .from('profiles')
               .upsert({
                 user_id: existingUser.id,
-                name: userData.name
+                name: userData.name,
+                email: userData.email
               });
             
             return new Response(
@@ -133,7 +134,8 @@ serve(async (req) => {
             .from('profiles')
             .insert({
               user_id: newUser.user.id,
-              name: userData.name
+              name: userData.name,
+              email: userData.email
             });
 
           if (profileError) {

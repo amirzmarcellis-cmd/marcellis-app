@@ -63,30 +63,16 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
         .select('user_id, name')
         .in('user_id', userIds);
 
-      // For each user, try to get their email from the current session or use a placeholder
-      const usersWithProfiles = await Promise.all(
-        (data || []).map(async (user) => {
-          const profile = profiles?.find(p => p.user_id === user.user_id);
-          
-          // Try to get email from auth metadata (this will only work for the current user)
-          let email = 'Email not available';
-          
-          // If this is the current user, we can get their email
-          const { data: { user: currentUser } } = await supabase.auth.getUser();
-          if (currentUser && currentUser.id === user.user_id) {
-            email = currentUser.email || 'Email not available';
-          } else {
-            // For other users, we'll show a masked version of their user ID or use profile name
-            email = profile?.name ? `${profile.name.toLowerCase().replace(/\s+/g, '.')}@company.local` : user.user_id.substring(0, 8) + '...';
-          }
-
-          return {
-            ...user,
-            profiles: profile || null,
-            email
-          };
-        })
-      );
+      // For each user, try to get their email - we'll store it in profiles table for better access
+      const usersWithProfiles = (data || []).map((user) => {
+        const profile = profiles?.find(p => p.user_id === user.user_id);
+        
+        return {
+          ...user,
+          profiles: profile || null,
+          email: 'Email not available' // We'll need to store emails in profiles for full access
+        };
+      });
 
       setUsers(usersWithProfiles);
     } catch (error: any) {
