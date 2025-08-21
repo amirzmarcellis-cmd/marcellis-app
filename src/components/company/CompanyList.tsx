@@ -25,22 +25,21 @@ export function CompanyList() {
 
   const fetchCompanies = async () => {
     try {
-      // Fetch all companies with user counts
+      // Fetch all companies first
       const { data: companiesData, error: companiesError } = await supabase
         .from('companies')
-        .select(`
-          *,
-          company_users!inner(
-            user_id,
-            role
-          )
-        `);
+        .select('*');
 
       if (companiesError) throw companiesError;
 
+      // Then fetch company users separately to get stats
+      const { data: companyUsersData } = await supabase
+        .from('company_users')
+        .select('company_id, role');
+
       // Process the data to include stats
       const companiesWithStats = companiesData?.map(company => {
-        const users = company.company_users || [];
+        const users = companyUsersData?.filter(u => u.company_id === company.id) || [];
         return {
           ...company,
           user_count: users.length,
