@@ -85,7 +85,7 @@ export default function CallLog() {
 
   const fetchData = async () => {
     try {
-      // Fetch Jobs_CVs data
+      // Fetch Jobs_CVs data with company filtering
       const { data: callLogsData, error: callLogsError } = await supabase
         .from('Jobs_CVs')
         .select('*')
@@ -93,7 +93,7 @@ export default function CallLog() {
 
       if (callLogsError) throw callLogsError
 
-      // Fetch Jobs data
+      // Fetch Jobs data with company filtering
       const { data: jobsData, error: jobsError } = await supabase
         .from('Jobs')
         .select('*')

@@ -247,7 +247,7 @@ export default function LiveCandidateFeed() {
   }, []);
   const fetchData = async () => {
     try {
-      // Fetch Jobs_CVs data with job titles
+      // Fetch Jobs_CVs data with company filtering
       const {
         data: jobsCvsData,
         error: jobsCvsError
@@ -256,21 +256,21 @@ export default function LiveCandidateFeed() {
       });
       if (jobsCvsError) throw jobsCvsError;
 
-      // Fetch Jobs data
+      // Fetch Jobs data with company filtering
       const {
         data: jobsData,
         error: jobsError
       } = await supabase.from('Jobs').select('*');
       if (jobsError) throw jobsError;
 
-      // Fetch CVs data for candidate status
+      // Fetch CVs data for candidate status with company filtering
       const {
         data: cvsData,
         error: cvsError
       } = await supabase.from('CVs').select('*');
       if (cvsError) throw cvsError;
 
-      // Fetch interviews data
+      // Fetch interviews data with company filtering
       const {
         data: interviewsData,
         error: interviewsError

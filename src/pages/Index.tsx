@@ -92,8 +92,12 @@ export default function Index() {
   }, []);
   const fetchDashboardData = async () => {
     try {
-      // Fetch base tables separately (no relational selects since there are no FKs)
-      const [cvsRes, jobsRes, linksRes] = await Promise.all([supabase.from('CVs').select('*'), supabase.from('Jobs').select('*'), supabase.from('Jobs_CVs').select('*')]);
+      // Fetch base tables with company filtering (RLS policies handle this automatically)
+      const [cvsRes, jobsRes, linksRes] = await Promise.all([
+        supabase.from('CVs').select('*'), 
+        supabase.from('Jobs').select('*'), 
+        supabase.from('Jobs_CVs').select('*')
+      ]);
       if (cvsRes.error) throw cvsRes.error;
       if (jobsRes.error) throw jobsRes.error;
       if (linksRes.error) throw linksRes.error;

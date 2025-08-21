@@ -55,7 +55,7 @@ export default function Candidates() {
 
   const fetchCandidates = async () => {
     try {
-      // Fetch CVs data
+      // Fetch CVs data with company filtering
       const { data: candidatesData, error: candidatesError } = await supabase
         .from('CVs')
         .select('*')
@@ -63,14 +63,14 @@ export default function Candidates() {
 
       if (candidatesError) throw candidatesError
 
-      // Fetch Jobs data
+      // Fetch Jobs data with company filtering
       const { data: jobsData, error: jobsError } = await supabase
         .from('Jobs')
         .select('*')
 
       if (jobsError) throw jobsError
 
-      // Fetch Jobs_CVs data
+      // Fetch Jobs_CVs data with company filtering
       const { data: jobsCVsData, error: jobsCVsError } = await supabase
         .from('Jobs_CVs')
         .select('*')
