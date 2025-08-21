@@ -56,20 +56,7 @@ export function CreateCompanyDialog({ open, onOpenChange, onCompanyCreated }: Cr
         },
       });
 
-      if (adminError) {
-        // If user already exists, that's okay - we can still assign them to the company
-        if (adminError.message?.includes('email address has already been registered')) {
-          // Get existing user by querying profiles with the email domain pattern
-          // Since we can't directly query auth.users, we'll need to handle this differently
-          toast({
-            title: 'User Already Exists',
-            description: 'A user with this email already exists. Please use a different email or contact support to assign an existing user to this company.',
-            variant: 'destructive',
-          });
-          return;
-        }
-        throw adminError;
-      }
+      if (adminError) throw adminError;
 
       if (!adminResult.user?.user) {
         throw new Error('Failed to create admin user');
