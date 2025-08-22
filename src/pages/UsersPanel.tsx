@@ -426,7 +426,6 @@ export default function UsersPanel() {
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Roles</TableHead>
-                <TableHead>Last Sign In</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -458,12 +457,6 @@ export default function UsersPanel() {
                         <Badge variant="outline">No Roles</Badge>
                       )}
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    {user.last_sign_in_at 
-                      ? new Date(user.last_sign_in_at).toLocaleDateString()
-                      : 'Never'
-                    }
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
