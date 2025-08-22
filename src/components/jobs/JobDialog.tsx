@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload, FileText, Briefcase } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 interface JobRecord {
   "Job ID": string;
@@ -49,6 +50,7 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
   const [loading, setLoading] = useState(false);
   const [jdFile, setJdFile] = useState<File | null>(null);
   const { toast } = useToast();
+  const { currentCompany } = useCompanyContext();
 
   useEffect(() => {
     if (job) {
@@ -123,6 +125,7 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
         jd_summary: formData.summary,
         musttohave: formData.musttohave,
         nicetohave: formData.nicetohave,
+        company_id: currentCompany?.id,
         Timestamp: (job as any)?.Timestamp || new Date().toISOString(),
       };
 

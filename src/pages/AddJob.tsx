@@ -13,6 +13,7 @@ import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 const countries = [
   "Afghanistan", "Albania", "Algeria", "United States", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia",
@@ -57,6 +58,7 @@ const contractLengths = [
 
 export default function AddJob() {
   const navigate = useNavigate();
+  const { currentCompany } = useCompanyContext();
   const [formData, setFormData] = useState({
     jobTitle: "",
     jobDescription: "",
@@ -132,6 +134,7 @@ export default function AddJob() {
           Type: formData.type,
           contract_length: formData.type === "Contract" ? formData.contractLength : null,
           Currency: formData.currency,
+          company_id: currentCompany?.id,
           Timestamp: new Date().toISOString()
         });
 
