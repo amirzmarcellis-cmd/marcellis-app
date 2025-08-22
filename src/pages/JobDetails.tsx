@@ -489,6 +489,7 @@ export default function JobDetails() {
 
       const payload = {
         jobID: job?.["Job ID"],
+        company_id: currentCompany?.id || '',
         groupid: candidates[0]?.["group_id"], // Get groupid from first candidate
         candidates: candidatesData
       };
