@@ -378,31 +378,31 @@ export default function CallLogDetails() {
                       <span className="text-sm font-medium">Task Status:</span>
                     </div>
                     <Select value={taskStatus} onValueChange={updateTaskStatus}>
-                      <SelectTrigger className="w-32">
+                      <SelectTrigger className="w-32 bg-background text-foreground border-border">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Pending">
+                      <SelectContent className="bg-background border-border">
+                        <SelectItem value="Pending" className="text-foreground">
                           <div className="flex items-center space-x-2">
-                            <Clock className="w-3 h-3 text-yellow-500" />
+                            <Clock className="w-3 h-3 text-yellow-600 dark:text-yellow-400" />
                             <span>Pending</span>
                           </div>
                         </SelectItem>
-                        <SelectItem value="Completed">
+                        <SelectItem value="Completed" className="text-foreground">
                           <div className="flex items-center space-x-2">
-                            <CheckCircle className="w-3 h-3 text-green-500" />
+                            <CheckCircle className="w-3 h-3 text-green-600 dark:text-green-400" />
                             <span>Completed</span>
                           </div>
                         </SelectItem>
-                        <SelectItem value="In Progress">
+                        <SelectItem value="In Progress" className="text-foreground">
                           <div className="flex items-center space-x-2">
-                            <Clock className="w-3 h-3 text-blue-500" />
+                            <Clock className="w-3 h-3 text-blue-600 dark:text-blue-400" />
                             <span>In Progress</span>
                           </div>
                         </SelectItem>
-                        <SelectItem value="Not Started">
+                        <SelectItem value="Not Started" className="text-foreground">
                           <div className="flex items-center space-x-2">
-                            <Clock className="w-3 h-3 text-gray-500" />
+                            <Clock className="w-3 h-3 text-muted-foreground" />
                             <span>Not Started</span>
                           </div>
                         </SelectItem>
