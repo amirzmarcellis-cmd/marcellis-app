@@ -863,25 +863,21 @@ export default function JobDetails() {
 
   if (loading) {
     return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
-      </DashboardLayout>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
     )
   }
 
   if (!job) {
     return (
-      <DashboardLayout>
-        <div className="flex flex-col items-center justify-center h-64 space-y-4">
-          <h2 className="text-2xl font-bold text-muted-foreground">Job not found</h2>
-          <Button onClick={() => navigate('/jobs')}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Jobs
-          </Button>
-        </div>
-      </DashboardLayout>
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <h2 className="text-2xl font-bold text-muted-foreground">Job not found</h2>
+        <Button onClick={() => navigate('/jobs')}>
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Jobs
+        </Button>
+      </div>
     )
   }
 
@@ -980,8 +976,7 @@ export default function JobDetails() {
   })
 
   return (
-    <DashboardLayout>
-      <div className="space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden">
+    <div className="space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden">
         {/* Header */}
         <div className="flex flex-col gap-4">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -2278,6 +2273,6 @@ export default function JobDetails() {
           </DialogContent>
         </Dialog>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }
