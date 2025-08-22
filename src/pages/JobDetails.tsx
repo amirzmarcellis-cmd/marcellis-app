@@ -539,7 +539,10 @@ export default function JobDetails() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ jobID: job?.["Job ID"] || '' }),
+        body: JSON.stringify({ 
+          jobID: job?.["Job ID"] || '',
+          company_id: currentCompany?.id || ''
+        }),
       });
 
       if (!response.ok) {
