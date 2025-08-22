@@ -2273,6 +2273,5 @@ export default function JobDetails() {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
   );
 }
