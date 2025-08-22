@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Users, Upload, FileText, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 interface Candidate {
   candidate_id: string;
@@ -70,6 +71,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [cvUrl, setCvUrl] = useState("");
   const { toast } = useToast();
+  const { currentCompany } = useCompanyContext();
 
   useEffect(() => {
     if (candidate) {
@@ -237,6 +239,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
         CandidateStatus: formData.candidateStatus || null,
         other_notes: formData.otherNotes || null,
         Timestamp: candidate?.Timestamp || new Date().toISOString(),
+        company_id: currentCompany?.id, // Always include the current company ID
       };
 
       if (candidate) {

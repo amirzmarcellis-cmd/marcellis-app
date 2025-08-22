@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Upload, FileText, X, Check, AlertCircle, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 interface UploadedFile {
   file: File;
@@ -30,6 +31,7 @@ export function BulkCandidateUpload({ open, onOpenChange, onSuccess }: BulkCandi
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const { toast } = useToast();
+  const { currentCompany } = useCompanyContext();
 
   const generateCandidateId = async () => {
     try {
@@ -133,6 +135,7 @@ export function BulkCandidateUpload({ open, onOpenChange, onSuccess }: BulkCandi
         // Extract potential name from filename (basic attempt)
         first_name: fileData.file.name.replace(/\.[^/.]+$/, "").split(/[-_\s]/)[0] || null,
         last_name: fileData.file.name.replace(/\.[^/.]+$/, "").split(/[-_\s]/)[1] || null,
+        company_id: currentCompany?.id, // Always include the current company ID
       };
 
       const { error: insertError } = await supabase

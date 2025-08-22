@@ -164,6 +164,23 @@ export default function Apply() {
       // Generate a proper candidate ID
       const candidateId = await generateCandidateId();
       
+      // Get the company_id from the job being applied to
+      const selectedJob = jobs.find(job => job.job_id === data.jobApplied);
+      let companyId = null;
+      
+      if (selectedJob) {
+        // Fetch the company_id for this job
+        const { data: jobData, error: jobError } = await supabase
+          .from('Jobs')
+          .select('company_id')
+          .eq('job_id', data.jobApplied)
+          .single();
+        
+        if (!jobError && jobData) {
+          companyId = jobData.company_id;
+        }
+      }
+      
       const cvData = {
         candidate_id: candidateId,
         Title: cleanText(data.title),
@@ -180,6 +197,7 @@ export default function Apply() {
         Experience: cleanText(`Agency: ${data.agencyExperience}, Overall: ${data.overallExperience}`),
         Location: cleanText(data.currentLocation),
         cv_summary: cleanText(`Salary Expectations: ${data.salaryExpectations} AED/month, Notice Period: ${data.noticePeriod} days`),
+        company_id: companyId, // Include the company_id from the job
       };
 
       // Try primary (snake_case) insert first, then legacy shape, then minimal fallback
@@ -221,6 +239,7 @@ export default function Apply() {
             phone_number: cleanText(data.phoneNumber),
             Title: cleanText(data.title),
             Timestamp: new Date().toISOString(),
+            company_id: companyId, // Include the company_id even in minimal fallback
           } as any;
 
           const { error: minimalError } = await supabase
