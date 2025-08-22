@@ -71,7 +71,7 @@ export function DashboardSidebar() {
     { title: "Call Log", url: "/call-log", icon: PhoneCall },
     { title: "Analytics", url: "/analytics", icon: BarChart3 },
     { title: "Reports", url: "/reports", icon: FileText },
-    ...(canManageUsers() ? [{ title: "Company Settings", url: "/company-settings", icon: Building2 }] : []),
+    ...(isPlatformAdmin() ? [{ title: "Company Settings", url: "/company-settings", icon: Building2 }] : []),
     ...(canManageUsers() ? [{ title: "Users", url: "/users-panel", icon: Users }] : []),
     { title: "Settings", url: "/settings", icon: Settings },
   ];

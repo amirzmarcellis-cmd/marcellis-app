@@ -8,22 +8,18 @@ import { Building2, Plus, Users, Settings } from "lucide-react";
 export default function CompanySettings() {
   const { isPlatformAdmin, canManageUsers } = useCompanyContext();
 
-  // Redirect platform admins to their dedicated interface
-  if (isPlatformAdmin()) {
+  // Only allow platform admins to access company settings
+  if (!isPlatformAdmin()) {
     return (
       <DashboardLayout>
-        <div className="space-y-6">
-          <div className="flex items-center gap-3">
-            <Building2 className="h-8 w-8 text-primary" />
-            <div>
-              <h1 className="text-3xl font-bold">Platform Administration</h1>
-              <p className="text-muted-foreground">
-                Manage all companies and platform-wide settings
-              </p>
+        <div className="flex items-center justify-center min-h-[200px]">
+          <div className="text-center">
+            <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+              <Building2 className="w-8 h-8 text-destructive" />
             </div>
+            <h3 className="text-lg font-semibold mb-2">Access Denied</h3>
+            <p className="text-muted-foreground">You don't have permission to access Company Settings.</p>
           </div>
-
-          <CompanyManagement />
         </div>
       </DashboardLayout>
     );
@@ -32,41 +28,17 @@ export default function CompanySettings() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Building2 className="h-8 w-8 text-primary" />
           <div>
-            <h1 className="text-3xl font-bold">Company Settings</h1>
+            <h1 className="text-3xl font-bold">Platform Administration</h1>
             <p className="text-muted-foreground">
-              Manage your company information and settings
+              Manage all companies and platform-wide settings
             </p>
           </div>
         </div>
 
         <CompanyManagement />
-
-        {canManageUsers() && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                User Management
-              </CardTitle>
-              <CardDescription>
-                Manage users within your company
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  User management functionality will be available here for company administrators.
-                </p>
-                <Button variant="outline">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Manage Users
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </DashboardLayout>
   );
