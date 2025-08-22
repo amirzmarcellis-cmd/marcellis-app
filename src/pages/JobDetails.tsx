@@ -473,6 +473,36 @@ export default function JobDetails() {
     }
   };
 
+  const handleRemoveFromLongList = async (candidateId: string) => {
+    try {
+      // Remove the candidate from the Jobs_CVs table for this job
+      const { error } = await supabase
+        .from('Jobs_CVs')
+        .delete()
+        .eq('Candidate_ID', candidateId)
+        .eq('job_id', id);
+
+      if (error) {
+        throw error;
+      }
+
+      // Update the local state to remove the candidate
+      setCandidates(prev => prev.filter(c => c["Candidate_ID"] !== candidateId));
+
+      toast({
+        title: "Success",
+        description: "Candidate removed from long list",
+      });
+    } catch (error) {
+      console.error('Error removing candidate from long list:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove candidate from long list",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleCallCandidate = async (candidateId: string, jobId: string, callid: number | null | undefined) => {
     try {
       setCallingCandidateId(candidateId);
@@ -1346,11 +1376,20 @@ export default function JobDetails() {
                                 <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
                                   <CardContent className="p-3 md:p-4">
                                     <div className="space-y-3">
-                                      <div className="flex items-start justify-between">
-                                        <div className="min-w-0 flex-1">
-                                          <h4 className="font-semibold text-sm md:text-base truncate">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
-                                          <p className="text-xs md:text-sm text-muted-foreground truncate">{candidateId}</p>
-                                        </div>
+                                       <div className="flex items-start justify-between">
+                                         <div className="min-w-0 flex-1">
+                                           <h4 className="font-semibold text-sm md:text-base truncate">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
+                                           <p className="text-xs md:text-sm text-muted-foreground truncate">{candidateId}</p>
+                                         </div>
+                                         <Button
+                                           variant="ghost"
+                                           size="sm"
+                                           onClick={() => handleRemoveFromLongList(candidateId)}
+                                           className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
+                                           title="Remove from Long List"
+                                         >
+                                           <X className="h-3 w-3" />
+                                         </Button>
                                         {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || 
                                           mainCandidate["Contacted"]?.toLowerCase() === "contacted" || 
                                           mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
@@ -1425,18 +1464,18 @@ export default function JobDetails() {
                                       </div>
 
                                      {/* Call Log Buttons */}
-                                     <div className="space-y-2 pt-2 border-t">
-                                       <div className="flex flex-col sm:flex-row gap-2">
-                                          <Button
-                                            variant="default"
-                                            size="sm"
-                                            onClick={() => handleCallCandidate(mainCandidate["Candidate_ID"], id!, mainCandidate["callid"])}
-                                            disabled={callingCandidateId === candidateId}
-                                            className="w-full sm:flex-1 bg-foreground hover:bg-foreground/90 text-background disabled:opacity-50 text-xs md:text-sm"
-                                          >
-                                           <Phone className="w-3 h-3 mr-1" />
-                                           {callingCandidateId === candidateId ? 'Calling...' : 'Call Candidate'}
-                                         </Button>
+                                      <div className="space-y-2 pt-2 border-t">
+                                        <div className="flex flex-col sm:flex-row gap-2">
+                                           <Button
+                                             variant="default"
+                                             size="sm"
+                                             onClick={() => handleCallCandidate(mainCandidate["Candidate_ID"], id!, mainCandidate["callid"])}
+                                             disabled={callingCandidateId === candidateId}
+                                             className="w-full sm:flex-1 bg-foreground hover:bg-foreground/90 text-background disabled:opacity-50 text-xs md:text-sm"
+                                           >
+                                            <Phone className="w-3 h-3 mr-1" />
+                                            {callingCandidateId === candidateId ? 'Calling...' : 'Call Candidate'}
+                                          </Button>
                            {(() => {
                              const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
                              if (contactsWithCalls.length === 0) return null;
