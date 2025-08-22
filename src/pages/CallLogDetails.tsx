@@ -378,32 +378,32 @@ export default function CallLogDetails() {
                       <span className="text-sm font-medium">Task Status:</span>
                     </div>
                     <Select value={taskStatus} onValueChange={updateTaskStatus}>
-                      <SelectTrigger className="w-32 bg-popover text-popover-foreground border-border">
-                        <SelectValue />
+                      <SelectTrigger className="w-32 bg-card text-card-foreground border-border">
+                        <SelectValue className="text-card-foreground" />
                       </SelectTrigger>
-                      <SelectContent className="bg-popover border-border shadow-elevated">
-                        <SelectItem value="Pending" className="text-popover-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer">
+                      <SelectContent className="bg-card border-border shadow-elevated z-50">
+                        <SelectItem value="Pending" className="text-card-foreground hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer">
                           <div className="flex items-center space-x-2">
                             <Clock className="w-3 h-3 text-warning" />
-                            <span>Pending</span>
+                            <span className="text-card-foreground">Pending</span>
                           </div>
                         </SelectItem>
-                        <SelectItem value="Completed" className="text-popover-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer">
+                        <SelectItem value="Completed" className="text-card-foreground hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer">
                           <div className="flex items-center space-x-2">
                             <CheckCircle className="w-3 h-3 text-success" />
-                            <span>Completed</span>
+                            <span className="text-card-foreground">Completed</span>
                           </div>
                         </SelectItem>
-                        <SelectItem value="In Progress" className="text-popover-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer">
+                        <SelectItem value="In Progress" className="text-card-foreground hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer">
                           <div className="flex items-center space-x-2">
                             <Clock className="w-3 h-3 text-primary" />
-                            <span>In Progress</span>
+                            <span className="text-card-foreground">In Progress</span>
                           </div>
                         </SelectItem>
-                        <SelectItem value="Not Started" className="text-popover-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer">
+                        <SelectItem value="Not Started" className="text-card-foreground hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer">
                           <div className="flex items-center space-x-2">
                             <Clock className="w-3 h-3 text-muted-foreground" />
-                            <span>Not Started</span>
+                            <span className="text-card-foreground">Not Started</span>
                           </div>
                         </SelectItem>
                       </SelectContent>
