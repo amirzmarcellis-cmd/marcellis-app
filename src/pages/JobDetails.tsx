@@ -1677,7 +1677,12 @@ export default function JobDetails() {
                                          </h5>
                                          <div className="space-y-2">
                                            {candidateTasks.map((task) => (
-                                             <div key={task.taskid} className="flex items-center justify-between p-2 bg-muted/50 rounded-md">
+                                              <div key={task.taskid} className={cn(
+                                                "flex items-center justify-between p-2 rounded-md",
+                                                task.status === 'Received' 
+                                                  ? "bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700" 
+                                                  : "bg-muted/50"
+                                              )}>
                                                <div className="flex items-center space-x-2">
                                                  <div className="flex items-center space-x-1">
                                                    {task.status === 'Pending' && <Hourglass className="w-3 h-3 text-orange-500" />}
@@ -1732,9 +1737,6 @@ export default function JobDetails() {
                                                      </Button>
                                                    )
                                                  )}
-                                                 <span className="text-xs text-muted-foreground">
-                                                   #{task.taskid}
-                                                 </span>
                                                </div>
                                              </div>
                                            ))}
