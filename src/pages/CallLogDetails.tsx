@@ -8,13 +8,14 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
-import { ArrowLeft, Phone, Clock, User, DollarSign, Calendar, Link2, Save, Search } from "lucide-react"
+import { ArrowLeft, Phone, Clock, User, DollarSign, Calendar, Link2, Save, Search, CheckCircle, ClipboardList } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
 import { TimelineLog } from "@/components/timeline/TimelineLog"
 import WaveformPlayer from "@/components/calls/WaveformPlayer"
 import RulerScore from "@/components/ui/ruler-score"
 import { useProfile } from "@/hooks/useProfile"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface CallLogDetail {
   "Job ID": string | null
@@ -56,6 +57,10 @@ export default function CallLogDetails() {
   const [saving, setSaving] = useState(false)
   const [search, setSearch] = useState("")
   const [notesUpdatedByName, setNotesUpdatedByName] = useState<string | null>(null)
+  const [taskStatus, setTaskStatus] = useState<string | null>(null)
+  const [taskLinks, setTaskLinks] = useState<string[]>([])
+  const [jobAssignmentLink, setJobAssignmentLink] = useState<string | null>(null)
+  const [taskId, setTaskId] = useState<string | null>(null)
   const firstMatchRef = useRef<HTMLElement | null>(null)
   const { profile } = useProfile()
 
@@ -181,10 +186,65 @@ export default function CallLogDetails() {
 
       setCallLog(enrichedData)
       setNotes(enrichedData?.["Notes"] || "")
+      
+      // Fetch task status and assignment links
+      await fetchTaskData(enrichedData["Candidate_ID"], enrichedData["Job ID"])
     } catch (error) {
       console.error('Error fetching call log detail:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchTaskData = async (candidateId: string | null, jobId: string | null) => {
+    if (!candidateId || !jobId) return
+    
+    try {
+      // Fetch task status from task_candidates table
+      const { data: taskData } = await supabase
+        .from('task_candidates')
+        .select('taskid, status, tasklink')
+        .eq('candidate_id', candidateId)
+        .eq('job_id', jobId)
+        .maybeSingle()
+      
+      if (taskData) {
+        setTaskStatus(taskData.status)
+        setTaskId(taskData.taskid.toString())
+        if (taskData.tasklink) {
+          setTaskLinks(taskData.tasklink.split(',').map((link: string) => link.trim()))
+        }
+      }
+      
+      // Fetch job assignment link
+      const { data: jobData } = await supabase
+        .from('Jobs')
+        .select('assignment')
+        .eq('job_id', jobId)
+        .maybeSingle()
+      
+      if (jobData?.assignment) {
+        setJobAssignmentLink(jobData.assignment)
+      }
+    } catch (error) {
+      console.error('Error fetching task data:', error)
+    }
+  }
+
+  const updateTaskStatus = async (newStatus: string) => {
+    if (!taskId || !candidateId || !jobId) return
+    
+    try {
+      const { error } = await supabase
+        .from('task_candidates')
+        .update({ status: newStatus })
+        .eq('taskid', parseInt(taskId))
+      
+      if (error) throw error
+      
+      setTaskStatus(newStatus)
+    } catch (error) {
+      console.error('Error updating task status:', error)
     }
   }
 
@@ -306,6 +366,85 @@ export default function CallLogDetails() {
                   <User className="w-4 h-4 mr-2" />
                   View Profile
                 </Button>
+              </div>
+              
+              {/* Task Status and Assignments Section */}
+              <div className="mt-4 space-y-3">
+                {/* Task Status */}
+                {taskStatus && (
+                  <div className="flex items-center justify-between p-3 bg-gradient-subtle rounded-lg border border-border/50">
+                    <div className="flex items-center space-x-2">
+                      <ClipboardList className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-medium">Task Status:</span>
+                    </div>
+                    <Select value={taskStatus} onValueChange={updateTaskStatus}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Pending">
+                          <div className="flex items-center space-x-2">
+                            <Clock className="w-3 h-3 text-yellow-500" />
+                            <span>Pending</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="Completed">
+                          <div className="flex items-center space-x-2">
+                            <CheckCircle className="w-3 h-3 text-green-500" />
+                            <span>Completed</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="In Progress">
+                          <div className="flex items-center space-x-2">
+                            <Clock className="w-3 h-3 text-blue-500" />
+                            <span>In Progress</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="Not Started">
+                          <div className="flex items-center space-x-2">
+                            <Clock className="w-3 h-3 text-gray-500" />
+                            <span>Not Started</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                
+                {/* Assignment Links */}
+                {(jobAssignmentLink || taskLinks.length > 0) && (
+                  <div className="p-3 bg-gradient-subtle rounded-lg border border-border/50">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Link2 className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-medium">Assignments:</span>
+                    </div>
+                    <div className="space-y-2">
+                      {jobAssignmentLink && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => window.open(jobAssignmentLink, '_blank')}
+                          className="w-full justify-start text-left"
+                        >
+                          <Link2 className="w-3 h-3 mr-2" />
+                          Job Assignment
+                        </Button>
+                      )}
+                      {taskLinks.map((link, index) => (
+                        <Button 
+                          key={index}
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => window.open(link, '_blank')}
+                          className="w-full justify-start text-left"
+                        >
+                          <Link2 className="w-3 h-3 mr-2" />
+                          Task Link {index + 1}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             <StatusDropdown
