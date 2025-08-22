@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
-import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck } from "lucide-react"
+import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, Hourglass } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { JobFunnel } from "@/components/jobs/JobFunnel"
 import { JobDialog } from "@/components/jobs/JobDialog"
@@ -47,6 +47,7 @@ export default function JobDetails() {
   const [cvData, setCvData] = useState<any[]>([])
   const [applications, setApplications] = useState<any[]>([])
   const [applicationsLoading, setApplicationsLoading] = useState(false)
+  const [taskCandidates, setTaskCandidates] = useState<any[]>([])
   const [nameFilter, setNameFilter] = useState("")
   const [emailFilter, setEmailFilter] = useState("")
   const [phoneFilter, setPhoneFilter] = useState("")
@@ -90,6 +91,7 @@ export default function JobDetails() {
       fetchCandidates(id)
       fetchCvData()
       fetchApplications(id)
+      fetchTaskCandidates(id)
       checkShortListButtonStatus()
       // Load last viewed timestamp for applications
       const lastViewed = localStorage.getItem(`lastViewedApplications_${id}`)
@@ -286,6 +288,53 @@ export default function JobDetails() {
       setApplications([])
     } finally {
       setApplicationsLoading(false)
+    }
+  }
+
+  const fetchTaskCandidates = async (jobId: string) => {
+    if (!currentCompany?.id) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('task_candidates')
+        .select('*')
+        .eq('job_id', jobId)
+        .eq('company_id', currentCompany.id)
+
+      if (error) throw error
+      setTaskCandidates(data || [])
+    } catch (error) {
+      console.error('Error fetching task candidates:', error)
+      setTaskCandidates([])
+    }
+  }
+
+  const updateTaskStatus = async (taskId: number, newStatus: 'Pending' | 'Received' | 'Reviewed') => {
+    try {
+      const { error } = await supabase
+        .from('task_candidates')
+        .update({ status: newStatus })
+        .eq('taskid', taskId);
+
+      if (error) throw error;
+
+      setTaskCandidates(prev => 
+        prev.map(task => 
+          task.taskid === taskId ? { ...task, status: newStatus } : task
+        )
+      );
+
+      toast({
+        title: "Success",
+        description: "Task status updated successfully"
+      });
+    } catch (error) {
+      console.error('Error updating task status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update task status",
+        variant: "destructive"
+      });
     }
   }
 
@@ -1613,9 +1662,88 @@ export default function JobDetails() {
                                     <p className="text-sm text-muted-foreground line-clamp-3">
                                       {mainCandidate["Summary"]}
                                     </p>
-                                  )}
+                                   )}
 
-                                   <div className="flex items-center justify-between pt-2 border-t">
+                                   {/* Task Status and Links Section */}
+                                   {(() => {
+                                     const candidateTasks = taskCandidates.filter(task => task.candidate_id === candidateId);
+                                     if (candidateTasks.length === 0) return null;
+
+                                     return (
+                                       <div className="space-y-2 pt-2 border-t">
+                                         <h5 className="text-sm font-medium text-foreground flex items-center">
+                                           <CheckCircle className="w-4 h-4 mr-2" />
+                                           Tasks ({candidateTasks.length})
+                                         </h5>
+                                         <div className="space-y-2">
+                                           {candidateTasks.map((task) => (
+                                             <div key={task.taskid} className="flex items-center justify-between p-2 bg-muted/50 rounded-md">
+                                               <div className="flex items-center space-x-2">
+                                                 <div className="flex items-center space-x-1">
+                                                   {task.status === 'Pending' && <Hourglass className="w-3 h-3 text-orange-500" />}
+                                                   {task.status === 'Received' && <AlertCircle className="w-3 h-3 text-blue-500" />}
+                                                   {task.status === 'Reviewed' && <CheckCircle className="w-3 h-3 text-green-500" />}
+                                                   <Select
+                                                     value={task.status}
+                                                     onValueChange={(value) => updateTaskStatus(task.taskid, value as any)}
+                                                   >
+                                                     <SelectTrigger className="w-24 h-6 text-xs bg-background/50 border-border/50">
+                                                       <SelectValue />
+                                                     </SelectTrigger>
+                                                     <SelectContent className="bg-background border border-border shadow-lg z-50">
+                                                       <SelectItem value="Pending">Pending</SelectItem>
+                                                       <SelectItem value="Received">Received</SelectItem>
+                                                       <SelectItem value="Reviewed">Reviewed</SelectItem>
+                                                     </SelectContent>
+                                                   </Select>
+                                                 </div>
+                                               </div>
+                                               <div className="flex items-center space-x-1">
+                                                 {task.tasklink && (
+                                                   task.tasklink.includes(',') ? (
+                                                     // Multiple links
+                                                     <div className="flex items-center space-x-1">
+                                                       {task.tasklink.split(',').map((link: string, index: number) => (
+                                                         <Button
+                                                           key={index}
+                                                           variant="ghost"
+                                                           size="sm"
+                                                           onClick={() => window.open(link.trim(), '_blank')}
+                                                           className="p-1 h-6 w-6 hover:bg-primary/10"
+                                                           title={`Task Link ${index + 1}`}
+                                                         >
+                                                           <ExternalLink className="h-3 w-3" />
+                                                         </Button>
+                                                       ))}
+                                                       <span className="text-xs text-muted-foreground">
+                                                         ({task.tasklink.split(',').length} links)
+                                                       </span>
+                                                     </div>
+                                                   ) : (
+                                                     // Single link
+                                                     <Button
+                                                       variant="ghost"
+                                                       size="sm"
+                                                       onClick={() => window.open(task.tasklink, '_blank')}
+                                                       className="p-1 h-6 w-6 hover:bg-primary/10"
+                                                       title="Task Link"
+                                                     >
+                                                       <ExternalLink className="h-3 w-3" />
+                                                     </Button>
+                                                   )
+                                                 )}
+                                                 <span className="text-xs text-muted-foreground">
+                                                   #{task.taskid}
+                                                 </span>
+                                               </div>
+                                             </div>
+                                           ))}
+                                         </div>
+                                       </div>
+                                     );
+                                   })()}
+
+                                    <div className="flex items-center justify-between pt-2 border-t">
                                      <div className="flex items-center space-x-2">
                                        <StatusDropdown
                                          currentStatus={mainCandidate["Contacted"]}
