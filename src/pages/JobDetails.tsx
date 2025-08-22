@@ -337,7 +337,6 @@ export default function JobDetails() {
         variant: "destructive"
       });
     }
-    }
   }
 
   const handleCallSelectedCandidates = async () => {
@@ -469,6 +468,7 @@ export default function JobDetails() {
 
   const clearAllSelection = () => {
     setSelectedCandidates(new Set());
+  };
 
   const handleButtonClick = () => {
     if (job?.longlist && job.longlist > 0) {
@@ -863,14 +863,17 @@ export default function JobDetails() {
 
   if (loading) {
     return (
+      <DashboardLayout>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
+      </DashboardLayout>
     )
   }
 
   if (!job) {
     return (
+      <DashboardLayout>
         <div className="flex flex-col items-center justify-center h-64 space-y-4">
           <h2 className="text-2xl font-bold text-muted-foreground">Job not found</h2>
           <Button onClick={() => navigate('/jobs')}>
@@ -878,6 +881,7 @@ export default function JobDetails() {
             Back to Jobs
           </Button>
         </div>
+      </DashboardLayout>
     )
   }
 
@@ -1063,28 +1067,28 @@ export default function JobDetails() {
           </CardContent>
         </Card>
 
-          {/* Job Funnel */}
-          <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
+        {/* Job Funnel */}
+        <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
 
-          {/* Detailed Information Tabs */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-             <div className="w-full overflow-x-auto">
-               <TabsList className="w-full min-w-[400px] grid grid-cols-6 h-auto p-1">
-                 <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">Overview</TabsTrigger>
-                 <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2">Description</TabsTrigger>
-                 <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">AI Requirements</TabsTrigger>
-                  <TabsTrigger value="applications" className="text-xs md:text-sm px-2 py-2 relative" onClick={handleApplicationsTabClick}>
-                    Applications
-                    {newApplicationsCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-[20px] z-10">
-                        {newApplicationsCount > 99 ? '99+' : newApplicationsCount}
-                      </span>
-                    )}
-                  </TabsTrigger>
-                 <TabsTrigger value="candidates" className="text-xs md:text-sm px-2 py-2">AI Long List</TabsTrigger>
-                 <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">AI Short List</TabsTrigger>
-               </TabsList>
-             </div>
+        {/* Detailed Information Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <div className="w-full overflow-x-auto">
+            <TabsList className="w-full min-w-[400px] grid grid-cols-6 h-auto p-1">
+              <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">Overview</TabsTrigger>
+              <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2">Description</TabsTrigger>
+              <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">AI Requirements</TabsTrigger>
+              <TabsTrigger value="applications" className="text-xs md:text-sm px-2 py-2 relative" onClick={handleApplicationsTabClick}>
+                Applications
+                {newApplicationsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-[20px] z-10">
+                    {newApplicationsCount > 99 ? '99+' : newApplicationsCount}
+                  </span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="candidates" className="text-xs md:text-sm px-2 py-2">AI Long List</TabsTrigger>
+              <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">AI Short List</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1164,7 +1168,7 @@ export default function JobDetails() {
             </div>
           </TabsContent>
 
-           <TabsContent value="description" className="space-y-4">
+          <TabsContent value="description" className="space-y-4">
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -1189,41 +1193,41 @@ export default function JobDetails() {
                   </div>
                 </div>
               </CardHeader>
-               <CardContent>
-                 <div className="prose prose-sm max-w-none">
-                   <p className="leading-relaxed whitespace-pre-wrap">
-                     {job["Job Description"] || "No description available for this position."}
-                   </p>
-                 </div>
-               </CardContent>
-             </Card>
+              <CardContent>
+                <div className="prose prose-sm max-w-none">
+                  <p className="leading-relaxed whitespace-pre-wrap">
+                    {job["Job Description"] || "No description available for this position."}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
 
-             {/* Job Documents Section */}
-             <Card>
-               <CardHeader>
-                 <CardTitle className="flex items-center">
-                   <FileText className="w-5 h-5 mr-2" />
-                   Job Documents
-                 </CardTitle>
-                 <CardDescription>
-                   Uploaded job description files and related documents
-                 </CardDescription>
-               </CardHeader>
-               <CardContent>
-                 <div className="text-center py-8">
-                   <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                   <h3 className="text-lg font-semibold mb-2">No documents uploaded</h3>
-                   <p className="text-muted-foreground">Upload job description files when creating or editing this job</p>
-                   <Button variant="outline" className="mt-4" onClick={() => setIsEditDialogOpen(true)}>
-                     <Upload className="w-4 h-4 mr-2" />
-                     Upload Documents
-                   </Button>
-                 </div>
-               </CardContent>
-             </Card>
-           </TabsContent>
+            {/* Job Documents Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <FileText className="w-5 h-5 mr-2" />
+                  Job Documents
+                </CardTitle>
+                <CardDescription>
+                  Uploaded job description files and related documents
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No documents uploaded</h3>
+                  <p className="text-muted-foreground">Upload job description files when creating or editing this job</p>
+                  <Button variant="outline" className="mt-4" onClick={() => setIsEditDialogOpen(true)}>
+                    <Upload className="w-4 h-4 mr-2" />
+                    Upload Documents
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-           <TabsContent value="requirements" className="space-y-4">
+          <TabsContent value="requirements" className="space-y-4">
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -1265,544 +1269,337 @@ export default function JobDetails() {
                 </div>
               </CardContent>
             </Card>
-           </TabsContent>
+          </TabsContent>
 
-           <TabsContent value="applications" className="space-y-4">
-             <Card>
-               <CardHeader>
-                 <div className="flex items-center justify-between">
-                   <div>
-                     <CardTitle className="flex items-center">
-                       <FileText className="w-5 h-5 mr-2" />
-                       Applications ({applications.length})
-                     </CardTitle>
-                     <CardDescription>
-                       Candidates who have applied for this position
-                     </CardDescription>
-                   </div>
-                 </div>
-                </CardHeader>
-                <CardContent>
-                  {/* Application Filters */}
-                  <Card className="mb-4">
-                    <CardContent className="pt-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">Name</label>
-                          <Input
-                            placeholder="Filter by name..."
-                            value={appNameFilter}
-                            onChange={(e) => setAppNameFilter(e.target.value)}
-                            className="h-9"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">Email</label>
-                          <Input
-                            placeholder="Filter by email..."
-                            value={appEmailFilter}
-                            onChange={(e) => setAppEmailFilter(e.target.value)}
-                            className="h-9"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">Phone</label>
-                          <Input
-                            placeholder="Filter by phone..."
-                            value={appPhoneFilter}
-                            onChange={(e) => setAppPhoneFilter(e.target.value)}
-                            className="h-9"
-                          />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {applicationsLoading ? (
-                    <div className="flex items-center justify-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                    </div>
-                  ) : applications.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      No applications found for this job.
-                    </div>
-                  ) : (
-                    (() => {
-                      // Filter applications based on name, email, and phone
-                      const filteredApplications = applications.filter(application => {
-                        const fullName = application.first_name && application.last_name 
-                          ? `${application.first_name} ${application.last_name}` 
-                          : application.first_name || application.last_name || "";
-                        const email = application.Email || "";
-                        const phone = application.phone_number || "";
-
-                        const nameMatch = !appNameFilter || fullName.toLowerCase().includes(appNameFilter.toLowerCase());
-                        const emailMatch = !appEmailFilter || email.toLowerCase().includes(appEmailFilter.toLowerCase());
-                        const phoneMatch = !appPhoneFilter || phone.includes(appPhoneFilter);
-
-                        return nameMatch && emailMatch && phoneMatch;
-                      });
-
-                      return (
-                        <div>
-                          <div className="mb-4 text-sm text-muted-foreground">
-                            Showing {filteredApplications.length} of {applications.length} applications
-                          </div>
-                          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                            {filteredApplications.map((application) => (
-                       <Card key={application.candidate_id} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
-                         <CardContent className="p-3 md:p-4">
-                           <div className="space-y-3">
-                             <div className="flex items-start justify-between">
-                               <div className="min-w-0 flex-1">
-                                 <h4 className="font-semibold text-sm md:text-base truncate">
-                                   {application.first_name && application.last_name 
-                                     ? `${application.first_name} ${application.last_name}` 
-                                     : application.first_name || application.last_name || "Unknown"}
-                                 </h4>
-                                 <p className="text-xs md:text-sm text-muted-foreground truncate">{application.candidate_id}</p>
-                               </div>
-                             </div>
-                             
-                             <div className="space-y-2 text-xs md:text-sm">
-                               {application.Email && (
-                                 <div className="flex items-center text-muted-foreground min-w-0">
-                                   <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
-                                   <span className="truncate">{application.Email}</span>
-                                 </div>
-                               )}
-                               
-                               {application.phone_number && (
-                                 <div className="flex items-center text-muted-foreground min-w-0">
-                                   <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
-                                   <span className="truncate">{application.phone_number}</span>
-                                 </div>
-                               )}
-                             </div>
-
-                             {application.cv_summary && (
-                               <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
-                                 {application.cv_summary}
-                               </p>
-                             )}
-
-                             <div className="flex items-center justify-between pt-2 border-t gap-2">
-                               <div className="flex items-center gap-2">
-                                 {application.CV_Link && (
-                                   <Button variant="outline" size="sm" asChild>
-                                     <a href={application.CV_Link} target="_blank" rel="noopener noreferrer">
-                                       <FileText className="w-4 h-4 mr-1" />
-                                       CV
-                                     </a>
-                                   </Button>
-                                 )}
-                                 <Button variant="outline" size="sm" asChild>
-                                   <Link to={`/candidate/${application.candidate_id}`}>
-                                     View Profile
-                                   </Link>
-                                 </Button>
-                               </div>
-                             </div>
-                           </div>
-                         </CardContent>
-                        </Card>
-                      ))}
-                    </div>
+          <TabsContent value="applications" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center">
+                      <FileText className="w-5 h-5 mr-2" />
+                      Applications ({applications.length})
+                    </CardTitle>
+                    <CardDescription>
+                      Candidates who have applied for this position
+                    </CardDescription>
                   </div>
-                    );
-                  })()
-                  )}
-                </CardContent>
-              </Card>
-           </TabsContent>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {/* Application Filters */}
+                <Card className="mb-4">
+                  <CardContent className="pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Name</label>
+                        <Input
+                          placeholder="Filter by name..."
+                          value={appNameFilter}
+                          onChange={(e) => setAppNameFilter(e.target.value)}
+                          className="h-9"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Email</label>
+                        <Input
+                          placeholder="Filter by email..."
+                          value={appEmailFilter}
+                          onChange={(e) => setAppEmailFilter(e.target.value)}
+                          className="h-9"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Phone</label>
+                        <Input
+                          placeholder="Filter by phone..."
+                          value={appPhoneFilter}
+                          onChange={(e) => setAppPhoneFilter(e.target.value)}
+                          className="h-9"
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-           <TabsContent value="candidates" className="space-y-4">
-             <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="flex items-center">
-                        <Users className="w-5 h-5 mr-2" />
-                        Contacted Candidates ({filteredCandidates.length} of {candidates.length})
-                      </CardTitle>
-                       <CardDescription>
-                         Candidates who have been contacted for this position
-                       </CardDescription>
-                     </div>
-                     <Button
-                       variant="default" 
-                       className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                       onClick={handleGenerateShortList}
-                       disabled={isGeneratingShortList || shortListButtonDisabled}
-                     >
-                       <Phone className="w-4 h-4 mr-2" />
-                       {isGeneratingShortList 
-                         ? "Generating..." 
-                         : shortListButtonDisabled 
-                           ? `Short List is being processed (${Math.floor(shortListTimeRemaining / 60)}:${(shortListTimeRemaining % 60).toString().padStart(2, '0')})`
-                           : "Call & Generate Short List"
-                       }
-                     </Button>
-                   </div>
-                 </CardHeader>
-                <CardContent>
-                  {(() => {
-                    const readyToContactCount = candidates.filter(
-                      candidate => candidate["Contacted"] === "Ready to Contact"
-                    ).length;
-                    
-                    if (readyToContactCount > 0) {
-                      return (
-                        <div className="mb-4 p-3 bg-yellow-100/80 dark:bg-yellow-950/20 border border-yellow-300 dark:border-yellow-700 rounded-lg">
-                          <div className="flex items-center">
-                            <Target className="w-4 h-4 mr-2 text-yellow-700 dark:text-yellow-400" />
-                            <span className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
-                              You have {readyToContactCount} Candidate{readyToContactCount > 1 ? 's' : ''} Ready to Contact
-                            </span>
-                          </div>
+                {applicationsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                ) : applications.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No applications found for this job.
+                  </div>
+                ) : (
+                  (() => {
+                    // Filter applications based on name, email, and phone
+                    const filteredApplications = applications.filter(application => {
+                      const fullName = application.first_name && application.last_name 
+                        ? `${application.first_name} ${application.last_name}` 
+                        : application.first_name || application.last_name || "";
+                      const email = application.Email || "";
+                      const phone = application.phone_number || "";
+
+                      const nameMatch = !appNameFilter || fullName.toLowerCase().includes(appNameFilter.toLowerCase());
+                      const emailMatch = !appEmailFilter || email.toLowerCase().includes(appEmailFilter.toLowerCase());
+                      const phoneMatch = !appPhoneFilter || phone.includes(appPhoneFilter);
+
+                      return nameMatch && emailMatch && phoneMatch;
+                    });
+
+                    return (
+                      <div>
+                        <div className="mb-4 text-sm text-muted-foreground">
+                          Showing {filteredApplications.length} of {applications.length} applications
                         </div>
-                      );
-                    }
-                    return null;
-                  })()}
-                 {candidatesLoading ? (
-                   <div className="flex items-center justify-center py-8">
-                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                   </div>
-                 ) : candidates.length === 0 ? (
-                   <div className="text-center py-8">
-                     <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                     <h3 className="text-lg font-semibold mb-2">No candidates contacted yet</h3>
-                     <p className="text-muted-foreground">Start reaching out to potential candidates for this position</p>
-                   </div>
-                 ) : (
-                    <>
-                       {/* Bulk Actions */}
-                       {selectedCandidates.size > 0 && (
-                         <Card className="p-3 md:p-4 mb-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
-                           <div className="flex items-center justify-between gap-4">
-                             <div className="flex items-center gap-2">
-                               <span className="text-sm font-medium">
-                                 {selectedCandidates.size} candidate{selectedCandidates.size > 1 ? 's' : ''} selected
-                               </span>
-                               <Button 
-                                 variant="ghost" 
-                                 size="sm"
-                                 onClick={clearAllSelection}
-                                 className="h-6 text-xs px-2"
-                               >
-                                 Clear
-                               </Button>
-                             </div>
-                             <div className="flex items-center gap-2">
-                               <Button
-                                 variant="outline"
-                                 size="sm"
-                                 onClick={handleRemoveSelectedCandidates}
-                                 className="text-destructive hover:text-destructive border-destructive/50 hover:border-destructive"
-                               >
-                                 <X className="w-4 h-4 mr-1" />
-                                 Remove Selected
-                               </Button>
-                               <Button
-                                 variant="default"
-                                 size="sm"
-                                 onClick={handleCallSelectedCandidates}
-                                 disabled={isGeneratingShortList}
-                                 className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600"
-                               >
-                                 <Phone className="w-4 h-4 mr-1" />
-                                 {isGeneratingShortList ? "Calling..." : "Call Selected"}
-                               </Button>
-                             </div>
-                           </div>
-                         </Card>
-                       )}
-
-                       {/* Filters */}
-                       <Card className="p-3 md:p-4 mb-4 bg-muted/50">
-                         <div className="flex items-center justify-between mb-3">
-                           <div className="flex items-center gap-2">
-                             <Filter className="w-4 h-4" />
-                             <h4 className="font-medium text-sm md:text-base">Filters</h4>
-                           </div>
-                           <div className="flex items-center gap-2">
-                             <Button 
-                               variant="ghost" 
-                               size="sm"
-                               onClick={selectAllCandidates}
-                               className="h-6 text-xs px-2"
-                             >
-                               Select All
-                             </Button>
-                           </div>
-                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
-                          <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                            <Input
-                              placeholder="Name..."
-                              value={nameFilter}
-                              onChange={(e) => setNameFilter(e.target.value)}
-                              className="pl-10 h-9 text-sm"
-                            />
-                          </div>
-                          <Input
-                            placeholder="Email..."
-                            value={emailFilter}
-                            onChange={(e) => setEmailFilter(e.target.value)}
-                            className="h-9 text-sm"
-                          />
-                          <Input
-                            placeholder="Phone..."
-                            value={phoneFilter}
-                            onChange={(e) => setPhoneFilter(e.target.value)}
-                            className="h-9 text-sm"
-                          />
-                          <Select value={scoreFilter} onValueChange={setScoreFilter}>
-                            <SelectTrigger className="h-9 text-sm">
-                              <SelectValue placeholder="Score" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">All Scores</SelectItem>
-                              <SelectItem value="high">High (75+)</SelectItem>
-                              <SelectItem value="moderate">Moderate (50-74)</SelectItem>
-                              <SelectItem value="poor">Poor (1-49)</SelectItem>
-                              <SelectItem value="none">No Score</SelectItem>
-                            </SelectContent>
-                          </Select>
-                           <Select value={contactedFilter} onValueChange={setContactedFilter}>
-                             <SelectTrigger className="h-9 text-sm">
-                               <SelectValue placeholder="Status" />
-                             </SelectTrigger>
-                               <SelectContent>
-                                 <SelectItem value="all">All Status</SelectItem>
-                                 <SelectItem value="Not Contacted">Not Contacted</SelectItem>
-                                 <SelectItem value="Ready to Call">Ready to Contact</SelectItem>
-                                 <SelectItem value="Contacted">Contacted</SelectItem>
-                                 <SelectItem value="Call Done">Call Done</SelectItem>
-                                 <SelectItem value="1st No Answer">1st No Answer</SelectItem>
-                                 <SelectItem value="2nd No Answer">2nd No Answer</SelectItem>
-                                 <SelectItem value="3rd No Answer">3rd No Answer</SelectItem>
-                                 <SelectItem value="Low Scored">Low Scored</SelectItem>
-                                 <SelectItem value="Tasked">Tasked</SelectItem>
-                                 <SelectItem value="Rejected">Rejected</SelectItem>
-                               </SelectContent>
-                           </Select>
-                        </div>
-                      </Card>
-
-                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                        {(() => {
-                          // Group candidates by Candidate_ID to handle multiple contacts
-                          const groupedCandidates = filteredCandidates.reduce((acc, candidate) => {
-                            const candidateId = candidate["Candidate_ID"]
-                            if (!acc[candidateId]) {
-                              acc[candidateId] = []
-                            }
-                            acc[candidateId].push(candidate)
-                            return acc
-                          }, {} as Record<string, any[]>)
-
-                          return Object.entries(groupedCandidates).map(([candidateId, candidateContacts]: [string, any[]]) => {
-                            // Use the first contact for display info
-                            const mainCandidate = candidateContacts[0]
-                            
-                            return (
-                                <Card key={candidateId} className={cn(
-                                  "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg",
-                                  selectedCandidates.has(candidateId) && "border-primary bg-primary/5"
-                                )}>
-                                  <CardContent className="p-3 md:p-4">
-                                    <div className="space-y-3">
-                                       <div className="flex items-start justify-between">
-                                         <div className="flex items-start gap-3 min-w-0 flex-1">
-                                           <input
-                                             type="checkbox"
-                                             checked={selectedCandidates.has(candidateId)}
-                                             onChange={() => toggleCandidateSelection(candidateId)}
-                                             className="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                                           />
-                                           <div className="min-w-0 flex-1">
-                                             <h4 className="font-semibold text-sm md:text-base truncate">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
-                                             <p className="text-xs md:text-sm text-muted-foreground truncate">{candidateId}</p>
-                                           </div>
-                                         </div>
-                                         <Button
-                                           variant="ghost"
-                                           size="sm"
-                                           onClick={() => handleRemoveFromLongList(candidateId)}
-                                           className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
-                                           title="Remove from Long List"
-                                         >
-                                           <X className="h-3 w-3" />
-                                         </Button>
-                                        {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || 
-                                          mainCandidate["Contacted"]?.toLowerCase() === "contacted" || 
-                                          mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
-                                          mainCandidate["Contacted"]?.toLowerCase() === "tasked") && 
-                                          mainCandidate["lastcalltime"] && (
-                                          <div className="text-xs text-muted-foreground text-right">
-                                            <div className="flex items-center">
-                                              <Clock className="w-3 h-3 mr-1" />
-                                              {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
-                                            </div>
-                                            <div className="text-xs">
-                                              {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            </div>
-                                          </div>
-                                        )}
-                                      </div>
-                                     
-                                     <div className="space-y-2 text-xs md:text-sm">
-                                       {mainCandidate["Candidate Email"] && (
-                                         <div className="flex items-center text-muted-foreground min-w-0">
-                                           <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
-                                           <span className="truncate">{mainCandidate["Candidate Email"]}</span>
-                                         </div>
-                                       )}
-                                       
-                                       {mainCandidate["Candidate Phone Number"] && (
-                                         <div className="flex items-center text-muted-foreground min-w-0">
-                                           <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
-                                           <span className="truncate">{mainCandidate["Candidate Phone Number"]}</span>
-                                         </div>
-                                       )}
-                                     </div>
-
-                                     {mainCandidate["Summary"] && (
-                                       <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
-                                         {mainCandidate["Summary"]}
-                                       </p>
-                                     )}
-
-                                      <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t gap-2">
-                                        <div className="flex flex-wrap items-center gap-1">
-                                          <StatusDropdown
-                                            currentStatus={mainCandidate["Contacted"]}
-                                            candidateId={mainCandidate["Candidate_ID"]}
-                                            jobId={id!}
-                                            onStatusChange={(newStatus) => {
-                                              setCandidates(prev => prev.map(c => 
-                                                c["Candidate_ID"] === mainCandidate["Candidate_ID"] 
-                                                  ? { ...c, Contacted: newStatus }
-                                                  : c
-                                              ))
-                                            }}
-                                            variant="badge"
-                                          />
-                                          {getCandidateStatus(mainCandidate["Candidate_ID"]) && (
-                                            <StatusDropdown
-                                              currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
-                                              candidateId={mainCandidate["Candidate_ID"]}
-                                              jobId={null}
-                                              onStatusChange={(newStatus) => {
-                                                setCvData(prev => prev.map(cv => 
-                                                  cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] 
-                                                    ? { ...cv, CandidateStatus: newStatus }
-                                                    : cv
-                                                ))
-                                              }}
-                                              variant="badge"
-                                            />
-                                          )}
-                                        </div>
-                                        {getScoreBadge(mainCandidate["Success Score"])}
-                                      </div>
-
-                                     {/* Call Log Buttons */}
-                                      <div className="space-y-2 pt-2 border-t">
-                                        <div className="flex flex-col sm:flex-row gap-2">
-                                           <Button
-                                             variant="default"
-                                             size="sm"
-                                             onClick={() => handleCallCandidate(mainCandidate["Candidate_ID"], id!, mainCandidate["callid"])}
-                                             disabled={callingCandidateId === candidateId}
-                                             className="w-full sm:flex-1 bg-foreground hover:bg-foreground/90 text-background disabled:opacity-50 text-xs md:text-sm"
-                                           >
-                                            <Phone className="w-3 h-3 mr-1" />
-                                            {callingCandidateId === candidateId ? 'Calling...' : 'Call Candidate'}
-                                          </Button>
-                           {(() => {
-                             const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
-                             if (contactsWithCalls.length === 0) return null;
-                             
-                             // Get the latest call log (highest callid)
-                             const latestContact = contactsWithCalls.reduce((latest, current) => 
-                               current.callid > latest.callid ? current : latest
-                             );
-                             
-                             return (
-                              <Button
-                                key={latestContact.callid}
-                                variant="outline"
-                                size="sm"
-                                asChild
-                                className="flex-1 min-w-0 text-xs md:text-sm"
-                              >
-                               <Link 
-                                 to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} 
-                                 className="truncate"
-                                 onClick={() => {
-                                   // Store current tab in URL hash for back navigation
-                                   window.location.hash = 'tab=candidates';
-                                 }}
-                               >
-                                  <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
-                                  <span className="truncate">Call Log</span>
-                                </Link>
-                              </Button>
-                             );
-                           })()}
-                                       </div>
-                                       <Button
-                                         variant="ghost"
-                                         size="sm"
-                                         asChild
-                                         className="w-full text-xs md:text-sm"
-                                       >
-                                         <Link to={`/candidate/${candidateId}`}>
-                                           <Users className="w-3 h-3 mr-1" />
-                                           View Profile
-                                         </Link>
-                                       </Button>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                          {filteredApplications.map((application) => (
+                            <Card key={application.candidate_id} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
+                              <CardContent className="p-3 md:p-4">
+                                <div className="space-y-3">
+                                  <div className="flex items-start justify-between">
+                                    <div className="min-w-0 flex-1">
+                                      <h4 className="font-semibold text-sm md:text-base truncate">
+                                        {application.first_name && application.last_name 
+                                          ? `${application.first_name} ${application.last_name}` 
+                                          : application.first_name || application.last_name || "Unknown"}
+                                      </h4>
+                                      <p className="text-xs md:text-sm text-muted-foreground truncate">{application.candidate_id}</p>
                                     </div>
                                   </div>
-                                </CardContent>
-                              </Card>
-                            )
-                          })
-                        })()}
-                      </div>
-                   </>
-                 )}
-               </CardContent>
-             </Card>
-            </TabsContent>
+                                  
+                                  <div className="space-y-2 text-xs md:text-sm">
+                                    {application.Email && (
+                                      <div className="flex items-center text-muted-foreground min-w-0">
+                                        <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+                                        <span className="truncate">{application.Email}</span>
+                                      </div>
+                                    )}
+                                    
+                                    {application.phone_number && (
+                                      <div className="flex items-center text-muted-foreground min-w-0">
+                                        <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
+                                        <span className="truncate">{application.phone_number}</span>
+                                      </div>
+                                    )}
+                                  </div>
 
-           <TabsContent value="shortlist" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Star className="w-5 h-5 mr-2" />
-                    AI Short List ({shortListCandidates.length} candidates with 74+ score)
-                  </CardTitle>
-                  <CardDescription>
-                    High-scoring candidates (74+) who have passed the initial screening
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {shortListCandidates.length === 0 ? (
-                    <div className="text-center py-8">
-                      <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">No high-scoring candidates yet</h3>
-                      <p className="text-muted-foreground">Candidates with scores of 74+ will appear here automatically</p>
-                    </div>
-                  ) : (
+                                  {application.cv_summary && (
+                                    <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
+                                      {application.cv_summary}
+                                    </p>
+                                  )}
+
+                                  <div className="flex items-center justify-between pt-2 border-t gap-2">
+                                    <div className="flex items-center gap-2">
+                                      {application.CV_Link && (
+                                        <Button variant="outline" size="sm" asChild>
+                                          <a href={application.CV_Link} target="_blank" rel="noopener noreferrer">
+                                            <FileText className="w-4 h-4 mr-1" />
+                                            CV
+                                          </a>
+                                        </Button>
+                                      )}
+                                      <Button variant="outline" size="sm" asChild>
+                                        <Link to={`/candidate/${application.candidate_id}`}>
+                                          View Profile
+                                        </Link>
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="candidates" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center">
+                      <Users className="w-5 h-5 mr-2" />
+                      Contacted Candidates ({filteredCandidates.length} of {candidates.length})
+                    </CardTitle>
+                    <CardDescription>
+                      Candidates who have been contacted for this position
+                    </CardDescription>
+                  </div>
+                  <Button
+                    variant="default" 
+                    className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={handleGenerateShortList}
+                    disabled={isGeneratingShortList || shortListButtonDisabled}
+                  >
+                    <Phone className="w-4 h-4 mr-2" />
+                    {isGeneratingShortList 
+                      ? "Generating..." 
+                      : shortListButtonDisabled 
+                        ? `Short List is being processed (${Math.floor(shortListTimeRemaining / 60)}:${(shortListTimeRemaining % 60).toString().padStart(2, '0')})`
+                        : "Call & Generate Short List"
+                    }
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {(() => {
+                  const readyToContactCount = candidates.filter(
+                    candidate => candidate["Contacted"] === "Ready to Contact"
+                  ).length;
+                  
+                  if (readyToContactCount > 0) {
+                    return (
+                      <div className="mb-4 p-3 bg-yellow-100/80 dark:bg-yellow-950/20 border border-yellow-300 dark:border-yellow-700 rounded-lg">
+                        <div className="flex items-center">
+                          <Target className="w-4 h-4 mr-2 text-yellow-700 dark:text-yellow-400" />
+                          <span className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
+                            You have {readyToContactCount} Candidate{readyToContactCount > 1 ? 's' : ''} Ready to Contact
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+                {candidatesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                ) : candidates.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No candidates contacted yet</h3>
+                    <p className="text-muted-foreground">Start reaching out to potential candidates for this position</p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Bulk Actions */}
+                    {selectedCandidates.size > 0 && (
+                      <Card className="p-3 md:p-4 mb-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium">
+                              {selectedCandidates.size} candidate{selectedCandidates.size > 1 ? 's' : ''} selected
+                            </span>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={clearAllSelection}
+                              className="h-6 text-xs px-2"
+                            >
+                              Clear
+                            </Button>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleRemoveSelectedCandidates}
+                              className="text-destructive hover:text-destructive border-destructive/50 hover:border-destructive"
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Remove Selected
+                            </Button>
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={handleCallSelectedCandidates}
+                              disabled={isGeneratingShortList}
+                              className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600"
+                            >
+                              <Phone className="w-4 h-4 mr-1" />
+                              {isGeneratingShortList ? "Calling..." : "Call Selected"}
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    )}
+
+                    {/* Filters */}
+                    <Card className="p-3 md:p-4 mb-4 bg-muted/50">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <Filter className="w-4 h-4" />
+                          <h4 className="font-medium text-sm md:text-base">Filters</h4>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={selectAllCandidates}
+                            className="h-6 text-xs px-2"
+                          >
+                            Select All
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                          <Input
+                            placeholder="Name..."
+                            value={nameFilter}
+                            onChange={(e) => setNameFilter(e.target.value)}
+                            className="pl-10 h-9 text-sm"
+                          />
+                        </div>
+                        <Input
+                          placeholder="Email..."
+                          value={emailFilter}
+                          onChange={(e) => setEmailFilter(e.target.value)}
+                          className="h-9 text-sm"
+                        />
+                        <Input
+                          placeholder="Phone..."
+                          value={phoneFilter}
+                          onChange={(e) => setPhoneFilter(e.target.value)}
+                          className="h-9 text-sm"
+                        />
+                        <Select value={scoreFilter} onValueChange={setScoreFilter}>
+                          <SelectTrigger className="h-9 text-sm">
+                            <SelectValue placeholder="Score" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Scores</SelectItem>
+                            <SelectItem value="high">High (75+)</SelectItem>
+                            <SelectItem value="moderate">Moderate (50-74)</SelectItem>
+                            <SelectItem value="poor">Poor (1-49)</SelectItem>
+                            <SelectItem value="none">No Score</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Select value={contactedFilter} onValueChange={setContactedFilter}>
+                          <SelectTrigger className="h-9 text-sm">
+                            <SelectValue placeholder="Status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Status</SelectItem>
+                            <SelectItem value="Not Contacted">Not Contacted</SelectItem>
+                            <SelectItem value="Ready to Call">Ready to Contact</SelectItem>
+                            <SelectItem value="Contacted">Contacted</SelectItem>
+                            <SelectItem value="Call Done">Call Done</SelectItem>
+                            <SelectItem value="1st No Answer">1st No Answer</SelectItem>
+                            <SelectItem value="2nd No Answer">2nd No Answer</SelectItem>
+                            <SelectItem value="3rd No Answer">3rd No Answer</SelectItem>
+                            <SelectItem value="Low Scored">Low Scored</SelectItem>
+                            <SelectItem value="Tasked">Tasked</SelectItem>
+                            <SelectItem value="Rejected">Rejected</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </Card>
+
                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                       {(() => {
-                        // Group short list candidates by Candidate_ID
-                        const groupedShortList = shortListCandidates.reduce((acc, candidate) => {
+                        // Group candidates by Candidate_ID to handle multiple contacts
+                        const groupedCandidates = filteredCandidates.reduce((acc, candidate) => {
                           const candidateId = candidate["Candidate_ID"]
                           if (!acc[candidateId]) {
                             acc[candidateId] = []
@@ -1811,18 +1608,39 @@ export default function JobDetails() {
                           return acc
                         }, {} as Record<string, any[]>)
 
-                        return Object.entries(groupedShortList).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                        return Object.entries(groupedCandidates).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                          // Use the first contact for display info
                           const mainCandidate = candidateContacts[0]
                           
                           return (
-                            <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20">
-                              <CardContent className="p-4">
+                            <Card key={candidateId} className={cn(
+                              "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg",
+                              selectedCandidates.has(candidateId) && "border-primary bg-primary/5"
+                            )}>
+                              <CardContent className="p-3 md:p-4">
                                 <div className="space-y-3">
                                   <div className="flex items-start justify-between">
-                                    <div className="min-w-0 flex-1">
-                                      <h4 className="font-semibold">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
-                                      <p className="text-sm text-muted-foreground">{candidateId}</p>
+                                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedCandidates.has(candidateId)}
+                                        onChange={() => toggleCandidateSelection(candidateId)}
+                                        className="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                                      />
+                                      <div className="min-w-0 flex-1">
+                                        <h4 className="font-semibold text-sm md:text-base truncate">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
+                                        <p className="text-xs md:text-sm text-muted-foreground truncate">{candidateId}</p>
+                                      </div>
                                     </div>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleRemoveFromLongList(candidateId)}
+                                      className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
+                                      title="Remove from Long List"
+                                    >
+                                      <X className="h-3 w-3" />
+                                    </Button>
                                     {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || 
                                       mainCandidate["Contacted"]?.toLowerCase() === "contacted" || 
                                       mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
@@ -1840,227 +1658,119 @@ export default function JobDetails() {
                                     )}
                                   </div>
                                   
-                                  <div className="space-y-2 text-sm">
+                                  <div className="space-y-2 text-xs md:text-sm">
                                     {mainCandidate["Candidate Email"] && (
-                                      <div className="flex items-center text-muted-foreground">
-                                        <Mail className="w-4 h-4 mr-2" />
+                                      <div className="flex items-center text-muted-foreground min-w-0">
+                                        <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
                                         <span className="truncate">{mainCandidate["Candidate Email"]}</span>
                                       </div>
                                     )}
                                     
                                     {mainCandidate["Candidate Phone Number"] && (
-                                      <div className="flex items-center text-muted-foreground">
-                                        <Phone className="w-4 h-4 mr-2" />
-                                        <span>{mainCandidate["Candidate Phone Number"]}</span>
+                                      <div className="flex items-center text-muted-foreground min-w-0">
+                                        <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
+                                        <span className="truncate">{mainCandidate["Candidate Phone Number"]}</span>
                                       </div>
                                     )}
                                   </div>
 
                                   {mainCandidate["Summary"] && (
-                                    <p className="text-sm text-muted-foreground line-clamp-3">
+                                    <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
                                       {mainCandidate["Summary"]}
                                     </p>
-                                   )}
+                                  )}
 
-                                   {/* Task Status and Links Section */}
-                                   {(() => {
-                                     const candidateTasks = taskCandidates.filter(task => task.candidate_id === candidateId);
-                                     const candidateStatus = mainCandidate["Contacted"]?.toLowerCase();
-                                     
-                                     // Only show tasks if candidate status is "tasked" and not "rejected"
-                                     if (candidateTasks.length === 0 || 
-                                         candidateStatus !== "tasked" || 
-                                         candidateStatus === "rejected") return null;
+                                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t gap-2">
+                                    <div className="flex flex-wrap items-center gap-1">
+                                      <StatusDropdown
+                                        currentStatus={mainCandidate["Contacted"]}
+                                        candidateId={mainCandidate["Candidate_ID"]}
+                                        jobId={id!}
+                                        onStatusChange={(newStatus) => {
+                                          setCandidates(prev => prev.map(c => 
+                                            c["Candidate_ID"] === mainCandidate["Candidate_ID"] 
+                                              ? { ...c, Contacted: newStatus }
+                                              : c
+                                          ))
+                                        }}
+                                        variant="badge"
+                                      />
+                                      {getCandidateStatus(mainCandidate["Candidate_ID"]) && (
+                                        <StatusDropdown
+                                          currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
+                                          candidateId={mainCandidate["Candidate_ID"]}
+                                          jobId={null}
+                                          onStatusChange={(newStatus) => {
+                                            setCvData(prev => prev.map(cv => 
+                                              cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] 
+                                                ? { ...cv, CandidateStatus: newStatus }
+                                                : cv
+                                            ))
+                                          }}
+                                          variant="badge"
+                                        />
+                                      )}
+                                    </div>
+                                    {getScoreBadge(mainCandidate["Success Score"])}
+                                  </div>
 
-                                     return (
-                                       <div className="space-y-2 pt-2 border-t">
-                                         <h5 className="text-sm font-medium text-foreground flex items-center">
-                                           <CheckCircle className="w-4 h-4 mr-2" />
-                                           Tasks ({candidateTasks.length})
-                                         </h5>
-                                         <div className="space-y-2">
-                                           {candidateTasks.map((task) => (
-                                              <div key={task.taskid} className={cn(
-                                                "flex items-center justify-between p-2 rounded-md",
-                                                task.status === 'Received' 
-                                                  ? "bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700" 
-                                                  : "bg-muted/50"
-                                              )}>
-                                               <div className="flex items-center space-x-2">
-                                                 <div className="flex items-center space-x-1">
-                                                   {task.status === 'Pending' && <Hourglass className="w-3 h-3 text-orange-500" />}
-                                                   {task.status === 'Received' && <AlertCircle className="w-3 h-3 text-blue-500" />}
-                                                   {task.status === 'Reviewed' && <CheckCircle className="w-3 h-3 text-green-500" />}
-                                                   <Select
-                                                     value={task.status}
-                                                     onValueChange={(value) => updateTaskStatus(task.taskid, value as any)}
-                                                   >
-                                                     <SelectTrigger className="w-24 h-6 text-xs bg-background/50 border-border/50">
-                                                       <SelectValue />
-                                                     </SelectTrigger>
-                                                     <SelectContent className="bg-background border border-border shadow-lg z-50">
-                                                       <SelectItem value="Pending">Pending</SelectItem>
-                                                       <SelectItem value="Received">Received</SelectItem>
-                                                       <SelectItem value="Reviewed">Reviewed</SelectItem>
-                                                     </SelectContent>
-                                                   </Select>
-                                                 </div>
-                                               </div>
-                                               <div className="flex items-center space-x-1">
-                                                 {task.tasklink && (
-                                                   task.tasklink.includes(',') ? (
-                                                     // Multiple links
-                                                     <div className="flex items-center space-x-1">
-                                                       {task.tasklink.split(',').map((link: string, index: number) => (
-                                                         <Button
-                                                           key={index}
-                                                           variant="ghost"
-                                                           size="sm"
-                                                           onClick={() => window.open(link.trim(), '_blank')}
-                                                           className="p-1 h-6 w-6 hover:bg-primary/10"
-                                                           title={`Task Link ${index + 1}`}
-                                                         >
-                                                           <ExternalLink className="h-3 w-3" />
-                                                         </Button>
-                                                       ))}
-                                                       <span className="text-xs text-muted-foreground">
-                                                         ({task.tasklink.split(',').length} links)
-                                                       </span>
-                                                     </div>
-                                                   ) : (
-                                                     // Single link
-                                                     <Button
-                                                       variant="ghost"
-                                                       size="sm"
-                                                       onClick={() => window.open(task.tasklink, '_blank')}
-                                                       className="p-1 h-6 w-6 hover:bg-primary/10"
-                                                       title="Task Link"
-                                                     >
-                                                       <ExternalLink className="h-3 w-3" />
-                                                     </Button>
-                                                   )
-                                                 )}
-                                               </div>
-                                             </div>
-                                           ))}
-                                         </div>
-                                       </div>
-                                     );
-                                   })()}
-
-                                    <div className="flex items-center justify-between pt-2 border-t">
-                                     <div className="flex items-center space-x-2">
-                                       <StatusDropdown
-                                         currentStatus={mainCandidate["Contacted"]}
-                                         candidateId={mainCandidate["Candidate_ID"]}
-                                         jobId={id!}
-                                         onStatusChange={(newStatus) => {
-                                           setCandidates(prev => prev.map(c => 
-                                             c["Candidate_ID"] === mainCandidate["Candidate_ID"] 
-                                               ? { ...c, Contacted: newStatus }
-                                               : c
-                                           ))
-                                         }}
-                                         variant="badge"
-                                       />
-                                       {getCandidateStatus(mainCandidate["Candidate_ID"]) && (
-                                         <StatusDropdown
-                                           currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
-                                           candidateId={mainCandidate["Candidate_ID"]}
-                                           jobId={null}
-                                           onStatusChange={(newStatus) => {
-                                             setCvData(prev => prev.map(cv => 
-                                               cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] 
-                                                 ? { ...cv, CandidateStatus: newStatus }
-                                                 : cv
-                                             ))
-                                           }}
-                                           variant="badge"
-                                         />
-                                       )}
-                                     </div>
-                                     {getScoreBadge(mainCandidate["Success Score"])}
-                                   </div>
-
-                                     {/* Call Log Buttons */}
-                                     <div className="space-y-2 pt-2 border-t">
-                                       <div className="flex flex-wrap gap-2">
-                                          {(() => {
-                                            const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
-                                            if (contactsWithCalls.length === 0) return null;
-                                            
-                                            // Get the latest call log (highest callid)
-                                            const latestContact = contactsWithCalls.reduce((latest, current) => 
-                                              current.callid > latest.callid ? current : latest
-                                            );
-                                            
-                                            return (
-                                             <Button
-                                               key={latestContact.callid}
-                                               variant="outline"
-                                               size="sm"
-                                               asChild
-                                               className="flex-1 min-w-[100px]"
-                                             >
-                                <Link 
-                                  to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`}
-                                  onClick={() => {
-                                    // Store current tab in URL hash for back navigation
-                                    window.location.hash = 'tab=shortlist';
-                                  }}
-                                >
-                                  <FileText className="w-3 h-3 mr-1" />
-                                  Call Log
-                                </Link>
-                                             </Button>
-                                            );
-                                          })()}
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          asChild
-                                          className="flex-1 min-w-[100px]"
-                                        >
-                                          <Link to={`/candidate/${candidateId}`}>
-                                            <Users className="w-3 h-3 mr-1" />
-                                            View Profile
-                                          </Link>
-                                        </Button>
-                                      </div>
-                                       {/* Action Buttons - Arrange Interview and Reject */}
-                                       <div className="flex gap-2">
+                                  {/* Call Log Buttons */}
+                                  <div className="space-y-2 pt-2 border-t">
+                                    <div className="flex flex-col sm:flex-row gap-2">
+                                      <Button
+                                        variant="default"
+                                        size="sm"
+                                        onClick={() => handleCallCandidate(mainCandidate["Candidate_ID"], id!, mainCandidate["callid"])}
+                                        disabled={callingCandidateId === candidateId}
+                                        className="w-full sm:flex-1 bg-foreground hover:bg-foreground/90 text-background disabled:opacity-50 text-xs md:text-sm"
+                                      >
+                                        <Phone className="w-3 h-3 mr-1" />
+                                        {callingCandidateId === candidateId ? 'Calling...' : 'Call Candidate'}
+                                      </Button>
+                                      {(() => {
+                                        const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
+                                        if (contactsWithCalls.length === 0) return null;
+                                        
+                                        // Get the latest call log (highest callid)
+                                        const latestContact = contactsWithCalls.reduce((latest, current) => 
+                                          current.callid > latest.callid ? current : latest
+                                        );
+                                        
+                                        return (
                                           <Button
+                                            key={latestContact.callid}
                                             variant="outline"
                                             size="sm"
-                                            onClick={() => handleArrangeInterview(candidateId)}
-                                           className="flex-1 min-w-[100px] bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200"
-                                         >
-                                           <Calendar className="w-3 h-3 mr-1" />
-                                           Arrange Interview
-                                         </Button>
-                                         {mainCandidate["Contacted"] === "Rejected" ? (
-                                           <Button
-                                             variant="outline"
-                                             size="sm"
-                                             className="flex-1 min-w-[100px] bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed"
-                                             disabled
-                                           >
-                                             <X className="w-3 h-3 mr-1" />
-                                             Rejected
-                                           </Button>
-                                         ) : (
-                                           <Button
-                                             variant="outline"
-                                             size="sm"
-                                             className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200"
-                                             onClick={() => handleRejectCandidate(id!, candidateId, candidateContacts[0].callid)}
-                                           >
-                                             <X className="w-3 h-3 mr-1" />
-                                             Reject Candidate
-                                           </Button>
-                                         )}
-                                       </div>
+                                            asChild
+                                            className="flex-1 min-w-0 text-xs md:text-sm"
+                                          >
+                                            <Link 
+                                              to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} 
+                                              className="truncate"
+                                              onClick={() => {
+                                                // Store current tab in URL hash for back navigation
+                                                window.location.hash = 'tab=candidates';
+                                              }}
+                                            >
+                                              <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
+                                              <span className="truncate">Call Log</span>
+                                            </Link>
+                                          </Button>
+                                        );
+                                      })()}
                                     </div>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      asChild
+                                      className="w-full text-xs md:text-sm"
+                                    >
+                                      <Link to={`/candidate/${candidateId}`}>
+                                        <Users className="w-3 h-3 mr-1" />
+                                        View Profile
+                                      </Link>
+                                    </Button>
+                                  </div>
                                 </div>
                               </CardContent>
                             </Card>
@@ -2068,213 +1778,506 @@ export default function JobDetails() {
                         })
                       })()}
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-         
-         <JobDialog
-           job={job}
-           open={isEditDialogOpen}
-           onOpenChange={setIsEditDialogOpen}
-           onSave={() => {
-             fetchJob(id!)
-             setIsEditDialogOpen(false)
-           }}
-         />
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-         <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-           <AlertDialogContent>
-             <AlertDialogHeader>
-               <AlertDialogTitle>Regenerate Long List</AlertDialogTitle>
-               <AlertDialogDescription>
-                 Are you sure you want to regenerate Long List?
-               </AlertDialogDescription>
-             </AlertDialogHeader>
-             <AlertDialogFooter>
-               <AlertDialogCancel>Cancel</AlertDialogCancel>
-               <AlertDialogAction 
-                 onClick={() => {
-                   setShowConfirmDialog(false);
-                   handleGenerateLongList();
-                 }}
-               >
-                 Yes, Regenerate
-               </AlertDialogAction>
-             </AlertDialogFooter>
-           </AlertDialogContent>
-          </AlertDialog>
+          <TabsContent value="shortlist" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Star className="w-5 h-5 mr-2" />
+                  AI Short List ({shortListCandidates.length} candidates with 74+ score)
+                </CardTitle>
+                <CardDescription>
+                  High-scoring candidates (74+) who have passed the initial screening
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {shortListCandidates.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No high-scoring candidates yet</h3>
+                    <p className="text-muted-foreground">Candidates with scores of 74+ will appear here automatically</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {(() => {
+                      // Group short list candidates by Candidate_ID
+                      const groupedShortList = shortListCandidates.reduce((acc, candidate) => {
+                        const candidateId = candidate["Candidate_ID"]
+                        if (!acc[candidateId]) {
+                          acc[candidateId] = []
+                        }
+                        acc[candidateId].push(candidate)
+                        return acc
+                      }, {} as Record<string, any[]>)
 
-           {/* Interview Scheduling Dialog */}
-           <Dialog open={interviewDialogOpen} onOpenChange={setInterviewDialogOpen}>
-             <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-               <DialogHeader>
-                 <DialogTitle>Schedule Interview Slots</DialogTitle>
-               </DialogHeader>
-              <div className="space-y-6 overflow-y-auto max-h-[70vh] px-1">
-                <p className="text-sm text-muted-foreground">
-                  Please select 3 preferred interview slots and interview type. Only future dates are allowed, and times must be in 15-minute intervals.
-                </p>
-                
-                {/* Interview Type Selection */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Interview Type</label>
-                  <Select value={interviewType} onValueChange={setInterviewType}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select interview type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Phone">Phone</SelectItem>
-                      <SelectItem value="Online Meeting">Online Meeting</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                {/* Conditional Interview Link Input */}
-                {interviewType === 'Online Meeting' && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Interview Link</label>
-                    <Input
-                      type="url"
-                      placeholder="https://zoom.us/j/... or https://meet.google.com/..."
-                      value={interviewLink}
-                      onChange={(e) => setInterviewLink(e.target.value)}
-                      className="w-full"
-                    />
+                      return Object.entries(groupedShortList).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                        const mainCandidate = candidateContacts[0]
+                        
+                        return (
+                          <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20">
+                            <CardContent className="p-4">
+                              <div className="space-y-3">
+                                <div className="flex items-start justify-between">
+                                  <div className="min-w-0 flex-1">
+                                    <h4 className="font-semibold">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
+                                    <p className="text-sm text-muted-foreground">{candidateId}</p>
+                                  </div>
+                                  {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || 
+                                    mainCandidate["Contacted"]?.toLowerCase() === "contacted" || 
+                                    mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
+                                    mainCandidate["Contacted"]?.toLowerCase() === "tasked") && 
+                                    mainCandidate["lastcalltime"] && (
+                                    <div className="text-xs text-muted-foreground text-right">
+                                      <div className="flex items-center">
+                                        <Clock className="w-3 h-3 mr-1" />
+                                        {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
+                                      </div>
+                                      <div className="text-xs">
+                                        {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                <div className="space-y-2 text-sm">
+                                  {mainCandidate["Candidate Email"] && (
+                                    <div className="flex items-center text-muted-foreground">
+                                      <Mail className="w-4 h-4 mr-2" />
+                                      <span className="truncate">{mainCandidate["Candidate Email"]}</span>
+                                    </div>
+                                  )}
+                                  
+                                  {mainCandidate["Candidate Phone Number"] && (
+                                    <div className="flex items-center text-muted-foreground">
+                                      <Phone className="w-4 h-4 mr-2" />
+                                      <span>{mainCandidate["Candidate Phone Number"]}</span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {mainCandidate["Summary"] && (
+                                  <p className="text-sm text-muted-foreground line-clamp-3">
+                                    {mainCandidate["Summary"]}
+                                  </p>
+                                )}
+
+                                {/* Task Status and Links Section */}
+                                {(() => {
+                                  const candidateTasks = taskCandidates.filter(task => task.candidate_id === candidateId);
+                                  const candidateStatus = mainCandidate["Contacted"]?.toLowerCase();
+                                  
+                                  // Only show tasks if candidate status is "tasked" and not "rejected"
+                                  if (candidateTasks.length === 0 || 
+                                      candidateStatus !== "tasked" || 
+                                      candidateStatus === "rejected") return null;
+
+                                  return (
+                                    <div className="space-y-2 pt-2 border-t">
+                                      <h5 className="text-sm font-medium text-foreground flex items-center">
+                                        <CheckCircle className="w-4 h-4 mr-2" />
+                                        Tasks ({candidateTasks.length})
+                                      </h5>
+                                      <div className="space-y-2">
+                                        {candidateTasks.map((task) => (
+                                          <div key={task.taskid} className={cn(
+                                            "flex items-center justify-between p-2 rounded-md",
+                                            task.status === 'Received' 
+                                              ? "bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700" 
+                                              : "bg-muted/50"
+                                          )}>
+                                            <div className="flex items-center space-x-2">
+                                              <div className="flex items-center space-x-1">
+                                                {task.status === 'Pending' && <Hourglass className="w-3 h-3 text-orange-500" />}
+                                                {task.status === 'Received' && <AlertCircle className="w-3 h-3 text-blue-500" />}
+                                                {task.status === 'Reviewed' && <CheckCircle className="w-3 h-3 text-green-500" />}
+                                                <Select
+                                                  value={task.status}
+                                                  onValueChange={(value) => updateTaskStatus(task.taskid, value as any)}
+                                                >
+                                                  <SelectTrigger className="w-24 h-6 text-xs bg-background/50 border-border/50">
+                                                    <SelectValue />
+                                                  </SelectTrigger>
+                                                  <SelectContent className="bg-background border border-border shadow-lg z-50">
+                                                    <SelectItem value="Pending">Pending</SelectItem>
+                                                    <SelectItem value="Received">Received</SelectItem>
+                                                    <SelectItem value="Reviewed">Reviewed</SelectItem>
+                                                  </SelectContent>
+                                                </Select>
+                                              </div>
+                                            </div>
+                                            <div className="flex items-center space-x-1">
+                                              {task.tasklink && (
+                                                task.tasklink.includes(',') ? (
+                                                  // Multiple links
+                                                  <div className="flex items-center space-x-1">
+                                                    {task.tasklink.split(',').map((link: string, index: number) => (
+                                                      <Button
+                                                        key={index}
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => window.open(link.trim(), '_blank')}
+                                                        className="p-1 h-6 w-6 hover:bg-primary/10"
+                                                        title={`Task Link ${index + 1}`}
+                                                      >
+                                                        <ExternalLink className="h-3 w-3" />
+                                                      </Button>
+                                                    ))}
+                                                    <span className="text-xs text-muted-foreground">
+                                                      ({task.tasklink.split(',').length} links)
+                                                    </span>
+                                                  </div>
+                                                ) : (
+                                                  // Single link
+                                                  <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => window.open(task.tasklink, '_blank')}
+                                                    className="p-1 h-6 w-6 hover:bg-primary/10"
+                                                    title="Task Link"
+                                                  >
+                                                    <ExternalLink className="h-3 w-3" />
+                                                  </Button>
+                                                )
+                                              )}
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  );
+                                })()}
+
+                                <div className="flex items-center justify-between pt-2 border-t">
+                                  <div className="flex items-center space-x-2">
+                                    <StatusDropdown
+                                      currentStatus={mainCandidate["Contacted"]}
+                                      candidateId={mainCandidate["Candidate_ID"]}
+                                      jobId={id!}
+                                      onStatusChange={(newStatus) => {
+                                        setCandidates(prev => prev.map(c => 
+                                          c["Candidate_ID"] === mainCandidate["Candidate_ID"] 
+                                            ? { ...c, Contacted: newStatus }
+                                            : c
+                                        ))
+                                      }}
+                                      variant="badge"
+                                    />
+                                    {getCandidateStatus(mainCandidate["Candidate_ID"]) && (
+                                      <StatusDropdown
+                                        currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
+                                        candidateId={mainCandidate["Candidate_ID"]}
+                                        jobId={null}
+                                        onStatusChange={(newStatus) => {
+                                          setCvData(prev => prev.map(cv => 
+                                            cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] 
+                                              ? { ...cv, CandidateStatus: newStatus }
+                                              : cv
+                                          ))
+                                        }}
+                                        variant="badge"
+                                      />
+                                    )}
+                                  </div>
+                                  {getScoreBadge(mainCandidate["Success Score"])}
+                                </div>
+
+                                {/* Call Log Buttons */}
+                                <div className="space-y-2 pt-2 border-t">
+                                  <div className="flex flex-wrap gap-2">
+                                    {(() => {
+                                      const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
+                                      if (contactsWithCalls.length === 0) return null;
+                                      
+                                      // Get the latest call log (highest callid)
+                                      const latestContact = contactsWithCalls.reduce((latest, current) => 
+                                        current.callid > latest.callid ? current : latest
+                                      );
+                                      
+                                      return (
+                                        <Button
+                                          key={latestContact.callid}
+                                          variant="outline"
+                                          size="sm"
+                                          asChild
+                                          className="flex-1 min-w-[100px]"
+                                        >
+                                          <Link 
+                                            to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`}
+                                            onClick={() => {
+                                              // Store current tab in URL hash for back navigation
+                                              window.location.hash = 'tab=shortlist';
+                                            }}
+                                          >
+                                            <FileText className="w-3 h-3 mr-1" />
+                                            Call Log
+                                          </Link>
+                                        </Button>
+                                      );
+                                    })()}
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      asChild
+                                      className="flex-1 min-w-[100px]"
+                                    >
+                                      <Link to={`/candidate/${candidateId}`}>
+                                        <Users className="w-3 h-3 mr-1" />
+                                        View Profile
+                                      </Link>
+                                    </Button>
+                                  </div>
+                                  {/* Action Buttons - Arrange Interview and Reject */}
+                                  <div className="flex gap-2">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleArrangeInterview(candidateId)}
+                                      className="flex-1 min-w-[100px] bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200"
+                                    >
+                                      <Calendar className="w-3 h-3 mr-1" />
+                                      Arrange Interview
+                                    </Button>
+                                    {mainCandidate["Contacted"] === "Rejected" ? (
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="flex-1 min-w-[100px] bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed"
+                                        disabled
+                                      >
+                                        <X className="w-3 h-3 mr-1" />
+                                        Rejected
+                                      </Button>
+                                    ) : (
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200"
+                                        onClick={() => handleRejectCandidate(id!, candidateId, candidateContacts[0].callid)}
+                                      >
+                                        <X className="w-3 h-3 mr-1" />
+                                        Reject Candidate
+                                      </Button>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )
+                      })
+                    })()}
                   </div>
                 )}
-                
-                {interviewSlots.map((slot, index) => (
-                  <div key={index} className="space-y-4 p-4 border rounded-lg">
-                    <h4 className="font-medium">Slot {index + 1}</h4>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      {/* Date Picker */}
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Date</label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "w-full justify-start text-left font-normal",
-                                !slot.date && "text-muted-foreground"
-                              )}
-                            >
-                              <Calendar className="mr-2 h-4 w-4" />
-                              {slot.date ? format(slot.date, "PPP") : <span>Pick a date</span>}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <CalendarComponent
-                              mode="single"
-                              selected={slot.date}
-                              onSelect={(date) => updateInterviewSlot(index, 'date', date!)}
-                              disabled={(date) => {
-                                const today = new Date();
-                                today.setHours(0, 0, 0, 0);
-                                return date < today;
-                              }}
-                              initialFocus
-                              className="p-3 pointer-events-auto"
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+        
+        <JobDialog
+          job={job}
+          open={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          onSave={() => {
+            fetchJob(id!)
+            setIsEditDialogOpen(false)
+          }}
+        />
 
-                      {/* Time Picker */}
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Time</label>
-                        <div className="grid grid-cols-2 gap-2">
-                          {/* Hours */}
-                          <Select
-                            value={slot.time.split(':')[0] || ''}
-                            onValueChange={(hour) => {
-                              const minute = slot.time.split(':')[1] || '00';
-                              const newTime = `${hour}:${minute}`;
-                              
-                              // Validate time is not in the past for today
-                              if (slot.date) {
-                                const today = new Date();
-                                const slotDate = format(slot.date, 'yyyy-MM-dd');
-                                const currentDate = format(today, 'yyyy-MM-dd');
-                                const currentTime = format(today, 'HH:mm');
-                                
-                                if (slotDate === currentDate && newTime <= currentTime) {
-                                  alert('Cannot select a time in the past for today');
-                                  return;
-                                }
-                              }
-                              
-                              updateInterviewSlot(index, 'time', newTime);
-                            }}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Hour" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Array.from({ length: 24 }, (_, i) => (
-                                <SelectItem key={i} value={i.toString().padStart(2, '0')}>
-                                  {i.toString().padStart(2, '0')}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+        <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Regenerate Long List</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to regenerate Long List?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={() => {
+                  setShowConfirmDialog(false);
+                  handleGenerateLongList();
+                }}
+              >
+                Yes, Regenerate
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
-                          {/* Minutes */}
-                          <Select
-                            value={slot.time.split(':')[1] || ''}
-                            onValueChange={(minute) => {
-                              const hour = slot.time.split(':')[0] || '09';
-                              const newTime = `${hour}:${minute}`;
-                              
-                              // Validate time is not in the past for today
-                              if (slot.date) {
-                                const today = new Date();
-                                const slotDate = format(slot.date, 'yyyy-MM-dd');
-                                const currentDate = format(today, 'yyyy-MM-dd');
-                                const currentTime = format(today, 'HH:mm');
-                                
-                                if (slotDate === currentDate && newTime <= currentTime) {
-                                  alert('Cannot select a time in the past for today');
-                                  return;
-                                }
-                              }
-                              
-                              updateInterviewSlot(index, 'time', newTime);
-                            }}
+        {/* Interview Scheduling Dialog */}
+        <Dialog open={interviewDialogOpen} onOpenChange={setInterviewDialogOpen}>
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Schedule Interview Slots</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-6 overflow-y-auto max-h-[70vh] px-1">
+              <p className="text-sm text-muted-foreground">
+                Please select 3 preferred interview slots and interview type. Only future dates are allowed, and times must be in 15-minute intervals.
+              </p>
+              
+              {/* Interview Type Selection */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Interview Type</label>
+                <Select value={interviewType} onValueChange={setInterviewType}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select interview type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Phone">Phone</SelectItem>
+                    <SelectItem value="Online Meeting">Online Meeting</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Conditional Interview Link Input */}
+              {interviewType === 'Online Meeting' && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Interview Link</label>
+                  <Input
+                    type="url"
+                    placeholder="https://zoom.us/j/... or https://meet.google.com/..."
+                    value={interviewLink}
+                    onChange={(e) => setInterviewLink(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+              )}
+              
+              {interviewSlots.map((slot, index) => (
+                <div key={index} className="space-y-4 p-4 border rounded-lg">
+                  <h4 className="font-medium">Slot {index + 1}</h4>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Date Picker */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Date</label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !slot.date && "text-muted-foreground"
+                            )}
                           >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Min" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {timeOptions.map((minute) => (
-                                <SelectItem key={minute} value={minute}>
-                                  {minute}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
+                            <Calendar className="mr-2 h-4 w-4" />
+                            {slot.date ? format(slot.date, "PPP") : <span>Pick a date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarComponent
+                            mode="single"
+                            selected={slot.date}
+                            onSelect={(date) => updateInterviewSlot(index, 'date', date!)}
+                            disabled={(date) => {
+                              const today = new Date();
+                              today.setHours(0, 0, 0, 0);
+                              return date < today;
+                            }}
+                            initialFocus
+                            className="p-3 pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    {/* Time Picker */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Time</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {/* Hours */}
+                        <Select
+                          value={slot.time.split(':')[0] || ''}
+                          onValueChange={(hour) => {
+                            const minute = slot.time.split(':')[1] || '00';
+                            const newTime = `${hour}:${minute}`;
+                            
+                            // Validate time is not in the past for today
+                            if (slot.date) {
+                              const today = new Date();
+                              const slotDate = format(slot.date, 'yyyy-MM-dd');
+                              const currentDate = format(today, 'yyyy-MM-dd');
+                              const currentTime = format(today, 'HH:mm');
+                              
+                              if (slotDate === currentDate && newTime <= currentTime) {
+                                alert('Cannot select a time in the past for today');
+                                return;
+                              }
+                            }
+                            
+                            updateInterviewSlot(index, 'time', newTime);
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Hour" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Array.from({ length: 24 }, (_, i) => (
+                              <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                                {i.toString().padStart(2, '0')}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+
+                        {/* Minutes */}
+                        <Select
+                          value={slot.time.split(':')[1] || ''}
+                          onValueChange={(minute) => {
+                            const hour = slot.time.split(':')[0] || '09';
+                            const newTime = `${hour}:${minute}`;
+                            
+                            // Validate time is not in the past for today
+                            if (slot.date) {
+                              const today = new Date();
+                              const slotDate = format(slot.date, 'yyyy-MM-dd');
+                              const currentDate = format(today, 'yyyy-MM-dd');
+                              const currentTime = format(today, 'HH:mm');
+                              
+                              if (slotDate === currentDate && newTime <= currentTime) {
+                                alert('Cannot select a time in the past for today');
+                                return;
+                              }
+                            }
+                            
+                            updateInterviewSlot(index, 'time', newTime);
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Min" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {timeOptions.map((minute) => (
+                              <SelectItem key={minute} value={minute}>
+                                {minute}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
                   </div>
-                ))}
-
-                <div className="flex justify-end space-x-2 pt-4 sticky bottom-0 bg-background border-t">
-                  <Button variant="outline" onClick={() => setInterviewDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleScheduleInterview} className="bg-emerald-600 hover:bg-emerald-700">
-                    Schedule Interview
-                  </Button>
                 </div>
+              ))}
+
+              <div className="flex justify-end space-x-2 pt-4 sticky bottom-0 bg-background border-t">
+                <Button variant="outline" onClick={() => setInterviewDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleScheduleInterview} className="bg-emerald-600 hover:bg-emerald-700">
+                  Schedule Interview
+                </Button>
               </div>
-            </DialogContent>
-          </Dialog>
-        </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
-  )
+  );
 }
