@@ -62,6 +62,7 @@ export default function JobDetails() {
   const [isGeneratingShortList, setIsGeneratingShortList] = useState(false)
   const [shortListButtonDisabled, setShortListButtonDisabled] = useState(false)
   const [shortListTimeRemaining, setShortListTimeRemaining] = useState(0)
+  const [candidateToRemove, setCandidateToRemove] = useState<{id: string, name: string} | null>(null)
   const { toast } = useToast()
   const [callingCandidateId, setCallingCandidateId] = useState<string | null>(null)
   const [newApplicationsCount, setNewApplicationsCount] = useState(0)
@@ -684,6 +685,17 @@ export default function JobDetails() {
         description: "Failed to remove candidate from long list",
         variant: "destructive",
       });
+    }
+  };
+
+  const showRemoveConfirmation = (candidateId: string, candidateName: string) => {
+    setCandidateToRemove({ id: candidateId, name: candidateName });
+  };
+
+  const confirmRemoveFromLongList = async () => {
+    if (candidateToRemove) {
+      await handleRemoveFromLongList(candidateToRemove.id);
+      setCandidateToRemove(null);
     }
   };
 
@@ -1616,45 +1628,47 @@ export default function JobDetails() {
                               selectedCandidates.has(candidateId) && "border-primary bg-primary/5"
                             )}>
                               <CardContent className="p-3 md:p-4">
-                                <div className="space-y-3">
-                                  <div className="flex items-start justify-between">
-                                    <div className="flex items-start gap-3 min-w-0 flex-1">
-                                      <input
-                                        type="checkbox"
-                                        checked={selectedCandidates.has(candidateId)}
-                                        onChange={() => toggleCandidateSelection(candidateId)}
-                                        className="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                                      />
-                                      <div className="min-w-0 flex-1">
-                                        <h4 className="font-semibold text-sm md:text-base truncate">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
-                                        <p className="text-xs md:text-sm text-muted-foreground truncate">{candidateId}</p>
-                                      </div>
-                                    </div>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => handleRemoveFromLongList(candidateId)}
-                                      className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
-                                      title="Remove from Long List"
-                                    >
-                                      <X className="h-3 w-3" />
-                                    </Button>
-                                    {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || 
-                                      mainCandidate["Contacted"]?.toLowerCase() === "contacted" || 
-                                      mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
-                                      mainCandidate["Contacted"]?.toLowerCase() === "tasked") && 
-                                      mainCandidate["lastcalltime"] && (
-                                      <div className="text-xs text-muted-foreground text-right">
-                                        <div className="flex items-center">
-                                          <Clock className="w-3 h-3 mr-1" />
-                                          {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
-                                        </div>
-                                        <div className="text-xs">
-                                          {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
+                                 <div className="space-y-3">
+                                   <div className="flex items-start justify-between">
+                                     <div className="flex items-start gap-3 min-w-0 flex-1">
+                                       <input
+                                         type="checkbox"
+                                         checked={selectedCandidates.has(candidateId)}
+                                         onChange={() => toggleCandidateSelection(candidateId)}
+                                         className="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                                       />
+                                       <div className="min-w-0 flex-1">
+                                         <h4 className="font-semibold text-sm md:text-base truncate">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
+                                         <div className="space-y-1">
+                                           <p className="text-xs md:text-sm text-muted-foreground truncate">{candidateId}</p>
+                                           {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || 
+                                             mainCandidate["Contacted"]?.toLowerCase() === "contacted" || 
+                                             mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
+                                             mainCandidate["Contacted"]?.toLowerCase() === "tasked") && 
+                                             mainCandidate["lastcalltime"] && (
+                                             <div className="text-xs text-muted-foreground">
+                                               <div className="flex items-center">
+                                                 <Clock className="w-3 h-3 mr-1" />
+                                                 {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
+                                               </div>
+                                               <div className="text-xs">
+                                                 {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                               </div>
+                                             </div>
+                                           )}
+                                         </div>
+                                       </div>
+                                     </div>
+                                     <Button
+                                       variant="ghost"
+                                       size="sm"
+                                       onClick={() => showRemoveConfirmation(candidateId, mainCandidate["Candidate Name"] || "Unknown")}
+                                       className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
+                                       title="Remove from Long List"
+                                     >
+                                       <X className="h-3 w-3" />
+                                     </Button>
+                                   </div>
                                   
                                   <div className="space-y-2 text-xs md:text-sm">
                                     {mainCandidate["Candidate Email"] && (
@@ -2275,6 +2289,24 @@ export default function JobDetails() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Remove Candidate Confirmation Dialog */}
+        <AlertDialog open={!!candidateToRemove} onOpenChange={() => setCandidateToRemove(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remove Candidate</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to remove {candidateToRemove?.name}?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmRemoveFromLongList}>
+                Remove
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
   );
 }
