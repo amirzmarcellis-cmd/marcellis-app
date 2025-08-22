@@ -1667,7 +1667,12 @@ export default function JobDetails() {
                                    {/* Task Status and Links Section */}
                                    {(() => {
                                      const candidateTasks = taskCandidates.filter(task => task.candidate_id === candidateId);
-                                     if (candidateTasks.length === 0) return null;
+                                     const candidateStatus = mainCandidate["Contacted"]?.toLowerCase();
+                                     
+                                     // Only show tasks if candidate status is "tasked" and not "rejected"
+                                     if (candidateTasks.length === 0 || 
+                                         candidateStatus !== "tasked" || 
+                                         candidateStatus === "rejected") return null;
 
                                      return (
                                        <div className="space-y-2 pt-2 border-t">
