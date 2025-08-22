@@ -1646,15 +1646,13 @@ export default function JobDetails() {
                                              mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
                                              mainCandidate["Contacted"]?.toLowerCase() === "tasked") && 
                                              mainCandidate["lastcalltime"] && (
-                                             <div className="text-xs text-muted-foreground">
-                                               <div className="flex items-center">
-                                                 <Clock className="w-3 h-3 mr-1" />
-                                                 {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
-                                               </div>
-                                               <div className="text-xs">
-                                                 {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                               </div>
-                                             </div>
+                                              <div className="text-xs text-muted-foreground flex items-center">
+                                                <Clock className="w-3 h-3 mr-1" />
+                                                {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
+                                                <span className="ml-2">
+                                                  {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                              </div>
                                            )}
                                          </div>
                                        </div>
