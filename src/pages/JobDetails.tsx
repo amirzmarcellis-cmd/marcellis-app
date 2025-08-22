@@ -1458,9 +1458,9 @@ export default function JobDetails() {
                       <div className="mb-4 p-3 bg-yellow-100/80 dark:bg-yellow-950/20 border border-yellow-300 dark:border-yellow-700 rounded-lg">
                         <div className="flex items-center">
                           <Target className="w-4 h-4 mr-2 text-yellow-700 dark:text-yellow-400" />
-                          <span className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
-                            You have {readyToContactCount} Candidate{readyToContactCount > 1 ? 's' : ''} Ready to Contact
-                          </span>
+                           <span className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
+                             6 Remaining candidates to be contacted
+                           </span>
                         </div>
                       </div>
                     );
