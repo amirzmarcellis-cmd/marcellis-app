@@ -168,32 +168,44 @@ export default function Apply() {
   }, [jobIdParam, form]);
 
 
-  const generateCandidateId = async (): Promise<string> => {
+  const generateCandidateId = async (companyId: string): Promise<string> => {
     try {
-      // Get the latest candidate ID to determine the next number
+      // Get the company data to access subdomain
+      const { data: companyData, error: companyError } = await supabase
+        .from('companies')
+        .select('subdomain')
+        .eq('id', companyId)
+        .single();
+
+      if (companyError) throw companyError;
+
+      const subdomain = companyData?.subdomain?.toUpperCase() || 'COMPANY';
+      
+      // Get the latest candidate ID for this company to determine the next number
       const { data, error } = await supabase
         .from("CVs")
         .select('candidate_id')
-        .like('candidate_id', 'DMS-C-%')
+        .eq('company_id', companyId)
+        .like('candidate_id', `${subdomain}-C-%`)
         .order('candidate_id', { ascending: false })
         .limit(1);
 
       if (error) throw error;
 
-      let nextNumber = 659; // Starting number
+      let nextNumber = 1; // Starting number
       if (data && data.length > 0) {
         const lastId = data[0].candidate_id;
-        const match = lastId.match(/DMS-C-(\d+)/);
+        const match = lastId.match(new RegExp(`${subdomain}-C-(\\d+)`));
         if (match) {
           nextNumber = parseInt(match[1]) + 1;
         }
       }
 
-      return `DMS-C-${nextNumber.toString().padStart(4, '0')}`;
+      return `${subdomain}-C-${nextNumber.toString().padStart(4, '0')}`;
     } catch (error) {
       console.error('Error generating candidate ID:', error);
       // Fallback to timestamp-based ID
-      return `DMS-C-${Date.now().toString().slice(-4)}`;
+      return `COMPANY-C-${Date.now().toString().slice(-4)}`;
     }
   };
 
@@ -207,8 +219,8 @@ export default function Apply() {
         return text.replace(/\u0000/g, "").trim();
       };
 
-      // Generate a proper candidate ID
-      const candidateId = await generateCandidateId();
+      // Generate a proper candidate ID using the current company
+      const candidateId = await generateCandidateId(currentCompanyId);
       
       // Use the current company ID that was determined from the route
       const companyId = currentCompanyId;

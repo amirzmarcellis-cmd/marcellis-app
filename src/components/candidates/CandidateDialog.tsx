@@ -119,33 +119,38 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
   }, [candidate, open]);
 
   const generateCandidateId = async () => {
+    if (!currentCompany?.id) return "COMPANY-C-0001";
+    
     try {
-      // Get all existing candidate IDs that follow the DMS-C-XXXX pattern
+      const subdomain = currentCompany.subdomain?.toUpperCase() || 'COMPANY';
+      // Get all existing candidate IDs for this company that follow the subdomain pattern
       const { data: candidates, error } = await supabase
         .from('CVs')
         .select('candidate_id')
-        .like('candidate_id', 'DMS-C-%')
+        .eq('company_id', currentCompany.id)
+        .like('candidate_id', `${subdomain}-C-%`)
         .order('candidate_id', { ascending: false })
         .limit(1);
 
       if (error) throw error;
 
-      let nextNumber = 6145; // Default starting number if no candidates exist
+      let nextNumber = 1; // Default starting number if no candidates exist
 
       if (candidates && candidates.length > 0) {
-        // Extract the number from the last candidate ID (e.g., "DMS-C-6144" -> 6144)
+        // Extract the number from the last candidate ID (e.g., "OCEAN-C-0001" -> 1)
         const lastId = candidates[0].candidate_id;
-        const match = lastId.match(/DMS-C-(\d+)/);
+        const match = lastId.match(new RegExp(`${subdomain}-C-(\\d+)`));
         if (match) {
           nextNumber = parseInt(match[1]) + 1;
         }
       }
 
-      return `DMS-C-${nextNumber}`;
+      return `${subdomain}-C-${nextNumber.toString().padStart(4, '0')}`;
     } catch (error) {
       console.error('Error generating candidate ID:', error);
+      const subdomain = currentCompany.subdomain?.toUpperCase() || 'COMPANY';
       // Fallback to timestamp-based ID if query fails
-      return `DMS-C-${Date.now()}`;
+      return `${subdomain}-C-${Date.now().toString().slice(-4)}`;
     }
   };
 
