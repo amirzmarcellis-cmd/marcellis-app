@@ -2276,5 +2276,5 @@ export default function JobDetails() {
         </div>
       </div>
     </DashboardLayout>
-  );
+  )
 }
