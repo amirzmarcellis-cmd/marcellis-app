@@ -66,6 +66,7 @@ export default function JobDetails() {
   const [callingCandidateId, setCallingCandidateId] = useState<string | null>(null)
   const [newApplicationsCount, setNewApplicationsCount] = useState(0)
   const [lastViewedApplications, setLastViewedApplications] = useState<string | null>(null)
+  const [selectedCandidates, setSelectedCandidates] = useState<Set<string>>(new Set())
   
   // Interview scheduling state variables
   const [interviewDialogOpen, setInterviewDialogOpen] = useState(false)
@@ -336,7 +337,138 @@ export default function JobDetails() {
         variant: "destructive"
       });
     }
+    }
   }
+
+  const handleCallSelectedCandidates = async () => {
+    if (selectedCandidates.size === 0) {
+      toast({
+        title: "Error",
+        description: "Please select candidates to call",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!job?.["Job ID"]) {
+      toast({
+        title: "Error",
+        description: "Job ID not found",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingShortList(true);
+    
+    try {
+      // Get selected candidate data
+      const selectedCandidateData = candidates.filter(candidate => 
+        selectedCandidates.has(candidate["Candidate_ID"])
+      );
+
+      // Process each selected candidate with their callid
+      for (const candidate of selectedCandidateData) {
+        const payload = {
+          candidateID: candidate["Candidate_ID"],
+          jobID: job["Job ID"],
+          callid: candidate["callid"]
+        };
+
+        // Make HTTP request to the webhook for each candidate
+        const response = await fetch('https://hook.eu2.make.com/i3owa6dmu1mstug4tsfb0dnhhjfh4arj', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      }
+
+      toast({
+        title: "Success",
+        description: `Calling ${selectedCandidates.size} selected candidates initiated successfully`,
+      });
+
+      // Clear selection after successful call
+      setSelectedCandidates(new Set());
+    } catch (error) {
+      console.error('Error calling selected candidates:', error);
+      toast({
+        title: "Error",
+        description: "Failed to call selected candidates",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingShortList(false);
+    }
+  };
+
+  const handleRemoveSelectedCandidates = async () => {
+    if (selectedCandidates.size === 0) {
+      toast({
+        title: "Error",
+        description: "Please select candidates to remove",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      for (const candidateId of selectedCandidates) {
+        const candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
+        if (candidate) {
+          await handleRemoveFromLongList(candidateId);
+        }
+      }
+
+      // Clear selection after successful removal
+      setSelectedCandidates(new Set());
+
+      toast({
+        title: "Success",
+        description: `${selectedCandidates.size} candidates removed from long list`,
+      });
+    } catch (error) {
+      console.error('Error removing selected candidates:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove selected candidates",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const toggleCandidateSelection = (candidateId: string) => {
+    setSelectedCandidates(prev => {
+      const newSelection = new Set(prev);
+      if (newSelection.has(candidateId)) {
+        newSelection.delete(candidateId);
+      } else {
+        newSelection.add(candidateId);
+      }
+      return newSelection;
+    });
+  };
+
+  const selectAllCandidates = () => {
+    const allCandidateIds = new Set(
+      Object.keys(
+        filteredCandidates.reduce((acc, candidate) => {
+          acc[candidate["Candidate_ID"]] = true;
+          return acc;
+        }, {} as Record<string, boolean>)
+      )
+    );
+    setSelectedCandidates(allCandidateIds);
+  };
+
+  const clearAllSelection = () => {
+    setSelectedCandidates(new Set());
 
   const handleButtonClick = () => {
     if (job?.longlist && job.longlist > 0) {
@@ -844,6 +976,7 @@ export default function JobDetails() {
   })
 
   return (
+    <DashboardLayout>
       <div className="space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden">
         {/* Header */}
         <div className="flex flex-col gap-4">
@@ -1343,13 +1476,67 @@ export default function JobDetails() {
                      <p className="text-muted-foreground">Start reaching out to potential candidates for this position</p>
                    </div>
                  ) : (
-                   <>
-                      {/* Filters */}
-                      <Card className="p-3 md:p-4 mb-4 bg-muted/50">
-                        <div className="flex items-center gap-2 mb-3">
-                          <Filter className="w-4 h-4" />
-                          <h4 className="font-medium text-sm md:text-base">Filters</h4>
-                        </div>
+                    <>
+                       {/* Bulk Actions */}
+                       {selectedCandidates.size > 0 && (
+                         <Card className="p-3 md:p-4 mb-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+                           <div className="flex items-center justify-between gap-4">
+                             <div className="flex items-center gap-2">
+                               <span className="text-sm font-medium">
+                                 {selectedCandidates.size} candidate{selectedCandidates.size > 1 ? 's' : ''} selected
+                               </span>
+                               <Button 
+                                 variant="ghost" 
+                                 size="sm"
+                                 onClick={clearAllSelection}
+                                 className="h-6 text-xs px-2"
+                               >
+                                 Clear
+                               </Button>
+                             </div>
+                             <div className="flex items-center gap-2">
+                               <Button
+                                 variant="outline"
+                                 size="sm"
+                                 onClick={handleRemoveSelectedCandidates}
+                                 className="text-destructive hover:text-destructive border-destructive/50 hover:border-destructive"
+                               >
+                                 <X className="w-4 h-4 mr-1" />
+                                 Remove Selected
+                               </Button>
+                               <Button
+                                 variant="default"
+                                 size="sm"
+                                 onClick={handleCallSelectedCandidates}
+                                 disabled={isGeneratingShortList}
+                                 className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600"
+                               >
+                                 <Phone className="w-4 h-4 mr-1" />
+                                 {isGeneratingShortList ? "Calling..." : "Call Selected"}
+                               </Button>
+                             </div>
+                           </div>
+                         </Card>
+                       )}
+
+                       {/* Filters */}
+                       <Card className="p-3 md:p-4 mb-4 bg-muted/50">
+                         <div className="flex items-center justify-between mb-3">
+                           <div className="flex items-center gap-2">
+                             <Filter className="w-4 h-4" />
+                             <h4 className="font-medium text-sm md:text-base">Filters</h4>
+                           </div>
+                           <div className="flex items-center gap-2">
+                             <Button 
+                               variant="ghost" 
+                               size="sm"
+                               onClick={selectAllCandidates}
+                               className="h-6 text-xs px-2"
+                             >
+                               Select All
+                             </Button>
+                           </div>
+                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
                           <div className="relative">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -1422,13 +1609,24 @@ export default function JobDetails() {
                             const mainCandidate = candidateContacts[0]
                             
                             return (
-                                <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
+                                <Card key={candidateId} className={cn(
+                                  "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg",
+                                  selectedCandidates.has(candidateId) && "border-primary bg-primary/5"
+                                )}>
                                   <CardContent className="p-3 md:p-4">
                                     <div className="space-y-3">
                                        <div className="flex items-start justify-between">
-                                         <div className="min-w-0 flex-1">
-                                           <h4 className="font-semibold text-sm md:text-base truncate">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
-                                           <p className="text-xs md:text-sm text-muted-foreground truncate">{candidateId}</p>
+                                         <div className="flex items-start gap-3 min-w-0 flex-1">
+                                           <input
+                                             type="checkbox"
+                                             checked={selectedCandidates.has(candidateId)}
+                                             onChange={() => toggleCandidateSelection(candidateId)}
+                                             className="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                                           />
+                                           <div className="min-w-0 flex-1">
+                                             <h4 className="font-semibold text-sm md:text-base truncate">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
+                                             <p className="text-xs md:text-sm text-muted-foreground truncate">{candidateId}</p>
+                                           </div>
                                          </div>
                                          <Button
                                            variant="ghost"
@@ -2076,5 +2274,7 @@ export default function JobDetails() {
             </DialogContent>
           </Dialog>
         </div>
-    )
+      </div>
+    </DashboardLayout>
+  )
 }
