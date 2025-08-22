@@ -81,7 +81,7 @@ export default function UsersPanel() {
       // Get users with roles - simplified approach using separate queries
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('user_id, name, created_at')
+        .select('user_id, name, email, created_at')
         .order('created_at', { ascending: false })
 
       if (profilesError) throw profilesError
@@ -99,7 +99,7 @@ export default function UsersPanel() {
         return {
           user_id: profile.user_id,
           name: profile.name,
-          email: profile.user_id, // Using user_id as placeholder for email
+          email: profile.email || 'No email', // Use actual email from profiles
           user_created_at: profile.created_at,
           last_sign_in_at: null,
           roles
