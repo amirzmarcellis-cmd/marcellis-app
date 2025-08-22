@@ -81,26 +81,32 @@ export default function AddJob() {
   };
 
   const generateJobId = async () => {
+    if (!currentCompany?.id) return "COMPANY-J-0001";
+    
     try {
+      const subdomain = currentCompany.subdomain?.toUpperCase() || 'COMPANY';
       const { data: jobs } = await supabase
         .from('Jobs')
         .select('job_id')
+        .eq('company_id', currentCompany.id)
+        .like('job_id', `${subdomain}-J-%`)
         .order('job_id', { ascending: false })
         .limit(1);
 
       if (jobs && jobs.length > 0) {
         const lastJobId = jobs[0]["job_id"];
-        const match = lastJobId.match(/DMS-J-(\d+)/);
+        const match = lastJobId.match(new RegExp(`${subdomain}-J-(\\d+)`));
         if (match) {
           const nextNumber = parseInt(match[1]) + 1;
-          return `DMS-J-${nextNumber.toString().padStart(4, '0')}`;
+          return `${subdomain}-J-${nextNumber.toString().padStart(4, '0')}`;
         }
       }
       
-      return "DMS-J-0001";
+      return `${subdomain}-J-0001`;
     } catch (error) {
       console.error('Error generating job ID:', error);
-      return "DMS-J-0001";
+      const subdomain = currentCompany.subdomain?.toUpperCase() || 'COMPANY';
+      return `${subdomain}-J-0001`;
     }
   };
 

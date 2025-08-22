@@ -84,9 +84,10 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
   }, [job, open]);
 
   const generateJobId = () => {
-    // Generate ID in format DMS-J-0004
+    // Generate ID using company subdomain in format OCEAN-J-0004
+    const subdomain = currentCompany?.subdomain?.toUpperCase() || 'COMPANY';
     const timestamp = Date.now().toString().slice(-4);
-    return `DMS-J-${timestamp}`;
+    return `${subdomain}-J-${timestamp}`;
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
