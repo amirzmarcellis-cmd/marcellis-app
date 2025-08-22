@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User, MapPin, Briefcase, Mail, Phone, Search, Filter, Eye, Download, Calendar, Clock, ExternalLink, Edit, UserPlus, Upload } from "lucide-react"
+import { User, MapPin, Briefcase, Mail, Phone, Search, Filter, Eye, Download, Calendar, Clock, ExternalLink, Edit, UserPlus, Upload, Trash2 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
@@ -158,6 +158,28 @@ export default function Candidates() {
     fetchCandidates() // Refresh the candidates list
   }
 
+  const handleDeleteCandidate = async (candidateId: string) => {
+    if (!confirm("Are you sure you want to delete this candidate? This action cannot be undone.")) {
+      return
+    }
+
+    try {
+      const { error } = await supabase
+        .from('CVs')
+        .delete()
+        .eq('candidate_id', candidateId)
+        .eq('company_id', currentCompany?.id)
+
+      if (error) throw error
+
+      toast.success("Candidate deleted successfully")
+      fetchCandidates() // Refresh the candidates list
+    } catch (error) {
+      console.error('Error deleting candidate:', error)
+      toast.error("Failed to delete candidate")
+    }
+  }
+
   return (
       <div className="space-y-6">
         <HeroHeader
@@ -304,6 +326,15 @@ export default function Candidates() {
                                 <Link to={`/candidate/edit/${candidate.candidate_id}`}>
                                   <Edit className="w-3 h-3" />
                                 </Link>
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                title="Delete Candidate" 
+                                className="h-8 px-2 text-destructive hover:text-destructive"
+                                onClick={() => handleDeleteCandidate(candidate.candidate_id)}
+                              >
+                                <Trash2 className="w-3 h-3" />
                               </Button>
                             </div>
                           </TableCell>
