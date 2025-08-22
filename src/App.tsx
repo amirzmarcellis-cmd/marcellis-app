@@ -50,6 +50,7 @@ const App = () => (
                 <Routes>
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/apply" element={<Apply />} />
+                  <Route path="/apply/:subdomain" element={<Apply />} />
                   <Route path="/" element={<DashboardLayout><Index /></DashboardLayout>} />
                   <Route path="/live-feed" element={<DashboardLayout><LiveCandidateFeed /></DashboardLayout>} />
                   <Route path="/tasks" element={<DashboardLayout><Tasks /></DashboardLayout>} />

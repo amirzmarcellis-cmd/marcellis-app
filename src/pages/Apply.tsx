@@ -71,8 +71,9 @@ export default function Apply() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cvFile, setCvFile] = useState<string>("");
   const [cvText, setCvText] = useState<string>("");
+  const [currentCompanyId, setCurrentCompanyId] = useState<string | null>(null);
   const { toast } = useToast();
-  const { id: jobIdParam } = useParams<{ id?: string }>();
+  const { id: jobIdParam, subdomain } = useParams<{ id?: string; subdomain?: string }>();
 
   const form = useForm<ApplicationForm>({
     resolver: zodResolver(applicationSchema),
@@ -93,8 +94,71 @@ export default function Apply() {
   });
 
   useEffect(() => {
-    fetchJobs();
-  }, []);
+    fetchCompanyAndJobs();
+  }, [subdomain]);
+
+  const fetchCompanyAndJobs = async () => {
+    try {
+      let companyId = null;
+      
+      if (subdomain) {
+        // Fetch company by subdomain
+        const { data: companyData, error: companyError } = await supabase
+          .from('companies')
+          .select('id')
+          .eq('subdomain', subdomain)
+          .single();
+        
+        if (companyError || !companyData) {
+          toast({
+            title: "Company not found",
+            description: "The company subdomain you're looking for doesn't exist.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        companyId = companyData.id;
+      } else {
+        // Default to DMS company (first company created)
+        const { data: companyData, error: companyError } = await supabase
+          .from('companies')
+          .select('id')
+          .order('created_at', { ascending: true })
+          .limit(1)
+          .single();
+        
+        if (companyError || !companyData) {
+          toast({
+            title: "Error",
+            description: "Could not find default company.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        companyId = companyData.id;
+      }
+      
+      setCurrentCompanyId(companyId);
+      
+      // Fetch jobs for the determined company
+      const { data, error } = await supabase
+        .from('Jobs')
+        .select('job_id, job_title, job_location')
+        .eq('company_id', companyId)
+        .order('job_title');
+
+      if (error) {
+        console.error('Error fetching jobs:', error);
+        return;
+      }
+
+      setJobs(data || []);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   // If we came via /job/:id/apply, preselect that Job ID
   useEffect(() => {
@@ -103,24 +167,6 @@ export default function Apply() {
     }
   }, [jobIdParam, form]);
 
-  const fetchJobs = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("Jobs")
-        .select('job_id, job_title, job_location')
-        .order('job_title');
-
-      if (error) throw error;
-      setJobs(data || []);
-    } catch (error) {
-      console.error("Error fetching jobs:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load available jobs",
-        variant: "destructive",
-      });
-    }
-  };
 
   const generateCandidateId = async (): Promise<string> => {
     try {
@@ -164,22 +210,8 @@ export default function Apply() {
       // Generate a proper candidate ID
       const candidateId = await generateCandidateId();
       
-      // Get the company_id from the job being applied to
-      const selectedJob = jobs.find(job => job.job_id === data.jobApplied);
-      let companyId = null;
-      
-      if (selectedJob) {
-        // Fetch the company_id for this job
-        const { data: jobData, error: jobError } = await supabase
-          .from('Jobs')
-          .select('company_id')
-          .eq('job_id', data.jobApplied)
-          .single();
-        
-        if (!jobError && jobData) {
-          companyId = jobData.company_id;
-        }
-      }
+      // Use the current company ID that was determined from the route
+      const companyId = currentCompanyId;
       
       const cvData = {
         candidate_id: candidateId,
@@ -197,7 +229,7 @@ export default function Apply() {
         Experience: cleanText(`Agency: ${data.agencyExperience}, Overall: ${data.overallExperience}`),
         Location: cleanText(data.currentLocation),
         cv_summary: cleanText(`Salary Expectations: ${data.salaryExpectations} AED/month, Notice Period: ${data.noticePeriod} days`),
-        company_id: companyId, // Include the company_id from the job
+        company_id: companyId, // Include the company_id from the route
       };
 
       // Try primary (snake_case) insert first, then legacy shape, then minimal fallback
@@ -239,7 +271,7 @@ export default function Apply() {
             phone_number: cleanText(data.phoneNumber),
             Title: cleanText(data.title),
             Timestamp: new Date().toISOString(),
-            company_id: companyId, // Include the company_id even in minimal fallback
+            company_id: companyId, // Include the company_id from the route
           } as any;
 
           const { error: minimalError } = await supabase
