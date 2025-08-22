@@ -102,6 +102,7 @@ export default function Candidates() {
                          (candidate.Title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (candidate.Email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (candidate.Skills || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (candidate.phone_number || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (candidate.candidate_id || "").toLowerCase().includes(searchTerm.toLowerCase())
     
     // Job title filter - check if candidate applied to jobs with this title
@@ -205,7 +206,7 @@ export default function Candidates() {
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
-                placeholder="Search by name, email, title, skills, or candidate ID..."
+                placeholder="Search by name, email, title, skills, phone number, or candidate ID..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 bg-background/50 border-border"
