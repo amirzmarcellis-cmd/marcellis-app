@@ -1,7 +1,1 @@
-project_id = "tifgdxfceojbrmprngvv"
-
-[functions.extract-cv-text]
-verify_jwt = false
-
-[functions.admin-user-management]
-verify_jwt = true
+project_id = "sofrxfgjptargppbepbi"
