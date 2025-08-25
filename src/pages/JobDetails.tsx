@@ -1469,11 +1469,11 @@ export default function JobDetails() {
                   
                   if (readyToContactCount > 0) {
                     return (
-                      <div className="mb-4 p-3 bg-warning/10 dark:bg-warning/5 border border-warning/30 rounded-lg">
+                      <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
                         <div className="flex items-center">
-                          <Target className="w-4 h-4 mr-2 text-warning-foreground" />
-                          <span className="text-sm font-medium text-warning-foreground">
-                            {readyToContactCount} {readyToContactCount === 1 ? 'candidate' : 'candidates'} ready to be contacted - Use phone icons or bulk select to contact
+                          <Target className="w-4 h-4 mr-2 text-amber-600 dark:text-amber-400" />
+                          <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                            {readyToContactCount} {readyToContactCount === 1 ? 'candidate' : 'candidates'} ready to be contacted
                           </span>
                         </div>
                       </div>
