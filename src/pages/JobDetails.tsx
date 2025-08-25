@@ -575,7 +575,8 @@ export default function JobDetails() {
         body: JSON.stringify({
           job_id: jobId,
           candidate_id: candidateId,
-          callid: callid
+          callid: callid,
+          company_id: currentCompany?.id || ''
         })
       })
 
