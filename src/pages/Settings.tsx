@@ -3,11 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { Upload, Settings as SettingsIcon, Palette, User, Users } from "lucide-react"
+import { Switch } from "@/components/ui/switch"
+import { Upload, Settings as SettingsIcon, Palette, User, Users, Phone } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useAppSettings } from "@/contexts/AppSettingsContext"
 import { useProfile } from "@/hooks/useProfile"
 import { useUserRole } from "@/hooks/useUserRole"
+import { useCompanyContext } from "@/contexts/CompanyContext"
+import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 import { useTheme } from "next-themes"
 import { useNavigate } from "react-router-dom"
@@ -17,11 +20,14 @@ export default function Settings() {
   const { settings, updateSettings } = useAppSettings();
   const { profile, loading: profileLoading, updateProfile } = useProfile();
   const { canAccessUsersPanel } = useUserRole();
+  const { currentCompany, isCompanyAdmin } = useCompanyContext();
   const [systemName, setSystemName] = useState(settings.systemName)
   const [primaryColor, setPrimaryColor] = useState(settings.primaryColor)
   const [userName, setUserName] = useState(profile?.name || "")
   const [lightLogo, setLightLogo] = useState<File | null>(null)
   const [darkLogo, setDarkLogo] = useState<File | null>(null)
+  const [automaticDialing, setAutomaticDialing] = useState(false)
+  const [loadingAutomaticDial, setLoadingAutomaticDial] = useState(false)
   const { theme } = useTheme()
 
   // Update userName when profile loads
@@ -30,6 +36,56 @@ export default function Settings() {
       setUserName(profile.name)
     }
   }, [profile?.name])
+
+  // Fetch current automatic dialing status
+  useEffect(() => {
+    const fetchAutomaticDialingStatus = async () => {
+      if (!currentCompany) return;
+      
+      try {
+        const { data: jobs } = await supabase
+          .from('Jobs')
+          .select('automatic_dial')
+          .eq('company_id', currentCompany.id)
+          .limit(1);
+        
+        // If any job exists, use its automatic_dial status
+        if (jobs && jobs.length > 0) {
+          setAutomaticDialing(jobs[0].automatic_dial || false);
+        }
+      } catch (error) {
+        console.error('Error fetching automatic dialing status:', error);
+      }
+    };
+
+    fetchAutomaticDialingStatus();
+  }, [currentCompany?.id])
+
+  const handleAutomaticDialingToggle = async (enabled: boolean) => {
+    if (!currentCompany || !isCompanyAdmin()) {
+      toast.error("Only company admins can change automatic dialing settings");
+      return;
+    }
+
+    setLoadingAutomaticDial(true);
+    try {
+      // Update all jobs for this company
+      const { error } = await supabase
+        .from('Jobs')
+        .update({ automatic_dial: enabled })
+        .eq('company_id', currentCompany.id);
+
+      if (error) throw error;
+
+      setAutomaticDialing(enabled);
+      toast.success(`Automatic dialing ${enabled ? 'enabled' : 'disabled'} for all jobs`);
+    } catch (error) {
+      console.error('Error updating automatic dialing:', error);
+      toast.error("Failed to update automatic dialing settings");
+    } finally {
+      setLoadingAutomaticDial(false);
+    }
+  };
 
   const handleLightLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -79,6 +135,7 @@ export default function Settings() {
   }
 
   return (
+    <DashboardLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">Settings</h1>
@@ -130,6 +187,37 @@ export default function Settings() {
                   <Users className="w-4 h-4 mr-2" />
                   Open Users Panel
                 </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Automatic Dialing - Company Admin Only */}
+          {isCompanyAdmin() && (
+            <Card className="bg-gradient-card backdrop-blur-glass border-glass-border shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Phone className="w-5 h-5" />
+                  Automatic Dialing
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label htmlFor="automaticDialing">Enable Automatic Dialing</Label>
+                    <p className="text-sm text-muted-foreground">
+                      When enabled, all jobs in your company will have automatic dialing activated
+                    </p>
+                  </div>
+                  <Switch
+                    id="automaticDialing"
+                    checked={automaticDialing}
+                    onCheckedChange={handleAutomaticDialingToggle}
+                    disabled={loadingAutomaticDial}
+                  />
+                </div>
+                {loadingAutomaticDial && (
+                  <p className="text-sm text-muted-foreground">Updating automatic dialing settings...</p>
+                )}
               </CardContent>
             </Card>
           )}
@@ -337,5 +425,6 @@ export default function Settings() {
           </div>
         </div>
       </div>
+    </DashboardLayout>
   )
 }
