@@ -483,7 +483,6 @@ export type Database = {
       Jobs: {
         Row: {
           assignment: string | null
-          automatic_dial: boolean
           client_description: string | null
           company_id: string | null
           contract_length: string | null
@@ -507,7 +506,6 @@ export type Database = {
         }
         Insert: {
           assignment?: string | null
-          automatic_dial?: boolean
           client_description?: string | null
           company_id?: string | null
           contract_length?: string | null
@@ -531,7 +529,6 @@ export type Database = {
         }
         Update: {
           assignment?: string | null
-          automatic_dial?: boolean
           client_description?: string | null
           company_id?: string | null
           contract_length?: string | null
