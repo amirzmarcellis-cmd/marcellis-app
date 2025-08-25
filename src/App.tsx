@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { CompanyProvider } from "@/contexts/CompanyContext";
+// Company context removed - using simple admin system
 import { AppSettingsProvider } from "@/contexts/AppSettingsContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 
@@ -41,7 +41,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <AuthProvider>
-        <CompanyProvider>
+        
           <AppSettingsProvider>
             <TooltipProvider delayDuration={200} skipDelayDuration={300}>
               <Toaster />
@@ -98,7 +98,7 @@ const App = () => (
               </BrowserRouter>
             </TooltipProvider>
           </AppSettingsProvider>
-        </CompanyProvider>
+        
       </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>

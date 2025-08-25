@@ -1,101 +1,76 @@
-import { useState, useEffect } from 'react'
-import { supabase } from '@/integrations/supabase/client'
-import { useToast } from '@/hooks/use-toast'
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
-interface Profile {
-  id: string
-  user_id: string
-  name: string | null
-  created_at: string
-  updated_at: string
+export interface Profile {
+  id: string;
+  user_id: string;
+  name: string | null;
+  email: string | null;
+  is_admin: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export function useProfile() {
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [loading, setLoading] = useState(true)
-  const { toast } = useToast()
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchProfile = async () => {
+    if (!user) {
+      setProfile(null);
+      setLoading(false);
+      return;
+    }
+
     try {
-      const { data: { user } } = await supabase.auth.getUser()
+      // Check if this is the admin user
+      const isAdminUser = user.email === 'amir.z@marc-ellis.com';
       
-      if (!user) {
-        setProfile(null)
-        setLoading(false)
-        return
-      }
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle()
-
-      if (error) throw error
-
-      // If no profile exists, create one
-      if (!data) {
-        const { data: newProfile, error: createError } = await supabase
-          .from('profiles')
-          .insert([{ user_id: user.id, name: null }])
-          .select()
-          .single()
-
-        if (createError) throw createError
-        setProfile(newProfile)
-      } else {
-        setProfile(data)
-      }
+      // Create mock profile
+      const mockProfile: Profile = {
+        id: 'mock-id',
+        user_id: user.id,
+        name: user.user_metadata?.name || user.email?.split('@')[0] || 'User',
+        email: user.email,
+        is_admin: isAdminUser,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      setProfile(mockProfile);
     } catch (error) {
-      console.error('Error fetching profile:', error)
-      toast({
-        title: "Error",
-        description: "Failed to load profile",
-        variant: "destructive"
-      })
+      console.error('Error fetching profile:', error);
+      setProfile(null);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
-  const updateProfile = async (updates: Partial<Pick<Profile, 'name'>>) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (!user) throw new Error('No user found')
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('user_id', user.id)
-        .select()
-        .single()
-
-      if (error) throw error
-
-      setProfile(data)
-      toast({
-        title: "Success",
-        description: "Profile updated successfully"
-      })
-    } catch (error) {
-      console.error('Error updating profile:', error)
-      toast({
-        title: "Error",
-        description: "Failed to update profile",
-        variant: "destructive"
-      })
-    }
-  }
+  };
 
   useEffect(() => {
-    fetchProfile()
-  }, [])
+    fetchProfile();
+  }, [user?.id]);
+
+  const updateProfile = async (updates: Partial<Pick<Profile, 'name'>>) => {
+    if (!user || !profile) return;
+
+    try {
+      // Update local state only (no database in simplified structure)
+      setProfile(prev => prev ? { ...prev, ...updates } : null);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      throw error;
+    }
+  };
+
+  const isAdmin = profile?.is_admin || false;
 
   return {
     profile,
     loading,
     updateProfile,
-    refetch: fetchProfile
-  }
+    isAdmin,
+    refetch: fetchProfile,
+  };
 }

@@ -14,7 +14,6 @@ import { format, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
 import { StatusDropdown } from '@/components/candidates/StatusDropdown';
 import { useProfile } from '@/hooks/useProfile';
-import { useCompanyContext } from '@/contexts/CompanyContext';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Play, Pause, Search, FileText, Upload, Users, Briefcase, Clock, Star, TrendingUp, Calendar, CheckCircle, XCircle, ClipboardList, Video, Target, Activity, Timer, Phone, UserCheck, Building2 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -25,7 +24,7 @@ import { HeroHeader } from '@/components/dashboard/HeroHeader';
 import { BentoKpis } from '@/components/dashboard/BentoKpis';
 import { TiltCard } from '@/components/effects/TiltCard';
 import { ActivityTicker } from '@/components/dashboard/ActivityTicker';
-import { CompanyList } from '@/components/company/CompanyList';
+// CompanyList removed - using simplified structure
 interface DashboardData {
   totalCandidates: number;
   totalJobs: number;
@@ -56,7 +55,7 @@ export default function Index() {
   const {
     profile
   } = useProfile();
-  const { isPlatformAdmin, currentCompany } = useCompanyContext();
+  const { isAdmin } = useProfile();
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -445,24 +444,7 @@ export default function Index() {
       job_title: job?.job_title || 'Unknown Position'
     };
   });
-  // Platform admin should see company management interface
-  if (isPlatformAdmin()) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <Building2 className="h-8 w-8 text-primary" />
-          <div>
-            <h1 className="text-3xl font-bold">Platform Administration</h1>
-            <p className="text-muted-foreground">
-              Manage all companies and platform-wide settings
-            </p>
-          </div>
-        </div>
-
-        <CompanyList />
-      </div>
-    );
-  }
+  // Simplified - no special admin interface needed
 
   if (loading) {
     return <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">

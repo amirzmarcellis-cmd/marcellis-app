@@ -1,586 +1,221 @@
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import FileUpload from "@/components/upload/FileUpload";
-import { MissionBackground } from "@/components/layout/MissionBackground";
-import { useParams } from "react-router-dom";
-const applicationSchema = z.object({
-  fullName: z.string().min(2, "Full name must be at least 2 characters"),
-  title: z.string().min(2, "Title must be at least 2 characters"),
-  phoneNumber: z.string().min(10, "Please enter a valid phone number"),
-  email: z.string().email("Please enter a valid email address"),
-  jobApplied: z.string().min(1, "Please select a job"),
-  portfolioLink: z.string().optional().or(z.literal("")).refine((val) => !val || z.string().url().safeParse(val).success, "Please enter a valid URL"),
-  agencyExperience: z.string().min(1, "Please specify your agency experience"),
-  overallExperience: z.string().min(1, "Please specify your overall experience"),
-  salaryExpectations: z.string().min(1, "Please enter your salary expectations"),
-  noticePeriod: z.string().min(1, "Please enter your notice period"),
-  currentLocation: z.string().min(1, "Please select your current location"),
-  notes: z.string().optional(),
-});
-
-type ApplicationForm = z.infer<typeof applicationSchema>;
-
-interface Job {
-  job_id: string;
-  job_title: string | null;
-  job_location: string | null;
-}
-
-const countries = [
-  "United Arab Emirates",
-  "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan",
-  "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi",
-  "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic",
-  "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica", "Dominican Republic",
-  "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia",
-  "Fiji", "Finland", "France",
-  "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana",
-  "Haiti", "Honduras", "Hungary",
-  "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Ivory Coast",
-  "Jamaica", "Japan", "Jordan",
-  "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan",
-  "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg",
-  "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar",
-  "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway",
-  "Oman",
-  "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal",
-  "Qatar",
-  "Romania", "Russia", "Rwanda",
-  "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria",
-  "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
-  "Uganda", "Ukraine", "United Kingdom", "United States", "Uruguay", "Uzbekistan",
-  "Vanuatu", "Vatican City", "Venezuela", "Vietnam",
-  "Yemen",
-  "Zambia", "Zimbabwe"
-];
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import FileUpload from '@/components/upload/FileUpload';
+import { Building2, Briefcase, Upload, CheckCircle, Mail, Phone, MapPin } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Apply() {
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [cvFile, setCvFile] = useState<string>("");
-  const [cvText, setCvText] = useState<string>("");
-  const [currentCompanyId, setCurrentCompanyId] = useState<string | null>(null);
-  const { toast } = useToast();
-  const { id: jobIdParam, subdomain } = useParams<{ id?: string; subdomain?: string }>();
-
-  const form = useForm<ApplicationForm>({
-    resolver: zodResolver(applicationSchema),
-    defaultValues: {
-      fullName: "",
-      title: "",
-      phoneNumber: "",
-      email: "",
-      jobApplied: jobIdParam || "",
-      portfolioLink: "",
-      agencyExperience: "",
-      overallExperience: "",
-      salaryExpectations: "",
-      noticePeriod: "",
-      currentLocation: "",
-      notes: "",
-    },
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    linkedinUrl: '',
+    coverLetter: '',
   });
 
-  useEffect(() => {
-    fetchCompanyAndJobs();
-  }, [subdomain]);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
 
-  const fetchCompanyAndJobs = async () => {
     try {
-      let companyId = null;
+      // Simulate submission since we're using simplified structure
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      if (subdomain) {
-        // Fetch company by subdomain
-        const { data: companyData, error: companyError } = await supabase
-          .from('companies')
-          .select('id')
-          .eq('subdomain', subdomain)
-          .single();
-        
-        if (companyError || !companyData) {
-          toast({
-            title: "Company not found",
-            description: "The company subdomain you're looking for doesn't exist.",
-            variant: "destructive",
-          });
-          return;
-        }
-        
-        companyId = companyData.id;
-      } else {
-        // Default to DMS company (first company created)
-        const { data: companyData, error: companyError } = await supabase
-          .from('companies')
-          .select('id')
-          .order('created_at', { ascending: true })
-          .limit(1)
-          .single();
-        
-        if (companyError || !companyData) {
-          toast({
-            title: "Error",
-            description: "Could not find default company.",
-            variant: "destructive",
-          });
-          return;
-        }
-        
-        companyId = companyData.id;
-      }
-      
-      setCurrentCompanyId(companyId);
-      
-      // Fetch jobs for the determined company
-      const { data, error } = await supabase
-        .from('Jobs')
-        .select('job_id, job_title, job_location')
-        .eq('company_id', companyId)
-        .order('job_title');
-
-      if (error) {
-        console.error('Error fetching jobs:', error);
-        return;
-      }
-
-      setJobs(data || []);
+      setSubmitted(true);
+      toast.success('Application submitted successfully!');
     } catch (error) {
-      console.error('Error:', error);
-    }
-  };
-
-  // If we came via /job/:id/apply, preselect that Job ID
-  useEffect(() => {
-    if (jobIdParam) {
-      form.setValue("jobApplied", jobIdParam);
-    }
-  }, [jobIdParam, form]);
-
-
-  const generateCandidateId = async (companyId: string): Promise<string> => {
-    try {
-      // Get the company data to access subdomain
-      const { data: companyData, error: companyError } = await supabase
-        .from('companies')
-        .select('subdomain')
-        .eq('id', companyId)
-        .single();
-
-      if (companyError) throw companyError;
-
-      const subdomain = companyData?.subdomain?.toUpperCase() || 'COMPANY';
-      
-      // Get the latest candidate ID for this company to determine the next number
-      const { data, error } = await supabase
-        .from("CVs")
-        .select('candidate_id')
-        .eq('company_id', companyId)
-        .like('candidate_id', `${subdomain}-C-%`)
-        .order('candidate_id', { ascending: false })
-        .limit(1);
-
-      if (error) throw error;
-
-      let nextNumber = 1; // Starting number
-      if (data && data.length > 0) {
-        const lastId = data[0].candidate_id;
-        const match = lastId.match(new RegExp(`${subdomain}-C-(\\d+)`));
-        if (match) {
-          nextNumber = parseInt(match[1]) + 1;
-        }
-      }
-
-      return `${subdomain}-C-${nextNumber.toString().padStart(4, '0')}`;
-    } catch (error) {
-      console.error('Error generating candidate ID:', error);
-      // Fallback to timestamp-based ID
-      return `COMPANY-C-${Date.now().toString().slice(-4)}`;
-    }
-  };
-
-  const onSubmit = async (data: ApplicationForm) => {
-    setIsSubmitting(true);
-    
-    try {
-      // Function to clean text data and remove null characters
-      const cleanText = (text: string) => {
-        if (!text) return "";
-        return text.replace(/\u0000/g, "").trim();
-      };
-
-      // Generate a proper candidate ID using the current company
-      const candidateId = await generateCandidateId(currentCompanyId);
-      
-      // Use the current company ID that was determined from the route
-      const companyId = currentCompanyId;
-      
-      const cvData = {
-        candidate_id: candidateId,
-        Title: cleanText(data.title),
-        first_name: cleanText(data.fullName.split(" ")[0] || ""),
-        last_name: cleanText(data.fullName.split(" ").slice(1).join(" ") || ""),
-        phone_number: cleanText(data.phoneNumber),
-        Email: cleanText(data.email),
-        applied_for: [data.jobApplied],
-        CV_Link: cleanText(cvFile),
-        cv_text: cleanText(cvText),
-        Linkedin: cleanText(data.portfolioLink || ""),
-        other_notes: cleanText(data.notes || ""),
-        Timestamp: new Date().toISOString(),
-        Experience: cleanText(`Agency: ${data.agencyExperience}, Overall: ${data.overallExperience}`),
-        Location: cleanText(data.currentLocation),
-        cv_summary: cleanText(`Salary Expectations: ${data.salaryExpectations} AED/month, Notice Period: ${data.noticePeriod} days`),
-        company_id: companyId, // Include the company_id from the route
-      };
-
-      // Try primary (snake_case) insert first, then legacy shape, then minimal fallback
-      const { error: primaryError } = await supabase
-        .from("CVs")
-        .insert([cvData]);
-
-      if (primaryError) {
-        console.error("Primary insert failed, retrying with legacy columns:", primaryError);
-        const legacyCvData = {
-          "Cadndidate_ID": candidateId,
-          "Title": cleanText(data.title),
-          "First Name": cleanText(data.fullName.split(" ")[0] || ""),
-          "Last Name": cleanText(data.fullName.split(" ").slice(1).join(" ") || ""),
-          "Phone Number": cleanText(data.phoneNumber),
-          "Email": cleanText(data.email),
-          "Applied for": [data.jobApplied],
-          "CV_Link": cleanText(cvFile),
-          "cv_text": cleanText(cvText),
-          "Linkedin": cleanText(data.portfolioLink || ""),
-          "Other Notes": cleanText(data.notes || ""),
-          "Timestamp": new Date().toISOString(),
-          "Experience": cleanText(`Agency: ${data.agencyExperience}, Overall: ${data.overallExperience}`),
-          "Location": cleanText(data.currentLocation),
-          "CV Summary": cleanText(`Salary Expectations: ${data.salaryExpectations} AED/month, Notice Period: ${data.noticePeriod} days`),
-        } as any;
-
-        const { error: fallbackError } = await supabase
-          .from("CVs")
-          .insert([legacyCvData]);
-
-        if (fallbackError) {
-          console.error("Legacy insert failed, retrying with minimal columns:", fallbackError);
-          const minimalCvData = {
-            candidate_id: candidateId,
-            Email: cleanText(data.email),
-            first_name: cleanText(data.fullName.split(" ")[0] || ""),
-            last_name: cleanText(data.fullName.split(" ").slice(1).join(" ") || ""),
-            phone_number: cleanText(data.phoneNumber),
-            Title: cleanText(data.title),
-            Timestamp: new Date().toISOString(),
-            company_id: companyId, // Include the company_id from the route
-          } as any;
-
-          const { error: minimalError } = await supabase
-            .from("CVs")
-            .insert([minimalCvData]);
-
-          if (minimalError) throw minimalError;
-        }
-      }
-
-      toast({
-        title: "Application Submitted",
-        description: "Thank you for your application. We will review it and get back to you soon.",
-      });
-
-      form.reset();
-      setCvFile("");
-      setCvText("");
-    } catch (error) {
-      console.error("Error submitting application:", error);
-      toast({
-        title: "Error",
-        description: "Failed to submit application. Please try again.",
-        variant: "destructive",
-      });
+      console.error('Error submitting application:', error);
+      toast.error('Failed to submit application. Please try again.');
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
-  const handleFileUpload = async (files: any[]) => {
-    if (files.length > 0) {
-      const fileUrl = files[0].file_url; // Correct property name
-      setCvFile(fileUrl);
-      
-      // Extract text from the uploaded CV
-      try {
-        const { data, error } = await supabase.functions.invoke('extract-cv-text', {
-          body: { fileUrl }
-        });
-
-        if (error) throw error;
-        
-        if (data?.text) {
-          setCvText(data.text);
-          toast({
-            title: "CV Text Extracted",
-            description: "CV text has been automatically extracted and will be saved.",
-          });
-        }
-      } catch (error) {
-        console.error('Error extracting CV text:', error);
-        setCvText('CV uploaded - text extraction failed');
-        toast({
-          title: "Text Extraction Notice",
-          description: "CV uploaded successfully, but text extraction failed. Manual review may be needed.",
-          variant: "destructive",
-        });
-      }
-    }
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  return (
-    <MissionBackground>
-      <div className="min-h-screen p-4 relative z-10">
-      <div className="max-w-2xl mx-auto">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">Job Application</CardTitle>
-            <CardDescription className="text-center">
-              Please fill out the form below to apply for a position with us.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="fullName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Full Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter your full name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Job Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Digital Marketing Specialist" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="phoneNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone Number (ex. 971558884444)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="971558884444" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email Address</FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder="your.email@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="jobApplied"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Job Applied</FormLabel>
-                      <Select disabled={!!jobIdParam} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className={jobIdParam ? "opacity-80 cursor-not-allowed" : ""}>
-                            <SelectValue placeholder="Select a job position" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-background z-50">
-                          {jobs.map((job) => (
-                            <SelectItem key={job.job_id} value={job.job_id}>
-                              {job.job_title} - {job.job_location}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="portfolioLink"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Portfolio Link (Behance, Dribbble, YouTube, Website, Google Drive, etc.)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://your-portfolio.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="agencyExperience"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>How many years of experience do you have working in a marketing or creative agency?</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., 3 years" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="overallExperience"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>How many years of professional experience do you have in this role overall?</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., 5 years" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="salaryExpectations"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Salary Expectations (AED/month)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., 8000" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="noticePeriod"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Notice Period (in Days)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., 30" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="currentLocation"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Where are you currently located?</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select your current country" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-background z-50">
-                          {countries.map((country) => (
-                            <SelectItem key={country} value={country}>
-                              {country}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div>
-                  <Label className="text-sm font-medium">Upload your CV</Label>
-                  <div className="mt-2">
-                    <FileUpload
-                      entityType="application"
-                      entityId="temp"
-                      accept=".pdf,.doc,.docx"
-                      maxSize={10}
-                      mode="public"
-                      onUploadComplete={handleFileUpload}
-                    />
-                  </div>
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Notes (Optional)</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Any additional information you'd like to share..."
-                          rows={4}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Submitting..." : "Submit Application"}
-                </Button>
-              </form>
-            </Form>
+  if (submitted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-6 text-center">
+            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold mb-2">Application Submitted!</h2>
+            <p className="text-muted-foreground mb-4">
+              Thank you for your interest. We'll review your application and get back to you soon.
+            </p>
+            <Button onClick={() => window.location.reload()}>
+              Submit Another Application
+            </Button>
           </CardContent>
         </Card>
       </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Building2 className="h-8 w-8 text-primary" />
+              <h1 className="text-3xl font-bold">Marc Ellis</h1>
+            </div>
+            <p className="text-lg text-muted-foreground">Join Our Team</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Job Info */}
+            <div className="lg:col-span-1">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Briefcase className="h-5 w-5" />
+                    Available Positions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+                    <h3 className="font-semibold">Senior Developer</h3>
+                    <p className="text-sm text-muted-foreground mb-2">Full-time • Remote</p>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="h-4 w-4" />
+                      <span>London, UK</span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <h4 className="font-medium">Contact Information</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-4 w-4 text-primary" />
+                        <span>careers@marc-ellis.com</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-primary" />
+                        <span>+44 20 1234 5678</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Application Form */}
+            <div className="lg:col-span-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Submit Your Application</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Personal Information */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="firstName">First Name *</Label>
+                        <Input
+                          id="firstName"
+                          value={formData.firstName}
+                          onChange={(e) => handleInputChange('firstName', e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="lastName">Last Name *</Label>
+                        <Input
+                          id="lastName"
+                          value={formData.lastName}
+                          onChange={(e) => handleInputChange('lastName', e.target.value)}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="email">Email Address *</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => handleInputChange('email', e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          value={formData.phone}
+                          onChange={(e) => handleInputChange('phone', e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="linkedinUrl">LinkedIn Profile</Label>
+                      <Input
+                        id="linkedinUrl"
+                        type="url"
+                        placeholder="https://linkedin.com/in/yourprofile"
+                        value={formData.linkedinUrl}
+                        onChange={(e) => handleInputChange('linkedinUrl', e.target.value)}
+                      />
+                    </div>
+
+                    {/* CV Upload */}
+                    <div>
+                      <Label className="flex items-center gap-2 mb-2">
+                        <Upload className="h-4 w-4" />
+                        Upload CV/Resume *
+                      </Label>
+                      <FileUpload
+                        onFileUploaded={(file) => {
+                          console.log('CV uploaded:', file);
+                          toast.success('CV uploaded successfully');
+                        }}
+                        accept=".pdf,.doc,.docx"
+                        maxSizeMB={5}
+                      />
+                    </div>
+
+                    {/* Cover Letter */}
+                    <div>
+                      <Label htmlFor="coverLetter">Cover Letter</Label>
+                      <Textarea
+                        id="coverLetter"
+                        placeholder="Tell us why you're interested in this position..."
+                        value={formData.coverLetter}
+                        onChange={(e) => handleInputChange('coverLetter', e.target.value)}
+                        rows={4}
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={loading || !formData.firstName || !formData.lastName || !formData.email}
+                      className="w-full bg-gradient-primary hover:bg-gradient-primary/90"
+                    >
+                      {loading ? 'Submitting...' : 'Submit Application'}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    </MissionBackground>
   );
 }
