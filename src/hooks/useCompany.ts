@@ -9,6 +9,7 @@ export interface Company {
   plan_type: string;
   logo_url?: string;
   settings: any;
+  automatic_dial?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -69,6 +70,7 @@ export function useCompany() {
             plan_type,
             logo_url,
             settings,
+            automatic_dial,
             created_at,
             updated_at
           )

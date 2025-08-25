@@ -3,11 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { Upload, Settings as SettingsIcon, Palette, User, Users } from "lucide-react"
+import { Upload, Settings as SettingsIcon, Palette, User, Users, Phone } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useAppSettings } from "@/contexts/AppSettingsContext"
 import { useProfile } from "@/hooks/useProfile"
 import { useUserRole } from "@/hooks/useUserRole"
+import { useCompanyContext } from "@/contexts/CompanyContext"
+import { supabase } from "@/integrations/supabase/client"
+import { Switch } from "@/components/ui/switch"
 import { toast } from "sonner"
 import { useTheme } from "next-themes"
 import { useNavigate } from "react-router-dom"
@@ -17,11 +20,14 @@ export default function Settings() {
   const { settings, updateSettings } = useAppSettings();
   const { profile, loading: profileLoading, updateProfile } = useProfile();
   const { canAccessUsersPanel } = useUserRole();
+  const { currentCompany, isCompanyAdmin } = useCompanyContext();
   const [systemName, setSystemName] = useState(settings.systemName)
   const [primaryColor, setPrimaryColor] = useState(settings.primaryColor)
   const [userName, setUserName] = useState(profile?.name || "")
   const [lightLogo, setLightLogo] = useState<File | null>(null)
   const [darkLogo, setDarkLogo] = useState<File | null>(null)
+  const [automaticDial, setAutomaticDial] = useState(true)
+  const [loading, setLoading] = useState(false)
   const { theme } = useTheme()
 
   // Update userName when profile loads
@@ -30,6 +36,37 @@ export default function Settings() {
       setUserName(profile.name)
     }
   }, [profile?.name])
+
+  // Load company automatic dial setting
+  useEffect(() => {
+    if (currentCompany?.id) {
+      setAutomaticDial(currentCompany.automatic_dial ?? true)
+    }
+  }, [currentCompany])
+
+  const handleAutomaticDialChange = async (checked: boolean) => {
+    if (!currentCompany?.id || !isCompanyAdmin()) {
+      return
+    }
+
+    setLoading(true)
+    try {
+      const { error } = await supabase
+        .from('companies')
+        .update({ automatic_dial: checked })
+        .eq('id', currentCompany.id)
+
+      if (error) throw error
+
+      setAutomaticDial(checked)
+      toast.success(`Automatic dialing ${checked ? 'enabled' : 'disabled'} for company`)
+    } catch (error) {
+      console.error('Error updating automatic dial setting:', error)
+      toast.error('Failed to update automatic dialing setting')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleLightLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -130,6 +167,34 @@ export default function Settings() {
                   <Users className="w-4 h-4 mr-2" />
                   Open Users Panel
                 </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Company Settings - Admin Only */}
+          {isCompanyAdmin() && currentCompany && (
+            <Card className="bg-gradient-card backdrop-blur-glass border-glass-border shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Phone className="w-5 h-5" />
+                  Company Settings
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label htmlFor="automaticDial">Automatic Dialing</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Enable automatic dialing for all jobs in this company
+                    </p>
+                  </div>
+                  <Switch
+                    id="automaticDial"
+                    checked={automaticDial}
+                    onCheckedChange={handleAutomaticDialChange}
+                    disabled={loading}
+                  />
+                </div>
               </CardContent>
             </Card>
           )}

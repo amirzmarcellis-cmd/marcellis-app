@@ -157,6 +157,7 @@ export type Database = {
       }
       companies: {
         Row: {
+          automatic_dial: boolean
           created_at: string
           id: string
           logo_url: string | null
@@ -167,6 +168,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          automatic_dial?: boolean
           created_at?: string
           id?: string
           logo_url?: string | null
@@ -177,6 +179,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          automatic_dial?: boolean
           created_at?: string
           id?: string
           logo_url?: string | null
