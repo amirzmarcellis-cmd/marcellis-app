@@ -13,6 +13,7 @@ import { Search, Filter, Video, Phone, Calendar as CalendarIcon, Clock, MapPin, 
 import { HeroHeader } from '@/components/dashboard/HeroHeader';
 import { toast } from 'sonner';
 import { format, parseISO, isSameDay } from 'date-fns';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 interface Interview {
   intid: string;
@@ -48,6 +49,7 @@ interface Job {
 }
 
 export default function Interviews() {
+  const { currentCompany } = useCompanyContext();
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -59,30 +61,37 @@ export default function Interviews() {
   const [showCalendar, setShowCalendar] = useState(false);
 
   useEffect(() => {
-    fetchInterviews();
-  }, []);
+    if (currentCompany?.id) {
+      fetchInterviews();
+    }
+  }, [currentCompany?.id]);
 
   const fetchInterviews = async () => {
+    if (!currentCompany?.id) return;
+
     try {
-      // Fetch interviews
+      // Fetch interviews for current company
       const { data: interviewsData, error: interviewsError } = await supabase
         .from('interview')
         .select('*')
+        .eq('company_id', currentCompany.id)
         .order('created_at', { ascending: false });
 
       if (interviewsError) throw interviewsError;
 
-      // Fetch candidates
+      // Fetch candidates for current company
       const { data: candidatesData, error: candidatesError } = await supabase
         .from('CVs')
-        .select('candidate_id, first_name, last_name, Email, phone_number, Title, Location, Skills');
+        .select('candidate_id, first_name, last_name, Email, phone_number, Title, Location, Skills')
+        .eq('company_id', currentCompany.id);
 
       if (candidatesError) throw candidatesError;
 
-      // Fetch jobs
+      // Fetch jobs for current company
       const { data: jobsData, error: jobsError } = await supabase
         .from('Jobs')
-        .select('job_id, job_title, job_location');
+        .select('job_id, job_title, job_location')
+        .eq('company_id', currentCompany.id);
 
       if (jobsError) throw jobsError;
 
