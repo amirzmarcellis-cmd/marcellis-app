@@ -80,7 +80,8 @@ export default function LiveCandidateFeed() {
             body: JSON.stringify({
               job_id: jobId,
               candidate_id: candidateId,
-              callid: candidate.callid
+              callid: candidate.callid,
+              company_id: currentCompany?.id || ''
             })
           });
         } catch (webhookError) {
