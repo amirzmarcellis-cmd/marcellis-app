@@ -181,12 +181,14 @@ export default function Apply() {
                         Upload CV/Resume *
                       </Label>
                       <FileUpload
-                        onFileUploaded={(file) => {
-                          console.log('CV uploaded:', file);
+                        entityType="application"
+                        entityId="temp"
+                        accept=".pdf,.doc,.docx"
+                        maxSize={5}
+                        onUploadComplete={(files) => {
+                          console.log('CV uploaded:', files);
                           toast.success('CV uploaded successfully');
                         }}
-                        accept=".pdf,.doc,.docx"
-                        maxSizeMB={5}
                       />
                     </div>
 
