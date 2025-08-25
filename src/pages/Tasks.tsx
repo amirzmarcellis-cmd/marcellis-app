@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCompanyContext } from "@/contexts/CompanyContext";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +46,7 @@ interface JobCVData {
 
 export default function Tasks() {
   const { user } = useAuth();
+  const { currentCompany } = useCompanyContext();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [taskCandidates, setTaskCandidates] = useState<TaskCandidate[]>([]);
@@ -57,19 +59,22 @@ export default function Tasks() {
   const [jobFilter, setJobFilter] = useState<string>("all");
 
   useEffect(() => {
-    if (user) {
+    if (user && currentCompany) {
       fetchData();
     }
-  }, [user]);
+  }, [user, currentCompany]);
 
   const fetchData = async () => {
+    if (!currentCompany) return
+    
     try {
       setLoading(true);
       
-      // Fetch task candidates
+      // Fetch task candidates with company filtering
       const { data: taskData, error: taskError } = await supabase
         .from('task_candidates')
         .select('*')
+        .eq('company_id', currentCompany.id)
         .order('created_at', { ascending: false });
       
       if (taskError) throw taskError;
@@ -78,26 +83,29 @@ export default function Tasks() {
         status: task.status as 'Pending' | 'Received' | 'Reviewed'
       })));
 
-      // Fetch candidates
+      // Fetch candidates with company filtering
       const { data: candidatesData, error: candidatesError } = await supabase
         .from('CVs')
-        .select('candidate_id, first_name, last_name, Email');
+        .select('candidate_id, first_name, last_name, Email')
+        .eq('company_id', currentCompany.id);
       
       if (candidatesError) throw candidatesError;
       setCandidates(candidatesData || []);
 
-      // Fetch jobs
+      // Fetch jobs with company filtering
       const { data: jobsData, error: jobsError } = await supabase
         .from('Jobs')
-        .select('job_id, job_title');
+        .select('job_id, job_title')
+        .eq('company_id', currentCompany.id);
       
       if (jobsError) throw jobsError;
       setJobs(jobsData || []);
 
-      // Fetch Jobs_CVs data for candidate names and emails
+      // Fetch Jobs_CVs data for candidate names and emails with company filtering
       const { data: jobCVsData, error: jobCVsError } = await supabase
         .from('Jobs_CVs')
-        .select('Candidate_ID, job_id, contacted, candidate_name, candidate_email');
+        .select('Candidate_ID, job_id, contacted, candidate_name, candidate_email')
+        .eq('company_id', currentCompany.id);
       
       if (jobCVsError) throw jobCVsError;
       setJobCVData(jobCVsData || []);

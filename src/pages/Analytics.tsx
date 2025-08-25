@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -72,33 +73,41 @@ const COLORS = {
 };
 
 export default function Analytics() {
+  const { currentCompany } = useCompanyContext();
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchAnalyticsData();
-  }, []);
+    if (currentCompany) {
+      fetchAnalyticsData();
+    }
+  }, [currentCompany]);
 
   const fetchAnalyticsData = async () => {
+    if (!currentCompany) return
+    
     try {
-      // Fetch CVs data
+      // Fetch CVs data with company filtering
       const { data: cvsData, error: cvsError } = await supabase
         .from('CVs')
-        .select('*');
+        .select('*')
+        .eq('company_id', currentCompany.id);
       
       if (cvsError) throw cvsError;
 
-      // Fetch Jobs data
+      // Fetch Jobs data with company filtering
       const { data: jobsData, error: jobsError } = await supabase
         .from('Jobs')
-        .select('*');
+        .select('*')
+        .eq('company_id', currentCompany.id);
       
       if (jobsError) throw jobsError;
 
-      // Fetch Jobs_CVs data
+      // Fetch Jobs_CVs data with company filtering
       const { data: jobsCvsData, error: jobsCvsError } = await supabase
         .from('Jobs_CVs')
-        .select('*');
+        .select('*')
+        .eq('company_id', currentCompany.id);
       
       if (jobsCvsError) throw jobsCvsError;
 

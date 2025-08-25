@@ -14,6 +14,7 @@ import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
 import { formatDate } from "@/lib/utils"
+import { useCompanyContext } from "@/contexts/CompanyContext"
 
 interface CallLog {
   job_id: string | null
@@ -65,6 +66,7 @@ const getContactedBadgeVariant = (contacted: string | null) => {
 }
 
 export default function CallLog() {
+  const { currentCompany } = useCompanyContext()
   const [searchParams] = useSearchParams()
   const [searchTerm, setSearchTerm] = useState("")
   const [contactedFilter, setContactedFilter] = useState("all")
@@ -80,15 +82,20 @@ export default function CallLog() {
   const jobParam = searchParams.get('job')
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    if (currentCompany) {
+      fetchData()
+    }
+  }, [currentCompany])
 
   const fetchData = async () => {
+    if (!currentCompany) return
+    
     try {
       // Fetch Jobs_CVs data with company filtering
       const { data: callLogsData, error: callLogsError } = await supabase
         .from('Jobs_CVs')
         .select('*')
+        .eq('company_id', currentCompany.id)
         .order('candidate_name', { ascending: true })
 
       if (callLogsError) throw callLogsError
@@ -97,6 +104,7 @@ export default function CallLog() {
       const { data: jobsData, error: jobsError } = await supabase
         .from('Jobs')
         .select('*')
+        .eq('company_id', currentCompany.id)
 
       if (jobsError) throw jobsError
 
