@@ -16,7 +16,7 @@ import { formatDate } from "@/lib/utils"
 import { HeroHeader } from "@/components/dashboard/HeroHeader"
 import { CandidateDialog } from "@/components/candidates/CandidateDialog"
 import { BulkCandidateUpload } from "@/components/candidates/BulkCandidateUpload"
-
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 interface Candidate {
   candidate_id: string
@@ -49,6 +49,7 @@ export default function Candidates() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [bulkUploadOpen, setBulkUploadOpen] = useState(false)
   const [selectedCandidate, setSelectedCandidate] = useState<any>(null)
+  const { currentCompany } = useCompanyContext()
 
   useEffect(() => {
     if (currentCompany?.id) {

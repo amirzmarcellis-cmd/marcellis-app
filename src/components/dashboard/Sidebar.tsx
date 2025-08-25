@@ -19,7 +19,8 @@ import {
   Building2,
 } from "lucide-react"
 import { useAuth } from '@/contexts/AuthContext';
-import { useProfile } from '@/hooks/useProfile';
+import { useCompanyContext } from '@/contexts/CompanyContext';
+import { CompanySwitcher } from '@/components/company/CompanySwitcher';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { Button } from '@/components/ui/button';
@@ -45,7 +46,7 @@ export function DashboardSidebar() {
   const { signOut } = useAuth();
   const { settings } = useAppSettings();
   const { canAccessAnalytics } = useUserRole();
-  const { canManageUsers, isAdmin } = useUserRole();
+  const { canManageUsers, isPlatformAdmin } = useCompanyContext();
   const { theme, setTheme } = useTheme();
   const location = useLocation()
   const currentPath = location.pathname
@@ -53,8 +54,14 @@ export function DashboardSidebar() {
   const isMobile = useIsMobile()
   const isMini = isCollapsed && !isMobile
 
-  // Navigation items
-  const navigationItems = [
+  // Platform admin gets different navigation
+  const platformAdminNavigation = [
+    { title: "Companies", url: "/platform-admin", icon: Building2 },
+    { title: "Settings", url: "/settings", icon: Settings },
+  ];
+
+  // Regular company navigation
+  const companyNavigation = [
     { title: "Dashboard", url: "/", icon: Home },
     { title: "Interviews", url: "/interviews", icon: Calendar },
     { title: "Live Feed", url: "/live-feed", icon: Activity },
@@ -64,10 +71,12 @@ export function DashboardSidebar() {
     { title: "Call Log", url: "/call-log", icon: PhoneCall },
     { title: "Analytics", url: "/analytics", icon: BarChart3 },
     { title: "Reports", url: "/reports", icon: FileText },
-    ...(isAdmin ? [{ title: "Administration", url: "/company-settings", icon: Building2 }] : []),
-    ...(canManageUsers ? [{ title: "Users", url: "/users-panel", icon: Users }] : []),
+    ...(isPlatformAdmin() ? [{ title: "Company Settings", url: "/company-settings", icon: Building2 }] : []),
+    ...(canManageUsers() ? [{ title: "Users", url: "/users-panel", icon: Users }] : []),
     { title: "Settings", url: "/settings", icon: Settings },
   ];
+
+  const navigationItems = isPlatformAdmin() ? platformAdminNavigation : companyNavigation;
 
   const isActive = (path: string) => currentPath === path
   const hasActiveItem = navigationItems.some((item) => isActive(item.url))
@@ -103,12 +112,15 @@ export function DashboardSidebar() {
                 })()}
               </div>
             </div>
-            {!isMini && (
+            {!isMini && !isPlatformAdmin() && (
               <div className="px-3">
-                <div className="flex items-center gap-2 p-2">
-                  <Building2 className="h-4 w-4" />
-                  <span className="text-sm font-medium">Marc Ellis</span>
-                </div>
+                <CompanySwitcher />
+              </div>
+            )}
+            {!isMini && isPlatformAdmin() && (
+              <div className="px-3 text-center">
+                <div className="text-sm font-medium text-foreground">Platform Admin</div>
+                <div className="text-xs text-muted-foreground">System Management</div>
               </div>
             )}
           </div>

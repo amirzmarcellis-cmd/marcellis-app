@@ -11,7 +11,7 @@ import { Plus, Search, Filter, Phone, Mail, MapPin, Building2, Users, Eye, Calen
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { CandidateDialog } from "./CandidateDialog";
-
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 interface Candidate {
   Cadndidate_ID: string;
@@ -45,6 +45,7 @@ export function CandidateManagementPanel() {
   const [salaryFilter, setSalaryFilter] = useState("all");
   const [sourceFilter, setSourceFilter] = useState("all");
   const { toast } = useToast();
+  const { currentCompany } = useCompanyContext();
 
   useEffect(() => {
     if (currentCompany?.id) {

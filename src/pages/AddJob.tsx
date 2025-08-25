@@ -13,7 +13,7 @@ import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 const countries = [
   "Afghanistan", "Albania", "Algeria", "United States", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia",
@@ -58,6 +58,7 @@ const contractLengths = [
 
 export default function AddJob() {
   const navigate = useNavigate();
+  const { currentCompany } = useCompanyContext();
   const [formData, setFormData] = useState({
     jobTitle: "",
     jobDescription: "",
@@ -80,11 +81,14 @@ export default function AddJob() {
   };
 
   const generateJobId = async () => {
+    if (!currentCompany?.id) return "COMPANY-J-0001";
+    
     try {
-      const subdomain = 'MARC';
+      const subdomain = currentCompany.subdomain?.toUpperCase() || 'COMPANY';
       const { data: jobs } = await supabase
         .from('Jobs')
         .select('job_id')
+        .eq('company_id', currentCompany.id)
         .like('job_id', `${subdomain}-J-%`)
         .order('job_id', { ascending: false })
         .limit(1);
@@ -101,7 +105,8 @@ export default function AddJob() {
       return `${subdomain}-J-0001`;
     } catch (error) {
       console.error('Error generating job ID:', error);
-      return `MARC-J-0001`;
+      const subdomain = currentCompany.subdomain?.toUpperCase() || 'COMPANY';
+      return `${subdomain}-J-0001`;
     }
   };
 
@@ -135,7 +140,7 @@ export default function AddJob() {
           Type: formData.type,
           contract_length: formData.type === "Contract" ? formData.contractLength : null,
           Currency: formData.currency,
-          company_id: null,
+          company_id: currentCompany?.id,
           Timestamp: new Date().toISOString()
         });
 

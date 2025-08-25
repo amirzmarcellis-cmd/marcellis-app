@@ -77,18 +77,25 @@ export function TimelineLog({ candidateId, jobId }: TimelineLogProps) {
         'hired'
       ])
 
-      // Disabled - status_history table doesn't exist in simplified structure
-      const history = null;
-      const error = null;
+      const { data: history, error } = await supabase
+        .from('status_history')
+        .select('*')
+        .or(`candidate_id.eq.${candidateId},job_id.eq.${jobId}`)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
 
       const filtered: TimelineEvent[] = []
 
-      if (false) { // Disabled
+      if (history && Array.isArray(history)) {
         // Get unique user IDs
-        const userIds: any[] = []
+        const userIds = Array.from(new Set(history.map(row => row.user_id).filter(Boolean)))
         
         // Fetch user names for all user IDs
-        const profiles = null;
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('user_id, name')
+          .in('user_id', userIds)
 
         // Create a map for quick lookup
         const userNameMap = new Map()
