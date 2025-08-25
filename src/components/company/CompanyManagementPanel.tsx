@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { useUserRole } from '@/hooks/useUserRole';
 import { Building2, Users, CreditCard, ArrowLeft, Trash2, UserPlus, Edit, Mail, User, Shield } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Company } from '@/hooks/useCompany';
@@ -31,6 +32,7 @@ interface CompanyUser {
 
 export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: CompanyManagementPanelProps) {
   const { toast } = useToast();
+  const { isSuperAdmin, isManager } = useUserRole();
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [users, setUsers] = useState<CompanyUser[]>([]);
@@ -583,9 +585,10 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="company_admin">Company Admin</SelectItem>
-                  <SelectItem value="manager">Manager</SelectItem>
                   <SelectItem value="recruiter">Recruiter</SelectItem>
+                  <SelectItem value="manager">Manager</SelectItem>
+                  {/* Only platform admins can assign company_admin roles */}
+                  {isSuperAdmin && <SelectItem value="company_admin">Company Admin</SelectItem>}
                 </SelectContent>
               </Select>
             </div>
@@ -667,9 +670,10 @@ export function CompanyManagementPanel({ company, onBack, onCompanyUpdated }: Co
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="company_admin">Company Admin</SelectItem>
-                  <SelectItem value="manager">Manager</SelectItem>
                   <SelectItem value="recruiter">Recruiter</SelectItem>
+                  <SelectItem value="manager">Manager</SelectItem>
+                  {/* Only platform admins can assign company_admin roles */}
+                  {isSuperAdmin && <SelectItem value="company_admin">Company Admin</SelectItem>}
                 </SelectContent>
               </Select>
             </div>

@@ -552,11 +552,20 @@ export default function UsersPanel() {
             <div className="space-y-3">
               <h4 className="font-medium">Assign Roles:</h4>
               {ROLE_OPTIONS.filter(roleOption => {
-                // Managers can only assign Manager and Recruiter roles
+                // Platform admins can assign any role
+                if (isSuperAdmin) {
+                  return true;
+                }
+                // Company admins can assign company_admin, manager, and recruiter roles (but not platform_admin)
+                if (canManageUsers && !isSuperAdmin) {
+                  return roleOption.value === 'company_admin' || roleOption.value === 'manager' || roleOption.value === 'recruiter';
+                }
+                // Managers can only assign manager and recruiter roles
                 if (isManager && !isSuperAdmin) {
                   return roleOption.value === 'manager' || roleOption.value === 'recruiter';
                 }
-                return true;
+                // Recruiters cannot assign any roles
+                return false;
               }).map((roleOption) => {
                 const Icon = roleOption.icon
                 const isSelected = userRoles.includes(roleOption.value)
@@ -652,7 +661,22 @@ export default function UsersPanel() {
             
             <div className="space-y-3">
               <h4 className="font-medium">Assign Roles:</h4>
-              {ROLE_OPTIONS.map((roleOption) => {
+              {ROLE_OPTIONS.filter(roleOption => {
+                // Platform admins can assign any role
+                if (isSuperAdmin) {
+                  return true;
+                }
+                // Company admins can assign company_admin, manager, and recruiter roles (but not platform_admin)
+                if (canManageUsers && !isSuperAdmin) {
+                  return roleOption.value === 'company_admin' || roleOption.value === 'manager' || roleOption.value === 'recruiter';
+                }
+                // Managers can only assign manager and recruiter roles
+                if (isManager && !isSuperAdmin) {
+                  return roleOption.value === 'manager' || roleOption.value === 'recruiter';
+                }
+                // Recruiters cannot assign any roles
+                return false;
+              }).map((roleOption) => {
                 const Icon = roleOption.icon
                 const isSelected = userRoles.includes(roleOption.value)
                 
