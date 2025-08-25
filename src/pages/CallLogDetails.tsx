@@ -15,6 +15,7 @@ import { TimelineLog } from "@/components/timeline/TimelineLog"
 import WaveformPlayer from "@/components/calls/WaveformPlayer"
 import RulerScore from "@/components/ui/ruler-score"
 import { useProfile } from "@/hooks/useProfile"
+import { useUserRole } from "@/hooks/useUserRole"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface CallLogDetail {
@@ -63,6 +64,7 @@ export default function CallLogDetails() {
   const [taskId, setTaskId] = useState<string | null>(null)
   const firstMatchRef = useRef<HTMLElement | null>(null)
   const { profile } = useProfile()
+  const { isManager, isCompanyAdmin } = useUserRole()
 
   const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
   const highlightedTranscript = useMemo(() => {
@@ -593,31 +595,33 @@ export default function CallLogDetails() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Transcript</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="relative">
-                <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
-                <Input
-                  placeholder="Search transcript keywords..."
-                  className="pl-9"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
+{(isManager || isCompanyAdmin) && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Transcript</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="relative">
+                  <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Input
+                    placeholder="Search transcript keywords..."
+                    className="pl-9"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
+                <div className="max-h-60 overflow-y-auto text-sm leading-relaxed">
+                  {callLog?.["Transcript"] ? (
+                    <div className="whitespace-pre-wrap break-words">{highlightedTranscript}</div>
+                  ) : (
+                    <p className="text-muted-foreground">No transcript available</p>
+                  )}
+                </div>
               </div>
-              <div className="max-h-60 overflow-y-auto text-sm leading-relaxed">
-                {callLog?.["Transcript"] ? (
-                  <div className="whitespace-pre-wrap break-words">{highlightedTranscript}</div>
-                ) : (
-                  <p className="text-muted-foreground">No transcript available</p>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Timeline Log */}
