@@ -9,7 +9,7 @@ import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Br
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { JobDialog } from "./JobDialog";
-import { useCompanyContext } from '@/contexts/CompanyContext';
+
 
 interface Job {
   job_id: string;
@@ -34,7 +34,6 @@ export function JobManagementPanel() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { currentCompany } = useCompanyContext();
 
   useEffect(() => {
     if (currentCompany?.id) {

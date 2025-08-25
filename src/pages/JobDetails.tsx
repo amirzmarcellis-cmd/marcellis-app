@@ -21,7 +21,7 @@ import { JobDialog } from "@/components/jobs/JobDialog"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDate } from "@/lib/utils"
-import { useCompanyContext } from '@/contexts/CompanyContext'
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,7 +39,6 @@ export default function JobDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("overview")
-  const { currentCompany } = useCompanyContext()
   const [job, setJob] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [candidates, setCandidates] = useState<any[]>([])

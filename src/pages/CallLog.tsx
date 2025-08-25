@@ -14,7 +14,7 @@ import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
 import { formatDate } from "@/lib/utils"
-import { useCompanyContext } from "@/contexts/CompanyContext"
+
 
 interface CallLog {
   job_id: string | null
@@ -66,7 +66,6 @@ const getContactedBadgeVariant = (contacted: string | null) => {
 }
 
 export default function CallLog() {
-  const { currentCompany } = useCompanyContext()
   const [searchParams] = useSearchParams()
   const [searchTerm, setSearchTerm] = useState("")
   const [contactedFilter, setContactedFilter] = useState("all")
