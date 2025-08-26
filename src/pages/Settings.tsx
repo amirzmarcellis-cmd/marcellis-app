@@ -14,6 +14,7 @@ export default function Settings() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    slug: '',
     notifications: true,
     automaticDial: false,
   });
@@ -24,6 +25,7 @@ export default function Settings() {
       setFormData({
         name: profile.name || '',
         email: profile.email || '',
+        slug: profile.slug || '',
         notifications: true,
         automaticDial: false,
       });
@@ -35,6 +37,7 @@ export default function Settings() {
     try {
       await updateProfile({
         name: formData.name,
+        slug: formData.slug.toLowerCase().replace(/[^a-z0-9-]/g, ''),
       });
 
       toast({
@@ -88,6 +91,19 @@ export default function Settings() {
                 className="bg-muted"
               />
             </div>
+          </div>
+          <div>
+            <Label htmlFor="slug">Company Slug</Label>
+            <Input
+              id="slug"
+              value={formData.slug}
+              onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
+              placeholder="Enter company slug (e.g., 'me', 'acme')"
+              pattern="[a-z0-9-]+"
+            />
+            <p className="text-sm text-muted-foreground mt-1">
+              This slug will be used for job IDs. Example: if slug is "me", job IDs will be "me-j-0001"
+            </p>
           </div>
           <Button onClick={handleSave} disabled={loading}>
             {loading ? 'Saving...' : 'Save Profile'}

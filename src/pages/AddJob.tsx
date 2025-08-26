@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -58,6 +59,7 @@ const contractLengths = [
 
 export default function AddJob() {
   const navigate = useNavigate();
+  const { profile } = useProfile();
   const [formData, setFormData] = useState({
     jobTitle: "",
     jobDescription: "",
@@ -80,8 +82,18 @@ export default function AddJob() {
   };
 
   const generateJobId = async () => {
-    // For simplified single-company structure, return mock job ID
-    return `JOB-${Date.now()}`;
+    // Get current job count for this slug
+    const slug = profile?.slug || 'default';
+    
+    const { data: existingJobs } = await supabase
+      .from('Jobs')
+      .select('job_id')
+      .like('job_id', `${slug}-j-%`);
+    
+    const jobNumber = (existingJobs?.length || 0) + 1;
+    const paddedNumber = jobNumber.toString().padStart(4, '0');
+    
+    return `${slug}-j-${paddedNumber}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -90,6 +102,11 @@ export default function AddJob() {
     // Basic validation
     if (!formData.jobTitle || !formData.jobDescription) {
       toast.error("Please fill in all required fields");
+      return;
+    }
+
+    if (!profile?.slug) {
+      toast.error("Please set up your company slug in Settings before creating jobs");
       return;
     }
 

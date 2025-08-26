@@ -8,6 +8,7 @@ export interface Profile {
   name: string | null;
   email: string;
   is_admin: boolean;
+  slug: string | null;
   created_at: string;
   updated_at: string;
 }
