@@ -354,7 +354,7 @@ export default function JobDetails() {
       for (const candidate of selectedCandidateData) {
         const payload = {
           candidateID: candidate["Candidate_ID"],
-          jobID: job["Job ID"],
+          jobID: job.job_id,
           callid: candidate["callid"]
         };
 
@@ -605,7 +605,7 @@ export default function JobDetails() {
       for (const candidate of candidates) {
         const payload = {
           candidateID: candidate["Candidate_ID"],
-          jobID: job["Job ID"],
+          jobID: job.job_id,
           callid: candidate["callid"]
         };
 
@@ -715,7 +715,7 @@ export default function JobDetails() {
     
     setSelectedCandidate({
       candidateId: candidateId,
-      jobId: job?.["Job ID"] || id || '',
+      jobId: job?.job_id || id || '',
       callid: candidate?.callid || candidate?.Callid || 0
     });
     
@@ -1012,13 +1012,13 @@ export default function JobDetails() {
                   <span className="sm:hidden">Generate List</span>
                 </Button>
               )}
-              <Button onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)} size="sm" className="w-full sm:w-auto">
+              <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto">
                 <FileText className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Edit Job</span>
                 <span className="sm:hidden">Edit</span>
               </Button>
               <Button variant="outline" asChild size="sm" className="w-full sm:w-auto">
-                <Link to={`/job/${job["Job ID"]}/apply`}>
+                <Link to={`/job/${job.job_id}/apply`}>
                   <span className="hidden sm:inline">Apply Link</span>
                   <span className="sm:hidden">Apply</span>
                 </Link>
@@ -1033,8 +1033,8 @@ export default function JobDetails() {
             <div className="space-y-4">
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                 <div className="space-y-2 flex-1 min-w-0">
-                  <h2 className="text-xl md:text-2xl font-bold break-words">{job["Job Title"]}</h2>
-                  <p className="text-base md:text-lg text-muted-foreground break-words">{job["Client Description"] || "Client Description"}</p>
+                  <h2 className="text-xl md:text-2xl font-bold break-words">{job.job_title}</h2>
+                  <p className="text-base md:text-lg text-muted-foreground break-words">{job.client_description || "Client Description"}</p>
                 </div>
                 <Badge 
                   variant={job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "default" : "destructive"}
@@ -1047,11 +1047,11 @@ export default function JobDetails() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 pt-4 border-t">
                 <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0">
                   <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                  <span className="truncate">{job["Job Location"]}</span>
+                  <span className="truncate">{job.job_location}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0">
                   <Banknote className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                  <span className="truncate">{formatCurrency(job["Job Salary Range (ex: 15000 AED)"], job["Currency"])}</span>
+                  <span className="truncate">{formatCurrency(job.job_salary_range?.toString(), job.Currency)}</span>
                 </div>
                 <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0 sm:col-span-2 lg:col-span-1">
                   <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -1094,15 +1094,15 @@ export default function JobDetails() {
                 <CardContent className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Job ID:</span>
-                    <span className="font-mono text-sm">{job["Job ID"]}</span>
+                    <span className="font-mono text-sm">{job.job_id}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Client:</span>
-                    <span>{job["Client Description"] || "N/A"}</span>
+                    <span>{job.client_description || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Location:</span>
-                    <span>{job["Job Location"] || "N/A"}</span>
+                    <span>{job.job_location || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Salary Range:</span>
@@ -1112,7 +1112,7 @@ export default function JobDetails() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Notice Period:</span>
-                    <span>{job["Notice Period"] || "N/A"}</span>
+                    <span>{job.notice_period || "N/A"}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -1124,11 +1124,11 @@ export default function JobDetails() {
                 <CardContent className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Nationality to Include:</span>
-                    <span>{job["Nationality to include"] || "N/A"}</span>
+                    <span>{job.nationality_to_include || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Nationality to Exclude:</span>
-                    <span>{job["Nationality to Exclude"] || "N/A"}</span>
+                    <span>{job.nationality_to_exclude || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Job Type:</span>
@@ -1156,7 +1156,7 @@ export default function JobDetails() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">JD Summary:</span>
-                    <span>{job["JD Summary"] || "N/A"}</span>
+                    <span>{job.jd_summary || "N/A"}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -1181,7 +1181,7 @@ export default function JobDetails() {
                       <Upload className="w-4 h-4 mr-2" />
                       Upload File
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)}>
+                    <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job.job_id}`)}>
                       <FileText className="w-4 h-4 mr-2" />
                       Edit Job
                     </Button>
@@ -1191,7 +1191,7 @@ export default function JobDetails() {
               <CardContent>
                 <div className="prose prose-sm max-w-none">
                   <p className="leading-relaxed whitespace-pre-wrap">
-                    {job["Job Description"] || "No description available for this position."}
+                    {job.job_description || "No description available for this position."}
                   </p>
                 </div>
               </CardContent>
@@ -1235,7 +1235,7 @@ export default function JobDetails() {
                       Skills, experience, and qualifications needed for this role
                     </CardDescription>
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job["Job ID"]}`)}>
+                  <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job.job_id}`)}>
                     <FileText className="w-4 h-4 mr-2" />
                     Amend
                   </Button>
@@ -1246,7 +1246,7 @@ export default function JobDetails() {
                   <div>
                     <h4 className="font-semibold mb-2">Things to look for:</h4>
                     <p className="leading-relaxed whitespace-pre-wrap">
-                      {job["Things to look for"] || "No specific criteria listed."}
+                      {job.things_to_look_for || "No specific criteria listed."}
                     </p>
                   </div>
                   <div>
