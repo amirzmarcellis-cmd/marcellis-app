@@ -41,9 +41,15 @@ export function JobManagementPanel() {
   }, []);
 
   const fetchJobs = async () => {
-    // Mock data for single-company structure
     try {
-      setJobs([]);
+      const { data, error } = await supabase
+        .from('Jobs')
+        .select('*')
+        .order('Timestamp', { ascending: false });
+
+      if (error) throw error;
+      
+      setJobs(data || []);
     } catch (error) {
       console.error('Error fetching jobs:', error);
       toast({

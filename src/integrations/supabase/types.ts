@@ -68,6 +68,75 @@ export type Database = {
         }
         Relationships: []
       }
+      Jobs: {
+        Row: {
+          assignment: string | null
+          client_description: string | null
+          contract_length: string | null
+          Currency: string | null
+          jd_summary: string | null
+          job_description: string | null
+          job_id: string | null
+          job_location: string | null
+          job_salary_range: number | null
+          job_title: string | null
+          longlist: number | null
+          musttohave: string | null
+          nationality_to_exclude: string | null
+          nationality_to_include: string | null
+          nicetohave: string | null
+          notice_period: string | null
+          Processed: string | null
+          things_to_look_for: string | null
+          Timestamp: string | null
+          Type: string | null
+        }
+        Insert: {
+          assignment?: string | null
+          client_description?: string | null
+          contract_length?: string | null
+          Currency?: string | null
+          jd_summary?: string | null
+          job_description?: string | null
+          job_id?: string | null
+          job_location?: string | null
+          job_salary_range?: number | null
+          job_title?: string | null
+          longlist?: number | null
+          musttohave?: string | null
+          nationality_to_exclude?: string | null
+          nationality_to_include?: string | null
+          nicetohave?: string | null
+          notice_period?: string | null
+          Processed?: string | null
+          things_to_look_for?: string | null
+          Timestamp?: string | null
+          Type?: string | null
+        }
+        Update: {
+          assignment?: string | null
+          client_description?: string | null
+          contract_length?: string | null
+          Currency?: string | null
+          jd_summary?: string | null
+          job_description?: string | null
+          job_id?: string | null
+          job_location?: string | null
+          job_salary_range?: number | null
+          job_title?: string | null
+          longlist?: number | null
+          musttohave?: string | null
+          nationality_to_exclude?: string | null
+          nationality_to_include?: string | null
+          nicetohave?: string | null
+          notice_period?: string | null
+          Processed?: string | null
+          things_to_look_for?: string | null
+          Timestamp?: string | null
+          Type?: string | null
+        }
+        Relationships: []
+      }
       memberships: {
         Row: {
           created_at: string
