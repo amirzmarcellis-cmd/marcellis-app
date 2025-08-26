@@ -122,9 +122,18 @@ export default function EditJob() {
         .from('Jobs')
         .select('*')
         .eq('job_id', id)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching job:', error);
+        toast.error("Failed to load job details");
+        return;
+      }
+      
+      if (!data) {
+        toast.error("Job not found");
+        return;
+      }
       
       if (data) {
         setFormData(data);
@@ -133,7 +142,7 @@ export default function EditJob() {
         // Parse salary range
         const salaryStr = data.job_salary_range;
         if (salaryStr) {
-          const salaryNum = parseInt(salaryStr.replace(/[^\d]/g, ''));
+          const salaryNum = parseInt(salaryStr.toString().replace(/[^\d]/g, ''));
           if (!isNaN(salaryNum)) {
             setSalaryRange([salaryNum]);
           }
