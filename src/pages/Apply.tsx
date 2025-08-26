@@ -429,12 +429,9 @@ export default function Apply() {
                   <Label className="text-sm font-medium">Upload your CV</Label>
                   <div className="mt-2">
                     <FileUpload
-                      entityType="application"
-                      entityId="temp"
+                      onFileUploaded={handleFileUpload}
                       accept=".pdf,.doc,.docx"
-                      maxSize={10}
-                      mode="public"
-                      onUploadComplete={handleFileUpload}
+                      maxSizeMB={10}
                     />
                   </div>
                 </div>

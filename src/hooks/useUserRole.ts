@@ -2,23 +2,9 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
-export type UserRole = 'platform_admin' | 'company_admin' | 'manager' | 'recruiter';
+export type UserRole = 'admin' | 'manager' | 'recruiter';
 
-interface UserRoleData {
-  roles: UserRole[];
-  hasRole: (role: UserRole) => boolean;
-  isAdmin: boolean;
-  isSuperAdmin: boolean;
-  isManager: boolean;
-  isRecruiter: boolean;
-  canManageUsers: boolean;
-  canDeleteUsers: boolean;
-  canAccessAnalytics: boolean;
-  canAccessUsersPanel: boolean;
-  loading: boolean;
-}
-
-export function useUserRole(): UserRoleData {
+export function useUserRole() {
   const { user } = useAuth();
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,29 +18,14 @@ export function useUserRole(): UserRoleData {
       }
 
       try {
-        // Check if user is platform admin from profiles table
-        const { data: profileData, error: profileError } = await supabase
+        const { data: profileData } = await supabase
           .from('profiles')
-          .select('is_platform_admin')
+          .select('is_admin')
           .eq('user_id', user.id)
           .single();
 
-        const isPlatformAdmin = profileData?.is_platform_admin || false;
-
-        // Get company-specific roles
-        const { data, error } = await supabase
-          .from('company_users')
-          .select('role')
-          .eq('user_id', user.id);
-
-        if (error && !error.message.includes('No rows found')) {
-          console.error('Error fetching user roles:', error);
-          setRoles(isPlatformAdmin ? ['platform_admin'] : []);
-        } else {
-          const companyRoles = data?.map(r => r.role as UserRole) || [];
-          const allRoles = isPlatformAdmin ? ['platform_admin' as UserRole, ...companyRoles] : companyRoles;
-          setRoles(allRoles);
-        }
+        const isAdmin = profileData?.is_admin || false;
+        setRoles(isAdmin ? ['admin'] : ['recruiter']);
       } catch (error) {
         console.error('Error fetching user roles:', error);
         setRoles([]);
@@ -67,32 +38,20 @@ export function useUserRole(): UserRoleData {
   }, [user]);
 
   const hasRole = (role: UserRole) => roles.includes(role);
-  
-  // Role checks
-  const isPlatformAdmin = hasRole('platform_admin');
-  const isCompanyAdmin = hasRole('company_admin');
-  const isManager = hasRole('manager');
-  const isRecruiter = hasRole('recruiter');
-
-  // Legacy compatibility
-  const isSuperAdmin = isPlatformAdmin;
-  const isAdmin = isCompanyAdmin;
-
-  // Permission checks based on RBAC rules
-  const canManageUsers = isPlatformAdmin || isCompanyAdmin || isManager;
-  const canDeleteUsers = isPlatformAdmin || isCompanyAdmin; // Only platform admin and company admin can delete
-  const canAccessAnalytics = isPlatformAdmin || isCompanyAdmin || isManager; // Recruiters cannot access
-  const canAccessUsersPanel = isPlatformAdmin || isCompanyAdmin || isManager; // Recruiters cannot access
+  const isAdmin = hasRole('admin');
+  const canManageUsers = isAdmin;
+  const canAccessAnalytics = isAdmin;
+  const canAccessUsersPanel = isAdmin;
 
   return {
     roles,
     hasRole,
     isAdmin,
-    isSuperAdmin,
-    isManager,
-    isRecruiter,
+    isSuperAdmin: isAdmin,
+    isManager: false,
+    isRecruiter: !isAdmin,
     canManageUsers,
-    canDeleteUsers,
+    canDeleteUsers: isAdmin,
     canAccessAnalytics,
     canAccessUsersPanel,
     loading
