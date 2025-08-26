@@ -19,10 +19,9 @@ import {
   Building2,
 } from "lucide-react"
 import { useAuth } from '@/contexts/AuthContext';
-import { useCompanyContext } from '@/contexts/CompanyContext';
-import { CompanySwitcher } from '@/components/company/CompanySwitcher';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -45,23 +44,17 @@ export function DashboardSidebar() {
   const { state } = useSidebar()
   const { signOut } = useAuth();
   const { settings } = useAppSettings();
-  const { canAccessAnalytics } = useUserRole();
-  const { canManageUsers, isPlatformAdmin } = useCompanyContext();
+  const { canAccessAnalytics, canManageUsers } = useUserRole();
+  const { profile } = useProfile();
   const { theme, setTheme } = useTheme();
   const location = useLocation()
   const currentPath = location.pathname
   const isCollapsed = state === "collapsed"
   const isMobile = useIsMobile()
   const isMini = isCollapsed && !isMobile
+  const isAdmin = profile?.is_admin || false;
 
-  // Platform admin gets different navigation
-  const platformAdminNavigation = [
-    { title: "Companies", url: "/platform-admin", icon: Building2 },
-    { title: "Settings", url: "/settings", icon: Settings },
-  ];
-
-  // Regular company navigation
-  const companyNavigation = [
+  const navigationItems = [
     { title: "Dashboard", url: "/", icon: Home },
     { title: "Interviews", url: "/interviews", icon: Calendar },
     { title: "Live Feed", url: "/live-feed", icon: Activity },
@@ -71,12 +64,9 @@ export function DashboardSidebar() {
     { title: "Call Log", url: "/call-log", icon: PhoneCall },
     { title: "Analytics", url: "/analytics", icon: BarChart3 },
     { title: "Reports", url: "/reports", icon: FileText },
-    ...(isPlatformAdmin() ? [{ title: "Company Settings", url: "/company-settings", icon: Building2 }] : []),
-    ...(canManageUsers() ? [{ title: "Users", url: "/users-panel", icon: Users }] : []),
+    ...(canManageUsers ? [{ title: "Users", url: "/users-panel", icon: Users }] : []),
     { title: "Settings", url: "/settings", icon: Settings },
   ];
-
-  const navigationItems = isPlatformAdmin() ? platformAdminNavigation : companyNavigation;
 
   const isActive = (path: string) => currentPath === path
   const hasActiveItem = navigationItems.some((item) => isActive(item.url))
@@ -112,15 +102,12 @@ export function DashboardSidebar() {
                 })()}
               </div>
             </div>
-            {!isMini && !isPlatformAdmin() && (
+            {!isMini && (
               <div className="px-3">
-                <CompanySwitcher />
-              </div>
-            )}
-            {!isMini && isPlatformAdmin() && (
-              <div className="px-3 text-center">
-                <div className="text-sm font-medium text-foreground">Platform Admin</div>
-                <div className="text-xs text-muted-foreground">System Management</div>
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4" />
+                  <span className="text-sm font-medium">MARC Ellis</span>
+                </div>
               </div>
             )}
           </div>

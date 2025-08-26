@@ -1,101 +1,104 @@
-import { useState, useEffect } from 'react'
-import { supabase } from '@/integrations/supabase/client'
-import { useToast } from '@/hooks/use-toast'
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
-interface Profile {
-  id: string
-  user_id: string
-  name: string | null
-  created_at: string
-  updated_at: string
+export interface Profile {
+  id: string;
+  user_id: string;
+  name: string | null;
+  email: string;
+  is_admin: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export function useProfile() {
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [loading, setLoading] = useState(true)
-  const { toast } = useToast()
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      fetchProfile();
+    } else {
+      setProfile(null);
+      setLoading(false);
+    }
+  }, [user?.id]);
 
   const fetchProfile = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (!user) {
-        setProfile(null)
-        setLoading(false)
-        return
-      }
+    if (!user) return;
 
+    try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
-        .maybeSingle()
+        .single();
 
-      if (error) throw error
-
-      // If no profile exists, create one
-      if (!data) {
-        const { data: newProfile, error: createError } = await supabase
-          .from('profiles')
-          .insert([{ user_id: user.id, name: null }])
-          .select()
-          .single()
-
-        if (createError) throw createError
-        setProfile(newProfile)
-      } else {
-        setProfile(data)
+      if (error && error.code !== 'PGRST116') {
+        throw error;
       }
+
+      setProfile(data);
     } catch (error) {
-      console.error('Error fetching profile:', error)
-      toast({
-        title: "Error",
-        description: "Failed to load profile",
-        variant: "destructive"
-      })
+      console.error('Error fetching profile:', error);
+      setProfile(null);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const updateProfile = async (updates: Partial<Pick<Profile, 'name'>>) => {
+  const updateProfile = async (updates: Partial<Profile>) => {
+    if (!user || !profile) return { error: new Error('No user or profile') };
+
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (!user) throw new Error('No user found')
-
       const { data, error } = await supabase
         .from('profiles')
         .update(updates)
         .eq('user_id', user.id)
         .select()
-        .single()
+        .single();
 
-      if (error) throw error
+      if (error) throw error;
 
-      setProfile(data)
-      toast({
-        title: "Success",
-        description: "Profile updated successfully"
-      })
+      setProfile(data);
+      return { data, error: null };
     } catch (error) {
-      console.error('Error updating profile:', error)
-      toast({
-        title: "Error",
-        description: "Failed to update profile",
-        variant: "destructive"
-      })
+      console.error('Error updating profile:', error);
+      return { data: null, error };
     }
-  }
+  };
 
-  useEffect(() => {
-    fetchProfile()
-  }, [])
+  const createProfile = async (profileData: Partial<Profile>) => {
+    if (!user) return { error: new Error('No user') };
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .insert({
+          user_id: user.id,
+          email: user.email!,
+          ...profileData
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setProfile(data);
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error creating profile:', error);
+      return { data: null, error };
+    }
+  };
 
   return {
     profile,
     loading,
     updateProfile,
+    createProfile,
     refetch: fetchProfile
-  }
+  };
 }
