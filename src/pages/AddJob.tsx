@@ -106,7 +106,7 @@ export default function AddJob() {
           job_description: formData.jobDescription,
           client_description: formData.clientDescription,
           job_location: formData.jobLocation,
-          job_salary_range: formData.jobSalaryRange[0].toString(),
+          job_salary_range: formData.jobSalaryRange[0],
           assignment: formData.hasAssignment ? formData.assignmentLink : null,
           notice_period: formData.noticePeriod,
           nationality_to_include: formData.nationalityToInclude.join(", "),
@@ -114,7 +114,6 @@ export default function AddJob() {
           Type: formData.type,
           contract_length: formData.type === "Contract" ? formData.contractLength : null,
           Currency: formData.currency,
-          company_id: null, // Simplified single-company structure
           Timestamp: new Date().toISOString()
         });
 
