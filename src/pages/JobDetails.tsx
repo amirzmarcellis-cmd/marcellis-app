@@ -21,6 +21,7 @@ import { JobDialog } from "@/components/jobs/JobDialog"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDate } from "@/lib/utils"
+import { useProfile } from "@/hooks/useProfile"
 
 import {
   AlertDialog,
@@ -39,6 +40,7 @@ export default function JobDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("overview")
+  const { profile } = useProfile()
   
   const [job, setJob] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -194,14 +196,14 @@ export default function JobDetails() {
 
 
   const fetchCandidates = async (jobId: string) => {
-    if (!currentCompany?.id) return;
+    if (!profile?.slug) return;
     
     try {
       const { data, error } = await supabase
         .from('Jobs_CVs')
         .select('*')
         .eq('job_id', jobId)
-        .eq('company_id', currentCompany.id)
+        .eq('company_id', profile.slug)
         .order('callid', { ascending: false })
 
       if (error) throw error
@@ -239,13 +241,13 @@ export default function JobDetails() {
   }
 
   const fetchCvData = async () => {
-    if (!currentCompany?.id) return;
+    if (!profile?.slug) return;
     
     try {
       const { data, error } = await supabase
         .from('CVs')
         .select('*')
-        .eq('company_id', currentCompany.id)
+        .eq('company_id', profile.slug)
 
       if (error) throw error
       setCvData(data || [])
@@ -256,14 +258,14 @@ export default function JobDetails() {
   }
 
   const fetchApplications = async (jobId: string) => {
-    if (!currentCompany?.id) return;
+    if (!profile?.slug) return;
     
     setApplicationsLoading(true)
     try {
       const { data, error } = await supabase
         .from('CVs')
         .select('*')
-        .eq('company_id', currentCompany.id)
+        .eq('company_id', profile.slug)
         .filter('applied_for', 'cs', `{${jobId}}`)
 
       if (error) throw error
@@ -277,14 +279,14 @@ export default function JobDetails() {
   }
 
   const fetchTaskCandidates = async (jobId: string) => {
-    if (!currentCompany?.id) return;
+    if (!profile?.slug) return;
     
     try {
       const { data, error } = await supabase
         .from('task_candidates')
         .select('*')
         .eq('job_id', jobId)
-        .eq('company_id', currentCompany.id)
+        .eq('company_id', profile.slug)
 
       if (error) throw error
       setTaskCandidates(data || [])
@@ -471,8 +473,8 @@ export default function JobDetails() {
       }));
 
       const payload = {
-        jobID: job?.["Job ID"],
-        company_id: null,
+        jobID: job?.job_id,
+        company_id: profile?.slug,
         groupid: candidates[0]?.["group_id"], // Get groupid from first candidate
         candidates: candidatesData
       };
@@ -509,7 +511,7 @@ export default function JobDetails() {
       const { error: updateError } = await supabase
         .from('Jobs')
         .update({ longlist: (job?.longlist || 0) + 1 })
-        .eq('job_id', job?.["Job ID"]);
+        .eq('job_id', job?.job_id);
 
       if (updateError) {
         throw updateError;
@@ -525,8 +527,8 @@ export default function JobDetails() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          jobID: job?.["Job ID"] || '',
-          company_id: null
+          jobID: job?.job_id || '',
+          company_id: profile?.slug
         }),
       });
 
