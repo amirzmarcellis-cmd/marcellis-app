@@ -14,7 +14,7 @@ import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
 import { formatDate } from "@/lib/utils"
-import { useCompanyContext } from "@/contexts/CompanyContext"
+
 
 interface CallLog {
   job_id: string | null
@@ -66,7 +66,7 @@ const getContactedBadgeVariant = (contacted: string | null) => {
 }
 
 export default function CallLog() {
-  const { currentCompany } = useCompanyContext()
+  
   const [searchParams] = useSearchParams()
   const [searchTerm, setSearchTerm] = useState("")
   const [contactedFilter, setContactedFilter] = useState("all")
@@ -82,47 +82,18 @@ export default function CallLog() {
   const jobParam = searchParams.get('job')
 
   useEffect(() => {
-    if (currentCompany) {
-      fetchData()
-    }
-  }, [currentCompany])
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
-    if (!currentCompany) return
-    
+    // Mock data for single-company structure
     try {
-      // Fetch Jobs_CVs data with company filtering
-      const { data: callLogsData, error: callLogsError } = await supabase
-        .from('Jobs_CVs')
-        .select('*')
-        .eq('company_id', currentCompany.id)
-        .order('candidate_name', { ascending: true })
-
-      if (callLogsError) throw callLogsError
-
-      // Fetch Jobs data with company filtering
-      const { data: jobsData, error: jobsError } = await supabase
-        .from('Jobs')
-        .select('*')
-        .eq('company_id', currentCompany.id)
-
-      if (jobsError) throw jobsError
-
-      // Match job titles with call logs
-      const enrichedCallLogs = (callLogsData || []).map(log => {
-        const job = (jobsData || []).find(j => j.job_id === log.job_id)
-        return {
-          ...log,
-          job_title: job?.job_title || null
-        }
-      })
-
-      setCallLogs(enrichedCallLogs)
-      setJobs(jobsData || [])
+      setCallLogs([]);
+      setJobs([]);
     } catch (error) {
-      console.error('Error fetching data:', error)
+      console.error('Error fetching data:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 

@@ -16,7 +16,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Search, Filter, Users, Zap, Activity, Star, Clock, Mail, Phone, MapPin, Briefcase, XCircle, Calendar, UserCheck } from 'lucide-react';
 import { toast } from 'sonner';
-import { useCompanyContext } from '@/contexts/CompanyContext';
+
 interface Candidate {
   'Candidate_ID': string;
   'Candidate Name': string;
@@ -55,7 +55,7 @@ export default function LiveCandidateFeed() {
   ]);
   const [interviewType, setInterviewType] = useState<string>('Phone');
   const [interviewLink, setInterviewLink] = useState<string>('');
-  const { currentCompany } = useCompanyContext();
+  
   const handleRejectCandidate = async (candidateId: string, jobId: string) => {
     // Show confirmation alert
     const confirmed = window.confirm('Are you sure you want to Reject Candidate?');

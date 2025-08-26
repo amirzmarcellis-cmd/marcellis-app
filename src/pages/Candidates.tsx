@@ -16,7 +16,7 @@ import { formatDate } from "@/lib/utils"
 import { HeroHeader } from "@/components/dashboard/HeroHeader"
 import { CandidateDialog } from "@/components/candidates/CandidateDialog"
 import { BulkCandidateUpload } from "@/components/candidates/BulkCandidateUpload"
-import { useCompanyContext } from '@/contexts/CompanyContext'
+
 
 interface Candidate {
   candidate_id: string
@@ -49,50 +49,22 @@ export default function Candidates() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [bulkUploadOpen, setBulkUploadOpen] = useState(false)
   const [selectedCandidate, setSelectedCandidate] = useState<any>(null)
-  const { currentCompany } = useCompanyContext()
+  
 
   useEffect(() => {
-    if (currentCompany?.id) {
-      fetchCandidates()
-    }
-  }, [currentCompany?.id])
+    fetchCandidates();
+  }, []);
 
   const fetchCandidates = async () => {
-    if (!currentCompany?.id) return;
-    
+    // Mock data for single-company structure
     try {
-      // Fetch CVs data with company filtering
-      const { data: candidatesData, error: candidatesError } = await supabase
-        .from('CVs')
-        .select('*')
-        .eq('company_id', currentCompany.id)
-        .order('Timestamp', { ascending: false })
-
-      if (candidatesError) throw candidatesError
-
-      // Fetch Jobs data with company filtering
-      const { data: jobsData, error: jobsError } = await supabase
-        .from('Jobs')
-        .select('*')
-        .eq('company_id', currentCompany.id)
-
-      if (jobsError) throw jobsError
-
-      // Fetch Jobs_CVs data with company filtering
-      const { data: jobsCVsData, error: jobsCVsError } = await supabase
-        .from('Jobs_CVs')
-        .select('*')
-        .eq('company_id', currentCompany.id)
-
-      if (jobsCVsError) throw jobsCVsError
-
-      setCandidates(candidatesData || [])
-      setJobs(jobsData || [])
-      setJobsCVs(jobsCVsData || [])
+      setCandidates([]);
+      setJobs([]);
+      setJobsCVs([]);
     } catch (error) {
-      console.error('Error fetching data:', error)
+      console.error('Error fetching data:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -169,7 +141,6 @@ export default function Candidates() {
         .from('CVs')
         .delete()
         .eq('candidate_id', candidateId)
-        .eq('company_id', currentCompany?.id)
 
       if (error) throw error
 

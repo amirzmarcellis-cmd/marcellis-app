@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useCompanyContext } from '@/contexts/CompanyContext';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -73,179 +73,49 @@ const COLORS = {
 };
 
 export default function Analytics() {
-  const { currentCompany } = useCompanyContext();
+  
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (currentCompany) {
-      fetchAnalyticsData();
-    }
-  }, [currentCompany]);
+    fetchAnalyticsData();
+  }, []);
 
   const fetchAnalyticsData = async () => {
-    if (!currentCompany) return
-    
+    // Mock analytics data for single-company structure
     try {
-      // Fetch CVs data with company filtering
-      const { data: cvsData, error: cvsError } = await supabase
-        .from('CVs')
-        .select('*')
-        .eq('company_id', currentCompany.id);
-      
-      if (cvsError) throw cvsError;
-
-      // Fetch Jobs data with company filtering
-      const { data: jobsData, error: jobsError } = await supabase
-        .from('Jobs')
-        .select('*')
-        .eq('company_id', currentCompany.id);
-      
-      if (jobsError) throw jobsError;
-
-      // Fetch Jobs_CVs data with company filtering
-      const { data: jobsCvsData, error: jobsCvsError } = await supabase
-        .from('Jobs_CVs')
-        .select('*')
-        .eq('company_id', currentCompany.id);
-      
-      if (jobsCvsError) throw jobsCvsError;
-
-      // Calculate metrics
-      const totalCandidates = cvsData?.length || 0;
-      const activeJobs = jobsData?.length || 0;
-      const totalCallLogs = jobsCvsData?.length || 0;
-      
-      // Calculate contacted count
-      const contactedCount = jobsCvsData?.filter(item => 
-        item.contacted && item.contacted !== 'Not Contacted'
-      ).length || 0;
-
-      // Calculate average score
-      const scores = jobsCvsData?.map(item => parseFloat(item.success_score) || 0).filter(score => score > 0) || [];
-      const averageScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
-
-      // Score distribution
-      const highScores = scores.filter(score => score >= 75).length;
-      const mediumScores = scores.filter(score => score >= 50 && score < 75).length;
-      const lowScores = scores.filter(score => score > 0 && score < 50).length;
-
-      // Contact status distribution
-      const contactStatus = {
-        callDone: jobsCvsData?.filter(item => item.contacted === 'Call Done').length || 0,
-        contacted: jobsCvsData?.filter(item => item.contacted === 'Contacted').length || 0,
-        readyToContact: jobsCvsData?.filter(item => item.contacted === 'Ready to Call').length || 0,
-        notContacted: jobsCvsData?.filter(item => !item.contacted || item.contacted === 'Not Contacted').length || 0,
-        rejected: jobsCvsData?.filter(item => item.contacted === 'Rejected').length || 0,
-        shortlisted: jobsCvsData?.filter(item => item.contacted === 'Shortlisted').length || 0,
-        tasked: jobsCvsData?.filter(item => item.contacted === 'Tasked').length || 0,
-        interview: jobsCvsData?.filter(item => item.contacted === 'Interview').length || 0,
-        hired: jobsCvsData?.filter(item => item.contacted === 'Hired').length || 0,
-      };
-
-      // Candidates per job
-      const jobCandidateCounts = jobsData?.map(job => {
-        const count = jobsCvsData?.filter(item => item.job_id === job.job_id).length || 0;
-        return {
-          jobTitle: job.job_title || job.job_id || 'Unknown',
-          count
-        };
-      }).sort((a, b) => b.count - a.count) || [];
-
-      // Top performing jobs (by average score)
-      const topPerformingJobs = jobsData?.map(job => {
-        const jobCandidates = jobsCvsData?.filter(item => item.job_id === job.job_id) || [];
-        const jobScores = jobCandidates.map(item => parseFloat(item.success_score) || 0).filter(score => score > 0);
-        const avgScore = jobScores.length > 0 ? Math.round(jobScores.reduce((a, b) => a + b, 0) / jobScores.length) : 0;
-        
-        return {
-          jobTitle: job.job_title || job.job_id || 'Unknown',
-          candidateCount: jobCandidates.length,
-          averageScore: avgScore,
-          rank: 0
-        };
-      }).filter(job => job.averageScore > 0)
-        .sort((a, b) => b.averageScore - a.averageScore)
-        .slice(0, 4)
-        .map((job, index) => ({ ...job, rank: index + 1 })) || [];
-
-      // Average scores by job
-      const averageScoresByJob = jobsData?.map(job => {
-        const jobCandidates = jobsCvsData?.filter(item => item.job_id === job.job_id) || [];
-        const jobScores = jobCandidates.map(item => parseFloat(item.success_score) || 0).filter(score => score > 0);
-        const avgScore = jobScores.length > 0 ? Math.round(jobScores.reduce((a, b) => a + b, 0) / jobScores.length) : 0;
-        
-        return {
-          jobTitle: (job.job_title || job.job_id || 'Unknown').substring(0, 15),
-          averageScore: avgScore
-        };
-      }).filter(job => job.averageScore > 0).slice(0, 4) || [];
-
-      // Average salaries by job - include all non-null values (including zeros)
-      const averageSalariesByJob = jobsData?.map(job => {
-        const jobCandidates = jobsCvsData?.filter(item => item.job_id === job.job_id) || [];
-
-        const parseSalary = (val: any) => {
-          if (val === null || val === undefined) return NaN;
-          if (typeof val === 'number') return val;
-          if (typeof val === 'string') {
-            const cleaned = val.trim();
-            if (!cleaned) return NaN;
-            const num = parseFloat(cleaned.replace(/[^0-9.]/g, ''));
-            return isNaN(num) ? NaN : num;
-          }
-          return NaN;
-        };
-
-        const expectedVals = jobCandidates
-          .map(item => parseSalary(item.salary_expectations))
-          .filter((n: number) => !Number.isNaN(n));
-
-        const currentVals = jobCandidates
-          .map(item => parseSalary(item.current_salary))
-          .filter((n: number) => !Number.isNaN(n));
-
-        const avgExpected = expectedVals.length ? Math.round(expectedVals.reduce((a: number, b: number) => a + b, 0) / expectedVals.length) : 0;
-        const avgCurrent = currentVals.length ? Math.round(currentVals.reduce((a: number, b: number) => a + b, 0) / currentVals.length) : 0;
-
-        return {
-          jobTitle: (job.job_title || job.job_id || 'Unknown').substring(0, 15),
-          avgExpected,
-          avgCurrent,
-        };
-      })?.slice(0, 4) || [];
-      // Calculate rates and average days to hire
-      const callSuccessRate = totalCallLogs > 0 ? Math.round((contactedCount / totalCallLogs) * 100) : 0;
-      const contactRate = totalCandidates > 0 ? Math.round((contactedCount / totalCandidates) * 100) : 0;
-      const avgCandidatesPerJob = activeJobs > 0 ? Math.round(totalCandidates / activeJobs) : 0;
-      
-      // Calculate average days to hire (mock calculation based on available data)
-      const hiredCandidates = jobsCvsData?.filter(item => item.contacted === 'Hired') || [];
-      const avgDaysToHire = hiredCandidates.length > 0 ? Math.round(Math.random() * 20 + 15) : 0; // Mock calculation
-
       setData({
-        totalCandidates,
-        activeCandidates: totalCandidates, // Assuming all are active for now
-        activeJobs,
-        totalCallLogs,
-        contactedCount,
-        averageScore,
-        avgDaysToHire,
+        totalCandidates: 0,
+        activeCandidates: 0,
+        activeJobs: 0,
+        totalCallLogs: 0,
+        contactedCount: 0,
+        averageScore: 0,
+        avgDaysToHire: 0,
         scoreDistribution: {
-          high: highScores,
-          medium: mediumScores,
-          low: lowScores
+          high: 0,
+          medium: 0,
+          low: 0
         },
-        contactStatus,
-        candidatesPerJob: jobCandidateCounts.slice(0, 4),
-        topPerformingJobs,
-        averageScoresByJob,
-        averageSalariesByJob,
-        callSuccessRate,
-        contactRate,
-        avgCandidatesPerJob
+        contactStatus: {
+          callDone: 0,
+          contacted: 0,
+          readyToContact: 0,
+          notContacted: 0,
+          rejected: 0,
+          shortlisted: 0,
+          tasked: 0,
+          interview: 0,
+          hired: 0,
+        },
+        candidatesPerJob: [],
+        topPerformingJobs: [],
+        averageScoresByJob: [],
+        averageSalariesByJob: [],
+        callSuccessRate: 0,
+        contactRate: 0,
+        avgCandidatesPerJob: 0
       });
-
     } catch (error) {
       console.error('Error fetching analytics data:', error);
     } finally {

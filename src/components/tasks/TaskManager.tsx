@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, X, CheckCircle, Clock, User, Briefcase } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { formatDate } from '@/lib/utils';
-import { useCompanyContext } from '@/contexts/CompanyContext';
+
 
 interface Task {
   id: string;
@@ -55,7 +55,7 @@ export function TaskManager({ showAddForm = true, onTaskCountChange }: TaskManag
     due_date: ''
   });
   const { toast } = useToast();
-  const { currentCompany } = useCompanyContext();
+  
 
   useEffect(() => {
     if (currentCompany?.id) {
