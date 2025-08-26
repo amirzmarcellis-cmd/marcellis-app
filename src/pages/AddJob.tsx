@@ -13,7 +13,7 @@ import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useCompanyContext } from '@/contexts/CompanyContext';
+
 
 const countries = [
   "Afghanistan", "Albania", "Algeria", "United States", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia",
@@ -58,7 +58,6 @@ const contractLengths = [
 
 export default function AddJob() {
   const navigate = useNavigate();
-  const { currentCompany } = useCompanyContext();
   const [formData, setFormData] = useState({
     jobTitle: "",
     jobDescription: "",
@@ -81,33 +80,8 @@ export default function AddJob() {
   };
 
   const generateJobId = async () => {
-    if (!currentCompany?.id) return "COMPANY-J-0001";
-    
-    try {
-      const subdomain = currentCompany.subdomain?.toUpperCase() || 'COMPANY';
-      const { data: jobs } = await supabase
-        .from('Jobs')
-        .select('job_id')
-        .eq('company_id', currentCompany.id)
-        .like('job_id', `${subdomain}-J-%`)
-        .order('job_id', { ascending: false })
-        .limit(1);
-
-      if (jobs && jobs.length > 0) {
-        const lastJobId = jobs[0]["job_id"];
-        const match = lastJobId.match(new RegExp(`${subdomain}-J-(\\d+)`));
-        if (match) {
-          const nextNumber = parseInt(match[1]) + 1;
-          return `${subdomain}-J-${nextNumber.toString().padStart(4, '0')}`;
-        }
-      }
-      
-      return `${subdomain}-J-0001`;
-    } catch (error) {
-      console.error('Error generating job ID:', error);
-      const subdomain = currentCompany.subdomain?.toUpperCase() || 'COMPANY';
-      return `${subdomain}-J-0001`;
-    }
+    // For simplified single-company structure, return mock job ID
+    return `JOB-${Date.now()}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -140,7 +114,7 @@ export default function AddJob() {
           Type: formData.type,
           contract_length: formData.type === "Contract" ? formData.contractLength : null,
           Currency: formData.currency,
-          company_id: currentCompany?.id,
+          company_id: null, // Simplified single-company structure
           Timestamp: new Date().toISOString()
         });
 
