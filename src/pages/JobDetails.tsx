@@ -548,24 +548,14 @@ export default function JobDetails() {
 
       // Prepare payload for webhook
       const payload = {
-        jobID: job?.job_id || '',
-        company_id: profile?.slug || '',
-        job_title: job?.job_title || '',
-        job_description: job?.job_description || '',
-        job_location: job?.job_location || '',
-        job_salary_range: job?.job_salary_range || '',
-        notice_period: job?.notice_period || '',
-        nationality_to_include: job?.nationality_to_include || '',
-        nationality_to_exclude: job?.nationality_to_exclude || '',
-        Type: job?.Type || '',
-        Currency: job?.Currency || ''
+        job_id: job?.job_id || ''
       };
 
       console.log('Webhook payload:', payload);
 
       // Call the automation endpoint
-      console.log('Calling webhook at:', 'https://hook.eu2.make.com/6vdrmblgusz8qvgb6gwfig1qpcy2vwd2');
-      const response = await fetch('https://hook.eu2.make.com/6vdrmblgusz8qvgb6gwfig1qpcy2vwd2', {
+      console.log('Calling webhook at:', 'https://hook.eu2.make.com/yeo696re8rx02r4u6tji5o42px16edwk');
+      const response = await fetch('https://hook.eu2.make.com/yeo696re8rx02r4u6tji5o42px16edwk', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
