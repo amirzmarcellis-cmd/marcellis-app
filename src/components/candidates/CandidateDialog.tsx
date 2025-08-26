@@ -119,15 +119,15 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
   }, [candidate, open]);
 
   const generateCandidateId = async () => {
-    if (!currentCompany?.id) return "COMPANY-C-0001";
+    return `CAND-${Date.now()}`;
     
     try {
-      const subdomain = currentCompany.subdomain?.toUpperCase() || 'COMPANY';
+      const subdomain = 'COMPANY';
       // Get all existing candidate IDs for this company that follow the subdomain pattern
       const { data: candidates, error } = await supabase
         .from('CVs')
         .select('candidate_id')
-        .eq('company_id', currentCompany.id)
+        .eq('company_id', null)
         .like('candidate_id', `${subdomain}-C-%`)
         .order('candidate_id', { ascending: false })
         .limit(1);
@@ -148,7 +148,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
       return `${subdomain}-C-${nextNumber.toString().padStart(4, '0')}`;
     } catch (error) {
       console.error('Error generating candidate ID:', error);
-      const subdomain = currentCompany.subdomain?.toUpperCase() || 'COMPANY';
+      const subdomain = 'COMPANY';
       // Fallback to timestamp-based ID if query fails
       return `${subdomain}-C-${Date.now().toString().slice(-4)}`;
     }
@@ -244,7 +244,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
         CandidateStatus: formData.candidateStatus || null,
         other_notes: formData.otherNotes || null,
         Timestamp: candidate?.Timestamp || new Date().toISOString(),
-        company_id: currentCompany?.id, // Always include the current company ID
+        company_id: null, // Simplified single-company structure
       };
 
       if (candidate) {

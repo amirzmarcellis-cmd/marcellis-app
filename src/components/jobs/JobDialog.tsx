@@ -85,7 +85,7 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
 
   const generateJobId = () => {
     // Generate ID using company subdomain in format OCEAN-J-0004
-    const subdomain = currentCompany?.subdomain?.toUpperCase() || 'COMPANY';
+    const subdomain = 'COMPANY';
     const timestamp = Date.now().toString().slice(-4);
     return `${subdomain}-J-${timestamp}`;
   };
@@ -126,7 +126,7 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
         jd_summary: formData.summary,
         musttohave: formData.musttohave,
         nicetohave: formData.nicetohave,
-        company_id: currentCompany?.id,
+        company_id: null,
         Timestamp: (job as any)?.Timestamp || new Date().toISOString(),
       };
 

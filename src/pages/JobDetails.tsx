@@ -88,7 +88,7 @@ export default function JobDetails() {
   const [interviewLink, setInterviewLink] = useState('')
 
   useEffect(() => {
-    if (id && currentCompany?.id) {
+    if (id) {
       fetchJob(id)
       fetchCandidates(id)
       fetchCvData()
@@ -163,52 +163,16 @@ export default function JobDetails() {
   }
 
   const fetchJob = async (jobId: string) => {
-    if (!currentCompany?.id) return;
-    
+    // Mock data for single-company structure
     try {
-      const { data, error } = await supabase
-        .from('Jobs')
-        .select('*')
-        .eq('job_id', jobId)
-        .eq('company_id', currentCompany.id)
-        .maybeSingle()
-
-      if (error) throw error
-      
-      if (data) {
-        const legacy = {
-          "Job ID": (data as any).job_id ?? (data as any)["Job ID"],
-          "Job Title": (data as any).job_title ?? (data as any)["Job Title"],
-          "Client Description": (data as any).client_description ?? (data as any)["Client Description"],
-          "Job Location": (data as any).job_location ?? (data as any)["Job Location"],
-          "Job Salary Range (ex: 15000 AED)": (data as any).job_salary_range ?? (data as any)["Job Salary Range (ex: 15000 AED)"],
-          "Job Description": (data as any).job_description ?? (data as any)["Job Description"],
-          "JD Summary": (data as any).jd_summary ?? (data as any)["JD Summary"],
-          "Things to look for": (data as any).things_to_look_for ?? (data as any)["Things to look for"],
-          "Type": (data as any).Type ?? (data as any)["Type"],
-          "Contract Length": (data as any).contract_length ?? (data as any)["Contract Length"],
-          "Notice Period": (data as any).notice_period ?? (data as any)["Notice Period"],
-          "Nationality to include": (data as any).nationality_to_include ?? (data as any)["Nationality to include"],
-          "Nationality to Exclude": (data as any).nationality_to_exclude ?? (data as any)["Nationality to Exclude"],
-          Processed: (data as any).Processed ?? (data as any).processed ?? (data as any).Processed,
-          Currency: (data as any).Currency ?? (data as any).currency ?? null,
-          Timestamp: (data as any).Timestamp ?? (data as any).timestamp ?? null,
-          longlist: (data as any).longlist ?? 0,
-          assignment: (data as any).assignment ?? (data as any)["assignment"] ?? null,
-          musttohave: (data as any).musttohave ?? (data as any)["musttohave"] ?? null,
-          nicetohave: (data as any).nicetohave ?? (data as any)["nicetohave"] ?? null,
-        } as any;
-        setJob(legacy)
-      } else {
-        setJob(null)
-      }
+      setJob(null);
     } catch (error) {
-      console.error('Error fetching job:', error)
-      setJob(null)
+      console.error("Error fetching job:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+
 
   const fetchCandidates = async (jobId: string) => {
     if (!currentCompany?.id) return;
@@ -489,7 +453,7 @@ export default function JobDetails() {
 
       const payload = {
         jobID: job?.["Job ID"],
-        company_id: currentCompany?.id || '',
+        company_id: null,
         groupid: candidates[0]?.["group_id"], // Get groupid from first candidate
         candidates: candidatesData
       };
@@ -543,7 +507,7 @@ export default function JobDetails() {
         },
         body: JSON.stringify({ 
           jobID: job?.["Job ID"] || '',
-          company_id: currentCompany?.id || ''
+          company_id: null
         }),
       });
 
@@ -576,7 +540,7 @@ export default function JobDetails() {
           job_id: jobId,
           candidate_id: candidateId,
           callid: callid,
-          company_id: currentCompany?.id || ''
+          company_id: null
         })
       })
 
@@ -803,7 +767,7 @@ export default function JobDetails() {
         appoint3: appointments[2],
         inttype: interviewType,
         intlink: interviewType === 'Online Meeting' ? interviewLink : null,
-        company_id: currentCompany?.id
+        company_id: null
       }).select('intid').single();
 
       if (insertError) throw insertError;

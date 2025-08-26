@@ -81,7 +81,7 @@ export default function LiveCandidateFeed() {
               job_id: jobId,
               candidate_id: candidateId,
               callid: candidate.callid,
-              company_id: currentCompany?.id || ''
+              company_id: null
             })
           });
         } catch (webhookError) {
@@ -167,7 +167,7 @@ export default function LiveCandidateFeed() {
           appoint3: appointments[2],
           inttype: interviewType,
           intlink: interviewType === 'Online Meeting' ? interviewLink : null,
-          company_id: currentCompany?.id
+          company_id: null
         })
         .select('intid')
         .maybeSingle();
@@ -247,71 +247,15 @@ export default function LiveCandidateFeed() {
     }
   };
   useEffect(() => {
-    if (currentCompany?.id) {
-      fetchData();
-    }
-  }, [currentCompany?.id]);
+    fetchData();
+  }, []);
   const fetchData = async () => {
-    if (!currentCompany?.id) return;
-    
+    // Mock data for single-company structure
     try {
-      // Fetch Jobs_CVs data with company filtering
-      const {
-        data: jobsCvsData,
-        error: jobsCvsError
-      } = await supabase.from('Jobs_CVs').select('*').eq('company_id', currentCompany.id).order('success_score', {
-        ascending: false
-      });
-      if (jobsCvsError) throw jobsCvsError;
-
-      // Fetch Jobs data with company filtering
-      const {
-        data: jobsData,
-        error: jobsError
-      } = await supabase.from('Jobs').select('*').eq('company_id', currentCompany.id);
-      if (jobsError) throw jobsError;
-
-      // Fetch CVs data for candidate status with company filtering
-      const {
-        data: cvsData,
-        error: cvsError
-      } = await supabase.from('CVs').select('*').eq('company_id', currentCompany.id);
-      if (cvsError) throw cvsError;
-
-      // Fetch interviews data with company filtering
-      const {
-        data: interviewsData,
-        error: interviewsError
-      } = await supabase.from('interview').select('*').eq('company_id', currentCompany.id);
-      if (interviewsError) throw interviewsError;
-
-      // Enrich candidates with job titles
-      const enrichedCandidates = (jobsCvsData || []).map(candidate => {
-        const job = (jobsData || []).find(j => j.job_id === candidate.job_id);
-        return {
-          ...candidate,
-          'Job Title': job?.job_title || 'Unknown Position'
-        };
-      });
-
-      // Filter: Shortlisted and Interview candidates from ACTIVE jobs
-      const activeJobIds = new Set((jobsData || []).filter(j => j.Processed === 'Yes').map(j => j.job_id));
-
-      // Debug: Log all candidate statuses to see what we have
-      console.log('All CV statuses:', (cvsData || []).map(c => ({
-        id: c.candidate_id,
-        status: c.CandidateStatus
-      })));
-      const shortlistedAndInterviewCandidateIds = new Set((cvsData || []).filter(c => (c.CandidateStatus === 'Shortlisted' || c.CandidateStatus === 'Interview') && c.CandidateStatus !== 'Hired').map(c => c.candidate_id));
-      console.log('Shortlisted/Interview candidate IDs:', Array.from(shortlistedAndInterviewCandidateIds));
-      console.log('Active job IDs:', Array.from(activeJobIds));
-      const filteredShortlistedActive = enrichedCandidates.filter(c => {
-        return shortlistedAndInterviewCandidateIds.has(c.Candidate_ID || c.candidate_id) && activeJobIds.has(c.job_id);
-      });
-      setCandidates(filteredShortlistedActive);
-      setJobs(jobsData || []);
-      setCvData(cvsData || []);
-      setInterviews(interviewsData || []);
+      setCandidates([]);
+      setJobs([]);
+      setCvData([]);
+      setInterviews([]);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {

@@ -49,22 +49,13 @@ export function CandidateManagementPanel() {
 
   useEffect(() => {
     fetchData();
-  }, [currentCompany?.id]);
+  }, []);
 
   const fetchData = async () => {
-    if (!currentCompany?.id) return;
-    
+    // Mock data for single-company structure
     try {
-      const [candidatesResult, jobsResult] = await Promise.all([
-        supabase.from('CVs').select('*').eq('company_id', currentCompany.id).order('Timestamp', { ascending: false }),
-        supabase.from('Jobs').select('*').eq('company_id', currentCompany.id)
-      ]);
-
-      if (candidatesResult.error) throw candidatesResult.error;
-      if (jobsResult.error) throw jobsResult.error;
-
-      setCandidates(candidatesResult.data || []);
-      setJobs(jobsResult.data || []);
+      setCandidates([]);
+      setJobs([]);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({

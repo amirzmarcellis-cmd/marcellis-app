@@ -58,11 +58,9 @@ export function TaskManager({ showAddForm = true, onTaskCountChange }: TaskManag
   
 
   useEffect(() => {
-    if (currentCompany?.id) {
-      fetchTasks();
-      fetchCandidatesAndJobs();
-    }
-  }, [currentCompany?.id]);
+    fetchTasks();
+    fetchCandidatesAndJobs();
+  }, []);
 
   useEffect(() => {
     const openTasks = tasks.filter(task => !task.completed).length;
@@ -70,17 +68,9 @@ export function TaskManager({ showAddForm = true, onTaskCountChange }: TaskManag
   }, [tasks, onTaskCountChange]);
 
   const fetchTasks = async () => {
-    if (!currentCompany?.id) return;
-    
+    // Mock data for single-company structure
     try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('*')
-        .eq('company_id', currentCompany.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setTasks(data || []);
+      setTasks([]);
     } catch (error) {
       console.error('Error fetching tasks:', error);
       toast({
@@ -94,19 +84,10 @@ export function TaskManager({ showAddForm = true, onTaskCountChange }: TaskManag
   };
 
   const fetchCandidatesAndJobs = async () => {
-    if (!currentCompany?.id) return;
-    
+    // Mock data for single-company structure
     try {
-      const [candidatesResponse, jobsResponse] = await Promise.all([
-        supabase.from('CVs').select('Cadndidate_ID, "First Name", "Last Name"').eq('company_id', currentCompany.id),
-        supabase.from('Jobs').select('"Job ID", "Job Title"').eq('company_id', currentCompany.id)
-      ]);
-
-      if (candidatesResponse.error) throw candidatesResponse.error;
-      if (jobsResponse.error) throw jobsResponse.error;
-
-      setCandidates(candidatesResponse.data || []);
-      setJobs(jobsResponse.data || []);
+      setCandidates([]);
+      setJobs([]);
     } catch (error) {
       console.error('Error fetching candidates and jobs:', error);
     }
@@ -145,7 +126,7 @@ export function TaskManager({ showAddForm = true, onTaskCountChange }: TaskManag
           entity_name: entityName || null,
           due_date: newTask.due_date || null,
           created_by: user.id,
-          company_id: currentCompany?.id
+          company_id: null
         }]);
 
       if (error) throw error;

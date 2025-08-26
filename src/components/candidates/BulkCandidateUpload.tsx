@@ -37,12 +37,12 @@ export function BulkCandidateUpload({ open, onOpenChange, onSuccess }: BulkCandi
     return `CAND-${Date.now()}`;
     
     try {
-      const subdomain = currentCompany.subdomain?.toUpperCase() || 'COMPANY';
+      const subdomain = 'COMPANY';
       // Get all existing candidate IDs for this company that follow the subdomain pattern
       const { data: candidates, error } = await supabase
         .from('CVs')
         .select('candidate_id')
-        .eq('company_id', currentCompany.id)
+        .eq('company_id', null)
         .like('candidate_id', `${subdomain}-C-%`)
         .order('candidate_id', { ascending: false })
         .limit(1);
@@ -63,7 +63,7 @@ export function BulkCandidateUpload({ open, onOpenChange, onSuccess }: BulkCandi
       return `${subdomain}-C-${nextNumber.toString().padStart(4, '0')}`;
     } catch (error) {
       console.error('Error generating candidate ID:', error);
-      const subdomain = currentCompany.subdomain?.toUpperCase() || 'COMPANY';
+      const subdomain = 'COMPANY';
       // Fallback to timestamp-based ID if query fails
       return `${subdomain}-C-${Date.now().toString().slice(-4)}`;
     }
@@ -140,7 +140,7 @@ export function BulkCandidateUpload({ open, onOpenChange, onSuccess }: BulkCandi
         // Extract potential name from filename (basic attempt)
         first_name: fileData.file.name.replace(/\.[^/.]+$/, "").split(/[-_\s]/)[0] || null,
         last_name: fileData.file.name.replace(/\.[^/.]+$/, "").split(/[-_\s]/)[1] || null,
-        company_id: currentCompany?.id, // Always include the current company ID
+        company_id: null, // Simplified single-company structure
       };
 
       const { error: insertError } = await supabase

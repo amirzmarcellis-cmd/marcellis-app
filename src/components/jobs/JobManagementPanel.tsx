@@ -38,20 +38,12 @@ export function JobManagementPanel() {
 
   useEffect(() => {
     fetchJobs();
-  }, [currentCompany?.id]);
+  }, []);
 
   const fetchJobs = async () => {
-    if (!currentCompany?.id) return;
-    
+    // Mock data for single-company structure
     try {
-      const { data, error } = await supabase
-        .from('Jobs')
-        .select('*')
-        .eq('company_id', currentCompany.id)
-        .order('Timestamp', { ascending: false });
-
-      if (error) throw error;
-      setJobs(data || []);
+      setJobs([]);
     } catch (error) {
       console.error('Error fetching jobs:', error);
       toast({
