@@ -477,7 +477,7 @@ export default function JobDetails() {
         candidates: candidatesData
       };
 
-      const response = await fetch('https://hook.eu2.make.com/j9objo7b05yubvv25fsvpxl3zrynl7dh', {
+      const response = await fetch('https://hook.eu2.make.com/6vdrmblgusz8qvgb6gwfig1qpcy2vwd2', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -519,7 +519,7 @@ export default function JobDetails() {
       setJob(prev => ({ ...prev, longlist: (prev?.longlist || 0) + 1 }));
 
       // Call the automation endpoint
-      const response = await fetch('https://hook.eu2.make.com/6so4sjxmr9gh97bzbvq8ggu1d4p49yva', {
+      const response = await fetch('https://hook.eu2.make.com/6vdrmblgusz8qvgb6gwfig1qpcy2vwd2', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
