@@ -528,6 +528,10 @@ export default function JobDetails() {
 
   const handleGenerateLongList = async () => {
     try {
+      console.log('Starting Generate Long List process...');
+      console.log('Current job:', job);
+      console.log('Current profile:', profile);
+      
       // First, increment the longlist count in the database
       const { error: updateError } = await supabase
         .from('Jobs')
@@ -535,27 +539,51 @@ export default function JobDetails() {
         .eq('job_id', job?.job_id);
 
       if (updateError) {
+        console.error('Database update error:', updateError);
         throw updateError;
       }
 
       // Update local state
       setJob(prev => ({ ...prev, longlist: (prev?.longlist || 0) + 1 }));
 
+      // Prepare payload for webhook
+      const payload = {
+        jobID: job?.job_id || '',
+        company_id: profile?.slug || '',
+        job_title: job?.job_title || '',
+        job_description: job?.job_description || '',
+        job_location: job?.job_location || '',
+        job_salary_range: job?.job_salary_range || '',
+        notice_period: job?.notice_period || '',
+        nationality_to_include: job?.nationality_to_include || '',
+        nationality_to_exclude: job?.nationality_to_exclude || '',
+        Type: job?.Type || '',
+        Currency: job?.Currency || ''
+      };
+
+      console.log('Webhook payload:', payload);
+
       // Call the automation endpoint
+      console.log('Calling webhook at:', 'https://hook.eu2.make.com/6vdrmblgusz8qvgb6gwfig1qpcy2vwd2');
       const response = await fetch('https://hook.eu2.make.com/6vdrmblgusz8qvgb6gwfig1qpcy2vwd2', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          jobID: job?.job_id || '',
-          company_id: profile?.slug
-        }),
+        body: JSON.stringify(payload),
       });
 
+      console.log('Webhook response status:', response.status);
+      console.log('Webhook response ok:', response.ok);
+      
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('Webhook error response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
       }
+
+      const responseData = await response.text();
+      console.log('Webhook success response:', responseData);
 
       toast({
         title: "Success",
@@ -565,7 +593,7 @@ export default function JobDetails() {
       console.error('Error generating long list:', error);
       toast({
         title: "Error",
-        description: "Failed to generate long list",
+        description: `Failed to generate long list: ${error.message}`,
         variant: "destructive",
       });
     }
