@@ -200,38 +200,52 @@ export default function JobDetails() {
     
     try {
       const { data, error } = await supabase
-        .from('Jobs_CVs')
+        .from('CVs')
         .select('*')
-        .eq('job_id', jobId)
-        .eq('company_id', profile.slug)
-        .order('callid', { ascending: false })
+        .filter('applied_for', 'cs', `{${jobId}}`)
+        .order('Timestamp', { ascending: false })
 
       if (error) throw error
 
       const mapped = (data || []).map((row: any) => ({
         ...row,
-        "Job ID": row.job_id ?? row["Job ID"],
-        "Candidate_ID": row.Candidate_ID ?? row.candidate_id ?? row["Candidate_ID"],
-        "Contacted": row.contacted ?? row.Contacted ?? '',
+        "Job ID": jobId,
+        "Candidate_ID": row.candidate_id ?? row["Candidate_ID"],
+        "Contacted": row.CandidateStatus ?? row.Contacted ?? '',
         "Transcript": row.transcript ?? row.Transcript ?? '',
-        "Summary": row.summary ?? row.Summary ?? '',
+        "Summary": row.cv_summary ?? row.Summary ?? '',
         "Success Score": row.success_score ?? row["Success Score"] ?? '',
         "Score and Reason": row.score_and_reason ?? row["Score and Reason"] ?? '',
-        "Candidate Name": row.candidate_name ?? row["Candidate Name"] ?? '',
-        "Candidate Email": row.candidate_email ?? row["Candidate Email"] ?? '',
-        "Candidate Phone Number": row.candidate_phone_number ?? row["Candidate Phone Number"] ?? '',
+        "Candidate Name": row.first_name && row.last_name ? `${row.first_name} ${row.last_name}` : row["Candidate Name"] ?? '',
+        "Candidate Email": row.Email ?? row["Candidate Email"] ?? '',
+        "Candidate Phone Number": row.phone_number ?? row["Candidate Phone Number"] ?? '',
         "pros": row.pros,
         "cons": row.cons,
         "Notice Period": row.notice_period ?? row["Notice Period"] ?? '',
         "Salary Expectations": row.salary_expectations ?? row["Salary Expectations"] ?? '',
         "current_salary": row.current_salary ?? row["current_salary"] ?? '',
-        "Notes": row.notes ?? row.Notes ?? '',
-        "callid": row.callid,
+        "Notes": row.other_notes ?? row.Notes ?? '',
+        "callid": row.callid ?? Math.random() * 1000000,
         "duration": row.duration,
         "recording": row.recording,
+        "first_name": row.first_name,
+        "last_name": row.last_name,
+        "Score": row.Score ?? '0'
       }))
 
       setCandidates(mapped)
+      console.log('Total candidates:', mapped?.length || 0)
+      
+      // Calculate candidate scores for analytics
+      const allScores = mapped?.map(c => parseFloat(c.Score) || 0).filter(score => !isNaN(score)) || []
+      console.log('All candidate scores:', allScores)
+      
+      // Calculate low scored candidates (score < 70)
+      const lowScoredCandidates = mapped?.filter(c => {
+        const score = parseFloat(c.Score) || 0
+        return !isNaN(score) && score < 70
+      }) || []
+      console.log('Low scored candidates:', lowScoredCandidates.length, 'Sample:', lowScoredCandidates.slice(0, 3).map(c => ({ name: c.first_name, score: c.Score })))
     } catch (error) {
       console.error('Error fetching candidates:', error)
       setCandidates([])
@@ -247,7 +261,6 @@ export default function JobDetails() {
       const { data, error } = await supabase
         .from('CVs')
         .select('*')
-        .eq('company_id', profile.slug)
 
       if (error) throw error
       setCvData(data || [])
@@ -282,14 +295,22 @@ export default function JobDetails() {
     if (!profile?.slug) return;
     
     try {
+      // For now, we'll use the same CVs table data since task_candidates table doesn't exist
       const { data, error } = await supabase
-        .from('task_candidates')
+        .from('CVs')
         .select('*')
-        .eq('job_id', jobId)
-        .eq('company_id', profile.slug)
+        .filter('applied_for', 'cs', `{${jobId}}`)
+        .not('CandidateStatus', 'is', null)
 
       if (error) throw error
       setTaskCandidates(data || [])
+      
+      const taskedCandidates = data?.filter(c => c.CandidateStatus === 'Tasked') || []
+      console.log('Tasked calculation:', {
+        tasked: taskedCandidates.length,
+        total: data?.length || 0,
+        taskedCandidates: taskedCandidates.slice(0, 3).map(c => ({ name: c.first_name, status: c.CandidateStatus }))
+      })
     } catch (error) {
       console.error('Error fetching task candidates:', error)
       setTaskCandidates([])

@@ -68,6 +68,81 @@ export type Database = {
         }
         Relationships: []
       }
+      CVs: {
+        Row: {
+          applied_for: string | null
+          candidate_id: string
+          CandidateStatus: string | null
+          Certifications: string | null
+          current_company: string | null
+          CV_Link: string | null
+          cv_summary: string | null
+          cv_text: string | null
+          done_questions: string | null
+          Education: string | null
+          Email: string | null
+          Experience: string | null
+          first_name: string | null
+          Language: string | null
+          last_name: string | null
+          Linkedin: string | null
+          Location: string | null
+          other_notes: string | null
+          phone_number: string | null
+          Skills: string | null
+          Timestamp: string | null
+          Title: string | null
+        }
+        Insert: {
+          applied_for?: string | null
+          candidate_id: string
+          CandidateStatus?: string | null
+          Certifications?: string | null
+          current_company?: string | null
+          CV_Link?: string | null
+          cv_summary?: string | null
+          cv_text?: string | null
+          done_questions?: string | null
+          Education?: string | null
+          Email?: string | null
+          Experience?: string | null
+          first_name?: string | null
+          Language?: string | null
+          last_name?: string | null
+          Linkedin?: string | null
+          Location?: string | null
+          other_notes?: string | null
+          phone_number?: string | null
+          Skills?: string | null
+          Timestamp?: string | null
+          Title?: string | null
+        }
+        Update: {
+          applied_for?: string | null
+          candidate_id?: string
+          CandidateStatus?: string | null
+          Certifications?: string | null
+          current_company?: string | null
+          CV_Link?: string | null
+          cv_summary?: string | null
+          cv_text?: string | null
+          done_questions?: string | null
+          Education?: string | null
+          Email?: string | null
+          Experience?: string | null
+          first_name?: string | null
+          Language?: string | null
+          last_name?: string | null
+          Linkedin?: string | null
+          Location?: string | null
+          other_notes?: string | null
+          phone_number?: string | null
+          Skills?: string | null
+          Timestamp?: string | null
+          Title?: string | null
+        }
+        Relationships: []
+      }
       Jobs: {
         Row: {
           assignment: string | null
@@ -76,7 +151,7 @@ export type Database = {
           Currency: string | null
           jd_summary: string | null
           job_description: string | null
-          job_id: string | null
+          job_id: string
           job_location: string | null
           job_salary_range: number | null
           job_title: string | null
@@ -98,7 +173,7 @@ export type Database = {
           Currency?: string | null
           jd_summary?: string | null
           job_description?: string | null
-          job_id?: string | null
+          job_id: string
           job_location?: string | null
           job_salary_range?: number | null
           job_title?: string | null
@@ -120,7 +195,7 @@ export type Database = {
           Currency?: string | null
           jd_summary?: string | null
           job_description?: string | null
-          job_id?: string | null
+          job_id?: string
           job_location?: string | null
           job_salary_range?: number | null
           job_title?: string | null
