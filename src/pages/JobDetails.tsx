@@ -163,11 +163,30 @@ export default function JobDetails() {
   }
 
   const fetchJob = async (jobId: string) => {
-    // Mock data for single-company structure
     try {
-      setJob(null);
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('Jobs')
+        .select('*')
+        .eq('job_id', jobId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error fetching job:", error);
+        setJob(null);
+        return;
+      }
+
+      if (!data) {
+        console.log("Job not found with ID:", jobId);
+        setJob(null);
+        return;
+      }
+
+      setJob(data);
     } catch (error) {
       console.error("Error fetching job:", error);
+      setJob(null);
     } finally {
       setLoading(false);
     }
