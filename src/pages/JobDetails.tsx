@@ -1138,6 +1138,10 @@ export default function JobDetails() {
                     <span className="font-mono text-sm">{job.job_id}</span>
                   </div>
                   <div className="flex justify-between">
+                    <span className="text-muted-foreground">Itris ID:</span>
+                    <span className="font-mono text-sm">{job.itris_job_id || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
                     <span className="text-muted-foreground">Client:</span>
                     <span>{job.client_description || "N/A"}</span>
                   </div>

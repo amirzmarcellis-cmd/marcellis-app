@@ -73,7 +73,8 @@ export default function AddJob() {
     nationalityToExclude: [] as string[],
     type: "",
     contractLength: "",
-    currency: ""
+    currency: "",
+    itrisId: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -131,6 +132,7 @@ export default function AddJob() {
           Type: formData.type,
           contract_length: formData.type === "Contract" ? formData.contractLength : null,
           Currency: formData.currency,
+          itris_job_id: formData.itrisId,
           Timestamp: new Date().toISOString()
         });
 
@@ -170,15 +172,26 @@ export default function AddJob() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="jobTitle">Job Title *</Label>
-              <Input
-                id="jobTitle"
-                value={formData.jobTitle}
-                onChange={(e) => handleInputChange("jobTitle", e.target.value)}
-                placeholder="Enter job title"
-                required
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="jobTitle">Job Title *</Label>
+                <Input
+                  id="jobTitle"
+                  value={formData.jobTitle}
+                  onChange={(e) => handleInputChange("jobTitle", e.target.value)}
+                  placeholder="Enter job title"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="itrisId">Itris ID</Label>
+                <Input
+                  id="itrisId"
+                  value={formData.itrisId}
+                  onChange={(e) => handleInputChange("itrisId", e.target.value)}
+                  placeholder="Enter Itris ID"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
