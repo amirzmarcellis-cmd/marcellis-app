@@ -52,19 +52,40 @@ export type Database = {
           cv_text: string | null
           Firstname: string | null
           Lastname: string | null
-          user_id: number | null
+          user_id: number
         }
         Insert: {
           cv_text?: string | null
           Firstname?: string | null
           Lastname?: string | null
-          user_id?: number | null
+          user_id?: number
         }
         Update: {
           cv_text?: string | null
           Firstname?: string | null
           Lastname?: string | null
-          user_id?: number | null
+          user_id?: number
+        }
+        Relationships: []
+      }
+      candidates_stage: {
+        Row: {
+          cv_text: string | null
+          Firstname: string | null
+          Lastname: string | null
+          user_id: string | null
+        }
+        Insert: {
+          cv_text?: string | null
+          Firstname?: string | null
+          Lastname?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          cv_text?: string | null
+          Firstname?: string | null
+          Lastname?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
