@@ -76,6 +76,7 @@ interface JobData {
   Type: string;
   contract_length: string | null;
   Currency: string;
+  itris_job_id?: string;
 }
 
 export default function EditJob() {
@@ -107,7 +108,8 @@ export default function EditJob() {
     nationality_to_exclude: "",
     Type: "",
     contract_length: "",
-    Currency: ""
+    Currency: "",
+    itris_job_id: ""
   });
 
   useEffect(() => {
@@ -258,16 +260,28 @@ export default function EditJob() {
 
               <TabsContent value="details" className="space-y-6">
                 <div className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="job_title">Job Title *</Label>
-                    <Input
-                      id="job_title"
-                      name="job_title"
-                      value={formData.job_title}
-                      onChange={handleInputChange}
-                      placeholder="e.g., Senior Software Engineer"
-                      required
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="job_title">Job Title *</Label>
+                      <Input
+                        id="job_title"
+                        name="job_title"
+                        value={formData.job_title}
+                        onChange={handleInputChange}
+                        placeholder="e.g., Senior Software Engineer"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="itris_job_id">Itris ID</Label>
+                      <Input
+                        id="itris_job_id"
+                        name="itris_job_id"
+                        value={formData.itris_job_id || ""}
+                        onChange={handleInputChange}
+                        placeholder="Enter Itris ID"
+                      />
+                    </div>
                   </div>
 
                   <div className="space-y-2">
