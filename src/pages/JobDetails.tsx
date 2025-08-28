@@ -487,20 +487,12 @@ export default function JobDetails() {
 
   const handleSearchMoreCandidates = async () => {
     try {
-      // Prepare the payload with current candidates
-      const candidatesData = candidates.map(candidate => ({
-        candidateID: candidate["Candidate_ID"],
-        callid: candidate["callid"]
-      }));
-
       const payload = {
-        jobID: job?.job_id,
-        company_id: profile?.slug,
-        groupid: candidates[0]?.["group_id"], // Get groupid from first candidate
-        candidates: candidatesData
+        job_id: job?.job_id || '',
+        itris_job_id: job?.itris_job_id || ''
       };
 
-      const response = await fetch('https://hook.eu2.make.com/6vdrmblgusz8qvgb6gwfig1qpcy2vwd2', {
+      const response = await fetch('https://hook.eu2.make.com/yiz4ustkcgxgji2sv6fwcs99jdr3674m', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -548,14 +540,15 @@ export default function JobDetails() {
 
       // Prepare payload for webhook
       const payload = {
-        job_id: job?.job_id || ''
+        job_id: job?.job_id || '',
+        itris_job_id: job?.itris_job_id || ''
       };
 
       console.log('Webhook payload:', payload);
 
       // Call the automation endpoint
-      console.log('Calling webhook at:', 'https://hook.eu2.make.com/yeo696re8rx02r4u6tji5o42px16edwk');
-      const response = await fetch('https://hook.eu2.make.com/yeo696re8rx02r4u6tji5o42px16edwk', {
+      console.log('Calling webhook at:', 'https://hook.eu2.make.com/yiz4ustkcgxgji2sv6fwcs99jdr3674m');
+      const response = await fetch('https://hook.eu2.make.com/yiz4ustkcgxgji2sv6fwcs99jdr3674m', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
