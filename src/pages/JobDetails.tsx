@@ -350,10 +350,9 @@ export default function JobDetails() {
       // Process each selected candidate with their callid
       for (const candidate of selectedCandidateData) {
         const payload = {
-          user_id: profile?.user_id,
+          user_id: candidate.user_id,
           jobID: job.job_id,
           job_itris_id: job.job_itris_id,
-          candidateID: candidate["Candidate_ID"],
           callid: candidate["callid"]
         };
 
@@ -590,10 +589,9 @@ export default function JobDetails() {
       // Process each candidate individually with their callid
       for (const candidate of candidates) {
         const payload = {
-          user_id: profile?.user_id,
+          user_id: candidate.user_id,
           jobID: job.job_id,
           job_itris_id: job.job_itris_id,
-          candidateID: candidate["Candidate_ID"],
           callid: candidate["callid"]
         };
 
