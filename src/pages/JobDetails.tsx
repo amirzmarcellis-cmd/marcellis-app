@@ -352,7 +352,7 @@ export default function JobDetails() {
         const payload = {
           user_id: candidate.user_id,
           jobID: job.job_id,
-          job_itris_id: job.job_itris_id,
+          job_itris_id: job.itris_job_id,
           callid: candidate["callid"]
         };
 
@@ -591,7 +591,7 @@ export default function JobDetails() {
         const payload = {
           user_id: candidate.user_id,
           jobID: job.job_id,
-          job_itris_id: job.job_itris_id,
+          job_itris_id: job.itris_job_id,
           callid: candidate["callid"]
         };
 
