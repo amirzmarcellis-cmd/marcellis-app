@@ -196,45 +196,44 @@ export default function JobDetails() {
 
 
   const fetchCandidates = async (jobId: string) => {
-    if (!profile?.slug) return;
-    
     try {
       const { data, error } = await supabase
-        .from('CVs')
+        .from('Jobs_CVs')
         .select('*')
-        .filter('applied_for', 'cs', `{${jobId}}`)
-        .order('Timestamp', { ascending: false })
+        .eq('job_id', jobId)
+        .order('longlisted_at', { ascending: false, nullsFirst: false })
 
       if (error) throw error
 
       const mapped = (data || []).map((row: any) => ({
         ...row,
         "Job ID": jobId,
-        "Candidate_ID": row.candidate_id ?? row["Candidate_ID"],
-        "Contacted": row.CandidateStatus ?? row.Contacted ?? '',
-        "Transcript": row.transcript ?? row.Transcript ?? '',
-        "Summary": row.cv_summary ?? row.Summary ?? '',
-        "Success Score": row.success_score ?? row["Success Score"] ?? '',
-        "Score and Reason": row.score_and_reason ?? row["Score and Reason"] ?? '',
-        "Candidate Name": row.first_name && row.last_name ? `${row.first_name} ${row.last_name}` : row["Candidate Name"] ?? '',
-        "Candidate Email": row.Email ?? row["Candidate Email"] ?? '',
-        "Candidate Phone Number": row.phone_number ?? row["Candidate Phone Number"] ?? '',
-        "pros": row.pros,
-        "cons": row.cons,
-        "Notice Period": row.notice_period ?? row["Notice Period"] ?? '',
-        "Salary Expectations": row.salary_expectations ?? row["Salary Expectations"] ?? '',
-        "current_salary": row.current_salary ?? row["current_salary"] ?? '',
-        "Notes": row.other_notes ?? row.Notes ?? '',
-        "callid": row.callid ?? Math.random() * 1000000,
+        "Candidate_ID": row.recordid?.toString() || '',
+        "Contacted": row.contacted ?? '',
+        "Transcript": row.transcript ?? '',
+        "Summary": row.cv_score_reason ?? '',
+        "Success Score": row.after_call_score?.toString() ?? '',
+        "Score and Reason": row.cv_score_reason ?? '',
+        "Candidate Name": row.candidate_name ?? '',
+        "Candidate Email": row.candidate_email ?? '',
+        "Candidate Phone Number": row.candidate_phone_number ?? '',
+        "pros": row.after_call_pros,
+        "cons": row.after_call_cons,
+        "Notice Period": row.notice_period ?? '',
+        "Salary Expectations": row.salary_expectations ?? '',
+        "current_salary": row.current_salary ?? '',
+        "Notes": row.notes ?? '',
+        "callid": row.recordid ?? Math.random() * 1000000,
         "duration": row.duration,
         "recording": row.recording,
-        "first_name": row.first_name,
-        "last_name": row.last_name,
-        "Score": row.Score ?? '0'
+        "first_name": row.candidate_name?.split(' ')[0] || '',
+        "last_name": row.candidate_name?.split(' ').slice(1).join(' ') || '',
+        "Score": row.cv_score?.toString() ?? '0',
+        "lastcalltime": row.lastcalltime
       }))
 
       setCandidates(mapped)
-      console.log('Total candidates:', mapped?.length || 0)
+      console.log('Total candidates from Jobs_CVs:', mapped?.length || 0)
       
       // Calculate candidate scores for analytics
       const allScores = mapped?.map(c => parseFloat(c.Score) || 0).filter(score => !isNaN(score)) || []
@@ -245,9 +244,9 @@ export default function JobDetails() {
         const score = parseFloat(c.Score) || 0
         return !isNaN(score) && score < 70
       }) || []
-      console.log('Low scored candidates:', lowScoredCandidates.length, 'Sample:', lowScoredCandidates.slice(0, 3).map(c => ({ name: c.first_name, score: c.Score })))
+      console.log('Low scored candidates:', lowScoredCandidates.length, 'Sample:', lowScoredCandidates.slice(0, 3).map(c => ({ name: c.candidate_name, score: c.Score })))
     } catch (error) {
-      console.error('Error fetching candidates:', error)
+      console.error('Error fetching candidates from Jobs_CVs:', error)
       setCandidates([])
     } finally {
       setCandidatesLoading(false)
