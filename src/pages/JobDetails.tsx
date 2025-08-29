@@ -626,11 +626,23 @@ export default function JobDetails() {
   };
   const handleRemoveFromLongList = async (candidateId: string) => {
     try {
-      // Remove the candidate from the Jobs_CVs table for this job
-      const {
-        error
-      } = await supabase.from('Jobs_CVs').delete().eq('Candidate_ID', candidateId).eq('job_id', id);
+      console.log('Attempting to remove candidate:', candidateId);
+      
+      // Find the candidate record to get the correct recordid
+      const candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
+      if (!candidate) {
+        throw new Error('Candidate not found in local data');
+      }
+      
+      // Remove the candidate from the Jobs_CVs table using recordid (which maps to Candidate_ID in our data transformation)
+      const { error } = await (supabase as any)
+        .from('Jobs_CVs')
+        .delete()
+        .eq('recordid', candidateId)
+        .eq('job_id', id);
+        
       if (error) {
+        console.error('Supabase delete error:', error);
         throw error;
       }
 
