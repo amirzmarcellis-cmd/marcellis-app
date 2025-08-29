@@ -20,6 +20,7 @@ import CandidateDetails from "./pages/CandidateDetails";
 import Calls from "./pages/Calls";
 import CallLog from "./pages/CallLog";
 import CallLogDetails from "./pages/CallLogDetails";
+import CallLogDetailPage from "./pages/CallLogDetailPage";
 import Analytics from "./pages/Analytics";
 import Performance from "./pages/Performance";
 import Reports from "./pages/Reports";
@@ -63,7 +64,7 @@ const App = () => (
                 <Route path="/candidate/edit/:id" element={<DashboardLayout><EditCandidate /></DashboardLayout>} />
                 <Route path="/calls" element={<DashboardLayout><Calls /></DashboardLayout>} />
                 <Route path="/call-log" element={<DashboardLayout><CallLog /></DashboardLayout>} />
-                <Route path="/call-log-details" element={<DashboardLayout><CallLogDetails /></DashboardLayout>} />
+                <Route path="/call-log-details" element={<DashboardLayout><CallLogDetailPage /></DashboardLayout>} />
                 <Route path="/analytics" element={
                   <ProtectedRoute requiresAnalytics={true}>
                     <DashboardLayout><Analytics /></DashboardLayout>
