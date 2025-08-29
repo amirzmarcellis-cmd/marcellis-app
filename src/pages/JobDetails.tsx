@@ -334,7 +334,7 @@ export default function JobDetails() {
       });
       return;
     }
-    if (!job?.["Job ID"]) {
+    if (!job?.job_id) {
       toast({
         title: "Error",
         description: "Job ID not found",
