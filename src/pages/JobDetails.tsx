@@ -1712,6 +1712,40 @@ export default function JobDetails() {
                                     </p>
                                   )}
 
+                                  {/* CV Score and Reason Section */}
+                                  <div className="space-y-2 pt-2 border-t">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                      <div className="space-y-1">
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-muted-foreground">CV Score:</span>
+                                          <span className="font-medium">{mainCandidate["cv_score"] || "N/A"}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-muted-foreground">User ID:</span>
+                                          <span className="font-mono text-xs">{mainCandidate["user_id"] || "N/A"}</span>
+                                        </div>
+                                      </div>
+                                      <div className="space-y-1">
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-muted-foreground">Longlisted:</span>
+                                          <span className="text-xs">
+                                            {mainCandidate["longlisted_at"] 
+                                              ? new Date(mainCandidate["longlisted_at"]).toLocaleDateString()
+                                              : "N/A"}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    {mainCandidate["cv_score_reason"] && (
+                                      <div className="pt-1">
+                                        <span className="text-muted-foreground text-xs">Reason:</span>
+                                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                          {mainCandidate["cv_score_reason"]}
+                                        </p>
+                                      </div>
+                                    )}
+                                  </div>
+
                                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t gap-2">
                                     <div className="flex flex-wrap items-center gap-1">
                                       <StatusDropdown
