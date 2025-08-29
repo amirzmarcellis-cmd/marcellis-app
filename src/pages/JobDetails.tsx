@@ -1,190 +1,182 @@
 // @ts-nocheck
-import { useEffect, useState } from "react"
-import { useParams, useNavigate, Link } from "react-router-dom"
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar as CalendarComponent } from "@/components/ui/calendar"
-import { format } from "date-fns"
-import { cn } from "@/lib/utils"
-import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, Hourglass } from "lucide-react"
-import { supabase } from "@/integrations/supabase/client"
-import { JobFunnel } from "@/components/jobs/JobFunnel"
-import { JobDialog } from "@/components/jobs/JobDialog"
-import { StatusDropdown } from "@/components/candidates/StatusDropdown"
-import { useToast } from "@/components/ui/use-toast"
-import { formatDate } from "@/lib/utils"
-import { useProfile } from "@/hooks/useProfile"
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { useEffect, useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, Hourglass } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { JobFunnel } from "@/components/jobs/JobFunnel";
+import { JobDialog } from "@/components/jobs/JobDialog";
+import { StatusDropdown } from "@/components/candidates/StatusDropdown";
+import { useToast } from "@/components/ui/use-toast";
+import { formatDate } from "@/lib/utils";
+import { useProfile } from "@/hooks/useProfile";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 // Using any type to avoid TypeScript complexity with quoted property names
 
 export default function JobDetails() {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState("overview")
-  const { profile } = useProfile()
-  
-  const [job, setJob] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [candidates, setCandidates] = useState<any[]>([])
-  const [candidatesLoading, setCandidatesLoading] = useState(true)
-  const [cvData, setCvData] = useState<any[]>([])
-  const [applications, setApplications] = useState<any[]>([])
-  const [applicationsLoading, setApplicationsLoading] = useState(false)
-  const [taskCandidates, setTaskCandidates] = useState<any[]>([])
-  const [nameFilter, setNameFilter] = useState("")
-  const [emailFilter, setEmailFilter] = useState("")
-  const [phoneFilter, setPhoneFilter] = useState("")
-  const [scoreFilter, setScoreFilter] = useState("all")
-  const [contactedFilter, setContactedFilter] = useState("all")
+  const {
+    id
+  } = useParams();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("overview");
+  const {
+    profile
+  } = useProfile();
+  const [job, setJob] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [candidates, setCandidates] = useState<any[]>([]);
+  const [candidatesLoading, setCandidatesLoading] = useState(true);
+  const [cvData, setCvData] = useState<any[]>([]);
+  const [applications, setApplications] = useState<any[]>([]);
+  const [applicationsLoading, setApplicationsLoading] = useState(false);
+  const [taskCandidates, setTaskCandidates] = useState<any[]>([]);
+  const [nameFilter, setNameFilter] = useState("");
+  const [emailFilter, setEmailFilter] = useState("");
+  const [phoneFilter, setPhoneFilter] = useState("");
+  const [scoreFilter, setScoreFilter] = useState("all");
+  const [contactedFilter, setContactedFilter] = useState("all");
   // Application filters
-  const [appNameFilter, setAppNameFilter] = useState("")
-  const [appEmailFilter, setAppEmailFilter] = useState("")
-  const [appPhoneFilter, setAppPhoneFilter] = useState("")
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
-  const [isGeneratingShortList, setIsGeneratingShortList] = useState(false)
-  const [shortListButtonDisabled, setShortListButtonDisabled] = useState(false)
-  const [shortListTimeRemaining, setShortListTimeRemaining] = useState(0)
-  const [candidateToRemove, setCandidateToRemove] = useState<{id: string, name: string} | null>(null)
-  const { toast } = useToast()
-  const [callingCandidateId, setCallingCandidateId] = useState<string | null>(null)
-  const [newApplicationsCount, setNewApplicationsCount] = useState(0)
-  const [lastViewedApplications, setLastViewedApplications] = useState<string | null>(null)
-  const [selectedCandidates, setSelectedCandidates] = useState<Set<string>>(new Set())
-  
+  const [appNameFilter, setAppNameFilter] = useState("");
+  const [appEmailFilter, setAppEmailFilter] = useState("");
+  const [appPhoneFilter, setAppPhoneFilter] = useState("");
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isGeneratingShortList, setIsGeneratingShortList] = useState(false);
+  const [shortListButtonDisabled, setShortListButtonDisabled] = useState(false);
+  const [shortListTimeRemaining, setShortListTimeRemaining] = useState(0);
+  const [candidateToRemove, setCandidateToRemove] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const {
+    toast
+  } = useToast();
+  const [callingCandidateId, setCallingCandidateId] = useState<string | null>(null);
+  const [newApplicationsCount, setNewApplicationsCount] = useState(0);
+  const [lastViewedApplications, setLastViewedApplications] = useState<string | null>(null);
+  const [selectedCandidates, setSelectedCandidates] = useState<Set<string>>(new Set());
+
   // Interview scheduling state variables
-  const [interviewDialogOpen, setInterviewDialogOpen] = useState(false)
+  const [interviewDialogOpen, setInterviewDialogOpen] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<{
     candidateId: string;
     jobId: string;
     callid: number;
-  } | null>(null)
+  } | null>(null);
   const [interviewSlots, setInterviewSlots] = useState<{
     date: Date | undefined;
     time: string;
-  }[]>([
-    { date: undefined, time: '' },
-    { date: undefined, time: '' },
-    { date: undefined, time: '' }
-  ])
-  const [interviewType, setInterviewType] = useState<'Phone' | 'Online Meeting'>('Phone')
-  const [interviewLink, setInterviewLink] = useState('')
-
+  }[]>([{
+    date: undefined,
+    time: ''
+  }, {
+    date: undefined,
+    time: ''
+  }, {
+    date: undefined,
+    time: ''
+  }]);
+  const [interviewType, setInterviewType] = useState<'Phone' | 'Online Meeting'>('Phone');
+  const [interviewLink, setInterviewLink] = useState('');
   useEffect(() => {
     if (id) {
-      fetchJob(id)
-      fetchCandidates(id)
-      fetchCvData()
-      fetchApplications(id)
-      fetchTaskCandidates(id)
-      checkShortListButtonStatus()
+      fetchJob(id);
+      fetchCandidates(id);
+      fetchCvData();
+      fetchApplications(id);
+      fetchTaskCandidates(id);
+      checkShortListButtonStatus();
       // Load last viewed timestamp for applications
-      const lastViewed = localStorage.getItem(`lastViewedApplications_${id}`)
-      setLastViewedApplications(lastViewed)
+      const lastViewed = localStorage.getItem(`lastViewedApplications_${id}`);
+      setLastViewedApplications(lastViewed);
     }
-    
-    // Check for tab in URL hash
-    const hash = window.location.hash
-    if (hash.startsWith('#tab=')) {
-      const tab = hash.substring(5)
-      setActiveTab(tab)
-    }
-  }, [id])
 
+    // Check for tab in URL hash
+    const hash = window.location.hash;
+    if (hash.startsWith('#tab=')) {
+      const tab = hash.substring(5);
+      setActiveTab(tab);
+    }
+  }, [id]);
   useEffect(() => {
-    let interval: NodeJS.Timeout
+    let interval: NodeJS.Timeout;
     if (shortListButtonDisabled && shortListTimeRemaining > 0) {
       interval = setInterval(() => {
         setShortListTimeRemaining(prev => {
           if (prev <= 1) {
-            setShortListButtonDisabled(false)
-            const storageKey = `shortlist_${id}_disabled`
-            localStorage.removeItem(storageKey)
-            return 0
+            setShortListButtonDisabled(false);
+            const storageKey = `shortlist_${id}_disabled`;
+            localStorage.removeItem(storageKey);
+            return 0;
           }
-          return prev - 1
-        })
-      }, 1000)
+          return prev - 1;
+        });
+      }, 1000);
     }
-    return () => clearInterval(interval)
-  }, [shortListButtonDisabled, shortListTimeRemaining, id])
+    return () => clearInterval(interval);
+  }, [shortListButtonDisabled, shortListTimeRemaining, id]);
 
   // Calculate new applications count
   useEffect(() => {
     if (applications.length > 0 && lastViewedApplications) {
-      const lastViewedTimestamp = new Date(lastViewedApplications)
+      const lastViewedTimestamp = new Date(lastViewedApplications);
       const newApps = applications.filter(app => {
-        const appTimestamp = new Date(app.Timestamp)
-        return appTimestamp > lastViewedTimestamp
-      })
-      setNewApplicationsCount(newApps.length)
+        const appTimestamp = new Date(app.Timestamp);
+        return appTimestamp > lastViewedTimestamp;
+      });
+      setNewApplicationsCount(newApps.length);
     } else if (applications.length > 0 && !lastViewedApplications) {
       // If never viewed, all applications are new
-      setNewApplicationsCount(applications.length)
+      setNewApplicationsCount(applications.length);
     } else {
-      setNewApplicationsCount(0)
+      setNewApplicationsCount(0);
     }
-  }, [applications, lastViewedApplications])
-
+  }, [applications, lastViewedApplications]);
   const checkShortListButtonStatus = () => {
-    if (!id) return
-    
-    const storageKey = `shortlist_${id}_disabled`
-    const disabledUntil = localStorage.getItem(storageKey)
-    
+    if (!id) return;
+    const storageKey = `shortlist_${id}_disabled`;
+    const disabledUntil = localStorage.getItem(storageKey);
     if (disabledUntil) {
-      const now = Date.now()
-      const disabledTime = parseInt(disabledUntil)
-      
+      const now = Date.now();
+      const disabledTime = parseInt(disabledUntil);
       if (now < disabledTime) {
-        setShortListButtonDisabled(true)
-        setShortListTimeRemaining(Math.ceil((disabledTime - now) / 1000))
+        setShortListButtonDisabled(true);
+        setShortListTimeRemaining(Math.ceil((disabledTime - now) / 1000));
       } else {
-        localStorage.removeItem(storageKey)
+        localStorage.removeItem(storageKey);
       }
     }
-  }
-
+  };
   const fetchJob = async (jobId: string) => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('Jobs')
-        .select('*')
-        .eq('job_id', jobId)
-        .maybeSingle();
-
+      const {
+        data,
+        error
+      } = await supabase.from('Jobs').select('*').eq('job_id', jobId).maybeSingle();
       if (error) {
         console.error("Error fetching job:", error);
         setJob(null);
         return;
       }
-
       if (!data) {
         console.log("Job not found with ID:", jobId);
         setJob(null);
         return;
       }
-
       setJob(data);
     } catch (error) {
       console.error("Error fetching job:", error);
@@ -193,18 +185,16 @@ export default function JobDetails() {
       setLoading(false);
     }
   };
-
-
   const fetchCandidates = async (jobId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('Jobs_CVs')
-        .select('*')
-        .eq('job_id', jobId)
-        .order('longlisted_at', { ascending: false, nullsFirst: false })
-
-      if (error) throw error
-
+      const {
+        data,
+        error
+      } = await supabase.from('Jobs_CVs').select('*').eq('job_id', jobId).order('longlisted_at', {
+        ascending: false,
+        nullsFirst: false
+      });
+      if (error) throw error;
       const mapped = (data || []).map((row: any) => ({
         ...row,
         "Job ID": jobId,
@@ -230,107 +220,97 @@ export default function JobDetails() {
         "last_name": row.candidate_name?.split(' ').slice(1).join(' ') || '',
         "Score": row.cv_score?.toString() ?? '0',
         "lastcalltime": row.lastcalltime
-      }))
+      }));
+      setCandidates(mapped);
+      console.log('Total candidates from Jobs_CVs:', mapped?.length || 0);
 
-      setCandidates(mapped)
-      console.log('Total candidates from Jobs_CVs:', mapped?.length || 0)
-      
       // Calculate candidate scores for analytics
-      const allScores = mapped?.map(c => parseFloat(c.Score) || 0).filter(score => !isNaN(score)) || []
-      console.log('All candidate scores:', allScores)
-      
+      const allScores = mapped?.map(c => parseFloat(c.Score) || 0).filter(score => !isNaN(score)) || [];
+      console.log('All candidate scores:', allScores);
+
       // Calculate low scored candidates (score < 70)
       const lowScoredCandidates = mapped?.filter(c => {
-        const score = parseFloat(c.Score) || 0
-        return !isNaN(score) && score < 70
-      }) || []
-      console.log('Low scored candidates:', lowScoredCandidates.length, 'Sample:', lowScoredCandidates.slice(0, 3).map(c => ({ name: c.candidate_name, score: c.Score })))
+        const score = parseFloat(c.Score) || 0;
+        return !isNaN(score) && score < 70;
+      }) || [];
+      console.log('Low scored candidates:', lowScoredCandidates.length, 'Sample:', lowScoredCandidates.slice(0, 3).map(c => ({
+        name: c.candidate_name,
+        score: c.Score
+      })));
     } catch (error) {
-      console.error('Error fetching candidates from Jobs_CVs:', error)
-      setCandidates([])
+      console.error('Error fetching candidates from Jobs_CVs:', error);
+      setCandidates([]);
     } finally {
-      setCandidatesLoading(false)
+      setCandidatesLoading(false);
     }
-  }
-
+  };
   const fetchCvData = async () => {
     if (!profile?.slug) return;
-    
     try {
-      const { data, error } = await supabase
-        .from('CVs')
-        .select('*')
-
-      if (error) throw error
-      setCvData(data || [])
+      const {
+        data,
+        error
+      } = await supabase.from('CVs').select('*');
+      if (error) throw error;
+      setCvData(data || []);
     } catch (error) {
-      console.error('Error fetching CV data:', error)
-      setCvData([])
+      console.error('Error fetching CV data:', error);
+      setCvData([]);
     }
-  }
-
+  };
   const fetchApplications = async (jobId: string) => {
     if (!profile?.slug) return;
-    
-    setApplicationsLoading(true)
+    setApplicationsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('CVs')
-        .select('*')
-        .eq('company_id', profile.slug)
-        .filter('applied_for', 'cs', `{${jobId}}`)
-
-      if (error) throw error
-      setApplications(data || [])
+      const {
+        data,
+        error
+      } = await supabase.from('CVs').select('*').eq('company_id', profile.slug).filter('applied_for', 'cs', `{${jobId}}`);
+      if (error) throw error;
+      setApplications(data || []);
     } catch (error) {
-      console.error('Error fetching applications:', error)
-      setApplications([])
+      console.error('Error fetching applications:', error);
+      setApplications([]);
     } finally {
-      setApplicationsLoading(false)
+      setApplicationsLoading(false);
     }
-  }
-
+  };
   const fetchTaskCandidates = async (jobId: string) => {
     if (!profile?.slug) return;
-    
     try {
       // For now, we'll use the same CVs table data since task_candidates table doesn't exist
-      const { data, error } = await supabase
-        .from('CVs')
-        .select('*')
-        .filter('applied_for', 'cs', `{${jobId}}`)
-        .not('CandidateStatus', 'is', null)
-
-      if (error) throw error
-      setTaskCandidates(data || [])
-      
-      const taskedCandidates = data?.filter(c => c.CandidateStatus === 'Tasked') || []
+      const {
+        data,
+        error
+      } = await supabase.from('CVs').select('*').filter('applied_for', 'cs', `{${jobId}}`).not('CandidateStatus', 'is', null);
+      if (error) throw error;
+      setTaskCandidates(data || []);
+      const taskedCandidates = data?.filter(c => c.CandidateStatus === 'Tasked') || [];
       console.log('Tasked calculation:', {
         tasked: taskedCandidates.length,
         total: data?.length || 0,
-        taskedCandidates: taskedCandidates.slice(0, 3).map(c => ({ name: c.first_name, status: c.CandidateStatus }))
-      })
+        taskedCandidates: taskedCandidates.slice(0, 3).map(c => ({
+          name: c.first_name,
+          status: c.CandidateStatus
+        }))
+      });
     } catch (error) {
-      console.error('Error fetching task candidates:', error)
-      setTaskCandidates([])
+      console.error('Error fetching task candidates:', error);
+      setTaskCandidates([]);
     }
-  }
-
+  };
   const updateTaskStatus = async (taskId: number, newStatus: 'Pending' | 'Received' | 'Reviewed') => {
     try {
-      const { error } = await supabase
-        .from('task_candidates')
-        .update({ status: newStatus })
-        .eq('taskid', taskId);
-
+      const {
+        error
+      } = await supabase.from('task_candidates').update({
+        status: newStatus
+      }).eq('taskid', taskId);
       if (error) throw error;
-
-      setTaskCandidates(prev => 
-        prev.map(task => 
-          task.taskid === taskId ? { ...task, status: newStatus } : task
-        )
-      );
-
+      setTaskCandidates(prev => prev.map(task => task.taskid === taskId ? {
+        ...task,
+        status: newStatus
+      } : task));
       toast({
         title: "Success",
         description: "Task status updated successfully"
@@ -343,34 +323,28 @@ export default function JobDetails() {
         variant: "destructive"
       });
     }
-  }
-
+  };
   const handleCallSelectedCandidates = async () => {
     if (selectedCandidates.size === 0) {
       toast({
         title: "Error",
         description: "Please select candidates to call",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     if (!job?.["Job ID"]) {
       toast({
         title: "Error",
         description: "Job ID not found",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     setIsGeneratingShortList(true);
-    
     try {
       // Get selected candidate data
-      const selectedCandidateData = candidates.filter(candidate => 
-        selectedCandidates.has(candidate["Candidate_ID"])
-      );
+      const selectedCandidateData = candidates.filter(candidate => selectedCandidates.has(candidate["Candidate_ID"]));
 
       // Process each selected candidate with their callid
       for (const candidate of selectedCandidateData) {
@@ -384,19 +358,17 @@ export default function JobDetails() {
         const response = await fetch('https://hook.eu2.make.com/i3owa6dmu1mstug4tsfb0dnhhjfh4arj', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
           },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(payload)
         });
-
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
       }
-
       toast({
         title: "Success",
-        description: `Calling ${selectedCandidates.size} selected candidates initiated successfully`,
+        description: `Calling ${selectedCandidates.size} selected candidates initiated successfully`
       });
 
       // Clear selection after successful call
@@ -406,23 +378,21 @@ export default function JobDetails() {
       toast({
         title: "Error",
         description: "Failed to call selected candidates",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsGeneratingShortList(false);
     }
   };
-
   const handleRemoveSelectedCandidates = async () => {
     if (selectedCandidates.size === 0) {
       toast({
         title: "Error",
         description: "Please select candidates to remove",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     try {
       for (const candidateId of selectedCandidates) {
         const candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
@@ -433,21 +403,19 @@ export default function JobDetails() {
 
       // Clear selection after successful removal
       setSelectedCandidates(new Set());
-
       toast({
         title: "Success",
-        description: `${selectedCandidates.size} candidates removed from long list`,
+        description: `${selectedCandidates.size} candidates removed from long list`
       });
     } catch (error) {
       console.error('Error removing selected candidates:', error);
       toast({
         title: "Error",
         description: "Failed to remove selected candidates",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
   const toggleCandidateSelection = (candidateId: string) => {
     setSelectedCandidates(prev => {
       const newSelection = new Set(prev);
@@ -459,23 +427,16 @@ export default function JobDetails() {
       return newSelection;
     });
   };
-
   const selectAllCandidates = () => {
-    const allCandidateIds = new Set(
-      Object.keys(
-        filteredCandidates.reduce((acc, candidate) => {
-          acc[candidate["Candidate_ID"]] = true;
-          return acc;
-        }, {} as Record<string, boolean>)
-      )
-    );
+    const allCandidateIds = new Set(Object.keys(filteredCandidates.reduce((acc, candidate) => {
+      acc[candidate["Candidate_ID"]] = true;
+      return acc;
+    }, {} as Record<string, boolean>)));
     setSelectedCandidates(allCandidateIds);
   };
-
   const clearAllSelection = () => {
     setSelectedCandidates(new Set());
   };
-
   const handleButtonClick = () => {
     if (job?.longlist && job.longlist > 0) {
       setShowConfirmDialog(true);
@@ -483,66 +444,63 @@ export default function JobDetails() {
       handleGenerateLongList();
     }
   };
-
   const handleSearchMoreCandidates = async () => {
     try {
       const payload = {
         job_id: job?.job_id || '',
         itris_job_id: job?.itris_job_id || ''
       };
-
       const response = await fetch('https://hook.eu2.make.com/yiz4ustkcgxgji2sv6fwcs99jdr3674m', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payload)
       });
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       toast({
         title: "Success",
-        description: "Search for more candidates initiated successfully",
+        description: "Search for more candidates initiated successfully"
       });
     } catch (error) {
       console.error('Error searching for more candidates:', error);
       toast({
         title: "Error",
         description: "Failed to search for more candidates",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
   const handleGenerateLongList = async () => {
     try {
       console.log('Starting Generate Long List process...');
       console.log('Current job:', job);
       console.log('Current profile:', profile);
-      
-      // First, increment the longlist count in the database
-      const { error: updateError } = await supabase
-        .from('Jobs')
-        .update({ longlist: (job?.longlist || 0) + 1 })
-        .eq('job_id', job?.job_id);
 
+      // First, increment the longlist count in the database
+      const {
+        error: updateError
+      } = await supabase.from('Jobs').update({
+        longlist: (job?.longlist || 0) + 1
+      }).eq('job_id', job?.job_id);
       if (updateError) {
         console.error('Database update error:', updateError);
         throw updateError;
       }
 
       // Update local state
-      setJob(prev => ({ ...prev, longlist: (prev?.longlist || 0) + 1 }));
+      setJob(prev => ({
+        ...prev,
+        longlist: (prev?.longlist || 0) + 1
+      }));
 
       // Prepare payload for webhook
       const payload = {
         job_id: job?.job_id || '',
         itris_job_id: job?.itris_job_id || ''
       };
-
       console.log('Webhook payload:', payload);
 
       // Call the automation endpoint
@@ -550,43 +508,38 @@ export default function JobDetails() {
       const response = await fetch('https://hook.eu2.make.com/yiz4ustkcgxgji2sv6fwcs99jdr3674m', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payload)
       });
-
       console.log('Webhook response status:', response.status);
       console.log('Webhook response ok:', response.ok);
-      
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Webhook error response:', errorText);
         throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
       }
-
       const responseData = await response.text();
       console.log('Webhook success response:', responseData);
-
       toast({
         title: "Success",
-        description: job?.longlist && job.longlist > 0 ? "Long list regenerated successfully" : "Long list generated successfully",
+        description: job?.longlist && job.longlist > 0 ? "Long list regenerated successfully" : "Long list generated successfully"
       });
     } catch (error) {
       console.error('Error generating long list:', error);
       toast({
         title: "Error",
         description: `Failed to generate long list: ${error.message}`,
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
   const handleRejectCandidate = async (jobId: string, candidateId: string, callid: number) => {
     try {
       const response = await fetch('https://hook.eu2.make.com/castzb5q0mllr7eq9zzyqll4ffcpet7j', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           job_id: jobId,
@@ -594,45 +547,42 @@ export default function JobDetails() {
           callid: callid,
           company_id: null
         })
-      })
-
+      });
       if (response.ok) {
         toast({
           title: "Candidate Rejected",
-          description: "The candidate has been successfully rejected.",
-        })
+          description: "The candidate has been successfully rejected."
+        });
       } else {
-        throw new Error('Failed to reject candidate')
+        throw new Error('Failed to reject candidate');
       }
     } catch (error) {
-      console.error('Error rejecting candidate:', error)
+      console.error('Error rejecting candidate:', error);
       toast({
         title: "Error",
         description: "Failed to reject candidate. Please try again.",
         variant: "destructive"
-      })
+      });
     }
-  }
-
+  };
   const handleGenerateShortList = async () => {
     if (!job?.["Job ID"] || candidates.length === 0) {
       toast({
         title: "Error",
         description: "No candidates available to process",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     setIsGeneratingShortList(true);
-    
+
     // Set button disabled for 30 minutes (1800 seconds)
-    const disabledUntil = Date.now() + (30 * 60 * 1000)
-    const storageKey = `shortlist_${id}_disabled`
-    localStorage.setItem(storageKey, disabledUntil.toString())
-    setShortListButtonDisabled(true)
-    setShortListTimeRemaining(30 * 60) // 30 minutes in seconds
-    
+    const disabledUntil = Date.now() + 30 * 60 * 1000;
+    const storageKey = `shortlist_${id}_disabled`;
+    localStorage.setItem(storageKey, disabledUntil.toString());
+    setShortListButtonDisabled(true);
+    setShortListTimeRemaining(30 * 60); // 30 minutes in seconds
+
     try {
       // Process each candidate individually with their callid
       for (const candidate of candidates) {
@@ -646,126 +596,128 @@ export default function JobDetails() {
         const response = await fetch('https://hook.eu2.make.com/i3owa6dmu1mstug4tsfb0dnhhjfh4arj', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
           },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(payload)
         });
-
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
       }
-
       toast({
         title: "Success",
-        description: "Short list generation initiated successfully",
+        description: "Short list generation initiated successfully"
       });
     } catch (error) {
       console.error('Error generating short list:', error);
       toast({
         title: "Error",
         description: "Failed to generate short list",
-        variant: "destructive",
+        variant: "destructive"
       });
       // Remove the disabled state if there was an error
-      localStorage.removeItem(storageKey)
-      setShortListButtonDisabled(false)
-      setShortListTimeRemaining(0)
+      localStorage.removeItem(storageKey);
+      setShortListButtonDisabled(false);
+      setShortListTimeRemaining(0);
     } finally {
       setIsGeneratingShortList(false);
     }
   };
-
   const handleRemoveFromLongList = async (candidateId: string) => {
     try {
       // Remove the candidate from the Jobs_CVs table for this job
-      const { error } = await supabase
-        .from('Jobs_CVs')
-        .delete()
-        .eq('Candidate_ID', candidateId)
-        .eq('job_id', id);
-
+      const {
+        error
+      } = await supabase.from('Jobs_CVs').delete().eq('Candidate_ID', candidateId).eq('job_id', id);
       if (error) {
         throw error;
       }
 
       // Update the local state to remove the candidate
       setCandidates(prev => prev.filter(c => c["Candidate_ID"] !== candidateId));
-
       toast({
         title: "Success",
-        description: "Candidate removed from long list",
+        description: "Candidate removed from long list"
       });
     } catch (error) {
       console.error('Error removing candidate from long list:', error);
       toast({
         title: "Error",
         description: "Failed to remove candidate from long list",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
   const showRemoveConfirmation = (candidateId: string, candidateName: string) => {
-    setCandidateToRemove({ id: candidateId, name: candidateName });
+    setCandidateToRemove({
+      id: candidateId,
+      name: candidateName
+    });
   };
-
   const confirmRemoveFromLongList = async () => {
     if (candidateToRemove) {
       await handleRemoveFromLongList(candidateToRemove.id);
       setCandidateToRemove(null);
     }
   };
-
   const handleCallCandidate = async (candidateId: string, jobId: string, callid: number | null | undefined) => {
     try {
       setCallingCandidateId(candidateId);
-      const payload = { candidateID: candidateId, jobID: jobId, callid };
+      const payload = {
+        candidateID: candidateId,
+        jobID: jobId,
+        callid
+      };
       const response = await fetch('https://hook.eu2.make.com/i3owa6dmu1mstug4tsfb0dnhhjfh4arj', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      toast({ title: 'Success', description: 'Call initiated successfully' });
+      toast({
+        title: 'Success',
+        description: 'Call initiated successfully'
+      });
     } catch (error) {
       console.error('Error calling candidate:', error);
-      toast({ title: 'Error', description: 'Failed to initiate call', variant: 'destructive' });
+      toast({
+        title: 'Error',
+        description: 'Failed to initiate call',
+        variant: 'destructive'
+      });
     } finally {
       setCallingCandidateId(null);
     }
   };
-
   const handleArrangeInterview = (candidateId: string) => {
     // Find the candidate object
-    const candidate = candidates.find(c => 
-      c["Candidate_ID"] === candidateId || 
-      c.candidate_id === candidateId ||
-      c.Candidate_ID === candidateId
-    );
-    
+    const candidate = candidates.find(c => c["Candidate_ID"] === candidateId || c.candidate_id === candidateId || c.Candidate_ID === candidateId);
     setSelectedCandidate({
       candidateId: candidateId,
       jobId: job?.job_id || id || '',
       callid: candidate?.callid || candidate?.Callid || 0
     });
-    
     setInterviewDialogOpen(true);
-    
+
     // Reset slots and type
-    setInterviewSlots([
-      { date: undefined, time: '' },
-      { date: undefined, time: '' },
-      { date: undefined, time: '' }
-    ]);
+    setInterviewSlots([{
+      date: undefined,
+      time: ''
+    }, {
+      date: undefined,
+      time: ''
+    }, {
+      date: undefined,
+      time: ''
+    }]);
     setInterviewType('Phone');
     setInterviewLink('');
-    
     console.log('Dialog should now be open. interviewDialogOpen state set to true');
   };
-
   const handleScheduleInterview = async () => {
     if (!selectedCandidate) return;
 
@@ -780,7 +732,6 @@ export default function JobDetails() {
     const now = new Date();
     const currentDate = format(now, 'yyyy-MM-dd');
     const currentTime = format(now, 'HH:mm');
-    
     for (const slot of validSlots) {
       const slotDate = format(slot.date!, 'yyyy-MM-dd');
       if (slotDate === currentDate && slot.time <= currentTime) {
@@ -794,7 +745,6 @@ export default function JobDetails() {
       alert('Please provide an interview link for online meetings');
       return;
     }
-
     try {
       // Update candidate status
       await supabase.from('CVs').update({
@@ -810,7 +760,10 @@ export default function JobDetails() {
       });
 
       // Save interview to database and get the generated intid (same as Dashboard)
-      const { data: interviewData, error: insertError } = await supabase.from('interview').insert({
+      const {
+        data: interviewData,
+        error: insertError
+      } = await supabase.from('interview').insert({
         candidate_id: selectedCandidate.candidateId,
         job_id: selectedCandidate.jobId,
         callid: selectedCandidate.callid,
@@ -821,7 +774,6 @@ export default function JobDetails() {
         intlink: interviewType === 'Online Meeting' ? interviewLink : null,
         company_id: null
       }).select('intid').single();
-
       if (insertError) throw insertError;
 
       // Send webhook to Make.com (exact same as Dashboard)
@@ -844,108 +796,104 @@ export default function JobDetails() {
       });
 
       // Update local state
-      setCvData(prev => prev.map(cv => 
-        cv.candidate_id === selectedCandidate.candidateId 
-          ? { ...cv, CandidateStatus: 'Interview' }
-          : cv
-      ));
+      setCvData(prev => prev.map(cv => cv.candidate_id === selectedCandidate.candidateId ? {
+        ...cv,
+        CandidateStatus: 'Interview'
+      } : cv));
 
       // Close dialog and show success message
       setInterviewDialogOpen(false);
       setSelectedCandidate(null);
       setInterviewType('Phone');
       setInterviewLink('');
-      
       toast({
         title: "Interview Scheduled",
-        description: "The candidate has been scheduled for an interview.",
+        description: "The candidate has been scheduled for an interview."
       });
     } catch (error) {
       console.error('Error scheduling interview:', error);
       toast({
         title: "Error",
         description: "Failed to schedule interview. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
   const updateInterviewSlot = (index: number, field: 'date' | 'time', value: Date | string) => {
     setInterviewSlots(prev => {
       const newSlots = [...prev];
       if (field === 'date') {
-        newSlots[index] = { ...newSlots[index], date: value as Date };
+        newSlots[index] = {
+          ...newSlots[index],
+          date: value as Date
+        };
       } else {
-        newSlots[index] = { ...newSlots[index], time: value as string };
+        newSlots[index] = {
+          ...newSlots[index],
+          time: value as string
+        };
       }
       return newSlots;
     });
   };
-
   const timeOptions = ['00', '15', '30', '45'];
-
   const handleApplicationsTabClick = () => {
     // Reset notification count and update last viewed timestamp
     if (id) {
-      const now = new Date().toISOString()
-      localStorage.setItem(`lastViewedApplications_${id}`, now)
-      setLastViewedApplications(now)
-      setNewApplicationsCount(0)
+      const now = new Date().toISOString();
+      localStorage.setItem(`lastViewedApplications_${id}`, now);
+      setLastViewedApplications(now);
+      setNewApplicationsCount(0);
     }
-  }
-
+  };
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
+    return <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    )
+      </div>;
   }
-
   if (!job) {
-    return (
-      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+    return <div className="flex flex-col items-center justify-center h-64 space-y-4">
         <h2 className="text-2xl font-bold text-muted-foreground">Job not found</h2>
         <Button onClick={() => navigate('/jobs')}>
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Jobs
         </Button>
-      </div>
-    )
+      </div>;
   }
-
   const getStatusVariant = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'active':
-        return 'default'
+        return 'default';
       case 'closed':
-        return 'destructive'
+        return 'destructive';
       case 'draft':
-        return 'secondary'
+        return 'secondary';
       default:
-        return 'outline'
+        return 'outline';
     }
-  }
-
+  };
   const getScoreBadge = (score: string | null) => {
-    if (!score || score === "0" || score === "") return null
-    
-    const numScore = parseInt(score)
+    if (!score || score === "0" || score === "") return null;
+    const numScore = parseInt(score);
     if (numScore >= 75) {
-      return <Badge className="bg-green-600 text-foreground border-0">{score} - High</Badge>
+      return <Badge className="bg-green-600 text-foreground border-0">{score} - High</Badge>;
     } else if (numScore >= 50) {
-      return <Badge className="bg-blue-600 text-foreground border-0">{score} - Moderate</Badge>
+      return <Badge className="bg-blue-600 text-foreground border-0">{score} - Moderate</Badge>;
     } else if (numScore >= 1) {
-      return <Badge className="bg-red-600 text-foreground border-0">{score} - Low</Badge>
+      return <Badge className="bg-red-600 text-foreground border-0">{score} - Low</Badge>;
     }
-    return null
-  }
-
+    return null;
+  };
   const formatCurrency = (amountStr: string | null | undefined, currency?: string | null) => {
     const amount = parseFloat((amountStr || "").toString().replace(/[^0-9.]/g, ""));
     if (!amount || !currency) return amountStr || "N/A";
     try {
-      return new Intl.NumberFormat("en", { style: "currency", currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
+      return new Intl.NumberFormat("en", {
+        style: "currency",
+        currency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(amount);
     } catch {
       return `${currency} ${isNaN(amount) ? amountStr : amount.toLocaleString()}`;
     }
@@ -953,63 +901,57 @@ export default function JobDetails() {
 
   // Filtered candidates based on all filters
   const filteredCandidates = candidates.filter(candidate => {
-    const nameMatch = !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase())
-    const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase())
-    const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter)
-    
-    let scoreMatch = true
+    const nameMatch = !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
+    const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
+    const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
+    let scoreMatch = true;
     if (scoreFilter !== "all") {
-      const score = parseInt(candidate["Success Score"] || "0")
+      const score = parseInt(candidate["Success Score"] || "0");
       switch (scoreFilter) {
         case "high":
-          scoreMatch = score >= 75
-          break
+          scoreMatch = score >= 75;
+          break;
         case "moderate":
-          scoreMatch = score >= 50 && score < 75
-          break
+          scoreMatch = score >= 50 && score < 75;
+          break;
         case "poor":
-          scoreMatch = score > 0 && score < 50
-          break
+          scoreMatch = score > 0 && score < 50;
+          break;
         case "none":
-          scoreMatch = score === 0 || !candidate["Success Score"]
-          break
+          scoreMatch = score === 0 || !candidate["Success Score"];
+          break;
       }
     }
-    
-    let contactedMatch = true
+    let contactedMatch = true;
     if (contactedFilter !== "all") {
-      const raw = (candidate["Contacted"] || "").toString().trim()
-      const norm = raw.toLowerCase()
+      const raw = (candidate["Contacted"] || "").toString().trim();
+      const norm = raw.toLowerCase();
       if (contactedFilter === "Not Contacted") {
         // Treat empty/undefined and case variations as "Not Contacted"
-        contactedMatch = raw === "" || norm === "not contacted"
+        contactedMatch = raw === "" || norm === "not contacted";
       } else if (contactedFilter === "Ready to Call") {
         // For "Ready to Contact", match both "Ready to Contact" and "Ready to Contact contacted"
-        contactedMatch = norm.includes("ready to contact") || norm.includes("ready to call")
+        contactedMatch = norm.includes("ready to contact") || norm.includes("ready to call");
       } else {
-        contactedMatch = norm === contactedFilter.toLowerCase()
+        contactedMatch = norm === contactedFilter.toLowerCase();
       }
     }
-    
-    return nameMatch && emailMatch && phoneMatch && scoreMatch && contactedMatch
-  })
-
-  const uniqueContactedStatuses = [...new Set(candidates.map(c => c["Contacted"]).filter(Boolean))]
+    return nameMatch && emailMatch && phoneMatch && scoreMatch && contactedMatch;
+  });
+  const uniqueContactedStatuses = [...new Set(candidates.map(c => c["Contacted"]).filter(Boolean))];
 
   // Get CV status for a candidate
   const getCandidateStatus = (candidateId: string) => {
-    const cvRecord = cvData.find(cv => cv['candidate_id'] === candidateId)
-    return cvRecord?.['CandidateStatus'] || null
-  }
+    const cvRecord = cvData.find(cv => cv['candidate_id'] === candidateId);
+    return cvRecord?.['CandidateStatus'] || null;
+  };
 
   // Short list candidates (score 74+)
   const shortListCandidates = candidates.filter(candidate => {
-    const score = parseInt(candidate["Success Score"] || "0")
-    return score >= 74
-  })
-
-  return (
-    <div className="space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden">
+    const score = parseInt(candidate["Success Score"] || "0");
+    return score >= 74;
+  });
+  return <div className="space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden">
         {/* Header */}
         <div className="flex flex-col gap-4">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -1023,28 +965,15 @@ export default function JobDetails() {
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
-              {job?.longlist && job.longlist > 0 ? (
-                <Button 
-                  onClick={handleSearchMoreCandidates}
-                  className="bg-foreground text-background hover:bg-foreground/90 text-sm w-full sm:w-auto"
-                  size="sm"
-                >
+              {job?.longlist && job.longlist > 0 ? <Button onClick={handleSearchMoreCandidates} className="bg-foreground text-background hover:bg-foreground/90 text-sm w-full sm:w-auto" size="sm">
                   <Search className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">Search for more candidates</span>
                   <span className="sm:hidden">Search More</span>
-                </Button>
-              ) : (
-                <Button 
-                  onClick={handleButtonClick}
-                  disabled={job?.longlist === 3}
-                  className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm w-full sm:w-auto"
-                  size="sm"
-                >
+                </Button> : <Button onClick={handleButtonClick} disabled={job?.longlist === 3} className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm w-full sm:w-auto" size="sm">
                   <Zap className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">Generate Long List</span>
                   <span className="sm:hidden">Generate List</span>
-                </Button>
-              )}
+                </Button>}
               <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto">
                 <FileText className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Edit Job</span>
@@ -1069,10 +998,7 @@ export default function JobDetails() {
                   <h2 className="text-xl md:text-2xl font-bold break-words">{job.job_title}</h2>
                   <p className="text-base md:text-lg text-muted-foreground break-words">{job.client_description || "Client Description"}</p>
                 </div>
-                <Badge 
-                  variant={job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "default" : "destructive"}
-                  className={`text-xs md:text-sm px-2 md:px-3 py-1 whitespace-nowrap ${job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "bg-green-600 text-white border-0" : "bg-red-600 text-white border-0"}`}
-                >
+                <Badge variant={job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "default" : "destructive"} className={`text-xs md:text-sm px-2 md:px-3 py-1 whitespace-nowrap ${job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "bg-green-600 text-white border-0" : "bg-red-600 text-white border-0"}`}>
                   {job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "Active" : "Not Active"}
                 </Badge>
               </div>
@@ -1107,11 +1033,9 @@ export default function JobDetails() {
               <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">AI Requirements</TabsTrigger>
               <TabsTrigger value="applications" className="text-xs md:text-sm px-2 py-2 relative" onClick={handleApplicationsTabClick}>
                 Applications
-                {newApplicationsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-[20px] z-10">
+                {newApplicationsCount > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-[20px] z-10">
                     {newApplicationsCount > 99 ? '99+' : newApplicationsCount}
-                  </span>
-                )}
+                  </span>}
               </TabsTrigger>
               <TabsTrigger value="candidates" className="text-xs md:text-sm px-2 py-2">AI Long List</TabsTrigger>
               <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">AI Short List</TabsTrigger>
@@ -1174,19 +1098,12 @@ export default function JobDetails() {
                       {job["Contract Length"] && job["Type"] === "Contract" && ` (${job["Contract Length"]})`}
                     </span>
                   </div>
-                  {job["assignment"] && (
-                    <div className="flex justify-between">
+                  {job["assignment"] && <div className="flex justify-between">
                       <span className="text-muted-foreground">Assignment Link:</span>
-                      <a 
-                        href={job["assignment"]} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline break-all"
-                      >
+                      <a href={job["assignment"]} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">
                         View Assignment
                       </a>
-                    </div>
-                  )}
+                    </div>}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Posted Date:</span>
                     <span>{job.Timestamp ? formatDate(job.Timestamp) : "N/A"}</span>
@@ -1325,113 +1242,76 @@ export default function JobDetails() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Name</label>
-                        <Input
-                          placeholder="Filter by name..."
-                          value={appNameFilter}
-                          onChange={(e) => setAppNameFilter(e.target.value)}
-                          className="h-9"
-                        />
+                        <Input placeholder="Filter by name..." value={appNameFilter} onChange={e => setAppNameFilter(e.target.value)} className="h-9" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Email</label>
-                        <Input
-                          placeholder="Filter by email..."
-                          value={appEmailFilter}
-                          onChange={(e) => setAppEmailFilter(e.target.value)}
-                          className="h-9"
-                        />
+                        <Input placeholder="Filter by email..." value={appEmailFilter} onChange={e => setAppEmailFilter(e.target.value)} className="h-9" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Phone</label>
-                        <Input
-                          placeholder="Filter by phone..."
-                          value={appPhoneFilter}
-                          onChange={(e) => setAppPhoneFilter(e.target.value)}
-                          className="h-9"
-                        />
+                        <Input placeholder="Filter by phone..." value={appPhoneFilter} onChange={e => setAppPhoneFilter(e.target.value)} className="h-9" />
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                {applicationsLoading ? (
-                  <div className="flex items-center justify-center py-8">
+                {applicationsLoading ? <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  </div>
-                ) : applications.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
+                  </div> : applications.length === 0 ? <div className="text-center py-8 text-muted-foreground">
                     No applications found for this job.
-                  </div>
-                ) : (
-                  (() => {
-                    // Filter applications based on name, email, and phone
-                    const filteredApplications = applications.filter(application => {
-                      const fullName = application.first_name && application.last_name 
-                        ? `${application.first_name} ${application.last_name}` 
-                        : application.first_name || application.last_name || "";
-                      const email = application.Email || "";
-                      const phone = application.phone_number || "";
-
-                      const nameMatch = !appNameFilter || fullName.toLowerCase().includes(appNameFilter.toLowerCase());
-                      const emailMatch = !appEmailFilter || email.toLowerCase().includes(appEmailFilter.toLowerCase());
-                      const phoneMatch = !appPhoneFilter || phone.includes(appPhoneFilter);
-
-                      return nameMatch && emailMatch && phoneMatch;
-                    });
-
-                    return (
-                      <div>
+                  </div> : (() => {
+              // Filter applications based on name, email, and phone
+              const filteredApplications = applications.filter(application => {
+                const fullName = application.first_name && application.last_name ? `${application.first_name} ${application.last_name}` : application.first_name || application.last_name || "";
+                const email = application.Email || "";
+                const phone = application.phone_number || "";
+                const nameMatch = !appNameFilter || fullName.toLowerCase().includes(appNameFilter.toLowerCase());
+                const emailMatch = !appEmailFilter || email.toLowerCase().includes(appEmailFilter.toLowerCase());
+                const phoneMatch = !appPhoneFilter || phone.includes(appPhoneFilter);
+                return nameMatch && emailMatch && phoneMatch;
+              });
+              return <div>
                         <div className="mb-4 text-sm text-muted-foreground">
                           Showing {filteredApplications.length} of {applications.length} applications
                         </div>
                         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                          {filteredApplications.map((application) => (
-                            <Card key={application.candidate_id} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
+                          {filteredApplications.map(application => <Card key={application.candidate_id} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
                               <CardContent className="p-3 md:p-4">
                                 <div className="space-y-3">
                                   <div className="flex items-start justify-between">
                                     <div className="min-w-0 flex-1">
                                       <h4 className="font-semibold text-sm md:text-base truncate">
-                                        {application.first_name && application.last_name 
-                                          ? `${application.first_name} ${application.last_name}` 
-                                          : application.first_name || application.last_name || "Unknown"}
+                                        {application.first_name && application.last_name ? `${application.first_name} ${application.last_name}` : application.first_name || application.last_name || "Unknown"}
                                       </h4>
                                       <p className="text-xs md:text-sm text-muted-foreground truncate">{application.candidate_id}</p>
                                     </div>
                                   </div>
                                   
                                   <div className="space-y-2 text-xs md:text-sm">
-                                    {application.Email && (
-                                      <div className="flex items-center text-muted-foreground min-w-0">
+                                    {application.Email && <div className="flex items-center text-muted-foreground min-w-0">
                                         <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
                                         <span className="truncate">{application.Email}</span>
-                                      </div>
-                                    )}
+                                      </div>}
                                     
-                                    {application.phone_number && (
-                                      <div className="flex items-center text-muted-foreground min-w-0">
+                                    {application.phone_number && <div className="flex items-center text-muted-foreground min-w-0">
                                         <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
                                         <span className="truncate">{application.phone_number}</span>
-                                      </div>
-                                    )}
+                                      </div>}
                                   </div>
 
-                                  {application.cv_summary && (
-                                    <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
+                                  {application.cv_summary && <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
                                       {application.cv_summary}
-                                    </p>
-                                  )}
+                                    </p>}
 
                                   <div className="flex items-center justify-between pt-2 border-t gap-2">
                                     <div className="flex items-center gap-2">
-                                      {application.CV_Link && (
-                                        <Button variant="outline" size="sm" asChild>
+                                      {application.CV_Link && <Button variant="outline" size="sm" asChild>
                                           <a href={application.CV_Link} target="_blank" rel="noopener noreferrer">
                                             <FileText className="w-4 h-4 mr-1" />
                                             CV
                                           </a>
-                                        </Button>
-                                      )}
+                                        </Button>}
                                       <Button variant="outline" size="sm" asChild>
                                         <Link to={`/candidate/${application.candidate_id}`}>
                                           View Profile
@@ -1441,13 +1321,10 @@ export default function JobDetails() {
                                   </div>
                                 </div>
                               </CardContent>
-                            </Card>
-                          ))}
+                            </Card>)}
                         </div>
-                      </div>
-                    );
-                  })()
-                )}
+                      </div>;
+            })()}
               </CardContent>
             </Card>
           </TabsContent>
@@ -1465,95 +1342,57 @@ export default function JobDetails() {
                       Candidates who have been contacted for this position
                     </CardDescription>
                   </div>
-                  <Button
-                    variant="default" 
-                    className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={handleGenerateShortList}
-                    disabled={isGeneratingShortList || shortListButtonDisabled}
-                  >
+                  <Button variant="default" className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed" onClick={handleGenerateShortList} disabled={isGeneratingShortList || shortListButtonDisabled}>
                     <Phone className="w-4 h-4 mr-2" />
-                    {isGeneratingShortList 
-                      ? "Generating..." 
-                      : shortListButtonDisabled 
-                        ? `Short List is being processed (${Math.floor(shortListTimeRemaining / 60)}:${(shortListTimeRemaining % 60).toString().padStart(2, '0')})`
-                        : "Call & Generate Short List"
-                    }
+                    {isGeneratingShortList ? "Generating..." : shortListButtonDisabled ? `Short List is being processed (${Math.floor(shortListTimeRemaining / 60)}:${(shortListTimeRemaining % 60).toString().padStart(2, '0')})` : "Call & Generate Short List"}
                   </Button>
                 </div>
               </CardHeader>
               <CardContent>
                 {(() => {
-                  const readyToContactCount = candidates.filter(
-                    candidate => candidate["Contacted"] === "Ready to Contact"
-                  ).length;
-                  
-                  if (readyToContactCount > 0) {
-                    return (
-                      <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+              const readyToContactCount = candidates.filter(candidate => candidate["Contacted"] === "Ready to Contact").length;
+              if (readyToContactCount > 0) {
+                return <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
                         <div className="flex items-center">
                           <Target className="w-4 h-4 mr-2 text-amber-600 dark:text-amber-400" />
                           <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
                             {readyToContactCount} {readyToContactCount === 1 ? 'candidate' : 'candidates'} ready to be contacted
                           </span>
                         </div>
-                      </div>
-                    );
-                  }
-                  return null;
-                })()}
-                {candidatesLoading ? (
-                  <div className="flex items-center justify-center py-8">
+                      </div>;
+              }
+              return null;
+            })()}
+                {candidatesLoading ? <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  </div>
-                ) : candidates.length === 0 ? (
-                  <div className="text-center py-8">
+                  </div> : candidates.length === 0 ? <div className="text-center py-8">
                     <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">No candidates contacted yet</h3>
                     <p className="text-muted-foreground">Start reaching out to potential candidates for this position</p>
-                  </div>
-                ) : (
-                  <>
+                  </div> : <>
                     {/* Bulk Actions */}
-                    {selectedCandidates.size > 0 && (
-                      <Card className="p-3 md:p-4 mb-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+                    {selectedCandidates.size > 0 && <Card className="p-3 md:p-4 mb-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
                         <div className="flex items-center justify-between gap-4">
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-medium">
                               {selectedCandidates.size} candidate{selectedCandidates.size > 1 ? 's' : ''} selected
                             </span>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={clearAllSelection}
-                              className="h-6 text-xs px-2"
-                            >
+                            <Button variant="ghost" size="sm" onClick={clearAllSelection} className="h-6 text-xs px-2">
                               Clear
                             </Button>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={handleRemoveSelectedCandidates}
-                              className="text-destructive hover:text-destructive border-destructive/50 hover:border-destructive"
-                            >
+                            <Button variant="outline" size="sm" onClick={handleRemoveSelectedCandidates} className="text-destructive hover:text-destructive border-destructive/50 hover:border-destructive">
                               <X className="w-4 h-4 mr-1" />
                               Remove Selected
                             </Button>
-                            <Button
-                              variant="default"
-                              size="sm"
-                              onClick={handleCallSelectedCandidates}
-                              disabled={isGeneratingShortList}
-                              className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600"
-                            >
+                            <Button variant="default" size="sm" onClick={handleCallSelectedCandidates} disabled={isGeneratingShortList} className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600">
                               <Phone className="w-4 h-4 mr-1" />
                               {isGeneratingShortList ? "Calling..." : "Call Selected"}
                             </Button>
                           </div>
                         </div>
-                      </Card>
-                    )}
+                      </Card>}
 
                     {/* Filters */}
                     <Card className="p-3 md:p-4 mb-4 bg-muted/50">
@@ -1563,12 +1402,7 @@ export default function JobDetails() {
                           <h4 className="font-medium text-sm md:text-base">Filters</h4>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={selectAllCandidates}
-                            className="h-6 text-xs px-2"
-                          >
+                          <Button variant="ghost" size="sm" onClick={selectAllCandidates} className="h-6 text-xs px-2">
                             Select All
                           </Button>
                         </div>
@@ -1576,25 +1410,10 @@ export default function JobDetails() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
                         <div className="relative">
                           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                          <Input
-                            placeholder="Name..."
-                            value={nameFilter}
-                            onChange={(e) => setNameFilter(e.target.value)}
-                            className="pl-10 h-9 text-sm"
-                          />
+                          <Input placeholder="Name..." value={nameFilter} onChange={e => setNameFilter(e.target.value)} className="pl-10 h-9 text-sm" />
                         </div>
-                        <Input
-                          placeholder="Email..."
-                          value={emailFilter}
-                          onChange={(e) => setEmailFilter(e.target.value)}
-                          className="h-9 text-sm"
-                        />
-                        <Input
-                          placeholder="Phone..."
-                          value={phoneFilter}
-                          onChange={(e) => setPhoneFilter(e.target.value)}
-                          className="h-9 text-sm"
-                        />
+                        <Input placeholder="Email..." value={emailFilter} onChange={e => setEmailFilter(e.target.value)} className="h-9 text-sm" />
+                        <Input placeholder="Phone..." value={phoneFilter} onChange={e => setPhoneFilter(e.target.value)} className="h-9 text-sm" />
                         <Select value={scoreFilter} onValueChange={setScoreFilter}>
                           <SelectTrigger className="h-9 text-sm">
                             <SelectValue placeholder="Score" />
@@ -1630,87 +1449,59 @@ export default function JobDetails() {
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                       {(() => {
-                        // Group candidates by Candidate_ID to handle multiple contacts
-                        const groupedCandidates = filteredCandidates.reduce((acc, candidate) => {
-                          const candidateId = candidate["Candidate_ID"]
-                          if (!acc[candidateId]) {
-                            acc[candidateId] = []
-                          }
-                          acc[candidateId].push(candidate)
-                          return acc
-                        }, {} as Record<string, any[]>)
-
-                        return Object.entries(groupedCandidates).map(([candidateId, candidateContacts]: [string, any[]]) => {
-                          // Use the first contact for display info
-                          const mainCandidate = candidateContacts[0]
-                          
-                          return (
-                            <Card key={candidateId} className={cn(
-                              "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg",
-                              selectedCandidates.has(candidateId) && "border-primary bg-primary/5"
-                            )}>
+                  // Group candidates by Candidate_ID to handle multiple contacts
+                  const groupedCandidates = filteredCandidates.reduce((acc, candidate) => {
+                    const candidateId = candidate["Candidate_ID"];
+                    if (!acc[candidateId]) {
+                      acc[candidateId] = [];
+                    }
+                    acc[candidateId].push(candidate);
+                    return acc;
+                  }, {} as Record<string, any[]>);
+                  return Object.entries(groupedCandidates).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                    // Use the first contact for display info
+                    const mainCandidate = candidateContacts[0];
+                    return <Card key={candidateId} className={cn("border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg", selectedCandidates.has(candidateId) && "border-primary bg-primary/5")}>
                               <CardContent className="p-3 md:p-4">
                                  <div className="space-y-3">
                                    <div className="flex items-start justify-between">
                                      <div className="flex items-start gap-3 min-w-0 flex-1">
-                                       <input
-                                         type="checkbox"
-                                         checked={selectedCandidates.has(candidateId)}
-                                         onChange={() => toggleCandidateSelection(candidateId)}
-                                         className="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                                       />
+                                       <input type="checkbox" checked={selectedCandidates.has(candidateId)} onChange={() => toggleCandidateSelection(candidateId)} className="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" />
                                        <div className="min-w-0 flex-1">
                                          <h4 className="font-semibold text-sm md:text-base truncate">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
                                          <div className="space-y-1">
-                                           <p className="text-xs md:text-sm text-muted-foreground truncate">{candidateId}</p>
-                                           {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || 
-                                             mainCandidate["Contacted"]?.toLowerCase() === "contacted" || 
-                                             mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
-                                             mainCandidate["Contacted"]?.toLowerCase() === "tasked") && 
-                                             mainCandidate["lastcalltime"] && (
-                                              <div className="text-xs text-muted-foreground flex items-center">
+                                           
+                                           {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || mainCandidate["Contacted"]?.toLowerCase() === "contacted" || mainCandidate["Contacted"]?.toLowerCase() === "low scored" || mainCandidate["Contacted"]?.toLowerCase() === "tasked") && mainCandidate["lastcalltime"] && <div className="text-xs text-muted-foreground flex items-center">
                                                 <Clock className="w-3 h-3 mr-1" />
                                                 {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
                                                 <span className="ml-2">
-                                                  {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                  {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], {
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                      })}
                                                 </span>
-                                              </div>
-                                           )}
+                                              </div>}
                                          </div>
                                        </div>
                                      </div>
-                                     <Button
-                                       variant="ghost"
-                                       size="sm"
-                                       onClick={() => showRemoveConfirmation(candidateId, mainCandidate["Candidate Name"] || "Unknown")}
-                                       className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
-                                       title="Remove from Long List"
-                                     >
+                                     <Button variant="ghost" size="sm" onClick={() => showRemoveConfirmation(candidateId, mainCandidate["Candidate Name"] || "Unknown")} className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive" title="Remove from Long List">
                                        <X className="h-3 w-3" />
                                      </Button>
                                    </div>
                                   
                                   <div className="space-y-2 text-xs md:text-sm">
-                                    {mainCandidate["Candidate Email"] && (
-                                      <div className="flex items-center text-muted-foreground min-w-0">
+                                    {mainCandidate["Candidate Email"] && <div className="flex items-center text-muted-foreground min-w-0">
                                         <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
                                         <span className="truncate">{mainCandidate["Candidate Email"]}</span>
-                                      </div>
-                                    )}
+                                      </div>}
                                     
-                                    {mainCandidate["Candidate Phone Number"] && (
-                                      <div className="flex items-center text-muted-foreground min-w-0">
+                                    {mainCandidate["Candidate Phone Number"] && <div className="flex items-center text-muted-foreground min-w-0">
                                         <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
                                         <span className="truncate">{mainCandidate["Candidate Phone Number"]}</span>
-                                      </div>
-                                    )}
+                                      </div>}
                                   </div>
 
-                                  {mainCandidate["Summary"] && (
-                                    <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
-                                      {mainCandidate["Summary"]}
-                                    </p>
-                                  )}
+                                  {mainCandidate["Summary"]}
 
                                   {/* CV Score and Reason Section */}
                                   <div className="space-y-2 pt-2 border-t">
@@ -1726,56 +1517,31 @@ export default function JobDetails() {
                                         </div>
                                       </div>
                                       <div className="space-y-1">
-                                        <div className="flex items-center justify-between">
-                                          <span className="text-muted-foreground">Longlisted:</span>
-                                          <span className="text-xs">
-                                            {mainCandidate["longlisted_at"] 
-                                              ? new Date(mainCandidate["longlisted_at"]).toLocaleDateString()
-                                              : "N/A"}
-                                          </span>
-                                        </div>
+                                        
                                       </div>
                                     </div>
-                                    {mainCandidate["cv_score_reason"] && (
-                                      <div className="pt-1">
+                                    {mainCandidate["cv_score_reason"] && <div className="pt-1">
                                         <span className="text-muted-foreground text-xs">Reason:</span>
                                         <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                                           {mainCandidate["cv_score_reason"]}
                                         </p>
-                                      </div>
-                                    )}
+                                      </div>}
                                   </div>
 
                                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t gap-2">
                                     <div className="flex flex-wrap items-center gap-1">
-                                      <StatusDropdown
-                                        currentStatus={mainCandidate["Contacted"]}
-                                        candidateId={mainCandidate["Candidate_ID"]}
-                                        jobId={id!}
-                                        onStatusChange={(newStatus) => {
-                                          setCandidates(prev => prev.map(c => 
-                                            c["Candidate_ID"] === mainCandidate["Candidate_ID"] 
-                                              ? { ...c, Contacted: newStatus }
-                                              : c
-                                          ))
-                                        }}
-                                        variant="badge"
-                                      />
-                                      {getCandidateStatus(mainCandidate["Candidate_ID"]) && (
-                                        <StatusDropdown
-                                          currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
-                                          candidateId={mainCandidate["Candidate_ID"]}
-                                          jobId={null}
-                                          onStatusChange={(newStatus) => {
-                                            setCvData(prev => prev.map(cv => 
-                                              cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] 
-                                                ? { ...cv, CandidateStatus: newStatus }
-                                                : cv
-                                            ))
-                                          }}
-                                          variant="badge"
-                                        />
-                                      )}
+                                      <StatusDropdown currentStatus={mainCandidate["Contacted"]} candidateId={mainCandidate["Candidate_ID"]} jobId={id!} onStatusChange={newStatus => {
+                                setCandidates(prev => prev.map(c => c["Candidate_ID"] === mainCandidate["Candidate_ID"] ? {
+                                  ...c,
+                                  Contacted: newStatus
+                                } : c));
+                              }} variant="badge" />
+                                      {getCandidateStatus(mainCandidate["Candidate_ID"]) && <StatusDropdown currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])} candidateId={mainCandidate["Candidate_ID"]} jobId={null} onStatusChange={newStatus => {
+                                setCvData(prev => prev.map(cv => cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] ? {
+                                  ...cv,
+                                  CandidateStatus: newStatus
+                                } : cv));
+                              }} variant="badge" />}
                                     </div>
                                     {getScoreBadge(mainCandidate["Success Score"])}
                                   </div>
@@ -1783,54 +1549,28 @@ export default function JobDetails() {
                                   {/* Call Log Buttons */}
                                   <div className="space-y-2 pt-2 border-t">
                                     <div className="flex flex-col sm:flex-row gap-2">
-                                      <Button
-                                        variant="default"
-                                        size="sm"
-                                        onClick={() => handleCallCandidate(mainCandidate["Candidate_ID"], id!, mainCandidate["callid"])}
-                                        disabled={callingCandidateId === candidateId}
-                                        className="w-full sm:flex-1 bg-foreground hover:bg-foreground/90 text-background disabled:opacity-50 text-xs md:text-sm"
-                                      >
+                                      <Button variant="default" size="sm" onClick={() => handleCallCandidate(mainCandidate["Candidate_ID"], id!, mainCandidate["callid"])} disabled={callingCandidateId === candidateId} className="w-full sm:flex-1 bg-foreground hover:bg-foreground/90 text-background disabled:opacity-50 text-xs md:text-sm">
                                         <Phone className="w-3 h-3 mr-1" />
                                         {callingCandidateId === candidateId ? 'Calling...' : 'Call Candidate'}
                                       </Button>
                                       {(() => {
-                                        const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
-                                        if (contactsWithCalls.length === 0) return null;
-                                        
-                                        // Get the latest call log (highest callid)
-                                        const latestContact = contactsWithCalls.reduce((latest, current) => 
-                                          current.callid > latest.callid ? current : latest
-                                        );
-                                        
-                                        return (
-                                          <Button
-                                            key={latestContact.callid}
-                                            variant="outline"
-                                            size="sm"
-                                            asChild
-                                            className="flex-1 min-w-0 text-xs md:text-sm"
-                                          >
-                                            <Link 
-                                              to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} 
-                                              className="truncate"
-                                              onClick={() => {
-                                                // Store current tab in URL hash for back navigation
-                                                window.location.hash = 'tab=candidates';
-                                              }}
-                                            >
+                                const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
+                                if (contactsWithCalls.length === 0) return null;
+
+                                // Get the latest call log (highest callid)
+                                const latestContact = contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest);
+                                return <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
+                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} className="truncate" onClick={() => {
+                                    // Store current tab in URL hash for back navigation
+                                    window.location.hash = 'tab=candidates';
+                                  }}>
                                               <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
                                               <span className="truncate">Call Log</span>
                                             </Link>
-                                          </Button>
-                                        );
-                                      })()}
+                                          </Button>;
+                              })()}
                                     </div>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      asChild
-                                      className="w-full text-xs md:text-sm"
-                                    >
+                                    <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
                                       <Link to={`/candidate/${candidateId}`}>
                                         <Users className="w-3 h-3 mr-1" />
                                         View Profile
@@ -1839,13 +1579,11 @@ export default function JobDetails() {
                                   </div>
                                 </div>
                               </CardContent>
-                            </Card>
-                          )
-                        })
-                      })()}
+                            </Card>;
+                  });
+                })()}
                     </div>
-                  </>
-                )}
+                  </>}
               </CardContent>
             </Card>
           </TabsContent>
@@ -1862,30 +1600,24 @@ export default function JobDetails() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {shortListCandidates.length === 0 ? (
-                  <div className="text-center py-8">
+                {shortListCandidates.length === 0 ? <div className="text-center py-8">
                     <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">No high-scoring candidates yet</h3>
                     <p className="text-muted-foreground">Candidates with scores of 74+ will appear here automatically</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                  </div> : <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                     {(() => {
-                      // Group short list candidates by Candidate_ID
-                      const groupedShortList = shortListCandidates.reduce((acc, candidate) => {
-                        const candidateId = candidate["Candidate_ID"]
-                        if (!acc[candidateId]) {
-                          acc[candidateId] = []
-                        }
-                        acc[candidateId].push(candidate)
-                        return acc
-                      }, {} as Record<string, any[]>)
-
-                      return Object.entries(groupedShortList).map(([candidateId, candidateContacts]: [string, any[]]) => {
-                        const mainCandidate = candidateContacts[0]
-                        
-                        return (
-                          <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20">
+                // Group short list candidates by Candidate_ID
+                const groupedShortList = shortListCandidates.reduce((acc, candidate) => {
+                  const candidateId = candidate["Candidate_ID"];
+                  if (!acc[candidateId]) {
+                    acc[candidateId] = [];
+                  }
+                  acc[candidateId].push(candidate);
+                  return acc;
+                }, {} as Record<string, any[]>);
+                return Object.entries(groupedShortList).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                  const mainCandidate = candidateContacts[0];
+                  return <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20">
                             <CardContent className="p-4">
                               <div className="space-y-3">
                                 <div className="flex items-start justify-between">
@@ -1893,78 +1625,56 @@ export default function JobDetails() {
                                     <h4 className="font-semibold">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
                                     <p className="text-sm text-muted-foreground">{candidateId}</p>
                                   </div>
-                                  {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || 
-                                    mainCandidate["Contacted"]?.toLowerCase() === "contacted" || 
-                                    mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
-                                    mainCandidate["Contacted"]?.toLowerCase() === "tasked") && 
-                                    mainCandidate["lastcalltime"] && (
-                                    <div className="text-xs text-muted-foreground text-right">
+                                  {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || mainCandidate["Contacted"]?.toLowerCase() === "contacted" || mainCandidate["Contacted"]?.toLowerCase() === "low scored" || mainCandidate["Contacted"]?.toLowerCase() === "tasked") && mainCandidate["lastcalltime"] && <div className="text-xs text-muted-foreground text-right">
                                       <div className="flex items-center">
                                         <Clock className="w-3 h-3 mr-1" />
                                         {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
                                       </div>
                                       <div className="text-xs">
-                                        {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
                                       </div>
-                                    </div>
-                                  )}
+                                    </div>}
                                 </div>
                                 
                                 <div className="space-y-2 text-sm">
-                                  {mainCandidate["Candidate Email"] && (
-                                    <div className="flex items-center text-muted-foreground">
+                                  {mainCandidate["Candidate Email"] && <div className="flex items-center text-muted-foreground">
                                       <Mail className="w-4 h-4 mr-2" />
                                       <span className="truncate">{mainCandidate["Candidate Email"]}</span>
-                                    </div>
-                                  )}
+                                    </div>}
                                   
-                                  {mainCandidate["Candidate Phone Number"] && (
-                                    <div className="flex items-center text-muted-foreground">
+                                  {mainCandidate["Candidate Phone Number"] && <div className="flex items-center text-muted-foreground">
                                       <Phone className="w-4 h-4 mr-2" />
                                       <span>{mainCandidate["Candidate Phone Number"]}</span>
-                                    </div>
-                                  )}
+                                    </div>}
                                 </div>
 
-                                {mainCandidate["Summary"] && (
-                                  <p className="text-sm text-muted-foreground line-clamp-3">
+                                {mainCandidate["Summary"] && <p className="text-sm text-muted-foreground line-clamp-3">
                                     {mainCandidate["Summary"]}
-                                  </p>
-                                )}
+                                  </p>}
 
                                 {/* Task Status and Links Section */}
                                 {(() => {
-                                  const candidateTasks = taskCandidates.filter(task => task.candidate_id === candidateId);
-                                  const candidateStatus = mainCandidate["Contacted"]?.toLowerCase();
-                                  
-                                  // Only show tasks if candidate status is "tasked" and not "rejected"
-                                  if (candidateTasks.length === 0 || 
-                                      candidateStatus !== "tasked" || 
-                                      candidateStatus === "rejected") return null;
+                          const candidateTasks = taskCandidates.filter(task => task.candidate_id === candidateId);
+                          const candidateStatus = mainCandidate["Contacted"]?.toLowerCase();
 
-                                  return (
-                                    <div className="space-y-2 pt-2 border-t">
+                          // Only show tasks if candidate status is "tasked" and not "rejected"
+                          if (candidateTasks.length === 0 || candidateStatus !== "tasked" || candidateStatus === "rejected") return null;
+                          return <div className="space-y-2 pt-2 border-t">
                                       <h5 className="text-sm font-medium text-foreground flex items-center">
                                         <CheckCircle className="w-4 h-4 mr-2" />
                                         Tasks ({candidateTasks.length})
                                       </h5>
                                       <div className="space-y-2">
-                                        {candidateTasks.map((task) => (
-                                          <div key={task.taskid} className={cn(
-                                            "flex items-center justify-between p-2 rounded-md",
-                                            task.status === 'Received' 
-                                              ? "bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700" 
-                                              : "bg-muted/50"
-                                          )}>
+                                        {candidateTasks.map(task => <div key={task.taskid} className={cn("flex items-center justify-between p-2 rounded-md", task.status === 'Received' ? "bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700" : "bg-muted/50")}>
                                             <div className="flex items-center space-x-2">
                                               <div className="flex items-center space-x-1">
                                                 {task.status === 'Pending' && <Hourglass className="w-3 h-3 text-orange-500" />}
                                                 {task.status === 'Received' && <AlertCircle className="w-3 h-3 text-blue-500" />}
                                                 {task.status === 'Reviewed' && <CheckCircle className="w-3 h-3 text-green-500" />}
-                                                <Select
-                                                  value={task.status}
-                                                  onValueChange={(value) => updateTaskStatus(task.taskid, value as any)}
-                                                >
+                                                <Select value={task.status} onValueChange={value => updateTaskStatus(task.taskid, value as any)}>
                                                   <SelectTrigger className="w-24 h-6 text-xs bg-background/50 border-border/50">
                                                     <SelectValue />
                                                   </SelectTrigger>
@@ -1977,77 +1687,40 @@ export default function JobDetails() {
                                               </div>
                                             </div>
                                             <div className="flex items-center space-x-1">
-                                              {task.tasklink && (
-                                                task.tasklink.includes(',') ? (
-                                                  // Multiple links
-                                                  <div className="flex items-center space-x-1">
-                                                    {task.tasklink.split(',').map((link: string, index: number) => (
-                                                      <Button
-                                                        key={index}
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => window.open(link.trim(), '_blank')}
-                                                        className="p-1 h-6 w-6 hover:bg-primary/10"
-                                                        title={`Task Link ${index + 1}`}
-                                                      >
+                                              {task.tasklink && (task.tasklink.includes(',') ?
+                                  // Multiple links
+                                  <div className="flex items-center space-x-1">
+                                                    {task.tasklink.split(',').map((link: string, index: number) => <Button key={index} variant="ghost" size="sm" onClick={() => window.open(link.trim(), '_blank')} className="p-1 h-6 w-6 hover:bg-primary/10" title={`Task Link ${index + 1}`}>
                                                         <ExternalLink className="h-3 w-3" />
-                                                      </Button>
-                                                    ))}
+                                                      </Button>)}
                                                     <span className="text-xs text-muted-foreground">
                                                       ({task.tasklink.split(',').length} links)
                                                     </span>
-                                                  </div>
-                                                ) : (
-                                                  // Single link
-                                                  <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => window.open(task.tasklink, '_blank')}
-                                                    className="p-1 h-6 w-6 hover:bg-primary/10"
-                                                    title="Task Link"
-                                                  >
+                                                  </div> :
+                                  // Single link
+                                  <Button variant="ghost" size="sm" onClick={() => window.open(task.tasklink, '_blank')} className="p-1 h-6 w-6 hover:bg-primary/10" title="Task Link">
                                                     <ExternalLink className="h-3 w-3" />
-                                                  </Button>
-                                                )
-                                              )}
+                                                  </Button>)}
                                             </div>
-                                          </div>
-                                        ))}
+                                          </div>)}
                                       </div>
-                                    </div>
-                                  );
-                                })()}
+                                    </div>;
+                        })()}
 
                                 <div className="flex items-center justify-between pt-2 border-t">
                                   <div className="flex items-center space-x-2">
-                                    <StatusDropdown
-                                      currentStatus={mainCandidate["Contacted"]}
-                                      candidateId={mainCandidate["Candidate_ID"]}
-                                      jobId={id!}
-                                      onStatusChange={(newStatus) => {
-                                        setCandidates(prev => prev.map(c => 
-                                          c["Candidate_ID"] === mainCandidate["Candidate_ID"] 
-                                            ? { ...c, Contacted: newStatus }
-                                            : c
-                                        ))
-                                      }}
-                                      variant="badge"
-                                    />
-                                    {getCandidateStatus(mainCandidate["Candidate_ID"]) && (
-                                      <StatusDropdown
-                                        currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
-                                        candidateId={mainCandidate["Candidate_ID"]}
-                                        jobId={null}
-                                        onStatusChange={(newStatus) => {
-                                          setCvData(prev => prev.map(cv => 
-                                            cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] 
-                                              ? { ...cv, CandidateStatus: newStatus }
-                                              : cv
-                                          ))
-                                        }}
-                                        variant="badge"
-                                      />
-                                    )}
+                                    <StatusDropdown currentStatus={mainCandidate["Contacted"]} candidateId={mainCandidate["Candidate_ID"]} jobId={id!} onStatusChange={newStatus => {
+                              setCandidates(prev => prev.map(c => c["Candidate_ID"] === mainCandidate["Candidate_ID"] ? {
+                                ...c,
+                                Contacted: newStatus
+                              } : c));
+                            }} variant="badge" />
+                                    {getCandidateStatus(mainCandidate["Candidate_ID"]) && <StatusDropdown currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])} candidateId={mainCandidate["Candidate_ID"]} jobId={null} onStatusChange={newStatus => {
+                              setCvData(prev => prev.map(cv => cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] ? {
+                                ...cv,
+                                CandidateStatus: newStatus
+                              } : cv));
+                            }} variant="badge" />}
                                   </div>
                                   {getScoreBadge(mainCandidate["Success Score"])}
                                 </div>
@@ -2056,41 +1729,22 @@ export default function JobDetails() {
                                 <div className="space-y-2 pt-2 border-t">
                                   <div className="flex flex-wrap gap-2">
                                     {(() => {
-                                      const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
-                                      if (contactsWithCalls.length === 0) return null;
-                                      
-                                      // Get the latest call log (highest callid)
-                                      const latestContact = contactsWithCalls.reduce((latest, current) => 
-                                        current.callid > latest.callid ? current : latest
-                                      );
-                                      
-                                      return (
-                                        <Button
-                                          key={latestContact.callid}
-                                          variant="outline"
-                                          size="sm"
-                                          asChild
-                                          className="flex-1 min-w-[100px]"
-                                        >
-                                          <Link 
-                                            to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`}
-                                            onClick={() => {
-                                              // Store current tab in URL hash for back navigation
-                                              window.location.hash = 'tab=shortlist';
-                                            }}
-                                          >
+                              const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
+                              if (contactsWithCalls.length === 0) return null;
+
+                              // Get the latest call log (highest callid)
+                              const latestContact = contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest);
+                              return <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-[100px]">
+                                          <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} onClick={() => {
+                                  // Store current tab in URL hash for back navigation
+                                  window.location.hash = 'tab=shortlist';
+                                }}>
                                             <FileText className="w-3 h-3 mr-1" />
                                             Call Log
                                           </Link>
-                                        </Button>
-                                      );
-                                    })()}
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      asChild
-                                      className="flex-1 min-w-[100px]"
-                                    >
+                                        </Button>;
+                            })()}
+                                    <Button variant="ghost" size="sm" asChild className="flex-1 min-w-[100px]">
                                       <Link to={`/candidate/${candidateId}`}>
                                         <Users className="w-3 h-3 mr-1" />
                                         View Profile
@@ -2099,60 +1753,34 @@ export default function JobDetails() {
                                   </div>
                                   {/* Action Buttons - Arrange Interview and Reject */}
                                   <div className="flex gap-2">
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => handleArrangeInterview(candidateId)}
-                                      className="flex-1 min-w-[100px] bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200"
-                                    >
+                                    <Button variant="outline" size="sm" onClick={() => handleArrangeInterview(candidateId)} className="flex-1 min-w-[100px] bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200">
                                       <Calendar className="w-3 h-3 mr-1" />
                                       Arrange Interview
                                     </Button>
-                                    {mainCandidate["Contacted"] === "Rejected" ? (
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="flex-1 min-w-[100px] bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed"
-                                        disabled
-                                      >
+                                    {mainCandidate["Contacted"] === "Rejected" ? <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed" disabled>
                                         <X className="w-3 h-3 mr-1" />
                                         Rejected
-                                      </Button>
-                                    ) : (
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200"
-                                        onClick={() => handleRejectCandidate(id!, candidateId, candidateContacts[0].callid)}
-                                      >
+                                      </Button> : <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200" onClick={() => handleRejectCandidate(id!, candidateId, candidateContacts[0].callid)}>
                                         <X className="w-3 h-3 mr-1" />
                                         Reject Candidate
-                                      </Button>
-                                    )}
+                                      </Button>}
                                   </div>
                                 </div>
                               </div>
                             </CardContent>
-                          </Card>
-                        )
-                      })
-                    })()}
-                  </div>
-                )}
+                          </Card>;
+                });
+              })()}
+                  </div>}
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
         
-        <JobDialog
-          job={job}
-          open={isEditDialogOpen}
-          onOpenChange={setIsEditDialogOpen}
-          onSave={() => {
-            fetchJob(id!)
-            setIsEditDialogOpen(false)
-          }}
-        />
+        <JobDialog job={job} open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen} onSave={() => {
+      fetchJob(id!);
+      setIsEditDialogOpen(false);
+    }} />
 
         <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
           <AlertDialogContent>
@@ -2164,12 +1792,10 @@ export default function JobDetails() {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction 
-                onClick={() => {
-                  setShowConfirmDialog(false);
-                  handleGenerateLongList();
-                }}
-              >
+              <AlertDialogAction onClick={() => {
+            setShowConfirmDialog(false);
+            handleGenerateLongList();
+          }}>
                 Yes, Regenerate
               </AlertDialogAction>
             </AlertDialogFooter>
@@ -2202,21 +1828,12 @@ export default function JobDetails() {
               </div>
               
               {/* Conditional Interview Link Input */}
-              {interviewType === 'Online Meeting' && (
-                <div className="space-y-2">
+              {interviewType === 'Online Meeting' && <div className="space-y-2">
                   <label className="text-sm font-medium">Interview Link</label>
-                  <Input
-                    type="url"
-                    placeholder="https://zoom.us/j/... or https://meet.google.com/..."
-                    value={interviewLink}
-                    onChange={(e) => setInterviewLink(e.target.value)}
-                    className="w-full"
-                  />
-                </div>
-              )}
+                  <Input type="url" placeholder="https://zoom.us/j/... or https://meet.google.com/..." value={interviewLink} onChange={e => setInterviewLink(e.target.value)} className="w-full" />
+                </div>}
               
-              {interviewSlots.map((slot, index) => (
-                <div key={index} className="space-y-4 p-4 border rounded-lg">
+              {interviewSlots.map((slot, index) => <div key={index} className="space-y-4 p-4 border rounded-lg">
                   <h4 className="font-medium">Slot {index + 1}</h4>
                   
                   <div className="grid grid-cols-2 gap-4">
@@ -2225,30 +1842,17 @@ export default function JobDetails() {
                       <label className="text-sm font-medium">Date</label>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full justify-start text-left font-normal",
-                              !slot.date && "text-muted-foreground"
-                            )}
-                          >
+                          <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !slot.date && "text-muted-foreground")}>
                             <Calendar className="mr-2 h-4 w-4" />
                             {slot.date ? format(slot.date, "PPP") : <span>Pick a date</span>}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
-                          <CalendarComponent
-                            mode="single"
-                            selected={slot.date}
-                            onSelect={(date) => updateInterviewSlot(index, 'date', date!)}
-                            disabled={(date) => {
-                              const today = new Date();
-                              today.setHours(0, 0, 0, 0);
-                              return date < today;
-                            }}
-                            initialFocus
-                            className="p-3 pointer-events-auto"
-                          />
+                          <CalendarComponent mode="single" selected={slot.date} onSelect={date => updateInterviewSlot(index, 'date', date!)} disabled={date => {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      return date < today;
+                    }} initialFocus className="p-3 pointer-events-auto" />
                         </PopoverContent>
                       </Popover>
                     </div>
@@ -2258,79 +1862,66 @@ export default function JobDetails() {
                       <label className="text-sm font-medium">Time</label>
                       <div className="grid grid-cols-2 gap-2">
                         {/* Hours */}
-                        <Select
-                          value={slot.time.split(':')[0] || ''}
-                          onValueChange={(hour) => {
-                            const minute = slot.time.split(':')[1] || '00';
-                            const newTime = `${hour}:${minute}`;
-                            
-                            // Validate time is not in the past for today
-                            if (slot.date) {
-                              const today = new Date();
-                              const slotDate = format(slot.date, 'yyyy-MM-dd');
-                              const currentDate = format(today, 'yyyy-MM-dd');
-                              const currentTime = format(today, 'HH:mm');
-                              
-                              if (slotDate === currentDate && newTime <= currentTime) {
-                                alert('Cannot select a time in the past for today');
-                                return;
-                              }
-                            }
-                            
-                            updateInterviewSlot(index, 'time', newTime);
-                          }}
-                        >
+                        <Select value={slot.time.split(':')[0] || ''} onValueChange={hour => {
+                    const minute = slot.time.split(':')[1] || '00';
+                    const newTime = `${hour}:${minute}`;
+
+                    // Validate time is not in the past for today
+                    if (slot.date) {
+                      const today = new Date();
+                      const slotDate = format(slot.date, 'yyyy-MM-dd');
+                      const currentDate = format(today, 'yyyy-MM-dd');
+                      const currentTime = format(today, 'HH:mm');
+                      if (slotDate === currentDate && newTime <= currentTime) {
+                        alert('Cannot select a time in the past for today');
+                        return;
+                      }
+                    }
+                    updateInterviewSlot(index, 'time', newTime);
+                  }}>
                           <SelectTrigger>
                             <SelectValue placeholder="Hour" />
                           </SelectTrigger>
                           <SelectContent>
-                            {Array.from({ length: 24 }, (_, i) => (
-                              <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                            {Array.from({
+                        length: 24
+                      }, (_, i) => <SelectItem key={i} value={i.toString().padStart(2, '0')}>
                                 {i.toString().padStart(2, '0')}
-                              </SelectItem>
-                            ))}
+                              </SelectItem>)}
                           </SelectContent>
                         </Select>
 
                         {/* Minutes */}
-                        <Select
-                          value={slot.time.split(':')[1] || ''}
-                          onValueChange={(minute) => {
-                            const hour = slot.time.split(':')[0] || '09';
-                            const newTime = `${hour}:${minute}`;
-                            
-                            // Validate time is not in the past for today
-                            if (slot.date) {
-                              const today = new Date();
-                              const slotDate = format(slot.date, 'yyyy-MM-dd');
-                              const currentDate = format(today, 'yyyy-MM-dd');
-                              const currentTime = format(today, 'HH:mm');
-                              
-                              if (slotDate === currentDate && newTime <= currentTime) {
-                                alert('Cannot select a time in the past for today');
-                                return;
-                              }
-                            }
-                            
-                            updateInterviewSlot(index, 'time', newTime);
-                          }}
-                        >
+                        <Select value={slot.time.split(':')[1] || ''} onValueChange={minute => {
+                    const hour = slot.time.split(':')[0] || '09';
+                    const newTime = `${hour}:${minute}`;
+
+                    // Validate time is not in the past for today
+                    if (slot.date) {
+                      const today = new Date();
+                      const slotDate = format(slot.date, 'yyyy-MM-dd');
+                      const currentDate = format(today, 'yyyy-MM-dd');
+                      const currentTime = format(today, 'HH:mm');
+                      if (slotDate === currentDate && newTime <= currentTime) {
+                        alert('Cannot select a time in the past for today');
+                        return;
+                      }
+                    }
+                    updateInterviewSlot(index, 'time', newTime);
+                  }}>
                           <SelectTrigger>
                             <SelectValue placeholder="Min" />
                           </SelectTrigger>
                           <SelectContent>
-                            {timeOptions.map((minute) => (
-                              <SelectItem key={minute} value={minute}>
+                            {timeOptions.map(minute => <SelectItem key={minute} value={minute}>
                                 {minute}
-                              </SelectItem>
-                            ))}
+                              </SelectItem>)}
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                </div>)}
 
               <div className="flex justify-end space-x-2 pt-4 sticky bottom-0 bg-background border-t">
                 <Button variant="outline" onClick={() => setInterviewDialogOpen(false)}>
@@ -2361,6 +1952,5 @@ export default function JobDetails() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div>
-  );
+      </div>;
 }
