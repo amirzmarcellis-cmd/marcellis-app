@@ -28,12 +28,21 @@ export default function CallLogDetailPage() {
   const fetchRecord = async () => {
     try {
       setLoading(true);
-      // @ts-ignore - Using CVs table which exists but may not be in types
+      console.log('Searching for record with ID:', recordId);
+      
+      // Try to find the record in CVs table using recordid field
+      // @ts-ignore
       const { data, error } = await supabase
         .from('CVs')
         .select('*')
         .eq('recordid', recordId)
-        .single();
+        .maybeSingle();
+        
+      console.log('Query result:', { data, error });
+      
+      if (error) {
+        console.error('Error fetching record:', error);
+      }
 
       if (error) throw error;
       setRecord(data);

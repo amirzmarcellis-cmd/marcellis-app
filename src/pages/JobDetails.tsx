@@ -1574,7 +1574,7 @@ export default function JobDetails() {
                                     <Button 
                                       variant="outline" 
                                       size="sm" 
-                                      onClick={() => navigate(`/call-log-details?recordId=${mainCandidate.recordid}&jobId=${id}`)}
+                                      onClick={() => navigate(`/call-log-details?recordId=${mainCandidate["Record ID"] || mainCandidate["Candidate_ID"]}&jobId=${id}`)}
                                       className="w-full text-xs md:text-sm"
                                     >
                                       <FileText className="w-3 h-3 mr-1" />
