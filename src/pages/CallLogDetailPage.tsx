@@ -30,10 +30,9 @@ export default function CallLogDetailPage() {
       setLoading(true);
       console.log('Searching for record with ID:', recordId);
       
-      // Try to find the record in CVs table using recordid field
-      // @ts-ignore
-      const { data, error } = await supabase
-        .from('CVs')
+      // Query the Jobs_CVs table using recordid field
+      const { data, error } = await (supabase as any)
+        .from('Jobs_CVs')
         .select('*')
         .eq('recordid', recordId)
         .maybeSingle();
