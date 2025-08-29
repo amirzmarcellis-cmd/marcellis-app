@@ -17,9 +17,9 @@ interface AppSettingsContextType {
 const AppSettingsContext = createContext<AppSettingsContextType | undefined>(undefined);
 
 const DEFAULT_SETTINGS: AppSettings = {
-  logo: "/lovable-uploads/a03c55f4-3de8-4dda-ba14-2e39d9d68b67.png",
-  logoLight: "/lovable-uploads/a03c55f4-3de8-4dda-ba14-2e39d9d68b67.png",
-  logoDark: "/lovable-uploads/a03c55f4-3de8-4dda-ba14-2e39d9d68b67.png",
+  logo: "/lovable-uploads/79fc3415-a8cb-4486-9765-0907521e9cda.png",
+  logoLight: "/lovable-uploads/79fc3415-a8cb-4486-9765-0907521e9cda.png",
+  logoDark: "/lovable-uploads/79fc3415-a8cb-4486-9765-0907521e9cda.png",
   systemName: "Onyx - Marc Ellis",
   primaryColor: "#00FFFF", // Cyan color
   motion: 'auto',
