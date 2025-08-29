@@ -347,13 +347,13 @@ export default function JobDetails() {
       // Get selected candidate data
       const selectedCandidateData = candidates.filter(candidate => selectedCandidates.has(candidate["Candidate_ID"]));
 
-      // Process each selected candidate with their callid
+      // Process each selected candidate with their recordid
       for (const candidate of selectedCandidateData) {
         const payload = {
           user_id: candidate.user_id,
           jobID: job.job_id,
           job_itris_id: job.itris_job_id,
-          callid: candidate["callid"]
+          recordid: candidate.recordid
         };
 
         // Make HTTP request to the webhook for each candidate
@@ -586,13 +586,13 @@ export default function JobDetails() {
     setShortListTimeRemaining(30 * 60); // 30 minutes in seconds
 
     try {
-      // Process each candidate individually with their callid
+      // Process each candidate individually with their recordid
       for (const candidate of candidates) {
         const payload = {
           user_id: candidate.user_id,
           jobID: job.job_id,
           job_itris_id: job.itris_job_id,
-          callid: candidate["callid"]
+          recordid: candidate.recordid
         };
 
         // Make HTTP request to the webhook for each candidate
