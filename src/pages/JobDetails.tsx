@@ -567,7 +567,7 @@ export default function JobDetails() {
     }
   };
   const handleGenerateShortList = async () => {
-    if (!job?.["Job ID"] || candidates.length === 0) {
+    if (!job?.job_id || candidates.length === 0) {
       toast({
         title: "Error",
         description: "No candidates available to process",
