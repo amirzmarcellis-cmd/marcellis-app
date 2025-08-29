@@ -1501,8 +1501,6 @@ export default function JobDetails() {
                                       </div>}
                                   </div>
 
-                                  {mainCandidate["Summary"]}
-
                                   {/* CV Score and Reason Section */}
                                   <div className="space-y-2 pt-2 border-t">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
