@@ -68,99 +68,63 @@ export type Database = {
         }
         Relationships: []
       }
-      candidates_stage: {
+      CVs: {
         Row: {
           cv_text: string | null
+          email: string | null
           Firstname: string | null
           Lastname: string | null
-          user_id: string | null
+          name: string | null
+          phone_number: string | null
+          user_id: string
         }
         Insert: {
           cv_text?: string | null
+          email?: string | null
           Firstname?: string | null
           Lastname?: string | null
-          user_id?: string | null
+          name?: string | null
+          phone_number?: string | null
+          user_id: string
         }
         Update: {
           cv_text?: string | null
+          email?: string | null
           Firstname?: string | null
           Lastname?: string | null
-          user_id?: string | null
+          name?: string | null
+          phone_number?: string | null
+          user_id?: string
         }
         Relationships: []
       }
-      CVs: {
+      CVs_duplicate: {
         Row: {
-          applied_for: string | null
-          candidate_id: string
-          CandidateStatus: string | null
-          Certifications: string | null
-          current_company: string | null
-          CV_Link: string | null
-          cv_summary: string | null
           cv_text: string | null
-          done_questions: string | null
-          Education: string | null
-          Email: string | null
-          Experience: string | null
-          first_name: string | null
-          Language: string | null
-          last_name: string | null
-          Linkedin: string | null
-          Location: string | null
-          other_notes: string | null
+          email: string | null
+          Firstname: string | null
+          Lastname: string | null
+          name: string | null
           phone_number: string | null
-          Skills: string | null
-          Timestamp: string | null
-          Title: string | null
+          user_id: string
         }
         Insert: {
-          applied_for?: string | null
-          candidate_id: string
-          CandidateStatus?: string | null
-          Certifications?: string | null
-          current_company?: string | null
-          CV_Link?: string | null
-          cv_summary?: string | null
           cv_text?: string | null
-          done_questions?: string | null
-          Education?: string | null
-          Email?: string | null
-          Experience?: string | null
-          first_name?: string | null
-          Language?: string | null
-          last_name?: string | null
-          Linkedin?: string | null
-          Location?: string | null
-          other_notes?: string | null
+          email?: string | null
+          Firstname?: string | null
+          Lastname?: string | null
+          name?: string | null
           phone_number?: string | null
-          Skills?: string | null
-          Timestamp?: string | null
-          Title?: string | null
+          user_id: string
         }
         Update: {
-          applied_for?: string | null
-          candidate_id?: string
-          CandidateStatus?: string | null
-          Certifications?: string | null
-          current_company?: string | null
-          CV_Link?: string | null
-          cv_summary?: string | null
           cv_text?: string | null
-          done_questions?: string | null
-          Education?: string | null
-          Email?: string | null
-          Experience?: string | null
-          first_name?: string | null
-          Language?: string | null
-          last_name?: string | null
-          Linkedin?: string | null
-          Location?: string | null
-          other_notes?: string | null
+          email?: string | null
+          Firstname?: string | null
+          Lastname?: string | null
+          name?: string | null
           phone_number?: string | null
-          Skills?: string | null
-          Timestamp?: string | null
-          Title?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -233,6 +197,102 @@ export type Database = {
           things_to_look_for?: string | null
           Timestamp?: string | null
           Type?: string | null
+        }
+        Relationships: []
+      }
+      Jobs_CVs: {
+        Row: {
+          after_call_cons: string | null
+          after_call_pros: string | null
+          after_call_reason: string | null
+          after_call_score: number | null
+          callcount: number | null
+          candidate_email: string | null
+          candidate_name: string | null
+          candidate_phone_number: string | null
+          contacted: string | null
+          current_salary: number | null
+          cv_score: number | null
+          cv_score_reason: string | null
+          duration: string | null
+          itris_job_id: string | null
+          job_id: string
+          lastcalltime: string | null
+          longlisted_at: string | null
+          notes: string | null
+          notes_updated_at: string | null
+          notes_updated_by: string | null
+          notice_period: string | null
+          recordid: number
+          recording: string | null
+          recruiter_id: number | null
+          salary_expectations: string | null
+          shortlisted_at: string | null
+          transcript: string | null
+          two_questions_of_interview: string | null
+          user_id: number | null
+        }
+        Insert: {
+          after_call_cons?: string | null
+          after_call_pros?: string | null
+          after_call_reason?: string | null
+          after_call_score?: number | null
+          callcount?: number | null
+          candidate_email?: string | null
+          candidate_name?: string | null
+          candidate_phone_number?: string | null
+          contacted?: string | null
+          current_salary?: number | null
+          cv_score?: number | null
+          cv_score_reason?: string | null
+          duration?: string | null
+          itris_job_id?: string | null
+          job_id: string
+          lastcalltime?: string | null
+          longlisted_at?: string | null
+          notes?: string | null
+          notes_updated_at?: string | null
+          notes_updated_by?: string | null
+          notice_period?: string | null
+          recordid?: number
+          recording?: string | null
+          recruiter_id?: number | null
+          salary_expectations?: string | null
+          shortlisted_at?: string | null
+          transcript?: string | null
+          two_questions_of_interview?: string | null
+          user_id?: number | null
+        }
+        Update: {
+          after_call_cons?: string | null
+          after_call_pros?: string | null
+          after_call_reason?: string | null
+          after_call_score?: number | null
+          callcount?: number | null
+          candidate_email?: string | null
+          candidate_name?: string | null
+          candidate_phone_number?: string | null
+          contacted?: string | null
+          current_salary?: number | null
+          cv_score?: number | null
+          cv_score_reason?: string | null
+          duration?: string | null
+          itris_job_id?: string | null
+          job_id?: string
+          lastcalltime?: string | null
+          longlisted_at?: string | null
+          notes?: string | null
+          notes_updated_at?: string | null
+          notes_updated_by?: string | null
+          notice_period?: string | null
+          recordid?: number
+          recording?: string | null
+          recruiter_id?: number | null
+          salary_expectations?: string | null
+          shortlisted_at?: string | null
+          transcript?: string | null
+          two_questions_of_interview?: string | null
+          user_id?: number | null
         }
         Relationships: []
       }
