@@ -61,7 +61,7 @@ export function DashboardSidebar() {
     icon: Briefcase
   }, {
     title: "Groups",
-    url: "/groups",
+    url: "/groups", 
     icon: FolderOpen
   }, {
     title: "Candidates",
