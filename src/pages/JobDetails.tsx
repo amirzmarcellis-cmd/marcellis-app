@@ -43,6 +43,7 @@ export default function JobDetails() {
   const [applications, setApplications] = useState<any[]>([]);
   const [applicationsLoading, setApplicationsLoading] = useState(false);
   const [taskCandidates, setTaskCandidates] = useState<any[]>([]);
+  const [jobGroup, setJobGroup] = useState<any>(null);
   const [nameFilter, setNameFilter] = useState("");
   const [emailFilter, setEmailFilter] = useState("");
   const [phoneFilter, setPhoneFilter] = useState("");
@@ -113,6 +114,13 @@ export default function JobDetails() {
       setActiveTab(tab);
     }
   }, [id]);
+
+  // Fetch group data when job is loaded
+  useEffect(() => {
+    if (job?.group_id) {
+      fetchJobGroup(job.group_id);
+    }
+  }, [job?.group_id]);
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (shortListButtonDisabled && shortListTimeRemaining > 0) {
@@ -185,6 +193,26 @@ export default function JobDetails() {
       setJob(null);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchJobGroup = async (groupId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('groups')
+        .select('*')
+        .eq('id', groupId)
+        .maybeSingle();
+      
+      if (error) {
+        console.error("Error fetching group:", error);
+        return;
+      }
+      
+      setJobGroup(data);
+    } catch (error) {
+      console.error("Error fetching group:", error);
+      setJobGroup(null);
     }
   };
   const fetchCandidates = async (jobId: string) => {
@@ -1092,6 +1120,20 @@ export default function JobDetails() {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Notice Period:</span>
                     <span>{job.notice_period || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Group:</span>
+                    <span className="flex items-center gap-2">
+                      {jobGroup ? (
+                        <>
+                          <div 
+                            className="w-3 h-3 rounded-full" 
+                            style={{ backgroundColor: jobGroup.color }}
+                          />
+                          {jobGroup.name}
+                        </>
+                      ) : "No Group"}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
