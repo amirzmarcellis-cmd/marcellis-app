@@ -24,11 +24,11 @@ export default function CandidateDetails() {
       const supabaseModule = await import('@/integrations/supabase/client');
       const supabase = supabaseModule.supabase;
       
-      // Query the CVs table
+      // Query the Jobs_CVs table using recordid
       const queryResult: any = await (supabase as any)
-        .from('CVs')
+        .from('Jobs_CVs')
         .select('*')
-        .eq('user_id', candidateId);
+        .eq('recordid', parseInt(candidateId));
       
       const { data, error } = queryResult;
 
@@ -39,13 +39,27 @@ export default function CandidateDetails() {
       }
 
       if (data && data.length > 0) {
-        const cvData = data[0];
+        const candidateData = data[0];
+        
+        // Try to get CV text from CVs table using user_id
+        let cvText = '';
+        if (candidateData.user_id) {
+          const cvQueryResult: any = await (supabase as any)
+            .from('CVs')
+            .select('cv_text')
+            .eq('user_id', candidateData.user_id.toString());
+          
+          if (cvQueryResult.data && cvQueryResult.data.length > 0) {
+            cvText = cvQueryResult.data[0].cv_text || '';
+          }
+        }
+        
         setCandidate({
-          user_id: cvData.user_id || candidateId,
-          name: cvData.name || `${cvData.Firstname || ''} ${cvData.Lastname || ''}`.trim() || 'Unknown Candidate',
-          email: cvData.email || '',
-          phone_number: cvData.phone_number || '',
-          cv_text: cvData.cv_text || ''
+          user_id: candidateData.user_id?.toString() || candidateId,
+          name: candidateData.candidate_name || 'Unknown Candidate',
+          email: candidateData.candidate_email || '',
+          phone_number: candidateData.candidate_phone_number || '',
+          cv_text: cvText
         });
       } else {
         setCandidate(null);
