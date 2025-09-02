@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Mail, Phone, FileText } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { User, Mail, Phone, FileText, Search } from 'lucide-react';
 
 interface Candidate {
   user_id: string;
@@ -15,6 +16,7 @@ export default function CandidateDetails() {
   const { id } = useParams<{ id: string }>();
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchCandidate = async (candidateId: string) => {
     try {
@@ -77,6 +79,26 @@ export default function CandidateDetails() {
       fetchCandidate(id);
     }
   }, [id]);
+
+  const highlightText = (text: string, searchTerm: string) => {
+    if (!searchTerm.trim()) return text;
+    
+    const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    const parts = text.split(regex);
+    
+    return parts.map((part, index) => {
+      if (regex.test(part)) {
+        return `<mark class="bg-yellow-200 dark:bg-yellow-800 px-1 rounded">${part}</mark>`;
+      }
+      return part;
+    }).join('');
+  };
+
+  const getSearchResultsCount = (text: string, searchTerm: string) => {
+    if (!searchTerm.trim()) return 0;
+    const regex = new RegExp(searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    return (text.match(regex) || []).length;
+  };
 
   if (loading) {
     return (
@@ -156,11 +178,32 @@ export default function CandidateDetails() {
             CV Content
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           {candidate.cv_text ? (
-            <div className="whitespace-pre-wrap text-sm leading-relaxed bg-muted/30 p-4 rounded-lg border max-h-96 overflow-y-auto">
-              {candidate.cv_text}
-            </div>
+            <>
+              <div className="flex items-center gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search in CV content..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                {searchTerm && (
+                  <div className="text-sm text-muted-foreground whitespace-nowrap">
+                    {getSearchResultsCount(candidate.cv_text, searchTerm)} results
+                  </div>
+                )}
+              </div>
+              <div 
+                className="whitespace-pre-wrap text-sm leading-relaxed bg-muted/30 p-4 rounded-lg border max-h-96 overflow-y-auto"
+                dangerouslySetInnerHTML={{
+                  __html: highlightText(candidate.cv_text, searchTerm)
+                }}
+              />
+            </>
           ) : (
             <div className="text-muted-foreground text-sm p-4 text-center bg-muted/20 rounded-lg border border-dashed">
               <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
