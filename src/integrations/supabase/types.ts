@@ -128,12 +128,40 @@ export type Database = {
         }
         Relationships: []
       }
+      groups: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       Jobs: {
         Row: {
           assignment: string | null
           client_description: string | null
           contract_length: string | null
           Currency: string | null
+          group_id: string | null
           itris_job_id: string | null
           jd_summary: string | null
           job_description: string | null
@@ -157,6 +185,7 @@ export type Database = {
           client_description?: string | null
           contract_length?: string | null
           Currency?: string | null
+          group_id?: string | null
           itris_job_id?: string | null
           jd_summary?: string | null
           job_description?: string | null
@@ -180,6 +209,7 @@ export type Database = {
           client_description?: string | null
           contract_length?: string | null
           Currency?: string | null
+          group_id?: string | null
           itris_job_id?: string | null
           jd_summary?: string | null
           job_description?: string | null
@@ -198,7 +228,15 @@ export type Database = {
           Timestamp?: string | null
           Type?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "Jobs_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       Jobs_CVs: {
         Row: {
