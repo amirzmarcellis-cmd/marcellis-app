@@ -46,6 +46,7 @@ export default function JobDetails() {
   const [nameFilter, setNameFilter] = useState("");
   const [emailFilter, setEmailFilter] = useState("");
   const [phoneFilter, setPhoneFilter] = useState("");
+  const [userIdFilter, setUserIdFilter] = useState("");
   const [scoreFilter, setScoreFilter] = useState("all");
   const [contactedFilter, setContactedFilter] = useState("all");
   // Application filters
@@ -919,9 +920,11 @@ export default function JobDetails() {
     const nameMatch = !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
     const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
     const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
+    const userIdMatch = !userIdFilter || (candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
     let scoreMatch = true;
     if (scoreFilter !== "all") {
-      const score = parseInt(candidate["Success Score"] || "0");
+      // Try multiple possible field names for CV score
+      const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
       switch (scoreFilter) {
         case "high":
           scoreMatch = score >= 75;
@@ -933,7 +936,7 @@ export default function JobDetails() {
           scoreMatch = score > 0 && score < 50;
           break;
         case "none":
-          scoreMatch = score === 0 || !candidate["Success Score"];
+          scoreMatch = score === 0 || (!candidate["Success Score"] && !candidate["cv_score"] && !candidate["CV Score"]);
           break;
       }
     }
@@ -951,7 +954,7 @@ export default function JobDetails() {
         contactedMatch = norm === contactedFilter.toLowerCase();
       }
     }
-    return nameMatch && emailMatch && phoneMatch && scoreMatch && contactedMatch;
+    return nameMatch && emailMatch && phoneMatch && userIdMatch && scoreMatch && contactedMatch;
   });
   const uniqueContactedStatuses = [...new Set(candidates.map(c => c["Contacted"]).filter(Boolean))];
 
@@ -963,7 +966,7 @@ export default function JobDetails() {
 
   // Short list candidates (score 74+)
   const shortListCandidates = candidates.filter(candidate => {
-    const score = parseInt(candidate["Success Score"] || "0");
+    const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
     return score >= 74;
   });
   return <div className="space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden">
@@ -1422,13 +1425,14 @@ export default function JobDetails() {
                           </Button>
                         </div>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
                         <div className="relative">
                           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                           <Input placeholder="Name..." value={nameFilter} onChange={e => setNameFilter(e.target.value)} className="pl-10 h-9 text-sm" />
                         </div>
                         <Input placeholder="Email..." value={emailFilter} onChange={e => setEmailFilter(e.target.value)} className="h-9 text-sm" />
                         <Input placeholder="Phone..." value={phoneFilter} onChange={e => setPhoneFilter(e.target.value)} className="h-9 text-sm" />
+                        <Input placeholder="User ID..." value={userIdFilter} onChange={e => setUserIdFilter(e.target.value)} className="h-9 text-sm" />
                         <Select value={scoreFilter} onValueChange={setScoreFilter}>
                           <SelectTrigger className="h-9 text-sm">
                             <SelectValue placeholder="Score" />
@@ -1556,7 +1560,7 @@ export default function JobDetails() {
                                 } : cv));
                               }} variant="badge" />}
                                     </div>
-                                    {getScoreBadge(mainCandidate["Success Score"])}
+                                    {getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
                                   </div>
 
                                   {/* Call Log Buttons */}
@@ -1747,7 +1751,7 @@ export default function JobDetails() {
                               } : cv));
                             }} variant="badge" />}
                                   </div>
-                                  {getScoreBadge(mainCandidate["Success Score"])}
+                                  {getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
                                 </div>
 
                                 {/* Call Log Buttons */}
