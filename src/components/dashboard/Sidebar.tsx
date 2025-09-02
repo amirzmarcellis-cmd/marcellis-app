@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { BarChart3, Phone, Users, Settings, Home, TrendingUp, Calendar, FileText, Briefcase, LogOut, PhoneCall, Activity, Sun, Moon, ClipboardList, Building2 } from "lucide-react";
+import { BarChart3, Phone, Users, Settings, Home, TrendingUp, Calendar, FileText, Briefcase, LogOut, PhoneCall, Activity, Sun, Moon, ClipboardList, Building2, FolderOpen } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -59,6 +59,10 @@ export function DashboardSidebar() {
     title: "Jobs",
     url: "/jobs",
     icon: Briefcase
+  }, {
+    title: "Groups",
+    url: "/groups",
+    icon: FolderOpen
   }, {
     title: "Candidates",
     url: "/candidates",

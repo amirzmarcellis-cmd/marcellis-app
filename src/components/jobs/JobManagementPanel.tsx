@@ -25,6 +25,12 @@ interface Job {
   musttohave?: string | null;
   nicetohave?: string | null;
   Timestamp: string | null;
+  group_id?: string | null;
+  groups?: {
+    id: string;
+    name: string;
+    color: string | null;
+  } | null;
 }
 
 export function JobManagementPanel() {
@@ -32,19 +38,29 @@ export function JobManagementPanel() {
   const [loading, setLoading] = useState(true);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedGroupFilter, setSelectedGroupFilter] = useState<string>("");
+  const [groups, setGroups] = useState<Array<{id: string, name: string, color: string | null}>>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
   
 
   useEffect(() => {
     fetchJobs();
+    fetchGroups();
   }, []);
 
   const fetchJobs = async () => {
     try {
       const { data, error } = await supabase
         .from('Jobs')
-        .select('*')
+        .select(`
+          *,
+          groups (
+            id,
+            name,
+            color
+          )
+        `)
         .order('Timestamp', { ascending: false });
 
       if (error) throw error;
@@ -59,6 +75,20 @@ export function JobManagementPanel() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchGroups = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('groups')
+        .select('id, name, color')
+        .order('name');
+
+      if (error) throw error;
+      setGroups(data || []);
+    } catch (error) {
+      console.error('Error fetching groups:', error);
     }
   };
 
@@ -131,6 +161,19 @@ export function JobManagementPanel() {
   const activeJobs = jobs.filter(job => job.Processed === "Yes");
   const pausedJobs = jobs.filter(job => job.Processed !== "Yes");
 
+  // Filter jobs by selected group
+  const filterJobsByGroup = (jobList: Job[]) => {
+    if (!selectedGroupFilter) return jobList;
+    if (selectedGroupFilter === "ungrouped") {
+      return jobList.filter(job => !job.group_id);
+    }
+    return jobList.filter(job => job.group_id === selectedGroupFilter);
+  };
+
+  const filteredActiveJobs = filterJobsByGroup(activeJobs);
+  const filteredPausedJobs = filterJobsByGroup(pausedJobs);
+  const filteredAllJobs = filterJobsByGroup(jobs);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -138,38 +181,78 @@ export function JobManagementPanel() {
           <h2 className="text-2xl font-bold text-glow">Job Management</h2>
           <p className="text-muted-foreground">Manage job postings and recruitment campaigns</p>
         </div>
-        <Button 
-          onClick={() => navigate("/jobs/add")}
-          className="action-button bg-gradient-primary hover:shadow-glow"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Create Job
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button 
+            onClick={() => navigate("/groups")}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Building2 className="h-4 w-4" />
+            Manage Groups
+          </Button>
+          <Button 
+            onClick={() => navigate("/jobs/add")}
+            className="action-button bg-gradient-primary hover:shadow-glow"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create Job
+          </Button>
+        </div>
+      </div>
+
+      {/* Group Filter */}
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium">Filter by Group:</label>
+          <select
+            value={selectedGroupFilter}
+            onChange={(e) => setSelectedGroupFilter(e.target.value)}
+            className="px-3 py-1 rounded-md border border-border bg-background text-sm"
+          >
+            <option value="">All Groups</option>
+            <option value="ungrouped">Ungrouped</option>
+            {groups.map((group) => (
+              <option key={group.id} value={group.id}>
+                {group.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        {selectedGroupFilter && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSelectedGroupFilter("")}
+            className="text-xs"
+          >
+            Clear Filter
+          </Button>
+        )}
       </div>
 
       <Tabs defaultValue="active" className="space-y-6">
         <TabsList className="glass-card">
           <TabsTrigger value="active" className="data-[state=active]:bg-status-active data-[state=active]:text-white">
-            Active Jobs ({activeJobs.length})
+            Active Jobs ({filteredActiveJobs.length})
           </TabsTrigger>
           <TabsTrigger value="paused">
-            Paused Jobs ({pausedJobs.length})
+            Paused Jobs ({filteredPausedJobs.length})
           </TabsTrigger>
           <TabsTrigger value="all">
-            All Jobs ({jobs.length})
+            All Jobs ({filteredAllJobs.length})
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="active">
-          <JobGrid jobs={activeJobs} onEdit={(job) => { setSelectedJob(job); setIsDialogOpen(true); }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} navigate={navigate} />
+          <JobGrid jobs={filteredActiveJobs} onEdit={(job) => { setSelectedJob(job); setIsDialogOpen(true); }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} navigate={navigate} />
         </TabsContent>
         
         <TabsContent value="paused">
-          <JobGrid jobs={pausedJobs} onEdit={(job) => { setSelectedJob(job); setIsDialogOpen(true); }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} navigate={navigate} />
+          <JobGrid jobs={filteredPausedJobs} onEdit={(job) => { setSelectedJob(job); setIsDialogOpen(true); }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} navigate={navigate} />
         </TabsContent>
         
         <TabsContent value="all">
-          <JobGrid jobs={jobs} onEdit={(job) => { setSelectedJob(job); setIsDialogOpen(true); }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} navigate={navigate} />
+          <JobGrid jobs={filteredAllJobs} onEdit={(job) => { setSelectedJob(job); setIsDialogOpen(true); }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} navigate={navigate} />
         </TabsContent>
       </Tabs>
 
@@ -250,11 +333,23 @@ function JobGrid({ jobs, onEdit, onDelete, onStatusToggle, navigate }: JobGridPr
                 <CardTitle className="text-lg font-semibold line-clamp-2 mb-2">
                   {job.job_title || "Untitled Position"}
                 </CardTitle>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 mb-2">
                   {getStatusBadge(job.Processed)}
                   <Badge variant="outline" className="text-xs">
                     ID: {job.job_id}
                   </Badge>
+                  {job.groups && (
+                    <Badge 
+                      variant="outline" 
+                      className="text-xs border"
+                      style={{ 
+                        borderColor: job.groups.color || "#3B82F6",
+                        color: job.groups.color || "#3B82F6"
+                      }}
+                    >
+                      {job.groups.name}
+                    </Badge>
+                  )}
                 </div>
               </div>
             </div>

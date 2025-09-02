@@ -77,6 +77,7 @@ interface JobData {
   contract_length: string | null;
   Currency: string;
   itris_job_id?: string;
+  group_id?: string;
 }
 
 export default function EditJob() {
@@ -89,6 +90,7 @@ export default function EditJob() {
   const [nationalityToInclude, setNationalityToInclude] = useState<string[]>([]);
   const [nationalityToExclude, setNationalityToExclude] = useState<string[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<Array<{ id: string; file_name: string; file_url: string; file_type: string; file_size: number }>>([]);
+  const [groups, setGroups] = useState<Array<{id: string, name: string, color: string | null}>>([]);
   
   const [formData, setFormData] = useState<JobData>({
     job_id: "",
@@ -109,14 +111,30 @@ export default function EditJob() {
     Type: "",
     contract_length: "",
     Currency: "",
-    itris_job_id: ""
+    itris_job_id: "",
+    group_id: ""
   });
 
   useEffect(() => {
     if (id) {
       fetchJob();
     }
+    fetchGroups();
   }, [id]);
+
+  const fetchGroups = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('groups')
+        .select('id, name, color')
+        .order('name');
+
+      if (error) throw error;
+      setGroups(data || []);
+    } catch (error) {
+      console.error('Error fetching groups:', error);
+    }
+  };
 
   const fetchJob = async () => {
     try {
@@ -192,7 +210,8 @@ export default function EditJob() {
         nationality_to_include: nationalityToInclude.join(", "),
         nationality_to_exclude: nationalityToExclude.join(", "),
         contract_length: formData.Type === "Contract" ? formData.contract_length : null,
-        assignment: hasAssignment ? formData.assignment : null
+        assignment: hasAssignment ? formData.assignment : null,
+        group_id: formData.group_id || null
       };
 
       const { error } = await supabase
@@ -282,6 +301,29 @@ export default function EditJob() {
                         placeholder="Enter Itris ID"
                       />
                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="group">Group</Label>
+                    <Select value={formData.group_id || ""} onValueChange={(value) => setFormData(prev => ({ ...prev, group_id: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a group (optional)" />
+                      </SelectTrigger>
+                      <SelectContent className="z-[60] bg-popover">
+                        <SelectItem value="">No Group</SelectItem>
+                        {groups.map((group) => (
+                          <SelectItem key={group.id} value={group.id}>
+                            <div className="flex items-center gap-2">
+                              <div 
+                                className="w-3 h-3 rounded-full"
+                                style={{ backgroundColor: group.color || "#3B82F6" }}
+                              />
+                              {group.name}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="space-y-2">

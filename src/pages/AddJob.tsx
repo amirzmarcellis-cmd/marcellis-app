@@ -74,9 +74,29 @@ export default function AddJob() {
     type: "",
     contractLength: "",
     currency: "",
-    itrisId: ""
+    itrisId: "",
+    groupId: ""
   });
+  const [groups, setGroups] = useState<Array<{id: string, name: string, color: string | null}>>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetchGroups();
+  }, []);
+
+  const fetchGroups = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('groups')
+        .select('id, name, color')
+        .order('name');
+
+      if (error) throw error;
+      setGroups(data || []);
+    } catch (error) {
+      console.error('Error fetching groups:', error);
+    }
+  };
 
   const handleInputChange = (field: string, value: string | boolean | number[] | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -133,6 +153,7 @@ export default function AddJob() {
           contract_length: formData.type === "Contract" ? formData.contractLength : null,
           Currency: formData.currency,
           itris_job_id: formData.itrisId,
+          group_id: formData.groupId || null,
           Timestamp: new Date().toISOString()
         });
 
@@ -192,6 +213,29 @@ export default function AddJob() {
                   placeholder="Enter Itris ID"
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="group">Group</Label>
+              <Select value={formData.groupId} onValueChange={(value) => handleInputChange("groupId", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a group (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">No Group</SelectItem>
+                  {groups.map((group) => (
+                    <SelectItem key={group.id} value={group.id}>
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: group.color || "#3B82F6" }}
+                        />
+                        {group.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

@@ -11,6 +11,7 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Jobs from "./pages/Jobs";
+import Groups from "./pages/Groups";
 import AddJob from "./pages/AddJob";
 import EditJob from "./pages/EditJob";
 import JobDetails from "./pages/JobDetails";
@@ -54,6 +55,7 @@ const App = () => (
                 <Route path="/live-feed" element={<DashboardLayout><LiveCandidateFeed /></DashboardLayout>} />
                 <Route path="/tasks" element={<DashboardLayout><Tasks /></DashboardLayout>} />
                 <Route path="/jobs" element={<DashboardLayout><Jobs /></DashboardLayout>} />
+                <Route path="/groups" element={<DashboardLayout><Groups /></DashboardLayout>} />
                 <Route path="/jobs/add" element={<DashboardLayout><AddJob /></DashboardLayout>} />
                 <Route path="/jobs/edit/:id" element={<DashboardLayout><EditJob /></DashboardLayout>} />
                 <Route path="/job/:id" element={<DashboardLayout><JobDetails /></DashboardLayout>} />
