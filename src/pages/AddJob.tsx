@@ -217,12 +217,12 @@ export default function AddJob() {
 
             <div className="space-y-2">
               <Label htmlFor="group">Group</Label>
-              <Select value={formData.groupId} onValueChange={(value) => handleInputChange("groupId", value)}>
+              <Select value={formData.groupId || "none"} onValueChange={(value) => handleInputChange("groupId", value === "none" ? "" : value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a group (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No Group</SelectItem>
+                  <SelectItem value="none">No Group</SelectItem>
                   {groups.map((group) => (
                     <SelectItem key={group.id} value={group.id}>
                       <div className="flex items-center gap-2">

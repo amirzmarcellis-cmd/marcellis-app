@@ -305,12 +305,12 @@ export default function EditJob() {
 
                   <div className="space-y-2">
                     <Label htmlFor="group">Group</Label>
-                    <Select value={formData.group_id || ""} onValueChange={(value) => setFormData(prev => ({ ...prev, group_id: value }))}>
+                    <Select value={formData.group_id || "none"} onValueChange={(value) => setFormData(prev => ({ ...prev, group_id: value === "none" ? "" : value }))}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a group (optional)" />
                       </SelectTrigger>
                       <SelectContent className="z-[60] bg-popover">
-                        <SelectItem value="">No Group</SelectItem>
+                        <SelectItem value="none">No Group</SelectItem>
                         {groups.map((group) => (
                           <SelectItem key={group.id} value={group.id}>
                             <div className="flex items-center gap-2">
