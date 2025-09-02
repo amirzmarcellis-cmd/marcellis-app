@@ -1,18 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { User, Mail, Phone, FileText } from 'lucide-react';
 
 interface Candidate {
-  candidate_id: string;
-  first_name: string;
-  last_name: string;
-  Email: string;
+  user_id: string;
+  name: string;
+  email: string;
   phone_number: string;
-  Title: string;
   cv_text: string;
-  CandidateStatus: string;
 }
 
 export default function CandidateDetails() {
@@ -22,20 +18,41 @@ export default function CandidateDetails() {
 
   const fetchCandidate = async (candidateId: string) => {
     try {
-      // Mock candidate data since CVs table doesn't exist
-      const mockCandidate = {
-        candidate_id: candidateId,
-        first_name: 'John',
-        last_name: 'Doe',
-        Email: 'john.doe@example.com',
-        phone_number: '+971501234567',
-        Title: 'Software Engineer',
-        cv_text: 'Mock CV content...',
-        CandidateStatus: 'Applied'
-      };
-      setCandidate(mockCandidate);
+      setLoading(true);
+      
+      // Use a dynamic import to avoid TypeScript issues
+      const supabaseModule = await import('@/integrations/supabase/client');
+      const supabase = supabaseModule.supabase;
+      
+      // Query the CVs table
+      const queryResult: any = await (supabase as any)
+        .from('CVs')
+        .select('*')
+        .eq('user_id', candidateId);
+      
+      const { data, error } = queryResult;
+
+      if (error) {
+        console.error('Error fetching candidate:', error);
+        setCandidate(null);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        const cvData = data[0];
+        setCandidate({
+          user_id: cvData.user_id || candidateId,
+          name: cvData.name || `${cvData.Firstname || ''} ${cvData.Lastname || ''}`.trim() || 'Unknown Candidate',
+          email: cvData.email || '',
+          phone_number: cvData.phone_number || '',
+          cv_text: cvData.cv_text || ''
+        });
+      } else {
+        setCandidate(null);
+      }
     } catch (error) {
       console.error('Error fetching candidate:', error);
+      setCandidate(null);
     } finally {
       setLoading(false);
     }
@@ -49,14 +66,17 @@ export default function CandidateDetails() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 p-6">
         <div className="flex items-center gap-3">
           <User className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-bold">Candidate Details</h1>
         </div>
         <Card>
           <CardContent className="p-6">
-            <p className="text-muted-foreground">Loading candidate...</p>
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+            <p className="text-muted-foreground text-center">Loading candidate...</p>
           </CardContent>
         </Card>
       </div>
@@ -65,14 +85,14 @@ export default function CandidateDetails() {
 
   if (!candidate) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 p-6">
         <div className="flex items-center gap-3">
           <User className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-bold">Candidate Details</h1>
         </div>
         <Card>
           <CardContent className="p-6">
-            <p className="text-muted-foreground">Candidate not found</p>
+            <p className="text-muted-foreground text-center">Candidate not found</p>
           </CardContent>
         </Card>
       </div>
@@ -80,47 +100,61 @@ export default function CandidateDetails() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       <div className="flex items-center gap-3">
         <User className="h-6 w-6 text-primary" />
         <h1 className="text-2xl font-bold">
-          {candidate.first_name} {candidate.last_name}
+          {candidate.name}
         </h1>
-        <Badge variant="secondary">{candidate.CandidateStatus}</Badge>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Contact Information</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Contact Information
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {candidate.email && (
+            <div className="flex items-center gap-3">
+              <Mail className="h-4 w-4 text-muted-foreground" />
+              <span>{candidate.email}</span>
+            </div>
+          )}
+          {candidate.phone_number && (
+            <div className="flex items-center gap-3">
+              <Phone className="h-4 w-4 text-muted-foreground" />
+              <span>{candidate.phone_number}</span>
+            </div>
+          )}
           <div className="flex items-center gap-3">
-            <Mail className="h-4 w-4 text-muted-foreground" />
-            <span>{candidate.Email}</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Phone className="h-4 w-4 text-muted-foreground" />
-            <span>{candidate.phone_number}</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <FileText className="h-4 w-4 text-muted-foreground" />
-            <span>{candidate.Title}</span>
+            <User className="h-4 w-4 text-muted-foreground" />
+            <span>User ID: {candidate.user_id}</span>
           </div>
         </CardContent>
       </Card>
 
-      {candidate.cv_text && (
-        <Card>
-          <CardHeader>
-            <CardTitle>CV Content</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="whitespace-pre-wrap text-sm text-muted-foreground">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            CV Content
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {candidate.cv_text ? (
+            <div className="whitespace-pre-wrap text-sm leading-relaxed bg-muted/30 p-4 rounded-lg border max-h-96 overflow-y-auto">
               {candidate.cv_text}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          ) : (
+            <div className="text-muted-foreground text-sm p-4 text-center bg-muted/20 rounded-lg border border-dashed">
+              <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p>No CV content available for this candidate</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
