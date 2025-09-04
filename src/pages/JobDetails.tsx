@@ -1757,6 +1757,18 @@ export default function JobDetails() {
                         <Input placeholder="Email..." value={emailFilter} onChange={e => setEmailFilter(e.target.value)} className="h-9 text-sm" />
                         <Input placeholder="Phone..." value={phoneFilter} onChange={e => setPhoneFilter(e.target.value)} className="h-9 text-sm" />
                         <Input placeholder="User ID..." value={userIdFilter} onChange={e => setUserIdFilter(e.target.value)} className="h-9 text-sm" />
+                        <Select value={scoreFilter} onValueChange={setScoreFilter}>
+                          <SelectTrigger className="h-9 text-sm">
+                            <SelectValue placeholder="Score" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Scores</SelectItem>
+                            <SelectItem value="high">High (75+)</SelectItem>
+                            <SelectItem value="moderate">Moderate (50-74)</SelectItem>
+                            <SelectItem value="poor">Poor (1-49)</SelectItem>
+                            <SelectItem value="none">No Score</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <Select value={contactedFilter} onValueChange={setContactedFilter}>
                           <SelectTrigger className="h-9 text-sm">
                             <SelectValue placeholder="Status" />
@@ -1805,7 +1817,7 @@ export default function JobDetails() {
                                 <div className="flex items-start justify-between">
                                   <div className="min-w-0 flex-1">
                                     <div className="flex items-center">
-                                      <Checkbox checked={selectedCandidates.has(candidateId)} onChange={(checked) => toggleCandidateSelection(candidateId, checked)} className="mr-2" />
+                                      <input type="checkbox" checked={selectedCandidates.has(candidateId)} onChange={() => toggleCandidateSelection(candidateId)} className="mr-2 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" />
                                       <h4 className="font-semibold">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
                                     </div>
                                     <p className="text-sm text-muted-foreground">{candidateId}</p>
