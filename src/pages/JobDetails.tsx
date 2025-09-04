@@ -1404,10 +1404,6 @@ export default function JobDetails() {
                       All candidates with their CV scores for this position
                     </CardDescription>
                   </div>
-                  <Button variant="default" className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed" onClick={handleGenerateShortList} disabled={isGeneratingShortList || shortListButtonDisabled}>
-                    <Phone className="w-4 h-4 mr-2" />
-                    {isGeneratingShortList ? "Generating..." : shortListButtonDisabled ? `Short List is being processed (${Math.floor(shortListTimeRemaining / 60)}:${(shortListTimeRemaining % 60).toString().padStart(2, '0')})` : "Call & Generate Short List"}
-                  </Button>
                 </div>
               </CardHeader>
               <CardContent>
