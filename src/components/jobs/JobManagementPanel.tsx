@@ -231,14 +231,14 @@ export function JobManagementPanel() {
       </div>
 
       <Tabs defaultValue="active" className="space-y-6">
-        <TabsList className="glass-card">
-          <TabsTrigger value="active" className="data-[state=active]:bg-status-active data-[state=active]:text-white">
+        <TabsList className="glass-card flex-nowrap whitespace-nowrap overflow-x-auto">
+          <TabsTrigger value="active" className="data-[state=active]:bg-status-active data-[state=active]:text-white flex-shrink-0">
             Active Jobs ({filteredActiveJobs.length})
           </TabsTrigger>
-          <TabsTrigger value="paused">
+          <TabsTrigger value="paused" className="flex-shrink-0">
             Paused Jobs ({filteredPausedJobs.length})
           </TabsTrigger>
-          <TabsTrigger value="all">
+          <TabsTrigger value="all" className="flex-shrink-0">
             All Jobs ({filteredAllJobs.length})
           </TabsTrigger>
         </TabsList>
