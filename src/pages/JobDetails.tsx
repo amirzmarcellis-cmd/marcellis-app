@@ -1083,7 +1083,8 @@ export default function JobDetails() {
                     {newApplicationsCount > 99 ? '99+' : newApplicationsCount}
                   </span>}
               </TabsTrigger>
-              <TabsTrigger value="candidates" className="text-xs md:text-sm px-2 py-2">AI Long List</TabsTrigger>
+              <TabsTrigger value="boolean-search" className="text-xs md:text-sm px-2 py-2">AI Boolean Search</TabsTrigger>
+              <TabsTrigger value="ai-longlist" className="text-xs md:text-sm px-2 py-2">AI Longlist</TabsTrigger>
               <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">AI Short List</TabsTrigger>
             </TabsList>
           </div>
@@ -1389,17 +1390,17 @@ export default function JobDetails() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="candidates" className="space-y-4">
+          <TabsContent value="boolean-search" className="space-y-4">
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="flex items-center">
                       <Users className="w-5 h-5 mr-2" />
-                      Contacted Candidates ({filteredCandidates.length} of {candidates.length})
+                      AI Boolean Search ({filteredCandidates.length} of {candidates.length})
                     </CardTitle>
                     <CardDescription>
-                      Candidates who have been contacted for this position
+                      All candidates with their CV scores for this position
                     </CardDescription>
                   </div>
                   <Button variant="default" className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed" onClick={handleGenerateShortList} disabled={isGeneratingShortList || shortListButtonDisabled}>
@@ -1621,7 +1622,7 @@ export default function JobDetails() {
                                 return <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
                                             <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} className="truncate" onClick={() => {
                                     // Store current tab in URL hash for back navigation
-                                    window.location.hash = 'tab=candidates';
+                                    window.location.hash = 'tab=boolean-search';
                                   }}>
                                               <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
                                               <span className="truncate">Call Log</span>
@@ -1653,6 +1654,249 @@ export default function JobDetails() {
                             </Card>;
                   });
                 })()}
+                    </div>
+                  </>}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="ai-longlist" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center">
+                      <Users className="w-5 h-5 mr-2" />
+                      AI Longlist ({filteredCandidates.filter(candidate => {
+                        const score = candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"];
+                        return score >= 70;
+                      }).length} candidates with score ≥ 70)
+                    </CardTitle>
+                    <CardDescription>
+                      High-scoring candidates (≥70) for this position
+                    </CardDescription>
+                  </div>
+                  <Button variant="default" className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed" onClick={handleGenerateShortList} disabled={isGeneratingShortList || shortListButtonDisabled}>
+                    <Phone className="w-4 h-4 mr-2" />
+                    {isGeneratingShortList ? "Generating..." : shortListButtonDisabled ? `Short List is being processed (${Math.floor(shortListTimeRemaining / 60)}:${(shortListTimeRemaining % 60).toString().padStart(2, '0')})` : "Call & Generate Short List"}
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {(() => {
+              const longlistCandidates = filteredCandidates.filter(candidate => {
+                const score = candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"];
+                return score >= 70;
+              });
+              const readyToContactCount = longlistCandidates.filter(candidate => candidate["Contacted"] === "Ready to Contact").length;
+              if (readyToContactCount > 0) {
+                return <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                        <div className="flex items-center">
+                          <Target className="w-4 h-4 mr-2 text-amber-600 dark:text-amber-400" />
+                          <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                            {readyToContactCount} {readyToContactCount === 1 ? 'candidate' : 'candidates'} ready to be contacted
+                          </span>
+                        </div>
+                      </div>;
+              }
+              return null;
+            })()}
+                {candidatesLoading ? <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div> : filteredCandidates.filter(candidate => {
+                    const score = candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"];
+                    return score >= 70;
+                  }).length === 0 ? <div className="text-center py-8">
+                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No high-scoring candidates yet</h3>
+                    <p className="text-muted-foreground">Candidates with CV scores ≥ 70 will appear here</p>
+                  </div> : <>
+                    {/* Bulk Actions */}
+                    {selectedCandidates.size > 0 && <Card className="p-3 md:p-4 mb-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium">
+                              {selectedCandidates.size} candidate{selectedCandidates.size > 1 ? 's' : ''} selected
+                            </span>
+                            <Button variant="ghost" size="sm" onClick={clearAllSelection} className="h-6 text-xs px-2">
+                              Clear
+                            </Button>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" size="sm" onClick={handleRemoveSelectedCandidates} className="text-destructive hover:text-destructive border-destructive/50 hover:border-destructive">
+                              <X className="w-4 h-4 mr-1" />
+                              Remove Selected
+                            </Button>
+                            <Button variant="default" size="sm" onClick={handleCallSelectedCandidates} disabled={isGeneratingShortList} className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600">
+                              <Phone className="w-4 h-4 mr-1" />
+                              {isGeneratingShortList ? "Calling..." : "Call Selected"}
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>}
+
+                    {/* Filters */}
+                    <Card className="p-3 md:p-4 mb-4 bg-muted/50">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <Filter className="w-4 h-4" />
+                          <h4 className="font-medium text-sm md:text-base">Filters</h4>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button variant="ghost" size="sm" onClick={selectAllCandidates} className="h-6 text-xs px-2">
+                            Select All
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                          <Input placeholder="Name..." value={nameFilter} onChange={e => setNameFilter(e.target.value)} className="pl-10 h-9 text-sm" />
+                        </div>
+                        <Input placeholder="Email..." value={emailFilter} onChange={e => setEmailFilter(e.target.value)} className="h-9 text-sm" />
+                        <Input placeholder="Phone..." value={phoneFilter} onChange={e => setPhoneFilter(e.target.value)} className="h-9 text-sm" />
+                        <Input placeholder="User ID..." value={userIdFilter} onChange={e => setUserIdFilter(e.target.value)} className="h-9 text-sm" />
+                        <Select value={contactedFilter} onValueChange={setContactedFilter}>
+                          <SelectTrigger className="h-9 text-sm">
+                            <SelectValue placeholder="Status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Status</SelectItem>
+                            <SelectItem value="Not Contacted">Not Contacted</SelectItem>
+                            <SelectItem value="Ready to Call">Ready to Contact</SelectItem>
+                            <SelectItem value="Contacted">Contacted</SelectItem>
+                            <SelectItem value="Call Done">Call Done</SelectItem>
+                            <SelectItem value="1st No Answer">1st No Answer</SelectItem>
+                            <SelectItem value="2nd No Answer">2nd No Answer</SelectItem>
+                            <SelectItem value="3rd No Answer">3rd No Answer</SelectItem>
+                            <SelectItem value="VM Left">VM Left</SelectItem>
+                            <SelectItem value="Interested">Interested</SelectItem>
+                            <SelectItem value="Not Interested">Not Interested</SelectItem>
+                            <SelectItem value="Reject">Reject</SelectItem>
+                            <SelectItem value="Tasked">Tasked</SelectItem>
+                            <SelectItem value="Low Scored">Low Scored</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </Card>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                      {(() => {
+                // Group longlist candidates by Candidate_ID and filter by score >= 70
+                const longlistCandidates = filteredCandidates.filter(candidate => {
+                  const score = candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"];
+                  return score >= 70;
+                });
+                const groupedLonglist = longlistCandidates.reduce((acc, candidate) => {
+                  const candidateId = candidate["Candidate_ID"];
+                  if (!acc[candidateId]) {
+                    acc[candidateId] = [];
+                  }
+                  acc[candidateId].push(candidate);
+                  return acc;
+                }, {} as Record<string, any[]>);
+                
+                return Object.entries(groupedLonglist).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                  const mainCandidate = candidateContacts[0];
+                  return <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
+                            <CardContent className="p-4">
+                              <div className="space-y-3">
+                                <div className="flex items-start justify-between">
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center">
+                                      <Checkbox checked={selectedCandidates.has(candidateId)} onChange={(checked) => toggleCandidateSelection(candidateId, checked)} className="mr-2" />
+                                      <h4 className="font-semibold">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">{candidateId}</p>
+                                  </div>
+                                  {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || mainCandidate["Contacted"]?.toLowerCase() === "contacted" || mainCandidate["Contacted"]?.toLowerCase() === "low scored" || mainCandidate["Contacted"]?.toLowerCase() === "tasked") && mainCandidate["lastcalltime"] && <div className="text-xs text-muted-foreground text-right">
+                                        <div>{new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}</div>
+                                        <div>{new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], {
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}</div>
+                                      </div>}
+                                </div>
+
+                                <div className="space-y-1 text-sm">
+                                  <div className="flex items-center text-muted-foreground">
+                                    <Mail className="w-3 h-3 mr-2" />
+                                    <span className="truncate">{mainCandidate["Candidate Email"] || "No email"}</span>
+                                  </div>
+                                  <div className="flex items-center text-muted-foreground">
+                                    <Phone className="w-3 h-3 mr-2" />
+                                    <span>{mainCandidate["Candidate Phone Number"] || "No phone"}</span>
+                                  </div>
+                                  <div className="flex items-center text-muted-foreground">
+                                    <User className="w-3 h-3 mr-2" />
+                                    <span>ID: {mainCandidate["user_id"] || "N/A"}</span>
+                                  </div>
+                                </div>
+
+                                <div className="flex flex-wrap gap-2 items-center">
+                                  <div className="flex items-center gap-2">
+                                    {mainCandidate["CandidateStatus"] && <StatusDropdown currentStatus={mainCandidate["CandidateStatus"]} candidateId={mainCandidate["Candidate_ID"]} onStatusChange={newStatus => {
+                                setCandidates(prev => prev.map(candidate => candidate["Candidate_ID"] === mainCandidate["Candidate_ID"] ? {
+                                  ...candidate,
+                                  CandidateStatus: newStatus
+                                } : candidate));
+                                setCvData(prev => prev.map(cv => cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] ? {
+                                  ...cv,
+                                  CandidateStatus: newStatus
+                                } : cv));
+                              }} variant="badge" />}
+                                  </div>
+                                  {getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
+                                </div>
+
+                                {/* Call Log Buttons */}
+                                <div className="space-y-2 pt-2 border-t">
+                                  <div className="flex flex-col sm:flex-row gap-2">
+                                    <Button variant="default" size="sm" onClick={() => handleCallCandidate(mainCandidate["Candidate_ID"], id!, mainCandidate["callid"])} disabled={callingCandidateId === candidateId} className="w-full sm:flex-1 bg-foreground hover:bg-foreground/90 text-background disabled:opacity-50 text-xs md:text-sm">
+                                      <Phone className="w-3 h-3 mr-1" />
+                                      {callingCandidateId === candidateId ? 'Calling...' : 'Call Candidate'}
+                                    </Button>
+                                    {(() => {
+                                const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
+                                if (contactsWithCalls.length === 0) return null;
+
+                                // Get the latest call log (highest callid)
+                                const latestContact = contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest);
+                                return <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
+                                          <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} className="truncate" onClick={() => {
+                                  // Store current tab in URL hash for back navigation
+                                  window.location.hash = 'tab=ai-longlist';
+                                }}>
+                                            <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
+                                            <span className="truncate">Call Log</span>
+                                          </Link>
+                                        </Button>;
+                              })()}
+                                  </div>
+                                  
+                                  {/* Show All Record Info Button */}
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    onClick={() => navigate(`/call-log-details?recordId=${mainCandidate["Record ID"] || mainCandidate["Candidate_ID"]}&jobId=${id}`)}
+                                    className="w-full text-xs md:text-sm"
+                                  >
+                                    <FileText className="w-3 h-3 mr-1" />
+                                    Call Log Details
+                                  </Button>
+                                  
+                                  <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
+                                    <Link to={`/candidate/${candidateId}`}>
+                                      <Users className="w-3 h-3 mr-1" />
+                                      View Profile
+                                    </Link>
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>;
+                });
+              })()}
                     </div>
                   </>}
               </CardContent>
