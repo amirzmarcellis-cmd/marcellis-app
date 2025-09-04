@@ -387,7 +387,7 @@ export default function JobDetails() {
         };
 
         // Make HTTP request to the webhook for each candidate
-        const response = await fetch('https://hook.eu2.make.com/mqf7bj597li1ac3yhabc7taaupuw89hp', {
+        const response = await fetch('https://hook.eu2.make.com/o9mt66urjw5a6sxfog71945s3ubghukw', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -626,7 +626,7 @@ export default function JobDetails() {
         };
 
         // Make HTTP request to the webhook for each candidate
-        const response = await fetch('https://hook.eu2.make.com/mqf7bj597li1ac3yhabc7taaupuw89hp', {
+        const response = await fetch('https://hook.eu2.make.com/o9mt66urjw5a6sxfog71945s3ubghukw', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -713,7 +713,7 @@ export default function JobDetails() {
         jobID: jobId,
         callid
       };
-      const response = await fetch('https://hook.eu2.make.com/i3owa6dmu1mstug4tsfb0dnhhjfh4arj', {
+      const response = await fetch('https://hook.eu2.make.com/o9mt66urjw5a6sxfog71945s3ubghukw', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

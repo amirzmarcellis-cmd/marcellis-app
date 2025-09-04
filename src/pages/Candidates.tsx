@@ -98,7 +98,7 @@ export default function Candidates() {
         ? candidate.applied_for[0] 
         : ""
       
-      const response = await fetch('https://hook.eu2.make.com/i3owa6dmu1mstug4tsfb0dnhhjfh4arj', {
+      const response = await fetch('https://hook.eu2.make.com/o9mt66urjw5a6sxfog71945s3ubghukw', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
