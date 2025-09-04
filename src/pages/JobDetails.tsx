@@ -708,10 +708,18 @@ export default function JobDetails() {
   const handleCallCandidate = async (candidateId: string, jobId: string, callid: number | null | undefined) => {
     try {
       setCallingCandidateId(candidateId);
+      
+      // Find the candidate record to get required data
+      const candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
+      if (!candidate) {
+        throw new Error('Candidate not found');
+      }
+      
       const payload = {
-        candidateID: candidateId,
-        jobID: jobId,
-        callid
+        user_id: candidate.user_id,
+        jobID: job.job_id,
+        job_itris_id: job.itris_job_id,
+        recordid: candidate.recordid
       };
       const response = await fetch('https://hook.eu2.make.com/o9mt66urjw5a6sxfog71945s3ubghukw', {
         method: 'POST',

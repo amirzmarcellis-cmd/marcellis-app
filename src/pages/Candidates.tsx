@@ -98,14 +98,36 @@ export default function Candidates() {
         ? candidate.applied_for[0] 
         : ""
       
+      // Find the job to get job_itris_id
+      const job = jobs.find(j => j.job_id === jobID)
+      if (!job) {
+        toast.error("Job information not found")
+        return
+      }
+      
+      // Fetch candidate record from Jobs_CVs to get user_id and recordid
+      const { data: jobsCVData, error } = await supabase
+        .from('Jobs_CVs')
+        .select('user_id, recordid')
+        .eq('job_id', jobID)
+        .eq('candidate_email', candidate?.Email)
+        .single()
+        
+      if (error || !jobsCVData) {
+        toast.error("Candidate record not found in job applications")
+        return
+      }
+      
       const response = await fetch('https://hook.eu2.make.com/o9mt66urjw5a6sxfog71945s3ubghukw', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          candidateID,
-          jobID
+          user_id: jobsCVData.user_id,
+          jobID: jobID,
+          job_itris_id: job.itris_job_id,
+          recordid: jobsCVData.recordid
         }),
       })
 
