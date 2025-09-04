@@ -1074,19 +1074,19 @@ export default function JobDetails() {
         {/* Detailed Information Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <div className="w-full overflow-x-auto">
-            <TabsList className="w-full min-w-[400px] flex flex-nowrap h-auto p-1 overflow-x-auto">
-              <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2 flex-shrink-0">Overview</TabsTrigger>
-              <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2 flex-shrink-0">Description</TabsTrigger>
-              <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2 flex-shrink-0">AI Requirements</TabsTrigger>
-              <TabsTrigger value="applications" className="text-xs md:text-sm px-2 py-2 relative flex-shrink-0" onClick={handleApplicationsTabClick}>
+            <TabsList className="w-full grid grid-cols-7 h-auto p-1">
+              <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">Overview</TabsTrigger>
+              <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2">Description</TabsTrigger>
+              <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">AI Requirements</TabsTrigger>
+              <TabsTrigger value="applications" className="text-xs md:text-sm px-2 py-2 relative" onClick={handleApplicationsTabClick}>
                 Applications
                 {newApplicationsCount > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-[20px] z-10">
                     {newApplicationsCount > 99 ? '99+' : newApplicationsCount}
                   </span>}
               </TabsTrigger>
-              <TabsTrigger value="boolean-search" className="text-xs md:text-sm px-2 py-2 flex-shrink-0">AI Boolean Search</TabsTrigger>
-              <TabsTrigger value="ai-longlist" className="text-xs md:text-sm px-2 py-2 flex-shrink-0">AI Longlist</TabsTrigger>
-              <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2 flex-shrink-0">AI Short List</TabsTrigger>
+              <TabsTrigger value="boolean-search" className="text-xs md:text-sm px-2 py-2">AI Boolean Search</TabsTrigger>
+              <TabsTrigger value="ai-longlist" className="text-xs md:text-sm px-2 py-2">AI Longlist</TabsTrigger>
+              <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">AI Short List</TabsTrigger>
             </TabsList>
           </div>
 
