@@ -1876,7 +1876,13 @@ export default function JobDetails() {
                                   </div>
 
                                 <div className="flex flex-wrap gap-2 items-center">
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex flex-wrap items-center gap-1">
+                                    <StatusDropdown currentStatus={mainCandidate["Contacted"]} candidateId={mainCandidate["Candidate_ID"]} jobId={id!} onStatusChange={newStatus => {
+                                setCandidates(prev => prev.map(c => c["Candidate_ID"] === mainCandidate["Candidate_ID"] ? {
+                                  ...c,
+                                  Contacted: newStatus
+                                } : c));
+                              }} variant="badge" statusType="contacted" />
                                     {mainCandidate["CandidateStatus"] && <StatusDropdown currentStatus={mainCandidate["CandidateStatus"]} candidateId={mainCandidate["Candidate_ID"]} onStatusChange={newStatus => {
                                 setCandidates(prev => prev.map(candidate => candidate["Candidate_ID"] === mainCandidate["Candidate_ID"] ? {
                                   ...candidate,
@@ -1886,7 +1892,7 @@ export default function JobDetails() {
                                   ...cv,
                                   CandidateStatus: newStatus
                                 } : cv));
-                              }} variant="badge" />}
+                              }} variant="badge" statusType="candidate" />}
                                   </div>
                                   {getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
                                 </div>
