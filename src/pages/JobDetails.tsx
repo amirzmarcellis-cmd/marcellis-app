@@ -1844,11 +1844,36 @@ export default function JobDetails() {
                                     <Phone className="w-3 h-3 mr-2" />
                                     <span>{mainCandidate["Candidate Phone Number"] || "No phone"}</span>
                                   </div>
-                                  <div className="flex items-center text-muted-foreground">
-                                    <User className="w-3 h-3 mr-2" />
-                                    <span>ID: {mainCandidate["user_id"] || "N/A"}</span>
+                                   <div className="flex items-center text-muted-foreground">
+                                     <User className="w-3 h-3 mr-2" />
+                                     <span>ID: {mainCandidate["user_id"] || "N/A"}</span>
+                                   </div>
+                                 </div>
+
+                                 {/* CV Score and Reason Section */}
+                                 <div className="space-y-2 pt-2 border-t">
+                                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                     <div className="space-y-1">
+                                       <div className="flex items-center justify-between">
+                                         <span className="text-muted-foreground">CV Score:</span>
+                                         <span className="font-medium">{mainCandidate["cv_score"] || "N/A"}</span>
+                                       </div>
+                                       <div className="flex items-center justify-between">
+                                         <span className="text-muted-foreground">User ID:</span>
+                                         <span className="font-mono text-xs">{mainCandidate["user_id"] || "N/A"}</span>
+                                       </div>
+                                     </div>
+                                     <div className="space-y-1">
+                                       
+                                     </div>
+                                   </div>
+                                   {mainCandidate["cv_score_reason"] && <div className="pt-1">
+                                       <span className="text-muted-foreground text-xs">Reason:</span>
+                                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                         {mainCandidate["cv_score_reason"]}
+                                       </p>
+                                     </div>}
                                   </div>
-                                </div>
 
                                 <div className="flex flex-wrap gap-2 items-center">
                                   <div className="flex items-center gap-2">
