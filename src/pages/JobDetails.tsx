@@ -475,8 +475,10 @@ export default function JobDetails() {
   const handleSearchMoreCandidates = async () => {
     try {
       const payload = {
-        job_id: job?.job_id || '',
-        itris_job_id: job?.itris_job_id || ''
+        user_id: profile?.user_id || '',
+        jobID: job?.job_id || '',
+        job_itris_id: job?.itris_job_id || '',
+        recordid: job?.recordid || ''
       };
       const response = await fetch('https://hook.eu2.make.com/w10612c8i0lg2em4p305sbhhnkj73auj', {
         method: 'POST',
