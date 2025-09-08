@@ -196,20 +196,16 @@ export default function JobDetails() {
       setLoading(false);
     }
   };
-
   const fetchJobGroup = async (groupId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('groups')
-        .select('*')
-        .eq('id', groupId)
-        .maybeSingle();
-      
+      const {
+        data,
+        error
+      } = await supabase.from('groups').select('*').eq('id', groupId).maybeSingle();
       if (error) {
         console.error("Error fetching group:", error);
         return;
       }
-      
       setJobGroup(data);
     } catch (error) {
       console.error("Error fetching group:", error);
@@ -659,20 +655,17 @@ export default function JobDetails() {
   const handleRemoveFromLongList = async (candidateId: string) => {
     try {
       console.log('Attempting to remove candidate:', candidateId);
-      
+
       // Find the candidate record to get the correct recordid
       const candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
       if (!candidate) {
         throw new Error('Candidate not found in local data');
       }
-      
+
       // Remove the candidate from the Jobs_CVs table using recordid (which maps to Candidate_ID in our data transformation)
-      const { error } = await (supabase as any)
-        .from('Jobs_CVs')
-        .delete()
-        .eq('recordid', candidateId)
-        .eq('job_id', id);
-        
+      const {
+        error
+      } = await (supabase as any).from('Jobs_CVs').delete().eq('recordid', candidateId).eq('job_id', id);
       if (error) {
         console.error('Supabase delete error:', error);
         throw error;
@@ -708,13 +701,12 @@ export default function JobDetails() {
   const handleCallCandidate = async (candidateId: string, jobId: string, callid: number | null | undefined) => {
     try {
       setCallingCandidateId(candidateId);
-      
+
       // Find the candidate record to get required data
       const candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
       if (!candidate) {
         throw new Error('Candidate not found');
       }
-      
       const payload = {
         user_id: candidate.user_id,
         jobID: job.job_id,
@@ -929,7 +921,7 @@ export default function JobDetails() {
     if (!score || score === "0" || score === "") return null;
     const numScore = parseInt(score);
     if (numScore >= 75) {
-      return <Badge className="bg-green-600 text-foreground border-0">{score} - High</Badge>;
+      return;
     } else if (numScore >= 50) {
       return <Badge className="bg-blue-600 text-foreground border-0">{score} - Moderate</Badge>;
     } else if (numScore >= 1) {
@@ -973,7 +965,7 @@ export default function JobDetails() {
           scoreMatch = score > 0 && score < 50;
           break;
         case "none":
-          scoreMatch = score === 0 || (!candidate["Success Score"] && !candidate["cv_score"] && !candidate["CV Score"]);
+          scoreMatch = score === 0 || !candidate["Success Score"] && !candidate["cv_score"] && !candidate["CV Score"];
           break;
       }
     }
@@ -1134,15 +1126,12 @@ export default function JobDetails() {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Group:</span>
                     <span className="flex items-center gap-2">
-                      {jobGroup ? (
-                        <>
-                          <div 
-                            className="w-3 h-3 rounded-full" 
-                            style={{ backgroundColor: jobGroup.color }}
-                          />
+                      {jobGroup ? <>
+                          <div className="w-3 h-3 rounded-full" style={{
+                      backgroundColor: jobGroup.color
+                    }} />
                           {jobGroup.name}
-                        </>
-                      ) : "No Group"}
+                        </> : "No Group"}
                     </span>
                   </div>
                 </CardContent>
@@ -1637,12 +1626,7 @@ export default function JobDetails() {
                                     </div>
                                     
                                     {/* Show All Record Info Button */}
-                                    <Button 
-                                      variant="outline" 
-                                      size="sm" 
-                                      onClick={() => navigate(`/call-log-details?recordId=${mainCandidate["Record ID"] || mainCandidate["Candidate_ID"]}&jobId=${id}`)}
-                                      className="w-full text-xs md:text-sm"
-                                    >
+                                    <Button variant="outline" size="sm" onClick={() => navigate(`/call-log-details?recordId=${mainCandidate["Record ID"] || mainCandidate["Candidate_ID"]}&jobId=${id}`)} className="w-full text-xs md:text-sm">
                                       <FileText className="w-3 h-3 mr-1" />
                                       Call Log Details
                                     </Button>
@@ -1673,9 +1657,9 @@ export default function JobDetails() {
                     <CardTitle className="flex items-center">
                       <Users className="w-5 h-5 mr-2" />
                       AI Longlist ({filteredCandidates.filter(candidate => {
-                        const score = candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"];
-                        return score >= 70;
-                      }).length} candidates with score ≥ 70)
+                    const score = candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"];
+                    return score >= 70;
+                  }).length} candidates with score ≥ 70)
                     </CardTitle>
                     <CardDescription>
                       High-scoring candidates (≥70) for this position
@@ -1709,9 +1693,9 @@ export default function JobDetails() {
                 {candidatesLoading ? <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                   </div> : filteredCandidates.filter(candidate => {
-                    const score = candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"];
-                    return score >= 70;
-                  }).length === 0 ? <div className="text-center py-8">
+              const score = candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"];
+              return score >= 70;
+            }).length === 0 ? <div className="text-center py-8">
                     <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">No high-scoring candidates yet</h3>
                     <p className="text-muted-foreground">Candidates with CV scores ≥ 70 will appear here</p>
@@ -1799,23 +1783,22 @@ export default function JobDetails() {
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                       {(() => {
-                // Group longlist candidates by Candidate_ID and filter by score >= 70
-                const longlistCandidates = filteredCandidates.filter(candidate => {
-                  const score = candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"];
-                  return score >= 70;
-                });
-                const groupedLonglist = longlistCandidates.reduce((acc, candidate) => {
-                  const candidateId = candidate["Candidate_ID"];
-                  if (!acc[candidateId]) {
-                    acc[candidateId] = [];
-                  }
-                  acc[candidateId].push(candidate);
-                  return acc;
-                }, {} as Record<string, any[]>);
-                
-                return Object.entries(groupedLonglist).map(([candidateId, candidateContacts]: [string, any[]]) => {
-                  const mainCandidate = candidateContacts[0];
-                  return <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
+                  // Group longlist candidates by Candidate_ID and filter by score >= 70
+                  const longlistCandidates = filteredCandidates.filter(candidate => {
+                    const score = candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"];
+                    return score >= 70;
+                  });
+                  const groupedLonglist = longlistCandidates.reduce((acc, candidate) => {
+                    const candidateId = candidate["Candidate_ID"];
+                    if (!acc[candidateId]) {
+                      acc[candidateId] = [];
+                    }
+                    acc[candidateId].push(candidate);
+                    return acc;
+                  }, {} as Record<string, any[]>);
+                  return Object.entries(groupedLonglist).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                    const mainCandidate = candidateContacts[0];
+                    return <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
                             <CardContent className="p-4">
                               <div className="space-y-3">
                                 <div className="flex items-start justify-between">
@@ -1912,9 +1895,9 @@ export default function JobDetails() {
                                 const latestContact = contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest);
                                 return <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
                                           <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} className="truncate" onClick={() => {
-                                  // Store current tab in URL hash for back navigation
-                                  window.location.hash = 'tab=ai-longlist';
-                                }}>
+                                    // Store current tab in URL hash for back navigation
+                                    window.location.hash = 'tab=ai-longlist';
+                                  }}>
                                             <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
                                             <span className="truncate">Call Log</span>
                                           </Link>
@@ -1923,12 +1906,7 @@ export default function JobDetails() {
                                   </div>
                                   
                                   {/* Show All Record Info Button */}
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    onClick={() => navigate(`/call-log-details?recordId=${mainCandidate["Record ID"] || mainCandidate["Candidate_ID"]}&jobId=${id}`)}
-                                    className="w-full text-xs md:text-sm"
-                                  >
+                                  <Button variant="outline" size="sm" onClick={() => navigate(`/call-log-details?recordId=${mainCandidate["Record ID"] || mainCandidate["Candidate_ID"]}&jobId=${id}`)} className="w-full text-xs md:text-sm">
                                     <FileText className="w-3 h-3 mr-1" />
                                     Call Log Details
                                   </Button>
@@ -1943,8 +1921,8 @@ export default function JobDetails() {
                               </div>
                             </CardContent>
                           </Card>;
-                });
-              })()}
+                  });
+                })()}
                     </div>
                   </>}
               </CardContent>
