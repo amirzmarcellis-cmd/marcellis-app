@@ -993,10 +993,10 @@ export default function JobDetails() {
     return cvRecord?.['CandidateStatus'] || null;
   };
 
-  // Short list candidates (score 74+)
+  // Short list candidates (after_call_score > 74)
   const shortListCandidates = candidates.filter(candidate => {
-    const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
-    return score >= 74;
+    const afterCallScore = parseInt(candidate["after_call_score"] || "0");
+    return afterCallScore > 74;
   });
   return <div className="space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden">
         {/* Header */}
@@ -1934,17 +1934,17 @@ export default function JobDetails() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Star className="w-5 h-5 mr-2" />
-                  AI Short List ({shortListCandidates.length} candidates with 74+ score)
+                  AI Short List ({shortListCandidates.length} candidates with after_call_score {">"}74)
                 </CardTitle>
                 <CardDescription>
-                  High-scoring candidates (74+) who have passed the initial screening
+                  High-scoring candidates (after_call_score {">"}74) who have passed the call screening
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {shortListCandidates.length === 0 ? <div className="text-center py-8">
                     <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">No high-scoring candidates yet</h3>
-                    <p className="text-muted-foreground">Candidates with scores of 74+ will appear here automatically</p>
+                    <p className="text-muted-foreground">Candidates with after_call_score {">"}74 will appear here automatically</p>
                   </div> : <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                     {(() => {
                 // Group short list candidates by Candidate_ID
