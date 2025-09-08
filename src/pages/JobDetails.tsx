@@ -1807,7 +1807,7 @@ export default function JobDetails() {
                                       <input type="checkbox" checked={selectedCandidates.has(candidateId)} onChange={() => toggleCandidateSelection(candidateId)} className="mr-2 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" />
                                       <h4 className="font-semibold">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
                                     </div>
-                                    <p className="text-sm text-muted-foreground">{candidateId}</p>
+                                    
                                   </div>
                                   {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || mainCandidate["Contacted"]?.toLowerCase() === "contacted" || mainCandidate["Contacted"]?.toLowerCase() === "low scored" || mainCandidate["Contacted"]?.toLowerCase() === "tasked") && mainCandidate["lastcalltime"] && <div className="text-xs text-muted-foreground text-right">
                                         <div>{new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}</div>
