@@ -474,8 +474,8 @@ export default function JobDetails() {
   };
   const handleSearchMoreCandidates = async () => {
     try {
-      // Get user_ids from AI Boolean Search candidates (filteredCandidates)
-      const booleanSearchUserIds = filteredCandidates.map(candidate => candidate.user_id).filter(Boolean);
+      // Get user_ids from AI Boolean Search candidates (filteredCandidates) as comma-separated string
+      const booleanSearchUserIds = filteredCandidates.map(candidate => candidate.user_id).filter(Boolean).join(',');
       
       const payload = {
         job_id: job?.job_id || '',
