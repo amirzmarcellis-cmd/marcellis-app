@@ -993,10 +993,10 @@ export default function JobDetails() {
     return cvRecord?.['CandidateStatus'] || null;
   };
 
-  // Short list candidates (score 74+)
+  // Short list candidates (after_call_score > 74)
   const shortListCandidates = candidates.filter(candidate => {
     const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
-    return score >= 74;
+    return score > 74;
   });
   return <div className="space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden">
         {/* Header */}
@@ -1934,10 +1934,10 @@ export default function JobDetails() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Star className="w-5 h-5 mr-2" />
-                  AI Short List ({shortListCandidates.length} candidates with 74+ score)
+                  AI Short List ({shortListCandidates.length} candidates with score {'>'} 74)
                 </CardTitle>
                 <CardDescription>
-                  High-scoring candidates (74+) who have passed the initial screening
+                  High-scoring candidates (after_call_score {'>'} 74) who have passed the initial screening
                 </CardDescription>
               </CardHeader>
               <CardContent>
