@@ -474,9 +474,13 @@ export default function JobDetails() {
   };
   const handleSearchMoreCandidates = async () => {
     try {
+      // Get user_ids from AI Boolean Search candidates (filteredCandidates)
+      const booleanSearchUserIds = filteredCandidates.map(candidate => candidate.user_id).filter(Boolean);
+      
       const payload = {
         job_id: job?.job_id || '',
-        itris_job_id: job?.itris_job_id || ''
+        itris_job_id: job?.itris_job_id || '',
+        user_ids: booleanSearchUserIds
       };
       const response = await fetch('https://hook.eu2.make.com/w10612c8i0lg2em4p305sbhhnkj73auj', {
         method: 'POST',
