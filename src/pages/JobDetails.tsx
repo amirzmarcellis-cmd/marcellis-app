@@ -999,7 +999,7 @@ export default function JobDetails() {
 
   // Short list candidates (after_call_score > 74)
   const shortListCandidates = candidates.filter(candidate => {
-    const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
+    const score = parseFloat(candidate.after_call_score || "0");
     return score > 74;
   });
   return <div className="space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden">
