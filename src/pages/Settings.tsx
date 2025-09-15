@@ -25,7 +25,7 @@ export default function Settings() {
       setFormData({
         name: profile.name || '',
         email: profile.email || '',
-        slug: profile.slug || '',
+        slug: profile.slug || 'me',
         notifications: true,
         automaticDial: false,
       });

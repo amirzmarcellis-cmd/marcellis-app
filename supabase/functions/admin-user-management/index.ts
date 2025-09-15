@@ -133,7 +133,8 @@ serve(async (req) => {
               user_id: newUser.user.id,
               name: userData.name,
               email: userData.email,
-              is_admin: userData.is_admin || false
+              is_admin: userData.is_admin || false,
+              slug: 'me'
             });
 
           if (profileError) {
