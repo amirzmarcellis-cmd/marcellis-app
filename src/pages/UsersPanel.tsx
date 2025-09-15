@@ -83,25 +83,18 @@ export default function UsersPanel() {
     try {
       setSubmitting(true);
       
-      const response = await fetch('https://sofrxfgjptargppbepbi.supabase.run/functions/v1/admin-user-management', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('admin-user-management', {
+        body: {
           action: 'create_user',
           email: newUser.email,
           password: newUser.password,
           name: newUser.name,
           is_admin: newUser.is_admin
-        })
+        }
       });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to create user');
+      if (error) {
+        throw new Error(error.message || 'Failed to create user');
       }
 
       toast({
@@ -139,22 +132,15 @@ export default function UsersPanel() {
     }
 
     try {
-      const response = await fetch('https://sofrxfgjptargppbepbi.supabase.run/functions/v1/admin-user-management', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('admin-user-management', {
+        body: {
           action: 'delete_user',
           user_id: userId
-        })
+        }
       });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to delete user');
+      if (error) {
+        throw new Error(error.message || 'Failed to delete user');
       }
 
       toast({
