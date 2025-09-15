@@ -86,10 +86,12 @@ export default function UsersPanel() {
       const { data, error } = await supabase.functions.invoke('admin-user-management', {
         body: {
           action: 'create_user',
-          email: newUser.email,
-          password: newUser.password,
-          name: newUser.name,
-          is_admin: newUser.is_admin
+          userData: {
+            email: newUser.email,
+            password: newUser.password,
+            name: newUser.name,
+            is_admin: newUser.is_admin
+          }
         }
       });
 
@@ -135,7 +137,7 @@ export default function UsersPanel() {
       const { data, error } = await supabase.functions.invoke('admin-user-management', {
         body: {
           action: 'delete_user',
-          user_id: userId
+          userId: userId
         }
       });
 

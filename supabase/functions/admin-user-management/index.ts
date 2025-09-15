@@ -39,11 +39,12 @@ serve(async (req) => {
       );
     }
 
-    // Check if user has admin privileges using the new company_users table
-    const { data: userRoles, error: roleError } = await supabaseAdmin
-      .from('company_users')
-      .select('role')
-      .eq('user_id', user.id);
+    // Check if user has admin privileges using the profiles table
+    const { data: profileData, error: roleError } = await supabaseAdmin
+      .from('profiles')
+      .select('is_admin')
+      .eq('user_id', user.id)
+      .single();
 
     if (roleError) {
       console.error('Error checking user roles:', roleError);
@@ -53,11 +54,7 @@ serve(async (req) => {
       );
     }
 
-    const hasAdminRole = userRoles?.some(role => 
-      role.role === 'platform_admin' || role.role === 'company_admin'
-    );
-
-    if (!hasAdminRole) {
+    if (!profileData?.is_admin) {
       console.error('User does not have admin role');
       return new Response(
         JSON.stringify({ error: 'Insufficient permissions' }),
@@ -135,7 +132,8 @@ serve(async (req) => {
             .insert({
               user_id: newUser.user.id,
               name: userData.name,
-              email: userData.email
+              email: userData.email,
+              is_admin: userData.is_admin || false
             });
 
           if (profileError) {
