@@ -83,7 +83,7 @@ export default function UsersPanel() {
     try {
       setSubmitting(true);
       
-      const response = await fetch('/functions/v1/admin-user-management', {
+      const response = await fetch('https://sofrxfgjptargppbepbi.supabase.run/functions/v1/admin-user-management', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -139,7 +139,7 @@ export default function UsersPanel() {
     }
 
     try {
-      const response = await fetch('/functions/v1/admin-user-management', {
+      const response = await fetch('https://sofrxfgjptargppbepbi.supabase.run/functions/v1/admin-user-management', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
