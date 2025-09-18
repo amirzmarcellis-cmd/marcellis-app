@@ -72,7 +72,7 @@ export function JobManagementPanel() {
         (jobsData || []).map(async (job) => {
           const { data: candidatesData, error: candidatesError } = await supabase
             .from('Jobs_CVs')
-            .select('longlisted_at, shortlisted_at')
+            .select('cv_score, after_call_score')
             .eq('job_id', job.job_id);
 
           if (candidatesError) {
@@ -84,8 +84,14 @@ export function JobManagementPanel() {
             };
           }
 
-          const longlisted_count = candidatesData?.filter(c => c.longlisted_at).length || 0;
-          const shortlisted_count = candidatesData?.filter(c => c.shortlisted_at).length || 0;
+          // Longlist = total candidates for this job
+          const longlisted_count = candidatesData?.length || 0;
+          
+          // Shortlist = candidates with after_call_score >= 74 (matching JobFunnel logic)
+          const shortlisted_count = candidatesData?.filter(c => {
+            const score = parseInt(c.after_call_score || "0");
+            return score >= 74;
+          }).length || 0;
 
           return {
             ...job,
