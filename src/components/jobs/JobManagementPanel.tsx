@@ -26,6 +26,8 @@ interface Job {
   nicetohave?: string | null;
   Timestamp: string | null;
   group_id?: string | null;
+  longlisted_count?: number;
+  shortlisted_count?: number;
   groups?: {
     id: string;
     name: string;
@@ -51,7 +53,7 @@ export function JobManagementPanel() {
 
   const fetchJobs = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: jobsData, error } = await supabase
         .from('Jobs')
         .select(`
           *,
@@ -65,7 +67,35 @@ export function JobManagementPanel() {
 
       if (error) throw error;
       
-      setJobs(data || []);
+      // Fetch candidate counts for each job
+      const jobsWithCounts = await Promise.all(
+        (jobsData || []).map(async (job) => {
+          const { data: candidatesData, error: candidatesError } = await supabase
+            .from('Jobs_CVs')
+            .select('longlisted_at, shortlisted_at')
+            .eq('job_id', job.job_id);
+
+          if (candidatesError) {
+            console.error('Error fetching candidate counts for job:', job.job_id, candidatesError);
+            return {
+              ...job,
+              longlisted_count: 0,
+              shortlisted_count: 0
+            };
+          }
+
+          const longlisted_count = candidatesData?.filter(c => c.longlisted_at).length || 0;
+          const shortlisted_count = candidatesData?.filter(c => c.shortlisted_at).length || 0;
+
+          return {
+            ...job,
+            longlisted_count,
+            shortlisted_count
+          };
+        })
+      );
+      
+      setJobs(jobsWithCounts);
     } catch (error) {
       console.error('Error fetching jobs:', error);
       toast({
@@ -384,6 +414,20 @@ function JobGrid({ jobs, onEdit, onDelete, onStatusToggle, navigate }: JobGridPr
                 {job.jd_summary}
               </p>
             )}
+
+            {/* Candidate Counts */}
+            <div className="flex items-center gap-4 text-sm">
+              <div className="flex items-center text-muted-foreground">
+                <Users className="h-4 w-4 mr-1 text-blue" />
+                <span className="font-medium text-foreground">{job.longlisted_count || 0}</span>
+                <span className="ml-1">Longlisted</span>
+              </div>
+              <div className="flex items-center text-muted-foreground">
+                <Users className="h-4 w-4 mr-1 text-green" />
+                <span className="font-medium text-foreground">{job.shortlisted_count || 0}</span>
+                <span className="ml-1">Shortlisted</span>
+              </div>
+            </div>
 
             <div className="flex items-center justify-between pt-2 border-t border-border/30">
               <div className="flex space-x-2">
