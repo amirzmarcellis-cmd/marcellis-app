@@ -13,7 +13,7 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
   // Calculate counts for each stage
   const getCounts = () => {
     const booleanSearch = candidates.length; // Total candidates from Boolean Search
-    const longlist = candidates.filter(c => c["longlisted_at"]).length;
+    const longlist = candidates.length;
     
     // Count by contacted status
     const firstNoAnswer = candidates.filter(c => c["contacted"] === "1st No Answer").length;
