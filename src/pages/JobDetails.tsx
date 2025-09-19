@@ -773,7 +773,7 @@ export default function JobDetails() {
       const { error } = await supabase
         .from('Jobs_CVs')
         .update({ 'contacted': 'Submitted' })
-        .eq('Candidate_ID', candidateId)
+        .eq('recordid', parseInt(candidateId))
         .eq('job_id', id);
       
       if (error) throw error;
