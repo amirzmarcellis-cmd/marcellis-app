@@ -17,24 +17,34 @@ import { formatDate } from "@/lib/utils"
 
 
 interface CallLog {
+  recordid: number
   job_id: string | null
-  Candidate_ID: string | null
+  user_id: number | null
+  recruiter_id: number | null
   contacted: string | null
   transcript: string | null
-  summary: string | null
-  success_score: string | null
-  score_and_reason: string | null
+  cv_score: number | null
+  cv_score_reason: string | null
+  after_call_score: number | null
+  after_call_reason: string | null
   candidate_name: string | null
   candidate_email: string | null
   candidate_phone_number: string | null
-  pros: string | null
-  cons: string | null
+  after_call_pros: string | null
+  after_call_cons: string | null
   notice_period: string | null
   salary_expectations: string | null
-  agency_experience: string | null
-  job_title: string | null
+  current_salary: number | null
   two_questions_of_interview: string | null
   notes: string | null
+  callcount: number | null
+  lastcalltime: string | null
+  duration: string | null
+  recording: string | null
+  longlisted_at: string | null
+  shortlisted_at: string | null
+  notes_updated_by: string | null
+  notes_updated_at: string | null
 }
 
 const formatPhoneNumber = (phone: string | null) => {
@@ -86,10 +96,37 @@ export default function CallLog() {
   }, []);
 
   const fetchData = async () => {
-    // Mock data for single-company structure
     try {
-      setCallLogs([]);
-      setJobs([]);
+      setLoading(true);
+      
+      // Fetch call logs from Jobs_CVs table
+      const { data: callLogsData, error: callLogsError } = await supabase
+        .from('Jobs_CVs')
+        .select('*')
+        .not('callcount', 'is', null)
+        .gt('callcount', 0)
+        .order('recordid', { ascending: false });
+
+      if (callLogsError) {
+        console.error('Error fetching call logs:', callLogsError);
+        throw callLogsError;
+      }
+
+      // Fetch jobs for filter dropdown
+      const { data: jobsData, error: jobsError } = await supabase
+        .from('Jobs')
+        .select('job_id, job_title')
+        .order('job_title');
+
+      if (jobsError) {
+        console.error('Error fetching jobs:', jobsError);
+      }
+
+      console.log('Fetched call logs:', callLogsData);
+      console.log('Fetched jobs:', jobsData);
+
+      setCallLogs(callLogsData || []);
+      setJobs(jobsData || []);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -102,7 +139,7 @@ export default function CallLog() {
   }
 
   const saveNotes = async (log: CallLog) => {
-    const logKey = `${log.Candidate_ID}-${log.job_id}`
+    const logKey = `${log.recordid}`
     const notes = editingNotes[logKey] || log.notes || ""
     
     setSavingNotes(prev => ({ ...prev, [logKey]: true }))
@@ -111,14 +148,13 @@ export default function CallLog() {
       const { error } = await supabase
         .from('Jobs_CVs')
         .update({ notes: notes })
-        .eq('Candidate_ID', log.Candidate_ID)
-        .eq('job_id', log.job_id)
+        .eq('recordid', log.recordid)
 
       if (error) throw error
 
       // Update local state
       setCallLogs(prev => prev.map(l => 
-        l.Candidate_ID === log.Candidate_ID && l.job_id === log.job_id
+        l.recordid === log.recordid
           ? { ...l, notes: notes }
           : l
       ))
@@ -172,14 +208,15 @@ export default function CallLog() {
           break
       }
     }
+    const score = log.after_call_score || log.cv_score || 0;
     const matchesScore = scoreFilter === "all" || 
-                        (scoreFilter === "high" && parseInt(log.success_score || "0") >= 75) ||
-                        (scoreFilter === "medium" && parseInt(log.success_score || "0") >= 50 && parseInt(log.success_score || "0") <= 74) ||
-                        (scoreFilter === "low" && parseInt(log.success_score || "0") >= 1 && parseInt(log.success_score || "0") <= 49)
+                        (scoreFilter === "high" && score >= 75) ||
+                        (scoreFilter === "medium" && score >= 50 && score <= 74) ||
+                        (scoreFilter === "low" && score >= 1 && score <= 49)
     const matchesJob = jobFilter === "all" || log.job_id === jobFilter
     
     // URL parameter filtering
-    const matchesCandidate = !candidateParam || log.Candidate_ID === candidateParam
+    const matchesCandidate = !candidateParam || log.user_id?.toString() === candidateParam
     const matchesJobParam = !jobParam || log.job_id === jobParam
     
     return matchesSearch && matchesContacted && matchesScore && matchesJob && matchesCandidate && matchesJobParam
@@ -317,12 +354,12 @@ export default function CallLog() {
                           <TableCell className="max-w-[120px]">
                             <StatusDropdown
                               currentStatus={log.contacted}
-                              candidateId={log.Candidate_ID || ""}
+                              candidateId={log.user_id?.toString() || ""}
                               jobId={log.job_id}
                               statusType="contacted"
                               onStatusChange={(newStatus) => {
                                 setCallLogs(prev => prev.map(l => 
-                                  l.Candidate_ID === log.Candidate_ID && l.job_id === log.job_id
+                                  l.recordid === log.recordid
                                     ? { ...l, contacted: newStatus }
                                     : l
                                 ))
@@ -330,9 +367,14 @@ export default function CallLog() {
                             />
                           </TableCell>
                           <TableCell className="max-w-[100px]">
-                            <Badge variant={getScoreBadgeVariant(log.success_score)} className="whitespace-nowrap">
-                              {log.success_score ? `${log.success_score}/100` : "N/A"}
-                            </Badge>
+                            {(() => {
+                              const score = log.after_call_score || log.cv_score;
+                              return (
+                                <Badge variant={getScoreBadgeVariant(score?.toString())} className="whitespace-nowrap">
+                                  {score ? `${score}/100` : "N/A"}
+                                </Badge>
+                              );
+                            })()}
                           </TableCell>
                           <TableCell className="max-w-[120px]">
                             <div className="flex items-center space-x-2">
@@ -346,12 +388,12 @@ export default function CallLog() {
                           <TableCell className="text-right max-w-[200px]">
                             <div className="flex justify-end space-x-1">
                               <Button variant="outline" size="sm" asChild className="h-8 px-2">
-                                <Link to={`/call-log-details?candidate=${log.Candidate_ID || (log as any)["candidate_id"]}&job=${log.job_id || (log as any)["job_id"]}&callid=${(log as any).callid}`}> 
+                                <Link to={`/call-log-details?candidate=${log.user_id}&job=${log.job_id}&callid=${log.recordid}`}> 
                                   <FileText className="w-3 h-3" />
                                 </Link>
                               </Button>
                               <Button variant="outline" size="sm" asChild className="h-8 px-2">
-                                <Link to={`/candidate/${log.Candidate_ID}`}>
+                                <Link to={`/candidate/${log.user_id}`}>
                                   <Eye className="w-3 h-3" />
                                 </Link>
                               </Button>
