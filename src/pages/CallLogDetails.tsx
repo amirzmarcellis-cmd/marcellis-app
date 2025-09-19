@@ -108,11 +108,13 @@ export default function CallLogDetails() {
   }, [candidateId, jobId, callid])
 
   const fetchCallLogDetail = async () => {
+    console.log('Fetching call log detail with params:', { candidateId, jobId, callid });
     try {
       let data: any = null
       let error: any = null
 
       if (callid) {
+        console.log('Fetching by callid:', callid);
         const resp = await supabase
           .from('Jobs_CVs')
           .select('*')
@@ -120,7 +122,9 @@ export default function CallLogDetails() {
           .maybeSingle()
         data = resp.data
         error = resp.error
+        console.log('Response for callid query:', { data, error });
       } else {
+        console.log('Fetching by candidateId and jobId:', { candidateId, jobId });
         const resp = await supabase
           .from('Jobs_CVs')
           .select('*')
@@ -128,11 +132,13 @@ export default function CallLogDetails() {
           .maybeSingle()
         data = resp.data
         error = resp.error
+        console.log('Response for candidateId/jobId query:', { data, error });
       }
 
       if (error) throw error
       
       if (!data) {
+        console.log('No call log data found');
         setCallLog(null)
         setLoading(false)
         return
@@ -309,17 +315,25 @@ export default function CallLogDetails() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6">
         <Button variant="outline" onClick={() => {
+          console.log('Back button clicked. Current location:', window.location.href);
+          console.log('Document referrer:', document.referrer);
+          console.log('JobId:', jobId);
+          
           // Check if we came from a job details page with tab info
-          if (jobId && document.referrer.includes(`/job-details/${jobId}`)) {
+          if (jobId && document.referrer.includes(`/job/${jobId}`)) {
             const url = new URL(document.referrer);
-            const hash = url.hash;
+            const hash = url.hash || window.location.hash;
+            console.log('Found hash:', hash);
             
             if (hash && hash.startsWith('#tab=')) {
-              navigate(`/job-details/${jobId}${hash}`);
+              console.log('Navigating to job with hash:', `/job/${jobId}${hash}`);
+              navigate(`/job/${jobId}${hash}`);
             } else {
-              navigate(`/job-details/${jobId}`);
+              console.log('Navigating to job without hash:', `/job/${jobId}`);
+              navigate(`/job/${jobId}`);
             }
           } else {
+            console.log('Using navigate(-1)');
             navigate(-1);
           }
         }}>

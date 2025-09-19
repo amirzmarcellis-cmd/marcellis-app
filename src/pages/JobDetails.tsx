@@ -2110,11 +2110,14 @@ export default function JobDetails() {
                                 <div className="space-y-2 pt-2 border-t">
                                   <div className="flex flex-wrap gap-2">
                                     {(() => {
+                              console.log('AI Short List - candidateContacts for candidate:', candidateId, candidateContacts);
                               const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
+                              console.log('AI Short List - contactsWithCalls:', contactsWithCalls);
                               if (contactsWithCalls.length === 0) return null;
 
                               // Get the latest call log (highest callid)
                               const latestContact = contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest);
+                              console.log('AI Short List - latestContact:', latestContact);
                               return <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-[100px]">
                                           <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} onClick={() => {
                                   // Store current tab in URL hash for back navigation
