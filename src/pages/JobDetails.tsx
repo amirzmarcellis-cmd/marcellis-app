@@ -15,7 +15,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, Hourglass, User } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, Hourglass, User, FileCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { JobFunnel } from "@/components/jobs/JobFunnel";
 import { JobDialog } from "@/components/jobs/JobDialog";
@@ -767,6 +767,36 @@ export default function JobDetails() {
     setInterviewLink('');
     console.log('Dialog should now be open. interviewDialogOpen state set to true');
   };
+
+  const handleCVSubmitted = async (candidateId: string) => {
+    try {
+      const { error } = await supabase
+        .from('Jobs_CVs')
+        .update({ 'contacted': 'Submitted' })
+        .eq('Candidate_ID', candidateId)
+        .eq('job_id', id);
+      
+      if (error) throw error;
+
+      // Update local state
+      setCandidates(prev => prev.map(c => 
+        c["Candidate_ID"] === candidateId ? { ...c, Contacted: 'Submitted' } : c
+      ));
+
+      toast({
+        title: "CV Submitted",
+        description: "Candidate's CV has been marked as submitted",
+      });
+    } catch (error) {
+      console.error('Error submitting CV:', error);
+      toast({
+        title: "Error",
+        description: "Failed to submit CV",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleScheduleInterview = async () => {
     if (!selectedCandidate) return;
 
@@ -2096,12 +2126,19 @@ export default function JobDetails() {
                                       </Link>
                                     </Button>
                                   </div>
-                                  {/* Action Buttons - Arrange Interview and Reject */}
+                                  {/* Action Buttons - CV Submitted and Reject */}
                                   <div className="flex gap-2">
-                                    <Button variant="outline" size="sm" onClick={() => handleArrangeInterview(candidateId)} className="flex-1 min-w-[100px] bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200">
-                                      <Calendar className="w-3 h-3 mr-1" />
-                                      Arrange Interview
-                                    </Button>
+                                    {mainCandidate["Contacted"] === "Submitted" ? 
+                                      <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-blue-500 text-blue-600 cursor-default" disabled>
+                                        <FileCheck className="w-3 h-3 mr-1" />
+                                        CV Submitted
+                                      </Button>
+                                      :
+                                      <Button variant="outline" size="sm" onClick={() => handleCVSubmitted(candidateId)} className="flex-1 min-w-[100px] bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200">
+                                        <FileCheck className="w-3 h-3 mr-1" />
+                                        CV Submitted
+                                      </Button>
+                                    }
                                     {mainCandidate["Contacted"] === "Rejected" ? <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed" disabled>
                                         <X className="w-3 h-3 mr-1" />
                                         Rejected
