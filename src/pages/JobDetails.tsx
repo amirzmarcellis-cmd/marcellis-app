@@ -1998,7 +1998,7 @@ export default function JobDetails() {
                                 <div className="flex items-start justify-between">
                                   <div className="min-w-0 flex-1">
                                     <h4 className="font-semibold">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
-                                    <p className="text-sm text-muted-foreground">User ID: {candidateId}</p>
+                                    <p className="text-sm text-muted-foreground">User ID: {mainCandidate["user_id"] || "N/A"}</p>
                                     <div className="flex items-center gap-4 text-sm mt-1">
                                       <span className="text-muted-foreground">CV Score: {mainCandidate["cv_score"] || mainCandidate["CV Score"] || "N/A"}</span>
                                       {mainCandidate["after_call_score"] && (
