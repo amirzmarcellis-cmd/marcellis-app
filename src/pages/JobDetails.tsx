@@ -1998,7 +1998,13 @@ export default function JobDetails() {
                                 <div className="flex items-start justify-between">
                                   <div className="min-w-0 flex-1">
                                     <h4 className="font-semibold">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
-                                    <p className="text-sm text-muted-foreground">{candidateId}</p>
+                                    <p className="text-sm text-muted-foreground">User ID: {candidateId}</p>
+                                    <div className="flex items-center gap-4 text-sm mt-1">
+                                      <span className="text-muted-foreground">CV Score: {mainCandidate["cv_score"] || mainCandidate["CV Score"] || "N/A"}</span>
+                                      {mainCandidate["after_call_score"] && (
+                                        <span className="text-muted-foreground">After Call Score: {mainCandidate["after_call_score"]}</span>
+                                      )}
+                                    </div>
                                   </div>
                                   {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || mainCandidate["Contacted"]?.toLowerCase() === "contacted" || mainCandidate["Contacted"]?.toLowerCase() === "low scored" || mainCandidate["Contacted"]?.toLowerCase() === "tasked") && mainCandidate["lastcalltime"] && <div className="text-xs text-muted-foreground text-right">
                                       <div className="flex items-center">
