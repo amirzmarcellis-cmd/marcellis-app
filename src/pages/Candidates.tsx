@@ -48,45 +48,21 @@ export default function Candidates() {
   const fetchCVs = async () => {
     try {
       setLoading(true);
-      
-      // First, get all CVs
-      const { data: cvsData, error: cvsError } = await supabase
+      const { data, error } = await supabase
         .from('CVs')
-        .select('*')
+        .select(`
+          *,
+          Jobs_CVs!inner(cv_score, after_call_score)
+        `)
         .order('user_id', { ascending: true });
 
-      if (cvsError) throw cvsError;
-
-      // Then, get scores from Jobs_CVs table
-      const { data: scoresData, error: scoresError } = await supabase
-        .from('Jobs_CVs')
-        .select('user_id, cv_score, after_call_score');
-
-      if (scoresError) {
-        console.warn('Could not fetch scores:', scoresError);
-      }
-
-      // Combine the data
-      const cvsWithScores = (cvsData || []).map(cv => {
-        // Find matching score data by user_id
-        const scoreData = scoresData?.find(score => 
-          score.user_id?.toString() === cv.user_id?.toString()
-        );
-        
-        const cvScore = scoreData?.cv_score || 0;
-        const afterCallScore = scoreData?.after_call_score || 0;
-        
-        // Calculate overall score - if only one score is available, use that score
-        let overallScore = null;
-        if (cvScore > 0 && afterCallScore > 0) {
-          overallScore = (cvScore + afterCallScore) / 2;
-        } else if (cvScore > 0) {
-          overallScore = cvScore; // Use CV score if only CV score is available
-        } else if (afterCallScore > 0) {
-          overallScore = afterCallScore; // Use after call score if only that's available
-        }
-        
-        console.log('Processing CV:', cv.user_id, 'CV Score:', cvScore, 'After Call Score:', afterCallScore, 'Overall:', overallScore);
+      if (error) throw error;
+      
+      // Calculate overall score for each CV
+      const cvsWithScores = (data || []).map(cv => {
+        const cvScore = cv.Jobs_CVs?.[0]?.cv_score || 0;
+        const afterCallScore = cv.Jobs_CVs?.[0]?.after_call_score || 0;
+        const overallScore = cvScore && afterCallScore ? (cvScore + afterCallScore) / 2 : null;
         
         return {
           ...cv,
@@ -99,7 +75,12 @@ export default function Candidates() {
       setCvs(cvsWithScores);
     } catch (error) {
       console.error('Error fetching CVs:', error);
-      toast.error('Failed to fetch CVs');
+      // Fallback to basic CV data if join fails
+      const { data: basicData } = await supabase
+        .from('CVs')
+        .select('*')
+        .order('user_id', { ascending: true });
+      setCvs(basicData || []);
     } finally {
       setLoading(false);
     }
@@ -271,15 +252,7 @@ export default function Candidates() {
                                   >
                                     <Star className="w-3 h-3 mr-1" />
                                     {cv.overall_score.toFixed(1)}
-                                    {cv.cv_score > 0 && cv.after_call_score > 0 ? '' : '*'}
                                   </Badge>
-                                  {cv.cv_score > 0 && cv.after_call_score > 0 ? (
-                                    <span className="text-xs text-muted-foreground">Avg</span>
-                                  ) : (
-                                    <span className="text-xs text-muted-foreground">
-                                      {cv.cv_score > 0 ? 'CV' : 'Call'}
-                                    </span>
-                                  )}
                                 </>
                               ) : (
                                 <Badge variant="outline" className="text-muted-foreground">
