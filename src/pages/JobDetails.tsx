@@ -528,8 +528,31 @@ export default function JobDetails() {
         longlist: (prev?.longlist || 0) + 1
       }));
 
-      // Long list generation completed successfully
-      console.log('Long list generated successfully');
+      // Prepare payload for webhook
+      const payload = {
+        job_id: job?.job_id || '',
+        itris_job_id: job?.itris_job_id || ''
+      };
+      console.log('Webhook payload:', payload);
+
+      // Call the automation endpoint
+      console.log('Calling webhook at:', 'https://hook.eu2.make.com/pjybmj92jovbo5jdlf63afd8mm5bh3ky');
+      const response = await fetch('https://hook.eu2.make.com/pjybmj92jovbo5jdlf63afd8mm5bh3ky', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      console.log('Webhook response status:', response.status);
+      console.log('Webhook response ok:', response.ok);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Webhook error response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
+      }
+      const responseData = await response.text();
+      console.log('Webhook success response:', responseData);
       toast({
         title: "Success",
         description: job?.longlist && job.longlist > 0 ? "Long list regenerated successfully" : "Long list generated successfully"
