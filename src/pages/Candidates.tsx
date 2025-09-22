@@ -60,7 +60,7 @@ export default function Candidates() {
 
       // If there's a search query, apply enhanced filters
       if (searchQuery && searchQuery.trim()) {
-        const searchTerms = searchQuery.trim().split(/\s+/);
+        const searchTerms = searchQuery.trim().toLowerCase().split(/\s+/);
         
         if (searchTerms.length === 1) {
           // Single word search - search across all fields
@@ -93,22 +93,9 @@ export default function Candidates() {
             
             const searchableText = searchableFields.join(' ').toLowerCase();
             
-            // Debug logging for Amir Ziani candidates
-            if (cv.user_id === 'CAND-1758529263736' || cv.user_id === 'CAND-1758528317631') {
-              console.log('Debug candidate:', cv.user_id, {
-                searchableFields,
-                searchableText,
-                searchTerms,
-                matches: searchTerms.map(term => ({
-                  term,
-                  found: searchableText.includes(term.toLowerCase())
-                }))
-              });
-            }
-            
             // All search terms must be found in the combined searchable text
             return searchTerms.every(term => 
-              searchableText.includes(term.toLowerCase())
+              searchableText.includes(term)
             );
           }) || [];
           
