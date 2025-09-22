@@ -134,13 +134,12 @@ export function BulkCandidateUpload({ open, onOpenChange, onSuccess }: BulkCandi
 
       // Create candidate record
       const candidateData = {
-        candidate_id: candidateId,
-        CV_Link: publicUrl,
-        Timestamp: new Date().toISOString(),
-        // Extract potential name from filename (basic attempt)
-        first_name: fileData.file.name.replace(/\.[^/.]+$/, "").split(/[-_\s]/)[0] || null,
-        last_name: fileData.file.name.replace(/\.[^/.]+$/, "").split(/[-_\s]/)[1] || null,
-        company_id: null, // Simplified single-company structure
+        user_id: candidateId,
+        cv_link: publicUrl,
+        name: fileData.file.name.replace(/\.[^/.]+$/, ""), // Remove file extension for name
+        // Extract potential first/last names from filename
+        Firstname: fileData.file.name.replace(/\.[^/.]+$/, "").split(/[-_\s]/)[0] || null,
+        Lastname: fileData.file.name.replace(/\.[^/.]+$/, "").split(/[-_\s]/)[1] || null,
       };
 
       const { error: insertError } = await supabase

@@ -26,6 +26,7 @@ interface CV {
   cv_text: string | null
   Lastname: string | null
   Firstname: string | null
+  cv_link: string | null
 }
 
 export default function Candidates() {
@@ -157,6 +158,7 @@ export default function Candidates() {
                     <TableHead className="w-[200px]">Name</TableHead>
                     <TableHead className="w-[200px]">Email</TableHead>
                     <TableHead className="w-[150px]">Phone</TableHead>
+                    <TableHead className="w-[150px]">CV Link</TableHead>
                     <TableHead className="w-[200px]">CV Preview</TableHead>
                     <TableHead className="w-[100px] text-right">Actions</TableHead>
                   </TableRow>
@@ -164,13 +166,13 @@ export default function Candidates() {
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8">
+                      <TableCell colSpan={7} className="text-center py-8">
                         Loading CVs...
                       </TableCell>
                     </TableRow>
                   ) : filteredCVs.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8">
+                      <TableCell colSpan={7} className="text-center py-8">
                         No CVs found
                       </TableCell>
                     </TableRow>
@@ -209,6 +211,20 @@ export default function Candidates() {
                               <Phone className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                               <span className="truncate">{cv.phone_number || "N/A"}</span>
                             </div>
+                          </TableCell>
+                          <TableCell className="max-w-[150px]">
+                            {cv.cv_link ? (
+                              <a 
+                                href={cv.cv_link} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-primary hover:underline text-sm"
+                              >
+                                View CV
+                              </a>
+                            ) : (
+                              <span className="text-muted-foreground text-sm">No CV</span>
+                            )}
                           </TableCell>
                           <TableCell className="max-w-[200px]">
                             <div className="text-sm text-muted-foreground truncate max-w-[200px]">
