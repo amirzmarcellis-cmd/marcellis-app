@@ -58,9 +58,46 @@ export default function Candidates() {
         .from('CVs')
         .select('*');
 
-      // If there's a search query, apply filters
+      // If there's a search query, apply enhanced filters
       if (searchQuery && searchQuery.trim()) {
-        query = query.or(`name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%,phone_number.ilike.%${searchQuery}%,user_id.ilike.%${searchQuery}%,Firstname.ilike.%${searchQuery}%,Lastname.ilike.%${searchQuery}%`);
+        const searchTerms = searchQuery.trim().split(/\s+/);
+        
+        if (searchTerms.length === 1) {
+          // Single word search - search across all fields
+          const term = searchTerms[0];
+          query = query.or(`name.ilike.%${term}%,email.ilike.%${term}%,phone_number.ilike.%${term}%,user_id.ilike.%${term}%,Firstname.ilike.%${term}%,Lastname.ilike.%${term}%`);
+        } else {
+          // Multi-word search - each word must be found somewhere in the record
+          // We'll fetch all records and filter client-side for complex multi-word logic
+          const { data: allData, error } = await supabase
+            .from('CVs')
+            .select('*')
+            .order('user_id', { ascending: true });
+
+          if (error) throw error;
+          
+          // Filter client-side for multi-word searches
+          const filteredData = allData?.filter(cv => {
+            const searchableText = [
+              cv.name,
+              cv.email, 
+              cv.phone_number,
+              cv.user_id,
+              cv.Firstname,
+              cv.Lastname,
+              `${cv.Firstname || ''} ${cv.Lastname || ''}`.trim()
+            ].filter(Boolean).join(' ').toLowerCase();
+            
+            // All search terms must be found in the combined searchable text
+            return searchTerms.every(term => 
+              searchableText.includes(term.toLowerCase())
+            );
+          }) || [];
+          
+          setCvs(filteredData);
+          setLoading(false);
+          return;
+        }
       }
 
       const { data, error } = await query
