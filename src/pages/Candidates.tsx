@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User, MapPin, Briefcase, Mail, Phone, Search, Filter, Eye, Download, Calendar, Clock, ExternalLink, Edit, UserPlus, Upload, Trash2, Star, Award } from "lucide-react"
+import { User, MapPin, Briefcase, Mail, Phone, Search, Filter, Eye, Download, Calendar, Clock, ExternalLink, Edit, UserPlus, Upload, Trash2 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
@@ -27,9 +27,6 @@ interface CV {
   Lastname: string | null
   Firstname: string | null
   cv_link: string | null
-  cv_score?: number | null
-  after_call_score?: number | null
-  overall_score?: number | null
 }
 
 export default function Candidates() {
@@ -50,37 +47,14 @@ export default function Candidates() {
       setLoading(true);
       const { data, error } = await supabase
         .from('CVs')
-        .select(`
-          *,
-          Jobs_CVs!inner(cv_score, after_call_score)
-        `)
+        .select('*')
         .order('user_id', { ascending: true });
 
       if (error) throw error;
-      
-      // Calculate overall score for each CV
-      const cvsWithScores = (data || []).map(cv => {
-        const cvScore = cv.Jobs_CVs?.[0]?.cv_score || 0;
-        const afterCallScore = cv.Jobs_CVs?.[0]?.after_call_score || 0;
-        const overallScore = cvScore && afterCallScore ? (cvScore + afterCallScore) / 2 : null;
-        
-        return {
-          ...cv,
-          cv_score: cvScore,
-          after_call_score: afterCallScore,
-          overall_score: overallScore
-        };
-      });
-      
-      setCvs(cvsWithScores);
+      setCvs(data || []);
     } catch (error) {
       console.error('Error fetching CVs:', error);
-      // Fallback to basic CV data if join fails
-      const { data: basicData } = await supabase
-        .from('CVs')
-        .select('*')
-        .order('user_id', { ascending: true });
-      setCvs(basicData || []);
+      toast.error('Failed to fetch CVs');
     } finally {
       setLoading(false);
     }
@@ -96,20 +70,6 @@ export default function Candidates() {
     
     return matchesSearch
   })
-
-  const getScoreColor = (score: number | null) => {
-    if (!score) return "text-muted-foreground";
-    if (score >= 8) return "text-green-600 dark:text-green-400";
-    if (score >= 6) return "text-yellow-600 dark:text-yellow-400";
-    return "text-red-600 dark:text-red-400";
-  };
-
-  const getScoreBadgeVariant = (score: number | null): "default" | "secondary" | "destructive" | "outline" => {
-    if (!score) return "outline";
-    if (score >= 8) return "default";
-    if (score >= 6) return "secondary";
-    return "destructive";
-  };
 
   const handleCallCandidate = async (userId: string) => {
     toast.info("Call functionality not available for CV table")
@@ -196,7 +156,6 @@ export default function Candidates() {
                   <TableRow className="border-border">
                     <TableHead className="w-[100px]">User ID</TableHead>
                     <TableHead className="w-[200px]">Name</TableHead>
-                    <TableHead className="w-[150px]">Overall Score</TableHead>
                     <TableHead className="w-[200px]">Email</TableHead>
                     <TableHead className="w-[150px]">Phone</TableHead>
                     <TableHead className="w-[150px]">CV Link</TableHead>
@@ -207,13 +166,13 @@ export default function Candidates() {
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8">
+                      <TableCell colSpan={7} className="text-center py-8">
                         Loading CVs...
                       </TableCell>
                     </TableRow>
                   ) : filteredCVs.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8">
+                      <TableCell colSpan={7} className="text-center py-8">
                         No CVs found
                       </TableCell>
                     </TableRow>
@@ -239,26 +198,6 @@ export default function Candidates() {
                               <div className="min-w-0 flex-1">
                                 <div className="font-medium truncate">{fullName || "N/A"}</div>
                               </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="max-w-[150px]">
-                            <div className="flex items-center space-x-2">
-                              {cv.overall_score ? (
-                                <>
-                                  <Award className="w-4 h-4 text-primary flex-shrink-0" />
-                                  <Badge 
-                                    variant={getScoreBadgeVariant(cv.overall_score)} 
-                                    className={`font-bold ${getScoreColor(cv.overall_score)}`}
-                                  >
-                                    <Star className="w-3 h-3 mr-1" />
-                                    {cv.overall_score.toFixed(1)}
-                                  </Badge>
-                                </>
-                              ) : (
-                                <Badge variant="outline" className="text-muted-foreground">
-                                  No Score
-                                </Badge>
-                              )}
                             </div>
                           </TableCell>
                           <TableCell className="max-w-[200px]">
