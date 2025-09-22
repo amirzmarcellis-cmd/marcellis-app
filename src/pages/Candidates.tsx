@@ -42,12 +42,28 @@ export default function Candidates() {
     fetchCVs();
   }, []);
 
-  const fetchCVs = async () => {
+  // Debounced search effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      fetchCVs(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  const fetchCVs = async (searchQuery?: string) => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      let query = supabase
         .from('CVs')
-        .select('*')
+        .select('*');
+
+      // If there's a search query, apply filters
+      if (searchQuery && searchQuery.trim()) {
+        query = query.or(`name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%,phone_number.ilike.%${searchQuery}%,user_id.ilike.%${searchQuery}%,Firstname.ilike.%${searchQuery}%,Lastname.ilike.%${searchQuery}%`);
+      }
+
+      const { data, error } = await query
         .order('user_id', { ascending: true });
 
       if (error) throw error;
@@ -60,16 +76,8 @@ export default function Candidates() {
     }
   }
 
-  const filteredCVs = cvs.filter(cv => {
-    const fullName = `${cv.Firstname || ""} ${cv.Lastname || ""}`.trim()
-    const matchesSearch = fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (cv.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (cv.email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (cv.phone_number || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         cv.user_id.toLowerCase().includes(searchTerm.toLowerCase())
-    
-    return matchesSearch
-  })
+  // Since we're now searching in the database, just return all CVs
+  const filteredCVs = cvs;
 
   const handleCallCandidate = async (userId: string) => {
     toast.info("Call functionality not available for CV table")

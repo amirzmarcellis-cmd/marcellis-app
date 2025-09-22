@@ -29,6 +29,7 @@ interface CandidateDialogProps {
 
 export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }: CandidateDialogProps) {
   const [formData, setFormData] = useState<Candidate>({
+    user_id: '',
     name: '',
     email: '',
     phone_number: '',
@@ -52,6 +53,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
       }
     } else {
       setFormData({
+        user_id: '',
         name: '',
         email: '',
         phone_number: '',
@@ -99,15 +101,26 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
     setUploading(true);
 
     try {
+      // Convert blob URL to actual file for upload
+      let actualFile: File;
+      
+      if (file.file_url.startsWith('blob:')) {
+        // Handle blob URL by converting to File
+        const response = await fetch(file.file_url);
+        const blob = await response.blob();
+        actualFile = new File([blob], file.file_name, { type: file.file_type });
+      } else {
+        actualFile = file;
+      }
+
       const fileExt = file.file_name.split('.').pop();
       const fileName = `cv-${Date.now()}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      // For this demo, we'll use the mock file data
-      // In a real implementation, you'd upload to Supabase storage
+      // Upload to Supabase storage
       const { error: uploadError } = await supabase.storage
         .from('cvs')
-        .upload(filePath, file.file_url);
+        .upload(filePath, actualFile);
 
       if (!uploadError) {
         const { data: { publicUrl } } = supabase.storage
@@ -116,13 +129,11 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
 
         setCvUrl(publicUrl);
         setFormData(prev => ({ ...prev, cv_link: publicUrl }));
+        toast.success("CV uploaded successfully");
       } else {
-        // If upload fails, use the mock URL for demo
-        setCvUrl(file.file_url);
-        setFormData(prev => ({ ...prev, cv_link: file.file_url }));
+        console.error('Upload error:', uploadError);
+        toast.error("Failed to upload CV");
       }
-
-      toast.success("CV uploaded successfully");
     } catch (error) {
       console.error('Error uploading file:', error);
       toast.error("Failed to upload CV");
@@ -198,6 +209,16 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
             <h3 className="text-lg font-medium">Candidate Information</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="user_id">User ID</Label>
+                <Input
+                  id="user_id"
+                  value={formData.user_id}
+                  onChange={(e) => setFormData({...formData, user_id: e.target.value})}
+                  placeholder="Enter user ID (leave empty to auto-generate)"
+                />
+              </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name *</Label>
                 <Input
