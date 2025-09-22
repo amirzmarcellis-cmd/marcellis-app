@@ -88,6 +88,11 @@ export default function Candidates() {
     setDialogOpen(true)
   }
 
+  const handleEditCandidate = (candidate: CV) => {
+    setSelectedCandidate(candidate)
+    setDialogOpen(true)
+  }
+
   const handleSaveCandidate = () => {
     setDialogOpen(false)
     setBulkUploadOpen(false)
@@ -241,6 +246,15 @@ export default function Candidates() {
                           </TableCell>
                           <TableCell className="text-right max-w-[100px]">
                             <div className="flex justify-end space-x-1">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                title="Edit CV" 
+                                className="h-8 px-2"
+                                onClick={() => handleEditCandidate(cv)}
+                              >
+                                <Edit className="w-3 h-3" />
+                              </Button>
                               <Button 
                                 variant="outline" 
                                 size="sm" 
