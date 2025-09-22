@@ -1070,11 +1070,17 @@ export default function JobDetails() {
     return cvRecord?.['CandidateStatus'] || null;
   };
 
-  // Short list candidates (after_call_score > 74)
-  const shortListCandidates = candidates.filter(candidate => {
-    const score = parseFloat(candidate.after_call_score || "0");
-    return score > 74;
-  });
+  // Short list candidates (after_call_score > 74) sorted by Overall Score descending
+  const shortListCandidates = candidates
+    .filter(candidate => {
+      const score = parseFloat(candidate.after_call_score || "0");
+      return score > 74;
+    })
+    .sort((a, b) => {
+      const overallScoreA = calculateOverallScore(a);
+      const overallScoreB = calculateOverallScore(b);
+      return overallScoreB - overallScoreA; // Sort highest score first
+    });
   return <div className="space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden">
         {/* Header */}
         <div className="flex flex-col gap-4">
