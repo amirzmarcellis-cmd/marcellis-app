@@ -955,13 +955,56 @@ export default function JobDetails() {
     if (!score || score === "0" || score === "") return null;
     const numScore = parseInt(score);
     if (numScore >= 75) {
-      return;
+      return <Badge className="bg-green-600 text-white border-0">{score} - High</Badge>;
     } else if (numScore >= 50) {
-      return;
+      return <Badge className="bg-yellow-600 text-white border-0">{score} - Medium</Badge>;
     } else if (numScore >= 1) {
       return <Badge className="bg-red-600 text-foreground border-0">{score} - Low</Badge>;
     }
     return null;
+  };
+
+  const calculateOverallScore = (candidate: any) => {
+    const cvScore = parseFloat(candidate.cv_score) || 0;
+    const afterCallScore = parseFloat(candidate.after_call_score) || 0;
+    
+    if (cvScore > 0 && afterCallScore > 0) {
+      return Math.round((cvScore + afterCallScore) / 2);
+    } else if (cvScore > 0) {
+      return cvScore; // Return CV score if only it's available
+    } else if (afterCallScore > 0) {
+      return afterCallScore; // Return after call score if only it's available
+    }
+    return 0;
+  };
+
+  const getOverallScoreBadge = (candidate: any) => {
+    const overallScore = calculateOverallScore(candidate);
+    if (overallScore === 0) return null;
+    
+    const cvScore = parseFloat(candidate.cv_score) || 0;
+    const afterCallScore = parseFloat(candidate.after_call_score) || 0;
+    
+    let variant = "";
+    if (overallScore >= 8) {
+      variant = "bg-emerald-500 text-white border-0";
+    } else if (overallScore >= 6) {
+      variant = "bg-amber-500 text-white border-0";
+    } else {
+      variant = "bg-red-500 text-white border-0";
+    }
+    
+    const hasIcon = cvScore > 0 && afterCallScore > 0;
+    
+    return (
+      <div className="flex items-center gap-1">
+        <Badge className={`${variant} flex items-center gap-1 font-semibold`}>
+          {hasIcon && <Star className="w-3 h-3" />}
+          Overall: {overallScore}
+          {!hasIcon && (cvScore > 0 ? " (CV)" : " (Call)")}
+        </Badge>
+      </div>
+    );
   };
   const formatCurrency = (amountStr: string | null | undefined, currency?: string | null) => {
     const amount = parseFloat((amountStr || "").toString().replace(/[^0-9.]/g, ""));
@@ -1616,23 +1659,26 @@ export default function JobDetails() {
                                       </div>}
                                   </div>
 
-                                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t gap-2">
-                                    <div className="flex flex-wrap items-center gap-1">
-                                      <StatusDropdown currentStatus={mainCandidate["Contacted"]} candidateId={mainCandidate["Candidate_ID"]} jobId={id!} onStatusChange={newStatus => {
+                                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t gap-2">
+                                     <div className="flex flex-wrap items-center gap-1">
+                                       <StatusDropdown currentStatus={mainCandidate["Contacted"]} candidateId={mainCandidate["Candidate_ID"]} jobId={id!} onStatusChange={newStatus => {
                                 setCandidates(prev => prev.map(c => c["Candidate_ID"] === mainCandidate["Candidate_ID"] ? {
                                   ...c,
                                   Contacted: newStatus
                                 } : c));
                               }} variant="badge" />
-                                      {getCandidateStatus(mainCandidate["Candidate_ID"]) && <StatusDropdown currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])} candidateId={mainCandidate["Candidate_ID"]} jobId={null} onStatusChange={newStatus => {
+                                       {getCandidateStatus(mainCandidate["Candidate_ID"]) && <StatusDropdown currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])} candidateId={mainCandidate["Candidate_ID"]} jobId={null} onStatusChange={newStatus => {
                                 setCvData(prev => prev.map(cv => cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] ? {
                                   ...cv,
                                   CandidateStatus: newStatus
                                 } : cv));
                               }} variant="badge" />}
-                                    </div>
-                                    {getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
-                                  </div>
+                                     </div>
+                                     <div className="flex flex-col gap-1 items-end">
+                                       {getOverallScoreBadge(mainCandidate)}
+                                       {getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
+                                     </div>
+                                   </div>
 
                                   {/* Call Log Buttons */}
                                   <div className="space-y-2 pt-2 border-t">
@@ -1910,9 +1956,12 @@ export default function JobDetails() {
                                   CandidateStatus: newStatus
                                 } : cv));
                               }} variant="badge" statusType="candidate" />}
-                                  </div>
-                                  {getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
-                                </div>
+                                   </div>
+                                   <div className="flex flex-col gap-1 items-end">
+                                     {getOverallScoreBadge(mainCandidate)}
+                                     {getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
+                                   </div>
+                                 </div>
 
                                 {/* Call Log Buttons */}
                                 <div className="space-y-2 pt-2 border-t">
@@ -2102,9 +2151,12 @@ export default function JobDetails() {
                                 CandidateStatus: newStatus
                               } : cv));
                             }} variant="badge" />}
-                                  </div>
-                                  {getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
-                                </div>
+                                   </div>
+                                   <div className="flex flex-col gap-1 items-end">
+                                     {getOverallScoreBadge(mainCandidate)}
+                                     {getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
+                                   </div>
+                                 </div>
 
                                 {/* Call Log Buttons */}
                                 <div className="space-y-2 pt-2 border-t">
