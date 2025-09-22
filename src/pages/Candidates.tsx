@@ -81,15 +81,17 @@ export default function Candidates() {
           
           // Filter client-side for multi-word searches
           const filteredData = allData?.filter(cv => {
-            const searchableText = [
-              cv.name,
-              cv.email, 
-              cv.phone_number,
-              cv.user_id,
-              cv.Firstname,
-              cv.Lastname,
+            const searchableFields = [
+              cv.name || '',
+              cv.email || '', 
+              cv.phone_number || '',
+              cv.user_id || '',
+              cv.Firstname || '',
+              cv.Lastname || '',
               `${cv.Firstname || ''} ${cv.Lastname || ''}`.trim()
-            ].filter(Boolean).join(' ').toLowerCase();
+            ];
+            
+            const searchableText = searchableFields.join(' ').toLowerCase();
             
             // All search terms must be found in the combined searchable text
             return searchTerms.every(term => 
