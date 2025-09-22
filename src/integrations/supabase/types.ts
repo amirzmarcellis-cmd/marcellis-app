@@ -70,6 +70,7 @@ export type Database = {
       }
       CVs: {
         Row: {
+          cv_link: string | null
           cv_text: string | null
           email: string | null
           Firstname: string | null
@@ -79,6 +80,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          cv_link?: string | null
           cv_text?: string | null
           email?: string | null
           Firstname?: string | null
@@ -88,6 +90,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          cv_link?: string | null
           cv_text?: string | null
           email?: string | null
           Firstname?: string | null
