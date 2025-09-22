@@ -74,7 +74,10 @@ export default function Candidates() {
             .select('*')
             .order('user_id', { ascending: true });
 
-          if (error) throw error;
+          if (error) {
+            console.error('Supabase error:', error);
+            throw error;
+          }
           
           // Filter client-side for multi-word searches
           const filteredData = allData?.filter(cv => {
@@ -94,6 +97,7 @@ export default function Candidates() {
             );
           }) || [];
           
+          console.log('Multi-word search results:', filteredData.length, 'found for terms:', searchTerms);
           setCvs(filteredData);
           setLoading(false);
           return;
@@ -103,7 +107,10 @@ export default function Candidates() {
       const { data, error } = await query
         .order('user_id', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
       setCvs(data || []);
     } catch (error) {
       console.error('Error fetching CVs:', error);
