@@ -476,7 +476,6 @@ export default function JobDetails() {
     try {
       // Get user_ids from AI Boolean Search candidates (filteredCandidates) as comma-separated string
       const booleanSearchUserIds = filteredCandidates.map(candidate => candidate.user_id).filter(Boolean).join(',');
-      
       const payload = {
         job_id: job?.job_id || '',
         itris_job_id: job?.itris_job_id || '',
@@ -570,7 +569,6 @@ export default function JobDetails() {
     try {
       // Find the candidate data from the candidates array
       const candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
-      
       if (!candidate) {
         toast({
           title: "Error",
@@ -579,7 +577,6 @@ export default function JobDetails() {
         });
         return;
       }
-
       const response = await fetch('https://hook.eu2.make.com/mk46k4ibvs5n5nk1lto9csljygesv75f', {
         method: 'POST',
         headers: {
@@ -779,36 +776,33 @@ export default function JobDetails() {
     setInterviewLink('');
     console.log('Dialog should now be open. interviewDialogOpen state set to true');
   };
-
   const handleCVSubmitted = async (candidateId: string) => {
     try {
-      const { error } = await supabase
-        .from('Jobs_CVs')
-        .update({ 'contacted': 'Submitted' })
-        .eq('recordid', parseInt(candidateId))
-        .eq('job_id', id);
-      
+      const {
+        error
+      } = await supabase.from('Jobs_CVs').update({
+        'contacted': 'Submitted'
+      }).eq('recordid', parseInt(candidateId)).eq('job_id', id);
       if (error) throw error;
 
       // Update local state
-      setCandidates(prev => prev.map(c => 
-        c["Candidate_ID"] === candidateId ? { ...c, Contacted: 'Submitted' } : c
-      ));
-
+      setCandidates(prev => prev.map(c => c["Candidate_ID"] === candidateId ? {
+        ...c,
+        Contacted: 'Submitted'
+      } : c));
       toast({
         title: "CV Submitted",
-        description: "Candidate's CV has been marked as submitted",
+        description: "Candidate's CV has been marked as submitted"
       });
     } catch (error) {
       console.error('Error submitting CV:', error);
       toast({
         title: "Error",
         description: "Failed to submit CV",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
   const handleScheduleInterview = async () => {
     if (!selectedCandidate) return;
 
@@ -967,7 +961,7 @@ export default function JobDetails() {
     if (!score || score === "0" || score === "") return null;
     const numScore = parseInt(score);
     if (numScore >= 75) {
-      return <Badge className="bg-green-600 text-white border-0">{score} - High</Badge>;
+      return;
     } else if (numScore >= 50) {
       return <Badge className="bg-yellow-600 text-white border-0">{score} - Medium</Badge>;
     } else if (numScore >= 1) {
@@ -975,11 +969,9 @@ export default function JobDetails() {
     }
     return null;
   };
-
   const calculateOverallScore = (candidate: any) => {
     const cvScore = parseFloat(candidate.cv_score) || 0;
     const afterCallScore = parseFloat(candidate.after_call_score) || 0;
-    
     if (cvScore > 0 && afterCallScore > 0) {
       return Math.round((cvScore + afterCallScore) / 2);
     } else if (cvScore > 0) {
@@ -989,14 +981,11 @@ export default function JobDetails() {
     }
     return 0;
   };
-
   const getOverallScoreBadge = (candidate: any) => {
     const overallScore = calculateOverallScore(candidate);
     if (overallScore === 0) return null;
-    
     const cvScore = parseFloat(candidate.cv_score) || 0;
     const afterCallScore = parseFloat(candidate.after_call_score) || 0;
-    
     let variant = "";
     if (overallScore >= 8) {
       variant = "bg-emerald-500 text-white border-0";
@@ -1005,18 +994,14 @@ export default function JobDetails() {
     } else {
       variant = "bg-red-500 text-white border-0";
     }
-    
     const hasIcon = cvScore > 0 && afterCallScore > 0;
-    
-    return (
-      <div className="flex items-center gap-1">
+    return <div className="flex items-center gap-1">
         <Badge className={`${variant} flex items-center gap-1 font-semibold`}>
           {hasIcon && <Star className="w-3 h-3" />}
           Overall: {overallScore}
           {!hasIcon && (cvScore > 0 ? " (CV)" : " (Call)")}
         </Badge>
-      </div>
-    );
+      </div>;
   };
   const formatCurrency = (amountStr: string | null | undefined, currency?: string | null) => {
     const amount = parseFloat((amountStr || "").toString().replace(/[^0-9.]/g, ""));
@@ -1076,8 +1061,7 @@ export default function JobDetails() {
   });
   // Helper function to render candidate cards
   const renderCandidateCard = (candidateId: string, candidateContacts: any[], mainCandidate: any) => {
-    return (
-      <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20">
+    return <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20">
         <CardContent className="p-4">
           <div className="space-y-3">
             <div className="flex items-start justify-between">
@@ -1086,71 +1070,57 @@ export default function JobDetails() {
                 <p className="text-sm text-muted-foreground">User ID: {mainCandidate["user_id"] || "N/A"}</p>
                 <div className="flex items-center gap-4 text-sm mt-1">
                   <span className="text-muted-foreground">CV Score: {mainCandidate["cv_score"] || mainCandidate["CV Score"] || "N/A"}</span>
-                  {mainCandidate["after_call_score"] && (
-                    <span className="text-muted-foreground">After Call Score: {mainCandidate["after_call_score"]}</span>
-                  )}
+                  {mainCandidate["after_call_score"] && <span className="text-muted-foreground">After Call Score: {mainCandidate["after_call_score"]}</span>}
                 </div>
-                {mainCandidate["Salary Expectations"] && (
-                  <div className="flex items-center gap-2 text-sm mt-1">
+                {mainCandidate["Salary Expectations"] && <div className="flex items-center gap-2 text-sm mt-1">
                     <Banknote className="w-3 h-3 text-muted-foreground" />
                     <span className="text-muted-foreground">Expected: {formatCurrency(mainCandidate["Salary Expectations"], job?.Currency)}</span>
-                  </div>
-                )}
+                  </div>}
               </div>
-              {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || mainCandidate["Contacted"]?.toLowerCase() === "contacted" || mainCandidate["Contacted"]?.toLowerCase() === "low scored" || mainCandidate["Contacted"]?.toLowerCase() === "tasked") && mainCandidate["lastcalltime"] && 
-                <div className="text-xs text-muted-foreground text-right">
+              {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || mainCandidate["Contacted"]?.toLowerCase() === "contacted" || mainCandidate["Contacted"]?.toLowerCase() === "low scored" || mainCandidate["Contacted"]?.toLowerCase() === "tasked") && mainCandidate["lastcalltime"] && <div className="text-xs text-muted-foreground text-right">
                   <div className="flex items-center">
                     <Clock className="w-3 h-3 mr-1" />
                     {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
                   </div>
                   <div className="text-xs">
                     {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
                   </div>
-                </div>
-              }
+                </div>}
             </div>
             
             <div className="space-y-2 text-sm">
-              {mainCandidate["Candidate Email"] && 
-                <div className="flex items-center text-muted-foreground">
+              {mainCandidate["Candidate Email"] && <div className="flex items-center text-muted-foreground">
                   <Mail className="w-4 h-4 mr-2" />
                   <span className="truncate">{mainCandidate["Candidate Email"]}</span>
-                </div>
-              }
+                </div>}
               
-              {mainCandidate["Candidate Phone Number"] && 
-                <div className="flex items-center text-muted-foreground">
+              {mainCandidate["Candidate Phone Number"] && <div className="flex items-center text-muted-foreground">
                   <Phone className="w-4 h-4 mr-2" />
                   <span>{mainCandidate["Candidate Phone Number"]}</span>
-                </div>
-              }
+                </div>}
             </div>
 
-            {mainCandidate["Summary"] && 
-              <p className="text-sm text-muted-foreground line-clamp-3">
+            {mainCandidate["Summary"] && <p className="text-sm text-muted-foreground line-clamp-3">
                 {mainCandidate["Summary"]}
-              </p>
-            }
+              </p>}
 
             {/* Task Status and Links Section */}
             {(() => {
-              const candidateTasks = taskCandidates.filter(task => task.candidate_id === candidateId);
-              const candidateStatus = mainCandidate["Contacted"]?.toLowerCase();
+            const candidateTasks = taskCandidates.filter(task => task.candidate_id === candidateId);
+            const candidateStatus = mainCandidate["Contacted"]?.toLowerCase();
 
-              // Only show tasks if candidate status is "tasked" and not "rejected"
-              if (candidateTasks.length === 0 || candidateStatus !== "tasked" || candidateStatus === "rejected") return null;
-              return (
-                <div className="space-y-2 pt-2 border-t">
+            // Only show tasks if candidate status is "tasked" and not "rejected"
+            if (candidateTasks.length === 0 || candidateStatus !== "tasked" || candidateStatus === "rejected") return null;
+            return <div className="space-y-2 pt-2 border-t">
                   <h5 className="text-sm font-medium text-foreground flex items-center">
                     <CheckCircle className="w-4 h-4 mr-2" />
                     Tasks ({candidateTasks.length})
                   </h5>
                   <div className="space-y-2">
-                    {candidateTasks.map(task => 
-                      <div key={task.taskid} className={cn("flex items-center justify-between p-2 rounded-md", task.status === 'Received' ? "bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700" : "bg-muted/50")}>
+                    {candidateTasks.map(task => <div key={task.taskid} className={cn("flex items-center justify-between p-2 rounded-md", task.status === 'Received' ? "bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700" : "bg-muted/50")}>
                         <div className="flex items-center space-x-2">
                           <div className="flex items-center space-x-1">
                             {task.status === 'Pending' && <Hourglass className="w-3 h-3 text-orange-500" />}
@@ -1170,58 +1140,39 @@ export default function JobDetails() {
                         </div>
                         <div className="flex items-center space-x-1">
                           {task.tasklink && (task.tasklink.includes(',') ?
-                            // Multiple links
-                            <div className="flex items-center space-x-1">
-                              {task.tasklink.split(',').map((link: string, index: number) => 
-                                <Button key={index} variant="ghost" size="sm" onClick={() => window.open(link.trim(), '_blank')} className="p-1 h-6 w-6 hover:bg-primary/10" title={`Task Link ${index + 1}`}>
+                    // Multiple links
+                    <div className="flex items-center space-x-1">
+                              {task.tasklink.split(',').map((link: string, index: number) => <Button key={index} variant="ghost" size="sm" onClick={() => window.open(link.trim(), '_blank')} className="p-1 h-6 w-6 hover:bg-primary/10" title={`Task Link ${index + 1}`}>
                                   <ExternalLink className="h-3 w-3" />
-                                </Button>
-                              )}
+                                </Button>)}
                               <span className="text-xs text-muted-foreground">
                                 ({task.tasklink.split(',').length} links)
                               </span>
                             </div> :
-                            // Single link
-                            <Button variant="ghost" size="sm" onClick={() => window.open(task.tasklink, '_blank')} className="p-1 h-6 w-6 hover:bg-primary/10" title="Task Link">
+                    // Single link
+                    <Button variant="ghost" size="sm" onClick={() => window.open(task.tasklink, '_blank')} className="p-1 h-6 w-6 hover:bg-primary/10" title="Task Link">
                               <ExternalLink className="h-3 w-3" />
-                            </Button>
-                          )}
+                            </Button>)}
                         </div>
-                      </div>
-                    )}
+                      </div>)}
                   </div>
-                </div>
-              );
-            })()}
+                </div>;
+          })()}
 
             <div className="flex items-center justify-between pt-2 border-t">
               <div className="flex items-center space-x-2">
-                <StatusDropdown 
-                  currentStatus={mainCandidate["Contacted"]} 
-                  candidateId={mainCandidate["Candidate_ID"]} 
-                  jobId={id!} 
-                  onStatusChange={newStatus => {
-                    setCandidates(prev => prev.map(c => 
-                      c["Candidate_ID"] === mainCandidate["Candidate_ID"] ? 
-                        { ...c, Contacted: newStatus } : c
-                    ));
-                  }} 
-                  variant="badge" 
-                />
-                {getCandidateStatus(mainCandidate["Candidate_ID"]) && 
-                  <StatusDropdown 
-                    currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])} 
-                    candidateId={mainCandidate["Candidate_ID"]} 
-                    jobId={null} 
-                    onStatusChange={newStatus => {
-                      setCvData(prev => prev.map(cv => 
-                        cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] ? 
-                          { ...cv, CandidateStatus: newStatus } : cv
-                      ));
-                    }} 
-                    variant="badge" 
-                  />
-                }
+                <StatusDropdown currentStatus={mainCandidate["Contacted"]} candidateId={mainCandidate["Candidate_ID"]} jobId={id!} onStatusChange={newStatus => {
+                setCandidates(prev => prev.map(c => c["Candidate_ID"] === mainCandidate["Candidate_ID"] ? {
+                  ...c,
+                  Contacted: newStatus
+                } : c));
+              }} variant="badge" />
+                {getCandidateStatus(mainCandidate["Candidate_ID"]) && <StatusDropdown currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])} candidateId={mainCandidate["Candidate_ID"]} jobId={null} onStatusChange={newStatus => {
+                setCvData(prev => prev.map(cv => cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] ? {
+                  ...cv,
+                  CandidateStatus: newStatus
+                } : cv));
+              }} variant="badge" />}
               </div>
               <div className="flex flex-col gap-1 items-end">
                 {getOverallScoreBadge(mainCandidate)}
@@ -1233,26 +1184,24 @@ export default function JobDetails() {
             <div className="space-y-2 pt-2 border-t">
               <div className="flex flex-wrap gap-2">
                 {(() => {
-                  console.log('AI Short List - candidateContacts for candidate:', candidateId, candidateContacts);
-                  const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
-                  console.log('AI Short List - contactsWithCalls:', contactsWithCalls);
-                  if (contactsWithCalls.length === 0) return null;
+                console.log('AI Short List - candidateContacts for candidate:', candidateId, candidateContacts);
+                const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
+                console.log('AI Short List - contactsWithCalls:', contactsWithCalls);
+                if (contactsWithCalls.length === 0) return null;
 
-                  // Get the latest call log (highest callid)
-                  const latestContact = contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest);
-                  console.log('AI Short List - latestContact:', latestContact);
-                  return (
-                    <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-[100px]">
+                // Get the latest call log (highest callid)
+                const latestContact = contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest);
+                console.log('AI Short List - latestContact:', latestContact);
+                return <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-[100px]">
                       <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} onClick={() => {
-                        // Store current tab in URL hash for back navigation
-                        window.location.hash = 'tab=shortlist';
-                      }}>
+                    // Store current tab in URL hash for back navigation
+                    window.location.hash = 'tab=shortlist';
+                  }}>
                         <FileText className="w-3 h-3 mr-1" />
                         Call Log
                       </Link>
-                    </Button>
-                  );
-                })()}
+                    </Button>;
+              })()}
                 <Button variant="ghost" size="sm" asChild className="flex-1 min-w-[100px]">
                   <Link to={`/candidate/${candidateId}`}>
                     <Users className="w-3 h-3 mr-1" />
@@ -1262,33 +1211,25 @@ export default function JobDetails() {
               </div>
               {/* Action Buttons - CV Submitted and Reject */}
               <div className="flex gap-2">
-                {mainCandidate["Contacted"] === "Submitted" ? 
-                  <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-blue-500 text-blue-600 cursor-default" disabled>
+                {mainCandidate["Contacted"] === "Submitted" ? <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-blue-500 text-blue-600 cursor-default" disabled>
                     <FileCheck className="w-3 h-3 mr-1" />
                     CV Submitted
-                  </Button>
-                  :
-                  <Button variant="outline" size="sm" onClick={() => handleCVSubmitted(candidateId)} className="flex-1 min-w-[100px] bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200">
+                  </Button> : <Button variant="outline" size="sm" onClick={() => handleCVSubmitted(candidateId)} className="flex-1 min-w-[100px] bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200">
                     <FileCheck className="w-3 h-3 mr-1" />
                     CV Submitted
-                  </Button>
-                }
-                {mainCandidate["Contacted"] === "Rejected" ? 
-                  <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed" disabled>
+                  </Button>}
+                {mainCandidate["Contacted"] === "Rejected" ? <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed" disabled>
                     <X className="w-3 h-3 mr-1" />
                     Rejected
-                  </Button> : 
-                  <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200" onClick={() => handleRejectCandidate(id!, candidateId, candidateContacts[0].callid)}>
+                  </Button> : <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200" onClick={() => handleRejectCandidate(id!, candidateId, candidateContacts[0].callid)}>
                     <X className="w-3 h-3 mr-1" />
                     Reject Candidate
-                  </Button>
-                }
+                  </Button>}
               </div>
             </div>
           </div>
         </CardContent>
-      </Card>
-    );
+      </Card>;
   };
 
   // Get CV status for a candidate
@@ -1298,16 +1239,14 @@ export default function JobDetails() {
   };
 
   // Short list candidates (after_call_score > 74) sorted by Overall Score descending
-  const shortListCandidates = candidates
-    .filter(candidate => {
-      const score = parseFloat(candidate.after_call_score || "0");
-      return score > 74;
-    })
-    .sort((a, b) => {
-      const overallScoreA = calculateOverallScore(a);
-      const overallScoreB = calculateOverallScore(b);
-      return overallScoreB - overallScoreA; // Sort highest score first
-    });
+  const shortListCandidates = candidates.filter(candidate => {
+    const score = parseFloat(candidate.after_call_score || "0");
+    return score > 74;
+  }).sort((a, b) => {
+    const overallScoreA = calculateOverallScore(a);
+    const overallScoreB = calculateOverallScore(b);
+    return overallScoreB - overallScoreA; // Sort highest score first
+  });
 
   // Helper function to parse salary as number
   const parseSalary = (salary: string | null | undefined): number => {
@@ -1325,7 +1264,6 @@ export default function JobDetails() {
     const expectedSalary = parseSalary(candidate["Salary Expectations"]);
     return expectedSalary === 0 || expectedSalary <= budgetThreshold;
   });
-
   const aboveBudgetCandidates = shortListCandidates.filter(candidate => {
     const expectedSalary = parseSalary(candidate["Salary Expectations"]);
     return expectedSalary > 0 && expectedSalary > budgetThreshold;
@@ -2281,34 +2219,29 @@ export default function JobDetails() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {withinBudgetCandidates.length === 0 ? (
-                    <div className="text-center py-8">
+                  {withinBudgetCandidates.length === 0 ? <div className="text-center py-8">
                       <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                       <h3 className="text-lg font-semibold mb-2">No within-budget candidates yet</h3>
                       <p className="text-muted-foreground">High-scoring candidates within budget will appear here</p>
-                    </div>
-                  ) : (
-                    <ScrollArea className="h-[600px] w-full">
+                    </div> : <ScrollArea className="h-[600px] w-full">
                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
                         {(() => {
-                          // Group within budget candidates by Candidate_ID
-                          const groupedWithinBudget = withinBudgetCandidates.reduce((acc, candidate) => {
-                            const candidateId = candidate["Candidate_ID"];
-                            if (!acc[candidateId]) {
-                              acc[candidateId] = [];
-                            }
-                            acc[candidateId].push(candidate);
-                            return acc;
-                          }, {} as Record<string, any[]>);
-                          
-                          return Object.entries(groupedWithinBudget).map(([candidateId, candidateContacts]: [string, any[]]) => {
-                            const mainCandidate = candidateContacts[0];
-                            return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
-                          });
-                        })()}
+                    // Group within budget candidates by Candidate_ID
+                    const groupedWithinBudget = withinBudgetCandidates.reduce((acc, candidate) => {
+                      const candidateId = candidate["Candidate_ID"];
+                      if (!acc[candidateId]) {
+                        acc[candidateId] = [];
+                      }
+                      acc[candidateId].push(candidate);
+                      return acc;
+                    }, {} as Record<string, any[]>);
+                    return Object.entries(groupedWithinBudget).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                      const mainCandidate = candidateContacts[0];
+                      return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
+                    });
+                  })()}
                       </div>
-                    </ScrollArea>
-                  )}
+                    </ScrollArea>}
                 </CardContent>
               </Card>
 
@@ -2324,34 +2257,29 @@ export default function JobDetails() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {aboveBudgetCandidates.length === 0 ? (
-                    <div className="text-center py-8">
+                  {aboveBudgetCandidates.length === 0 ? <div className="text-center py-8">
                       <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                       <h3 className="text-lg font-semibold mb-2">No above-budget candidates</h3>
                       <p className="text-muted-foreground">High-scoring candidates above budget will appear here</p>
-                    </div>
-                  ) : (
-                    <ScrollArea className="h-[600px] w-full">
+                    </div> : <ScrollArea className="h-[600px] w-full">
                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
                         {(() => {
-                          // Group above budget candidates by Candidate_ID
-                          const groupedAboveBudget = aboveBudgetCandidates.reduce((acc, candidate) => {
-                            const candidateId = candidate["Candidate_ID"];
-                            if (!acc[candidateId]) {
-                              acc[candidateId] = [];
-                            }
-                            acc[candidateId].push(candidate);
-                            return acc;
-                          }, {} as Record<string, any[]>);
-                          
-                          return Object.entries(groupedAboveBudget).map(([candidateId, candidateContacts]: [string, any[]]) => {
-                            const mainCandidate = candidateContacts[0];
-                            return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
-                          });
-                        })()}
+                    // Group above budget candidates by Candidate_ID
+                    const groupedAboveBudget = aboveBudgetCandidates.reduce((acc, candidate) => {
+                      const candidateId = candidate["Candidate_ID"];
+                      if (!acc[candidateId]) {
+                        acc[candidateId] = [];
+                      }
+                      acc[candidateId].push(candidate);
+                      return acc;
+                    }, {} as Record<string, any[]>);
+                    return Object.entries(groupedAboveBudget).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                      const mainCandidate = candidateContacts[0];
+                      return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
+                    });
+                  })()}
                       </div>
-                    </ScrollArea>
-                  )}
+                    </ScrollArea>}
                 </CardContent>
               </Card>
             </div>
