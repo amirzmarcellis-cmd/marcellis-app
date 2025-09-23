@@ -568,16 +568,16 @@ export default function JobDetails() {
   };
   const handleRejectCandidate = async (jobId: string, candidateId: string, callid: number) => {
     try {
-      const response = await fetch('https://hook.eu2.make.com/castzb5q0mllr7eq9zzyqll4ffcpet7j', {
+      const response = await fetch('https://hook.eu2.make.com/mk46k4ibvs5n5nk1lto9csljygesv75f', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           job_id: jobId,
-          candidate_id: candidateId,
-          callid: callid,
-          company_id: null
+          user_id: "",
+          recordid: "",
+          itris_job_id: ""
         })
       });
       if (response.ok) {
