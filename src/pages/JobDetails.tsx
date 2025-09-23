@@ -78,7 +78,7 @@ export default function JobDetails() {
   const [selectedCandidate, setSelectedCandidate] = useState<{
     candidateId: string;
     jobId: string;
-    recordid: number;
+    callid: number;
   } | null>(null);
   const [interviewSlots, setInterviewSlots] = useState<{
     date: Date | undefined;
@@ -565,7 +565,7 @@ export default function JobDetails() {
       });
     }
   };
-  const handleRejectCandidate = async (jobId: string, candidateId: string, recordid: number) => {
+  const handleRejectCandidate = async (jobId: string, candidateId: string, callid: number) => {
     try {
       // Find the candidate data from the candidates array
       const candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
@@ -757,7 +757,7 @@ export default function JobDetails() {
     setSelectedCandidate({
       candidateId: candidateId,
       jobId: job?.job_id || id || '',
-      recordid: candidate?.recordid || candidate?.Recordid || 0
+      callid: candidate?.callid || candidate?.Callid || 0
     });
     setInterviewDialogOpen(true);
 
@@ -851,7 +851,7 @@ export default function JobDetails() {
       } = await supabase.from('interview').insert({
         candidate_id: selectedCandidate.candidateId,
         job_id: selectedCandidate.jobId,
-        callid: selectedCandidate.recordid,
+        callid: selectedCandidate.callid,
         appoint1: appointments[0],
         appoint2: appointments[1],
         appoint3: appointments[2],
@@ -870,7 +870,7 @@ export default function JobDetails() {
         body: JSON.stringify({
           job_id: selectedCandidate.jobId,
           candidate_id: selectedCandidate.candidateId,
-          callid: selectedCandidate.recordid,
+          callid: selectedCandidate.callid,
           intid: interviewData?.intid,
           appoint1: appointments[0],
           appoint2: appointments[1],
@@ -963,7 +963,7 @@ export default function JobDetails() {
     if (numScore >= 75) {
       return;
     } else if (numScore >= 50) {
-      return <Badge className="bg-yellow-600 text-white border-0">{score} - Medium</Badge>;
+      return;
     } else if (numScore >= 1) {
       return <Badge className="bg-red-600 text-foreground border-0">{score} - Low</Badge>;
     }
@@ -1061,10 +1061,7 @@ export default function JobDetails() {
   });
   // Helper function to render candidate cards
   const renderCandidateCard = (candidateId: string, candidateContacts: any[], mainCandidate: any, isTopCandidate: boolean = false) => {
-    const cardClassName = isTopCandidate 
-      ? "border-2 border-amber-300 hover:border-amber-400 transition-colors hover:shadow-xl bg-gradient-to-br from-amber-50/80 to-yellow-50/80 dark:from-amber-950/40 dark:to-yellow-950/40 shadow-lg shadow-amber-200/30 dark:shadow-amber-900/30 ring-1 ring-amber-200/50 dark:ring-amber-800/50" 
-      : "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20";
-    
+    const cardClassName = isTopCandidate ? "border-2 border-amber-300 hover:border-amber-400 transition-colors hover:shadow-xl bg-gradient-to-br from-amber-50/80 to-yellow-50/80 dark:from-amber-950/40 dark:to-yellow-950/40 shadow-lg shadow-amber-200/30 dark:shadow-amber-900/30 ring-1 ring-amber-200/50 dark:ring-amber-800/50" : "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20";
     return <Card key={candidateId} className={cardClassName}>
         <CardContent className="p-4">
           <div className="space-y-3">
@@ -1193,11 +1190,11 @@ export default function JobDetails() {
                 console.log('AI Short List - contactsWithCalls:', contactsWithCalls);
                 if (contactsWithCalls.length === 0) return null;
 
-                // Get the latest call log (highest recordid)
-                const latestContact = contactsWithCalls.reduce((latest, current) => (current.recordid || 0) > (latest.recordid || 0) ? current : latest);
+                // Get the latest call log (highest callid)
+                const latestContact = contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest);
                 console.log('AI Short List - latestContact:', latestContact);
-                return <Button key={latestContact.recordid || candidateId} variant="outline" size="sm" asChild className="flex-1 min-w-[100px]">
-                      <Link to={`/call-log-details/${latestContact.recordid}`} onClick={() => {
+                return <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-[100px]">
+                      <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} onClick={() => {
                     // Store current tab in URL hash for back navigation
                     window.location.hash = 'tab=shortlist';
                   }}>
@@ -1225,9 +1222,9 @@ export default function JobDetails() {
                 {mainCandidate["Contacted"] === "Rejected" ? <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed" disabled>
                     <X className="w-3 h-3 mr-1" />
                     Rejected
-                   </Button> : <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200" onClick={() => handleRejectCandidate(id!, candidateId, candidateContacts[0].recordid)}>
-                     <X className="w-3 h-3 mr-1" />
-                     Reject Candidate
+                  </Button> : <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200" onClick={() => handleRejectCandidate(id!, candidateId, candidateContacts[0].callid)}>
+                    <X className="w-3 h-3 mr-1" />
+                    Reject Candidate
                   </Button>}
               </div>
             </div>
@@ -1888,10 +1885,10 @@ export default function JobDetails() {
                                 const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
                                 if (contactsWithCalls.length === 0) return null;
 
-                                // Get the latest call log (highest recordid)
-                                const latestContact = contactsWithCalls.reduce((latest, current) => (current.recordid || 0) > (latest.recordid || 0) ? current : latest);
-                return <Button key={latestContact.recordid || candidateId} variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
-                                            <Link to={`/call-log-details/${latestContact.recordid}`} className="truncate" onClick={() => {
+                                // Get the latest call log (highest callid)
+                                const latestContact = contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest);
+                                return <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
+                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} className="truncate" onClick={() => {
                                     // Store current tab in URL hash for back navigation
                                     window.location.hash = 'tab=boolean-search';
                                   }}>
@@ -1902,11 +1899,11 @@ export default function JobDetails() {
                               })()}
                                     </div>
                                     
-                    {/* Show All Record Info Button */}
-                    <Button variant="outline" size="sm" onClick={() => navigate(`/call-log-details/${mainCandidate["Record ID"] || mainCandidate["recordid"]}`)} className="w-full text-xs md:text-sm">
-                      <FileText className="w-3 h-3 mr-1" />
-                      Call Log Details
-                    </Button>
+                                    {/* Show All Record Info Button */}
+                                    <Button variant="outline" size="sm" onClick={() => navigate(`/call-log-details?recordId=${mainCandidate["Record ID"] || mainCandidate["Candidate_ID"]}&jobId=${id}`)} className="w-full text-xs md:text-sm">
+                                      <FileText className="w-3 h-3 mr-1" />
+                                      Call Log Details
+                                    </Button>
                                     
                                     <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
                                       <Link to={`/candidate/${candidateId}`}>
@@ -2171,10 +2168,10 @@ export default function JobDetails() {
                                 const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
                                 if (contactsWithCalls.length === 0) return null;
 
-                                // Get the latest call log (highest recordid)
-                                const latestContact = contactsWithCalls.reduce((latest, current) => (current.recordid || 0) > (latest.recordid || 0) ? current : latest);
-                return <Button key={latestContact.recordid || candidateId} variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
-                                          <Link to={`/call-log-details/${latestContact.recordid}`} className="truncate" onClick={() => {
+                                // Get the latest call log (highest callid)
+                                const latestContact = contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest);
+                                return <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
+                                          <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} className="truncate" onClick={() => {
                                     // Store current tab in URL hash for back navigation
                                     window.location.hash = 'tab=ai-longlist';
                                   }}>
@@ -2185,11 +2182,11 @@ export default function JobDetails() {
                               })()}
                                   </div>
                                   
-                  {/* Show All Record Info Button */}
-                  <Button variant="outline" size="sm" onClick={() => navigate(`/call-log-details/${mainCandidate["Record ID"] || mainCandidate["recordid"]}`)} className="w-full text-xs md:text-sm">
-                    <FileText className="w-3 h-3 mr-1" />
-                    Call Log Details
-                  </Button>
+                                  {/* Show All Record Info Button */}
+                                  <Button variant="outline" size="sm" onClick={() => navigate(`/call-log-details?recordId=${mainCandidate["Record ID"] || mainCandidate["Candidate_ID"]}&jobId=${id}`)} className="w-full text-xs md:text-sm">
+                                    <FileText className="w-3 h-3 mr-1" />
+                                    Call Log Details
+                                  </Button>
                                   
                                   <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
                                     <Link to={`/candidate/${candidateId}`}>
@@ -2239,19 +2236,17 @@ export default function JobDetails() {
                       acc[candidateId].push(candidate);
                       return acc;
                     }, {} as Record<string, any[]>);
-                    
-                     // Convert to array and sort by highest Overall score
-                     const sortedCandidateEntries = Object.entries(groupedWithinBudget).sort(([, candidateContactsA], [, candidateContactsB]) => {
-                       const candidateA = candidateContactsA[0];
-                       const candidateB = candidateContactsB[0];
-                       
-                       // Use the calculateOverallScore function to get accurate overall scores
-                       const scoreA = calculateOverallScore(candidateA);
-                       const scoreB = calculateOverallScore(candidateB);
-                       
-                       return scoreB - scoreA; // Sort in descending order (highest scores first)
-                     });
-                    
+
+                    // Convert to array and sort by highest score (CV score or after_call_score)
+                    const sortedCandidateEntries = Object.entries(groupedWithinBudget).sort(([, candidateContactsA], [, candidateContactsB]) => {
+                      const candidateA = candidateContactsA[0];
+                      const candidateB = candidateContactsB[0];
+
+                      // Get the best score for each candidate (prefer after_call_score, then cv_score)
+                      const scoreA = parseFloat(candidateA["after_call_score"] || candidateA["cv_score"] || candidateA["CV Score"] || "0");
+                      const scoreB = parseFloat(candidateB["after_call_score"] || candidateB["cv_score"] || candidateB["CV Score"] || "0");
+                      return scoreB - scoreA; // Sort in descending order (highest scores first)
+                    });
                     return sortedCandidateEntries.map(([candidateId, candidateContacts]: [string, any[]], index: number) => {
                       const mainCandidate = candidateContacts[0];
                       const isTopCandidate = index < 3; // Top 3 candidates get golden effect
@@ -2282,7 +2277,7 @@ export default function JobDetails() {
                     </div> : <ScrollArea className="h-[600px] w-full">
                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
                         {(() => {
-                    // Group above budget candidates by Candidate_ID and sort by score
+                    // Group above budget candidates by Candidate_ID
                     const groupedAboveBudget = aboveBudgetCandidates.reduce((acc, candidate) => {
                       const candidateId = candidate["Candidate_ID"];
                       if (!acc[candidateId]) {
@@ -2291,20 +2286,7 @@ export default function JobDetails() {
                       acc[candidateId].push(candidate);
                       return acc;
                     }, {} as Record<string, any[]>);
-                    
-                     // Convert to array and sort by highest Overall score
-                     const sortedCandidateEntries = Object.entries(groupedAboveBudget).sort(([, candidateContactsA], [, candidateContactsB]) => {
-                       const candidateA = candidateContactsA[0];
-                       const candidateB = candidateContactsB[0];
-                       
-                       // Use the calculateOverallScore function to get accurate overall scores
-                       const scoreA = calculateOverallScore(candidateA);
-                       const scoreB = calculateOverallScore(candidateB);
-                       
-                       return scoreB - scoreA; // Sort in descending order (highest scores first)
-                     });
-                    
-                    return sortedCandidateEntries.map(([candidateId, candidateContacts]: [string, any[]]) => {
+                    return Object.entries(groupedAboveBudget).map(([candidateId, candidateContacts]: [string, any[]]) => {
                       const mainCandidate = candidateContacts[0];
                       return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
                     });
