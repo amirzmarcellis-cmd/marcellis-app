@@ -1197,7 +1197,7 @@ export default function JobDetails() {
                 const latestContact = contactsWithCalls.reduce((latest, current) => (current.recordid || 0) > (latest.recordid || 0) ? current : latest);
                 console.log('AI Short List - latestContact:', latestContact);
                 return <Button key={latestContact.recordid || candidateId} variant="outline" size="sm" asChild className="flex-1 min-w-[100px]">
-                      <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.recordid}`} onClick={() => {
+                      <Link to={`/call-log-details/${latestContact.recordid}`} onClick={() => {
                     // Store current tab in URL hash for back navigation
                     window.location.hash = 'tab=shortlist';
                   }}>
@@ -1890,8 +1890,8 @@ export default function JobDetails() {
 
                                 // Get the latest call log (highest recordid)
                                 const latestContact = contactsWithCalls.reduce((latest, current) => (current.recordid || 0) > (latest.recordid || 0) ? current : latest);
-                                return <Button key={latestContact.recordid || candidateId} variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
-                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.recordid}`} className="truncate" onClick={() => {
+                return <Button key={latestContact.recordid || candidateId} variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
+                                            <Link to={`/call-log-details/${latestContact.recordid}`} className="truncate" onClick={() => {
                                     // Store current tab in URL hash for back navigation
                                     window.location.hash = 'tab=boolean-search';
                                   }}>
@@ -1902,11 +1902,11 @@ export default function JobDetails() {
                               })()}
                                     </div>
                                     
-                                    {/* Show All Record Info Button */}
-                                    <Button variant="outline" size="sm" onClick={() => navigate(`/call-log-details?recordId=${mainCandidate["Record ID"] || mainCandidate["Candidate_ID"]}&jobId=${id}`)} className="w-full text-xs md:text-sm">
-                                      <FileText className="w-3 h-3 mr-1" />
-                                      Call Log Details
-                                    </Button>
+                    {/* Show All Record Info Button */}
+                    <Button variant="outline" size="sm" onClick={() => navigate(`/call-log-details/${mainCandidate["Record ID"] || mainCandidate["recordid"]}`)} className="w-full text-xs md:text-sm">
+                      <FileText className="w-3 h-3 mr-1" />
+                      Call Log Details
+                    </Button>
                                     
                                     <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
                                       <Link to={`/candidate/${candidateId}`}>
@@ -2173,8 +2173,8 @@ export default function JobDetails() {
 
                                 // Get the latest call log (highest recordid)
                                 const latestContact = contactsWithCalls.reduce((latest, current) => (current.recordid || 0) > (latest.recordid || 0) ? current : latest);
-                                return <Button key={latestContact.recordid || candidateId} variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
-                                          <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.recordid}`} className="truncate" onClick={() => {
+                return <Button key={latestContact.recordid || candidateId} variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
+                                          <Link to={`/call-log-details/${latestContact.recordid}`} className="truncate" onClick={() => {
                                     // Store current tab in URL hash for back navigation
                                     window.location.hash = 'tab=ai-longlist';
                                   }}>
@@ -2185,11 +2185,11 @@ export default function JobDetails() {
                               })()}
                                   </div>
                                   
-                                  {/* Show All Record Info Button */}
-                                  <Button variant="outline" size="sm" onClick={() => navigate(`/call-log-details?recordId=${mainCandidate["Record ID"] || mainCandidate["Candidate_ID"]}&jobId=${id}`)} className="w-full text-xs md:text-sm">
-                                    <FileText className="w-3 h-3 mr-1" />
-                                    Call Log Details
-                                  </Button>
+                  {/* Show All Record Info Button */}
+                  <Button variant="outline" size="sm" onClick={() => navigate(`/call-log-details/${mainCandidate["Record ID"] || mainCandidate["recordid"]}`)} className="w-full text-xs md:text-sm">
+                    <FileText className="w-3 h-3 mr-1" />
+                    Call Log Details
+                  </Button>
                                   
                                   <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
                                     <Link to={`/candidate/${candidateId}`}>

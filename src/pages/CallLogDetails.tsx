@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useEffect, useState, useMemo, useRef } from "react"
-import { useSearchParams, useNavigate } from "react-router-dom"
+import { useSearchParams, useNavigate, useParams } from "react-router-dom"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -44,9 +44,10 @@ interface CallLogDetail {
 
 export default function CallLogDetails() {
   const [searchParams] = useSearchParams()
+  const { recordid: urlRecordId } = useParams()
   const candidateId = searchParams.get('candidate')
   const jobId = searchParams.get('job')
-  const callid = searchParams.get('callid')
+  const callid = searchParams.get('callid') || urlRecordId
   const navigate = useNavigate()
   const [callLog, setCallLog] = useState<CallLogDetail | null>(null)
   const [loading, setLoading] = useState(true)
@@ -126,7 +127,7 @@ export default function CallLogDetails() {
         data = resp.data
         error = resp.error
         console.log('Response for recordid query:', { data, error });
-      } else {
+      } else if (candidateId && jobId) {
         console.log('Fetching by candidateId and jobId:', { candidateId, jobId });
         const resp = await supabase
           .from('Jobs_CVs')
@@ -137,6 +138,10 @@ export default function CallLogDetails() {
         data = resp.data
         error = resp.error
         console.log('Response for candidateId/jobId query:', { data, error });
+      } else {
+        console.log('No valid parameters provided');
+        setLoading(false);
+        return;
       }
 
       clearTimeout(timeoutId); // Clear timeout if query completes
@@ -207,7 +212,7 @@ export default function CallLogDetails() {
       setNotes(enrichedData?.notes || "")
       
       // Fetch task status and assignment links
-      await fetchTaskData(candidateId, enrichedData.job_id)
+      await fetchTaskData(data.user_id?.toString() || candidateId, enrichedData.job_id)
     } catch (error) {
       clearTimeout(timeoutId);
       console.error('Error fetching call log detail:', error)
@@ -282,10 +287,13 @@ export default function CallLogDetails() {
           'notes_updated_by': user?.id,
           'notes_updated_at': new Date().toISOString()
         })
+        
       if (callid) {
         updateQuery = updateQuery.eq('recordid', callid)
+      } else if (candidateId && jobId) {
+        updateQuery = updateQuery.eq('user_id', candidateId).eq('job_id', jobId)
       } else {
-        updateQuery = updateQuery.or(`and(candidate_id.eq.${candidateId},job_id.eq.${jobId}),and("Candidate_ID".eq.${candidateId},"Job ID".eq.${jobId}),and("Candidate_ID".eq.${candidateId},job_id.eq.${jobId}),and(candidate_id.eq.${candidateId},"Job ID".eq.${jobId})`)
+        throw new Error('No valid identifiers for update')
       }
 
       const { error } = await updateQuery

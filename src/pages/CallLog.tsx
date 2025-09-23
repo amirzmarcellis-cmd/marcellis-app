@@ -388,7 +388,7 @@ export default function CallLog() {
                           <TableCell className="text-right max-w-[200px]">
                             <div className="flex justify-end space-x-1">
                               <Button variant="outline" size="sm" asChild className="h-8 px-2">
-                                <Link to={`/call-log-details?candidate=${log.user_id}&job=${log.job_id}&callid=${log.recordid}`}> 
+                                <Link to={`/call-log-details/${log.recordid}`}> 
                                   <FileText className="w-3 h-3" />
                                 </Link>
                               </Button>

@@ -198,7 +198,11 @@ export default function Index() {
     setOpenTasksCount(count);
   };
   const handleCandidateClick = (candidateId: string, jobId: string, callid?: number) => {
-    navigate(`/call-log-details?candidate=${candidateId}&job=${jobId}&callid=${callid || ''}`);
+    if (callid) {
+      navigate(`/call-log-details/${callid}`);
+    } else {
+      navigate(`/call-log-details?candidate=${candidateId}&job=${jobId}`);
+    }
   };
   const handleRejectCandidate = async (candidateId: string, jobId: string) => {
     // Show confirmation alert
