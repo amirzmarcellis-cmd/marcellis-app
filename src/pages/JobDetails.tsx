@@ -2240,14 +2240,14 @@ export default function JobDetails() {
                       return acc;
                     }, {} as Record<string, any[]>);
                     
-                    // Convert to array and sort by highest score (CV score or after_call_score)
+                    // Convert to array and sort by highest Overall score
                     const sortedCandidateEntries = Object.entries(groupedWithinBudget).sort(([, candidateContactsA], [, candidateContactsB]) => {
                       const candidateA = candidateContactsA[0];
                       const candidateB = candidateContactsB[0];
                       
-                      // Get the best score for each candidate (prefer after_call_score, then cv_score)
-                      const scoreA = parseFloat(candidateA["after_call_score"] || candidateA["cv_score"] || candidateA["CV Score"] || "0");
-                      const scoreB = parseFloat(candidateB["after_call_score"] || candidateB["cv_score"] || candidateB["CV Score"] || "0");
+                      // Get the Overall score for each candidate
+                      const scoreA = parseFloat(candidateA["Overall"] || candidateA["overall"] || candidateA["after_call_score"] || candidateA["cv_score"] || candidateA["CV Score"] || "0");
+                      const scoreB = parseFloat(candidateB["Overall"] || candidateB["overall"] || candidateB["after_call_score"] || candidateB["cv_score"] || candidateB["CV Score"] || "0");
                       
                       return scoreB - scoreA; // Sort in descending order (highest scores first)
                     });
@@ -2292,14 +2292,14 @@ export default function JobDetails() {
                       return acc;
                     }, {} as Record<string, any[]>);
                     
-                    // Convert to array and sort by highest score (CV score or after_call_score)
+                    // Convert to array and sort by highest Overall score
                     const sortedCandidateEntries = Object.entries(groupedAboveBudget).sort(([, candidateContactsA], [, candidateContactsB]) => {
                       const candidateA = candidateContactsA[0];
                       const candidateB = candidateContactsB[0];
                       
-                      // Get the best score for each candidate (prefer after_call_score, then cv_score)
-                      const scoreA = parseFloat(candidateA["after_call_score"] || candidateA["cv_score"] || candidateA["CV Score"] || "0");
-                      const scoreB = parseFloat(candidateB["after_call_score"] || candidateB["cv_score"] || candidateB["CV Score"] || "0");
+                      // Get the Overall score for each candidate
+                      const scoreA = parseFloat(candidateA["Overall"] || candidateA["overall"] || candidateA["after_call_score"] || candidateA["cv_score"] || candidateA["CV Score"] || "0");
+                      const scoreB = parseFloat(candidateB["Overall"] || candidateB["overall"] || candidateB["after_call_score"] || candidateB["cv_score"] || candidateB["CV Score"] || "0");
                       
                       return scoreB - scoreA; // Sort in descending order (highest scores first)
                     });
