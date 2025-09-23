@@ -1099,7 +1099,7 @@ export default function JobDetails() {
                   <Search className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">Search for more candidates</span>
                   <span className="sm:hidden">Search More</span>
-                </Button> : <Button onClick={handleButtonClick} disabled={job?.longlist === 3} className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm w-full sm:w-auto" size="sm">
+                </Button> : <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm w-full sm:w-auto" size="sm">
                   <Zap className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">Generate Long List</span>
                   <span className="sm:hidden">Generate List</span>
