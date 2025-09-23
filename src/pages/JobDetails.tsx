@@ -536,8 +536,8 @@ export default function JobDetails() {
       console.log('Webhook payload:', payload);
 
       // Call the automation endpoint
-      console.log('Calling webhook at:', 'https://hook.eu2.make.com/pjybmj92jovbo5jdlf63afd8mm5bh3ky');
-      const response = await fetch('https://hook.eu2.make.com/pjybmj92jovbo5jdlf63afd8mm5bh3ky', {
+      console.log('Calling webhook at:', 'https://hook.eu2.make.com/yiz4ustkcgxgji2sv6fwcs99jdr3674m');
+      const response = await fetch('https://hook.eu2.make.com/yiz4ustkcgxgji2sv6fwcs99jdr3674m', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
