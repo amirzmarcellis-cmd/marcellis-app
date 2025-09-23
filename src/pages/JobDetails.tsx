@@ -1060,8 +1060,12 @@ export default function JobDetails() {
     return nameMatch && emailMatch && phoneMatch && userIdMatch && scoreMatch && contactedMatch;
   });
   // Helper function to render candidate cards
-  const renderCandidateCard = (candidateId: string, candidateContacts: any[], mainCandidate: any) => {
-    return <Card key={candidateId} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20">
+  const renderCandidateCard = (candidateId: string, candidateContacts: any[], mainCandidate: any, isTopCandidate: boolean = false) => {
+    const cardClassName = isTopCandidate 
+      ? "border-2 border-amber-300 hover:border-amber-400 transition-colors hover:shadow-xl bg-gradient-to-br from-amber-50/80 to-yellow-50/80 dark:from-amber-950/40 dark:to-yellow-950/40 shadow-lg shadow-amber-200/30 dark:shadow-amber-900/30 ring-1 ring-amber-200/50 dark:ring-amber-800/50" 
+      : "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20";
+    
+    return <Card key={candidateId} className={cardClassName}>
         <CardContent className="p-4">
           <div className="space-y-3">
             <div className="flex items-start justify-between">
@@ -2226,7 +2230,7 @@ export default function JobDetails() {
                     </div> : <ScrollArea className="h-[600px] w-full">
                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
                         {(() => {
-                    // Group within budget candidates by Candidate_ID
+                    // Group within budget candidates by Candidate_ID and sort by score
                     const groupedWithinBudget = withinBudgetCandidates.reduce((acc, candidate) => {
                       const candidateId = candidate["Candidate_ID"];
                       if (!acc[candidateId]) {
@@ -2235,9 +2239,23 @@ export default function JobDetails() {
                       acc[candidateId].push(candidate);
                       return acc;
                     }, {} as Record<string, any[]>);
-                    return Object.entries(groupedWithinBudget).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                    
+                    // Convert to array and sort by highest score (CV score or after_call_score)
+                    const sortedCandidateEntries = Object.entries(groupedWithinBudget).sort(([, candidateContactsA], [, candidateContactsB]) => {
+                      const candidateA = candidateContactsA[0];
+                      const candidateB = candidateContactsB[0];
+                      
+                      // Get the best score for each candidate (prefer after_call_score, then cv_score)
+                      const scoreA = parseFloat(candidateA["after_call_score"] || candidateA["cv_score"] || candidateA["CV Score"] || "0");
+                      const scoreB = parseFloat(candidateB["after_call_score"] || candidateB["cv_score"] || candidateB["CV Score"] || "0");
+                      
+                      return scoreB - scoreA; // Sort in descending order (highest scores first)
+                    });
+                    
+                    return sortedCandidateEntries.map(([candidateId, candidateContacts]: [string, any[]], index: number) => {
                       const mainCandidate = candidateContacts[0];
-                      return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
+                      const isTopCandidate = index < 3; // Top 3 candidates get golden effect
+                      return renderCandidateCard(candidateId, candidateContacts, mainCandidate, isTopCandidate);
                     });
                   })()}
                       </div>
