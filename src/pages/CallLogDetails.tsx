@@ -19,31 +19,27 @@ import { useUserRole } from "@/hooks/useUserRole"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface CallLogDetail {
-  "Job ID": string | null
-  "Candidate_ID": string | null
-  "Contacted": string | null
-  "Transcript": string | null
-  "Summary": string | null
-  "Success Score": string | null
-  "Score and Reason": string | null
-  "Candidate Name": string | null
-  "Candidate Email": string | null
-  "Candidate Phone Number": string | null
-  "pros": string | null
-  "cons": string | null
-  "Notice Period": string | null
-  "Salary Expectations": string | null
-  "current_salary": string | null
-  "Agency Experience": string | null
-  "Job Title": string | null
-  "Notes": string | null
-  "lastcalltime": string | null
-  "callcount": number | null
-  "duration": string | null
-  "recording": string | null
-  "cv_link": string | null
-  "notes_updated_by": string | null
-  "notes_updated_at": string | null
+  job_id: string | null
+  candidate_name: string | null
+  candidate_email: string | null
+  candidate_phone_number: string | null
+  transcript: string | null
+  contacted: string | null
+  after_call_score: string | null
+  after_call_reason: string | null
+  after_call_pros: string | null
+  after_call_cons: string | null
+  notice_period: string | null
+  salary_expectations: string | null
+  current_salary: string | null
+  notes: string | null
+  lastcalltime: string | null
+  callcount: number | null
+  duration: string | null
+  recording: string | null
+  notes_updated_by: string | null
+  notes_updated_at: string | null
+  job_title?: string | null
 }
 
 export default function CallLogDetails() {
@@ -68,7 +64,7 @@ export default function CallLogDetails() {
 
   const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
   const highlightedTranscript = useMemo(() => {
-    const t = callLog?.["Transcript"] || ""
+    const t = callLog?.transcript || ""
     if (!search.trim()) return t
     const regex = new RegExp(`(${escapeRegExp(search.trim())})`, "gi")
     const parts = t.split(regex)
@@ -109,6 +105,13 @@ export default function CallLogDetails() {
 
   const fetchCallLogDetail = async () => {
     console.log('Fetching call log detail with params:', { candidateId, jobId, callid });
+    
+    // Add timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.log('Query timeout - setting loading to false');
+      setLoading(false);
+    }, 10000); // 10 second timeout
+
     try {
       let data: any = null
       let error: any = null
@@ -128,14 +131,20 @@ export default function CallLogDetails() {
         const resp = await supabase
           .from('Jobs_CVs')
           .select('*')
-          .or(`and(Candidate_ID.eq.${candidateId},job_id.eq.${jobId}),and("Candidate_ID".eq.${candidateId},"Job ID".eq.${jobId})`)
+          .eq('user_id', candidateId)
+          .eq('job_id', jobId)
           .maybeSingle()
         data = resp.data
         error = resp.error
         console.log('Response for candidateId/jobId query:', { data, error });
       }
 
-      if (error) throw error
+      clearTimeout(timeoutId); // Clear timeout if query completes
+
+      if (error) {
+        console.error('Database error:', error);
+        throw error;
+      }
       
       if (!data) {
         console.log('No call log data found');
@@ -144,47 +153,49 @@ export default function CallLogDetails() {
         return
       }
 
-      const jobIdForLookup = (data as any)?.job_id ?? (data as any)?.["Job ID"] ?? jobId
+      console.log('Raw data from database:', data);
+
+      // Fetch job data
+      const jobIdForLookup = data.job_id || jobId
       const { data: jobData } = await supabase
         .from('Jobs')
-        .select('*')
-        .or(`job_id.eq.${jobIdForLookup},"Job ID".eq.${jobIdForLookup}`)
+        .select('job_title')
+        .eq('job_id', jobIdForLookup)
         .maybeSingle()
 
+      // Direct mapping using snake_case field names from database
       const enrichedData: CallLogDetail = {
-        "Job ID": (data as any).job_id ?? (data as any)["Job ID"],
-        "Candidate_ID": (data as any).candidate_id ?? (data as any)["Candidate_ID"],
-        "Contacted": (data as any).contacted ?? (data as any)["Contacted"],
-        "Transcript": (data as any).transcript ?? (data as any)["Transcript"],
-        "Summary": (data as any).summary ?? (data as any)["Summary"],
-        "Success Score": (data as any).success_score ?? (data as any)["Success Score"],
-        "Score and Reason": (data as any).score_and_reason ?? (data as any)["Score and Reason"],
-        "Candidate Name": (data as any).candidate_name ?? (data as any)["Candidate Name"],
-        "Candidate Email": (data as any).candidate_email ?? (data as any)["Candidate Email"],
-        "Candidate Phone Number": (data as any).candidate_phone_number ?? (data as any)["Candidate Phone Number"],
-        "pros": (data as any).pros ?? (data as any)["pros"],
-        "cons": (data as any).cons ?? (data as any)["cons"],
-        "Notice Period": (data as any).notice_period ?? (data as any)["Notice Period"],
-        "Salary Expectations": (data as any).salary_expectations ?? (data as any)["Salary Expectations"],
-        "current_salary": (data as any).current_salary ?? (data as any)["current_salary"],
-        "Agency Experience": (data as any).agency_experience ?? (data as any)["Agency Experience"],
-        "Job Title": (jobData as any)?.job_title ?? (jobData as any)?.["Job Title"] ?? null,
-        "Notes": (data as any).notes ?? (data as any)["Notes"],
-        "lastcalltime": (data as any).lastcalltime ?? (data as any)["lastcalltime"],
-        "callcount": (data as any).callcount ?? (data as any)["callcount"],
-        "duration": (data as any).duration ?? (data as any)["duration"],
-        "recording": (data as any).recording ?? (data as any)["recording"],
-        "cv_link": (data as any).cv_link ?? (data as any)["cv_link"],
-        "notes_updated_by": (data as any).notes_updated_by ?? (data as any)["notes_updated_by"],
-        "notes_updated_at": (data as any).notes_updated_at ?? (data as any)["notes_updated_at"]
+        job_id: data.job_id,
+        candidate_name: data.candidate_name,
+        candidate_email: data.candidate_email,
+        candidate_phone_number: data.candidate_phone_number,
+        transcript: data.transcript,
+        contacted: data.contacted,
+        after_call_score: data.after_call_score?.toString(),
+        after_call_reason: data.after_call_reason,
+        after_call_pros: data.after_call_pros,
+        after_call_cons: data.after_call_cons,
+        notice_period: data.notice_period,
+        salary_expectations: data.salary_expectations,
+        current_salary: data.current_salary,
+        notes: data.notes,
+        lastcalltime: data.lastcalltime,
+        callcount: data.callcount,
+        duration: data.duration,
+        recording: data.recording,
+        notes_updated_by: data.notes_updated_by,
+        notes_updated_at: data.notes_updated_at,
+        job_title: jobData?.job_title
       }
 
+      console.log('Enriched data:', enrichedData);
+
       // If there's a notes_updated_by user ID, fetch their profile
-      if (enrichedData["notes_updated_by"]) {
+      if (enrichedData.notes_updated_by) {
         const { data: profileData } = await supabase
           .from('profiles')
           .select('name')
-          .eq('user_id', enrichedData["notes_updated_by"])
+          .eq('user_id', enrichedData.notes_updated_by)
           .maybeSingle()
         
         if (profileData?.name) {
@@ -193,11 +204,12 @@ export default function CallLogDetails() {
       }
 
       setCallLog(enrichedData)
-      setNotes(enrichedData?.["Notes"] || "")
+      setNotes(enrichedData?.notes || "")
       
       // Fetch task status and assignment links
-      await fetchTaskData(enrichedData["Candidate_ID"], enrichedData["Job ID"])
+      await fetchTaskData(candidateId, enrichedData.job_id)
     } catch (error) {
+      clearTimeout(timeoutId);
       console.error('Error fetching call log detail:', error)
     } finally {
       setLoading(false)
@@ -280,7 +292,7 @@ export default function CallLogDetails() {
 
       if (error) throw error
       
-      setCallLog(prev => prev ? { ...prev, Notes: notes } : null)
+      setCallLog(prev => prev ? { ...prev, notes: notes } : null)
       setNotesUpdatedByName(profile?.name || null)
       // Refresh the page after successful save to reflect timeline updates
       window.location.reload()
@@ -307,7 +319,7 @@ export default function CallLogDetails() {
     )
   }
 
-  const score = parseInt(callLog["Success Score"] || "0")
+  const score = parseInt(callLog.after_call_score || "0")
   const scoreColorClass = score >= 80 ? "text-primary" : score >= 50 ? "text-foreground" : "text-destructive"
 
   return (
@@ -349,35 +361,25 @@ export default function CallLogDetails() {
           <div className="flex items-center space-x-6">
             <Avatar className="w-20 h-20">
               <AvatarFallback className="bg-gradient-primary text-white text-xl">
-                {callLog["Candidate Name"]?.charAt(0) || 'C'}
+                {callLog.candidate_name?.charAt(0) || 'C'}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h2 className="text-2xl font-bold">{callLog["Candidate Name"]}</h2>
-              <p className="text-muted-foreground">{callLog["Candidate Email"]}</p>
-              <p className="text-sm">{callLog["Job Title"]}</p>
+              <h2 className="text-2xl font-bold">{callLog.candidate_name}</h2>
+              <p className="text-muted-foreground">{callLog.candidate_email}</p>
+              <p className="text-sm">{callLog.job_title}</p>
               <Badge variant="outline" className="mt-2">
-                Score: {callLog["Success Score"]}/100
+                Score: {callLog.after_call_score}/100
               </Badge>
               <div className="flex items-center space-x-2 mt-2">
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={() => {
-                    const cvLink = callLog["cv_link"];
-                    if (cvLink) {
-                      window.open(cvLink, '_blank');
+                    if (candidateId) {
+                      navigate(`/candidate/${candidateId}`);
                     }
                   }}
-                  disabled={!callLog["cv_link"]}
-                >
-                  <Link2 className="w-4 h-4 mr-2" />
-                  View CV
-                </Button>
-                <Button 
-                  variant="default" 
-                  size="sm"
-                  onClick={() => navigate(`/candidate/${callLog["Candidate_ID"]}`)}
                 >
                   <User className="w-4 h-4 mr-2" />
                   View Profile
@@ -464,12 +466,12 @@ export default function CallLogDetails() {
               </div>
             </div>
             <StatusDropdown
-              currentStatus={callLog["Contacted"]}
+              currentStatus={callLog.contacted}
               candidateId={candidateId!}
               jobId={jobId!}
               statusType="contacted"
               onStatusChange={(newStatus) => {
-                setCallLog(prev => prev ? { ...prev, Contacted: newStatus } : null)
+                setCallLog(prev => prev ? { ...prev, contacted: newStatus } : null)
               }}
             />
           </div>
@@ -489,22 +491,22 @@ export default function CallLogDetails() {
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Duration</label>
-                <p className="text-lg">{callLog["duration"] || 'N/A'}</p>
+                <p className="text-lg">{callLog.duration || 'N/A'}</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Last Call Time</label>
-                <p className="text-lg">{callLog["lastcalltime"] ? new Date(callLog["lastcalltime"]).toLocaleString() : 'N/A'}</p>
+                <p className="text-lg">{callLog.lastcalltime ? new Date(callLog.lastcalltime).toLocaleString() : 'N/A'}</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Call Count</label>
-                <p className="text-lg">{callLog["callcount"] || 0}</p>
+                <p className="text-lg">{callLog.callcount || 0}</p>
               </div>
             </div>
-            {callLog["recording"] && (
+            {callLog.recording && (
               <div className="pt-2">
                 <label className="text-sm font-medium text-muted-foreground">Playback</label>
                 <div className="mt-2">
-                  <WaveformPlayer url={callLog["recording"]!} />
+                  <WaveformPlayer url={callLog.recording!} />
                 </div>
               </div>
             )}
@@ -522,15 +524,15 @@ export default function CallLogDetails() {
           <CardContent className="space-y-4">
             <div>
               <label className="text-sm font-medium text-muted-foreground">Notice Period</label>
-              <p className="text-lg">{callLog["Notice Period"] || 'N/A'}</p>
+              <p className="text-lg">{callLog.notice_period || 'N/A'}</p>
             </div>
             <div>
               <label className="text-sm font-medium text-muted-foreground">Current Salary</label>
-              <p className="text-lg">{callLog["current_salary"] || 'N/A'}</p>
+              <p className="text-lg">{callLog.current_salary || 'N/A'}</p>
             </div>
             <div>
               <label className="text-sm font-medium text-muted-foreground">Expected Salary</label>
-              <p className="text-lg">{callLog["Salary Expectations"] || 'N/A'}</p>
+              <p className="text-lg">{callLog.salary_expectations || 'N/A'}</p>
             </div>
           </CardContent>
         </Card>
@@ -545,7 +547,7 @@ export default function CallLogDetails() {
           </CardHeader>
           <CardContent className="space-y-3">
             <RulerScore value={score} />
-            <p className="text-sm text-muted-foreground">{callLog["Score and Reason"]}</p>
+            <p className="text-sm text-muted-foreground">{callLog.after_call_reason}</p>
           </CardContent>
         </Card>
 
@@ -561,11 +563,11 @@ export default function CallLogDetails() {
               onChange={(e) => setNotes(e.target.value)}
               className="min-h-[100px]"
             />
-            {notesUpdatedByName && callLog?.["Notes"] && (
+            {notesUpdatedByName && callLog?.notes && (
               <p className="text-xs text-muted-foreground">
                 Added by <span className="text-primary font-medium">{notesUpdatedByName}</span>
-                {callLog?.["notes_updated_at"] && (
-                  <span> on {new Date(callLog["notes_updated_at"]).toLocaleDateString()}</span>
+                {callLog?.notes_updated_at && (
+                  <span> on {new Date(callLog.notes_updated_at).toLocaleDateString()}</span>
                 )}
               </p>
             )}
@@ -584,7 +586,7 @@ export default function CallLogDetails() {
             <CardTitle className="text-green-600">Pros</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="whitespace-pre-wrap break-words">{callLog["pros"] || 'No pros available'}</p>
+            <p className="whitespace-pre-wrap break-words">{callLog.after_call_pros || 'No pros available'}</p>
           </CardContent>
         </Card>
 
@@ -593,50 +595,39 @@ export default function CallLogDetails() {
             <CardTitle className="text-red-600">Cons</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="whitespace-pre-wrap break-words">{callLog["cons"] || 'No cons available'}</p>
+            <p className="whitespace-pre-wrap break-words">{callLog.after_call_cons || 'No cons available'}</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Summary & Transcript */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Transcript */}
+      {(isManager || isCompanyAdmin) && (
         <Card>
           <CardHeader>
-            <CardTitle>Summary</CardTitle>
+            <CardTitle>Transcript</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="whitespace-pre-wrap break-words">{callLog["Summary"] || 'No summary available'}</p>
+            <div className="space-y-3">
+              <div className="relative">
+                <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                <Input
+                  placeholder="Search transcript keywords..."
+                  className="pl-9"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+              <div className="max-h-60 overflow-y-auto text-sm leading-relaxed">
+                {callLog?.transcript ? (
+                  <div className="whitespace-pre-wrap break-words">{highlightedTranscript}</div>
+                ) : (
+                  <p className="text-muted-foreground">No transcript available</p>
+                )}
+              </div>
+            </div>
           </CardContent>
         </Card>
-
-{(isManager || isCompanyAdmin) && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Transcript</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="relative">
-                  <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
-                  <Input
-                    placeholder="Search transcript keywords..."
-                    className="pl-9"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
-                </div>
-                <div className="max-h-60 overflow-y-auto text-sm leading-relaxed">
-                  {callLog?.["Transcript"] ? (
-                    <div className="whitespace-pre-wrap break-words">{highlightedTranscript}</div>
-                  ) : (
-                    <p className="text-muted-foreground">No transcript available</p>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+      )}
 
       {/* Timeline Log */}
       {candidateId && jobId && (
