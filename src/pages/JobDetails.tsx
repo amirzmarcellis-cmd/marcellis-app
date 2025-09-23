@@ -568,7 +568,7 @@ export default function JobDetails() {
   };
   const handleRejectCandidate = async (jobId: string, candidateId: string, callid: number) => {
     try {
-      const response = await fetch('https://hook.eu2.make.com/mk46k4ibvs5n5nk1lto9csljygesv75f', {
+      const response = await fetch('https://hook.eu2.make.com/castzb5q0mllr7eq9zzyqll4ffcpet7j', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -577,7 +577,7 @@ export default function JobDetails() {
           job_id: jobId,
           candidate_id: candidateId,
           callid: callid,
-          company_id: "e2bf7296-2d99-43d0-b357-0cda2c202399"
+          company_id: null
         })
       });
       if (response.ok) {
