@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
-import { ArrowLeft, Phone, Clock, User, DollarSign, Calendar, Link2, Save, Search, CheckCircle, ClipboardList } from "lucide-react"
+import { ArrowLeft, Phone, Clock, User, Banknote, Calendar, Link2, Save, Search, CheckCircle, ClipboardList } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
 import { TimelineLog } from "@/components/timeline/TimelineLog"
@@ -525,7 +525,7 @@ export default function CallLogDetails() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <DollarSign className="w-5 h-5 mr-2" />
+              <Banknote className="w-5 h-5 mr-2" />
               Salary & Notice
             </CardTitle>
           </CardHeader>
