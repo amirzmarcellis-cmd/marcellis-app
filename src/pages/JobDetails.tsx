@@ -1066,7 +1066,9 @@ export default function JobDetails() {
   });
   // Helper function to render candidate cards
   const renderCandidateCard = (candidateId: string, candidateContacts: any[], mainCandidate: any, isTopCandidate: boolean = false) => {
-    const cardClassName = isTopCandidate ? "border-2 border-amber-300 hover:border-amber-400 transition-colors hover:shadow-xl bg-gradient-to-br from-amber-50/80 to-yellow-50/80 dark:from-amber-950/40 dark:to-yellow-950/40 shadow-lg shadow-amber-200/30 dark:shadow-amber-900/30 ring-1 ring-amber-200/50 dark:ring-amber-800/50" : "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20";
+    const cardClassName = isTopCandidate 
+      ? "relative border-2 border-yellow-400 hover:border-yellow-500 transition-all duration-300 hover:shadow-2xl bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 dark:from-yellow-950/50 dark:via-amber-950/50 dark:to-orange-950/50 shadow-xl shadow-yellow-200/50 dark:shadow-yellow-900/30 ring-2 ring-yellow-300/60 dark:ring-yellow-600/40 before:absolute before:inset-0 before:bg-gradient-to-r before:from-yellow-300/10 before:via-amber-300/10 before:to-orange-300/10 before:rounded-lg before:animate-pulse" 
+      : "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20";
     return <Card key={candidateId} className={cardClassName}>
         <CardContent className="p-4">
           <div className="space-y-3">
