@@ -2244,15 +2244,15 @@ export default function JobDetails() {
                       return acc;
                     }, {} as Record<string, any[]>);
 
-                    // Convert to array and sort by highest score (CV score or after_call_score)
+                    // Convert to array and sort by highest Overall Score first
                     const sortedCandidateEntries = Object.entries(groupedWithinBudget).sort(([, candidateContactsA], [, candidateContactsB]) => {
                       const candidateA = candidateContactsA[0];
                       const candidateB = candidateContactsB[0];
 
-                      // Get the best score for each candidate (prefer after_call_score, then cv_score)
-                      const scoreA = parseFloat(candidateA["after_call_score"] || candidateA["cv_score"] || candidateA["CV Score"] || "0");
-                      const scoreB = parseFloat(candidateB["after_call_score"] || candidateB["cv_score"] || candidateB["CV Score"] || "0");
-                      return scoreB - scoreA; // Sort in descending order (highest scores first)
+                      // Use the calculateOverallScore function for consistent scoring
+                      const overallScoreA = calculateOverallScore(candidateA);
+                      const overallScoreB = calculateOverallScore(candidateB);
+                      return overallScoreB - overallScoreA; // Sort in descending order (highest Overall Score first)
                     });
                     return sortedCandidateEntries.map(([candidateId, candidateContacts]: [string, any[]], index: number) => {
                       const mainCandidate = candidateContacts[0];
@@ -2284,7 +2284,7 @@ export default function JobDetails() {
                     </div> : <ScrollArea className="h-[600px] w-full">
                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
                         {(() => {
-                    // Group above budget candidates by Candidate_ID
+                    // Group above budget candidates by Candidate_ID and sort by Overall Score
                     const groupedAboveBudget = aboveBudgetCandidates.reduce((acc, candidate) => {
                       const candidateId = candidate["Candidate_ID"];
                       if (!acc[candidateId]) {
@@ -2293,7 +2293,19 @@ export default function JobDetails() {
                       acc[candidateId].push(candidate);
                       return acc;
                     }, {} as Record<string, any[]>);
-                    return Object.entries(groupedAboveBudget).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                    
+                    // Sort by Overall Score descending (highest first)
+                    const sortedAboveBudgetEntries = Object.entries(groupedAboveBudget).sort(([, candidateContactsA], [, candidateContactsB]) => {
+                      const candidateA = candidateContactsA[0];
+                      const candidateB = candidateContactsB[0];
+
+                      // Use the calculateOverallScore function for consistent scoring
+                      const overallScoreA = calculateOverallScore(candidateA);
+                      const overallScoreB = calculateOverallScore(candidateB);
+                      return overallScoreB - overallScoreA; // Sort in descending order (highest Overall Score first)
+                    });
+                    
+                    return sortedAboveBudgetEntries.map(([candidateId, candidateContacts]: [string, any[]]) => {
                       const mainCandidate = candidateContacts[0];
                       return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
                     });
