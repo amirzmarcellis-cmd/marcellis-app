@@ -2282,7 +2282,7 @@ export default function JobDetails() {
                     </div> : <ScrollArea className="h-[600px] w-full">
                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
                         {(() => {
-                    // Group above budget candidates by Candidate_ID
+                    // Group above budget candidates by Candidate_ID and sort by score
                     const groupedAboveBudget = aboveBudgetCandidates.reduce((acc, candidate) => {
                       const candidateId = candidate["Candidate_ID"];
                       if (!acc[candidateId]) {
@@ -2291,7 +2291,20 @@ export default function JobDetails() {
                       acc[candidateId].push(candidate);
                       return acc;
                     }, {} as Record<string, any[]>);
-                    return Object.entries(groupedAboveBudget).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                    
+                    // Convert to array and sort by highest score (CV score or after_call_score)
+                    const sortedCandidateEntries = Object.entries(groupedAboveBudget).sort(([, candidateContactsA], [, candidateContactsB]) => {
+                      const candidateA = candidateContactsA[0];
+                      const candidateB = candidateContactsB[0];
+                      
+                      // Get the best score for each candidate (prefer after_call_score, then cv_score)
+                      const scoreA = parseFloat(candidateA["after_call_score"] || candidateA["cv_score"] || candidateA["CV Score"] || "0");
+                      const scoreB = parseFloat(candidateB["after_call_score"] || candidateB["cv_score"] || candidateB["CV Score"] || "0");
+                      
+                      return scoreB - scoreA; // Sort in descending order (highest scores first)
+                    });
+                    
+                    return sortedCandidateEntries.map(([candidateId, candidateContacts]: [string, any[]]) => {
                       const mainCandidate = candidateContacts[0];
                       return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
                     });
