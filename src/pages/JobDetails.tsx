@@ -217,7 +217,7 @@ export default function JobDetails() {
       const {
         data,
         error
-      } = await supabase.from('Jobs_CVs').select('*').eq('job_id', jobId).order('longlisted_at', {
+      } = await supabase.from('Jobs_CVs').select('*').eq('job_id', jobId).order('cv_score', {
         ascending: false,
         nullsFirst: false
       });
@@ -1058,6 +1058,11 @@ export default function JobDetails() {
       }
     }
     return nameMatch && emailMatch && phoneMatch && userIdMatch && scoreMatch && contactedMatch;
+  }).sort((a, b) => {
+    // Sort by CV Score descending (highest first)
+    const scoreA = parseFloat(a["cv_score"] || a["CV Score"] || "0");
+    const scoreB = parseFloat(b["cv_score"] || b["CV Score"] || "0");
+    return scoreB - scoreA;
   });
   // Helper function to render candidate cards
   const renderCandidateCard = (candidateId: string, candidateContacts: any[], mainCandidate: any, isTopCandidate: boolean = false) => {
