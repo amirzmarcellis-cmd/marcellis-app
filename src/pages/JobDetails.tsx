@@ -2240,17 +2240,17 @@ export default function JobDetails() {
                       return acc;
                     }, {} as Record<string, any[]>);
                     
-                    // Convert to array and sort by highest Overall score
-                    const sortedCandidateEntries = Object.entries(groupedWithinBudget).sort(([, candidateContactsA], [, candidateContactsB]) => {
-                      const candidateA = candidateContactsA[0];
-                      const candidateB = candidateContactsB[0];
-                      
-                      // Get the Overall score for each candidate
-                      const scoreA = parseFloat(candidateA["Overall"] || candidateA["overall"] || candidateA["after_call_score"] || candidateA["cv_score"] || candidateA["CV Score"] || "0");
-                      const scoreB = parseFloat(candidateB["Overall"] || candidateB["overall"] || candidateB["after_call_score"] || candidateB["cv_score"] || candidateB["CV Score"] || "0");
-                      
-                      return scoreB - scoreA; // Sort in descending order (highest scores first)
-                    });
+                     // Convert to array and sort by highest Overall score
+                     const sortedCandidateEntries = Object.entries(groupedWithinBudget).sort(([, candidateContactsA], [, candidateContactsB]) => {
+                       const candidateA = candidateContactsA[0];
+                       const candidateB = candidateContactsB[0];
+                       
+                       // Use the calculateOverallScore function to get accurate overall scores
+                       const scoreA = calculateOverallScore(candidateA);
+                       const scoreB = calculateOverallScore(candidateB);
+                       
+                       return scoreB - scoreA; // Sort in descending order (highest scores first)
+                     });
                     
                     return sortedCandidateEntries.map(([candidateId, candidateContacts]: [string, any[]], index: number) => {
                       const mainCandidate = candidateContacts[0];
@@ -2292,17 +2292,17 @@ export default function JobDetails() {
                       return acc;
                     }, {} as Record<string, any[]>);
                     
-                    // Convert to array and sort by highest Overall score
-                    const sortedCandidateEntries = Object.entries(groupedAboveBudget).sort(([, candidateContactsA], [, candidateContactsB]) => {
-                      const candidateA = candidateContactsA[0];
-                      const candidateB = candidateContactsB[0];
-                      
-                      // Get the Overall score for each candidate
-                      const scoreA = parseFloat(candidateA["Overall"] || candidateA["overall"] || candidateA["after_call_score"] || candidateA["cv_score"] || candidateA["CV Score"] || "0");
-                      const scoreB = parseFloat(candidateB["Overall"] || candidateB["overall"] || candidateB["after_call_score"] || candidateB["cv_score"] || candidateB["CV Score"] || "0");
-                      
-                      return scoreB - scoreA; // Sort in descending order (highest scores first)
-                    });
+                     // Convert to array and sort by highest Overall score
+                     const sortedCandidateEntries = Object.entries(groupedAboveBudget).sort(([, candidateContactsA], [, candidateContactsB]) => {
+                       const candidateA = candidateContactsA[0];
+                       const candidateB = candidateContactsB[0];
+                       
+                       // Use the calculateOverallScore function to get accurate overall scores
+                       const scoreA = calculateOverallScore(candidateA);
+                       const scoreB = calculateOverallScore(candidateB);
+                       
+                       return scoreB - scoreA; // Sort in descending order (highest scores first)
+                     });
                     
                     return sortedCandidateEntries.map(([candidateId, candidateContacts]: [string, any[]]) => {
                       const mainCandidate = candidateContacts[0];
