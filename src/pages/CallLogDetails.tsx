@@ -114,15 +114,15 @@ export default function CallLogDetails() {
       let error: any = null
 
       if (callid) {
-        console.log('Fetching by callid:', callid);
+        console.log('Fetching by recordid:', callid);
         const resp = await supabase
           .from('Jobs_CVs')
           .select('*')
-          .eq('callid', callid)
+          .eq('recordid', callid)
           .maybeSingle()
         data = resp.data
         error = resp.error
-        console.log('Response for callid query:', { data, error });
+        console.log('Response for recordid query:', { data, error });
       } else {
         console.log('Fetching by candidateId and jobId:', { candidateId, jobId });
         const resp = await supabase
@@ -271,7 +271,7 @@ export default function CallLogDetails() {
           'notes_updated_at': new Date().toISOString()
         })
       if (callid) {
-        updateQuery = updateQuery.eq('callid', callid)
+        updateQuery = updateQuery.eq('recordid', callid)
       } else {
         updateQuery = updateQuery.or(`and(candidate_id.eq.${candidateId},job_id.eq.${jobId}),and("Candidate_ID".eq.${candidateId},"Job ID".eq.${jobId}),and("Candidate_ID".eq.${candidateId},job_id.eq.${jobId}),and(candidate_id.eq.${candidateId},"Job ID".eq.${jobId})`)
       }
