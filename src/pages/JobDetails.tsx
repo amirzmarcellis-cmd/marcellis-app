@@ -568,6 +568,18 @@ export default function JobDetails() {
   };
   const handleRejectCandidate = async (jobId: string, candidateId: string, callid: number) => {
     try {
+      // Find the candidate data from the candidates array
+      const candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
+      
+      if (!candidate) {
+        toast({
+          title: "Error",
+          description: "Candidate data not found",
+          variant: "destructive"
+        });
+        return;
+      }
+
       const response = await fetch('https://hook.eu2.make.com/mk46k4ibvs5n5nk1lto9csljygesv75f', {
         method: 'POST',
         headers: {
@@ -575,9 +587,9 @@ export default function JobDetails() {
         },
         body: JSON.stringify({
           job_id: jobId,
-          user_id: "",
-          recordid: "",
-          itris_job_id: ""
+          user_id: candidate.user_id?.toString() || "",
+          recordid: candidate.recordid?.toString() || "",
+          itris_job_id: job?.itris_job_id || ""
         })
       });
       if (response.ok) {
