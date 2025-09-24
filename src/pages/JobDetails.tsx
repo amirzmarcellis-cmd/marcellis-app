@@ -15,7 +15,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, AlertTriangle, Hourglass, User, FileCheck } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, AlertTriangle, Hourglass, User, FileCheck, Building } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { JobFunnel } from "@/components/jobs/JobFunnel";
 import { JobDialog } from "@/components/jobs/JobDialog";
@@ -61,6 +61,10 @@ export default function JobDetails() {
   const [shortListPhoneFilter, setShortListPhoneFilter] = useState("");
   const [shortListUserIdFilter, setShortListUserIdFilter] = useState("");
   const [shortListScoreFilter, setShortListScoreFilter] = useState("all");
+  const [shortListSourceFilter, setShortListSourceFilter] = useState("");
+  
+  // AI Long List filters  
+  const [longListSourceFilter, setLongListSourceFilter] = useState("");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isGeneratingShortList, setIsGeneratingShortList] = useState(false);
@@ -240,6 +244,7 @@ export default function JobDetails() {
         "Candidate Name": row.candidate_name ?? '',
         "Candidate Email": row.candidate_email ?? '',
         "Candidate Phone Number": row.candidate_phone_number ?? '',
+        "Source": row.source ?? '',
         "pros": row.after_call_pros,
         "cons": row.after_call_cons,
         "Notice Period": row.notice_period ?? '',
@@ -1030,6 +1035,7 @@ export default function JobDetails() {
     const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
     const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
     const userIdMatch = !userIdFilter || (candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
+    const sourceMatch = !longListSourceFilter || (candidate["Source"] || "").toLowerCase().includes(longListSourceFilter.toLowerCase());
     let scoreMatch = true;
     if (scoreFilter !== "all") {
       // Try multiple possible field names for CV score
@@ -1063,7 +1069,7 @@ export default function JobDetails() {
         contactedMatch = norm === contactedFilter.toLowerCase();
       }
     }
-    return nameMatch && emailMatch && phoneMatch && userIdMatch && scoreMatch && contactedMatch;
+    return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceMatch && scoreMatch && contactedMatch;
   }).sort((a, b) => {
     // Sort by CV Score descending (highest first)
     const scoreA = parseFloat(a["cv_score"] || a["CV Score"] || "0");
@@ -1121,6 +1127,11 @@ export default function JobDetails() {
               {mainCandidate["Candidate Phone Number"] && <div className="flex items-center text-muted-foreground">
                   <Phone className="w-4 h-4 mr-2" />
                   <span>{mainCandidate["Candidate Phone Number"]}</span>
+                </div>}
+                
+              {mainCandidate["Source"] && <div className="flex items-center text-muted-foreground">
+                  <Building className="w-4 h-4 mr-2" />
+                  <span className="truncate">{mainCandidate["Source"]}</span>
                 </div>}
             </div>
 
@@ -1287,6 +1298,7 @@ export default function JobDetails() {
       const emailMatch = !shortListEmailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(shortListEmailFilter.toLowerCase());
       const phoneMatch = !shortListPhoneFilter || (candidate["Candidate Phone Number"] || "").includes(shortListPhoneFilter);
       const userIdMatch = !shortListUserIdFilter || (candidate.user_id || candidate["user_id"] || "").toString().includes(shortListUserIdFilter);
+      const sourceMatch = !shortListSourceFilter || (candidate["Source"] || "").toLowerCase().includes(shortListSourceFilter.toLowerCase());
       
       let scoreMatch = true;
       if (shortListScoreFilter !== "all") {
@@ -1321,7 +1333,7 @@ export default function JobDetails() {
         }
       }
       
-      return nameMatch && emailMatch && phoneMatch && userIdMatch && scoreMatch;
+      return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceMatch && scoreMatch;
     });
   };
 
@@ -1798,15 +1810,16 @@ export default function JobDetails() {
                           </Button>
                         </div>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
-                        <div className="relative">
-                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                          <Input placeholder="Name..." value={nameFilter} onChange={e => setNameFilter(e.target.value)} className="pl-10 h-9 text-sm" />
-                        </div>
-                        <Input placeholder="Email..." value={emailFilter} onChange={e => setEmailFilter(e.target.value)} className="h-9 text-sm" />
-                        <Input placeholder="Phone..." value={phoneFilter} onChange={e => setPhoneFilter(e.target.value)} className="h-9 text-sm" />
-                        <Input placeholder="User ID..." value={userIdFilter} onChange={e => setUserIdFilter(e.target.value)} className="h-9 text-sm" />
-                        <Select value={scoreFilter} onValueChange={setScoreFilter}>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-3">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                            <Input placeholder="Name..." value={nameFilter} onChange={e => setNameFilter(e.target.value)} className="pl-10 h-9 text-sm" />
+                          </div>
+                          <Input placeholder="Email..." value={emailFilter} onChange={e => setEmailFilter(e.target.value)} className="h-9 text-sm" />
+                          <Input placeholder="Phone..." value={phoneFilter} onChange={e => setPhoneFilter(e.target.value)} className="h-9 text-sm" />
+                          <Input placeholder="User ID..." value={userIdFilter} onChange={e => setUserIdFilter(e.target.value)} className="h-9 text-sm" />
+                          <Input placeholder="Source..." value={longListSourceFilter} onChange={e => setLongListSourceFilter(e.target.value)} className="h-9 text-sm" />
+                          <Select value={scoreFilter} onValueChange={setScoreFilter}>
                           <SelectTrigger className="h-9 text-sm">
                             <SelectValue placeholder="Score" />
                           </SelectTrigger>
@@ -1887,9 +1900,14 @@ export default function JobDetails() {
                                         <span className="truncate">{mainCandidate["Candidate Email"]}</span>
                                       </div>}
                                     
-                                    {mainCandidate["Candidate Phone Number"] && <div className="flex items-center text-muted-foreground min-w-0">
+                                     {mainCandidate["Candidate Phone Number"] && <div className="flex items-center text-muted-foreground min-w-0">
                                         <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
                                         <span className="truncate">{mainCandidate["Candidate Phone Number"]}</span>
+                                      </div>}
+                                      
+                                     {mainCandidate["Source"] && <div className="flex items-center text-muted-foreground min-w-0">
+                                        <Building className="w-4 h-4 mr-2 flex-shrink-0" />
+                                        <span className="truncate">{mainCandidate["Source"]}</span>
                                       </div>}
                                   </div>
 
@@ -2313,6 +2331,12 @@ export default function JobDetails() {
                       onChange={e => setShortListUserIdFilter(e.target.value)} 
                       className="h-9 text-sm min-w-0 flex-1" 
                     />
+                    <Input 
+                      placeholder="Source..." 
+                      value={shortListSourceFilter} 
+                      onChange={e => setShortListSourceFilter(e.target.value)} 
+                      className="h-9 text-sm min-w-0 flex-1" 
+                    />
                     <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
                       <SelectTrigger className="h-9 text-sm w-32">
                         <SelectValue placeholder="Score" />
@@ -2408,6 +2432,12 @@ export default function JobDetails() {
                       placeholder="User ID..." 
                       value={shortListUserIdFilter} 
                       onChange={e => setShortListUserIdFilter(e.target.value)} 
+                      className="h-9 text-sm min-w-0 flex-1" 
+                    />
+                    <Input 
+                      placeholder="Source..." 
+                      value={shortListSourceFilter} 
+                      onChange={e => setShortListSourceFilter(e.target.value)} 
                       className="h-9 text-sm min-w-0 flex-1" 
                     />
                     <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
