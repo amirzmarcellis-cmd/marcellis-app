@@ -61,10 +61,10 @@ export default function JobDetails() {
   const [shortListPhoneFilter, setShortListPhoneFilter] = useState("");
   const [shortListUserIdFilter, setShortListUserIdFilter] = useState("");
   const [shortListScoreFilter, setShortListScoreFilter] = useState("all");
-  const [shortListSourceFilter, setShortListSourceFilter] = useState("");
+  const [shortListSourceFilter, setShortListSourceFilter] = useState("all");
   
   // AI Long List filters  
-  const [longListSourceFilter, setLongListSourceFilter] = useState("");
+  const [longListSourceFilter, setLongListSourceFilter] = useState("all");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isGeneratingShortList, setIsGeneratingShortList] = useState(false);
@@ -1035,7 +1035,7 @@ export default function JobDetails() {
     const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
     const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
     const userIdMatch = !userIdFilter || (candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
-    const sourceMatch = !longListSourceFilter || (candidate["Source"] || "").toLowerCase().includes(longListSourceFilter.toLowerCase());
+    const sourceMatch = !longListSourceFilter || longListSourceFilter === "all" || (candidate["Source"] || "").toLowerCase().includes(longListSourceFilter.toLowerCase());
     let scoreMatch = true;
     if (scoreFilter !== "all") {
       // Try multiple possible field names for CV score
@@ -1298,7 +1298,7 @@ export default function JobDetails() {
       const emailMatch = !shortListEmailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(shortListEmailFilter.toLowerCase());
       const phoneMatch = !shortListPhoneFilter || (candidate["Candidate Phone Number"] || "").includes(shortListPhoneFilter);
       const userIdMatch = !shortListUserIdFilter || (candidate.user_id || candidate["user_id"] || "").toString().includes(shortListUserIdFilter);
-      const sourceMatch = !shortListSourceFilter || (candidate["Source"] || "").toLowerCase().includes(shortListSourceFilter.toLowerCase());
+      const sourceMatch = !shortListSourceFilter || shortListSourceFilter === "all" || (candidate["Source"] || "").toLowerCase().includes(shortListSourceFilter.toLowerCase());
       
       let scoreMatch = true;
       if (shortListScoreFilter !== "all") {
@@ -1818,7 +1818,16 @@ export default function JobDetails() {
                           <Input placeholder="Email..." value={emailFilter} onChange={e => setEmailFilter(e.target.value)} className="h-9 text-sm" />
                           <Input placeholder="Phone..." value={phoneFilter} onChange={e => setPhoneFilter(e.target.value)} className="h-9 text-sm" />
                           <Input placeholder="User ID..." value={userIdFilter} onChange={e => setUserIdFilter(e.target.value)} className="h-9 text-sm" />
-                          <Input placeholder="Source..." value={longListSourceFilter} onChange={e => setLongListSourceFilter(e.target.value)} className="h-9 text-sm" />
+                          <Select value={longListSourceFilter} onValueChange={setLongListSourceFilter}>
+                            <SelectTrigger className="h-9 text-sm">
+                              <SelectValue placeholder="Source" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Sources</SelectItem>
+                              <SelectItem value="Itris">Itris</SelectItem>
+                              <SelectItem value="Linkedin">LinkedIn</SelectItem>
+                            </SelectContent>
+                          </Select>
                           <Select value={scoreFilter} onValueChange={setScoreFilter}>
                           <SelectTrigger className="h-9 text-sm">
                             <SelectValue placeholder="Score" />
@@ -2337,6 +2346,16 @@ export default function JobDetails() {
                       onChange={e => setShortListSourceFilter(e.target.value)} 
                       className="h-9 text-sm min-w-0 flex-1" 
                     />
+                    <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
+                      <SelectTrigger className="h-9 text-sm w-32">
+                        <SelectValue placeholder="Source" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Sources</SelectItem>
+                        <SelectItem value="Itris">Itris</SelectItem>
+                        <SelectItem value="Linkedin">LinkedIn</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
                       <SelectTrigger className="h-9 text-sm w-32">
                         <SelectValue placeholder="Score" />
@@ -2440,6 +2459,16 @@ export default function JobDetails() {
                       onChange={e => setShortListSourceFilter(e.target.value)} 
                       className="h-9 text-sm min-w-0 flex-1" 
                     />
+                    <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
+                      <SelectTrigger className="h-9 text-sm w-32">
+                        <SelectValue placeholder="Source" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Sources</SelectItem>
+                        <SelectItem value="Itris">Itris</SelectItem>
+                        <SelectItem value="Linkedin">LinkedIn</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
                       <SelectTrigger className="h-9 text-sm w-32">
                         <SelectValue placeholder="Score" />
