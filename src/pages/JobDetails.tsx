@@ -2284,9 +2284,9 @@ export default function JobDetails() {
                     High-scoring candidates with salary expectations within 20% of budget ({formatCurrency(jobBudget.toString(), job?.Currency)} + 20%)
                   </CardDescription>
                   
-                  {/* AI Short List Filters */}
-                  <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t">
-                    <div className="relative">
+                  {/* AI Short List Filters - Single Line */}
+                  <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center">
+                    <div className="relative min-w-0 flex-1">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                       <Input 
                         placeholder="Name..." 
@@ -2299,22 +2299,22 @@ export default function JobDetails() {
                       placeholder="Email..." 
                       value={shortListEmailFilter} 
                       onChange={e => setShortListEmailFilter(e.target.value)} 
-                      className="h-9 text-sm" 
+                      className="h-9 text-sm min-w-0 flex-1" 
                     />
                     <Input 
                       placeholder="Phone..." 
                       value={shortListPhoneFilter} 
                       onChange={e => setShortListPhoneFilter(e.target.value)} 
-                      className="h-9 text-sm" 
+                      className="h-9 text-sm min-w-0 flex-1" 
                     />
                     <Input 
                       placeholder="User ID..." 
                       value={shortListUserIdFilter} 
                       onChange={e => setShortListUserIdFilter(e.target.value)} 
-                      className="h-9 text-sm" 
+                      className="h-9 text-sm min-w-0 flex-1" 
                     />
                     <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
-                      <SelectTrigger className="h-9 text-sm">
+                      <SelectTrigger className="h-9 text-sm w-32">
                         <SelectValue placeholder="Score" />
                       </SelectTrigger>
                       <SelectContent>
@@ -2381,9 +2381,9 @@ export default function JobDetails() {
                     High-scoring candidates with salary expectations more than 20% above budget ({formatCurrency(budgetThreshold.toString(), job?.Currency)}+)
                   </CardDescription>
                   
-                  {/* AI Short List Filters */}
-                  <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t">
-                    <div className="relative">
+                  {/* AI Short List Filters - Single Line */}
+                  <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center">
+                    <div className="relative min-w-0 flex-1">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                       <Input 
                         placeholder="Name..." 
@@ -2396,22 +2396,22 @@ export default function JobDetails() {
                       placeholder="Email..." 
                       value={shortListEmailFilter} 
                       onChange={e => setShortListEmailFilter(e.target.value)} 
-                      className="h-9 text-sm" 
+                      className="h-9 text-sm min-w-0 flex-1" 
                     />
                     <Input 
                       placeholder="Phone..." 
                       value={shortListPhoneFilter} 
                       onChange={e => setShortListPhoneFilter(e.target.value)} 
-                      className="h-9 text-sm" 
+                      className="h-9 text-sm min-w-0 flex-1" 
                     />
                     <Input 
                       placeholder="User ID..." 
                       value={shortListUserIdFilter} 
                       onChange={e => setShortListUserIdFilter(e.target.value)} 
-                      className="h-9 text-sm" 
+                      className="h-9 text-sm min-w-0 flex-1" 
                     />
                     <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
-                      <SelectTrigger className="h-9 text-sm">
+                      <SelectTrigger className="h-9 text-sm w-32">
                         <SelectValue placeholder="Score" />
                       </SelectTrigger>
                       <SelectContent>
