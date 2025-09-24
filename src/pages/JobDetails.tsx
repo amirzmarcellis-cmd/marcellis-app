@@ -1077,9 +1077,8 @@ export default function JobDetails() {
                 <div className="flex items-center gap-2 mb-1">
                   <h4 className="font-semibold">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
                   {isTopCandidate && (
-                    <Badge className="bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-amber-900 hover:from-amber-500 hover:via-yellow-500 hover:to-amber-600 border-0 shadow-lg font-medium text-xs px-2 py-1 flex items-center gap-1">
-                      <Star className="w-3 h-3 fill-current" />
-                      Recommended
+                    <Badge className="bg-gradient-to-br from-amber-300 via-yellow-300 to-amber-400 hover:from-amber-400 hover:via-yellow-400 hover:to-amber-500 border-2 border-amber-200 shadow-lg hover:shadow-xl transition-all duration-200 w-8 h-8 rounded-full p-0 flex items-center justify-center group">
+                      <Star className="w-4 h-4 fill-amber-800 text-amber-800 group-hover:scale-110 transition-transform duration-200" />
                     </Badge>
                   )}
                 </div>
