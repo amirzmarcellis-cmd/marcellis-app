@@ -1074,7 +1074,14 @@ export default function JobDetails() {
           <div className="space-y-3">
             <div className="flex items-start justify-between">
               <div className="min-w-0 flex-1">
-                <h4 className="font-semibold">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
+                <div className="flex items-center gap-2 mb-1">
+                  <h4 className="font-semibold">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
+                  {isTopCandidate && (
+                    <Badge variant="default" className="bg-gradient-to-r from-yellow-400 to-amber-500 text-yellow-900 font-semibold text-xs px-2 py-1 shadow-md border-0">
+                      ⭐ Recommended
+                    </Badge>
+                  )}
+                </div>
                 <p className="text-sm text-muted-foreground">User ID: {mainCandidate["user_id"] || "N/A"}</p>
                 <div className="flex items-center gap-4 text-sm mt-1">
                   <span className="text-muted-foreground">CV Score: {mainCandidate["cv_score"] || mainCandidate["CV Score"] || "N/A"}</span>
