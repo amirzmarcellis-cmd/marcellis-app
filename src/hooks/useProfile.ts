@@ -9,6 +9,7 @@ export interface Profile {
   email: string;
   is_admin: boolean;
   slug: string | null;
+  linkedin_id: string | null;
   created_at: string;
   updated_at: string;
 }

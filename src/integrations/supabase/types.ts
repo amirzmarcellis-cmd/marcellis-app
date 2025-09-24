@@ -131,39 +131,6 @@ export type Database = {
         }
         Relationships: []
       }
-      CVs_duplicate_duplicate: {
-        Row: {
-          cv_link: string | null
-          cv_text: string | null
-          email: string | null
-          Firstname: string | null
-          Lastname: string | null
-          name: string | null
-          phone_number: string | null
-          user_id: string
-        }
-        Insert: {
-          cv_link?: string | null
-          cv_text?: string | null
-          email?: string | null
-          Firstname?: string | null
-          Lastname?: string | null
-          name?: string | null
-          phone_number?: string | null
-          user_id: string
-        }
-        Update: {
-          cv_link?: string | null
-          cv_text?: string | null
-          email?: string | null
-          Firstname?: string | null
-          Lastname?: string | null
-          name?: string | null
-          phone_number?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
       groups: {
         Row: {
           color: string | null
@@ -194,11 +161,13 @@ export type Database = {
       Jobs: {
         Row: {
           assignment: string | null
+          automatic_dial: boolean | null
           client_description: string | null
           contract_length: string | null
           Currency: string | null
           group_id: string | null
           itris_job_id: string | null
+          jd_link: string | null
           jd_summary: string | null
           job_description: string | null
           job_id: string
@@ -218,11 +187,13 @@ export type Database = {
         }
         Insert: {
           assignment?: string | null
+          automatic_dial?: boolean | null
           client_description?: string | null
           contract_length?: string | null
           Currency?: string | null
           group_id?: string | null
           itris_job_id?: string | null
+          jd_link?: string | null
           jd_summary?: string | null
           job_description?: string | null
           job_id: string
@@ -242,11 +213,13 @@ export type Database = {
         }
         Update: {
           assignment?: string | null
+          automatic_dial?: boolean | null
           client_description?: string | null
           contract_length?: string | null
           Currency?: string | null
           group_id?: string | null
           itris_job_id?: string | null
+          jd_link?: string | null
           jd_summary?: string | null
           job_description?: string | null
           job_id?: string
@@ -292,6 +265,8 @@ export type Database = {
           itris_job_id: string | null
           job_id: string
           lastcalltime: string | null
+          linkedin_score: number | null
+          linkedin_score_reason: string | null
           longlisted_at: string | null
           notes: string | null
           notes_updated_at: string | null
@@ -302,9 +277,10 @@ export type Database = {
           recruiter_id: number | null
           salary_expectations: string | null
           shortlisted_at: string | null
+          source: string | null
           transcript: string | null
           two_questions_of_interview: string | null
-          user_id: number | null
+          user_id: string | null
         }
         Insert: {
           after_call_cons?: string | null
@@ -323,6 +299,8 @@ export type Database = {
           itris_job_id?: string | null
           job_id: string
           lastcalltime?: string | null
+          linkedin_score?: number | null
+          linkedin_score_reason?: string | null
           longlisted_at?: string | null
           notes?: string | null
           notes_updated_at?: string | null
@@ -333,9 +311,10 @@ export type Database = {
           recruiter_id?: number | null
           salary_expectations?: string | null
           shortlisted_at?: string | null
+          source?: string | null
           transcript?: string | null
           two_questions_of_interview?: string | null
-          user_id?: number | null
+          user_id?: string | null
         }
         Update: {
           after_call_cons?: string | null
@@ -354,6 +333,8 @@ export type Database = {
           itris_job_id?: string | null
           job_id?: string
           lastcalltime?: string | null
+          linkedin_score?: number | null
+          linkedin_score_reason?: string | null
           longlisted_at?: string | null
           notes?: string | null
           notes_updated_at?: string | null
@@ -364,9 +345,40 @@ export type Database = {
           recruiter_id?: number | null
           salary_expectations?: string | null
           shortlisted_at?: string | null
+          source?: string | null
           transcript?: string | null
           two_questions_of_interview?: string | null
-          user_id?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      linkedin_boolean_search: {
+        Row: {
+          id: number
+          job_id: string | null
+          linkedin_id: string | null
+          status: string | null
+          thread_id: string | null
+          unipile_user_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: number
+          job_id?: string | null
+          linkedin_id?: string | null
+          status?: string | null
+          thread_id?: string | null
+          unipile_user_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: number
+          job_id?: string | null
+          linkedin_id?: string | null
+          status?: string | null
+          thread_id?: string | null
+          unipile_user_id?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -438,6 +450,7 @@ export type Database = {
           email: string
           id: string
           is_admin: boolean
+          linkedin_id: string | null
           name: string | null
           slug: string | null
           updated_at: string
@@ -448,6 +461,7 @@ export type Database = {
           email: string
           id?: string
           is_admin?: boolean
+          linkedin_id?: string | null
           name?: string | null
           slug?: string | null
           updated_at?: string
@@ -458,6 +472,7 @@ export type Database = {
           email?: string
           id?: string
           is_admin?: boolean
+          linkedin_id?: string | null
           name?: string | null
           slug?: string | null
           updated_at?: string

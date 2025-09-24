@@ -15,6 +15,7 @@ export default function Settings() {
     name: '',
     email: '',
     slug: '',
+    linkedin_id: '',
     notifications: true,
     automaticDial: false,
   });
@@ -26,6 +27,7 @@ export default function Settings() {
         name: profile.name || '',
         email: profile.email || '',
         slug: profile.slug || 'me',
+        linkedin_id: profile.linkedin_id || '',
         notifications: true,
         automaticDial: false,
       });
@@ -38,6 +40,7 @@ export default function Settings() {
       await updateProfile({
         name: formData.name,
         slug: formData.slug.toLowerCase().replace(/[^a-z0-9-]/g, ''),
+        linkedin_id: formData.linkedin_id,
       });
 
       toast({
@@ -103,6 +106,18 @@ export default function Settings() {
             />
             <p className="text-sm text-muted-foreground mt-1">
               This slug will be used for job IDs. Example: if slug is "me", job IDs will be "me-j-0001"
+            </p>
+          </div>
+          <div>
+            <Label htmlFor="linkedin_id">LinkedIn ID</Label>
+            <Input
+              id="linkedin_id"
+              value={formData.linkedin_id}
+              onChange={(e) => setFormData({ ...formData, linkedin_id: e.target.value })}
+              placeholder="Enter your LinkedIn ID"
+            />
+            <p className="text-sm text-muted-foreground mt-1">
+              Your LinkedIn profile identifier for integration purposes
             </p>
           </div>
           <Button onClick={handleSave} disabled={loading}>
