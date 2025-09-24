@@ -104,7 +104,7 @@ export default function AddJob() {
 
   const generateJobId = async () => {
     // Get current job count for this slug
-    const slug = profile?.slug || 'default';
+    const slug = profile?.slug || 'me';
     
     const { data: existingJobs } = await supabase
       .from('Jobs')
@@ -126,10 +126,6 @@ export default function AddJob() {
       return;
     }
 
-    if (!profile?.slug) {
-      toast.error("Please set up your company slug in Settings before creating jobs");
-      return;
-    }
 
     setIsSubmitting(true);
     
