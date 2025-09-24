@@ -55,6 +55,12 @@ export default function JobDetails() {
   const [appNameFilter, setAppNameFilter] = useState("");
   const [appEmailFilter, setAppEmailFilter] = useState("");
   const [appPhoneFilter, setAppPhoneFilter] = useState("");
+  // AI Short List filters
+  const [shortListNameFilter, setShortListNameFilter] = useState("");
+  const [shortListEmailFilter, setShortListEmailFilter] = useState("");
+  const [shortListPhoneFilter, setShortListPhoneFilter] = useState("");
+  const [shortListUserIdFilter, setShortListUserIdFilter] = useState("");
+  const [shortListScoreFilter, setShortListScoreFilter] = useState("all");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isGeneratingShortList, setIsGeneratingShortList] = useState(false);
@@ -1274,15 +1280,60 @@ export default function JobDetails() {
   const jobBudget = parseSalary(job?.job_salary_range?.toString() || job?.["Job Salary Range (ex: 15000 AED)"]);
   const budgetThreshold = jobBudget * 1.2; // 20% above budget
 
-  // Filter candidates into budget categories
-  const withinBudgetCandidates = shortListCandidates.filter(candidate => {
+  // Function to filter short list candidates
+  const filterShortListCandidates = (candidates: any[]) => {
+    return candidates.filter(candidate => {
+      const nameMatch = !shortListNameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(shortListNameFilter.toLowerCase());
+      const emailMatch = !shortListEmailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(shortListEmailFilter.toLowerCase());
+      const phoneMatch = !shortListPhoneFilter || (candidate["Candidate Phone Number"] || "").includes(shortListPhoneFilter);
+      const userIdMatch = !shortListUserIdFilter || (candidate.user_id || candidate["user_id"] || "").toString().includes(shortListUserIdFilter);
+      
+      let scoreMatch = true;
+      if (shortListScoreFilter !== "all") {
+        const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
+        switch (shortListScoreFilter) {
+          case "90+":
+            scoreMatch = score >= 90;
+            break;
+          case "85+":
+            scoreMatch = score >= 85;
+            break;
+          case "80+":
+            scoreMatch = score >= 80;
+            break;
+          case "75+":
+            scoreMatch = score >= 75;
+            break;
+          case "70+":
+            scoreMatch = score >= 70;
+            break;
+          case "high":
+            scoreMatch = score >= 85;
+            break;
+          case "medium":
+            scoreMatch = score >= 70 && score < 85;
+            break;
+          case "low":
+            scoreMatch = score < 70;
+            break;
+          default:
+            scoreMatch = true;
+        }
+      }
+      
+      return nameMatch && emailMatch && phoneMatch && userIdMatch && scoreMatch;
+    });
+  };
+
+  // Filter candidates into budget categories with applied filters
+  const withinBudgetCandidates = filterShortListCandidates(shortListCandidates.filter(candidate => {
     const expectedSalary = parseSalary(candidate["Salary Expectations"]);
     return expectedSalary === 0 || expectedSalary <= budgetThreshold;
-  });
-  const aboveBudgetCandidates = shortListCandidates.filter(candidate => {
+  }));
+  const aboveBudgetCandidates = filterShortListCandidates(shortListCandidates.filter(candidate => {
     const expectedSalary = parseSalary(candidate["Salary Expectations"]);
     return expectedSalary > 0 && expectedSalary > budgetThreshold;
-  });
+  }));
   return <div className="space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden">
         {/* Header */}
         <div className="flex flex-col gap-4">
@@ -2232,6 +2283,53 @@ export default function JobDetails() {
                   <CardDescription>
                     High-scoring candidates with salary expectations within 20% of budget ({formatCurrency(jobBudget.toString(), job?.Currency)} + 20%)
                   </CardDescription>
+                  
+                  {/* AI Short List Filters */}
+                  <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                      <Input 
+                        placeholder="Name..." 
+                        value={shortListNameFilter} 
+                        onChange={e => setShortListNameFilter(e.target.value)} 
+                        className="pl-10 h-9 text-sm" 
+                      />
+                    </div>
+                    <Input 
+                      placeholder="Email..." 
+                      value={shortListEmailFilter} 
+                      onChange={e => setShortListEmailFilter(e.target.value)} 
+                      className="h-9 text-sm" 
+                    />
+                    <Input 
+                      placeholder="Phone..." 
+                      value={shortListPhoneFilter} 
+                      onChange={e => setShortListPhoneFilter(e.target.value)} 
+                      className="h-9 text-sm" 
+                    />
+                    <Input 
+                      placeholder="User ID..." 
+                      value={shortListUserIdFilter} 
+                      onChange={e => setShortListUserIdFilter(e.target.value)} 
+                      className="h-9 text-sm" 
+                    />
+                    <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
+                      <SelectTrigger className="h-9 text-sm">
+                        <SelectValue placeholder="Score" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Scores</SelectItem>
+                        <SelectItem value="90+">90+</SelectItem>
+                        <SelectItem value="85+">85+</SelectItem>
+                        <SelectItem value="80+">80+</SelectItem>
+                        <SelectItem value="75+">75+</SelectItem>
+                        <SelectItem value="70+">70+</SelectItem>
+                        <SelectItem value="high">High (85+)</SelectItem>
+                        <SelectItem value="medium">Medium (70-84)</SelectItem>
+                        <SelectItem value="low">Low (&lt;70)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {withinBudgetCandidates.length === 0 ? <div className="text-center py-8">
@@ -2282,6 +2380,53 @@ export default function JobDetails() {
                   <CardDescription>
                     High-scoring candidates with salary expectations more than 20% above budget ({formatCurrency(budgetThreshold.toString(), job?.Currency)}+)
                   </CardDescription>
+                  
+                  {/* AI Short List Filters */}
+                  <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                      <Input 
+                        placeholder="Name..." 
+                        value={shortListNameFilter} 
+                        onChange={e => setShortListNameFilter(e.target.value)} 
+                        className="pl-10 h-9 text-sm" 
+                      />
+                    </div>
+                    <Input 
+                      placeholder="Email..." 
+                      value={shortListEmailFilter} 
+                      onChange={e => setShortListEmailFilter(e.target.value)} 
+                      className="h-9 text-sm" 
+                    />
+                    <Input 
+                      placeholder="Phone..." 
+                      value={shortListPhoneFilter} 
+                      onChange={e => setShortListPhoneFilter(e.target.value)} 
+                      className="h-9 text-sm" 
+                    />
+                    <Input 
+                      placeholder="User ID..." 
+                      value={shortListUserIdFilter} 
+                      onChange={e => setShortListUserIdFilter(e.target.value)} 
+                      className="h-9 text-sm" 
+                    />
+                    <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
+                      <SelectTrigger className="h-9 text-sm">
+                        <SelectValue placeholder="Score" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Scores</SelectItem>
+                        <SelectItem value="90+">90+</SelectItem>
+                        <SelectItem value="85+">85+</SelectItem>
+                        <SelectItem value="80+">80+</SelectItem>
+                        <SelectItem value="75+">75+</SelectItem>
+                        <SelectItem value="70+">70+</SelectItem>
+                        <SelectItem value="high">High (85+)</SelectItem>
+                        <SelectItem value="medium">Medium (70-84)</SelectItem>
+                        <SelectItem value="low">Low (&lt;70)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {aboveBudgetCandidates.length === 0 ? <div className="text-center py-8">
