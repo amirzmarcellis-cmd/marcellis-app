@@ -1154,9 +1154,12 @@ export default function JobDetails() {
                 </div>
                 <p className="text-sm text-muted-foreground">User ID: {mainCandidate["user_id"] || "N/A"}</p>
                 <div className="flex items-center gap-4 text-sm mt-1">
-                  <span className="text-muted-foreground">CV Score: {mainCandidate["cv_score"] || mainCandidate["CV Score"] || "N/A"}</span>
+                  {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && (
+                    <span className="text-muted-foreground">CV Score: {mainCandidate["cv_score"] || mainCandidate["CV Score"] || "N/A"}</span>
+                  )}
                   {mainCandidate["after_call_score"] && <span className="text-muted-foreground">After Call Score: {mainCandidate["after_call_score"]}</span>}
-                  {(mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && (mainCandidate["linkedin_score"] !== undefined && mainCandidate["linkedin_score"] !== null && mainCandidate["linkedin_score"] !== "")) && (
+                  {(mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && (mainCandidate["linkedin_score"] !== undefined && mainCandidate["linkedin_score"] !== null && mainCandidate["linkedin_score"] !== "")) && 
+                   !["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && (
                     <span className="text-muted-foreground">Overall: {mainCandidate["linkedin_score"]}</span>
                   )}
                 </div>
@@ -1273,8 +1276,8 @@ export default function JobDetails() {
               }} variant="badge" />}
               </div>
               <div className="flex flex-col gap-1 items-end">
-                {getOverallScoreBadge(mainCandidate)}
-                {getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
+                {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getOverallScoreBadge(mainCandidate)}
+                {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
               </div>
             </div>
 
@@ -1996,10 +1999,12 @@ export default function JobDetails() {
                                   <div className="space-y-2 pt-2 border-t">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                                       <div className="space-y-1">
-                                        <div className="flex items-center justify-between">
-                                          <span className="text-muted-foreground">{(typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin')) ? 'LinkedIn Score:' : 'CV Score:'}</span>
-                                          <span className="font-medium">{(typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin')) ? (mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "N/A") : (mainCandidate["cv_score"] || "N/A")}</span>
-                                        </div>
+                                        {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && (
+                                          <div className="flex items-center justify-between">
+                                            <span className="text-muted-foreground">{(typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin')) ? 'LinkedIn Score:' : 'CV Score:'}</span>
+                                            <span className="font-medium">{(typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin')) ? (mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "N/A") : (mainCandidate["cv_score"] || "N/A")}</span>
+                                          </div>
+                                        )
                                         <div className="flex items-center justify-between">
                                           <span className="text-muted-foreground">User ID:</span>
                                           <span className="font-mono text-xs">{mainCandidate["user_id"] || "N/A"}</span>
@@ -2044,9 +2049,9 @@ export default function JobDetails() {
                               }} variant="badge" />}
                                      </div>
                                       <div className="flex flex-col gap-1 items-end">
-                                        {/* Hide overall score for specific statuses */}
-                                        {!["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer"].includes(mainCandidate["contacted"]?.toLowerCase() || "") && getOverallScoreBadge(mainCandidate)}
-                                        {!["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer"].includes(mainCandidate["contacted"]?.toLowerCase() || "") && getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
+                                        {/* Hide overall/CV scores for specific contact statuses */}
+                                        {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getOverallScoreBadge(mainCandidate)}
+                                        {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
                                       </div>
                                    </div>
 
@@ -2287,20 +2292,23 @@ export default function JobDetails() {
                                  <div className="space-y-2 pt-2 border-t">
                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                                      <div className="space-y-1">
-                                       <div className="flex items-center justify-between">
-                                         <span className="text-muted-foreground">CV Score:</span>
-                                         <span className="font-medium">{mainCandidate["cv_score"] || "N/A"}</span>
-                                       </div>
+                                       {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && (
+                                         <div className="flex items-center justify-between">
+                                           <span className="text-muted-foreground">CV Score:</span>
+                                           <span className="font-medium">{mainCandidate["cv_score"] || "N/A"}</span>
+                                         </div>
+                                       )}
                                        <div className="flex items-center justify-between">
                                          <span className="text-muted-foreground">User ID:</span>
                                          <span className="font-mono text-xs">{mainCandidate["user_id"] || "N/A"}</span>
                                        </div>
-                                       {(mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && (mainCandidate["linkedin_score"] !== undefined && mainCandidate["linkedin_score"] !== null && mainCandidate["linkedin_score"] !== "")) && (
-                                         <div className="flex items-center justify-between">
-                                           <span className="text-muted-foreground">Overall:</span>
-                                           <span className="font-medium">{mainCandidate["linkedin_score"]}</span>
-                                         </div>
-                                       )}
+                                        {(mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && (mainCandidate["linkedin_score"] !== undefined && mainCandidate["linkedin_score"] !== null && mainCandidate["linkedin_score"] !== "")) && 
+                                         !["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && (
+                                          <div className="flex items-center justify-between">
+                                            <span className="text-muted-foreground">Overall:</span>
+                                            <span className="font-medium">{mainCandidate["linkedin_score"]}</span>
+                                          </div>
+                                        )
                                      </div>
                                      <div className="space-y-1">
                                        {/* reserved for extra fields */}
@@ -2345,8 +2353,8 @@ export default function JobDetails() {
                               }} variant="badge" statusType="candidate" />}
                                    </div>
                                    <div className="flex flex-col gap-1 items-end">
-                                     {getOverallScoreBadge(mainCandidate)}
-                                     {getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
+                                     {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getOverallScoreBadge(mainCandidate)}
+                                     {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
                                    </div>
                                  </div>
 
