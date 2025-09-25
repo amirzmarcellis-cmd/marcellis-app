@@ -50,9 +50,9 @@ interface CallLogDetail {
 export default function CallLogDetails() {
   const [searchParams] = useSearchParams()
   const { recordid: urlRecordId } = useParams()
-  const candidateId = searchParams.get('candidate')
-  const jobId = searchParams.get('job')
-  const callid = searchParams.get('callid') || urlRecordId
+  const candidateId = searchParams.get('candidate') || searchParams.get('candidateId') || searchParams.get('user_id')
+  const jobId = searchParams.get('job') || searchParams.get('jobId')
+  const callid = searchParams.get('callid') || urlRecordId || searchParams.get('recordId') || searchParams.get('recordid')
   const navigate = useNavigate()
   const [callLog, setCallLog] = useState<CallLogDetail | null>(null)
   const [loading, setLoading] = useState(true)
