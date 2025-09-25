@@ -332,22 +332,25 @@ export default function Apply() {
     const timestamp = Date.now();
     const candidateUserId = `CAND-${timestamp}`;
     
-    const webhookPayload = [{
-      type: "INSERT",
-      table: "CVs",
-      record: {
-        name: uploadedFiles[0]?.name || `${form.getValues("firstName")} ${form.getValues("lastName")}`,
-        email: null,
-        cv_link: uploadedFiles.map(f => f.url).join(', '),
-        cv_text: null,
-        user_id: candidateUserId,
-        Lastname: form.getValues("lastName"),
-        Firstname: form.getValues("firstName"),
-        phone_number: null
-      },
-      schema: "public",
-      old_record: null
-    }];
+    // Structure webhook payload exactly as shown in the image
+    const webhookPayload = {
+      "Bundle 1": {
+        type: "INSERT",
+        table: "CVs",
+        record: {
+          name: uploadedFiles[0]?.name || `${form.getValues("firstName")} ${form.getValues("lastName")}`,
+          email: "empty",
+          cv_link: uploadedFiles.map(f => f.url).join(', '),
+          cv_text: "empty",
+          user_id: candidateUserId,
+          Lastname: form.getValues("lastName"),
+          Firstname: form.getValues("firstName"),
+          phone_number: "empty"
+        },
+        schema: "public",
+        old_record: "empty"
+      }
+    };
     
     const success = await triggerWebhook(webhookPayload);
     
