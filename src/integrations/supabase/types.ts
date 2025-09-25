@@ -184,6 +184,7 @@ export type Database = {
           nicetohave: string | null
           notice_period: string | null
           Processed: string | null
+          recruiter_id: string | null
           things_to_look_for: string | null
           Timestamp: string | null
           Type: string | null
@@ -210,6 +211,7 @@ export type Database = {
           nicetohave?: string | null
           notice_period?: string | null
           Processed?: string | null
+          recruiter_id?: string | null
           things_to_look_for?: string | null
           Timestamp?: string | null
           Type?: string | null
@@ -236,6 +238,7 @@ export type Database = {
           nicetohave?: string | null
           notice_period?: string | null
           Processed?: string | null
+          recruiter_id?: string | null
           things_to_look_for?: string | null
           Timestamp?: string | null
           Type?: string | null
