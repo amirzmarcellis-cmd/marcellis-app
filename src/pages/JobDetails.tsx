@@ -16,6 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, AlertTriangle, Hourglass, User, FileCheck, Building } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { JobFunnel } from "@/components/jobs/JobFunnel";
 import { JobDialog } from "@/components/jobs/JobDialog";
@@ -38,6 +39,7 @@ export default function JobDetails() {
   } = useProfile();
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [automaticDialSaving, setAutomaticDialSaving] = useState(false);
   const [candidates, setCandidates] = useState<any[]>([]);
   const [candidatesLoading, setCandidatesLoading] = useState(true);
   const [cvData, setCvData] = useState<any[]>([]);
@@ -204,6 +206,36 @@ export default function JobDetails() {
       setJob(null);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAutomaticDialToggle = async (checked: boolean) => {
+    if (!job?.job_id) return;
+    
+    setAutomaticDialSaving(true);
+    try {
+      const { error } = await supabase
+        .from('Jobs')
+        .update({ automatic_dial: checked })
+        .eq('job_id', job.job_id);
+
+      if (error) throw error;
+
+      setJob(prev => ({ ...prev, automatic_dial: checked }));
+      
+      toast({
+        title: "Success",
+        description: `Automatic dial ${checked ? 'enabled' : 'disabled'} for this job`,
+      });
+    } catch (error) {
+      console.error('Error updating automatic dial:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update automatic dial setting",
+        variant: "destructive",
+      });
+    } finally {
+      setAutomaticDialSaving(false);
     }
   };
   const fetchJobGroup = async (groupId: string) => {
@@ -1560,6 +1592,19 @@ export default function JobDetails() {
                           {jobGroup.name}
                         </> : "No Group"}
                     </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Automatic Dial:</span>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={job.automatic_dial || false}
+                        onCheckedChange={handleAutomaticDialToggle}
+                        disabled={automaticDialSaving}
+                      />
+                      <span className="text-sm text-muted-foreground">
+                        {job.automatic_dial ? 'ON' : 'OFF'}
+                      </span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
