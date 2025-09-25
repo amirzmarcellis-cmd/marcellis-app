@@ -123,16 +123,18 @@ export default function Teams() {
             return { teamId: team.id, members: [] };
           }
 
-          const members = (profiles || []).map((p) => {
-            const membership = memberships.find(m => m.user_id === p.user_id);
-            return {
-              id: p.user_id,
-              name: p.name,
-              email: p.email,
-              is_admin: p.is_admin,
-              role: membership?.role || 'EMPLOYEE',
-            };
-          });
+          const members = (profiles || [])
+            .filter(p => !p.is_admin) // Filter out admin users
+            .map((p) => {
+              const membership = memberships.find(m => m.user_id === p.user_id);
+              return {
+                id: p.user_id,
+                name: p.name,
+                email: p.email,
+                is_admin: p.is_admin,
+                role: membership?.role || 'EMPLOYEE',
+              };
+            });
 
           return {
             teamId: team.id,
