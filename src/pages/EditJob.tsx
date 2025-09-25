@@ -78,6 +78,7 @@ interface JobData {
   Currency: string;
   itris_job_id?: string;
   group_id?: string;
+  recruiter_id?: string;
 }
 
 export default function EditJob() {
@@ -91,6 +92,7 @@ export default function EditJob() {
   const [nationalityToExclude, setNationalityToExclude] = useState<string[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<Array<{ id: string; file_name: string; file_url: string; file_type: string; file_size: number }>>([]);
   const [groups, setGroups] = useState<Array<{id: string, name: string, color: string | null}>>([]);
+  const [recruiters, setRecruiters] = useState<Array<{user_id: string, name: string, email: string}>>([]);
   
   const [formData, setFormData] = useState<JobData>({
     job_id: "",
@@ -112,7 +114,8 @@ export default function EditJob() {
     contract_length: "",
     Currency: "",
     itris_job_id: "",
-    group_id: ""
+    group_id: "",
+    recruiter_id: ""
   });
 
   useEffect(() => {
@@ -120,6 +123,7 @@ export default function EditJob() {
       fetchJob();
     }
     fetchGroups();
+    fetchRecruiters();
   }, [id]);
 
   const fetchGroups = async () => {
@@ -133,6 +137,20 @@ export default function EditJob() {
       setGroups(data || []);
     } catch (error) {
       console.error('Error fetching groups:', error);
+    }
+  };
+
+  const fetchRecruiters = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('user_id, name, email')
+        .order('name');
+
+      if (error) throw error;
+      setRecruiters(data || []);
+    } catch (error) {
+      console.error('Error fetching recruiters:', error);
     }
   };
 
@@ -319,6 +337,26 @@ export default function EditJob() {
                                 style={{ backgroundColor: group.color || "#3B82F6" }}
                               />
                               {group.name}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="recruiter">Assigned Recruiter</Label>
+                    <Select value={formData.recruiter_id || "none"} onValueChange={(value) => setFormData(prev => ({ ...prev, recruiter_id: value === "none" ? "" : value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a recruiter (optional)" />
+                      </SelectTrigger>
+                      <SelectContent className="z-[60] bg-popover">
+                        <SelectItem value="none">No Recruiter</SelectItem>
+                        {recruiters.map((recruiter) => (
+                          <SelectItem key={recruiter.user_id} value={recruiter.user_id}>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-primary"/>
+                              {recruiter.name || recruiter.email}
                             </div>
                           </SelectItem>
                         ))}
