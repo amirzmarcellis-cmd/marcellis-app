@@ -12,19 +12,23 @@ export default function FileUpload({ onFileUploaded, accept = "*/*", maxSizeMB =
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     if (files.length === 0) return;
     
-    // Mock file upload for demo
-    const mockFiles = files.map(file => ({
+    setUploading(true);
+    
+    // Create file objects with actual File objects for upload
+    const fileObjects = files.map(file => ({
       file_name: file.name,
-      file_url: URL.createObjectURL(file),
+      file_url: null, // We'll upload to storage instead
       file_type: file.type,
-      file_size: file.size
+      file_size: file.size,
+      file: file // Add the actual File object
     }));
     
-    onFileUploaded?.(mockFiles);
+    onFileUploaded?.(fileObjects);
+    setUploading(false);
   };
 
   return (

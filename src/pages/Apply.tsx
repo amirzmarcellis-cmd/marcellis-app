@@ -249,20 +249,40 @@ export default function Apply() {
 
   const handleFileUpload = async (files: any[]) => {
     if (files.length > 0) {
-      for (const file of files) {
-        const fileUrl = file.file_url;
-        
-        // Extract text from the uploaded CV
+      for (const fileObj of files) {
         try {
+          // Generate unique filename with timestamp
+          const timestamp = Date.now();
+          const fileExtension = fileObj.file_name.split('.').pop();
+          const uniqueFileName = `cv-${timestamp}-${Math.random().toString(36).substring(2, 6)}.${fileExtension}`;
+          
+          // Upload file to Supabase storage using the actual File object
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('cvs')
+            .upload(uniqueFileName, fileObj.file, {
+              cacheControl: '3600',
+              upsert: false
+            });
+
+          if (uploadError) {
+            throw uploadError;
+          }
+
+          // Get public URL
+          const { data: { publicUrl } } = supabase.storage
+            .from('cvs')
+            .getPublicUrl(uploadData.path);
+
+          // Extract text from the uploaded CV using the public URL
           const { data, error } = await supabase.functions.invoke('extract-cv-text', {
-            body: { fileUrl }
+            body: { fileUrl: publicUrl }
           });
 
           if (error) throw error;
           
           const newFile: UploadedFile = {
-            name: file.file_name,
-            url: fileUrl,
+            name: fileObj.file_name,
+            url: publicUrl,
             text: data?.text || 'CV uploaded - text extraction failed'
           };
           
@@ -270,21 +290,23 @@ export default function Apply() {
           
           toast({
             title: "CV Uploaded",
-            description: `${file.file_name} has been uploaded successfully.`,
+            description: `${fileObj.file_name} has been uploaded successfully.`,
           });
         } catch (error) {
-          console.error('Error extracting CV text:', error);
+          console.error('Error uploading CV:', error);
+          // Fallback to blob URL if storage upload fails
+          const blobUrl = URL.createObjectURL(fileObj.file);
           const newFile: UploadedFile = {
-            name: file.file_name,
-            url: fileUrl,
-            text: 'CV uploaded - text extraction failed'
+            name: fileObj.file_name,
+            url: blobUrl,
+            text: 'CV uploaded - storage upload failed'
           };
           
           setUploadedFiles(prev => [...prev, newFile]);
           
           toast({
             title: "CV Uploaded",
-            description: `${file.file_name} has been uploaded successfully.`,
+            description: `${fileObj.file_name} has been uploaded successfully.`,
           });
         }
       }
