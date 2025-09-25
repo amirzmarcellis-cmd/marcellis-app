@@ -40,11 +40,6 @@ interface CallLogDetail {
   notes_updated_by: string | null
   notes_updated_at: string | null
   job_title?: string | null
-  cv_score: string | null
-  linkedin_score: string | null
-  cv_score_reason: string | null
-  linkedin_score_reason: string | null
-  source: string | null
 }
 
 export default function CallLogDetails() {
@@ -195,12 +190,7 @@ export default function CallLogDetails() {
         recording: data.recording,
         notes_updated_by: data.notes_updated_by,
         notes_updated_at: data.notes_updated_at,
-        job_title: jobData?.job_title,
-        cv_score: data.cv_score?.toString(),
-        linkedin_score: data.linkedin_score?.toString(),
-        cv_score_reason: data.cv_score_reason,
-        linkedin_score_reason: data.linkedin_score_reason,
-        source: data.source
+        job_title: jobData?.job_title
       }
 
       console.log('Enriched data:', enrichedData);
@@ -555,60 +545,17 @@ export default function CallLogDetails() {
           </CardContent>
         </Card>
 
-        {/* Scores */}
+        {/* Success Score */}
         <Card>
           <CardHeader>
-            <CardTitle>Scores & Evaluation</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              <span>Success Score</span>
+              <span className={`text-xl font-semibold ${scoreColorClass}`}>{score}</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Success Score (After Call) */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="font-medium">Success Score</span>
-                <span className={`text-xl font-semibold ${scoreColorClass}`}>{score}</span>
-              </div>
-              <RulerScore value={score} />
-              {callLog.after_call_reason && (
-                <p className="text-sm text-muted-foreground">{callLog.after_call_reason}</p>
-              )}
-            </div>
-
-            {/* CV Score */}
-            {callLog.cv_score && (
-              <div className="space-y-2 pt-2 border-t">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">CV Score</span>
-                  <span className="text-lg font-semibold text-blue-600">{callLog.cv_score}/100</span>
-                </div>
-                <RulerScore value={parseInt(callLog.cv_score)} />
-                {callLog.cv_score_reason && (
-                  <p className="text-sm text-muted-foreground">{callLog.cv_score_reason}</p>
-                )}
-              </div>
-            )}
-
-            {/* LinkedIn Score */}
-            {callLog.linkedin_score && (
-              <div className="space-y-2 pt-2 border-t">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">LinkedIn Score</span>
-                  <span className="text-lg font-semibold text-blue-600">{callLog.linkedin_score}/100</span>
-                </div>
-                <RulerScore value={parseInt(callLog.linkedin_score)} />
-                {callLog.linkedin_score_reason && (
-                  <p className="text-sm text-muted-foreground">{callLog.linkedin_score_reason}</p>
-                )}
-              </div>
-            )}
-
-            {/* Source indicator */}
-            {callLog.source && (
-              <div className="pt-2 border-t">
-                <Badge variant="outline" className="text-xs">
-                  Source: {callLog.source}
-                </Badge>
-              </div>
-            )}
+          <CardContent className="space-y-3">
+            <RulerScore value={score} />
+            <p className="text-sm text-muted-foreground">{callLog.after_call_reason}</p>
           </CardContent>
         </Card>
 
