@@ -18,8 +18,8 @@ const applicationSchema = z.object({
   user_id: z.string().min(1, "User ID is required"),
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
   phoneNumber: z.string().min(10, "Please enter a valid phone number"),
+  email: z.string().email("Please enter a valid email address"),
   notes: z.string().optional(),
   jobApplied: z.string().min(1, "Job applied is required"),
 });
@@ -42,8 +42,8 @@ export default function Apply() {
       user_id: "",
       firstName: "",
       lastName: "",
-      email: "",
       phoneNumber: "",
+      email: "",
       notes: "",
       jobApplied: "",
     },
@@ -157,8 +157,8 @@ export default function Apply() {
         user_id: newUserId,
         firstName: "",
         lastName: "",
-        email: "",
         phoneNumber: "",
+        email: "",
         notes: "",
         jobApplied: jobName,
       });
@@ -272,12 +272,12 @@ export default function Apply() {
 
                 <FormField
                   control={form.control}
-                  name="email"
+                  name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Address</FormLabel>
+                      <FormLabel>Phone Number</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="your.email@example.com" {...field} />
+                        <Input placeholder="Enter your phone number" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -286,12 +286,12 @@ export default function Apply() {
 
                 <FormField
                   control={form.control}
-                  name="phoneNumber"
+                  name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel>Email Address</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your phone number" {...field} />
+                        <Input type="email" placeholder="your.email@example.com" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
