@@ -1967,10 +1967,16 @@ export default function JobDetails() {
                                         <span className="truncate">{mainCandidate["Candidate Phone Number"]}</span>
                                       </div>}
                                       
-                                     {mainCandidate["Source"] && <div className="flex items-center text-muted-foreground min-w-0">
+                                      {mainCandidate["Source"] && <div className="flex items-center text-muted-foreground min-w-0">
                                         <Building className="w-4 h-4 mr-2 flex-shrink-0" />
                                         <span className="truncate">{mainCandidate["Source"]}</span>
                                       </div>}
+                                      {(typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin')) && (
+                                        <div className="flex items-center text-muted-foreground min-w-0">
+                                          <Star className="w-4 h-4 mr-2 flex-shrink-0" />
+                                          <span className="truncate">CV Score: {mainCandidate["cv_score"] ?? mainCandidate["CV Score"] ?? 'N/A'}</span>
+                                        </div>
+                                      )}
                                   </div>
 
                                   {/* CV Score and Reason Section */}
