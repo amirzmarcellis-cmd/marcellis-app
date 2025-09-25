@@ -561,6 +561,44 @@ export default function CallLogDetails() {
             <CardTitle>Candidate Scores</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Overall Score - Only show when status is Call Done */}
+            {callLog.contacted?.toLowerCase() === "call done" && (
+              <div className="p-3 bg-gradient-subtle rounded-lg border border-border/50">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Overall Score</span>
+                  <span className={`text-xl font-semibold ${scoreColorClass}`}>
+                    {(() => {
+                      // Calculate overall score based on available scores
+                      const afterCallScore = parseInt(callLog.after_call_score || "0")
+                      const cvScore = parseInt(callLog.cv_score || "0")
+                      const linkedinScore = parseInt(callLog.linkedin_score || "0")
+                      
+                      // Use the highest available score as overall
+                      const overallScore = Math.max(afterCallScore, cvScore, linkedinScore)
+                      
+                      // Determine source type for display
+                      let sourceType = ""
+                      if (callLog.source && typeof callLog.source === 'string') {
+                        if (callLog.source.toLowerCase().includes('linkedin')) {
+                          sourceType = " (linkedin)"
+                        } else if (callLog.source.toLowerCase().includes('itris')) {
+                          sourceType = " (cv)"
+                        }
+                      }
+                      
+                      return `${overallScore}/100${sourceType}`
+                    })()}
+                  </span>
+                </div>
+                <RulerScore value={(() => {
+                  const afterCallScore = parseInt(callLog.after_call_score || "0")
+                  const cvScore = parseInt(callLog.cv_score || "0")
+                  const linkedinScore = parseInt(callLog.linkedin_score || "0")
+                  return Math.max(afterCallScore, cvScore, linkedinScore)
+                })()} />
+              </div>
+            )}
+
             {/* After Call Score */}
             <div className="p-3 bg-gradient-subtle rounded-lg border border-border/50">
               <div className="flex items-center justify-between mb-2">
