@@ -276,8 +276,8 @@ export default function JobDetails() {
           "Candidate Email": row.candidate_email ?? '',
           "Candidate Phone Number": row.candidate_phone_number ?? '',
           "Source": row.source ?? '',
-          "linkedin_score": linkedinInfo.linkedin_score ?? '',
-          "linkedin_score_reason": linkedinInfo.linkedin_score_reason ?? '',
+          "linkedin_score": (linkedinInfo.linkedin_score ?? row.linkedin_score) ?? '',
+          "linkedin_score_reason": (linkedinInfo.linkedin_score_reason ?? row.linkedin_score_reason) ?? '',
           "pros": row.after_call_pros,
           "cons": row.after_call_cons,
           "Notice Period": row.notice_period ?? '',
@@ -1134,11 +1134,11 @@ export default function JobDetails() {
                 <div className="flex items-center gap-4 text-sm mt-1">
                   <span className="text-muted-foreground">CV Score: {mainCandidate["cv_score"] || mainCandidate["CV Score"] || "N/A"}</span>
                   {mainCandidate["after_call_score"] && <span className="text-muted-foreground">After Call Score: {mainCandidate["after_call_score"]}</span>}
-                  {(mainCandidate["Source"]?.toLowerCase() === "linkedin" || mainCandidate["Source"] === "Linkedin") && mainCandidate["linkedin_score"] && (
+                  {(mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score"]) && (
                     <span className="text-muted-foreground">Overall: {mainCandidate["linkedin_score"]}</span>
                   )}
                 </div>
-                {(mainCandidate["Source"]?.toLowerCase() === "linkedin" || mainCandidate["Source"] === "Linkedin") && mainCandidate["linkedin_score_reason"] && (
+                {(mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score_reason"]) && (
                   <div className="text-sm text-muted-foreground mt-1">
                     <span className="font-medium">Reason:</span> {mainCandidate["linkedin_score_reason"]}
                   </div>
