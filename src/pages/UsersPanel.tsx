@@ -87,6 +87,16 @@ export default function UsersPanel() {
   const { session } = useAuth();
   const { canAccessUsersPanel, loading: roleLoading } = useUserRole();
 
+  // Move all useEffect hooks to top level before any conditional returns
+  useEffect(() => {
+    if (canAccessUsersPanel && !roleLoading && session) {
+      fetchUsers();
+      fetchTeams();
+      fetchUserTeams();
+      fetchUserMemberships();
+    }
+  }, [session, canAccessUsersPanel, roleLoading]);
+
   // Restrict access to admin users only
   if (!canAccessUsersPanel && !roleLoading) {
     return (
@@ -116,13 +126,6 @@ export default function UsersPanel() {
       </div>
     );
   }
-
-  useEffect(() => {
-    fetchUsers();
-    fetchTeams();
-    fetchUserTeams();
-    fetchUserMemberships();
-  }, [session]);
 
   const fetchUsers = async () => {
     try {
