@@ -243,7 +243,7 @@ export default function JobDetails() {
         data: linkedinData,
         error: linkedinError
       } = await supabase.from('linkedin_boolean_search')
-        .select('user_id, linkedin_score, linkedin_score_reason')
+        .select('user_id, linkedin_id')
         .eq('job_id', jobId);
       
       if (linkedinError) console.warn('Error fetching LinkedIn data:', linkedinError);
@@ -260,9 +260,17 @@ export default function JobDetails() {
       });
       
       const mapped = (candidatesData || []).map((row: any) => {
-        // Get LinkedIn data for this candidate by user_id
-        const linkedinInfo = linkedinMap.get(row.user_id) || {};
-        
+        // Determine effective CV score (prioritize LinkedIn score for LinkedIn-sourced candidates)
+        const sourceLower = (row.source || '').toLowerCase()
+        const effectiveCvScore = sourceLower.includes('linkedin')
+          ? (row.linkedin_score ?? row.cv_score ?? null)
+          : (row.cv_score ?? row.linkedin_score ?? null)
+
+        // Get LinkedIn data for this candidate by user_id (if available from map)
+        const linkedinInfo = linkedinMap.get(row.user_id) || {}
+        const linkedinScore = linkedinInfo.linkedin_score ?? row.linkedin_score ?? null
+        const linkedinReason = linkedinInfo.linkedin_score_reason ?? row.linkedin_score_reason ?? ''
+
         return {
           ...row,
           "Job ID": jobId,
@@ -276,8 +284,9 @@ export default function JobDetails() {
           "Candidate Email": row.candidate_email ?? '',
           "Candidate Phone Number": row.candidate_phone_number ?? '',
           "Source": row.source ?? '',
-          "linkedin_score": (linkedinInfo.linkedin_score ?? row.linkedin_score) ?? '',
-          "linkedin_score_reason": (linkedinInfo.linkedin_score_reason ?? row.linkedin_score_reason) ?? '',
+          // Keep LinkedIn fields for UI/debug
+          "linkedin_score": linkedinScore ?? '',
+          "linkedin_score_reason": linkedinReason ?? '',
           "pros": row.after_call_pros,
           "cons": row.after_call_cons,
           "Notice Period": row.notice_period ?? '',
@@ -289,10 +298,14 @@ export default function JobDetails() {
           "recording": row.recording,
           "first_name": row.candidate_name?.split(' ')[0] || '',
           "last_name": row.candidate_name?.split(' ').slice(1).join(' ') || '',
-          "Score": row.cv_score?.toString() ?? '0',
+          // Normalize CV score fields so the UI picks them up everywhere
+          cv_score: effectiveCvScore ?? 0,
+          "CV Score": effectiveCvScore != null ? String(effectiveCvScore) : '',
+          // Keep legacy "Score" alias used elsewhere for sorting/analytics
+          "Score": effectiveCvScore != null ? String(effectiveCvScore) : '0',
           "lastcalltime": row.lastcalltime
-        };
-      });
+        }
+      })
       setCandidates(mapped);
       console.log('Total candidates from Jobs_CVs:', mapped?.length || 0);
 
