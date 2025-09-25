@@ -77,6 +77,7 @@ export type Database = {
           Lastname: string | null
           name: string | null
           phone_number: string | null
+          updated_time: string | null
           user_id: string
         }
         Insert: {
@@ -87,6 +88,7 @@ export type Database = {
           Lastname?: string | null
           name?: string | null
           phone_number?: string | null
+          updated_time?: string | null
           user_id: string
         }
         Update: {
@@ -97,6 +99,7 @@ export type Database = {
           Lastname?: string | null
           name?: string | null
           phone_number?: string | null
+          updated_time?: string | null
           user_id?: string
         }
         Relationships: []
@@ -274,7 +277,7 @@ export type Database = {
           notice_period: string | null
           recordid: number
           recording: string | null
-          recruiter_id: number | null
+          recruiter_id: string | null
           salary_expectations: string | null
           shortlisted_at: string | null
           source: string | null
@@ -308,7 +311,7 @@ export type Database = {
           notice_period?: string | null
           recordid?: number
           recording?: string | null
-          recruiter_id?: number | null
+          recruiter_id?: string | null
           salary_expectations?: string | null
           shortlisted_at?: string | null
           source?: string | null
@@ -342,7 +345,7 @@ export type Database = {
           notice_period?: string | null
           recordid?: number
           recording?: string | null
-          recruiter_id?: number | null
+          recruiter_id?: string | null
           salary_expectations?: string | null
           shortlisted_at?: string | null
           source?: string | null
@@ -357,6 +360,7 @@ export type Database = {
           id: number
           job_id: string | null
           linkedin_id: string | null
+          recruiter_id: string | null
           status: string | null
           thread_id: string | null
           unipile_user_id: string | null
@@ -366,6 +370,7 @@ export type Database = {
           id?: number
           job_id?: string | null
           linkedin_id?: string | null
+          recruiter_id?: string | null
           status?: string | null
           thread_id?: string | null
           unipile_user_id?: string | null
@@ -375,6 +380,7 @@ export type Database = {
           id?: number
           job_id?: string | null
           linkedin_id?: string | null
+          recruiter_id?: string | null
           status?: string | null
           thread_id?: string | null
           unipile_user_id?: string | null
@@ -635,6 +641,17 @@ export type Database = {
         Args: { "": string } | { "": unknown }
         Returns: unknown
       }
+      get_user_team_role: {
+        Args: { team_name: string; user_uuid: string }
+        Returns: string
+      }
+      get_user_teams: {
+        Args: { user_uuid: string }
+        Returns: {
+          role: string
+          team_name: string
+        }[]
+      }
       halfvec_avg: {
         Args: { "": number[] }
         Returns: unknown
@@ -666,6 +683,10 @@ export type Database = {
       hnswhandler: {
         Args: { "": unknown }
         Returns: unknown
+      }
+      is_team_leader: {
+        Args: { user_uuid: string }
+        Returns: boolean
       }
       ivfflat_bit_support: {
         Args: { "": unknown }
