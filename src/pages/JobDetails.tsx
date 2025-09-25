@@ -1100,7 +1100,15 @@ export default function JobDetails() {
                 <div className="flex items-center gap-4 text-sm mt-1">
                   <span className="text-muted-foreground">CV Score: {mainCandidate["cv_score"] || mainCandidate["CV Score"] || "N/A"}</span>
                   {mainCandidate["after_call_score"] && <span className="text-muted-foreground">After Call Score: {mainCandidate["after_call_score"]}</span>}
+                  {mainCandidate["Source"]?.toLowerCase() === "linkedin" && mainCandidate["linkedin_score"] && (
+                    <span className="text-muted-foreground">Overall: {mainCandidate["linkedin_score"]}</span>
+                  )}
                 </div>
+                {mainCandidate["Source"]?.toLowerCase() === "linkedin" && mainCandidate["linkedin_score_reason"] && (
+                  <div className="text-sm text-muted-foreground mt-1">
+                    <span className="font-medium">Reason:</span> {mainCandidate["linkedin_score_reason"]}
+                  </div>
+                )}
                 {mainCandidate["Salary Expectations"] && <div className="flex items-center gap-2 text-sm mt-1">
                     <Banknote className="w-3 h-3 text-muted-foreground" />
                     <span className="text-muted-foreground">Expected: {formatCurrency(mainCandidate["Salary Expectations"], job?.Currency)}</span>
