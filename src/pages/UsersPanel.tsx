@@ -15,7 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import Teams from './Teams';
 
-type UserRole = 'admin' | 'management' | 'team_leader';
+type UserRole = 'admin' | 'management' | 'team_member' | 'team_leader';
 
 interface Profile {
   id: string;
@@ -44,6 +44,7 @@ interface Team {
 const roleOptions: { value: UserRole; label: string; icon: any }[] = [
   { value: 'admin', label: 'Admin', icon: Crown },
   { value: 'management', label: 'Management', icon: Briefcase },
+  { value: 'team_member', label: 'Team Member', icon: Users },
   { value: 'team_leader', label: 'Team Leader', icon: UserCheck },
 ];
 
@@ -125,7 +126,7 @@ export default function UsersPanel() {
     if (!session?.user) return;
     
     try {
-      // Fetch all teams for management role
+      // Fetch all teams for management, team member, and team leader roles
       const { data: allTeams, error: allTeamsError } = await supabase
         .from('teams')
         .select('id, name')
@@ -134,21 +135,8 @@ export default function UsersPanel() {
       if (allTeamsError) throw allTeamsError;
       setUserTeams(allTeams || []);
       
-      // Fetch teams where current user is a leader
-      const { data: memberships, error: membershipsError } = await supabase
-        .from('memberships')
-        .select('team_id, teams(id, name)')
-        .eq('user_id', session.user.id)
-        .eq('role', 'MANAGER');
-      
-      if (membershipsError) throw membershipsError;
-      
-      const leaderTeamsList = memberships?.map(m => ({
-        id: m.teams?.id || '',
-        name: m.teams?.name || ''
-      })).filter(team => team.id) || [];
-      
-      setLeaderTeams(leaderTeamsList);
+      // For team leaders, also show all available teams (admins can assign leaders to any team)
+      setLeaderTeams(allTeams || []);
     } catch (error) {
       console.error('Error fetching user teams:', error);
     }
@@ -323,7 +311,7 @@ export default function UsersPanel() {
                     </SelectContent>
                   </Select>
                 </div>
-                {(newUser.role === 'management' || newUser.role === 'team_leader') && (
+                {(newUser.role === 'management' || newUser.role === 'team_member' || newUser.role === 'team_leader') && (
                   <div className="space-y-2">
                     <Label htmlFor="team">Team</Label>
                     <Select value={newUser.team} onValueChange={(value: string) => setNewUser({ ...newUser, team: value })}>
@@ -331,7 +319,7 @@ export default function UsersPanel() {
                         <SelectValue placeholder="Select a team" />
                       </SelectTrigger>
                       <SelectContent className="bg-background border border-border shadow-md z-50">
-                        {(newUser.role === 'management' ? userTeams : leaderTeams).map((team) => {
+                        {userTeams.map((team) => {
                           const TeamIcon = team.name.toLowerCase().includes('sales') ? DollarSign : 
                                           team.name.toLowerCase().includes('delivery') ? Truck : Users2;
                           return (
