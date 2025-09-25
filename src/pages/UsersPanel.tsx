@@ -48,15 +48,21 @@ const roleOptions: { value: UserRole; label: string; icon: any }[] = [
   { value: 'team_leader', label: 'Team Leader', icon: UserCheck },
 ];
 
-const getRoleDisplay = (role: UserRole | undefined, isAdmin?: boolean) => {
+const getRoleDisplay = (user: Profile, userMemberships: Array<{team_id: string, role: string, team_name: string}>, isAdmin?: boolean) => {
   // For backwards compatibility, check is_admin first
-  if (isAdmin || role === 'admin') {
+  if (isAdmin || user.is_admin) {
     return { label: 'Admin', icon: Crown, variant: 'default' as const };
   }
   
-  const roleOption = roleOptions.find(r => r.value === role);
-  if (roleOption) {
-    return { ...roleOption, variant: 'secondary' as const };
+  // Check if user has team roles
+  if (userMemberships.length > 0) {
+    const membership = userMemberships[0]; // Take the first membership
+    switch (membership.role) {
+      case 'MANAGER':
+        return { label: 'Team Leader', icon: UserCheck, variant: 'secondary' as const };
+      case 'EMPLOYEE':
+        return { label: 'Team Member', icon: Users, variant: 'secondary' as const };
+    }
   }
   
   return { label: 'User', icon: User, variant: 'secondary' as const };
@@ -65,6 +71,7 @@ const getRoleDisplay = (role: UserRole | undefined, isAdmin?: boolean) => {
 export default function UsersPanel() {
   const [users, setUsers] = useState<Profile[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
+  const [userMembershipsMap, setUserMembershipsMap] = useState<Record<string, Array<{team_id: string, role: string, team_name: string}>>>({});
   const [loading, setLoading] = useState(true);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [newUser, setNewUser] = useState<NewUserData>({
@@ -84,6 +91,7 @@ export default function UsersPanel() {
     fetchUsers();
     fetchTeams();
     fetchUserTeams();
+    fetchUserMemberships();
   }, [session]);
 
   const fetchUsers = async () => {
@@ -105,6 +113,40 @@ export default function UsersPanel() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchUserMemberships = async () => {
+    try {
+      const { data: memberships, error } = await supabase
+        .from('memberships')
+        .select(`
+          user_id,
+          role,
+          teams (
+            id,
+            name
+          )
+        `);
+
+      if (error) throw error;
+
+      const membershipsMap: Record<string, Array<{team_id: string, role: string, team_name: string}>> = {};
+      
+      memberships?.forEach((membership) => {
+        if (!membershipsMap[membership.user_id]) {
+          membershipsMap[membership.user_id] = [];
+        }
+        membershipsMap[membership.user_id].push({
+          team_id: membership.teams?.id || '',
+          role: membership.role,
+          team_name: membership.teams?.name || ''
+        });
+      });
+
+      setUserMembershipsMap(membershipsMap);
+    } catch (error) {
+      console.error('Error fetching user memberships:', error);
     }
   };
 
@@ -182,6 +224,8 @@ export default function UsersPanel() {
       setNewUser({ email: '', password: '', name: '', role: 'admin' });
       setIsAddUserOpen(false);
       fetchUsers();
+      fetchUserMemberships(); // Refresh memberships when user is deleted
+      fetchUserMemberships(); // Refresh memberships when new user is added
     } catch (error: any) {
       console.error('Error creating user:', error);
       toast({
@@ -401,13 +445,25 @@ export default function UsersPanel() {
                     </TableCell>
                     <TableCell>
                       {(() => {
-                        const roleDisplay = getRoleDisplay(user.role, user.is_admin);
+                        const roleDisplay = getRoleDisplay(user, userMembershipsMap[user.user_id] || [], user.is_admin);
                         const Icon = roleDisplay.icon;
+                        const userMemberships = userMembershipsMap[user.user_id] || [];
                         return (
-                          <Badge variant={roleDisplay.variant}>
-                            <Icon className="h-3 w-3 mr-1" />
-                            {roleDisplay.label}
-                          </Badge>
+                          <div className="space-y-1">
+                            <Badge variant={roleDisplay.variant}>
+                              <Icon className="h-3 w-3 mr-1" />
+                              {roleDisplay.label}
+                            </Badge>
+                            {userMemberships.length > 0 && (
+                              <div className="text-xs text-muted-foreground">
+                                {userMemberships.map((membership, idx) => (
+                                  <div key={idx}>
+                                    {membership.team_name} ({membership.role === 'MANAGER' ? 'Leader' : 'Member'})
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         );
                       })()}
                     </TableCell>
