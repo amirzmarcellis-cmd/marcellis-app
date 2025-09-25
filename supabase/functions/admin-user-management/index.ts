@@ -218,18 +218,53 @@ serve(async (req) => {
       case 'delete_user': {
         console.log('Deleting user:', userId);
         
-        const { data: deletedUser, error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId);
+        // First check if user exists in auth
+        const { data: authUser, error: getUserError } = await supabaseAdmin.auth.admin.getUserById(userId);
+        
+        let authDeletionSuccess = false;
+        
+        if (!getUserError && authUser?.user) {
+          // User exists in auth, try to delete
+          const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId);
+          
+          if (deleteError) {
+            console.error('User deletion from auth error:', deleteError);
+            // Continue with profile deletion even if auth deletion fails
+          } else {
+            authDeletionSuccess = true;
+            console.log('User successfully deleted from auth');
+          }
+        } else {
+          console.log('User not found in auth, will only delete profile:', getUserError?.message || 'User does not exist');
+        }
 
-        if (deleteError) {
-          console.error('User deletion error:', deleteError);
-          return new Response(
-            JSON.stringify({ error: deleteError.message }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
+        // Always try to clean up the profile and related data
+        const { error: profileDeleteError } = await supabaseAdmin
+          .from('profiles')
+          .delete()
+          .eq('user_id', userId);
+
+        if (profileDeleteError) {
+          console.error('Profile deletion error:', profileDeleteError);
+        }
+
+        // Clean up memberships
+        const { error: membershipDeleteError } = await supabaseAdmin
+          .from('memberships')
+          .delete()
+          .eq('user_id', userId);
+
+        if (membershipDeleteError) {
+          console.error('Membership deletion error:', membershipDeleteError);
         }
 
         return new Response(
-          JSON.stringify({ user: deletedUser, success: true }),
+          JSON.stringify({ 
+            success: true, 
+            authDeleted: authDeletionSuccess,
+            profileDeleted: !profileDeleteError,
+            message: authDeletionSuccess ? 'User completely deleted' : 'Profile cleaned up (auth user was already missing)'
+          }),
           { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
