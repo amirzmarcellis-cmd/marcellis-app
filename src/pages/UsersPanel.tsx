@@ -6,11 +6,13 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Switch } from '@/components/ui/switch';
-import { Users, Plus, Mail, User, Shield, Trash2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Users, Plus, Mail, User, Shield, Trash2, Crown, Briefcase, DollarSign, Truck, UserCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+
+type UserRole = 'admin' | 'management' | 'sales_team' | 'delivery_team' | 'team_leader';
 
 interface Profile {
   id: string;
@@ -18,6 +20,7 @@ interface Profile {
   name: string | null;
   email: string;
   is_admin: boolean;
+  role?: UserRole;
   created_at: string;
   updated_at: string;
 }
@@ -26,8 +29,30 @@ interface NewUserData {
   email: string;
   password: string;
   name: string;
-  is_admin: boolean;
+  role: UserRole;
 }
+
+const roleOptions: { value: UserRole; label: string; icon: any }[] = [
+  { value: 'admin', label: 'Admin', icon: Crown },
+  { value: 'management', label: 'Management', icon: Briefcase },
+  { value: 'sales_team', label: 'Sales Team', icon: DollarSign },
+  { value: 'delivery_team', label: 'Delivery Team', icon: Truck },
+  { value: 'team_leader', label: 'Team Leader', icon: UserCheck },
+];
+
+const getRoleDisplay = (role: UserRole | undefined, isAdmin?: boolean) => {
+  // For backwards compatibility, check is_admin first
+  if (isAdmin || role === 'admin') {
+    return { label: 'Admin', icon: Crown, variant: 'default' as const };
+  }
+  
+  const roleOption = roleOptions.find(r => r.value === role);
+  if (roleOption) {
+    return { ...roleOption, variant: 'secondary' as const };
+  }
+  
+  return { label: 'User', icon: User, variant: 'secondary' as const };
+};
 
 export default function UsersPanel() {
   const [users, setUsers] = useState<Profile[]>([]);
@@ -37,7 +62,7 @@ export default function UsersPanel() {
     email: '',
     password: '',
     name: '',
-    is_admin: false
+    role: 'admin' // Default all users as admin as requested
   });
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
@@ -90,7 +115,8 @@ export default function UsersPanel() {
             email: newUser.email,
             password: newUser.password,
             name: newUser.name,
-            is_admin: newUser.is_admin
+            is_admin: newUser.role === 'admin', // Set admin based on role
+            role: newUser.role
           }
         }
       });
@@ -104,7 +130,7 @@ export default function UsersPanel() {
         description: "User created successfully",
       });
 
-      setNewUser({ email: '', password: '', name: '', is_admin: false });
+      setNewUser({ email: '', password: '', name: '', role: 'admin' });
       setIsAddUserOpen(false);
       fetchUsers();
     } catch (error: any) {
@@ -214,13 +240,26 @@ export default function UsersPanel() {
                   required
                 />
               </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="is_admin"
-                  checked={newUser.is_admin}
-                  onCheckedChange={(checked) => setNewUser({ ...newUser, is_admin: checked })}
-                />
-                <Label htmlFor="is_admin">Admin privileges</Label>
+              <div className="space-y-2">
+                <Label htmlFor="role">Role</Label>
+                <Select value={newUser.role} onValueChange={(value: UserRole) => setNewUser({ ...newUser, role: value })}>
+                  <SelectTrigger className="bg-background border-input z-50">
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border border-border shadow-md z-50">
+                    {roleOptions.map((option) => {
+                      const Icon = option.icon;
+                      return (
+                        <SelectItem key={option.value} value={option.value} className="hover:bg-accent hover:text-accent-foreground">
+                          <div className="flex items-center gap-2">
+                            <Icon className="h-4 w-4" />
+                            {option.label}
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
               </div>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setIsAddUserOpen(false)}>
@@ -273,16 +312,16 @@ export default function UsersPanel() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={user.is_admin ? "default" : "secondary"}>
-                        {user.is_admin ? (
-                          <>
-                            <Shield className="h-3 w-3 mr-1" />
-                            Admin
-                          </>
-                        ) : (
-                          'User'
-                        )}
-                      </Badge>
+                      {(() => {
+                        const roleDisplay = getRoleDisplay(user.role, user.is_admin);
+                        const Icon = roleDisplay.icon;
+                        return (
+                          <Badge variant={roleDisplay.variant}>
+                            <Icon className="h-3 w-3 mr-1" />
+                            {roleDisplay.label}
+                          </Badge>
+                        );
+                      })()}
                     </TableCell>
                     <TableCell>
                       {new Date(user.created_at).toLocaleDateString()}
