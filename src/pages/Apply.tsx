@@ -218,11 +218,6 @@ export default function Apply() {
     try {
       console.log("Triggering webhook:", webhookUrl);
       
-      // Get job ID from URL
-      const path = window.location.pathname;
-      const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
-      const jobId = pathMatch?.[1] || "unknown";
-      
       // Format data to match the required structure
       const webhookPayload = [
         {
@@ -236,8 +231,7 @@ export default function Apply() {
             "user_id": formData.user_id,
             "Lastname": formData.lastName,
             "Firstname": formData.firstName,
-            "phone_number": formData.phoneNumber,
-            "job_id": jobId
+            "phone_number": formData.phoneNumber
           },
           "schema": "public",
           "old_record": null
