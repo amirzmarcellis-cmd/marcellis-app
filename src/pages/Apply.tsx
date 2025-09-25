@@ -224,8 +224,24 @@ export default function Apply() {
     try {
       console.log("Triggering webhook:", webhookUrl, "with data:", data);
       
-      // Convert data to JSON string format but send as text
-      const jsonString = JSON.stringify(data, null, 2);
+      // Convert data to text format
+      const textData = Array.isArray(data) ? data.map(item => {
+        if (item.record) {
+          return `Type: ${item.type}
+Table: ${item.table}
+Name: ${item.record.name || 'N/A'}
+Email: ${item.record.email || 'null'}
+CV Link: ${item.record.cv_link || 'N/A'}
+CV Text: ${item.record.cv_text || 'null'}
+User ID: ${item.record.user_id || 'N/A'}
+Last Name: ${item.record.Lastname || 'N/A'}
+First Name: ${item.record.Firstname || 'N/A'}
+Phone Number: ${item.record.phone_number || 'null'}
+Schema: ${item.schema || 'N/A'}
+Old Record: ${item.old_record || 'null'}`;
+        }
+        return JSON.stringify(item);
+      }).join('\n\n---\n\n') : JSON.stringify(data);
       
       const response = await fetch(webhookUrl, {
         method: "POST",
@@ -233,7 +249,7 @@ export default function Apply() {
           "Content-Type": "text/plain",
         },
         mode: "no-cors",
-        body: jsonString,
+        body: textData,
       });
 
       // Don't show webhook-specific toast here, let the caller handle success message
@@ -332,25 +348,22 @@ export default function Apply() {
     const timestamp = Date.now();
     const candidateUserId = `CAND-${timestamp}`;
     
-    // Structure webhook payload exactly as shown in the image
-    const webhookPayload = {
-      "Bundle 1": {
-        type: "INSERT",
-        table: "CVs",
-        record: {
-          name: uploadedFiles[0]?.name || `${form.getValues("firstName")} ${form.getValues("lastName")}`,
-          email: "empty",
-          cv_link: uploadedFiles.map(f => f.url).join(', '),
-          cv_text: "empty",
-          user_id: candidateUserId,
-          Lastname: form.getValues("lastName"),
-          Firstname: form.getValues("firstName"),
-          phone_number: "empty"
-        },
-        schema: "public",
-        old_record: "empty"
-      }
-    };
+    const webhookPayload = [{
+      type: "INSERT",
+      table: "CVs",
+      record: {
+        name: uploadedFiles[0]?.name || `${form.getValues("firstName")} ${form.getValues("lastName")}`,
+        email: null,
+        cv_link: uploadedFiles.map(f => f.url).join(', '),
+        cv_text: null,
+        user_id: candidateUserId,
+        Lastname: form.getValues("lastName"),
+        Firstname: form.getValues("firstName"),
+        phone_number: null
+      },
+      schema: "public",
+      old_record: null
+    }];
     
     const success = await triggerWebhook(webhookPayload);
     
