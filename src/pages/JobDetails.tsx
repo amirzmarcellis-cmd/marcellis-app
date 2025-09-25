@@ -2043,10 +2043,11 @@ export default function JobDetails() {
                                 } : cv));
                               }} variant="badge" />}
                                      </div>
-                                     <div className="flex flex-col gap-1 items-end">
-                                       {getOverallScoreBadge(mainCandidate)}
-                                       {getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
-                                     </div>
+                                      <div className="flex flex-col gap-1 items-end">
+                                        {/* Hide overall score for specific statuses */}
+                                        {!["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer"].includes(mainCandidate["contacted"]?.toLowerCase() || "") && getOverallScoreBadge(mainCandidate)}
+                                        {!["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer"].includes(mainCandidate["contacted"]?.toLowerCase() || "") && getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
+                                      </div>
                                    </div>
 
                                   {/* Call Log Buttons */}
