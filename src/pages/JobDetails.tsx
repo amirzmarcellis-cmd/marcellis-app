@@ -64,7 +64,7 @@ export default function JobDetails() {
   const [shortListUserIdFilter, setShortListUserIdFilter] = useState("");
   const [shortListScoreFilter, setShortListScoreFilter] = useState("all");
   const [shortListSourceFilter, setShortListSourceFilter] = useState("all");
-  
+
   // AI Long List filters  
   const [longListSourceFilter, setLongListSourceFilter] = useState("all");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -208,31 +208,30 @@ export default function JobDetails() {
       setLoading(false);
     }
   };
-
   const handleAutomaticDialToggle = async (checked: boolean) => {
     if (!job?.job_id) return;
-    
     setAutomaticDialSaving(true);
     try {
-      const { error } = await supabase
-        .from('Jobs')
-        .update({ automatic_dial: checked })
-        .eq('job_id', job.job_id);
-
+      const {
+        error
+      } = await supabase.from('Jobs').update({
+        automatic_dial: checked
+      }).eq('job_id', job.job_id);
       if (error) throw error;
-
-      setJob(prev => ({ ...prev, automatic_dial: checked }));
-      
+      setJob(prev => ({
+        ...prev,
+        automatic_dial: checked
+      }));
       toast({
         title: "Success",
-        description: `Automatic dial ${checked ? 'enabled' : 'disabled'} for this job`,
+        description: `Automatic dial ${checked ? 'enabled' : 'disabled'} for this job`
       });
     } catch (error) {
       console.error('Error updating automatic dial:', error);
       toast({
         title: "Error",
         description: "Failed to update automatic dial setting",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setAutomaticDialSaving(false);
@@ -260,24 +259,17 @@ export default function JobDetails() {
       const {
         data: candidatesData,
         error: candidatesError
-      } = await supabase.from('Jobs_CVs')
-        .select('*')
-        .eq('job_id', jobId)
-        .order('cv_score', {
-          ascending: false,
-          nullsFirst: false
-        });
-      
+      } = await supabase.from('Jobs_CVs').select('*').eq('job_id', jobId).order('cv_score', {
+        ascending: false,
+        nullsFirst: false
+      });
       if (candidatesError) throw candidatesError;
 
       // Fetch LinkedIn boolean search data for this job
       const {
         data: linkedinData,
         error: linkedinError
-      } = await supabase.from('linkedin_boolean_search')
-        .select('user_id, linkedin_id, linkedin_score, linkedin_score_reason')
-        .eq('job_id', jobId);
-      
+      } = await supabase.from('linkedin_boolean_search').select('user_id, linkedin_id, linkedin_score, linkedin_score_reason').eq('job_id', jobId);
       if (linkedinError) console.warn('Error fetching LinkedIn data:', linkedinError);
 
       // Create a map of LinkedIn data by user_id for quick lookup
@@ -290,19 +282,15 @@ export default function JobDetails() {
           });
         }
       });
-      
       const mapped = (candidatesData || []).map((row: any) => {
         // Determine effective CV score (prioritize LinkedIn score for LinkedIn-sourced candidates)
-        const sourceLower = (row.source || '').toLowerCase()
-        const effectiveCvScore = sourceLower.includes('linkedin')
-          ? (row.linkedin_score ?? row.cv_score ?? null)
-          : (row.cv_score ?? row.linkedin_score ?? null)
+        const sourceLower = (row.source || '').toLowerCase();
+        const effectiveCvScore = sourceLower.includes('linkedin') ? row.linkedin_score ?? row.cv_score ?? null : row.cv_score ?? row.linkedin_score ?? null;
 
         // Get LinkedIn data for this candidate by user_id (if available from map)
-        const linkedinInfo = linkedinMap.get(row.user_id) || {}
-        const linkedinScore = linkedinInfo.linkedin_score ?? row.linkedin_score ?? null
-        const linkedinReason = linkedinInfo.linkedin_score_reason ?? row.linkedin_score_reason ?? ''
-
+        const linkedinInfo = linkedinMap.get(row.user_id) || {};
+        const linkedinScore = linkedinInfo.linkedin_score ?? row.linkedin_score ?? null;
+        const linkedinReason = linkedinInfo.linkedin_score_reason ?? row.linkedin_score_reason ?? '';
         return {
           ...row,
           "Job ID": jobId,
@@ -336,8 +324,8 @@ export default function JobDetails() {
           // Keep legacy "Score" alias used elsewhere for sorting/analytics
           "Score": effectiveCvScore != null ? String(effectiveCvScore) : '0',
           "lastcalltime": row.lastcalltime
-        }
-      })
+        };
+      });
       setCandidates(mapped);
       console.log('Total candidates from Jobs_CVs:', mapped?.length || 0);
 
@@ -352,7 +340,6 @@ export default function JobDetails() {
         overall: c["linkedin_score"],
         reason: c["linkedin_score_reason"]
       })));
-
 
       // Calculate low scored candidates (score < 70)
       const lowScoredCandidates = mapped?.filter(c => {
@@ -1096,7 +1083,7 @@ export default function JobDetails() {
       variant = "bg-red-500 text-white border-0";
     }
     const hasIcon = cvScore > 0 && afterCallScore > 0;
-    
+
     // Determine source type for display
     let sourceType = "";
     if (candidate["Source"] && typeof candidate["Source"] === 'string') {
@@ -1106,7 +1093,6 @@ export default function JobDetails() {
         sourceType = " (cv)";
       }
     }
-    
     return <div className="flex items-center gap-1">
         <Badge className={`${variant} flex items-center gap-1 font-semibold`}>
           {hasIcon && <Star className="w-3 h-3" />}
@@ -1178,16 +1164,12 @@ export default function JobDetails() {
   });
   // Helper function to render candidate cards
   const renderCandidateCard = (candidateId: string, candidateContacts: any[], mainCandidate: any, isTopCandidate: boolean = false) => {
-    const cardClassName = isTopCandidate 
-      ? "relative border-2 border-yellow-400 hover:border-yellow-500 transition-all duration-300 hover:shadow-2xl bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 dark:from-yellow-950/50 dark:via-amber-950/50 dark:to-orange-950/50 shadow-xl shadow-yellow-200/50 dark:shadow-yellow-900/30 ring-2 ring-yellow-300/60 dark:ring-yellow-600/40 before:absolute before:inset-0 before:bg-gradient-to-r before:from-yellow-300/10 before:via-amber-300/10 before:to-orange-300/10 before:rounded-lg before:animate-pulse" 
-      : "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20";
+    const cardClassName = isTopCandidate ? "relative border-2 border-yellow-400 hover:border-yellow-500 transition-all duration-300 hover:shadow-2xl bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 dark:from-yellow-950/50 dark:via-amber-950/50 dark:to-orange-950/50 shadow-xl shadow-yellow-200/50 dark:shadow-yellow-900/30 ring-2 ring-yellow-300/60 dark:ring-yellow-600/40 before:absolute before:inset-0 before:bg-gradient-to-r before:from-yellow-300/10 before:via-amber-300/10 before:to-orange-300/10 before:rounded-lg before:animate-pulse" : "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20";
     return <Card key={candidateId} className={cardClassName}>
         <CardContent className="p-4 relative">
-          {isTopCandidate && (
-            <Badge className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-gradient-to-br from-amber-300 via-yellow-300 to-amber-400 hover:from-amber-400 hover:via-yellow-400 hover:to-amber-500 border-2 border-amber-200 shadow-lg hover:shadow-xl transition-all duration-200 w-8 h-8 rounded-full p-0 flex items-center justify-center group z-10">
+          {isTopCandidate && <Badge className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-gradient-to-br from-amber-300 via-yellow-300 to-amber-400 hover:from-amber-400 hover:via-yellow-400 hover:to-amber-500 border-2 border-amber-200 shadow-lg hover:shadow-xl transition-all duration-200 w-8 h-8 rounded-full p-0 flex items-center justify-center group z-10">
               <Star className="w-4 h-4 fill-amber-800 text-amber-800 group-hover:scale-110 transition-transform duration-200" />
-            </Badge>
-          )}
+            </Badge>}
           <div className="space-y-3">
             <div className="flex items-start justify-between">
               <div className="min-w-0 flex-1">
@@ -1196,20 +1178,13 @@ export default function JobDetails() {
                 </div>
                 <p className="text-sm text-muted-foreground">User ID: {mainCandidate["user_id"] || "N/A"}</p>
                 <div className="flex items-center gap-4 text-sm mt-1">
-                  {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && (
-                    <span className="text-muted-foreground">CV Score: {mainCandidate["cv_score"] || mainCandidate["CV Score"] || "N/A"}</span>
-                  )}
+                  {!["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && <span className="text-muted-foreground">CV Score: {mainCandidate["cv_score"] || mainCandidate["CV Score"] || "N/A"}</span>}
                   {mainCandidate["after_call_score"] && <span className="text-muted-foreground">After Call Score: {mainCandidate["after_call_score"]}</span>}
-                  {(mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && (mainCandidate["linkedin_score"] !== undefined && mainCandidate["linkedin_score"] !== null && mainCandidate["linkedin_score"] !== "")) && 
-                   !["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && (
-                    <span className="text-muted-foreground">Overall: {mainCandidate["linkedin_score"]}</span>
-                  )}
+                  {mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score"] !== undefined && mainCandidate["linkedin_score"] !== null && mainCandidate["linkedin_score"] !== "" && !["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && <span className="text-muted-foreground">Overall: {mainCandidate["linkedin_score"]}</span>}
                 </div>
-                {(mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && (mainCandidate["linkedin_score_reason"] !== undefined && mainCandidate["linkedin_score_reason"] !== null && mainCandidate["linkedin_score_reason"] !== "")) && (
-                  <div className="text-sm text-muted-foreground mt-1">
+                {mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score_reason"] !== undefined && mainCandidate["linkedin_score_reason"] !== null && mainCandidate["linkedin_score_reason"] !== "" && <div className="text-sm text-muted-foreground mt-1">
                     <span className="font-medium">Reason:</span> {mainCandidate["linkedin_score_reason"]}
-                  </div>
-                )}
+                  </div>}
                 {mainCandidate["Salary Expectations"] && <div className="flex items-center gap-2 text-sm mt-1">
                     <Banknote className="w-3 h-3 text-muted-foreground" />
                     <span className="text-muted-foreground">Expected: {formatCurrency(mainCandidate["Salary Expectations"], job?.Currency)}</span>
@@ -1320,7 +1295,7 @@ export default function JobDetails() {
               <div className="flex flex-col gap-1 items-end">
                 {/* Only show overall score when status is Call Done */}
                 {mainCandidate["Contacted"]?.toLowerCase() === "call done" && getOverallScoreBadge(mainCandidate)}
-                {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
+                {!["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
               </div>
             </div>
 
@@ -1411,7 +1386,6 @@ export default function JobDetails() {
       const phoneMatch = !shortListPhoneFilter || (candidate["Candidate Phone Number"] || "").includes(shortListPhoneFilter);
       const userIdMatch = !shortListUserIdFilter || (candidate.user_id || candidate["user_id"] || "").toString().includes(shortListUserIdFilter);
       const sourceMatch = !shortListSourceFilter || shortListSourceFilter === "all" || (candidate["Source"] || "").toLowerCase().includes(shortListSourceFilter.toLowerCase());
-      
       let scoreMatch = true;
       if (shortListScoreFilter !== "all") {
         const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
@@ -1444,7 +1418,6 @@ export default function JobDetails() {
             scoreMatch = true;
         }
       }
-      
       return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceMatch && scoreMatch;
     });
   };
@@ -1596,11 +1569,7 @@ export default function JobDetails() {
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Automatic Dial:</span>
                     <div className="flex items-center gap-2">
-                      <Switch
-                        checked={job.automatic_dial || false}
-                        onCheckedChange={handleAutomaticDialToggle}
-                        disabled={automaticDialSaving}
-                      />
+                      <Switch checked={job.automatic_dial || false} onCheckedChange={handleAutomaticDialToggle} disabled={automaticDialSaving} />
                       <span className="text-sm text-muted-foreground">
                         {job.automatic_dial ? 'ON' : 'OFF'}
                       </span>
@@ -2042,24 +2011,20 @@ export default function JobDetails() {
                                         <Building className="w-4 h-4 mr-2 flex-shrink-0" />
                                         <span className="truncate">{mainCandidate["Source"]}</span>
                                       </div>}
-                                       {(typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && !["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "")) && (
-                                         <div className="flex items-center text-muted-foreground min-w-0">
+                                       {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && !["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && <div className="flex items-center text-muted-foreground min-w-0">
                                            <Star className="w-4 h-4 mr-2 flex-shrink-0" />
                                            <span className="truncate">LinkedIn Score: {mainCandidate["linkedin_score"] ?? mainCandidate["cv_score"] ?? mainCandidate["CV Score"] ?? 'N/A'}</span>
-                                         </div>
-                                       )}
+                                         </div>}
                                   </div>
 
                                   {/* CV Score and Reason Section */}
                                   <div className="space-y-2 pt-2 border-t">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                                       <div className="space-y-1">
-                                         {(!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") || (typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('itris'))) && (
-                                            <div className="flex items-center justify-between">
-                                              <span className="text-muted-foreground">{(typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin')) ? 'LinkedIn Score:' : 'CV Score:'}</span>
-                                              <span className="font-medium">{(typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin')) ? (mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "N/A") : (mainCandidate["cv_score"] || "N/A")}</span>
-                                            </div>
-                                          )}
+                                         {(!["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") || typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('itris')) && <div className="flex items-center justify-between">
+                                              <span className="text-muted-foreground">{typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? 'LinkedIn Score:' : 'CV Score:'}</span>
+                                              <span className="font-medium">{typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "N/A" : mainCandidate["cv_score"] || "N/A"}</span>
+                                            </div>}
                                          <div className="flex items-center justify-between">
                                            <span className="text-muted-foreground">User ID:</span>
                                            <span className="font-mono text-xs">{mainCandidate["user_id"] || "N/A"}</span>
@@ -2069,23 +2034,17 @@ export default function JobDetails() {
                                         
                                       </div>
                                     </div>
-                                    {(mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score_reason"]) ? (
-                                      <div className="pt-1">
+                                    {mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score_reason"] ? <div className="pt-1">
                                         <span className="text-muted-foreground text-xs">Reason:</span>
                                         <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                                           {mainCandidate["linkedin_score_reason"]}
                                         </p>
-                                      </div>
-                                    ) : (
-                                      mainCandidate["cv_score_reason"] && (
-                                        <div className="pt-1">
+                                      </div> : mainCandidate["cv_score_reason"] && <div className="pt-1">
                                           <span className="text-muted-foreground text-xs">Reason:</span>
                                           <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                                             {mainCandidate["cv_score_reason"]}
                                           </p>
-                                        </div>
-                                      )
-                                    )}
+                                        </div>}
                                   </div>
 
                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t gap-2">
@@ -2106,7 +2065,7 @@ export default function JobDetails() {
                                       <div className="flex flex-col gap-1 items-end">
                                         {/* Only show overall score when status is Call Done */}
                                         {mainCandidate["Contacted"]?.toLowerCase() === "call done" && getOverallScoreBadge(mainCandidate)}
-                                        {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
+                                        {!["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
                                       </div>
                                    </div>
 
@@ -2136,10 +2095,7 @@ export default function JobDetails() {
                                     </div>
                                     
                                     {/* Show All Record Info Button */}
-                                    <Button variant="outline" size="sm" onClick={() => navigate(`/call-log-details?recordId=${mainCandidate["Record ID"] || mainCandidate["Candidate_ID"]}&jobId=${id}`)} className="w-full text-xs md:text-sm">
-                                      <FileText className="w-3 h-3 mr-1" />
-                                      Call Log Details
-                                    </Button>
+                                    
                                     
                                     <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
                                       <Link to={`/candidate/${candidateId}`}>
@@ -2176,37 +2132,12 @@ export default function JobDetails() {
                   <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center">
                     <div className="relative min-w-0 flex-1">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                      <Input 
-                        placeholder="Name..." 
-                        value={shortListNameFilter} 
-                        onChange={e => setShortListNameFilter(e.target.value)} 
-                        className="pl-10 h-9 text-sm" 
-                      />
+                      <Input placeholder="Name..." value={shortListNameFilter} onChange={e => setShortListNameFilter(e.target.value)} className="pl-10 h-9 text-sm" />
                     </div>
-                    <Input 
-                      placeholder="Email..." 
-                      value={shortListEmailFilter} 
-                      onChange={e => setShortListEmailFilter(e.target.value)} 
-                      className="h-9 text-sm min-w-0 flex-1" 
-                    />
-                    <Input 
-                      placeholder="Phone..." 
-                      value={shortListPhoneFilter} 
-                      onChange={e => setShortListPhoneFilter(e.target.value)} 
-                      className="h-9 text-sm min-w-0 flex-1" 
-                    />
-                    <Input 
-                      placeholder="User ID..." 
-                      value={shortListUserIdFilter} 
-                      onChange={e => setShortListUserIdFilter(e.target.value)} 
-                      className="h-9 text-sm min-w-0 flex-1" 
-                    />
-                    <Input 
-                      placeholder="Source..." 
-                      value={shortListSourceFilter} 
-                      onChange={e => setShortListSourceFilter(e.target.value)} 
-                      className="h-9 text-sm min-w-0 flex-1" 
-                    />
+                    <Input placeholder="Email..." value={shortListEmailFilter} onChange={e => setShortListEmailFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
+                    <Input placeholder="Phone..." value={shortListPhoneFilter} onChange={e => setShortListPhoneFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
+                    <Input placeholder="User ID..." value={shortListUserIdFilter} onChange={e => setShortListUserIdFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
+                    <Input placeholder="Source..." value={shortListSourceFilter} onChange={e => setShortListSourceFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
                     <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
                       <SelectTrigger className="h-9 text-sm w-32">
                         <SelectValue placeholder="Source" />
@@ -2289,37 +2220,12 @@ export default function JobDetails() {
                   <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center">
                     <div className="relative min-w-0 flex-1">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                      <Input 
-                        placeholder="Name..." 
-                        value={shortListNameFilter} 
-                        onChange={e => setShortListNameFilter(e.target.value)} 
-                        className="pl-10 h-9 text-sm" 
-                      />
+                      <Input placeholder="Name..." value={shortListNameFilter} onChange={e => setShortListNameFilter(e.target.value)} className="pl-10 h-9 text-sm" />
                     </div>
-                    <Input 
-                      placeholder="Email..." 
-                      value={shortListEmailFilter} 
-                      onChange={e => setShortListEmailFilter(e.target.value)} 
-                      className="h-9 text-sm min-w-0 flex-1" 
-                    />
-                    <Input 
-                      placeholder="Phone..." 
-                      value={shortListPhoneFilter} 
-                      onChange={e => setShortListPhoneFilter(e.target.value)} 
-                      className="h-9 text-sm min-w-0 flex-1" 
-                    />
-                    <Input 
-                      placeholder="User ID..." 
-                      value={shortListUserIdFilter} 
-                      onChange={e => setShortListUserIdFilter(e.target.value)} 
-                      className="h-9 text-sm min-w-0 flex-1" 
-                    />
-                    <Input 
-                      placeholder="Source..." 
-                      value={shortListSourceFilter} 
-                      onChange={e => setShortListSourceFilter(e.target.value)} 
-                      className="h-9 text-sm min-w-0 flex-1" 
-                    />
+                    <Input placeholder="Email..." value={shortListEmailFilter} onChange={e => setShortListEmailFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
+                    <Input placeholder="Phone..." value={shortListPhoneFilter} onChange={e => setShortListPhoneFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
+                    <Input placeholder="User ID..." value={shortListUserIdFilter} onChange={e => setShortListUserIdFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
+                    <Input placeholder="Source..." value={shortListSourceFilter} onChange={e => setShortListSourceFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
                     <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
                       <SelectTrigger className="h-9 text-sm w-32">
                         <SelectValue placeholder="Source" />
@@ -2365,7 +2271,7 @@ export default function JobDetails() {
                       acc[candidateId].push(candidate);
                       return acc;
                     }, {} as Record<string, any[]>);
-                    
+
                     // Sort by Overall Score descending (highest first)
                     const sortedAboveBudgetEntries = Object.entries(groupedAboveBudget).sort(([, candidateContactsA], [, candidateContactsB]) => {
                       const candidateA = candidateContactsA[0];
@@ -2376,7 +2282,6 @@ export default function JobDetails() {
                       const overallScoreB = calculateOverallScore(candidateB);
                       return overallScoreB - overallScoreA; // Sort in descending order (highest Overall Score first)
                     });
-                    
                     return sortedAboveBudgetEntries.map(([candidateId, candidateContacts]: [string, any[]]) => {
                       const mainCandidate = candidateContacts[0];
                       return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
