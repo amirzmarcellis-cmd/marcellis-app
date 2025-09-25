@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Plus, Mail, User, Shield, Trash2, Crown, Briefcase, DollarSign, Truck, UserCheck, Users2 } from 'lucide-react';
+import { Users, Plus, Mail, User, Shield, Trash2, Crown, Briefcase, DollarSign, Truck, UserCheck, Users2, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -85,7 +85,37 @@ export default function UsersPanel() {
   const [leaderTeams, setLeaderTeams] = useState<Team[]>([]);
   const { toast } = useToast();
   const { session } = useAuth();
-  const { isAdmin } = useUserRole();
+  const { canAccessUsersPanel, loading: roleLoading } = useUserRole();
+
+  // Restrict access to admin users only
+  if (!canAccessUsersPanel && !roleLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <Card className="w-full max-w-md">
+          <CardContent className="flex flex-col items-center gap-4 p-8">
+            <AlertTriangle className="h-12 w-12 text-destructive" />
+            <div className="text-center space-y-2">
+              <h2 className="text-xl font-semibold">Access Restricted</h2>
+              <p className="text-muted-foreground">
+                You don't have permission to access the user management panel. Only administrators can view this section.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (roleLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-2 text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     fetchUsers();
@@ -287,7 +317,7 @@ export default function UsersPanel() {
           <Users className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-bold">User Management</h1>
         </div>
-        {isAdmin && (
+        {canAccessUsersPanel && (
           <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
             <DialogTrigger asChild>
               <Button>
