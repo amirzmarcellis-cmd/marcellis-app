@@ -214,31 +214,9 @@ export default function Apply() {
     }
   };
 
-  const triggerWebhook = async (webhookUrl: string, formData: any) => {
+  const triggerWebhook = async (webhookUrl: string, data: any) => {
     try {
-      console.log("Triggering webhook:", webhookUrl);
-      
-      // Format data to match the required structure
-      const webhookPayload = [
-        {
-          "type": "INSERT",
-          "table": "CVs", 
-          "record": {
-            "name": `${formData.firstName} ${formData.lastName}`,
-            "email": formData.email,
-            "cv_link": formData.cv_link,
-            "cv_text": formData.cv_text,
-            "user_id": formData.user_id,
-            "Lastname": formData.lastName,
-            "Firstname": formData.firstName,
-            "phone_number": formData.phoneNumber
-          },
-          "schema": "public",
-          "old_record": null
-        }
-      ];
-      
-      console.log("Webhook payload:", webhookPayload);
+      console.log("Triggering webhook:", webhookUrl, "with data:", data);
       
       const response = await fetch(webhookUrl, {
         method: "POST",
@@ -246,12 +224,12 @@ export default function Apply() {
           "Content-Type": "application/json",
         },
         mode: "no-cors",
-        body: JSON.stringify(webhookPayload),
+        body: JSON.stringify(data),
       });
 
       toast({
         title: "Webhook Triggered",
-        description: "CV data has been sent to your webhook in the required format.",
+        description: "CV data has been sent to your webhook. Check your automation for processing.",
       });
     } catch (error) {
       console.error("Error triggering webhook:", error);
@@ -293,8 +271,11 @@ export default function Apply() {
             lastName: form.getValues("lastName"),
             email: form.getValues("email"),
             phoneNumber: form.getValues("phoneNumber"),
+            jobApplied: form.getValues("jobApplied"),
             cv_link: fileUrl,
-            cv_text: data?.text || 'CV uploaded - text extraction failed'
+            cv_text: data?.text || 'CV uploaded - text extraction failed',
+            timestamp: new Date().toISOString(),
+            triggered_from: "CV Upload"
           });
         }
       } catch (error) {
