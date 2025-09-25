@@ -22,6 +22,7 @@ interface TeamMember {
   name: string | null;
   email: string;
   is_admin: boolean;
+  role: string; // Add role from membership
 }
 
 interface NewTeamData {
@@ -122,12 +123,16 @@ export default function Teams() {
             return { teamId: team.id, members: [] };
           }
 
-          const members = (profiles || []).map((p) => ({
-            id: p.user_id,
-            name: p.name,
-            email: p.email,
-            is_admin: p.is_admin,
-          }));
+          const members = (profiles || []).map((p) => {
+            const membership = memberships.find(m => m.user_id === p.user_id);
+            return {
+              id: p.user_id,
+              name: p.name,
+              email: p.email,
+              is_admin: p.is_admin,
+              role: membership?.role || 'EMPLOYEE',
+            };
+          });
 
           return {
             teamId: team.id,
@@ -193,9 +198,21 @@ export default function Teams() {
     return Users2;
   };
 
-  const getRoleIcon = (isAdmin?: boolean) => {
-    if (isAdmin) return Crown;
-    return User;
+  const getRoleDisplay = (member: TeamMember) => {
+    // First check if admin (overrides membership role)
+    if (member.is_admin) {
+      return { label: 'Admin', icon: Crown };
+    }
+    
+    // Then check membership role
+    switch (member.role) {
+      case 'MANAGER':
+        return { label: 'Team Leader', icon: Crown };
+      case 'EMPLOYEE':
+        return { label: 'Team Member', icon: User };
+      default:
+        return { label: 'Member', icon: User };
+    }
   };
 
   return (
@@ -273,17 +290,21 @@ export default function Teams() {
                     {members.length > 0 ? (
                       <div className="space-y-2">
                         {members.map((member) => {
-                          const RoleIcon = getRoleIcon(member.is_admin);
+                          const roleDisplay = getRoleDisplay(member);
+                          const RoleIcon = roleDisplay.icon;
                           return (
                             <div key={member.id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
                               <div className="flex items-center gap-2">
                                 <User className="h-4 w-4" />
-                                <span className="text-sm font-medium">{member.name || 'No name'}</span>
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium">{member.name || 'No name'}</span>
+                                  <span className="text-xs text-muted-foreground">{member.email}</span>
+                                </div>
                               </div>
                               <div className="flex items-center gap-2">
                                 <RoleIcon className="h-3 w-3" />
                                 <span className="text-xs text-muted-foreground">
-                                  {member.is_admin ? 'Admin' : 'Member'}
+                                  {roleDisplay.label}
                                 </span>
                               </div>
                             </div>
