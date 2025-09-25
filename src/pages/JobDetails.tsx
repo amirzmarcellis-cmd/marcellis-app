@@ -243,7 +243,7 @@ export default function JobDetails() {
         data: linkedinData,
         error: linkedinError
       } = await supabase.from('linkedin_boolean_search')
-        .select('user_id, linkedin_id')
+        .select('user_id, linkedin_id, linkedin_score, linkedin_score_reason')
         .eq('job_id', jobId);
       
       if (linkedinError) console.warn('Error fetching LinkedIn data:', linkedinError);
