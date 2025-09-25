@@ -34,7 +34,7 @@ export default function Apply() {
   const [jobName, setJobName] = useState<string>("");
   const [nextUserId, setNextUserId] = useState<string>("");
   const { toast } = useToast();
-  const { jobId } = useParams();
+  const { id: jobId } = useParams();
 
   const form = useForm<ApplicationForm>({
     resolver: zodResolver(applicationSchema),
