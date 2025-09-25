@@ -323,7 +323,6 @@ export default function Apply() {
         name: `${form.getValues("firstName")} ${form.getValues("lastName")}`,
         email: form.getValues("email"),
         cv_link: uploadedFiles.map(f => f.url).join(', '),
-        cv_text: uploadedFiles.map(f => f.text).join('\n'),
         user_id: form.getValues("user_id"),
         Lastname: form.getValues("lastName"),
         Firstname: form.getValues("firstName"),
