@@ -22,6 +22,7 @@ const applicationSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   notes: z.string().optional(),
   jobApplied: z.string().min(1, "Job applied is required"),
+  webhookUrl: z.string().url("Please enter a valid webhook URL").optional(),
 });
 
 type ApplicationForm = z.infer<typeof applicationSchema>;
@@ -46,6 +47,7 @@ export default function Apply() {
       email: "",
       notes: "",
       jobApplied: "",
+      webhookUrl: "",
     },
   });
 
@@ -195,6 +197,7 @@ export default function Apply() {
         email: "",
         notes: "",
         jobApplied: jobName,
+        webhookUrl: "",
       });
       setNextUserId(newUserId);
       setCvFile("");
@@ -211,9 +214,36 @@ export default function Apply() {
     }
   };
 
+  const triggerWebhook = async (webhookUrl: string, data: any) => {
+    try {
+      console.log("Triggering webhook:", webhookUrl, "with data:", data);
+      
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        mode: "no-cors",
+        body: JSON.stringify(data),
+      });
+
+      toast({
+        title: "Webhook Triggered",
+        description: "CV data has been sent to your webhook. Check your automation for processing.",
+      });
+    } catch (error) {
+      console.error("Error triggering webhook:", error);
+      toast({
+        title: "Webhook Error",
+        description: "Failed to trigger webhook. Please check the URL and try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleFileUpload = async (files: any[]) => {
     if (files.length > 0) {
-      const fileUrl = files[0].file_url; // Correct property name
+      const fileUrl = files[0].file_url;
       setCvFile(fileUrl);
       
       // Extract text from the uploaded CV
@@ -229,6 +259,23 @@ export default function Apply() {
           toast({
             title: "CV Text Extracted",
             description: "CV text has been automatically extracted and will be saved.",
+          });
+        }
+
+        // Trigger webhook if URL is provided
+        const webhookUrl = form.getValues("webhookUrl");
+        if (webhookUrl) {
+          await triggerWebhook(webhookUrl, {
+            user_id: form.getValues("user_id"),
+            firstName: form.getValues("firstName"),
+            lastName: form.getValues("lastName"),
+            email: form.getValues("email"),
+            phoneNumber: form.getValues("phoneNumber"),
+            jobApplied: form.getValues("jobApplied"),
+            cv_link: fileUrl,
+            cv_text: data?.text || 'CV uploaded - text extraction failed',
+            timestamp: new Date().toISOString(),
+            triggered_from: "CV Upload"
           });
         }
       } catch (error) {
@@ -376,6 +423,27 @@ export default function Apply() {
                         />
                       </FormControl>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="webhookUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Webhook URL (Optional)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="url"
+                          placeholder="https://hooks.zapier.com/hooks/catch/..." 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                      <p className="text-xs text-muted-foreground">
+                        Enter your Zapier webhook URL to automatically send CV data when uploaded
+                      </p>
                     </FormItem>
                   )}
                 />
