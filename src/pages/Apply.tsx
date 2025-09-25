@@ -11,8 +11,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import FileUpload from "@/components/upload/FileUpload";
 import { MissionBackground } from "@/components/layout/MissionBackground";
+import { Upload, X, FileText } from "lucide-react";
 
 const applicationSchema = z.object({
   user_id: z.string().min(1, "User ID is required"),
@@ -27,10 +29,16 @@ const applicationSchema = z.object({
 type ApplicationForm = z.infer<typeof applicationSchema>;
 
 
+interface UploadedFile {
+  name: string;
+  url: string;
+  text?: string;
+}
+
 export default function Apply() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [cvFile, setCvFile] = useState<string>("");
-  const [cvText, setCvText] = useState<string>("");
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [jobName, setJobName] = useState<string>("");
   const [nextUserId, setNextUserId] = useState<string>("");
   const { toast } = useToast();
@@ -171,8 +179,8 @@ export default function Apply() {
           name: cleanText(`${data.firstName} ${data.lastName}`),
           email: cleanText(data.email),
           phone_number: cleanText(data.phoneNumber),
-          cv_text: cleanText(cvText),
-          cv_link: cleanText(cvFile)
+          cv_text: cleanText(uploadedFiles.map(f => f.text).join('\n')),
+          cv_link: cleanText(uploadedFiles.map(f => f.url).join(', '))
         }]);
 
       if (insertError) {
@@ -197,8 +205,7 @@ export default function Apply() {
         jobApplied: jobName,
       });
       setNextUserId(newUserId);
-      setCvFile("");
-      setCvText("");
+      setUploadedFiles([]);
     } catch (error) {
       console.error("Error submitting application:", error);
       toast({
@@ -248,51 +255,74 @@ export default function Apply() {
 
   const handleFileUpload = async (files: any[]) => {
     if (files.length > 0) {
-      const fileUrl = files[0].file_url;
-      setCvFile(fileUrl);
-      
-      // Extract text from the uploaded CV
-      try {
-        const { data, error } = await supabase.functions.invoke('extract-cv-text', {
-          body: { fileUrl }
-        });
-
-        if (error) throw error;
+      for (const file of files) {
+        const fileUrl = file.file_url;
         
-        if (data?.text) {
-          setCvText(data.text);
+        // Extract text from the uploaded CV
+        try {
+          const { data, error } = await supabase.functions.invoke('extract-cv-text', {
+            body: { fileUrl }
+          });
+
+          if (error) throw error;
+          
+          const newFile: UploadedFile = {
+            name: file.file_name,
+            url: fileUrl,
+            text: data?.text || 'CV uploaded - text extraction failed'
+          };
+          
+          setUploadedFiles(prev => [...prev, newFile]);
+          
           toast({
-            title: "CV Text Extracted",
-            description: "CV text has been automatically extracted and will be saved.",
+            title: "CV Uploaded",
+            description: `${file.file_name} has been uploaded successfully.`,
+          });
+        } catch (error) {
+          console.error('Error extracting CV text:', error);
+          const newFile: UploadedFile = {
+            name: file.file_name,
+            url: fileUrl,
+            text: 'CV uploaded - text extraction failed'
+          };
+          
+          setUploadedFiles(prev => [...prev, newFile]);
+          
+          toast({
+            title: "CV Uploaded",
+            description: `${file.file_name} uploaded but text extraction failed.`,
+            variant: "destructive",
           });
         }
-
-        // Trigger webhook automatically
-        const path = window.location.pathname;
-        const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
-        const jobId = pathMatch?.[1] || "general";
-        
-        await triggerWebhook({
-          name: `${form.getValues("firstName")} ${form.getValues("lastName")}`,
-          email: form.getValues("email"),
-          cv_link: fileUrl,
-          cv_text: data?.text || 'CV uploaded - text extraction failed',
-          user_id: form.getValues("user_id"),
-          Lastname: form.getValues("lastName"),
-          Firstname: form.getValues("firstName"),
-          phone_number: form.getValues("phoneNumber"),
-          job_id: jobId
-        });
-      } catch (error) {
-        console.error('Error extracting CV text:', error);
-        setCvText('CV uploaded - text extraction failed');
-        toast({
-          title: "Text Extraction Notice",
-          description: "CV uploaded successfully, but text extraction failed. Manual review may be needed.",
-          variant: "destructive",
-        });
       }
+      setIsDialogOpen(true);
     }
+  };
+
+  const removeFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmitFiles = async () => {
+    if (uploadedFiles.length === 0) return;
+    
+    const path = window.location.pathname;
+    const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
+    const resolvedJobId = pathMatch?.[1] || "general";
+    
+    await triggerWebhook({
+      name: `${form.getValues("firstName")} ${form.getValues("lastName")}`,
+      email: form.getValues("email"),
+      cv_link: uploadedFiles.map(f => f.url).join(', '),
+      cv_text: uploadedFiles.map(f => f.text).join('\n'),
+      user_id: form.getValues("user_id"),
+      Lastname: form.getValues("lastName"),
+      Firstname: form.getValues("firstName"),
+      phone_number: form.getValues("phoneNumber"),
+      job_id: resolvedJobId
+    });
+    
+    setIsDialogOpen(false);
   };
 
   return (
@@ -387,11 +417,75 @@ export default function Apply() {
                 <div>
                   <Label className="text-sm font-medium">Upload your CV</Label>
                   <div className="mt-2">
-                    <FileUpload
-                      onFileUploaded={handleFileUpload}
-                      accept=".pdf,.doc,.docx"
-                      maxSizeMB={10}
-                    />
+                    {uploadedFiles.length > 0 ? (
+                      <div className="space-y-2">
+                        <div className="text-sm text-muted-foreground">
+                          {uploadedFiles.length} file(s) uploaded
+                        </div>
+                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" className="w-full">
+                              <FileText className="h-4 w-4 mr-2" />
+                              View Uploaded Files
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-md">
+                            <DialogHeader>
+                              <DialogTitle>Uploaded Files</DialogTitle>
+                              <DialogDescription>
+                                Manage your uploaded CV files
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div className="space-y-2">
+                                {uploadedFiles.map((file, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                                  >
+                                    <div className="flex items-center space-x-2">
+                                      <FileText className="h-4 w-4" />
+                                      <span className="text-sm font-medium truncate">
+                                        {file.name}
+                                      </span>
+                                    </div>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => removeFile(index)}
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                              
+                              <div className="flex space-x-2">
+                                <FileUpload
+                                  onFileUploaded={handleFileUpload}
+                                  accept=".pdf,.doc,.docx"
+                                  maxSizeMB={10}
+                                />
+                              </div>
+                              
+                              <Button 
+                                onClick={handleSubmitFiles}
+                                className="w-full"
+                                disabled={uploadedFiles.length === 0}
+                              >
+                                Submit Files
+                              </Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    ) : (
+                      <FileUpload
+                        onFileUploaded={handleFileUpload}
+                        accept=".pdf,.doc,.docx"
+                        maxSizeMB={10}
+                      />
+                    )}
                   </div>
                 </div>
 
