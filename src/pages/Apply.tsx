@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -15,11 +16,12 @@ import { MissionBackground } from "@/components/layout/MissionBackground";
 
 const applicationSchema = z.object({
   user_id: z.string().min(1, "User ID is required"),
-  fullName: z.string().min(2, "Full name must be at least 2 characters"),
-  name: z.string().min(2, "Display name must be at least 2 characters"),
+  firstName: z.string().min(2, "First name must be at least 2 characters"),
+  lastName: z.string().min(2, "Last name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
   phoneNumber: z.string().min(10, "Please enter a valid phone number"),
   notes: z.string().optional(),
+  jobApplied: z.string().min(1, "Job applied is required"),
 });
 
 type ApplicationForm = z.infer<typeof applicationSchema>;
@@ -29,33 +31,91 @@ export default function Apply() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cvFile, setCvFile] = useState<string>("");
   const [cvText, setCvText] = useState<string>("");
+  const [jobName, setJobName] = useState<string>("");
+  const [nextUserId, setNextUserId] = useState<string>("");
   const { toast } = useToast();
+  const { jobId } = useParams();
 
   const form = useForm<ApplicationForm>({
     resolver: zodResolver(applicationSchema),
     defaultValues: {
       user_id: "",
-      fullName: "",
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       phoneNumber: "",
       notes: "",
+      jobApplied: "",
     },
   });
 
 
 
-  // Auto-populate name field when fullName changes
+  // Generate next user ID and fetch job details
   useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
-      if (name === "fullName" && value.fullName && !value.name) {
-        form.setValue("name", value.fullName);
+    const initializeForm = async () => {
+      // Generate next user ID
+      const userId = await generateNextUserId();
+      setNextUserId(userId);
+      form.setValue("user_id", userId);
+
+      // Fetch job details
+      if (jobId) {
+        const jobName = await fetchJobName(jobId);
+        if (jobName) {
+          setJobName(jobName);
+          form.setValue("jobApplied", jobName);
+        }
       }
-    });
-    return () => subscription.unsubscribe();
-  }, [form]);
+    };
+
+    initializeForm();
+  }, [form, jobId]);
 
 
+
+  const generateNextUserId = async (): Promise<string> => {
+    try {
+      const { data, error } = await supabase
+        .from("CVs")
+        .select("user_id")
+        .like("user_id", "App%")
+        .order("user_id", { ascending: false })
+        .limit(1);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const lastUserId = data[0].user_id;
+        const match = lastUserId.match(/App(\d+)/);
+        if (match) {
+          const nextNumber = parseInt(match[1]) + 1;
+          return `App${nextNumber.toString().padStart(4, '0')}`;
+        }
+      }
+      
+      return "App0001";
+    } catch (error) {
+      console.error("Error generating user ID:", error);
+      return "App0001";
+    }
+  };
+
+  const fetchJobName = async (jobId: string): Promise<string> => {
+    try {
+      const { data, error } = await supabase
+        .from("Jobs")
+        .select("job_title")
+        .eq("job_id", jobId)
+        .single();
+
+      if (error) throw error;
+      return data?.job_title || "";
+    } catch (error) {
+      console.error("Error fetching job:", error);
+      return "";
+    }
+  };
 
   const onSubmit = async (data: ApplicationForm) => {
     setIsSubmitting(true);
@@ -67,19 +127,14 @@ export default function Apply() {
         return text.replace(/\u0000/g, "").trim();
       };
 
-      // Split full name into first and last name
-      const nameParts = data.fullName.split(" ");
-      const firstName = nameParts[0] || "";
-      const lastName = nameParts.slice(1).join(" ") || "";
-
       // Insert into CVs table with correct field mapping
       const { error: insertError } = await supabase
         .from("CVs")
         .insert([{
           user_id: cleanText(data.user_id),
-          Firstname: cleanText(firstName),
-          Lastname: cleanText(lastName),
-          name: cleanText(data.name),
+          Firstname: cleanText(data.firstName),
+          Lastname: cleanText(data.lastName),
+          name: cleanText(`${data.firstName} ${data.lastName}`),
           email: cleanText(data.email),
           phone_number: cleanText(data.phoneNumber),
           cv_text: cleanText(cvText),
@@ -96,7 +151,18 @@ export default function Apply() {
         description: "Thank you for your application. We will review it and get back to you soon.",
       });
 
-      form.reset();
+      // Generate new user ID for next application
+      const newUserId = await generateNextUserId();
+      form.reset({
+        user_id: newUserId,
+        firstName: "",
+        lastName: "",
+        email: "",
+        phoneNumber: "",
+        notes: "",
+        jobApplied: jobName,
+      });
+      setNextUserId(newUserId);
       setCvFile("");
       setCvText("");
     } catch (error) {
@@ -164,7 +230,12 @@ export default function Apply() {
                     <FormItem>
                       <FormLabel>User ID</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your user ID" {...field} />
+                        <Input 
+                          placeholder="Auto-generated user ID" 
+                          {...field} 
+                          disabled
+                          className="bg-muted"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -173,12 +244,12 @@ export default function Apply() {
 
                 <FormField
                   control={form.control}
-                  name="fullName"
+                  name="firstName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel>First Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your full name" {...field} />
+                        <Input placeholder="Enter your first name" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -187,12 +258,12 @@ export default function Apply() {
 
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="lastName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Display Name</FormLabel>
+                      <FormLabel>Last Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your display name" {...field} />
+                        <Input placeholder="Enter your last name" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -249,6 +320,25 @@ export default function Apply() {
                           placeholder="Any additional information you'd like to share..."
                           rows={4}
                           {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="jobApplied"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Job Applied</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Auto-populated job title" 
+                          {...field} 
+                          disabled
+                          className="bg-muted"
                         />
                       </FormControl>
                       <FormMessage />
