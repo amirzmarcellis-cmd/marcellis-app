@@ -1064,11 +1064,21 @@ export default function JobDetails() {
       variant = "bg-red-500 text-white border-0";
     }
     const hasIcon = cvScore > 0 && afterCallScore > 0;
+    
+    // Determine source type for display
+    let sourceType = "";
+    if (candidate["Source"] && typeof candidate["Source"] === 'string') {
+      if (candidate["Source"].toLowerCase().includes('linkedin')) {
+        sourceType = " (linkedin)";
+      } else if (candidate["Source"].toLowerCase().includes('itris')) {
+        sourceType = " (cv)";
+      }
+    }
+    
     return <div className="flex items-center gap-1">
         <Badge className={`${variant} flex items-center gap-1 font-semibold`}>
           {hasIcon && <Star className="w-3 h-3" />}
-          Overall: {overallScore}
-          {!hasIcon && (cvScore > 0 ? " (CV)" : " (Call)")}
+          Overall: {overallScore}{sourceType}
         </Badge>
       </div>;
   };
@@ -1276,7 +1286,8 @@ export default function JobDetails() {
               }} variant="badge" />}
               </div>
               <div className="flex flex-col gap-1 items-end">
-                {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getOverallScoreBadge(mainCandidate)}
+                {/* Only show overall score when status is Call Done */}
+                {mainCandidate["Contacted"]?.toLowerCase() === "call done" && getOverallScoreBadge(mainCandidate)}
                 {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
               </div>
             </div>
@@ -2049,8 +2060,8 @@ export default function JobDetails() {
                               }} variant="badge" />}
                                      </div>
                                       <div className="flex flex-col gap-1 items-end">
-                                        {/* Hide overall/CV scores for specific contact statuses */}
-                                        {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getOverallScoreBadge(mainCandidate)}
+                                        {/* Only show overall score when status is Call Done */}
+                                        {mainCandidate["Contacted"]?.toLowerCase() === "call done" && getOverallScoreBadge(mainCandidate)}
                                         {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
                                       </div>
                                    </div>
@@ -2353,7 +2364,8 @@ export default function JobDetails() {
                               }} variant="badge" statusType="candidate" />}
                                    </div>
                                    <div className="flex flex-col gap-1 items-end">
-                                     {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getOverallScoreBadge(mainCandidate)}
+                                     {/* Only show overall score when status is Call Done */}
+                                     {mainCandidate["Contacted"]?.toLowerCase() === "call done" && getOverallScoreBadge(mainCandidate)}
                                      {!["ready to contact","not contacted","1st no answer","2nd no answer","3rd no answer","1st no anwser","2nd no anwser","3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
                                    </div>
                                  </div>
