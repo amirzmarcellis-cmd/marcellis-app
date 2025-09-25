@@ -143,10 +143,10 @@ export default function Apply() {
         return "";
       }
       
-      console.log("Job found:", data);
+      console.log("Job found successfully:", data);
       return data.job_title || "";
     } catch (error) {
-      console.error("Error fetching job:", error);
+      console.error("Error in fetchJobName:", error);
       return "";
     }
   };
