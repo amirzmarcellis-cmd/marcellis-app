@@ -7,10 +7,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, Plus, Mail, User, Shield, Trash2, Crown, Briefcase, DollarSign, Truck, UserCheck } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Users, Plus, Mail, User, Shield, Trash2, Crown, Briefcase, DollarSign, Truck, UserCheck, Users2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
+import Teams from './Teams';
 
 type UserRole = 'admin' | 'management' | 'sales_team' | 'delivery_team' | 'team_leader';
 
@@ -30,6 +33,12 @@ interface NewUserData {
   password: string;
   name: string;
   role: UserRole;
+  team?: string;
+}
+
+interface Team {
+  id: string;
+  name: string;
 }
 
 const roleOptions: { value: UserRole; label: string; icon: any }[] = [
@@ -56,6 +65,7 @@ const getRoleDisplay = (role: UserRole | undefined, isAdmin?: boolean) => {
 
 export default function UsersPanel() {
   const [users, setUsers] = useState<Profile[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [newUser, setNewUser] = useState<NewUserData>({
@@ -67,9 +77,11 @@ export default function UsersPanel() {
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
   const { session } = useAuth();
+  const { isAdmin } = useUserRole();
 
   useEffect(() => {
     fetchUsers();
+    fetchTeams();
   }, []);
 
   const fetchUsers = async () => {
@@ -91,6 +103,20 @@ export default function UsersPanel() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchTeams = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('teams')
+        .select('id, name')
+        .order('name');
+
+      if (error) throw error;
+      setTeams(data || []);
+    } catch (error) {
+      console.error('Error fetching teams:', error);
     }
   };
 
@@ -116,7 +142,8 @@ export default function UsersPanel() {
             password: newUser.password,
             name: newUser.name,
             is_admin: newUser.role === 'admin', // Set admin based on role
-            role: newUser.role
+            role: newUser.role,
+            team: newUser.team
           }
         }
       });
@@ -192,15 +219,16 @@ export default function UsersPanel() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Users className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-bold">Users</h1>
+          <h1 className="text-2xl font-bold">User Management</h1>
         </div>
-        <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add User
-            </Button>
-          </DialogTrigger>
+        {isAdmin && (
+          <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add User
+              </Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Add New User</DialogTitle>
@@ -242,7 +270,7 @@ export default function UsersPanel() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="role">Role</Label>
-                <Select value={newUser.role} onValueChange={(value: UserRole) => setNewUser({ ...newUser, role: value })}>
+                <Select value={newUser.role} onValueChange={(value: UserRole) => setNewUser({ ...newUser, role: value, team: value === 'team_leader' ? newUser.team : undefined })}>
                   <SelectTrigger className="bg-background border-input z-50">
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
@@ -261,6 +289,30 @@ export default function UsersPanel() {
                   </SelectContent>
                 </Select>
               </div>
+              {newUser.role === 'team_leader' && (
+                <div className="space-y-2">
+                  <Label htmlFor="team">Team</Label>
+                  <Select value={newUser.team} onValueChange={(value: string) => setNewUser({ ...newUser, team: value })}>
+                    <SelectTrigger className="bg-background border-input z-50">
+                      <SelectValue placeholder="Select a team" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border border-border shadow-md z-50">
+                      {teams.map((team) => {
+                        const TeamIcon = team.name.toLowerCase().includes('sales') ? DollarSign : 
+                                        team.name.toLowerCase().includes('delivery') ? Truck : Users2;
+                        return (
+                          <SelectItem key={team.id} value={team.id} className="hover:bg-accent hover:text-accent-foreground">
+                            <div className="flex items-center gap-2">
+                              <TeamIcon className="h-4 w-4" />
+                              {team.name}
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setIsAddUserOpen(false)}>
                   Cancel
@@ -272,9 +324,23 @@ export default function UsersPanel() {
             </form>
           </DialogContent>
         </Dialog>
+        )}
       </div>
 
-      <Card>
+      <Tabs defaultValue="users" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="users" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Users
+          </TabsTrigger>
+          <TabsTrigger value="teams" className="flex items-center gap-2">
+            <Users2 className="h-4 w-4" />
+            Teams
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="users">
+          <Card>
         <CardHeader>
           <CardTitle>All Users</CardTitle>
         </CardHeader>
@@ -340,9 +406,15 @@ export default function UsersPanel() {
                 ))}
               </TableBody>
             </Table>
-          )}
-        </CardContent>
-      </Card>
+            )}
+          </CardContent>
+        </Card>
+        </TabsContent>
+
+        <TabsContent value="teams">
+          <Teams />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

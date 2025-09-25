@@ -111,6 +111,17 @@ serve(async (req) => {
                 name: userData.name,
                 email: userData.email
               });
+
+            // Create team membership if team is specified
+            if (userData.team) {
+              await supabaseAdmin
+                .from('memberships')
+                .upsert({
+                  user_id: existingUser.id,
+                  team_id: userData.team,
+                  role: userData.role === 'team_leader' ? 'MANAGER' : 'EMPLOYEE'
+                });
+            }
             
             return new Response(
               JSON.stringify({ user: { user: existingUser }, success: true }),
@@ -139,6 +150,21 @@ serve(async (req) => {
 
           if (profileError) {
             console.error('Profile creation error:', profileError);
+          }
+
+          // Create team membership if team is specified
+          if (userData.team) {
+            const { error: membershipError } = await supabaseAdmin
+              .from('memberships')
+              .insert({
+                user_id: newUser.user.id,
+                team_id: userData.team,
+                role: userData.role === 'team_leader' ? 'MANAGER' : 'EMPLOYEE'
+              });
+
+            if (membershipError) {
+              console.error('Membership creation error:', membershipError);
+            }
           }
         }
 
