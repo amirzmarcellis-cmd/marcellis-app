@@ -230,13 +230,7 @@ export default function Apply() {
           "Content-Type": "application/json",
         },
         mode: "no-cors",
-        body: JSON.stringify([{
-          type: "INSERT",
-          table: "CVs",
-          record: data,
-          schema: "public",
-          old_record: null
-        }]),
+        body: JSON.stringify(data),
       });
 
       toast({
@@ -309,17 +303,26 @@ export default function Apply() {
     const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
     const resolvedJobId = pathMatch?.[1] || "general";
     
-    await triggerWebhook({
-      name: `${form.getValues("firstName")} ${form.getValues("lastName")}`,
-      email: form.getValues("email"),
-      cv_link: uploadedFiles.map(f => f.url).join(', '),
-      cv_text: uploadedFiles.map(f => f.text).join('\n'),
-      user_id: form.getValues("user_id"),
-      Lastname: form.getValues("lastName"),
-      Firstname: form.getValues("firstName"),
-      phone_number: form.getValues("phoneNumber"),
-      job_id: resolvedJobId
-    });
+    const webhookPayload = [{
+      type: "INSERT",
+      table: "CVs",
+      record: {
+        name: `${form.getValues("firstName")} ${form.getValues("lastName")}`,
+        email: form.getValues("email"),
+        cv_link: uploadedFiles.map(f => f.url).join(', '),
+        cv_text: uploadedFiles.map(f => f.text).join('\n'),
+        user_id: form.getValues("user_id"),
+        Lastname: form.getValues("lastName"),
+        Firstname: form.getValues("firstName"),
+        phone_number: form.getValues("phoneNumber"),
+        updated_time: new Date().toISOString(),
+        job_id: resolvedJobId
+      },
+      schema: "public",
+      old_record: null
+    }];
+    
+    await triggerWebhook(webhookPayload);
     
     setIsDialogOpen(false);
   };
