@@ -219,7 +219,7 @@ export default function Apply() {
   };
 
   const triggerWebhook = async (data: any) => {
-    const webhookUrl = "https://hook.eu2.make.com/tv58ofd5rftm64t677f65phmbwrnq24e";
+    const webhookUrl = "https://hook.eu2.make.com/8y6jctmrqnlahnh6dccxefvctwmfq134";
     
     try {
       console.log("Triggering webhook:", webhookUrl, "with data:", data);
