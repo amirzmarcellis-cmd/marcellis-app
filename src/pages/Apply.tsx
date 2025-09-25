@@ -233,10 +233,8 @@ export default function Apply() {
         body: JSON.stringify(data),
       });
 
-      toast({
-        title: "Webhook Triggered",
-        description: "CV data has been sent to your webhook. Check your automation for processing.",
-      });
+      // Don't show webhook-specific toast here, let the caller handle success message
+      return true;
     } catch (error) {
       console.error("Error triggering webhook:", error);
       toast({
@@ -244,6 +242,7 @@ export default function Apply() {
         description: "Failed to trigger webhook. Please check the URL and try again.",
         variant: "destructive",
       });
+      return false;
     }
   };
 
@@ -310,7 +309,7 @@ export default function Apply() {
           });
         }
       }
-      setIsDialogOpen(true);
+      // Only show uploaded files, don't open dialog automatically
     }
   };
 
@@ -344,7 +343,14 @@ export default function Apply() {
       old_record: null
     }];
     
-    await triggerWebhook(webhookPayload);
+    const success = await triggerWebhook(webhookPayload);
+    
+    if (success) {
+      toast({
+        title: "Application Submitted",
+        description: "Thank you for your application. We will review it and get back to you soon.",
+      });
+    }
     
     setIsDialogOpen(false);
   };
