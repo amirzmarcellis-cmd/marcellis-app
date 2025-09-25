@@ -15,7 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import Teams from './Teams';
 
-type UserRole = 'admin' | 'management' | 'sales_team' | 'delivery_team' | 'team_leader';
+type UserRole = 'admin' | 'management' | 'team_leader';
 
 interface Profile {
   id: string;
@@ -44,8 +44,6 @@ interface Team {
 const roleOptions: { value: UserRole; label: string; icon: any }[] = [
   { value: 'admin', label: 'Admin', icon: Crown },
   { value: 'management', label: 'Management', icon: Briefcase },
-  { value: 'sales_team', label: 'Sales Team', icon: DollarSign },
-  { value: 'delivery_team', label: 'Delivery Team', icon: Truck },
   { value: 'team_leader', label: 'Team Leader', icon: UserCheck },
 ];
 
@@ -75,6 +73,8 @@ export default function UsersPanel() {
     role: 'admin' // Default all users as admin as requested
   });
   const [submitting, setSubmitting] = useState(false);
+  const [userTeams, setUserTeams] = useState<Team[]>([]);
+  const [leaderTeams, setLeaderTeams] = useState<Team[]>([]);
   const { toast } = useToast();
   const { session } = useAuth();
   const { isAdmin } = useUserRole();
@@ -82,7 +82,8 @@ export default function UsersPanel() {
   useEffect(() => {
     fetchUsers();
     fetchTeams();
-  }, []);
+    fetchUserTeams();
+  }, [session]);
 
   const fetchUsers = async () => {
     try {
@@ -117,6 +118,39 @@ export default function UsersPanel() {
       setTeams(data || []);
     } catch (error) {
       console.error('Error fetching teams:', error);
+    }
+  };
+
+  const fetchUserTeams = async () => {
+    if (!session?.user) return;
+    
+    try {
+      // Fetch all teams for management role
+      const { data: allTeams, error: allTeamsError } = await supabase
+        .from('teams')
+        .select('id, name')
+        .order('name');
+      
+      if (allTeamsError) throw allTeamsError;
+      setUserTeams(allTeams || []);
+      
+      // Fetch teams where current user is a leader
+      const { data: memberships, error: membershipsError } = await supabase
+        .from('memberships')
+        .select('team_id, teams(id, name)')
+        .eq('user_id', session.user.id)
+        .eq('role', 'MANAGER');
+      
+      if (membershipsError) throw membershipsError;
+      
+      const leaderTeamsList = memberships?.map(m => ({
+        id: m.teams?.id || '',
+        name: m.teams?.name || ''
+      })).filter(team => team.id) || [];
+      
+      setLeaderTeams(leaderTeamsList);
+    } catch (error) {
+      console.error('Error fetching user teams:', error);
     }
   };
 
@@ -229,82 +263,59 @@ export default function UsersPanel() {
                 Add User
               </Button>
             </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New User</DialogTitle>
-              <DialogDescription>
-                Create a new user account for the system.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleAddUser} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={newUser.email}
-                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={newUser.password}
-                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                  required
-                  minLength={6}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  value={newUser.name}
-                  onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="role">Role</Label>
-                <Select value={newUser.role} onValueChange={(value: UserRole) => setNewUser({ ...newUser, role: value, team: value === 'team_leader' ? newUser.team : undefined })}>
-                  <SelectTrigger className="bg-background border-input z-50">
-                    <SelectValue placeholder="Select a role" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background border border-border shadow-md z-50">
-                    {roleOptions.map((option) => {
-                      const Icon = option.icon;
-                      return (
-                        <SelectItem key={option.value} value={option.value} className="hover:bg-accent hover:text-accent-foreground">
-                          <div className="flex items-center gap-2">
-                            <Icon className="h-4 w-4" />
-                            {option.label}
-                          </div>
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
-              {newUser.role === 'team_leader' && (
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New User</DialogTitle>
+                <DialogDescription>
+                  Create a new user account for the system.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleAddUser} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="team">Team</Label>
-                  <Select value={newUser.team} onValueChange={(value: string) => setNewUser({ ...newUser, team: value })}>
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={newUser.email}
+                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={newUser.password}
+                    onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    value={newUser.name}
+                    onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="role">Role</Label>
+                  <Select value={newUser.role} onValueChange={(value: UserRole) => setNewUser({ ...newUser, role: value, team: undefined })}>
                     <SelectTrigger className="bg-background border-input z-50">
-                      <SelectValue placeholder="Select a team" />
+                      <SelectValue placeholder="Select a role" />
                     </SelectTrigger>
                     <SelectContent className="bg-background border border-border shadow-md z-50">
-                      {teams.map((team) => {
-                        const TeamIcon = team.name.toLowerCase().includes('sales') ? DollarSign : 
-                                        team.name.toLowerCase().includes('delivery') ? Truck : Users2;
+                      {roleOptions.map((option) => {
+                        const Icon = option.icon;
                         return (
-                          <SelectItem key={team.id} value={team.id} className="hover:bg-accent hover:text-accent-foreground">
+                          <SelectItem key={option.value} value={option.value} className="hover:bg-accent hover:text-accent-foreground">
                             <div className="flex items-center gap-2">
-                              <TeamIcon className="h-4 w-4" />
-                              {team.name}
+                              <Icon className="h-4 w-4" />
+                              {option.label}
                             </div>
                           </SelectItem>
                         );
@@ -312,18 +323,41 @@ export default function UsersPanel() {
                     </SelectContent>
                   </Select>
                 </div>
-              )}
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsAddUserOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={submitting}>
-                  {submitting ? 'Creating...' : 'Create User'}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+                {(newUser.role === 'management' || newUser.role === 'team_leader') && (
+                  <div className="space-y-2">
+                    <Label htmlFor="team">Team</Label>
+                    <Select value={newUser.team} onValueChange={(value: string) => setNewUser({ ...newUser, team: value })}>
+                      <SelectTrigger className="bg-background border-input z-50">
+                        <SelectValue placeholder="Select a team" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background border border-border shadow-md z-50">
+                        {(newUser.role === 'management' ? userTeams : leaderTeams).map((team) => {
+                          const TeamIcon = team.name.toLowerCase().includes('sales') ? DollarSign : 
+                                          team.name.toLowerCase().includes('delivery') ? Truck : Users2;
+                          return (
+                            <SelectItem key={team.id} value={team.id} className="hover:bg-accent hover:text-accent-foreground">
+                              <div className="flex items-center gap-2">
+                                <TeamIcon className="h-4 w-4" />
+                                {team.name}
+                              </div>
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setIsAddUserOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={submitting}>
+                    {submitting ? 'Creating...' : 'Create User'}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
         )}
       </div>
 

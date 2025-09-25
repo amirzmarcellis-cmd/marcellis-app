@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { BarChart3, Phone, Users, Settings, Home, TrendingUp, FileText, Briefcase, LogOut, PhoneCall, Activity, Sun, Moon, Building2, FolderOpen } from "lucide-react";
+import { BarChart3, Phone, Users, Settings, Home, TrendingUp, FileText, Briefcase, LogOut, PhoneCall, Activity, Sun, Moon, Building2, FolderOpen, User, Crown } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -98,9 +98,24 @@ export function DashboardSidebar() {
               })()}
               </div>
             </div>
-            {!isMini && <div className="px-3">
-                
-              </div>}
+            {!isMini && profile && (
+              <div className="px-3 py-2 bg-muted/50 rounded-lg mx-4">
+                <div className="flex items-center gap-2">
+                  <User className="w-4 h-4 text-primary" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {profile.name || 'User'}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {profile.email}
+                    </p>
+                  </div>
+                  {isAdmin && (
+                    <Crown className="w-3 h-3 text-primary" />
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
