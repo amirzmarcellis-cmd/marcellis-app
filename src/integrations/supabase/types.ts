@@ -357,9 +357,11 @@ export type Database = {
       }
       linkedin_boolean_search: {
         Row: {
+          chat_id: string | null
           id: number
           job_id: string | null
           linkedin_id: string | null
+          linkedin_score: number | null
           recruiter_id: string | null
           status: string | null
           thread_id: string | null
@@ -367,9 +369,11 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          chat_id?: string | null
           id?: number
           job_id?: string | null
           linkedin_id?: string | null
+          linkedin_score?: number | null
           recruiter_id?: string | null
           status?: string | null
           thread_id?: string | null
@@ -377,9 +381,11 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          chat_id?: string | null
           id?: number
           job_id?: string | null
           linkedin_id?: string | null
+          linkedin_score?: number | null
           recruiter_id?: string | null
           status?: string | null
           thread_id?: string | null
