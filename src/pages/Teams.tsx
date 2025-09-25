@@ -97,29 +97,47 @@ export default function Teams() {
       // Fetch members for each team
       if (data) {
         const membersPromises = data.map(async (team) => {
+          console.log('Fetching members for team:', team.name);
+          
           const { data: memberships, error: membersError } = await supabase
             .from('memberships')
-            .select('user_id')
+            .select(`
+              user_id,
+              role,
+              profiles (
+                user_id,
+                name,
+                email,
+                is_admin
+              )
+            `)
             .eq('team_id', team.id);
 
-          if (membersError) throw membersError;
+          if (membersError) {
+            console.error('Error fetching memberships for team', team.name, ':', membersError);
+            return { teamId: team.id, members: [] };
+          }
+          
+          console.log('Memberships found for team', team.name, ':', memberships);
           
           if (!memberships || memberships.length === 0) {
             return { teamId: team.id, members: [] };
           }
 
-          const userIds = memberships.map(m => m.user_id);
-          
-          const { data: profiles, error: profilesError } = await supabase
-            .from('profiles')
-            .select('id, name, email, is_admin')
-            .in('user_id', userIds);
-
-          if (profilesError) throw profilesError;
+          // Transform the data to match the expected format
+          const members = memberships
+            .filter(membership => membership.profiles) // Only include if profile exists
+            .map(membership => ({
+              id: membership.profiles.user_id,
+              name: membership.profiles.name,
+              email: membership.profiles.email,
+              is_admin: membership.profiles.is_admin,
+              role: membership.role
+            }));
           
           return {
             teamId: team.id,
-            members: profiles || []
+            members
           };
         });
 
@@ -130,6 +148,7 @@ export default function Teams() {
           membersMap[teamId] = members;
         });
 
+        console.log('Final team members map:', membersMap);
         setTeamMembers(membersMap);
       }
     } catch (error) {
