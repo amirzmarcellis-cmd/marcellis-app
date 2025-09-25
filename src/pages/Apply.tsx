@@ -224,13 +224,32 @@ export default function Apply() {
     try {
       console.log("Triggering webhook:", webhookUrl, "with data:", data);
       
+      // Convert data to text format
+      const textData = Array.isArray(data) ? data.map(item => {
+        if (item.record) {
+          return `Type: ${item.type}
+Table: ${item.table}
+Name: ${item.record.name || 'N/A'}
+Email: ${item.record.email || 'null'}
+CV Link: ${item.record.cv_link || 'N/A'}
+CV Text: ${item.record.cv_text || 'null'}
+User ID: ${item.record.user_id || 'N/A'}
+Last Name: ${item.record.Lastname || 'N/A'}
+First Name: ${item.record.Firstname || 'N/A'}
+Phone Number: ${item.record.phone_number || 'null'}
+Schema: ${item.schema || 'N/A'}
+Old Record: ${item.old_record || 'null'}`;
+        }
+        return JSON.stringify(item);
+      }).join('\n\n---\n\n') : JSON.stringify(data);
+      
       const response = await fetch(webhookUrl, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "text/plain",
         },
         mode: "no-cors",
-        body: JSON.stringify(data),
+        body: textData,
       });
 
       // Don't show webhook-specific toast here, let the caller handle success message
