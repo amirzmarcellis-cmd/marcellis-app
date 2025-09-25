@@ -222,7 +222,7 @@ export default function Apply() {
     const webhookUrl = "https://hook.eu2.make.com/8y6jctmrqnlahnh6dccxefvctwmfq134";
     
     try {
-      console.log("Triggering webhook:", webhookUrl, "with data:", data);
+      console.log("Triggering webhook:", webhookUrl, "with data:", JSON.stringify(data, null, 2));
       
       const response = await fetch(webhookUrl, {
         method: "POST",
