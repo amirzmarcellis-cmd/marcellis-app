@@ -300,6 +300,15 @@ export default function JobDetails() {
       const allScores = mapped?.map(c => parseFloat(c.Score) || 0).filter(score => !isNaN(score)) || [];
       console.log('All candidate scores:', allScores);
 
+      // Debug LinkedIn data visibility
+      const linkedinCandidates = mapped.filter(c => typeof c["Source"] === 'string' && c["Source"].toLowerCase().includes('linkedin'));
+      console.log('LinkedIn source candidates:', linkedinCandidates.length, 'Sample:', linkedinCandidates.slice(0, 3).map(c => ({
+        name: c["Candidate Name"],
+        overall: c["linkedin_score"],
+        reason: c["linkedin_score_reason"]
+      })));
+
+
       // Calculate low scored candidates (score < 70)
       const lowScoredCandidates = mapped?.filter(c => {
         const score = parseFloat(c.Score) || 0;
@@ -1134,11 +1143,11 @@ export default function JobDetails() {
                 <div className="flex items-center gap-4 text-sm mt-1">
                   <span className="text-muted-foreground">CV Score: {mainCandidate["cv_score"] || mainCandidate["CV Score"] || "N/A"}</span>
                   {mainCandidate["after_call_score"] && <span className="text-muted-foreground">After Call Score: {mainCandidate["after_call_score"]}</span>}
-                  {(mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score"]) && (
+                  {(mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && (mainCandidate["linkedin_score"] !== undefined && mainCandidate["linkedin_score"] !== null && mainCandidate["linkedin_score"] !== "")) && (
                     <span className="text-muted-foreground">Overall: {mainCandidate["linkedin_score"]}</span>
                   )}
                 </div>
-                {(mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score_reason"]) && (
+                {(mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && (mainCandidate["linkedin_score_reason"] !== undefined && mainCandidate["linkedin_score_reason"] !== null && mainCandidate["linkedin_score_reason"] !== "")) && (
                   <div className="text-sm text-muted-foreground mt-1">
                     <span className="font-medium">Reason:</span> {mainCandidate["linkedin_score_reason"]}
                   </div>
@@ -2255,18 +2264,35 @@ export default function JobDetails() {
                                          <span className="text-muted-foreground">User ID:</span>
                                          <span className="font-mono text-xs">{mainCandidate["user_id"] || "N/A"}</span>
                                        </div>
+                                       {(mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && (mainCandidate["linkedin_score"] !== undefined && mainCandidate["linkedin_score"] !== null && mainCandidate["linkedin_score"] !== "")) && (
+                                         <div className="flex items-center justify-between">
+                                           <span className="text-muted-foreground">Overall:</span>
+                                           <span className="font-medium">{mainCandidate["linkedin_score"]}</span>
+                                         </div>
+                                       )}
                                      </div>
                                      <div className="space-y-1">
-                                       
+                                       {/* reserved for extra fields */}
                                      </div>
                                    </div>
-                                   {mainCandidate["cv_score_reason"] && <div className="pt-1">
+                                   {(mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score_reason"]) ? (
+                                     <div className="pt-1">
                                        <span className="text-muted-foreground text-xs">Reason:</span>
                                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                                         {mainCandidate["cv_score_reason"]}
+                                         {mainCandidate["linkedin_score_reason"]}
                                        </p>
-                                     </div>}
-                                  </div>
+                                     </div>
+                                   ) : (
+                                     mainCandidate["cv_score_reason"] && (
+                                       <div className="pt-1">
+                                         <span className="text-muted-foreground text-xs">Reason:</span>
+                                         <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                           {mainCandidate["cv_score_reason"]}
+                                         </p>
+                                       </div>
+                                     )
+                                   )}
+                                 </div>
 
                                 <div className="flex flex-wrap gap-2 items-center">
                                   <div className="flex flex-wrap items-center gap-1">
