@@ -316,20 +316,22 @@ export default function Apply() {
     const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
     const resolvedJobId = pathMatch?.[1] || "general";
     
+    // Generate timestamp for user_id
+    const timestamp = Date.now();
+    const candidateUserId = `CAND-${timestamp}`;
+    
     const webhookPayload = [{
       type: "INSERT",
       table: "CVs",
       record: {
-        name: `${form.getValues("firstName")} ${form.getValues("lastName")}`,
-        email: form.getValues("email"),
+        name: uploadedFiles[0]?.name || `${form.getValues("firstName")} ${form.getValues("lastName")}`,
+        email: null,
         cv_link: uploadedFiles.map(f => f.url).join(', '),
-        cv_text: uploadedFiles.map(f => f.text).join('\n'),
-        user_id: form.getValues("user_id"),
+        cv_text: null,
+        user_id: candidateUserId,
         Lastname: form.getValues("lastName"),
         Firstname: form.getValues("firstName"),
-        phone_number: form.getValues("phoneNumber"),
-        updated_time: new Date().toISOString(),
-        job_id: resolvedJobId
+        phone_number: null
       },
       schema: "public",
       old_record: null
