@@ -286,11 +286,7 @@ export default function Apply() {
           };
           
           setUploadedFiles(prev => [...prev, newFile]);
-          
-          toast({
-            title: "CV Uploaded",
-            description: `${fileObj.file_name} has been uploaded successfully.`,
-          });
+          // Do not show any toast on file selection/upload per requirements
         } catch (error) {
           console.error('Error uploading CV:', error);
           // Fallback to blob URL if storage upload fails
@@ -302,11 +298,7 @@ export default function Apply() {
           };
           
           setUploadedFiles(prev => [...prev, newFile]);
-          
-          toast({
-            title: "CV Uploaded",
-            description: `${fileObj.file_name} has been uploaded successfully.`,
-          });
+          // No toast here either
         }
       }
       // Only show uploaded files, don't open dialog automatically
