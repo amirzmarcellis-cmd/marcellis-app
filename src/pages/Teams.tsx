@@ -94,69 +94,60 @@ export default function Teams() {
       if (error) throw error;
       setTeams(data || []);
 
-      // Fetch members for each team
+      // Fetch members for each team (two-step to avoid typed joins)
       if (data) {
         const membersPromises = data.map(async (team) => {
-          console.log('Fetching members for team:', team.name);
-          
           const { data: memberships, error: membersError } = await supabase
             .from('memberships')
-            .select(`
-              user_id,
-              role,
-              profiles (
-                user_id,
-                name,
-                email,
-                is_admin
-              )
-            `)
+            .select('user_id, role')
             .eq('team_id', team.id);
 
           if (membersError) {
             console.error('Error fetching memberships for team', team.name, ':', membersError);
             return { teamId: team.id, members: [] };
           }
-          
-          console.log('Memberships found for team', team.name, ':', memberships);
-          
+
           if (!memberships || memberships.length === 0) {
             return { teamId: team.id, members: [] };
           }
 
-          // Transform the data to match the expected format
-          const members = memberships
-            .filter(membership => membership.profiles) // Only include if profile exists
-            .map(membership => ({
-              id: membership.profiles.user_id,
-              name: membership.profiles.name,
-              email: membership.profiles.email,
-              is_admin: membership.profiles.is_admin,
-              role: membership.role
-            }));
-          
+          const userIds = memberships.map((m) => m.user_id);
+          const { data: profiles, error: profilesError } = await supabase
+            .from('profiles')
+            .select('user_id, name, email, is_admin')
+            .in('user_id', userIds);
+
+          if (profilesError) {
+            console.error('Error fetching profiles for team', team.name, ':', profilesError);
+            return { teamId: team.id, members: [] };
+          }
+
+          const members = (profiles || []).map((p) => ({
+            id: p.user_id,
+            name: p.name,
+            email: p.email,
+            is_admin: p.is_admin,
+          }));
+
           return {
             teamId: team.id,
-            members
+            members,
           };
         });
 
         const membersResults = await Promise.all(membersPromises);
         const membersMap: Record<string, TeamMember[]> = {};
-        
         membersResults.forEach(({ teamId, members }) => {
           membersMap[teamId] = members;
         });
-
-        console.log('Final team members map:', membersMap);
         setTeamMembers(membersMap);
       }
     } catch (error) {
       console.error('Error fetching teams:', error);
       toast({
-        title: "Error",
-        description: "Failed to fetch teams",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to fetch teams',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
