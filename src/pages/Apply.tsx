@@ -290,8 +290,7 @@ export default function Apply() {
           
           toast({
             title: "CV Uploaded",
-            description: `${file.file_name} uploaded but text extraction failed.`,
-            variant: "destructive",
+            description: `${file.file_name} has been uploaded successfully.`,
           });
         }
       }
