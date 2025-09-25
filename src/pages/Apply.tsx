@@ -248,7 +248,20 @@ export default function Apply() {
 
   const handleFileUpload = async (files: any[]) => {
     if (files.length > 0) {
-      for (const fileObj of files) {
+      // Show files instantly in UI
+      const instantFiles: UploadedFile[] = files.map(fileObj => ({
+        name: fileObj.file_name,
+        url: URL.createObjectURL(fileObj.file), // Temporary blob URL for instant display
+        text: 'Processing...'
+      }));
+      
+      setUploadedFiles(prev => [...prev, ...instantFiles]);
+      
+      // Process files in background
+      for (let i = 0; i < files.length; i++) {
+        const fileObj = files[i];
+        const fileIndex = uploadedFiles.length + i;
+        
         try {
           // Generate unique filename with timestamp
           const timestamp = Date.now();
@@ -279,29 +292,25 @@ export default function Apply() {
 
           if (error) throw error;
           
-          const newFile: UploadedFile = {
-            name: fileObj.file_name,
-            url: publicUrl,
-            text: data?.text || 'CV uploaded - text extraction failed'
-          };
-          
-          setUploadedFiles(prev => [...prev, newFile]);
-          // Do not show any toast on file selection/upload per requirements
+          // Update the file entry with real URL and extracted text
+          setUploadedFiles(prev => prev.map((file, index) => 
+            index === fileIndex ? {
+              ...file,
+              url: publicUrl,
+              text: data?.text || 'Text extraction failed'
+            } : file
+          ));
         } catch (error) {
-          console.error('Error uploading CV:', error);
-          // Fallback to blob URL if storage upload fails
-          const blobUrl = URL.createObjectURL(fileObj.file);
-          const newFile: UploadedFile = {
-            name: fileObj.file_name,
-            url: blobUrl,
-            text: 'CV uploaded - storage upload failed'
-          };
-          
-          setUploadedFiles(prev => [...prev, newFile]);
-          // No toast here either
+          console.error('Error processing CV:', error);
+          // Update with error state but keep the file visible
+          setUploadedFiles(prev => prev.map((file, index) => 
+            index === fileIndex ? {
+              ...file,
+              text: 'Upload failed - using temporary file'
+            } : file
+          ));
         }
       }
-      // Only show uploaded files, don't open dialog automatically
     }
   };
 
