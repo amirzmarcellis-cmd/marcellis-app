@@ -55,43 +55,40 @@ export default function Apply() {
   useEffect(() => {
     const initializeForm = async () => {
       try {
-        console.log("Full URL params:", window.location.pathname);
-        console.log("All URL params from useParams:", useParams());
-        console.log("Extracted jobId:", jobId);
-        
-        // Generate next user ID
+        // Generate next user ID first
         const userId = await generateNextUserId();
         setNextUserId(userId);
         form.setValue("user_id", userId);
 
-        // Fetch job details
-        if (jobId) {
-          console.log("JobId from URL params:", jobId);
-          const jobName = await fetchJobName(jobId);
-          console.log("Fetched job name:", jobName);
-          
-          if (jobName) {
-            setJobName(jobName);
-            form.setValue("jobApplied", jobName);
-            console.log("Job applied field set to:", jobName);
+        // Resolve job id from router params or URL path as a fallback
+        const path = window.location.pathname;
+        const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
+        const fallbackJobId = pathMatch?.[1];
+        const resolvedJobId = jobId || fallbackJobId;
+        console.log("Resolved jobId:", resolvedJobId, "pathname:", path);
+
+        if (resolvedJobId) {
+          const title = await fetchJobName(resolvedJobId);
+          if (title) {
+            setJobName(title);
+            form.setValue("jobApplied", title, { shouldValidate: true });
           } else {
-            console.warn("No job name found, using default");
+            // If job lookup fails, still set a sensible default to avoid validation error
             const defaultJobName = "Position Available";
             setJobName(defaultJobName);
-            form.setValue("jobApplied", defaultJobName);
+            form.setValue("jobApplied", defaultJobName, { shouldValidate: true });
           }
         } else {
-          console.warn("No jobId found in URL params");
+          // No job id in URL, treat as general application
           const defaultJobName = "General Application";
           setJobName(defaultJobName);
-          form.setValue("jobApplied", defaultJobName);
+          form.setValue("jobApplied", defaultJobName, { shouldValidate: true });
         }
       } catch (error) {
         console.error("Error initializing form:", error);
-        // Set a default job name if everything fails
-        const defaultJobName = "Application Submission";
+        const defaultJobName = "General Application";
         setJobName(defaultJobName);
-        form.setValue("jobApplied", defaultJobName);
+        form.setValue("jobApplied", defaultJobName, { shouldValidate: true });
       }
     };
 
