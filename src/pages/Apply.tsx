@@ -454,7 +454,7 @@ export default function Apply() {
                         </div>
                         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                           <DialogTrigger asChild>
-                            <Button variant="outline" className="w-full">
+                            <Button type="button" variant="outline" className="w-full">
                               <FileText className="h-4 w-4 mr-2" />
                               View Uploaded Files
                             </Button>
@@ -499,6 +499,7 @@ export default function Apply() {
                               </div>
                               
                               <Button 
+                                type="button"
                                 onClick={handleSubmitFiles}
                                 className="w-full"
                                 disabled={uploadedFiles.length === 0}

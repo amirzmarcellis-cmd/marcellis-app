@@ -43,7 +43,7 @@ export default function FileUpload({ onFileUploaded, accept = "*/*", maxSizeMB =
       />
       <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
       <p className="text-sm font-medium mb-2">Click to upload files</p>
-      <Button onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+      <Button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
         Choose Files
       </Button>
     </div>
