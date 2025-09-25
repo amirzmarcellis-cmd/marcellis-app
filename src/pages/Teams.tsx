@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Users2, Plus, DollarSign, Truck, User, Crown } from 'lucide-react';
+import { Users2, Plus, DollarSign, Truck, User, Crown, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -34,6 +34,7 @@ export default function Teams() {
   const [teamMembers, setTeamMembers] = useState<Record<string, TeamMember[]>>({});
   const [loading, setLoading] = useState(true);
   const [isAddTeamOpen, setIsAddTeamOpen] = useState(false);
+  const [deleteTeamId, setDeleteTeamId] = useState<string | null>(null);
   const [newTeam, setNewTeam] = useState<NewTeamData>({ name: '' });
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
@@ -194,6 +195,32 @@ export default function Teams() {
     }
   };
 
+  const handleDeleteTeam = async (teamId: string) => {
+    try {
+      const { error } = await supabase
+        .from('teams')
+        .delete()
+        .eq('id', teamId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Team deleted successfully",
+      });
+
+      fetchTeams();
+      setDeleteTeamId(null);
+    } catch (error: any) {
+      console.error('Error deleting team:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete team",
+        variant: "destructive"
+      });
+    }
+  };
+
   const getTeamIcon = (teamName: string) => {
     if (teamName.toLowerCase().includes('sales')) return DollarSign;
     if (teamName.toLowerCase().includes('delivery')) return Truck;
@@ -277,9 +304,19 @@ export default function Teams() {
             return (
               <Card key={team.id}>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TeamIcon className="h-5 w-5 text-primary" />
-                    {team.name}
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <TeamIcon className="h-5 w-5 text-primary" />
+                      {team.name}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDeleteTeamId(team.id)}
+                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -325,6 +362,29 @@ export default function Teams() {
           })}
         </div>
       )}
+
+      {/* Delete Team Confirmation Dialog */}
+      <Dialog open={deleteTeamId !== null} onOpenChange={() => setDeleteTeamId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Team</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this team? This action cannot be undone and will remove all associated memberships.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTeamId(null)}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={() => deleteTeamId && handleDeleteTeam(deleteTeamId)}
+            >
+              Delete Team
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
