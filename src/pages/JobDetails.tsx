@@ -2009,12 +2009,23 @@ export default function JobDetails() {
                                         
                                       </div>
                                     </div>
-                                    {mainCandidate["cv_score_reason"] && <div className="pt-1">
+                                    {(mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score_reason"]) ? (
+                                      <div className="pt-1">
                                         <span className="text-muted-foreground text-xs">Reason:</span>
                                         <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                                          {mainCandidate["cv_score_reason"]}
+                                          {mainCandidate["linkedin_score_reason"]}
                                         </p>
-                                      </div>}
+                                      </div>
+                                    ) : (
+                                      mainCandidate["cv_score_reason"] && (
+                                        <div className="pt-1">
+                                          <span className="text-muted-foreground text-xs">Reason:</span>
+                                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                            {mainCandidate["cv_score_reason"]}
+                                          </p>
+                                        </div>
+                                      )
+                                    )}
                                   </div>
 
                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t gap-2">
