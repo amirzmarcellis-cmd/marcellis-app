@@ -568,13 +568,12 @@ export default function CallLogDetails() {
                   <span className="text-sm font-medium">Overall Score</span>
                   <span className={`text-xl font-semibold ${scoreColorClass}`}>
                     {(() => {
-                      // Calculate overall score based on available scores
+                      // Calculate overall score as average of after call score and CV score
                       const afterCallScore = parseInt(callLog.after_call_score || "0")
                       const cvScore = parseInt(callLog.cv_score || "0")
-                      const linkedinScore = parseInt(callLog.linkedin_score || "0")
                       
-                      // Use the highest available score as overall
-                      const overallScore = Math.max(afterCallScore, cvScore, linkedinScore)
+                      // Calculate average of after call and CV scores
+                      const overallScore = Math.round((afterCallScore + cvScore) / 2)
                       
                       // Determine source type for display
                       let sourceType = ""
@@ -593,8 +592,7 @@ export default function CallLogDetails() {
                 <RulerScore value={(() => {
                   const afterCallScore = parseInt(callLog.after_call_score || "0")
                   const cvScore = parseInt(callLog.cv_score || "0")
-                  const linkedinScore = parseInt(callLog.linkedin_score || "0")
-                  return Math.max(afterCallScore, cvScore, linkedinScore)
+                  return Math.round((afterCallScore + cvScore) / 2)
                 })()} />
               </div>
             )}
