@@ -54,18 +54,40 @@ export default function Apply() {
   // Generate next user ID and fetch job details
   useEffect(() => {
     const initializeForm = async () => {
-      // Generate next user ID
-      const userId = await generateNextUserId();
-      setNextUserId(userId);
-      form.setValue("user_id", userId);
+      try {
+        // Generate next user ID
+        const userId = await generateNextUserId();
+        setNextUserId(userId);
+        form.setValue("user_id", userId);
 
-      // Fetch job details
-      if (jobId) {
-        const jobName = await fetchJobName(jobId);
-        if (jobName) {
-          setJobName(jobName);
-          form.setValue("jobApplied", jobName);
+        // Fetch job details
+        if (jobId) {
+          console.log("JobId from URL params:", jobId);
+          const jobName = await fetchJobName(jobId);
+          console.log("Fetched job name:", jobName);
+          
+          if (jobName) {
+            setJobName(jobName);
+            form.setValue("jobApplied", jobName);
+            console.log("Job applied field set to:", jobName);
+          } else {
+            console.warn("No job name found, using default");
+            const defaultJobName = "Position Available";
+            setJobName(defaultJobName);
+            form.setValue("jobApplied", defaultJobName);
+          }
+        } else {
+          console.warn("No jobId found in URL params");
+          const defaultJobName = "General Application";
+          setJobName(defaultJobName);
+          form.setValue("jobApplied", defaultJobName);
         }
+      } catch (error) {
+        console.error("Error initializing form:", error);
+        // Set a default job name if everything fails
+        const defaultJobName = "Application Submission";
+        setJobName(defaultJobName);
+        form.setValue("jobApplied", defaultJobName);
       }
     };
 
@@ -103,14 +125,25 @@ export default function Apply() {
 
   const fetchJobName = async (jobId: string): Promise<string> => {
     try {
+      console.log("Fetching job with ID:", jobId);
       const { data, error } = await supabase
         .from("Jobs")
         .select("job_title")
         .eq("job_id", jobId)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
-      return data?.job_title || "";
+      if (error) {
+        console.error("Supabase error fetching job:", error);
+        return "";
+      }
+      
+      if (!data) {
+        console.warn("No job found with ID:", jobId);
+        return "";
+      }
+      
+      console.log("Job found:", data);
+      return data.job_title || "";
     } catch (error) {
       console.error("Error fetching job:", error);
       return "";
