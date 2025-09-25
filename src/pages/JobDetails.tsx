@@ -2000,13 +2000,6 @@ export default function JobDetails() {
                                           <span className="text-muted-foreground">{(typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin')) ? 'LinkedIn Score:' : 'CV Score:'}</span>
                                           <span className="font-medium">{(typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin')) ? (mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "N/A") : (mainCandidate["cv_score"] || "N/A")}</span>
                                         </div>
-                                        {/* Hide overall score for specific statuses */}
-                                        {!["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer"].includes(mainCandidate["contacted"]?.toLowerCase() || "") && mainCandidate["cv_score"] && (
-                                          <div className="flex items-center justify-between">
-                                            <span className="text-muted-foreground">Overall:</span>
-                                            <span className="font-medium">{(typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin')) ? (mainCandidate["linkedin_score"] || "N/A") : (mainCandidate["cv_score"] || "N/A")}</span>
-                                          </div>
-                                        )}
                                         <div className="flex items-center justify-between">
                                           <span className="text-muted-foreground">User ID:</span>
                                           <span className="font-mono text-xs">{mainCandidate["user_id"] || "N/A"}</span>
