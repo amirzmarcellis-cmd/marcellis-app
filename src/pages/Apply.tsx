@@ -22,7 +22,6 @@ const applicationSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   notes: z.string().optional(),
   jobApplied: z.string().min(1, "Job applied is required"),
-  webhookUrl: z.string().url("Please enter a valid webhook URL").optional(),
 });
 
 type ApplicationForm = z.infer<typeof applicationSchema>;
@@ -47,7 +46,6 @@ export default function Apply() {
       email: "",
       notes: "",
       jobApplied: "",
-      webhookUrl: "",
     },
   });
 
@@ -197,7 +195,6 @@ export default function Apply() {
         email: "",
         notes: "",
         jobApplied: jobName,
-        webhookUrl: "",
       });
       setNextUserId(newUserId);
       setCvFile("");
@@ -214,7 +211,9 @@ export default function Apply() {
     }
   };
 
-  const triggerWebhook = async (webhookUrl: string, data: any) => {
+  const triggerWebhook = async (data: any) => {
+    const webhookUrl = "https://hook.eu2.make.com/tv58ofd5rftm64t677f65phmbwrnq24e";
+    
     try {
       console.log("Triggering webhook:", webhookUrl, "with data:", data);
       
@@ -224,7 +223,13 @@ export default function Apply() {
           "Content-Type": "application/json",
         },
         mode: "no-cors",
-        body: JSON.stringify(data),
+        body: JSON.stringify([{
+          type: "INSERT",
+          table: "CVs",
+          record: data,
+          schema: "public",
+          old_record: null
+        }]),
       });
 
       toast({
@@ -262,22 +267,22 @@ export default function Apply() {
           });
         }
 
-        // Trigger webhook if URL is provided
-        const webhookUrl = form.getValues("webhookUrl");
-        if (webhookUrl) {
-          await triggerWebhook(webhookUrl, {
-            user_id: form.getValues("user_id"),
-            firstName: form.getValues("firstName"),
-            lastName: form.getValues("lastName"),
-            email: form.getValues("email"),
-            phoneNumber: form.getValues("phoneNumber"),
-            jobApplied: form.getValues("jobApplied"),
-            cv_link: fileUrl,
-            cv_text: data?.text || 'CV uploaded - text extraction failed',
-            timestamp: new Date().toISOString(),
-            triggered_from: "CV Upload"
-          });
-        }
+        // Trigger webhook automatically
+        const path = window.location.pathname;
+        const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
+        const jobId = pathMatch?.[1] || "general";
+        
+        await triggerWebhook({
+          name: `${form.getValues("firstName")} ${form.getValues("lastName")}`,
+          email: form.getValues("email"),
+          cv_link: fileUrl,
+          cv_text: data?.text || 'CV uploaded - text extraction failed',
+          user_id: form.getValues("user_id"),
+          Lastname: form.getValues("lastName"),
+          Firstname: form.getValues("firstName"),
+          phone_number: form.getValues("phoneNumber"),
+          job_id: jobId
+        });
       } catch (error) {
         console.error('Error extracting CV text:', error);
         setCvText('CV uploaded - text extraction failed');
@@ -423,27 +428,6 @@ export default function Apply() {
                         />
                       </FormControl>
                       <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="webhookUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Webhook URL (Optional)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="url"
-                          placeholder="https://hooks.zapier.com/hooks/catch/..." 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                      <p className="text-xs text-muted-foreground">
-                        Enter your Zapier webhook URL to automatically send CV data when uploaded
-                      </p>
                     </FormItem>
                   )}
                 />
