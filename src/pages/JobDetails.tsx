@@ -224,41 +224,75 @@ export default function JobDetails() {
   };
   const fetchCandidates = async (jobId: string) => {
     try {
+      // Fetch candidates from Jobs_CVs
       const {
-        data,
-        error
-      } = await supabase.from('Jobs_CVs').select('*').eq('job_id', jobId).order('cv_score', {
-        ascending: false,
-        nullsFirst: false
+        data: candidatesData,
+        error: candidatesError
+      } = await supabase.from('Jobs_CVs')
+        .select('*')
+        .eq('job_id', jobId)
+        .order('cv_score', {
+          ascending: false,
+          nullsFirst: false
+        });
+      
+      if (candidatesError) throw candidatesError;
+
+      // Fetch LinkedIn boolean search data for this job
+      const {
+        data: linkedinData,
+        error: linkedinError
+      } = await supabase.from('linkedin_boolean_search')
+        .select('user_id, linkedin_score, linkedin_score_reason')
+        .eq('job_id', jobId);
+      
+      if (linkedinError) console.warn('Error fetching LinkedIn data:', linkedinError);
+
+      // Create a map of LinkedIn data by user_id for quick lookup
+      const linkedinMap = new Map();
+      (linkedinData || []).forEach(item => {
+        if (item.user_id) {
+          linkedinMap.set(item.user_id, {
+            linkedin_score: item.linkedin_score,
+            linkedin_score_reason: item.linkedin_score_reason
+          });
+        }
       });
-      if (error) throw error;
-      const mapped = (data || []).map((row: any) => ({
-        ...row,
-        "Job ID": jobId,
-        "Candidate_ID": row.recordid?.toString() || '',
-        "Contacted": row.contacted ?? '',
-        "Transcript": row.transcript ?? '',
-        "Summary": row.cv_score_reason ?? '',
-        "Success Score": row.after_call_score?.toString() ?? '',
-        "Score and Reason": row.cv_score_reason ?? '',
-        "Candidate Name": row.candidate_name ?? '',
-        "Candidate Email": row.candidate_email ?? '',
-        "Candidate Phone Number": row.candidate_phone_number ?? '',
-        "Source": row.source ?? '',
-        "pros": row.after_call_pros,
-        "cons": row.after_call_cons,
-        "Notice Period": row.notice_period ?? '',
-        "Salary Expectations": row.salary_expectations ?? '',
-        "current_salary": row.current_salary ?? '',
-        "Notes": row.notes ?? '',
-        "callid": row.recordid ?? Math.random() * 1000000,
-        "duration": row.duration,
-        "recording": row.recording,
-        "first_name": row.candidate_name?.split(' ')[0] || '',
-        "last_name": row.candidate_name?.split(' ').slice(1).join(' ') || '',
-        "Score": row.cv_score?.toString() ?? '0',
-        "lastcalltime": row.lastcalltime
-      }));
+      
+      const mapped = (candidatesData || []).map((row: any) => {
+        // Get LinkedIn data for this candidate by user_id
+        const linkedinInfo = linkedinMap.get(row.user_id) || {};
+        
+        return {
+          ...row,
+          "Job ID": jobId,
+          "Candidate_ID": row.recordid?.toString() || '',
+          "Contacted": row.contacted ?? '',
+          "Transcript": row.transcript ?? '',
+          "Summary": row.cv_score_reason ?? '',
+          "Success Score": row.after_call_score?.toString() ?? '',
+          "Score and Reason": row.cv_score_reason ?? '',
+          "Candidate Name": row.candidate_name ?? '',
+          "Candidate Email": row.candidate_email ?? '',
+          "Candidate Phone Number": row.candidate_phone_number ?? '',
+          "Source": row.source ?? '',
+          "linkedin_score": linkedinInfo.linkedin_score ?? '',
+          "linkedin_score_reason": linkedinInfo.linkedin_score_reason ?? '',
+          "pros": row.after_call_pros,
+          "cons": row.after_call_cons,
+          "Notice Period": row.notice_period ?? '',
+          "Salary Expectations": row.salary_expectations ?? '',
+          "current_salary": row.current_salary ?? '',
+          "Notes": row.notes ?? '',
+          "callid": row.recordid ?? Math.random() * 1000000,
+          "duration": row.duration,
+          "recording": row.recording,
+          "first_name": row.candidate_name?.split(' ')[0] || '',
+          "last_name": row.candidate_name?.split(' ').slice(1).join(' ') || '',
+          "Score": row.cv_score?.toString() ?? '0',
+          "lastcalltime": row.lastcalltime
+        };
+      });
       setCandidates(mapped);
       console.log('Total candidates from Jobs_CVs:', mapped?.length || 0);
 
@@ -1100,11 +1134,11 @@ export default function JobDetails() {
                 <div className="flex items-center gap-4 text-sm mt-1">
                   <span className="text-muted-foreground">CV Score: {mainCandidate["cv_score"] || mainCandidate["CV Score"] || "N/A"}</span>
                   {mainCandidate["after_call_score"] && <span className="text-muted-foreground">After Call Score: {mainCandidate["after_call_score"]}</span>}
-                  {mainCandidate["Source"]?.toLowerCase() === "linkedin" && mainCandidate["linkedin_score"] && (
+                  {(mainCandidate["Source"]?.toLowerCase() === "linkedin" || mainCandidate["Source"] === "Linkedin") && mainCandidate["linkedin_score"] && (
                     <span className="text-muted-foreground">Overall: {mainCandidate["linkedin_score"]}</span>
                   )}
                 </div>
-                {mainCandidate["Source"]?.toLowerCase() === "linkedin" && mainCandidate["linkedin_score_reason"] && (
+                {(mainCandidate["Source"]?.toLowerCase() === "linkedin" || mainCandidate["Source"] === "Linkedin") && mainCandidate["linkedin_score_reason"] && (
                   <div className="text-sm text-muted-foreground mt-1">
                     <span className="font-medium">Reason:</span> {mainCandidate["linkedin_score_reason"]}
                   </div>
