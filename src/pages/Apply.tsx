@@ -55,6 +55,10 @@ export default function Apply() {
   useEffect(() => {
     const initializeForm = async () => {
       try {
+        console.log("Full URL params:", window.location.pathname);
+        console.log("All URL params from useParams:", useParams());
+        console.log("Extracted jobId:", jobId);
+        
         // Generate next user ID
         const userId = await generateNextUserId();
         setNextUserId(userId);
