@@ -23,7 +23,6 @@ const applicationSchema = z.object({
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
   phoneNumber: z.string().min(10, "Please enter a valid phone number"),
   email: z.string().email("Please enter a valid email address"),
-  notes: z.string().optional(),
   jobApplied: z.string().min(1, "Job applied is required"),
 });
 
@@ -58,7 +57,6 @@ export default function Apply() {
       lastName: "",
       phoneNumber: "",
       email: "",
-      notes: "",
       jobApplied: "",
     },
   });
@@ -197,7 +195,7 @@ export default function Apply() {
             name: cleanText(`${data.firstName} ${data.lastName}`),
             email: cleanText(data.email),
             phone_number: cleanText(data.phoneNumber),
-            notes: cleanText(data.notes || ""),
+            notes: "",
             job_id: cleanText(jobIdFromUrl),
             cv_text: "",
             cv_link: ""
@@ -395,7 +393,7 @@ export default function Apply() {
           Lastname: form.getValues("lastName"),
           Firstname: form.getValues("firstName"),
           phone_number: form.getValues("phoneNumber"),
-          notes: form.getValues("notes") || "",
+          notes: "",
           job_id: resolvedJobId
         },
         schema: "public",
@@ -627,23 +625,6 @@ export default function Apply() {
                   </div>
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Notes (Optional)</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Any additional information you'd like to share..."
-                          rows={4}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
                 <FormField
                   control={form.control}
