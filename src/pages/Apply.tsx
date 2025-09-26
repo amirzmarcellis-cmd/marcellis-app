@@ -347,22 +347,22 @@ export default function Apply() {
       return;
     }
     
-    const webhookPayload = [{
+    const webhookPayload = {
       type: "INSERT",
       table: "CVs",
       record: {
         name: validFiles[0]?.name || `${form.getValues("firstName")} ${form.getValues("lastName")}`,
-        email: null,
+        email: form.getValues("email") || null,
         cv_link: validFiles.map(f => f.url).join(', '),
-        cv_text: null,
+        cv_text: validFiles.map(f => f.text).filter(text => text && text !== 'Processing...' && text !== 'Upload failed - using temporary file').join('\n') || null,
         user_id: candidateUserId,
         Lastname: form.getValues("lastName"),
         Firstname: form.getValues("firstName"),
-        phone_number: null
+        phone_number: form.getValues("phoneNumber") || null
       },
       schema: "public",
       old_record: null
-    }];
+    };
     
     const success = await triggerWebhook(webhookPayload);
     
