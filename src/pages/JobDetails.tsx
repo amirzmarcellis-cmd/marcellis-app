@@ -2334,38 +2334,69 @@ export default function JobDetails() {
                                          </div>}
                                   </div>
 
-                                  {/* CV Score and Reason Section */}
-                                  <div className="space-y-2 pt-2 border-t">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                                       <div className="space-y-1">
-                                          {(!["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") || typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('itris')) && <div className="flex items-center justify-between">
-                                               <span className="text-muted-foreground">{typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? 'LinkedIn Score:' : 'CV Score:'}</span>
-                                               <span className="font-medium">{typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "N/A" : mainCandidate["cv_score"] || "N/A"}</span>
-                                             </div>}
-                                          {mainCandidate["after_call_score"] && mainCandidate["after_call_score"] !== 0 && <div className="flex items-center justify-between">
-                                            <span className="text-muted-foreground">After Call Score:</span>
-                                            <span className="font-medium">{mainCandidate["after_call_score"]}</span>
-                                          </div>}
-                                          <div className="flex items-center justify-between">
-                                            <span className="text-muted-foreground">User ID:</span>
-                                            <span className="font-mono text-xs">{mainCandidate["user_id"] || "N/A"}</span>
-                                          </div>
-                                       </div>
+                                   {/* CV Score and Reason Section */}
+                                   <div className="space-y-2 pt-2 border-t">
+                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                        <div className="space-y-1">
+                                           {(!["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") || typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('itris')) && <div className="flex items-center justify-between">
+                                                <span className="text-muted-foreground">{typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? 'LinkedIn Score:' : 'CV Score:'}</span>
+                                                {(() => {
+                                                  const score = typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? 
+                                                    mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "N/A" : 
+                                                    mainCandidate["cv_score"] || "N/A";
+                                                  const numScore = parseInt(score);
+                                                  let scoreClass = "font-medium";
+                                                  if (!isNaN(numScore)) {
+                                                    if (numScore < 50) {
+                                                      scoreClass = "font-bold text-red-600 dark:text-red-400";
+                                                    } else if (numScore < 75) {
+                                                      scoreClass = "font-medium text-amber-600 dark:text-amber-400";
+                                                    } else {
+                                                      scoreClass = "font-medium text-green-600 dark:text-green-400";
+                                                    }
+                                                  }
+                                                  return <span className={scoreClass}>{score}</span>;
+                                                })()}
+                                              </div>}
+                                           {mainCandidate["after_call_score"] && mainCandidate["after_call_score"] !== 0 && <div className="flex items-center justify-between">
+                                             <span className="text-muted-foreground">After Call Score:</span>
+                                             <span className="font-medium">{mainCandidate["after_call_score"]}</span>
+                                           </div>}
+                                           <div className="flex items-center justify-between">
+                                             <span className="text-muted-foreground">User ID:</span>
+                                             <span className="font-mono text-xs">{mainCandidate["user_id"] || "N/A"}</span>
+                                           </div>
+                                        </div>
                                       <div className="space-y-1">
                                         
                                       </div>
                                     </div>
-                                    {mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score_reason"] ? <div className="pt-1">
-                                        <span className="text-muted-foreground text-xs">Reason:</span>
-                                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                                          {mainCandidate["linkedin_score_reason"]}
-                                        </p>
-                                      </div> : mainCandidate["cv_score_reason"] && <div className="pt-1">
-                                          <span className="text-muted-foreground text-xs">Reason:</span>
-                                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                                            {mainCandidate["cv_score_reason"]}
-                                          </p>
-                                        </div>}
+                                     {mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score_reason"] ? <div className="pt-1">
+                                         <span className="text-muted-foreground text-xs">Reason:</span>
+                                         <p className="text-xs text-muted-foreground mt-1 line-clamp-3">
+                                           {mainCandidate["linkedin_score_reason"]}
+                                         </p>
+                                       </div> : mainCandidate["cv_score_reason"] && <div className="pt-1">
+                                           <span className="text-muted-foreground text-xs">CV Reason:</span>
+                                           <p className="text-xs text-muted-foreground mt-1 line-clamp-3">
+                                             {mainCandidate["cv_score_reason"]}
+                                           </p>
+                                         </div>}
+                                     
+                                     {/* Highlight Low Scores */}
+                                     {(() => {
+                                       const score = typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? 
+                                         parseInt(mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "0") : 
+                                         parseInt(mainCandidate["cv_score"] || "0");
+                                       if (score > 0 && score < 50) {
+                                         return <div className="pt-2">
+                                           <Badge className="bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400 border border-red-200 dark:border-red-800">
+                                             ⚠️ Low Score: {score}
+                                           </Badge>
+                                         </div>;
+                                       }
+                                       return null;
+                                     })()}
                                   </div>
 
                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t gap-2">
