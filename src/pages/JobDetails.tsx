@@ -1849,11 +1849,13 @@ export default function JobDetails() {
                                        onClick={async () => {
                                          try {
                                            const webhookUrl = "https://hook.eu2.make.com/tv58ofd5rftm64t677f65phmbwrnq24e";
-                                           const payload = {
-                                             "candidate_id": application.candidate_id,
-                                             "job_id": job?.job_id,
-                                             "company_id": profile?.id || "e2bf7296-2d99-43d0-b357-0cda2c202399"
-                                           };
+                                           const payload = [
+                                             {
+                                               "candidate_id": application.candidate_id,
+                                               "job_id": job?.job_id,
+                                               "company_id": profile?.id || "e2bf7296-2d99-43d0-b357-0cda2c202399"
+                                             }
+                                           ];
 
                                            console.log('Triggering webhook with payload:', JSON.stringify(payload, null, 2));
                                            
