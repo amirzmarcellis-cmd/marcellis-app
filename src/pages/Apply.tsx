@@ -463,24 +463,7 @@ export default function Apply() {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="user_id"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>User ID</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Auto-generated user ID" 
-                          {...field} 
-                          disabled
-                          className="bg-muted"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* User ID is auto-generated and hidden from applicants */}
 
                 <FormField
                   control={form.control}
