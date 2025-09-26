@@ -42,6 +42,8 @@ export default function JobDetails() {
   const [automaticDialSaving, setAutomaticDialSaving] = useState(false);
   const [candidates, setCandidates] = useState<any[]>([]);
   const [candidatesLoading, setCandidatesLoading] = useState(true);
+  const [longlistedCandidates, setLonglistedCandidates] = useState<any[]>([]);
+  const [longlistedLoading, setLonglistedLoading] = useState(true);
   const [cvData, setCvData] = useState<any[]>([]);
   const [applications, setApplications] = useState<any[]>([]);
   const [applicationsLoading, setApplicationsLoading] = useState(false);
@@ -112,6 +114,7 @@ export default function JobDetails() {
     if (id) {
       fetchJob(id);
       fetchCandidates(id);
+      fetchLonglistedCandidates(id);
       fetchCvData();
       fetchApplications(id);
       fetchTaskCandidates(id);
@@ -356,6 +359,66 @@ export default function JobDetails() {
       setCandidates([]);
     } finally {
       setCandidatesLoading(false);
+    }
+  };
+
+  const fetchLonglistedCandidates = async (jobId: string) => {
+    try {
+      setLonglistedLoading(true);
+      
+      // Fetch only longlisted candidates from Jobs_CVs
+      const {
+        data: longlistedData,
+        error: longlistedError
+      } = await supabase
+        .from('Jobs_CVs')
+        .select('*')
+        .eq('job_id', jobId)
+        .not('longlisted_at', 'is', null)
+        .order('longlisted_at', { ascending: false });
+
+      if (longlistedError) throw longlistedError;
+
+      const mappedLonglisted = (longlistedData || []).map((row: any) => {
+        return {
+          ...row,
+          "Job ID": jobId,
+          "Candidate_ID": row.recordid?.toString() || '',
+          "Contacted": row.contacted ?? '',
+          "Transcript": row.transcript ?? '',
+          "Summary": row.cv_score_reason ?? '',
+          "Success Score": row.after_call_score?.toString() ?? '',
+          "Score and Reason": row.cv_score_reason ?? '',
+          "Candidate Name": row.candidate_name ?? '',
+          "Candidate Email": row.candidate_email ?? '',
+          "Candidate Phone Number": row.candidate_phone_number ?? '',
+          "Source": row.source ?? '',
+          "linkedin_score": row.linkedin_score ?? '',
+          "linkedin_score_reason": row.linkedin_score_reason ?? '',
+          "pros": row.after_call_pros,
+          "cons": row.after_call_cons,
+          "Notice Period": row.notice_period ?? '',
+          "Salary Expectations": row.salary_expectations ?? '',
+          "current_salary": row.current_salary ?? '',
+          "Notes": row.notes ?? '',
+          "callid": row.recordid ?? Math.random() * 1000000,
+          "duration": row.duration,
+          "recording": row.recording,
+          "first_name": row.candidate_name?.split(' ')[0] || '',
+          "last_name": row.candidate_name?.split(' ').slice(1).join(' ') || '',
+          "score": row.cv_score ?? 0,
+          "success_score": row.after_call_score ?? 0,
+          "linkedin_id": row.linkedin_id ?? '',
+          "longlisted_at": row.longlisted_at
+        };
+      });
+
+      setLonglistedCandidates(mappedLonglisted);
+    } catch (error) {
+      console.error('Error fetching longlisted candidates:', error);
+      setLonglistedCandidates([]);
+    } finally {
+      setLonglistedLoading(false);
     }
   };
   const fetchCvData = async () => {
@@ -1921,15 +1984,18 @@ export default function JobDetails() {
                                                  });
 
                                                if (updateError) {
-                                                 console.error('Error updating longlisted status:', updateError);
-                                               }
+                                               console.error('Error updating longlisted status:', updateError);
+                                             }
 
-                                               console.log('Webhook triggered successfully');
-                                            } catch (error) {
-                                              console.error('Error triggering webhook:', error);
-                                            }
-                                          }}
-                                        >
+                                             // Refresh longlisted candidates to show the new addition
+                                             await fetchLonglistedCandidates(String(job?.job_id || id || ''));
+
+                                             console.log('Webhook triggered successfully');
+                                          } catch (error) {
+                                            console.error('Error triggering webhook:', error);
+                                          }
+                                        }}
+                                      >
                                           Add to Long List
                                         </Button>
                                       )}
@@ -1949,38 +2015,38 @@ export default function JobDetails() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="flex items-center">
-                      <Users className="w-5 h-5 mr-2" />
-                      AI Longlist ({filteredCandidates.length} of {candidates.length})
-                    </CardTitle>
-                    <CardDescription>
-                      All candidates with their CV scores for this position
-                    </CardDescription>
+                     <CardTitle className="flex items-center">
+                       <Users className="w-5 h-5 mr-2" />
+                       AI Longlist ({longlistedCandidates.length} candidates)
+                     </CardTitle>
+                     <CardDescription>
+                       Candidates added to the longlist for this position
+                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                {(() => {
-              const readyToContactCount = candidates.filter(candidate => candidate["Contacted"] === "Ready to Contact").length;
-              if (readyToContactCount > 0) {
-                return <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                        <div className="flex items-center">
-                          <Target className="w-4 h-4 mr-2 text-amber-600 dark:text-amber-400" />
-                          <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                            {readyToContactCount} {readyToContactCount === 1 ? 'candidate' : 'candidates'} ready to be contacted
-                          </span>
-                        </div>
-                      </div>;
-              }
-              return null;
-            })()}
-                {candidatesLoading ? <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  </div> : candidates.length === 0 ? <div className="text-center py-8">
-                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No candidates contacted yet</h3>
-                    <p className="text-muted-foreground">Start reaching out to potential candidates for this position</p>
-                  </div> : <>
+               <CardContent>
+                 {(() => {
+               const readyToContactCount = longlistedCandidates.filter(candidate => candidate["Contacted"] === "Ready to Contact").length;
+               if (readyToContactCount > 0) {
+                 return <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                         <div className="flex items-center">
+                           <Target className="w-4 h-4 mr-2 text-amber-600 dark:text-amber-400" />
+                           <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                             {readyToContactCount} {readyToContactCount === 1 ? 'candidate' : 'candidates'} ready to be contacted
+                           </span>
+                         </div>
+                       </div>;
+               }
+               return null;
+             })()}
+                 {longlistedLoading ? <div className="flex items-center justify-center py-8">
+                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                   </div> : longlistedCandidates.length === 0 ? <div className="text-center py-8">
+                     <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                     <h3 className="text-lg font-semibold mb-2">No candidates in longlist yet</h3>
+                     <p className="text-muted-foreground">Add candidates to the longlist from the Applications tab</p>
+                   </div> : <>
                     {/* Bulk Actions */}
                     {selectedCandidates.size > 0 && <Card className="p-3 md:p-4 mb-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
                         <div className="flex items-center justify-between gap-4">
@@ -2069,18 +2135,46 @@ export default function JobDetails() {
                       </div>
                     </Card>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                      {(() => {
-                  // Group candidates by Candidate_ID to handle multiple contacts
-                  const groupedCandidates = filteredCandidates.reduce((acc, candidate) => {
-                    const candidateId = candidate["Candidate_ID"];
-                    if (!acc[candidateId]) {
-                      acc[candidateId] = [];
-                    }
-                    acc[candidateId].push(candidate);
-                    return acc;
-                  }, {} as Record<string, any[]>);
-                  return Object.entries(groupedCandidates).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                       {(() => {
+                   // Filter longlisted candidates based on filters
+                   const filteredLonglistedCandidates = longlistedCandidates.filter(candidate => {
+                     const nameMatch = !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
+                     const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
+                     const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
+                     const userIdMatch = !userIdFilter || (candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
+                     const sourceMatch = !longListSourceFilter || longListSourceFilter === "all" || (candidate["Source"] || "").toLowerCase().includes(longListSourceFilter.toLowerCase());
+                     
+                     let scoreMatch = true;
+                     if (scoreFilter !== "all") {
+                       const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
+                       switch (scoreFilter) {
+                         case "high": scoreMatch = score >= 75; break;
+                         case "moderate": scoreMatch = score >= 50 && score < 75; break;
+                         case "poor": scoreMatch = score >= 1 && score < 50; break;
+                         case "none": scoreMatch = score === 0 || isNaN(score); break;
+                       }
+                     }
+                     
+                     let contactedMatch = true;
+                     if (contactedFilter !== "all") {
+                       const contacted = candidate["Contacted"] || "";
+                       contactedMatch = contacted === contactedFilter || (contactedFilter === "Ready to Call" && contacted === "Ready to Contact");
+                     }
+                     
+                     return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceMatch && scoreMatch && contactedMatch;
+                   });
+
+                   // Group candidates by Candidate_ID to handle multiple contacts
+                   const groupedCandidates = filteredLonglistedCandidates.reduce((acc, candidate) => {
+                     const candidateId = candidate["Candidate_ID"];
+                     if (!acc[candidateId]) {
+                       acc[candidateId] = [];
+                     }
+                     acc[candidateId].push(candidate);
+                     return acc;
+                   }, {} as Record<string, any[]>);
+                   return Object.entries(groupedCandidates).map(([candidateId, candidateContacts]: [string, any[]]) => {
                     // Use the first contact for display info
                     const mainCandidate = candidateContacts[0];
                     return <Card key={candidateId} className={cn("border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg", selectedCandidates.has(candidateId) && "border-primary bg-primary/5")}>
