@@ -379,35 +379,76 @@ export default function JobDetails() {
 
       if (longlistedError) throw longlistedError;
 
-      // Fetch any existing scores for these users in this job (regardless of longlisted status)
+      // Fetch any existing scores for this job (regardless of longlisted status)
       const { data: scoreRows, error: scoreErr } = await supabase
         .from('Jobs_CVs')
-        .select('user_id, cv_score, cv_score_reason')
+        .select('user_id, candidate_email, candidate_phone_number, cv_score, cv_score_reason')
         .eq('job_id', jobId);
 
       if (scoreErr) console.warn('Error fetching score map:', scoreErr);
 
       const scoreMap = new Map<string, { score: number | null, reason: string | null }>();
+      const emailScoreMap = new Map<string, { score: number | null, reason: string | null }>();
+      const phoneScoreMap = new Map<string, { score: number | null, reason: string | null }>();
+
       (scoreRows || []).forEach((r: any) => {
-        if (!r?.user_id) return;
-        const prev = scoreMap.get(r.user_id);
-        const nextScore = r.cv_score ?? null;
-        const nextReason = r.cv_score_reason ?? null;
-        if (!prev) scoreMap.set(r.user_id, { score: nextScore, reason: nextReason });
-        else scoreMap.set(r.user_id, {
-          score: prev.score ?? nextScore,
-          reason: prev.reason ?? nextReason
-        });
+        const nextScore = r?.cv_score ?? null;
+        const nextReason = r?.cv_score_reason ?? null;
+
+        // by user_id
+        if (r?.user_id) {
+          const prev = scoreMap.get(String(r.user_id));
+          if (!prev) scoreMap.set(String(r.user_id), { score: nextScore, reason: nextReason });
+          else scoreMap.set(String(r.user_id), {
+            score: prev.score ?? nextScore,
+            reason: prev.reason ?? nextReason
+          });
+        }
+
+        // by email
+        const email = (r?.candidate_email || '').toString().trim().toLowerCase();
+        if (email) {
+          const prevE = emailScoreMap.get(email);
+          if (!prevE) emailScoreMap.set(email, { score: nextScore, reason: nextReason });
+          else emailScoreMap.set(email, {
+            score: prevE.score ?? nextScore,
+            reason: prevE.reason ?? nextReason
+          });
+        }
+
+        // by phone (digits only)
+        const phone = (r?.candidate_phone_number || '').toString().replace(/[^0-9]/g, '');
+        if (phone) {
+          const prevP = phoneScoreMap.get(phone);
+          if (!prevP) phoneScoreMap.set(phone, { score: nextScore, reason: nextReason });
+          else phoneScoreMap.set(phone, {
+            score: prevP.score ?? nextScore,
+            reason: prevP.reason ?? nextReason
+          });
+        }
       });
 
       const mappedLonglisted = (longlistedData || []).map((row: any) => {
         const sourceLower = (row.source || '').toLowerCase();
         const hasLinkedIn = sourceLower.includes('linkedin');
 
-        // Prefer stored cv_score on the row; if missing, fall back to any score we have for the same user_id in this job
-        const fromMap = scoreMap.get(String(row.user_id)) || { score: null, reason: null };
-        const mergedScore = row.cv_score ?? fromMap.score ?? (hasLinkedIn ? (row.linkedin_score ?? null) : null);
-        const mergedReason = row.cv_score_reason ?? fromMap.reason ?? (hasLinkedIn ? (row.linkedin_score_reason ?? '') : '');
+        // Prefer stored cv_score on the row; if missing, fall back to any score we have for the same user_id/email/phone in this job
+        const fromUser = scoreMap.get(String(row.user_id));
+        const emailKey = (row.candidate_email || '').toString().trim().toLowerCase();
+        const phoneKey = (row.candidate_phone_number || '').toString().replace(/[^0-9]/g, '');
+        const fromEmail = emailKey ? emailScoreMap.get(emailKey) : undefined;
+        const fromPhone = phoneKey ? phoneScoreMap.get(phoneKey) : undefined;
+
+        const mergedScore = row.cv_score
+          ?? fromUser?.score
+          ?? fromEmail?.score
+          ?? fromPhone?.score
+          ?? (hasLinkedIn ? (row.linkedin_score ?? null) : null);
+        const mergedReason = row.cv_score_reason
+          ?? fromUser?.reason
+          ?? fromEmail?.reason
+          ?? fromPhone?.reason
+          ?? (hasLinkedIn ? (row.linkedin_score_reason ?? '') : '');
 
         return {
           ...row,
@@ -2002,12 +2043,22 @@ export default function JobDetails() {
                                                  }
                                                }
 
-                                                // Try to reuse any existing CV score/reason for this user on this job
+                                                // Try to reuse any existing CV score/reason for this candidate on this job by user_id/email/phone
+                                                const email = (application.Email || application.email || '').toString().trim().toLowerCase();
+                                                const phone = (application.phone_number || '').toString().replace(/[^0-9]/g, '');
+                                                const orFilters = [
+                                                  `user_id.eq.${String(application.candidate_id)}`,
+                                                  email ? `candidate_email.eq.${email}` : null,
+                                                  phone ? `candidate_phone_number.eq.${phone}` : null,
+                                                ].filter(Boolean).join(',');
+
                                                 const { data: existingScore } = await supabase
                                                   .from('Jobs_CVs')
                                                   .select('cv_score, cv_score_reason')
                                                   .eq('job_id', String(job?.job_id || id || ''))
-                                                  .eq('user_id', String(application.candidate_id))
+                                                  .or(orFilters)
+                                                  .order('cv_score', { ascending: false })
+                                                  .limit(1)
                                                   .maybeSingle();
 
                                                 // Update database to mark as longlisted and carry over existing score/reason if present
