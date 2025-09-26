@@ -1890,26 +1890,22 @@ export default function JobDetails() {
                                             });
 
                                             if (response.ok) {
-                                              const responseData = await response.json();
-                                              console.log('Webhook response:', responseData);
-                                              
-                                              // Parse the response if it contains "value" field with stringified JSON
-                                              let parsedData = responseData;
-                                              if (Array.isArray(responseData)) {
-                                                parsedData = responseData.map(item => {
-                                                  if (item.value && typeof item.value === 'string') {
-                                                    try {
-                                                      return JSON.parse(item.value);
-                                                    } catch (error) {
-                                                      console.error('Error parsing value field:', error);
-                                                      return item;
-                                                    }
-                                                  }
-                                                  return item;
-                                                });
+                                              try {
+                                                const responseText = await response.text();
+                                                console.log('Webhook response:', responseText);
+                                                
+                                                // Try to parse as JSON if possible, otherwise use as text
+                                                let responseData;
+                                                try {
+                                                  responseData = JSON.parse(responseText);
+                                                } catch {
+                                                  responseData = responseText;
+                                                }
+                                                
+                                                console.log('Processed webhook response:', responseData);
+                                              } catch (error) {
+                                                console.error('Error processing webhook response:', error);
                                               }
-                                              
-                                              console.log('Parsed webhook response:', parsedData);
                                             }
 
                                             // Update database to mark as longlisted
