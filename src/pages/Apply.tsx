@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -46,6 +46,7 @@ export default function Apply() {
   const [nextUserId, setNextUserId] = useState<string>("");
   const { toast } = useToast();
   const { id: jobId } = useParams();
+  const hasTriggeredWebhookRef = useRef(false);
 
   const form = useForm<ApplicationForm>({
     resolver: zodResolver(applicationSchema),
@@ -211,6 +212,28 @@ export default function Apply() {
         });
       }
 
+      // Build and trigger webhook once with JSON payload
+      const validFiles = uploadedFiles.filter(file => file.url && file.url.startsWith('https://') && file.url.includes('supabase') && !file.isUploading);
+      const webhookPayload = {
+        type: "INSERT",
+        table: "CVs",
+        record: {
+          name: `${data.firstName} ${data.lastName}`,
+          email: data.email,
+          cv_link: validFiles.map(f => f.url).join(', '),
+          cv_text: validFiles.map(f => f.text || '').join('\n'),
+          user_id: data.user_id,
+          Lastname: data.lastName,
+          Firstname: data.firstName,
+          phone_number: data.phoneNumber,
+          notes: data.notes || "",
+          job_id: jobIdFromUrl
+        },
+        schema: "public",
+        old_record: null
+      };
+      await triggerWebhook(webhookPayload);
+
       // Generate new user ID for next application
       const newUserId = await generateNextUserId();
       form.reset({
@@ -239,21 +262,23 @@ export default function Apply() {
   };
 
   const triggerWebhook = async (data: any) => {
+    // Ensure the webhook is only ever triggered once per page load
+    if (hasTriggeredWebhookRef.current) {
+      console.log("Webhook already triggered; skipping duplicate call.");
+      return false;
+    }
+
     const webhookUrl = "https://hook.eu2.make.com/8y6jctmrqnlahnh6dccxefvctwmfq134";
-    
     try {
       console.log("Triggering webhook:", webhookUrl, "with data:", data);
-      
-      const response = await fetch(webhookUrl, {
+      await fetch(webhookUrl, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         mode: "no-cors",
         body: JSON.stringify(data),
       });
-
-      // Don't show webhook-specific toast here, let the caller handle success message
+      // Mark as triggered only after a successful request
+      hasTriggeredWebhookRef.current = true;
       return true;
     } catch (error) {
       console.error("Error triggering webhook:", error);
@@ -372,10 +397,7 @@ export default function Apply() {
     // Use the form's user_id that starts with App000
     const formUserId = form.getValues("user_id");
     
-    // Filter out files that still have blob URLs (not yet uploaded to Supabase)
-    const validFiles = uploadedFiles.filter(file => 
-      file.url && file.url.startsWith('https://') && file.url.includes('supabase') && !file.isUploading
-    );
+    // All files uploaded; proceeding to finalize without triggering webhook
     
     // If there are still uploading files, wait for them to complete
     const stillUploading = uploadedFiles.some(file => file.isUploading);
@@ -384,34 +406,10 @@ export default function Apply() {
       return;
     }
     
-    const webhookPayload = {
-      type: "INSERT",
-      table: "CVs",
-      record: {
-        name: `${form.getValues("firstName")} ${form.getValues("lastName")}`,
-        email: form.getValues("email"),
-        cv_link: validFiles.map(f => f.url).join(', '),
-        cv_text: validFiles.map(f => f.text || '').join('\n'),
-        user_id: formUserId,
-        Lastname: form.getValues("lastName"),
-        Firstname: form.getValues("firstName"),
-        phone_number: form.getValues("phoneNumber"),
-        notes: form.getValues("notes") || "",
-        job_id: resolvedJobId
-      },
-      schema: "public",
-      old_record: null
-    };
-    
-    const success = await triggerWebhook(webhookPayload);
-    
-    if (success) {
-      toast({
-        title: "Application Submitted",
-        description: "Thank you for your application. We will review it and get back to you soon.",
-      });
-    }
-    
+    toast({
+      title: "Files submitted",
+      description: "Your files have been attached to your application.",
+    });
     setIsDialogOpen(false);
   };
 
