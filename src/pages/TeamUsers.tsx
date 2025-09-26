@@ -7,7 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users2, Plus, User, UserPlus, UserMinus, Trash2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Users2, Plus, User, UserPlus, UserMinus, Trash2, Mail, Lock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -44,6 +45,12 @@ export default function TeamUsers() {
   const [removeMemberId, setRemoveMemberId] = useState<string | null>(null);
   const [removeMemberTeamId, setRemoveMemberTeamId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [addMemberType, setAddMemberType] = useState<'existing' | 'new'>('new');
+  const [newUserData, setNewUserData] = useState({
+    name: '',
+    email: '',
+    password: ''
+  });
   const { toast } = useToast();
   const { isTeamLeader, isAdmin } = useUserRole();
   const { profile } = useProfile();
@@ -58,26 +65,11 @@ export default function TeamUsers() {
     try {
       setLoading(true);
       
-      let teamsQuery = supabase.from('teams').select('*');
-      
-      // If user is team leader (not admin), only show teams they lead
-      if (isTeamLeader && !isAdmin && profile?.user_id) {
-        const { data: leadershipData } = await supabase
-          .from('memberships')
-          .select('team_id')
-          .eq('user_id', profile.user_id)
-          .eq('role', 'MANAGER');
-        
-        const teamIds = leadershipData?.map(m => m.team_id) || [];
-        if (teamIds.length === 0) {
-          setTeams([]);
-          setTeamMembers({});
-          return;
-        }
-        teamsQuery = teamsQuery.in('id', teamIds);
-      }
-
-      const { data, error } = await teamsQuery.order('created_at', { ascending: false });
+      // Show all teams for team leaders
+      const { data, error } = await supabase
+        .from('teams')
+        .select('*')
+        .order('created_at', { ascending: false });
       
       if (error) throw error;
       setTeams(data || []);
@@ -183,19 +175,18 @@ export default function TeamUsers() {
     }
   };
 
-  const handleAddMember = async () => {
+  const handleAddExistingMember = async () => {
     if (!selectedTeamId || !selectedUserId) return;
 
     try {
       setSubmitting(true);
 
-      // Team leaders can only add EMPLOYEE role members
       const { error } = await supabase
         .from('memberships')
         .insert([{
           team_id: selectedTeamId,
           user_id: selectedUserId,
-          role: 'EMPLOYEE' // Team leaders can only add team members, not managers
+          role: 'EMPLOYEE'
         }]);
 
       if (error) throw error;
@@ -213,6 +204,59 @@ export default function TeamUsers() {
       toast({
         title: "Error",
         description: error.message || "Failed to add team member",
+        variant: "destructive"
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleCreateNewUser = async () => {
+    if (!selectedTeamId || !newUserData.name || !newUserData.email || !newUserData.password) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('No session');
+
+      const { data, error } = await supabase.functions.invoke('admin-user-management', {
+        body: {
+          action: 'create_team_member',
+          userData: {
+            email: newUserData.email,
+            password: newUserData.password,
+            name: newUserData.name,
+            teamId: selectedTeamId
+          }
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "New team member created and added successfully",
+      });
+
+      setIsAddMemberOpen(false);
+      setNewUserData({ name: '', email: '', password: '' });
+      fetchTeams();
+    } catch (error: any) {
+      console.error('Error creating new user:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create new team member",
         variant: "destructive"
       });
     } finally {
@@ -252,6 +296,8 @@ export default function TeamUsers() {
 
   const openAddMemberDialog = (teamId: string) => {
     setSelectedTeamId(teamId);
+    setAddMemberType('new');
+    setNewUserData({ name: '', email: '', password: '' });
     fetchAvailableUsers(teamId);
     setIsAddMemberOpen(true);
   };
@@ -373,42 +419,123 @@ export default function TeamUsers() {
 
       {/* Add Member Dialog */}
       <Dialog open={isAddMemberOpen} onOpenChange={setIsAddMemberOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Add Team Member</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <UserPlus className="h-5 w-5" />
+              Add Team Member
+            </DialogTitle>
             <DialogDescription>
-              Select a user to add as a team member.
+              Create a new user or add an existing user to the team.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Select User</Label>
-              <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose a user..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableUsers.map((user) => (
-                    <SelectItem key={user.user_id} value={user.user_id}>
-                      {user.name || user.email} ({user.email})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              Note: New members will be added with "Team Member" role.
-            </div>
-          </div>
+          
+          <Tabs value={addMemberType} onValueChange={(value) => setAddMemberType(value as 'existing' | 'new')} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="new" className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Create New
+              </TabsTrigger>
+              <TabsTrigger value="existing" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Add Existing
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="new" className="space-y-4">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Full Name
+                  </Label>
+                  <Input
+                    id="name"
+                    placeholder="Enter full name"
+                    value={newUserData.name}
+                    onChange={(e) => setNewUserData(prev => ({ ...prev, name: e.target.value }))}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    Email Address
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter email address"
+                    value={newUserData.email}
+                    onChange={(e) => setNewUserData(prev => ({ ...prev, email: e.target.value }))}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="flex items-center gap-2">
+                    <Lock className="h-4 w-4" />
+                    Password
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter password"
+                    value={newUserData.password}
+                    onChange={(e) => setNewUserData(prev => ({ ...prev, password: e.target.value }))}
+                  />
+                </div>
+                
+                <div className="text-sm text-muted-foreground bg-muted/50 p-3 rounded">
+                  A new user account will be created and added to the team as a member.
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="existing" className="space-y-4">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Select User</Label>
+                  <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a user..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableUsers.map((user) => (
+                        <SelectItem key={user.user_id} value={user.user_id}>
+                          <div className="flex flex-col">
+                            <span>{user.name || 'No name'}</span>
+                            <span className="text-xs text-muted-foreground">{user.email}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="text-sm text-muted-foreground bg-muted/50 p-3 rounded">
+                  Select an existing user who is not already a member of this team.
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+          
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setIsAddMemberOpen(false)}>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => {
+                setIsAddMemberOpen(false);
+                setNewUserData({ name: '', email: '', password: '' });
+                setSelectedUserId('');
+              }}
+            >
               Cancel
             </Button>
             <Button 
-              onClick={handleAddMember} 
-              disabled={!selectedUserId || submitting}
+              onClick={addMemberType === 'new' ? handleCreateNewUser : handleAddExistingMember}
+              disabled={submitting || (addMemberType === 'new' ? !newUserData.name || !newUserData.email || !newUserData.password : !selectedUserId)}
             >
-              {submitting ? 'Adding...' : 'Add Member'}
+              {submitting ? 'Processing...' : addMemberType === 'new' ? 'Create & Add' : 'Add Member'}
             </Button>
           </DialogFooter>
         </DialogContent>

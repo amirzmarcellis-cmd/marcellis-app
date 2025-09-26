@@ -39,7 +39,7 @@ serve(async (req) => {
       );
     }
 
-    // Check if user has admin privileges using the profiles table
+    // Check if user has admin privileges or is a team leader
     const { data: profileData, error: roleError } = await supabaseAdmin
       .from('profiles')
       .select('is_admin')
@@ -54,8 +54,17 @@ serve(async (req) => {
       );
     }
 
-    if (!profileData?.is_admin) {
-      console.error('User does not have admin role');
+    // Check if user is team leader
+    const { data: membershipData } = await supabaseAdmin
+      .from('memberships')
+      .select('role')
+      .eq('user_id', user.id);
+
+    const isAdmin = profileData?.is_admin;
+    const isTeamLeader = membershipData?.some((m: any) => m.role === 'MANAGER');
+
+    if (!isAdmin && !isTeamLeader) {
+      console.error('User does not have admin or team leader role');
       return new Response(
         JSON.stringify({ error: 'Insufficient permissions' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -65,6 +74,80 @@ serve(async (req) => {
     const { action, userId, userData } = await req.json();
 
     switch (action) {
+      case 'create_team_member': {
+        console.log('Creating team member:', userData.email);
+        
+        if (!userData.email || !userData.password || !userData.name || !userData.teamId) {
+          return new Response(
+            JSON.stringify({ error: 'Missing required fields' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        
+        const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+          email: userData.email,
+          password: userData.password,
+          user_metadata: {
+            name: userData.name
+          },
+          email_confirm: true
+        });
+
+        if (createError) {
+          console.error('User creation error:', createError);
+          return new Response(
+            JSON.stringify({ error: createError.message }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        // Create profile entry
+        if (newUser.user) {
+          const { error: profileError } = await supabaseAdmin
+            .from('profiles')
+            .insert({
+              user_id: newUser.user.id,
+              name: userData.name,
+              email: userData.email,
+              is_admin: false,
+              slug: 'me'
+            });
+
+          if (profileError) {
+            console.error('Profile creation error:', profileError);
+          }
+
+          // Create team membership as EMPLOYEE
+          const { error: membershipError } = await supabaseAdmin
+            .from('memberships')
+            .insert({
+              user_id: newUser.user.id,
+              team_id: userData.teamId,
+              role: 'EMPLOYEE'
+            });
+
+          if (membershipError) {
+            console.error('Membership creation error:', membershipError);
+            return new Response(
+              JSON.stringify({ error: 'Failed to add user to team' }),
+              { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+        }
+
+        return new Response(
+          JSON.stringify({ 
+            user: { 
+              id: newUser.user?.id, 
+              email: newUser.user?.email,
+              name: userData.name
+            }, 
+            success: true 
+          }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
       case 'create_user': {
         console.log('Creating user:', userData.email);
         
