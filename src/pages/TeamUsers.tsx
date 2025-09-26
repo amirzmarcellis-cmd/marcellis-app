@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Users2, Plus, User, UserPlus, UserMinus, Mail, Lock, Shield, Crown, Settings } from 'lucide-react';
+import { Users2, Plus, User, UserPlus, UserMinus, Mail, Lock, Shield, Crown, Settings, Edit } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -52,6 +52,13 @@ export default function TeamUsers() {
     name: '',
     email: '',
     password: ''
+  });
+  const [isEditUserOpen, setIsEditUserOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<TeamMember | null>(null);
+  const [editUserData, setEditUserData] = useState({
+    name: '',
+    email: '',
+    role: ''
   });
   const { toast } = useToast();
   const { isTeamLeader, isAdmin } = useUserRole();
@@ -304,6 +311,72 @@ export default function TeamUsers() {
     setIsAddMemberOpen(true);
   };
 
+  const openEditUserDialog = (user: TeamMember, teamId: string) => {
+    setEditingUser(user);
+    setSelectedTeamId(teamId);
+    setEditUserData({
+      name: user.name || '',
+      email: user.email,
+      role: user.role
+    });
+    setIsEditUserOpen(true);
+  };
+
+  const handleEditUser = async () => {
+    if (!editingUser || !selectedTeamId || !editUserData.name || !editUserData.email) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('No session');
+
+      const { data, error } = await supabase.functions.invoke('admin-user-management', {
+        body: {
+          action: 'update_user',
+          userData: {
+            userId: editingUser.id,
+            name: editUserData.name,
+            email: editUserData.email,
+            role: editUserData.role,
+            teamId: selectedTeamId
+          }
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "User updated successfully",
+      });
+
+      setIsEditUserOpen(false);
+      setEditingUser(null);
+      setEditUserData({ name: '', email: '', role: '' });
+      fetchTeams();
+    } catch (error: any) {
+      console.error('Error updating user:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update user",
+        variant: "destructive"
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const canManageTeam = (teamId: string) => {
     if (isAdmin) return true;
     if (!isTeamLeader || !profile?.user_id) return false;
@@ -441,8 +514,60 @@ export default function TeamUsers() {
                     </div>
                     
                     <ScrollArea className="max-h-64">
+                      {/* Display Managers First */}
+                      {teamManagers.length > 0 && (
+                        <div className="space-y-2 mb-4">
+                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Team Managers</div>
+                          {teamManagers.map((manager) => (
+                            <div key={manager.id} className="flex items-center justify-between p-3 bg-background border rounded-lg hover:bg-muted/50 transition-colors">
+                              <div className="flex items-center gap-3">
+                                <Avatar className="h-8 w-8">
+                                  <AvatarFallback className="text-xs bg-amber-100 text-amber-800">
+                                    {manager.name ? manager.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'M'}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium">{manager.name || 'No name'}</span>
+                                  <span className="text-xs text-muted-foreground">{manager.email}</span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline" className="text-xs bg-amber-50 text-amber-700 border-amber-200">Manager</Badge>
+                                {canManage && (
+                                  <>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => openEditUserDialog(manager, team.id)}
+                                      className="h-8 w-8 p-0 text-muted-foreground hover:text-primary"
+                                    >
+                                      <Edit className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        setRemoveMemberId(manager.id);
+                                        setRemoveMemberTeamId(team.id);
+                                      }}
+                                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                                    >
+                                      <UserMinus className="h-3 w-3" />
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Display Team Members */}
                       {teamEmployees.length > 0 ? (
                         <div className="space-y-2">
+                          {teamManagers.length > 0 && (
+                            <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Team Members</div>
+                          )}
                           {teamEmployees.map((member) => (
                             <div key={member.id} className="flex items-center justify-between p-3 bg-background border rounded-lg hover:bg-muted/50 transition-colors">
                               <div className="flex items-center gap-3">
@@ -456,26 +581,36 @@ export default function TeamUsers() {
                                   <span className="text-xs text-muted-foreground">{member.email}</span>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-2">
+                               <div className="flex items-center gap-2">
                                 <Badge variant="outline" className="text-xs">Member</Badge>
                                 {canManage && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                      setRemoveMemberId(member.id);
-                                      setRemoveMemberTeamId(team.id);
-                                    }}
-                                    className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
-                                  >
-                                    <UserMinus className="h-3 w-3" />
-                                  </Button>
+                                  <>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => openEditUserDialog(member, team.id)}
+                                      className="h-8 w-8 p-0 text-muted-foreground hover:text-primary"
+                                    >
+                                      <Edit className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        setRemoveMemberId(member.id);
+                                        setRemoveMemberTeamId(team.id);
+                                      }}
+                                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                                    >
+                                      <UserMinus className="h-3 w-3" />
+                                    </Button>
+                                  </>
                                 )}
                               </div>
                             </div>
                           ))}
                         </div>
-                      ) : (
+                      ) : teamManagers.length === 0 ? (
                         <div className="text-center py-6 text-muted-foreground">
                           <User className="h-8 w-8 mx-auto mb-2 opacity-50" />
                           <p className="text-sm">No team members yet</p>
@@ -483,7 +618,7 @@ export default function TeamUsers() {
                             <p className="text-xs mt-1">Click "Add Member" to get started</p>
                           )}
                         </div>
-                      )}
+                      ) : null}
                     </ScrollArea>
                   </div>
                 </CardContent>
@@ -713,6 +848,74 @@ export default function TeamUsers() {
               className="h-10 px-6"
             >
               Remove Member
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit User Dialog */}
+      <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit className="h-5 w-5" />
+              Edit User
+            </DialogTitle>
+            <DialogDescription>
+              Update user information and role
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-name">Name</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="edit-name"
+                  placeholder="Enter full name"
+                  value={editUserData.name}
+                  onChange={(e) => setEditUserData(prev => ({ ...prev, name: e.target.value }))}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="edit-email">Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="edit-email"
+                  type="email"
+                  placeholder="Enter email address"
+                  value={editUserData.email}
+                  onChange={(e) => setEditUserData(prev => ({ ...prev, email: e.target.value }))}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-role">Role</Label>
+              <Select value={editUserData.role} onValueChange={(value) => setEditUserData(prev => ({ ...prev, role: value }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="EMPLOYEE">Member</SelectItem>
+                  <SelectItem value="MANAGER">Manager</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditUserOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleEditUser} disabled={submitting}>
+              {submitting ? 'Updating...' : 'Update User'}
             </Button>
           </DialogFooter>
         </DialogContent>

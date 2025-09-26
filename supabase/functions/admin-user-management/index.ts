@@ -258,42 +258,53 @@ serve(async (req) => {
       }
 
       case 'update_user': {
-        console.log('Updating user:', userId);
+        console.log('Updating user:', userData.userId);
         
-        const updateData: any = {};
-        if (userData.email) updateData.email = userData.email;
-        if (userData.password) updateData.password = userData.password;
-        if (userData.name) {
-          updateData.user_metadata = { name: userData.name };
-        }
+        // Update user profile
+        const { error: profileError } = await supabaseAdmin
+          .from('profiles')
+          .update({
+            name: userData.name,
+            email: userData.email
+          })
+          .eq('user_id', userData.userId);
 
-        const { data: updatedUser, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-          userId,
-          updateData
-        );
-
-        if (updateError) {
-          console.error('User update error:', updateError);
+        if (profileError) {
+          console.error('Profile update error:', profileError);
           return new Response(
-            JSON.stringify({ error: updateError.message }),
+            JSON.stringify({ error: profileError.message }),
             { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
 
-        // Update profile
-        if (userData.name) {
-          const { error: profileError } = await supabaseAdmin
-            .from('profiles')
-            .update({ name: userData.name })
-            .eq('user_id', userId);
+        // Update user email in auth if it changed
+        const { error: authUpdateError } = await supabaseAdmin.auth.admin.updateUserById(
+          userData.userId,
+          { 
+            email: userData.email,
+            user_metadata: { name: userData.name }
+          }
+        );
 
-          if (profileError) {
-            console.error('Profile update error:', profileError);
+        if (authUpdateError) {
+          console.error('Auth update error:', authUpdateError);
+        }
+
+        // Update team membership role if changed
+        if (userData.role && userData.teamId) {
+          const { error: membershipError } = await supabaseAdmin
+            .from('memberships')
+            .update({ role: userData.role })
+            .eq('user_id', userData.userId)
+            .eq('team_id', userData.teamId);
+
+          if (membershipError) {
+            console.error('Membership update error:', membershipError);
           }
         }
 
         return new Response(
-          JSON.stringify({ user: updatedUser, success: true }),
+          JSON.stringify({ success: true }),
           { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
