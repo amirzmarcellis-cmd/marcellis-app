@@ -1157,10 +1157,16 @@ export default function JobDetails() {
     }
     return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceMatch && scoreMatch && contactedMatch;
   }).sort((a, b) => {
-    // Sort by CV Score descending (highest first)
-    const scoreA = parseFloat(a["cv_score"] || a["CV Score"] || "0");
-    const scoreB = parseFloat(b["cv_score"] || b["CV Score"] || "0");
-    return scoreB - scoreA;
+    // Sort by highest score descending (CV Score or LinkedIn Score, whichever is higher)
+    const cvScoreA = parseFloat(a["cv_score"] || a["CV Score"] || "0");
+    const linkedinScoreA = parseFloat(a["linkedin_score"] || "0");
+    const maxScoreA = Math.max(cvScoreA, linkedinScoreA);
+    
+    const cvScoreB = parseFloat(b["cv_score"] || b["CV Score"] || "0");
+    const linkedinScoreB = parseFloat(b["linkedin_score"] || "0");
+    const maxScoreB = Math.max(cvScoreB, linkedinScoreB);
+    
+    return maxScoreB - maxScoreA;
   });
   // Helper function to render candidate cards
   const renderCandidateCard = (candidateId: string, candidateContacts: any[], mainCandidate: any, isTopCandidate: boolean = false) => {
