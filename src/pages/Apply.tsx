@@ -328,9 +328,8 @@ export default function Apply() {
     const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
     const resolvedJobId = pathMatch?.[1] || "general";
     
-    // Generate timestamp for user_id
-    const timestamp = Date.now();
-    const candidateUserId = `CAND-${timestamp}`;
+    // Use the form's user_id that starts with App000
+    const formUserId = form.getValues("user_id");
     
     // Filter out files that still have blob URLs (not yet uploaded to Supabase)
     const validFiles = uploadedFiles.filter(file => 
@@ -347,22 +346,22 @@ export default function Apply() {
       return;
     }
     
-    const webhookPayload = [{
+    const webhookPayload = {
       type: "INSERT",
       table: "CVs",
       record: {
-        name: validFiles[0]?.name || `${form.getValues("firstName")} ${form.getValues("lastName")}`,
-        email: null,
+        name: `${form.getValues("firstName")} ${form.getValues("lastName")}`,
+        email: form.getValues("email"),
         cv_link: validFiles.map(f => f.url).join(', '),
-        cv_text: null,
-        user_id: candidateUserId,
+        cv_text: validFiles.map(f => f.text || '').join('\n'),
+        user_id: formUserId,
         Lastname: form.getValues("lastName"),
         Firstname: form.getValues("firstName"),
-        phone_number: null
+        phone_number: form.getValues("phoneNumber")
       },
       schema: "public",
       old_record: null
-    }];
+    };
     
     const success = await triggerWebhook(webhookPayload);
     
