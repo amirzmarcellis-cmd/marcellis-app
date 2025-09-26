@@ -44,7 +44,6 @@ export default function Apply() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [jobName, setJobName] = useState<string>("");
   const [nextUserId, setNextUserId] = useState<string>("");
-  const [isApplicationSubmitted, setIsApplicationSubmitted] = useState(false);
   const { toast } = useToast();
   const { id: jobId } = useParams();
   const [isSubmittingFiles, setIsSubmittingFiles] = useState(false);
@@ -208,12 +207,31 @@ export default function Apply() {
           throw insertError;
         }
 
-        setIsApplicationSubmitted(true);
+        toast({
+          title: "Application Submitted",
+          description: "Thank you for your application. We will review it and get back to you soon.",
+        });
       } else {
         toast({
           title: "Form Saved",
           description: "Your form data has been saved. Please submit your files to complete the application.",
         });
+      }
+
+      // Generate new user ID for next application
+      const newUserId = await generateNextUserId();
+      form.reset({
+        user_id: newUserId,
+        firstName: "",
+        lastName: "",
+        phoneNumber: "",
+        email: "",
+        notes: "",
+        jobApplied: jobName,
+      });
+      setNextUserId(newUserId);
+      if (uploadedFiles.length === 0) {
+        setUploadedFiles([]);
       }
     } catch (error) {
       console.error("Error submitting application:", error);
@@ -408,7 +426,10 @@ export default function Apply() {
       const success = await triggerWebhook(webhookPayload);
 
       if (success) {
-        setIsApplicationSubmitted(true);
+        toast({
+          title: "Application Submitted",
+          description: "Thank you for your application. We will review it and get back to you soon.",
+        });
       }
 
       // Keep the one-time flag set after a send attempt (even with no-cors opaque response)
@@ -421,35 +442,6 @@ export default function Apply() {
       setIsSubmittingFiles(false);
     }
   };
-
-  // Success dialog for submitted applications
-  if (isApplicationSubmitted) {
-    return (
-      <MissionBackground>
-        <div className="min-h-screen p-4 relative z-10 flex items-center justify-center">
-          <Card className="max-w-md w-full">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl text-green-600">Success!</CardTitle>
-              <CardDescription>
-                Job application have successfully submitted
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-muted-foreground mb-4">
-                Thank you for your application. We will review it and get back to you soon.
-              </p>
-              <Button 
-                onClick={() => window.location.href = '/'}
-                className="w-full"
-              >
-                Return to Home
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </MissionBackground>
-    );
-  }
 
   return (
     <MissionBackground>
