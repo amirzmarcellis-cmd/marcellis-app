@@ -1974,14 +1974,24 @@ export default function JobDetails() {
                                                // Update database to mark as longlisted
                                                const { error: updateError } = await supabase
                                                  .from('Jobs_CVs')
-                                                 .upsert({
-                                                   job_id: String(job?.job_id || id || ''),
-                                                   user_id: String(application.candidate_id),
-                                                   longlisted_at: new Date().toISOString(),
-                                                   candidate_name: application.candidate_name || application.name || `${application.Firstname} ${application.Lastname}`,
-                                                   candidate_email: application.candidate_email || application.email,
-                                                   candidate_phone_number: application.candidate_phone_number || application.phone_number
-                                                 });
+                                                  .upsert({
+                                                    job_id: String(job?.job_id || id || ''),
+                                                    user_id: String(application.candidate_id),
+                                                    longlisted_at: new Date().toISOString(),
+                                                    candidate_name: (() => {
+                                                      const fn = application.first_name || application.Firstname || '';
+                                                      const ln = application.last_name || application.Lastname || '';
+                                                      const combined = `${fn} ${ln}`.trim();
+                                                      if (combined && combined.toLowerCase() !== 'undefined undefined') return combined;
+                                                      if (application.name) return application.name;
+                                                      if (application.candidate_name) return application.candidate_name;
+                                                      if (application.Email) return String(application.Email).split('@')[0];
+                                                      if (application.email) return String(application.email).split('@')[0];
+                                                      return `Candidate ${application.candidate_id}`;
+                                                    })(),
+                                                    candidate_email: application.Email || application.email || application.candidate_email || null,
+                                                    candidate_phone_number: application.phone_number || application.candidate_phone_number || null
+                                                  });
 
                                                if (updateError) {
                                                console.error('Error updating longlisted status:', updateError);
@@ -2184,7 +2194,7 @@ export default function JobDetails() {
                                      <div className="flex items-start gap-3 min-w-0 flex-1">
                                        <input type="checkbox" checked={selectedCandidates.has(candidateId)} onChange={() => toggleCandidateSelection(candidateId)} className="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" />
                                        <div className="min-w-0 flex-1">
-                                         <h4 className="font-semibold text-sm md:text-base truncate">{mainCandidate["Candidate Name"] || "Unknown"}</h4>
+                                         <h4 className="font-semibold text-sm md:text-base truncate">{(mainCandidate["Candidate Name"] && !/undefined/i.test(String(mainCandidate["Candidate Name"]))) ? mainCandidate["Candidate Name"] : (mainCandidate["Candidate Email"] ? String(mainCandidate["Candidate Email"]).split('@')[0] : `Candidate ${candidateId}`)}</h4>
                                          <div className="space-y-1">
                                            
                                            {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || mainCandidate["Contacted"]?.toLowerCase() === "contacted" || mainCandidate["Contacted"]?.toLowerCase() === "low scored" || mainCandidate["Contacted"]?.toLowerCase() === "tasked") && mainCandidate["lastcalltime"] && <div className="text-xs text-muted-foreground flex items-center">
@@ -2214,6 +2224,11 @@ export default function JobDetails() {
                                      {mainCandidate["Candidate Phone Number"] && <div className="flex items-center text-muted-foreground min-w-0">
                                         <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
                                         <span className="truncate">{mainCandidate["Candidate Phone Number"]}</span>
+                                      </div>}
+                                      
+                                      {mainCandidate["Job ID"] && <div className="flex items-center text-muted-foreground min-w-0">
+                                        <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
+                                        <span className="truncate">{mainCandidate["Job ID"]}</span>
                                       </div>}
                                       
                                       {mainCandidate["Source"] && <div className="flex items-center text-muted-foreground min-w-0">
