@@ -3,12 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users2, Plus, User, UserPlus, UserMinus, Trash2, Mail, Lock } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Users2, Plus, User, UserPlus, UserMinus, Mail, Lock, Shield, Crown, Settings } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -313,80 +315,149 @@ export default function TeamUsers() {
 
   if (!isTeamLeader && !isAdmin) {
     return (
-      <div className="text-center py-8">
-        <Users2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
-        <p className="text-muted-foreground">You need to be a team leader to access this page.</p>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="mx-auto w-24 h-24 bg-muted rounded-full flex items-center justify-center">
+            <Shield className="h-12 w-12 text-muted-foreground" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold tracking-tight">Access Denied</h2>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              You need to be a team leader to manage team members. Contact your administrator for access.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 p-6">
+      {/* Header Section */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Users2 className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-bold">Team Members</h1>
+        <div className="space-y-1">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Users2 className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Team Management</h1>
+              <p className="text-muted-foreground">Manage your team members and organization structure</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary" className="px-3 py-1">
+            <Crown className="h-4 w-4 mr-2" />
+            {isAdmin ? 'Administrator' : 'Team Leader'}
+          </Badge>
         </div>
       </div>
 
       {loading ? (
-        <div className="text-center py-4">Loading teams...</div>
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="text-muted-foreground">Loading teams...</p>
+          </div>
+        </div>
       ) : teams.length === 0 ? (
-        <div className="text-center py-4 text-muted-foreground">
-          No teams available for management
+        <div className="text-center py-12">
+          <div className="mx-auto w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-6">
+            <Users2 className="h-12 w-12 text-muted-foreground" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">No Teams Found</h3>
+          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+            There are no teams available for management at this time.
+          </p>
         </div>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
           {teams.map((team) => {
             const members = teamMembers[team.id] || [];
             const canManage = canManageTeam(team.id);
+            const teamEmployees = members.filter(m => m.role === 'EMPLOYEE');
+            const teamManagers = members.filter(m => m.role === 'MANAGER');
             
             return (
-              <Card key={team.id}>
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Users2 className="h-5 w-5 text-primary" />
-                      {team.name}
-                    </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Team Members</span>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary">{members.filter(m => m.role === 'EMPLOYEE').length}</Badge>
-                        {canManage && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => openAddMemberDialog(team.id)}
-                            className="h-6 px-2"
-                          >
-                            <UserPlus className="h-3 w-3 mr-1" />
-                            Add
-                          </Button>
-                        )}
+              <Card key={team.id} className="group hover:shadow-lg transition-all duration-200 border-muted/40">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg">
+                        <Users2 className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg font-semibold group-hover:text-primary transition-colors">
+                          {team.name}
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          {teamEmployees.length + teamManagers.length} total members
+                        </p>
                       </div>
                     </div>
+                    {canManage && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openAddMemberDialog(team.id)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <UserPlus className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Team Statistics */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-3 bg-muted/50 rounded-lg">
+                      <div className="text-lg font-semibold">{teamManagers.length}</div>
+                      <div className="text-xs text-muted-foreground">Managers</div>
+                    </div>
+                    <div className="text-center p-3 bg-muted/50 rounded-lg">
+                      <div className="text-lg font-semibold">{teamEmployees.length}</div>
+                      <div className="text-xs text-muted-foreground">Members</div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Team Members List */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">Team Members</span>
+                      {canManage && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openAddMemberDialog(team.id)}
+                          className="h-8 px-3 text-xs"
+                        >
+                          <Plus className="h-3 w-3 mr-1" />
+                          Add Member
+                        </Button>
+                      )}
+                    </div>
                     
-                    {members.filter(m => m.role === 'EMPLOYEE').length > 0 ? (
-                      <div className="space-y-2">
-                        {members
-                          .filter(m => m.role === 'EMPLOYEE') // Only show team members, not managers
-                          .map((member) => (
-                            <div key={member.id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
-                              <div className="flex items-center gap-2">
-                                <User className="h-4 w-4" />
+                    <ScrollArea className="max-h-64">
+                      {teamEmployees.length > 0 ? (
+                        <div className="space-y-2">
+                          {teamEmployees.map((member) => (
+                            <div key={member.id} className="flex items-center justify-between p-3 bg-background border rounded-lg hover:bg-muted/50 transition-colors">
+                              <div className="flex items-center gap-3">
+                                <Avatar className="h-8 w-8">
+                                  <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                                    {member.name ? member.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'U'}
+                                  </AvatarFallback>
+                                </Avatar>
                                 <div className="flex flex-col">
                                   <span className="text-sm font-medium">{member.name || 'No name'}</span>
                                   <span className="text-xs text-muted-foreground">{member.email}</span>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
-                                <Badge variant="outline">Team Member</Badge>
+                                <Badge variant="outline" className="text-xs">Member</Badge>
                                 {canManage && (
                                   <Button
                                     variant="ghost"
@@ -395,7 +466,7 @@ export default function TeamUsers() {
                                       setRemoveMemberId(member.id);
                                       setRemoveMemberTeamId(team.id);
                                     }}
-                                    className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                                    className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
                                   >
                                     <UserMinus className="h-3 w-3" />
                                   </Button>
@@ -403,12 +474,17 @@ export default function TeamUsers() {
                               </div>
                             </div>
                           ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-4 text-muted-foreground text-sm">
-                        No team members
-                      </div>
-                    )}
+                        </div>
+                      ) : (
+                        <div className="text-center py-6 text-muted-foreground">
+                          <User className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                          <p className="text-sm">No team members yet</p>
+                          {canManage && (
+                            <p className="text-xs mt-1">Click "Add Member" to get started</p>
+                          )}
+                        </div>
+                      )}
+                    </ScrollArea>
                   </div>
                 </CardContent>
               </Card>
@@ -419,107 +495,139 @@ export default function TeamUsers() {
 
       {/* Add Member Dialog */}
       <Dialog open={isAddMemberOpen} onOpenChange={setIsAddMemberOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <UserPlus className="h-5 w-5" />
+        <DialogContent className="sm:max-w-[550px]">
+          <DialogHeader className="space-y-3">
+            <DialogTitle className="flex items-center gap-3 text-xl">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <UserPlus className="h-5 w-5 text-primary" />
+              </div>
               Add Team Member
             </DialogTitle>
-            <DialogDescription>
-              Create a new user or add an existing user to the team.
+            <DialogDescription className="text-base">
+              Create a new user account or add an existing user to the team.
             </DialogDescription>
           </DialogHeader>
           
-          <Tabs value={addMemberType} onValueChange={(value) => setAddMemberType(value as 'existing' | 'new')} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="new" className="flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                Create New
-              </TabsTrigger>
-              <TabsTrigger value="existing" className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                Add Existing
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="new" className="space-y-4">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    Full Name
-                  </Label>
-                  <Input
-                    id="name"
-                    placeholder="Enter full name"
-                    value={newUserData.name}
-                    onChange={(e) => setNewUserData(prev => ({ ...prev, name: e.target.value }))}
-                  />
+          <div className="py-4">
+            <Tabs value={addMemberType} onValueChange={(value) => setAddMemberType(value as 'existing' | 'new')} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 h-12 p-1">
+                <TabsTrigger value="new" className="flex items-center gap-2 h-10">
+                  <Plus className="h-4 w-4" />
+                  Create New User
+                </TabsTrigger>
+                <TabsTrigger value="existing" className="flex items-center gap-2 h-10">
+                  <User className="h-4 w-4" />
+                  Add Existing User
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="new" className="mt-6 space-y-6">
+                <div className="grid gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="flex items-center gap-2 text-sm font-medium">
+                      <User className="h-4 w-4 text-primary" />
+                      Full Name
+                    </Label>
+                    <Input
+                      id="name"
+                      placeholder="Enter full name"
+                      value={newUserData.name}
+                      onChange={(e) => setNewUserData(prev => ({ ...prev, name: e.target.value }))}
+                      className="h-11"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="flex items-center gap-2 text-sm font-medium">
+                      <Mail className="h-4 w-4 text-primary" />
+                      Email Address
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="Enter email address"
+                      value={newUserData.email}
+                      onChange={(e) => setNewUserData(prev => ({ ...prev, email: e.target.value }))}
+                      className="h-11"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="flex items-center gap-2 text-sm font-medium">
+                      <Lock className="h-4 w-4 text-primary" />
+                      Password
+                    </Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Enter password (min. 6 characters)"
+                      value={newUserData.password}
+                      onChange={(e) => setNewUserData(prev => ({ ...prev, password: e.target.value }))}
+                      className="h-11"
+                    />
+                  </div>
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="flex items-center gap-2">
-                    <Mail className="h-4 w-4" />
-                    Email Address
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter email address"
-                    value={newUserData.email}
-                    onChange={(e) => setNewUserData(prev => ({ ...prev, email: e.target.value }))}
-                  />
+                <div className="bg-muted/50 border border-muted rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <Settings className="h-5 w-5 text-primary mt-0.5" />
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-medium">Account Details</h4>
+                      <p className="text-sm text-muted-foreground">
+                        A new user account will be created with team member privileges. 
+                        The user will receive login credentials via email.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="existing" className="mt-6 space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Select User</Label>
+                    <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                      <SelectTrigger className="h-11">
+                        <SelectValue placeholder="Choose a user to add..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableUsers.map((user) => (
+                          <SelectItem key={user.user_id} value={user.user_id}>
+                            <div className="flex items-center gap-3 py-1">
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                                  {user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'U'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex flex-col">
+                                <span className="font-medium">{user.name || 'No name'}</span>
+                                <span className="text-xs text-muted-foreground">{user.email}</span>
+                              </div>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="flex items-center gap-2">
-                    <Lock className="h-4 w-4" />
-                    Password
-                  </Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Enter password"
-                    value={newUserData.password}
-                    onChange={(e) => setNewUserData(prev => ({ ...prev, password: e.target.value }))}
-                  />
+                <div className="bg-muted/50 border border-muted rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <Shield className="h-5 w-5 text-primary mt-0.5" />
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-medium">Add Existing User</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Select an existing user who is not already a member of this team. 
+                        They will be added with standard team member permissions.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="text-sm text-muted-foreground bg-muted/50 p-3 rounded">
-                  A new user account will be created and added to the team as a member.
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="existing" className="space-y-4">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Select User</Label>
-                  <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Choose a user..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableUsers.map((user) => (
-                        <SelectItem key={user.user_id} value={user.user_id}>
-                          <div className="flex flex-col">
-                            <span>{user.name || 'No name'}</span>
-                            <span className="text-xs text-muted-foreground">{user.email}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="text-sm text-muted-foreground bg-muted/50 p-3 rounded">
-                  Select an existing user who is not already a member of this team.
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
+              </TabsContent>
+            </Tabs>
+          </div>
           
-          <DialogFooter>
+          <DialogFooter className="gap-3 pt-6 border-t">
             <Button 
               type="button" 
               variant="outline" 
@@ -528,14 +636,23 @@ export default function TeamUsers() {
                 setNewUserData({ name: '', email: '', password: '' });
                 setSelectedUserId('');
               }}
+              className="h-10 px-6"
             >
               Cancel
             </Button>
             <Button 
               onClick={addMemberType === 'new' ? handleCreateNewUser : handleAddExistingMember}
               disabled={submitting || (addMemberType === 'new' ? !newUserData.name || !newUserData.email || !newUserData.password : !selectedUserId)}
+              className="h-10 px-6"
             >
-              {submitting ? 'Processing...' : addMemberType === 'new' ? 'Create & Add' : 'Add Member'}
+              {submitting ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Processing...
+                </div>
+              ) : (
+                addMemberType === 'new' ? 'Create & Add Member' : 'Add to Team'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -551,14 +668,34 @@ export default function TeamUsers() {
           }
         }}
       >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Remove Team Member</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to remove this member from the team?
+        <DialogContent className="sm:max-w-[450px]">
+          <DialogHeader className="space-y-3">
+            <DialogTitle className="flex items-center gap-3 text-xl">
+              <div className="p-2 bg-destructive/10 rounded-lg">
+                <UserMinus className="h-5 w-5 text-destructive" />
+              </div>
+              Remove Team Member
+            </DialogTitle>
+            <DialogDescription className="text-base">
+              Are you sure you want to remove this member from the team? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          
+          <div className="py-4">
+            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <Shield className="h-5 w-5 text-destructive mt-0.5" />
+                <div className="space-y-1">
+                  <h4 className="text-sm font-medium text-destructive">Warning</h4>
+                  <p className="text-sm text-muted-foreground">
+                    The user will lose access to this team's resources and will no longer be able to collaborate on team projects.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="gap-3 pt-6 border-t">
             <Button 
               type="button" 
               variant="outline" 
@@ -566,11 +703,16 @@ export default function TeamUsers() {
                 setRemoveMemberId(null);
                 setRemoveMemberTeamId(null);
               }}
+              className="h-10 px-6"
             >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleRemoveMember}>
-              Remove
+            <Button 
+              variant="destructive" 
+              onClick={handleRemoveMember}
+              className="h-10 px-6"
+            >
+              Remove Member
             </Button>
           </DialogFooter>
         </DialogContent>
