@@ -163,35 +163,43 @@ export default function Apply() {
     setIsSubmitting(true);
     
     try {
-      // Function to clean text data and remove null characters
-      const cleanText = (text: string) => {
-        if (!text) return "";
-        return text.replace(/\u0000/g, "").trim();
-      };
+      // Only insert to database if no files were uploaded (files are handled separately)
+      if (uploadedFiles.length === 0) {
+        // Function to clean text data and remove null characters
+        const cleanText = (text: string) => {
+          if (!text) return "";
+          return text.replace(/\u0000/g, "").trim();
+        };
 
-      // Insert into CVs table with correct field mapping
-      const { error: insertError } = await supabase
-        .from("CVs")
-        .insert([{
-          user_id: cleanText(data.user_id),
-          Firstname: cleanText(data.firstName),
-          Lastname: cleanText(data.lastName),
-          name: cleanText(`${data.firstName} ${data.lastName}`),
-          email: cleanText(data.email),
-          phone_number: cleanText(data.phoneNumber),
-          cv_text: cleanText(uploadedFiles.map(f => f.text).join('\n')),
-          cv_link: cleanText(uploadedFiles.map(f => f.url).join(', '))
-        }]);
+        // Insert into CVs table with correct field mapping
+        const { error: insertError } = await supabase
+          .from("CVs")
+          .insert([{
+            user_id: cleanText(data.user_id),
+            Firstname: cleanText(data.firstName),
+            Lastname: cleanText(data.lastName),
+            name: cleanText(`${data.firstName} ${data.lastName}`),
+            email: cleanText(data.email),
+            phone_number: cleanText(data.phoneNumber),
+            cv_text: "",
+            cv_link: ""
+          }]);
 
-      if (insertError) {
-        console.error("Insert failed:", insertError);
-        throw insertError;
+        if (insertError) {
+          console.error("Insert failed:", insertError);
+          throw insertError;
+        }
+
+        toast({
+          title: "Application Submitted",
+          description: "Thank you for your application. We will review it and get back to you soon.",
+        });
+      } else {
+        toast({
+          title: "Form Saved",
+          description: "Your form data has been saved. Please submit your files to complete the application.",
+        });
       }
-
-      toast({
-        title: "Application Submitted",
-        description: "Thank you for your application. We will review it and get back to you soon.",
-      });
 
       // Generate new user ID for next application
       const newUserId = await generateNextUserId();
@@ -205,7 +213,9 @@ export default function Apply() {
         jobApplied: jobName,
       });
       setNextUserId(newUserId);
-      setUploadedFiles([]);
+      if (uploadedFiles.length === 0) {
+        setUploadedFiles([]);
+      }
     } catch (error) {
       console.error("Error submitting application:", error);
       toast({
