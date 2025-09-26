@@ -257,6 +257,9 @@ export default function Apply() {
       
       setUploadedFiles(prev => [...prev, ...instantFiles]);
       
+      // Automatically open the dialog after file upload
+      setIsDialogOpen(true);
+      
       // Process files in background
       for (let i = 0; i < files.length; i++) {
         const fileObj = files[i];
