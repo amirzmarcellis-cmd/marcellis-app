@@ -12,7 +12,6 @@ interface JobFunnelProps {
 export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
   // Calculate counts for each stage
   const getCounts = () => {
-    const booleanSearch = candidates.length; // Total candidates from Boolean Search
     const longlist = candidates.length;
     
     // Count by contacted status
@@ -34,7 +33,6 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
     const submitted = candidates.filter(c => c["contacted"] === "Submitted").length;
     
     return {
-      booleanSearch,
       longlist,
       firstNoAnswer,
       secondNoAnswer,
@@ -49,7 +47,6 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
   const counts = getCounts();
   
   const stages = [
-    { name: "Boolean Search", count: counts.booleanSearch, bgColor: "bg-slate-600", textColor: "text-black dark:text-white" },
     { name: "Longlist", count: counts.longlist, bgColor: "bg-blue-600", textColor: "text-black dark:text-white" },
     { name: "1st No Answer", count: counts.firstNoAnswer, bgColor: "bg-orange-500", textColor: "text-black dark:text-white" },
     { name: "2nd No Answer", count: counts.secondNoAnswer, bgColor: "bg-orange-600", textColor: "text-black dark:text-white" },
