@@ -81,11 +81,16 @@ export default function AddJob() {
   const [groups, setGroups] = useState<Array<{id: string, name: string, color: string | null}>>([]);
   const [recruiters, setRecruiters] = useState<Array<{user_id: string, name: string, email: string}>>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTeamLeader, setIsTeamLeader] = useState(false);
 
   useEffect(() => {
     fetchGroups();
+    checkTeamLeaderStatus();
+  }, [profile?.user_id]);
+
+  useEffect(() => {
     fetchRecruiters();
-  }, []);
+  }, [isTeamLeader]);
 
   const fetchGroups = async () => {
     try {
@@ -101,12 +106,37 @@ export default function AddJob() {
     }
   };
 
+  const checkTeamLeaderStatus = async () => {
+    if (!profile?.user_id) return;
+    
+    try {
+      const { data, error } = await supabase.rpc('is_team_leader', {
+        user_uuid: profile.user_id
+      });
+
+      if (error) throw error;
+      setIsTeamLeader(data || false);
+    } catch (error) {
+      console.error('Error checking team leader status:', error);
+      setIsTeamLeader(false);
+    }
+  };
+
   const fetchRecruiters = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('profiles')
-        .select('user_id, name, email')
-        .order('name');
+        .select('user_id, name, email');
+
+      // If user is a team leader, show all users
+      if (isTeamLeader) {
+        query = query.order('name');
+      } else {
+        // If not a team leader, only show their own profile
+        query = query.eq('user_id', profile?.user_id || '').order('name');
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setRecruiters(data || []);
