@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { User, Mail, Phone, FileText, Search } from 'lucide-react';
+import { User, Mail, Phone, FileText, Search, ArrowLeft } from 'lucide-react';
 
 interface Candidate {
   user_id: string;
@@ -14,6 +15,7 @@ interface Candidate {
 
 export default function CandidateDetails() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -104,6 +106,14 @@ export default function CandidateDetails() {
     return (
       <div className="space-y-6 p-6">
         <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(-1)}
+            className="h-8 w-8 p-0"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
           <User className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-bold">Candidate Details</h1>
         </div>
@@ -123,6 +133,14 @@ export default function CandidateDetails() {
     return (
       <div className="space-y-6 p-6">
         <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(-1)}
+            className="h-8 w-8 p-0"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
           <User className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-bold">Candidate Details</h1>
         </div>
@@ -138,6 +156,14 @@ export default function CandidateDetails() {
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center gap-3">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate(-1)}
+          className="h-8 w-8 p-0"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <User className="h-6 w-6 text-primary" />
         <h1 className="text-2xl font-bold">
           {candidate.name}
