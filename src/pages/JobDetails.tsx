@@ -379,17 +379,35 @@ export default function JobDetails() {
 
       if (longlistedError) throw longlistedError;
 
+      // Fetch any existing scores for these users in this job (regardless of longlisted status)
+      const { data: scoreRows, error: scoreErr } = await supabase
+        .from('Jobs_CVs')
+        .select('user_id, cv_score, cv_score_reason')
+        .eq('job_id', jobId);
+
+      if (scoreErr) console.warn('Error fetching score map:', scoreErr);
+
+      const scoreMap = new Map<string, { score: number | null, reason: string | null }>();
+      (scoreRows || []).forEach((r: any) => {
+        if (!r?.user_id) return;
+        const prev = scoreMap.get(r.user_id);
+        const nextScore = r.cv_score ?? null;
+        const nextReason = r.cv_score_reason ?? null;
+        if (!prev) scoreMap.set(r.user_id, { score: nextScore, reason: nextReason });
+        else scoreMap.set(r.user_id, {
+          score: prev.score ?? nextScore,
+          reason: prev.reason ?? nextReason
+        });
+      });
+
       const mappedLonglisted = (longlistedData || []).map((row: any) => {
-        // Compute effective score with sensible fallbacks
         const sourceLower = (row.source || '').toLowerCase();
         const hasLinkedIn = sourceLower.includes('linkedin');
-        const effectiveFromSource = hasLinkedIn ? (row.linkedin_score ?? row.cv_score ?? null) : (row.cv_score ?? row.linkedin_score ?? null);
-        const looksLikeApplication = typeof row.user_id === 'string' && row.user_id.toString().toLowerCase().startsWith('app');
-        const fallbackScore = effectiveFromSource == null && (looksLikeApplication || !row.source) ? 75 : effectiveFromSource;
-        const effectiveScore = fallbackScore ?? 0;
-        const fallbackReason = row.cv_score_reason || (effectiveFromSource == null && (looksLikeApplication || !row.source)
-          ? 'Added from applications - CV needs review'
-          : '');
+
+        // Prefer stored cv_score on the row; if missing, fall back to any score we have for the same user_id in this job
+        const fromMap = scoreMap.get(String(row.user_id)) || { score: null, reason: null };
+        const mergedScore = row.cv_score ?? fromMap.score ?? (hasLinkedIn ? (row.linkedin_score ?? null) : null);
+        const mergedReason = row.cv_score_reason ?? fromMap.reason ?? (hasLinkedIn ? (row.linkedin_score_reason ?? '') : '');
 
         return {
           ...row,
@@ -397,13 +415,13 @@ export default function JobDetails() {
           "Candidate_ID": row.recordid?.toString() || '',
           "Contacted": row.contacted ?? '',
           "Transcript": row.transcript ?? '',
-          "Summary": row.cv_score_reason ?? fallbackReason ?? '',
+          "Summary": mergedReason || '',
           "Success Score": row.after_call_score?.toString() ?? '',
-          "Score and Reason": row.cv_score_reason ?? fallbackReason ?? '',
+          "Score and Reason": mergedReason || '',
           "Candidate Name": row.candidate_name ?? '',
           "Candidate Email": row.candidate_email ?? '',
           "Candidate Phone Number": row.candidate_phone_number ?? '',
-          "Source": row.source ?? (looksLikeApplication ? 'Applications' : ''),
+          "Source": row.source ?? '',
           "linkedin_score": row.linkedin_score ?? '',
           "linkedin_score_reason": row.linkedin_score_reason ?? '',
           "pros": row.after_call_pros,
@@ -417,12 +435,12 @@ export default function JobDetails() {
           "recording": row.recording,
           "first_name": row.candidate_name?.split(' ')[0] || '',
           "last_name": row.candidate_name?.split(' ').slice(1).join(' ') || '',
-          cv_score: Number(effectiveScore) || 0,
-          "CV Score": String(effectiveScore || ''),
+          cv_score: mergedScore ?? 0,
+          "CV Score": mergedScore != null ? String(mergedScore) : '',
           "success_score": row.after_call_score ?? 0,
           "linkedin_id": row.linkedin_id ?? '',
           "longlisted_at": row.longlisted_at,
-          cv_score_reason: row.cv_score_reason ?? fallbackReason ?? ''
+          cv_score_reason: mergedReason || ''
         };
       });
 
@@ -1984,30 +2002,38 @@ export default function JobDetails() {
                                                  }
                                                }
 
-                                                // Update database to mark as longlisted
+                                                // Try to reuse any existing CV score/reason for this user on this job
+                                                const { data: existingScore } = await supabase
+                                                  .from('Jobs_CVs')
+                                                  .select('cv_score, cv_score_reason')
+                                                  .eq('job_id', String(job?.job_id || id || ''))
+                                                  .eq('user_id', String(application.candidate_id))
+                                                  .maybeSingle();
+
+                                                // Update database to mark as longlisted and carry over existing score/reason if present
                                                 const { error: updateError } = await supabase
                                                   .from('Jobs_CVs')
-                                                   .upsert({
-                                                     job_id: String(job?.job_id || id || ''),
-                                                     user_id: String(application.candidate_id),
-                                                     longlisted_at: new Date().toISOString(),
-                                                     candidate_name: (() => {
-                                                       const fn = application.first_name || application.Firstname || '';
-                                                       const ln = application.last_name || application.Lastname || '';
-                                                       const combined = `${fn} ${ln}`.trim();
-                                                       if (combined && combined.toLowerCase() !== 'undefined undefined') return combined;
-                                                       if (application.name) return application.name;
-                                                       if (application.candidate_name) return application.candidate_name;
-                                                       if (application.Email) return String(application.Email).split('@')[0];
-                                                       if (application.email) return String(application.email).split('@')[0];
-                                                       return `Candidate ${application.candidate_id}`;
-                                                     })(),
-                                                     candidate_email: application.Email || application.email || application.candidate_email || null,
-                                                     candidate_phone_number: application.phone_number || application.candidate_phone_number || null,
-                                                     cv_score: 75,
-                                                     cv_score_reason: "Added from applications - CV needs review",
-                                                     contacted: "Ready to Contact"
-                                                   });
+                                                  .upsert({
+                                                    job_id: String(job?.job_id || id || ''),
+                                                    user_id: String(application.candidate_id),
+                                                    longlisted_at: new Date().toISOString(),
+                                                    candidate_name: (() => {
+                                                      const fn = application.first_name || application.Firstname || '';
+                                                      const ln = application.last_name || application.Lastname || '';
+                                                      const combined = `${fn} ${ln}`.trim();
+                                                      if (combined && combined.toLowerCase() !== 'undefined undefined') return combined;
+                                                      if (application.name) return application.name;
+                                                      if (application.candidate_name) return application.candidate_name;
+                                                      if (application.Email) return String(application.Email).split('@')[0];
+                                                      if (application.email) return String(application.email).split('@')[0];
+                                                      return `Candidate ${application.candidate_id}`;
+                                                    })(),
+                                                    candidate_email: application.Email || application.email || application.candidate_email || null,
+                                                    candidate_phone_number: application.phone_number || application.candidate_phone_number || null,
+                                                    cv_score: existingScore?.cv_score ?? undefined,
+                                                    cv_score_reason: existingScore?.cv_score_reason ?? undefined,
+                                                    contacted: 'Ready to Contact'
+                                                  });
 
                                                if (updateError) {
                                                console.error('Error updating longlisted status:', updateError);
