@@ -1851,8 +1851,8 @@ export default function JobDetails() {
                                            const webhookUrl = "https://hook.eu2.make.com/tv58ofd5rftm64t677f65phmbwrnq24e";
                                             const payload = [
                                               {
-                                                 "candidate_id": application.user_id,
-                                                 "job_id": job?.job_id
+                                                "user_id": application.user_id,
+                                                "job_id": job?.job_id
                                               }
                                             ];
 
