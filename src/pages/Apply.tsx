@@ -332,13 +332,28 @@ export default function Apply() {
     const timestamp = Date.now();
     const candidateUserId = `CAND-${timestamp}`;
     
+    // Filter out files that still have blob URLs (not yet uploaded to Supabase)
+    const validFiles = uploadedFiles.filter(file => 
+      file.url && file.url.startsWith('https://') && file.url.includes('supabase')
+    );
+    
+    // If no valid Supabase URLs yet, wait or show error
+    if (validFiles.length === 0) {
+      toast({
+        title: "Files Still Processing",
+        description: "Please wait for files to finish uploading before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     const webhookPayload = [{
       type: "INSERT",
       table: "CVs",
       record: {
-        name: uploadedFiles[0]?.name || `${form.getValues("firstName")} ${form.getValues("lastName")}`,
+        name: validFiles[0]?.name || `${form.getValues("firstName")} ${form.getValues("lastName")}`,
         email: null,
-        cv_link: uploadedFiles.map(f => f.url).join(', '),
+        cv_link: validFiles.map(f => f.url).join(', '),
         cv_text: null,
         user_id: candidateUserId,
         Lastname: form.getValues("lastName"),
