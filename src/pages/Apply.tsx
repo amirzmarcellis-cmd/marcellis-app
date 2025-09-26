@@ -237,7 +237,7 @@ export default function Apply() {
         body: JSON.stringify(data),
       });
 
-      // Don't show webhook-specific toast here, let the caller handle success message
+      console.log("Webhook triggered successfully");
       return true;
     } catch (error) {
       console.error("Error triggering webhook:", error);
@@ -404,8 +404,8 @@ export default function Apply() {
 
       if (success) {
         toast({
-          title: "Files Submitted",
-          description: "Your CV files have been submitted successfully.",
+          title: "Files Submitted Successfully",
+          description: `Your CV files have been submitted with User ID: ${formUserId}. Webhook triggered to external system.`,
         });
       }
 
