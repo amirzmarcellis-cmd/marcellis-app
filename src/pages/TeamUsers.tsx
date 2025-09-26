@@ -904,7 +904,6 @@ export default function TeamUsers() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="EMPLOYEE">Member</SelectItem>
-                  <SelectItem value="MANAGER">Manager</SelectItem>
                 </SelectContent>
               </Select>
             </div>
