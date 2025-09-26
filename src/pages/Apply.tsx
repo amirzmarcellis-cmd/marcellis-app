@@ -210,10 +210,7 @@ export default function Apply() {
 
         setIsSubmitted(true);
       } else {
-        toast({
-          title: "Form Saved",
-          description: "Your form data has been saved. Please submit your files to complete the application.",
-        });
+        setIsSubmitted(true);
       }
     } catch (error) {
       console.error("Error submitting application:", error);
@@ -408,7 +405,10 @@ export default function Apply() {
       const success = await triggerWebhook(webhookPayload);
 
       if (success) {
-        setIsSubmitted(true);
+        toast({
+          title: "Files Submitted",
+          description: "Your CV files have been submitted successfully.",
+        });
       }
 
       // Keep the one-time flag set after a send attempt (even with no-cors opaque response)
@@ -427,19 +427,23 @@ export default function Apply() {
       <MissionBackground>
         <div className="min-h-screen p-4 relative z-10 flex items-center justify-center">
           <Dialog open={true}>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle className="text-center">Application Submitted Successfully!</DialogTitle>
-                <DialogDescription className="text-center">
-                  Thank you for your application. We will review it and get back to you soon.
+            <DialogContent className="max-w-lg">
+              <DialogHeader className="text-center space-y-4">
+                <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
+                  <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <DialogTitle className="text-2xl font-bold text-center">Thank You!</DialogTitle>
+                <DialogDescription className="text-center text-lg">
+                  Your application has been submitted successfully. We will review it and get back to you soon.
                 </DialogDescription>
               </DialogHeader>
-              <Button 
-                onClick={() => window.location.reload()} 
-                className="w-full mt-4"
-              >
-                Submit Another Application
-              </Button>
+              <div className="mt-6 text-center">
+                <p className="text-muted-foreground">
+                  We appreciate your interest in joining our team.
+                </p>
+              </div>
             </DialogContent>
           </Dialog>
         </div>
