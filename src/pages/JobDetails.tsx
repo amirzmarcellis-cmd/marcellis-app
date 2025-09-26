@@ -1971,27 +1971,30 @@ export default function JobDetails() {
                                                  }
                                                }
 
-                                               // Update database to mark as longlisted
-                                               const { error: updateError } = await supabase
-                                                 .from('Jobs_CVs')
-                                                  .upsert({
-                                                    job_id: String(job?.job_id || id || ''),
-                                                    user_id: String(application.candidate_id),
-                                                    longlisted_at: new Date().toISOString(),
-                                                    candidate_name: (() => {
-                                                      const fn = application.first_name || application.Firstname || '';
-                                                      const ln = application.last_name || application.Lastname || '';
-                                                      const combined = `${fn} ${ln}`.trim();
-                                                      if (combined && combined.toLowerCase() !== 'undefined undefined') return combined;
-                                                      if (application.name) return application.name;
-                                                      if (application.candidate_name) return application.candidate_name;
-                                                      if (application.Email) return String(application.Email).split('@')[0];
-                                                      if (application.email) return String(application.email).split('@')[0];
-                                                      return `Candidate ${application.candidate_id}`;
-                                                    })(),
-                                                    candidate_email: application.Email || application.email || application.candidate_email || null,
-                                                    candidate_phone_number: application.phone_number || application.candidate_phone_number || null
-                                                  });
+                                                // Update database to mark as longlisted
+                                                const { error: updateError } = await supabase
+                                                  .from('Jobs_CVs')
+                                                   .upsert({
+                                                     job_id: String(job?.job_id || id || ''),
+                                                     user_id: String(application.candidate_id),
+                                                     longlisted_at: new Date().toISOString(),
+                                                     candidate_name: (() => {
+                                                       const fn = application.first_name || application.Firstname || '';
+                                                       const ln = application.last_name || application.Lastname || '';
+                                                       const combined = `${fn} ${ln}`.trim();
+                                                       if (combined && combined.toLowerCase() !== 'undefined undefined') return combined;
+                                                       if (application.name) return application.name;
+                                                       if (application.candidate_name) return application.candidate_name;
+                                                       if (application.Email) return String(application.Email).split('@')[0];
+                                                       if (application.email) return String(application.email).split('@')[0];
+                                                       return `Candidate ${application.candidate_id}`;
+                                                     })(),
+                                                     candidate_email: application.Email || application.email || application.candidate_email || null,
+                                                     candidate_phone_number: application.phone_number || application.candidate_phone_number || null,
+                                                     cv_score: 75,
+                                                     cv_score_reason: "Added from applications - CV needs review",
+                                                     contacted: "Ready to Contact"
+                                                   });
 
                                                if (updateError) {
                                                console.error('Error updating longlisted status:', updateError);
