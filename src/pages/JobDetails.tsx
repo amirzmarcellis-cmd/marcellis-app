@@ -380,19 +380,22 @@ export default function JobDetails() {
       if (longlistedError) throw longlistedError;
 
       const mappedLonglisted = (longlistedData || []).map((row: any) => {
+        // Handle name properly - prioritize candidate_name, fallback to first/last name construction
+        const candidateName = row.candidate_name || `${row.first_name || ''} ${row.last_name || ''}`.trim() || 'Unknown';
+        
         return {
           ...row,
           "Job ID": jobId,
-          "Candidate_ID": row.recordid?.toString() || '',
-          "Contacted": row.contacted ?? '',
+          "Candidate_ID": row.recordid?.toString() || row.user_id || '',
+          "Contacted": row.contacted ?? 'Ready to Contact',
           "Transcript": row.transcript ?? '',
-          "Summary": row.cv_score_reason ?? '',
+          "Summary": row.cv_score_reason ?? 'Added from Applications - Ready to Contact',
           "Success Score": row.after_call_score?.toString() ?? '',
-          "Score and Reason": row.cv_score_reason ?? '',
-          "Candidate Name": row.candidate_name ?? '',
+          "Score and Reason": row.cv_score_reason ?? 'Added from Applications - Ready to Contact',
+          "Candidate Name": candidateName,
           "Candidate Email": row.candidate_email ?? '',
           "Candidate Phone Number": row.candidate_phone_number ?? '',
-          "Source": row.source ?? '',
+          "Source": row.source ?? 'Application',
           "linkedin_score": row.linkedin_score ?? '',
           "linkedin_score_reason": row.linkedin_score_reason ?? '',
           "pros": row.after_call_pros,
@@ -404,9 +407,11 @@ export default function JobDetails() {
           "callid": row.recordid ?? Math.random() * 1000000,
           "duration": row.duration,
           "recording": row.recording,
-          "first_name": row.candidate_name?.split(' ')[0] || '',
-          "last_name": row.candidate_name?.split(' ').slice(1).join(' ') || '',
-          "score": row.cv_score ?? 0,
+          "first_name": candidateName.split(' ')[0] || '',
+          "last_name": candidateName.split(' ').slice(1).join(' ') || '',
+          "score": row.cv_score ?? 85, // Default score for longlisted
+          "CV Score": row.cv_score?.toString() ?? '85',
+          "Score": row.cv_score?.toString() ?? '85',
           "success_score": row.after_call_score ?? 0,
           "linkedin_id": row.linkedin_id ?? '',
           "longlisted_at": row.longlisted_at
@@ -1971,17 +1976,21 @@ export default function JobDetails() {
                                                  }
                                                }
 
-                                               // Update database to mark as longlisted
-                                               const { error: updateError } = await supabase
-                                                 .from('Jobs_CVs')
-                                                 .upsert({
-                                                   job_id: String(job?.job_id || id || ''),
-                                                   user_id: String(application.candidate_id),
-                                                   longlisted_at: new Date().toISOString(),
-                                                   candidate_name: application.candidate_name || application.name || `${application.Firstname} ${application.Lastname}`,
-                                                   candidate_email: application.candidate_email || application.email,
-                                                   candidate_phone_number: application.candidate_phone_number || application.phone_number
-                                                 });
+                                                // Update database to mark as longlisted
+                                                const { error: updateError } = await supabase
+                                                  .from('Jobs_CVs')
+                                                  .upsert({
+                                                    job_id: String(job?.job_id || id || ''),
+                                                    user_id: String(application.candidate_id),
+                                                    longlisted_at: new Date().toISOString(),
+                                                    candidate_name: application.candidate_name || application.name || `${application.Firstname || ''} ${application.Lastname || ''}`.trim(),
+                                                    candidate_email: application.candidate_email || application.email,
+                                                    candidate_phone_number: application.candidate_phone_number || application.phone_number,
+                                                    cv_score: 85, // Default score for longlisted applications
+                                                    cv_score_reason: 'Added from Applications - Ready to Contact',
+                                                    contacted: 'Ready to Contact',
+                                                    source: 'Application'
+                                                  });
 
                                                if (updateError) {
                                                console.error('Error updating longlisted status:', updateError);
