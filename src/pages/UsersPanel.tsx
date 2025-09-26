@@ -487,7 +487,7 @@ export default function UsersPanel() {
                               <Icon className="h-3 w-3 mr-1" />
                               {roleDisplay.label}
                             </Badge>
-                            {userMemberships.length > 0 && (
+                            {userMemberships.length > 0 && !user.is_admin && (
                               <div className="text-xs text-muted-foreground">
                                 {userMemberships.map((membership, idx) => (
                                   <div key={idx}>
