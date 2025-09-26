@@ -1878,6 +1878,9 @@ export default function JobDetails() {
 
                                             console.log('Triggering webhook with payload:', JSON.stringify(payload, null, 2));
                                             
+                                            // Optimistically disable the button immediately
+                                            setAddedToLongList(prev => new Set([...prev, application.candidate_id]));
+                                            
                                             const response = await fetch(webhookUrl, {
                                               method: "POST",
                                               headers: {
@@ -1925,9 +1928,6 @@ export default function JobDetails() {
                                               console.error('Error updating longlisted status:', updateError);
                                             }
 
-                                            // Mark as added to long list in state
-                                            setAddedToLongList(prev => new Set([...prev, application.candidate_id]));
-                                            
                                             console.log('Webhook triggered successfully');
                                          } catch (error) {
                                            console.error('Error triggering webhook:', error);
