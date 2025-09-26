@@ -74,8 +74,10 @@ export type Database = {
           cv_text: string | null
           email: string | null
           Firstname: string | null
+          job_id: string | null
           Lastname: string | null
           name: string | null
+          notes: string | null
           phone_number: string | null
           updated_time: string | null
           user_id: string
@@ -85,8 +87,10 @@ export type Database = {
           cv_text?: string | null
           email?: string | null
           Firstname?: string | null
+          job_id?: string | null
           Lastname?: string | null
           name?: string | null
+          notes?: string | null
           phone_number?: string | null
           updated_time?: string | null
           user_id: string
@@ -96,8 +100,10 @@ export type Database = {
           cv_text?: string | null
           email?: string | null
           Firstname?: string | null
+          job_id?: string | null
           Lastname?: string | null
           name?: string | null
+          notes?: string | null
           phone_number?: string | null
           updated_time?: string | null
           user_id?: string
@@ -364,7 +370,6 @@ export type Database = {
           id: number
           job_id: string | null
           linkedin_id: string | null
-          linkedin_score: number | null
           recruiter_id: string | null
           status: string | null
           thread_id: string | null
@@ -376,7 +381,6 @@ export type Database = {
           id?: number
           job_id?: string | null
           linkedin_id?: string | null
-          linkedin_score?: number | null
           recruiter_id?: string | null
           status?: string | null
           thread_id?: string | null
@@ -388,7 +392,6 @@ export type Database = {
           id?: number
           job_id?: string | null
           linkedin_id?: string | null
-          linkedin_score?: number | null
           recruiter_id?: string | null
           status?: string | null
           thread_id?: string | null

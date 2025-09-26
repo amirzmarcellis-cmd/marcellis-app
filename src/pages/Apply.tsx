@@ -163,6 +163,11 @@ export default function Apply() {
     setIsSubmitting(true);
     
     try {
+      // Get job_id from URL params
+      const path = window.location.pathname;
+      const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
+      const jobIdFromUrl = pathMatch?.[1] || "";
+
       // Only insert to database if no files were uploaded (files are handled separately)
       if (uploadedFiles.length === 0) {
         // Function to clean text data and remove null characters
@@ -181,6 +186,8 @@ export default function Apply() {
             name: cleanText(`${data.firstName} ${data.lastName}`),
             email: cleanText(data.email),
             phone_number: cleanText(data.phoneNumber),
+            notes: cleanText(data.notes || ""),
+            job_id: cleanText(jobIdFromUrl),
             cv_text: "",
             cv_link: ""
           }]);
@@ -367,7 +374,9 @@ export default function Apply() {
         user_id: formUserId,
         Lastname: form.getValues("lastName"),
         Firstname: form.getValues("firstName"),
-        phone_number: form.getValues("phoneNumber")
+        phone_number: form.getValues("phoneNumber"),
+        notes: form.getValues("notes") || "",
+        job_id: resolvedJobId
       },
       schema: "public",
       old_record: null
