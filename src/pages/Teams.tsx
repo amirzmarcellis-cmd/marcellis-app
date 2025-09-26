@@ -6,9 +6,12 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Users2, Plus, DollarSign, Truck, User, Crown, Trash2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Users2, Plus, DollarSign, Truck, User, Crown, Trash2, UserPlus, UserMinus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useUserRole } from '@/hooks/useUserRole';
+import { useProfile } from '@/hooks/useProfile';
 
 interface Team {
   id: string;
@@ -29,6 +32,12 @@ interface NewTeamData {
   name: string;
 }
 
+interface AvailableUser {
+  user_id: string;
+  name: string | null;
+  email: string;
+}
+
 export default function Teams() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [teamMembers, setTeamMembers] = useState<Record<string, TeamMember[]>>({});
@@ -37,7 +46,16 @@ export default function Teams() {
   const [deleteTeamId, setDeleteTeamId] = useState<string | null>(null);
   const [newTeam, setNewTeam] = useState<NewTeamData>({ name: '' });
   const [submitting, setSubmitting] = useState(false);
+  const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
+  const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
+  const [availableUsers, setAvailableUsers] = useState<AvailableUser[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
+  const [selectedRole, setSelectedRole] = useState<'EMPLOYEE' | 'MANAGER'>('EMPLOYEE');
+  const [removeMemberId, setRemoveMemberId] = useState<string | null>(null);
+  const [removeMemberTeamId, setRemoveMemberTeamId] = useState<string | null>(null);
   const { toast } = useToast();
+  const { isAdmin, isManager } = useUserRole();
+  const { profile } = useProfile();
 
   useEffect(() => {
     initializeTeams();
@@ -221,6 +239,132 @@ export default function Teams() {
     }
   };
 
+  const fetchAvailableUsers = async (teamId: string) => {
+    try {
+      // Get all profiles
+      const { data: allProfiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('user_id, name, email, is_admin')
+        .eq('is_admin', false); // Exclude admin users
+
+      if (profilesError) throw profilesError;
+
+      // Get current team members
+      const { data: currentMemberships, error: membershipsError } = await supabase
+        .from('memberships')
+        .select('user_id')
+        .eq('team_id', teamId);
+
+      if (membershipsError) throw membershipsError;
+
+      const currentMemberIds = currentMemberships?.map(m => m.user_id) || [];
+      
+      // Filter out current team members
+      const available = (allProfiles || []).filter(
+        profile => !currentMemberIds.includes(profile.user_id)
+      );
+
+      setAvailableUsers(available);
+    } catch (error) {
+      console.error('Error fetching available users:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch available users",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleAddMember = async () => {
+    if (!selectedTeamId || !selectedUserId) return;
+
+    try {
+      setSubmitting(true);
+
+      const { error } = await supabase
+        .from('memberships')
+        .insert([{
+          team_id: selectedTeamId,
+          user_id: selectedUserId,
+          role: selectedRole
+        }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Team member added successfully",
+      });
+
+      setIsAddMemberOpen(false);
+      setSelectedUserId('');
+      setSelectedRole('EMPLOYEE');
+      fetchTeams();
+    } catch (error: any) {
+      console.error('Error adding team member:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add team member",
+        variant: "destructive"
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleRemoveMember = async () => {
+    if (!removeMemberId || !removeMemberTeamId) return;
+
+    try {
+      const { error } = await supabase
+        .from('memberships')
+        .delete()
+        .eq('team_id', removeMemberTeamId)
+        .eq('user_id', removeMemberId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Team member removed successfully",
+      });
+
+      setRemoveMemberId(null);
+      setRemoveMemberTeamId(null);
+      fetchTeams();
+    } catch (error: any) {
+      console.error('Error removing team member:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to remove team member",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const openAddMemberDialog = (teamId: string) => {
+    setSelectedTeamId(teamId);
+    fetchAvailableUsers(teamId);
+    setIsAddMemberOpen(true);
+  };
+
+  const canManageTeamMembers = () => {
+    return isAdmin || isManager || checkIfTeamLeader();
+  };
+
+  const checkIfTeamLeader = () => {
+    if (!profile?.user_id) return false;
+    
+    // Check if user is a manager in any team
+    for (const members of Object.values(teamMembers)) {
+      const member = members.find(m => m.id === profile.user_id);
+      if (member && member.role === 'MANAGER') {
+        return true;
+      }
+    }
+    return false;
+  };
+
   const getTeamIcon = (teamName: string) => {
     if (teamName.toLowerCase().includes('sales')) return DollarSign;
     if (teamName.toLowerCase().includes('delivery')) return Truck;
@@ -323,7 +467,20 @@ export default function Teams() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Members</span>
-                      <Badge variant="secondary">{members.length}</Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary">{members.length}</Badge>
+                        {canManageTeamMembers() && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openAddMemberDialog(team.id)}
+                            className="h-6 px-2"
+                          >
+                            <UserPlus className="h-3 w-3 mr-1" />
+                            Add
+                          </Button>
+                        )}
+                      </div>
                     </div>
                     
                     {members.length > 0 ? (
@@ -331,23 +488,36 @@ export default function Teams() {
                         {members.map((member) => {
                           const roleDisplay = getRoleDisplay(member);
                           const RoleIcon = roleDisplay.icon;
-                          return (
-                            <div key={member.id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
-                              <div className="flex items-center gap-2">
-                                <User className="h-4 w-4" />
-                                <div className="flex flex-col">
-                                  <span className="text-sm font-medium">{member.name || 'No name'}</span>
-                                  <span className="text-xs text-muted-foreground">{member.email}</span>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <RoleIcon className="h-3 w-3" />
-                                <span className="text-xs text-muted-foreground">
-                                  {roleDisplay.label}
-                                </span>
-                              </div>
-                            </div>
-                          );
+                           return (
+                             <div key={member.id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
+                               <div className="flex items-center gap-2">
+                                 <User className="h-4 w-4" />
+                                 <div className="flex flex-col">
+                                   <span className="text-sm font-medium">{member.name || 'No name'}</span>
+                                   <span className="text-xs text-muted-foreground">{member.email}</span>
+                                 </div>
+                               </div>
+                               <div className="flex items-center gap-2">
+                                 <RoleIcon className="h-3 w-3" />
+                                 <span className="text-xs text-muted-foreground">
+                                   {roleDisplay.label}
+                                 </span>
+                                 {canManageTeamMembers() && (
+                                   <Button
+                                     variant="ghost"
+                                     size="sm"
+                                     onClick={() => {
+                                       setRemoveMemberId(member.id);
+                                       setRemoveMemberTeamId(team.id);
+                                     }}
+                                     className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive ml-2"
+                                   >
+                                     <UserMinus className="h-3 w-3" />
+                                   </Button>
+                                 )}
+                               </div>
+                             </div>
+                           );
                         })}
                       </div>
                     ) : (
@@ -381,6 +551,81 @@ export default function Teams() {
               onClick={() => deleteTeamId && handleDeleteTeam(deleteTeamId)}
             >
               Delete Team
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Member Dialog */}
+      <Dialog open={isAddMemberOpen} onOpenChange={setIsAddMemberOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Team Member</DialogTitle>
+            <DialogDescription>
+              Select a user to add to the team and assign their role.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="user">Select User</Label>
+              <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a user" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableUsers.map((user) => (
+                    <SelectItem key={user.user_id} value={user.user_id}>
+                      {user.name || user.email} ({user.email})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="role">Role</Label>
+              <Select value={selectedRole} onValueChange={(value: 'EMPLOYEE' | 'MANAGER') => setSelectedRole(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="EMPLOYEE">Team Member</SelectItem>
+                  <SelectItem value="MANAGER">Team Leader</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddMemberOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleAddMember} 
+              disabled={submitting || !selectedUserId}
+            >
+              {submitting ? 'Adding...' : 'Add Member'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Remove Member Confirmation Dialog */}
+      <Dialog open={removeMemberId !== null} onOpenChange={() => setRemoveMemberId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Remove Team Member</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to remove this member from the team? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRemoveMemberId(null)}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleRemoveMember}
+            >
+              Remove Member
             </Button>
           </DialogFooter>
         </DialogContent>
