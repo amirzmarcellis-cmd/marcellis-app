@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { JobDialog } from "./JobDialog";
 import { useProfile } from "@/hooks/useProfile";
+import { useUserRole } from "@/hooks/useUserRole";
 interface Job {
   job_id: string;
   job_title: string | null;
@@ -50,6 +51,7 @@ export function JobManagementPanel() {
     toast
   } = useToast();
   const { profile } = useProfile();
+  const { isAdmin, isManager } = useUserRole();
 
   useEffect(() => {
     if (profile?.user_id) {
@@ -62,7 +64,7 @@ export function JobManagementPanel() {
       fetchJobs();
       fetchGroups();
     }
-  }, [profile, isTeamLeader]);
+  }, [profile, isTeamLeader, isAdmin, isManager]);
 
   const checkTeamLeaderStatus = async () => {
     if (!profile?.user_id) return;
@@ -92,8 +94,9 @@ export function JobManagementPanel() {
           )
         `);
 
-      // If not a team leader, only show jobs assigned to this user
-      if (!isTeamLeader) {
+      // If user is not admin, manager, or team leader, only show jobs assigned to this user
+      const canViewAllJobs = isAdmin || isManager || isTeamLeader;
+      if (!canViewAllJobs) {
         query = query.eq('recruiter_id', profile.user_id);
       }
 
