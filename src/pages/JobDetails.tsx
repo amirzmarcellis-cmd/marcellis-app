@@ -1827,21 +1827,31 @@ export default function JobDetails() {
                                       {application.cv_summary}
                                     </p>}
 
-                                  <div className="flex items-center justify-between pt-2 border-t gap-2">
-                                    <div className="flex items-center gap-2">
-                                      {application.CV_Link && <Button variant="outline" size="sm" asChild>
-                                          <a href={application.CV_Link} target="_blank" rel="noopener noreferrer">
-                                            <FileText className="w-4 h-4 mr-1" />
-                                            CV
-                                          </a>
-                                        </Button>}
-                                      <Button variant="outline" size="sm" asChild>
-                                        <Link to={`/candidate/${application.candidate_id}`}>
-                                          View Profile
-                                        </Link>
-                                      </Button>
-                                    </div>
-                                  </div>
+                                   <div className="flex items-center justify-between pt-2 border-t gap-2">
+                                     <div className="flex items-center gap-2">
+                                       {application.CV_Link && <Button variant="outline" size="sm" asChild>
+                                           <a href={application.CV_Link} target="_blank" rel="noopener noreferrer">
+                                             <FileText className="w-4 h-4 mr-1" />
+                                             CV
+                                           </a>
+                                         </Button>}
+                                       <Button variant="outline" size="sm" asChild>
+                                         <Link to={`/candidate/${application.candidate_id}`}>
+                                           View Profile
+                                         </Link>
+                                       </Button>
+                                     </div>
+                                     <Button 
+                                       size="sm" 
+                                       className="bg-primary text-primary-foreground hover:bg-primary/90"
+                                       onClick={() => {
+                                         // Add to long list functionality
+                                         console.log('Adding to long list:', application.candidate_id);
+                                       }}
+                                     >
+                                       Add to Long List
+                                     </Button>
+                                   </div>
                                 </div>
                               </CardContent>
                             </Card>)}
