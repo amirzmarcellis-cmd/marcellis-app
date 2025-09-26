@@ -81,6 +81,7 @@ export default function JobDetails() {
   } = useToast();
   const [callingCandidateId, setCallingCandidateId] = useState<string | null>(null);
   const [newApplicationsCount, setNewApplicationsCount] = useState(0);
+  const [addedToLongList, setAddedToLongList] = useState<Set<string>>(new Set());
   const [lastViewedApplications, setLastViewedApplications] = useState<string | null>(null);
   const [selectedCandidates, setSelectedCandidates] = useState<Set<string>>(new Set());
   const [selectedCandidateRecord, setSelectedCandidateRecord] = useState<any>(null);
@@ -1844,13 +1845,37 @@ export default function JobDetails() {
                                      <Button 
                                        size="sm" 
                                        className="bg-primary text-primary-foreground hover:bg-primary/90"
-                                       onClick={() => {
-                                         // Add to long list functionality for applications from apply form
-                                         console.log('Adding application to long list:', application.candidate_id);
-                                         // TODO: Implement logic to add this application to the long list
+                                       disabled={addedToLongList.has(application.candidate_id)}
+                                       onClick={async () => {
+                                         try {
+                                           const webhookUrl = "https://hook.eu2.make.com/tv58ofd5rftm64t677f65phmbwrnq24e";
+                                           const payload = {
+                                             candidate_id: application.candidate_id,
+                                             job_id: job?.job_id,
+                                             company_id: profile?.id || "e2bf7296-2d99-43d0-b357-0cda2c202399"
+                                           };
+
+                                           console.log('Triggering webhook with payload:', payload);
+                                           
+                                           const response = await fetch(webhookUrl, {
+                                             method: "POST",
+                                             headers: {
+                                               "Content-Type": "application/json",
+                                             },
+                                             mode: "no-cors",
+                                             body: JSON.stringify(payload),
+                                           });
+
+                                           // Mark as added to long list
+                                           setAddedToLongList(prev => new Set([...prev, application.candidate_id]));
+                                           
+                                           console.log('Webhook triggered successfully');
+                                         } catch (error) {
+                                           console.error('Error triggering webhook:', error);
+                                         }
                                        }}
                                      >
-                                       Add to Long List
+                                       {addedToLongList.has(application.candidate_id) ? 'Added to Long List' : 'Add to Long List'}
                                      </Button>
                                    </div>
                                 </div>
