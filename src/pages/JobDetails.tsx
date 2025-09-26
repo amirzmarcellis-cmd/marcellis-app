@@ -1845,8 +1845,9 @@ export default function JobDetails() {
                                        size="sm" 
                                        className="bg-primary text-primary-foreground hover:bg-primary/90"
                                        onClick={() => {
-                                         // Add to long list functionality
-                                         console.log('Adding to long list:', application.candidate_id);
+                                         // Add to long list functionality for applications from apply form
+                                         console.log('Adding application to long list:', application.candidate_id);
+                                         // TODO: Implement logic to add this application to the long list
                                        }}
                                      >
                                        Add to Long List
