@@ -353,8 +353,6 @@ function JobGrid({
                   <Banknote className="h-4 w-4 mr-2 text-green" />
                   {formatCurrency(job.job_salary_range, job["Currency"] as string | null)}
                 </div>}
-              
-              {job.client_description}
             </div>
 
             {job.jd_summary && <p className="text-sm text-muted-foreground line-clamp-3">
