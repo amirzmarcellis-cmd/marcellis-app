@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Users2, Plus, DollarSign, Truck, User, Crown, Trash2, UserPlus, UserMinus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -106,10 +107,32 @@ export default function Teams() {
 
   const fetchTeams = async () => {
     try {
-      const { data, error } = await supabase
+      let teamsQuery = supabase
         .from('teams')
         .select('*')
         .order('created_at', { ascending: false });
+
+      // If user is not admin but is a team leader, only show their teams
+      if (!isAdmin && profile?.user_id) {
+        // Get teams where user is a member
+        const { data: userMemberships } = await supabase
+          .from('memberships')
+          .select('team_id')
+          .eq('user_id', profile.user_id);
+
+        if (userMemberships && userMemberships.length > 0) {
+          const teamIds = userMemberships.map(m => m.team_id);
+          teamsQuery = teamsQuery.in('id', teamIds);
+        } else if (!isAdmin) {
+          // If not admin and has no memberships, show no teams
+          setTeams([]);
+          setTeamMembers({});
+          setLoading(false);
+          return;
+        }
+      }
+
+      const { data, error } = await teamsQuery;
 
       if (error) throw error;
       setTeams(data || []);
@@ -143,7 +166,6 @@ export default function Teams() {
           }
 
           const members = (profiles || [])
-            .filter(p => !p.is_admin) // Filter out admin users
             .map((p) => {
               const membership = memberships.find(m => m.user_id === p.user_id);
               return {
@@ -484,42 +506,44 @@ export default function Teams() {
                     </div>
                     
                     {members.length > 0 ? (
-                      <div className="space-y-2">
-                        {members.map((member) => {
-                          const roleDisplay = getRoleDisplay(member);
-                          const RoleIcon = roleDisplay.icon;
-                           return (
-                             <div key={member.id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
-                               <div className="flex items-center gap-2">
-                                 <User className="h-4 w-4" />
-                                 <div className="flex flex-col">
-                                   <span className="text-sm font-medium">{member.name || 'No name'}</span>
-                                   <span className="text-xs text-muted-foreground">{member.email}</span>
+                      <ScrollArea className={`${members.length > 3 ? 'h-64' : 'h-auto'} w-full`}>
+                        <div className="space-y-2 pr-4">
+                          {members.map((member) => {
+                            const roleDisplay = getRoleDisplay(member);
+                            const RoleIcon = roleDisplay.icon;
+                             return (
+                               <div key={member.id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
+                                 <div className="flex items-center gap-2">
+                                   <User className="h-4 w-4" />
+                                   <div className="flex flex-col">
+                                     <span className="text-sm font-medium">{member.name || 'No name'}</span>
+                                     <span className="text-xs text-muted-foreground">{member.email}</span>
+                                   </div>
+                                 </div>
+                                 <div className="flex items-center gap-2">
+                                   <RoleIcon className="h-3 w-3" />
+                                   <span className="text-xs text-muted-foreground">
+                                     {roleDisplay.label}
+                                   </span>
+                                   {canManageTeamMembers() && (
+                                     <Button
+                                       variant="ghost"
+                                       size="sm"
+                                       onClick={() => {
+                                         setRemoveMemberId(member.id);
+                                         setRemoveMemberTeamId(team.id);
+                                       }}
+                                       className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive ml-2"
+                                     >
+                                       <UserMinus className="h-3 w-3" />
+                                     </Button>
+                                   )}
                                  </div>
                                </div>
-                               <div className="flex items-center gap-2">
-                                 <RoleIcon className="h-3 w-3" />
-                                 <span className="text-xs text-muted-foreground">
-                                   {roleDisplay.label}
-                                 </span>
-                                 {canManageTeamMembers() && (
-                                   <Button
-                                     variant="ghost"
-                                     size="sm"
-                                     onClick={() => {
-                                       setRemoveMemberId(member.id);
-                                       setRemoveMemberTeamId(team.id);
-                                     }}
-                                     className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive ml-2"
-                                   >
-                                     <UserMinus className="h-3 w-3" />
-                                   </Button>
-                                 )}
-                               </div>
-                             </div>
-                           );
-                        })}
-                      </div>
+                             );
+                          })}
+                        </div>
+                      </ScrollArea>
                     ) : (
                       <div className="text-center py-4 text-muted-foreground text-sm">
                         No members assigned
