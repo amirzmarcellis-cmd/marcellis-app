@@ -10,7 +10,7 @@ interface JobFunnelProps {
 }
 
 export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
-  // Calculate counts for each stage
+  // Calculate counts for each funnel stage
   const getCounts = () => {
     const longlist = candidates.length;
     
