@@ -380,19 +380,30 @@ export default function JobDetails() {
       if (longlistedError) throw longlistedError;
 
       const mappedLonglisted = (longlistedData || []).map((row: any) => {
+        // Compute effective score with sensible fallbacks
+        const sourceLower = (row.source || '').toLowerCase();
+        const hasLinkedIn = sourceLower.includes('linkedin');
+        const effectiveFromSource = hasLinkedIn ? (row.linkedin_score ?? row.cv_score ?? null) : (row.cv_score ?? row.linkedin_score ?? null);
+        const looksLikeApplication = typeof row.user_id === 'string' && row.user_id.toString().toLowerCase().startsWith('app');
+        const fallbackScore = effectiveFromSource == null && (looksLikeApplication || !row.source) ? 75 : effectiveFromSource;
+        const effectiveScore = fallbackScore ?? 0;
+        const fallbackReason = row.cv_score_reason || (effectiveFromSource == null && (looksLikeApplication || !row.source)
+          ? 'Added from applications - CV needs review'
+          : '');
+
         return {
           ...row,
           "Job ID": jobId,
           "Candidate_ID": row.recordid?.toString() || '',
           "Contacted": row.contacted ?? '',
           "Transcript": row.transcript ?? '',
-          "Summary": row.cv_score_reason ?? '',
+          "Summary": row.cv_score_reason ?? fallbackReason ?? '',
           "Success Score": row.after_call_score?.toString() ?? '',
-          "Score and Reason": row.cv_score_reason ?? '',
+          "Score and Reason": row.cv_score_reason ?? fallbackReason ?? '',
           "Candidate Name": row.candidate_name ?? '',
           "Candidate Email": row.candidate_email ?? '',
           "Candidate Phone Number": row.candidate_phone_number ?? '',
-          "Source": row.source ?? '',
+          "Source": row.source ?? (looksLikeApplication ? 'Applications' : ''),
           "linkedin_score": row.linkedin_score ?? '',
           "linkedin_score_reason": row.linkedin_score_reason ?? '',
           "pros": row.after_call_pros,
@@ -406,10 +417,12 @@ export default function JobDetails() {
           "recording": row.recording,
           "first_name": row.candidate_name?.split(' ')[0] || '',
           "last_name": row.candidate_name?.split(' ').slice(1).join(' ') || '',
-          "score": row.cv_score ?? 0,
+          cv_score: Number(effectiveScore) || 0,
+          "CV Score": String(effectiveScore || ''),
           "success_score": row.after_call_score ?? 0,
           "linkedin_id": row.linkedin_id ?? '',
-          "longlisted_at": row.longlisted_at
+          "longlisted_at": row.longlisted_at,
+          cv_score_reason: row.cv_score_reason ?? fallbackReason ?? ''
         };
       });
 
