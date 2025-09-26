@@ -14,6 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import FileUpload from "@/components/upload/FileUpload";
 import { MissionBackground } from "@/components/layout/MissionBackground";
+import { Progress } from "@/components/ui/progress";
 import { Upload, X, FileText } from "lucide-react";
 
 const applicationSchema = z.object({
@@ -33,6 +34,8 @@ interface UploadedFile {
   name: string;
   url: string;
   text?: string;
+  isUploading?: boolean;
+  uploadProgress?: number;
 }
 
 export default function Apply() {
@@ -265,11 +268,13 @@ export default function Apply() {
 
   const handleFileUpload = async (files: any[]) => {
     if (files.length > 0) {
-      // Show files instantly in UI
+      // Show files instantly in UI with uploading state
       const instantFiles: UploadedFile[] = files.map(fileObj => ({
         name: fileObj.file_name,
         url: URL.createObjectURL(fileObj.file), // Temporary blob URL for instant display
-        text: 'Processing...'
+        text: 'Processing...',
+        isUploading: true,
+        uploadProgress: 0
       }));
       
       setUploadedFiles(prev => [...prev, ...instantFiles]);
@@ -283,11 +288,21 @@ export default function Apply() {
         const fileIndex = uploadedFiles.length + i;
         
         try {
+          // Update progress to 25%
+          setUploadedFiles(prev => prev.map((file, index) => 
+            index === fileIndex ? { ...file, uploadProgress: 25 } : file
+          ));
+
           // Generate unique filename with timestamp
           const timestamp = Date.now();
           const fileExtension = fileObj.file_name.split('.').pop();
           const uniqueFileName = `cv-${timestamp}-${Math.random().toString(36).substring(2, 6)}.${fileExtension}`;
           
+          // Update progress to 50%
+          setUploadedFiles(prev => prev.map((file, index) => 
+            index === fileIndex ? { ...file, uploadProgress: 50 } : file
+          ));
+
           // Upload file to Supabase storage using the actual File object
           const { data: uploadData, error: uploadError } = await supabase.storage
             .from('cvs')
@@ -299,6 +314,11 @@ export default function Apply() {
           if (uploadError) {
             throw uploadError;
           }
+
+          // Update progress to 75%
+          setUploadedFiles(prev => prev.map((file, index) => 
+            index === fileIndex ? { ...file, uploadProgress: 75 } : file
+          ));
 
           // Get public URL
           const { data: { publicUrl } } = supabase.storage
@@ -312,12 +332,14 @@ export default function Apply() {
 
           if (error) throw error;
           
-          // Update the file entry with real URL and extracted text
+          // Update the file entry with real URL and extracted text - completed
           setUploadedFiles(prev => prev.map((file, index) => 
             index === fileIndex ? {
               ...file,
               url: publicUrl,
-              text: data?.text || 'Text extraction failed'
+              text: data?.text || 'Text extraction failed',
+              isUploading: false,
+              uploadProgress: 100
             } : file
           ));
         } catch (error) {
@@ -326,7 +348,9 @@ export default function Apply() {
           setUploadedFiles(prev => prev.map((file, index) => 
             index === fileIndex ? {
               ...file,
-              text: 'Upload failed - using temporary file'
+              text: 'Upload failed - using temporary file',
+              isUploading: false,
+              uploadProgress: 0
             } : file
           ));
         }
@@ -350,16 +374,13 @@ export default function Apply() {
     
     // Filter out files that still have blob URLs (not yet uploaded to Supabase)
     const validFiles = uploadedFiles.filter(file => 
-      file.url && file.url.startsWith('https://') && file.url.includes('supabase')
+      file.url && file.url.startsWith('https://') && file.url.includes('supabase') && !file.isUploading
     );
     
-    // If no valid Supabase URLs yet, wait or show error
-    if (validFiles.length === 0) {
-      toast({
-        title: "Files Still Processing",
-        description: "Please wait for files to finish uploading before submitting.",
-        variant: "destructive",
-      });
+    // If there are still uploading files, wait for them to complete
+    const stillUploading = uploadedFiles.some(file => file.isUploading);
+    if (stillUploading) {
+      // Don't show error, just wait for uploads to complete
       return;
     }
     
@@ -510,21 +531,32 @@ export default function Apply() {
                                 {uploadedFiles.map((file, index) => (
                                   <div
                                     key={index}
-                                    className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                                    className="flex flex-col space-y-2 p-3 bg-muted rounded-lg"
                                   >
-                                    <div className="flex items-center space-x-2">
-                                      <FileText className="h-4 w-4" />
-                                      <span className="text-sm font-medium truncate">
-                                        {file.name}
-                                      </span>
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center space-x-2">
+                                        <FileText className="h-4 w-4" />
+                                        <span className="text-sm font-medium truncate">
+                                          {file.name}
+                                        </span>
+                                      </div>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => removeFile(index)}
+                                      >
+                                        <X className="h-4 w-4" />
+                                      </Button>
                                     </div>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => removeFile(index)}
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
+                                    {file.isUploading && (
+                                      <div className="space-y-1">
+                                        <div className="flex justify-between text-xs text-muted-foreground">
+                                          <span>Uploading...</span>
+                                          <span>{file.uploadProgress}%</span>
+                                        </div>
+                                        <Progress value={file.uploadProgress} className="h-2" />
+                                      </div>
+                                    )}
                                   </div>
                                 ))}
                               </div>
