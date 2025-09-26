@@ -372,15 +372,32 @@ export default function JobDetails() {
     }
   };
   const fetchApplications = async (jobId: string) => {
-    if (!profile?.slug) return;
     setApplicationsLoading(true);
     try {
       const {
         data,
         error
-      } = await supabase.from('CVs').select('*').eq('company_id', profile.slug).filter('applied_for', 'cs', `{${jobId}}`);
+      } = await supabase
+        .from('CVs')
+        .select('*')
+        .eq('job_id', jobId)
+        .order('updated_time', { ascending: false });
+      
       if (error) throw error;
-      setApplications(data || []);
+      
+      // Map the data to match the expected structure in the UI
+      const mappedApplications = (data || []).map(cv => ({
+        candidate_id: cv.user_id,
+        first_name: cv.Firstname,
+        last_name: cv.Lastname,
+        Email: cv.email,
+        phone_number: cv.phone_number,
+        CV_Link: cv.cv_link,
+        cv_summary: cv.cv_text ? cv.cv_text.substring(0, 200) + '...' : '',
+        Timestamp: cv.updated_time
+      }));
+      
+      setApplications(mappedApplications);
     } catch (error) {
       console.error('Error fetching applications:', error);
       setApplications([]);
