@@ -506,8 +506,8 @@ export default function Teams() {
                     </div>
                     
                     {members.length > 0 ? (
-                      <ScrollArea className={`${members.length > 3 ? 'h-64' : 'h-auto'} w-full`}>
-                        <div className="space-y-2 pr-4">
+                      <ScrollArea className={`${members.length > 2 ? 'h-48' : 'h-auto'} w-full`}>
+                        <div className="space-y-2 pr-2">
                           {members.map((member) => {
                             const roleDisplay = getRoleDisplay(member);
                             const RoleIcon = roleDisplay.icon;
