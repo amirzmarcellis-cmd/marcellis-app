@@ -506,7 +506,7 @@ export default function Teams() {
                     </div>
                     
                     {members.length > 0 ? (
-                      <ScrollArea className={`${members.length > 2 ? 'h-48' : 'h-auto'} w-full`}>
+                      <ScrollArea className={`${team.name.toLowerCase().includes('delivery') ? 'h-80 pr-2' : (members.length > 2 ? 'h-48' : 'h-auto')} w-full`}>
                         <div className="space-y-2 pr-2">
                           {members.map((member) => {
                             const roleDisplay = getRoleDisplay(member);
