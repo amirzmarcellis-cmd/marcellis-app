@@ -365,32 +365,36 @@ export default function Apply() {
   };
 
   const handleSubmitFiles = async () => {
-    // Prevent duplicate triggers
-    if (hasTriggeredWebhookRef.current) return;
-    if (isSubmittingFiles) return;
+    // One-click lock and one-time trigger guard
+    if (hasTriggeredWebhookRef.current || isSubmittingFiles) return;
     
-    // Do not proceed while files are still uploading
-    const stillUploading = uploadedFiles.some(file => file.isUploading);
-    if (stillUploading) {
-      return;
-    }
-
+    // Temporarily lock to avoid rapid double clicks; we'll release if we can't send yet
+    hasTriggeredWebhookRef.current = true;
     setIsSubmittingFiles(true);
 
     try {
+      // Do not proceed while files are still uploading
+      const stillUploading = uploadedFiles.some(file => file.isUploading);
+      if (stillUploading) {
+        // Release lock so user can try again once uploads finish
+        hasTriggeredWebhookRef.current = false;
+        setIsSubmittingFiles(false);
+        return;
+      }
+
       const path = window.location.pathname;
       const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
       const resolvedJobId = pathMatch?.[1] || "general";
 
-      // Use the form's user_id that starts with App000
       const formUserId = form.getValues("user_id");
 
-      // Only include files that are fully uploaded and have a Supabase public URL
       const validFiles = uploadedFiles.filter(file => 
         file.url && file.url.startsWith('https://') && file.url.includes('supabase') && !file.isUploading
       );
 
       if (validFiles.length === 0) {
+        // Release lock (nothing to send yet)
+        hasTriggeredWebhookRef.current = false;
         setIsSubmittingFiles(false);
         return;
       }
@@ -414,9 +418,6 @@ export default function Apply() {
         old_record: null
       };
 
-      // One-time gate: set just before making the request so it never triggers again
-      hasTriggeredWebhookRef.current = true;
-
       const success = await triggerWebhook(webhookPayload);
 
       if (success) {
@@ -426,10 +427,12 @@ export default function Apply() {
         });
       }
 
+      // Keep the one-time flag set after a send attempt (even with no-cors opaque response)
       setIsDialogOpen(false);
     } catch (e) {
       console.error("Submit files failed:", e);
-      // Intentionally keep hasTriggeredWebhookRef as-is to avoid re-triggering
+      // On unexpected error, allow retry
+      hasTriggeredWebhookRef.current = false;
     } finally {
       setIsSubmittingFiles(false);
     }
@@ -593,7 +596,7 @@ export default function Apply() {
                                 type="button"
                                 onClick={handleSubmitFiles}
                                 className="w-full"
-                                disabled={uploadedFiles.length === 0 || isSubmittingFiles || hasTriggeredWebhookRef.current}
+                                disabled={uploadedFiles.length === 0 || isSubmittingFiles || hasTriggeredWebhookRef.current || uploadedFiles.some(f => f.isUploading)}
                               >
                                 {isSubmittingFiles ? "Submitting..." : "Submit Files"}
                               </Button>
