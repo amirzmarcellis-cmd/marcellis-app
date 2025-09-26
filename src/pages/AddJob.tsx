@@ -124,19 +124,11 @@ export default function AddJob() {
 
   const fetchRecruiters = async () => {
     try {
-      let query = supabase
+      // Show all users to everyone (both team leaders and regular members)
+      const { data, error } = await supabase
         .from('profiles')
-        .select('user_id, name, email');
-
-      // If user is a team leader, show all users
-      if (isTeamLeader) {
-        query = query.order('name');
-      } else {
-        // If not a team leader, only show their own profile
-        query = query.eq('user_id', profile?.user_id || '').order('name');
-      }
-
-      const { data, error } = await query;
+        .select('user_id, name, email')
+        .order('name');
 
       if (error) throw error;
       setRecruiters(data || []);
