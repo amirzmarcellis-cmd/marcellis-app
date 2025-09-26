@@ -120,18 +120,48 @@ export default function AddJob() {
   };
 
   const generateJobId = async () => {
-    // Get current job count for this slug
     const slug = profile?.slug || 'me';
+    let attempts = 0;
+    const maxAttempts = 10;
     
-    const { data: existingJobs } = await supabase
-      .from('Jobs')
-      .select('job_id')
-      .like('job_id', `${slug}-j-%`);
+    while (attempts < maxAttempts) {
+      // Get the highest existing job number for this slug
+      const { data: existingJobs } = await supabase
+        .from('Jobs')
+        .select('job_id')
+        .like('job_id', `${slug}-j-%`)
+        .order('job_id', { ascending: false })
+        .limit(1);
+      
+      let nextNumber = 1;
+      if (existingJobs && existingJobs.length > 0) {
+        const lastJobId = existingJobs[0].job_id;
+        const match = lastJobId.match(/-j-(\d+)$/);
+        if (match) {
+          nextNumber = parseInt(match[1], 10) + 1;
+        }
+      }
+      
+      const paddedNumber = nextNumber.toString().padStart(4, '0');
+      const newJobId = `${slug}-j-${paddedNumber}`;
+      
+      // Check if this ID already exists
+      const { data: duplicateCheck } = await supabase
+        .from('Jobs')
+        .select('job_id')
+        .eq('job_id', newJobId)
+        .limit(1);
+      
+      if (!duplicateCheck || duplicateCheck.length === 0) {
+        return newJobId;
+      }
+      
+      attempts++;
+    }
     
-    const jobNumber = (existingJobs?.length || 0) + 1;
-    const paddedNumber = jobNumber.toString().padStart(4, '0');
-    
-    return `${slug}-j-${paddedNumber}`;
+    // Fallback to timestamp-based ID if we can't find a unique sequential number
+    const timestamp = Date.now().toString().slice(-6);
+    return `${slug}-j-${timestamp}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
