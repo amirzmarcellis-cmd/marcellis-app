@@ -33,10 +33,9 @@ export function useUserRole() {
         const { data: membershipData } = await supabase
           .from('memberships')
           .select('role')
-          .eq('user_id', user.id)
-          .eq('role', 'MANAGER');
+          .eq('user_id', user.id);
 
-        const isLeader = membershipData && membershipData.length > 0;
+        const isLeader = Array.isArray(membershipData) && membershipData.some((m: any) => m.role === 'MANAGER');
         setIsTeamLeader(isLeader);
 
         if (isAdmin) {
