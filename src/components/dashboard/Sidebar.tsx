@@ -24,7 +24,8 @@ export function DashboardSidebar() {
   } = useAppSettings();
   const {
     canAccessAnalytics,
-    canManageUsers
+    canManageUsers,
+    isTeamLeader
   } = useUserRole();
   const {
     profile
@@ -74,6 +75,10 @@ export function DashboardSidebar() {
   }, ...(canManageUsers ? [{
     title: "Users",
     url: "/users-panel",
+    icon: Users
+  }] : []), ...(isTeamLeader && !canManageUsers ? [{
+    title: "Users",
+    url: "/team-users",
     icon: Users
   }] : []), {
     title: "Settings",

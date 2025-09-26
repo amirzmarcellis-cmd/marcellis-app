@@ -30,6 +30,7 @@ import Interviews from "./pages/Interviews";
 import Tasks from "./pages/Tasks";
 import Apply from "./pages/Apply";
 import UsersPanel from "./pages/UsersPanel";
+import TeamUsers from "./pages/TeamUsers";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import CompanySettings from "./pages/CompanySettings";
@@ -83,6 +84,9 @@ const App = () => (
                   <ProtectedRoute requiresUsersPanel={true}>
                     <DashboardLayout><UsersPanel /></DashboardLayout>
                   </ProtectedRoute>
+                } />
+                <Route path="/team-users" element={
+                  <DashboardLayout><TeamUsers /></DashboardLayout>
                 } />
                  <Route path="/company-settings" element={
                    <ProtectedRoute>
