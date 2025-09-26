@@ -1971,17 +1971,22 @@ export default function JobDetails() {
                                                  }
                                                }
 
-                                               // Update database to mark as longlisted
-                                               const { error: updateError } = await supabase
-                                                 .from('Jobs_CVs')
-                                                 .upsert({
-                                                   job_id: String(job?.job_id || id || ''),
-                                                   user_id: String(application.candidate_id),
-                                                   longlisted_at: new Date().toISOString(),
-                                                   candidate_name: application.candidate_name || application.name || `${application.Firstname} ${application.Lastname}`,
-                                                   candidate_email: application.candidate_email || application.email,
-                                                   candidate_phone_number: application.candidate_phone_number || application.phone_number
-                                                 });
+                                                // Update database to mark as longlisted
+                                                const candidateName = `${application.first_name || ''} ${application.last_name || ''}`.trim() || 'Unknown Candidate';
+                                                const { error: updateError } = await supabase
+                                                  .from('Jobs_CVs')
+                                                  .upsert({
+                                                    job_id: String(job?.job_id || id || ''),
+                                                    user_id: String(application.candidate_id),
+                                                    longlisted_at: new Date().toISOString(),
+                                                    candidate_name: candidateName,
+                                                    candidate_email: application.Email || application.email,
+                                                    candidate_phone_number: application.phone_number,
+                                                    cv_score: 75, // Default score for "Ready to Contact"
+                                                    cv_score_reason: "Added from applications - Ready to Contact",
+                                                    contacted: "Ready to Contact",
+                                                    source: "Application"
+                                                  });
 
                                                if (updateError) {
                                                console.error('Error updating longlisted status:', updateError);
