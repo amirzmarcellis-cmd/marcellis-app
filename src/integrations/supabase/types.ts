@@ -72,7 +72,7 @@ export type Database = {
         Row: {
           cv_link: string | null
           cv_text: string | null
-          done_questions: boolean | null
+          done_questions: string | null
           email: string | null
           Firstname: string | null
           job_id: string | null
@@ -86,7 +86,7 @@ export type Database = {
         Insert: {
           cv_link?: string | null
           cv_text?: string | null
-          done_questions?: boolean | null
+          done_questions?: string | null
           email?: string | null
           Firstname?: string | null
           job_id?: string | null
@@ -100,7 +100,7 @@ export type Database = {
         Update: {
           cv_link?: string | null
           cv_text?: string | null
-          done_questions?: boolean | null
+          done_questions?: string | null
           email?: string | null
           Firstname?: string | null
           job_id?: string | null
