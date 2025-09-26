@@ -1864,74 +1864,75 @@ export default function JobDetails() {
                                          </Link>
                                        </Button>
                                      </div>
-                                     <Button 
-                                       size="sm" 
-                                       className="bg-primary text-primary-foreground hover:bg-primary/90"
-                                       disabled={addedToLongList.has(application.candidate_id)}
-                                       onClick={async () => {
-                                         try {
-                                            const webhookUrl = "https://hook.eu2.make.com/tv58ofd5rftm64t677f65phmbwrnq24e";
-                                            const payload = {
-                                              "user_id": String(application.candidate_id),
-                                              "job_id": String(job?.job_id || id || '')
-                                            };
+                                      {!addedToLongList.has(application.candidate_id) && (
+                                        <Button 
+                                          size="sm" 
+                                          className="bg-primary text-primary-foreground hover:bg-primary/90"
+                                          onClick={async () => {
+                                            try {
+                                               const webhookUrl = "https://hook.eu2.make.com/tv58ofd5rftm64t677f65phmbwrnq24e";
+                                               const payload = {
+                                                 "user_id": String(application.candidate_id),
+                                                 "job_id": String(job?.job_id || id || '')
+                                               };
 
-                                            console.log('Triggering webhook with payload:', JSON.stringify(payload, null, 2));
-                                            
-                                            // Optimistically disable the button immediately
-                                            setAddedToLongList(prev => new Set([...prev, application.candidate_id]));
-                                            
-                                            const response = await fetch(webhookUrl, {
-                                              method: "POST",
-                                              headers: {
-                                                "Content-Type": "application/json",
-                                              },
-                                              body: JSON.stringify(payload),
-                                            });
+                                               console.log('Triggering webhook with payload:', JSON.stringify(payload, null, 2));
+                                               
+                                               // Optimistically disable the button immediately
+                                               setAddedToLongList(prev => new Set([...prev, application.candidate_id]));
+                                               
+                                               const response = await fetch(webhookUrl, {
+                                                 method: "POST",
+                                                 headers: {
+                                                   "Content-Type": "application/json",
+                                                 },
+                                                 body: JSON.stringify(payload),
+                                               });
 
-                                            if (response.ok) {
-                                              try {
-                                                const responseText = await response.text();
-                                                console.log('Webhook response:', responseText);
-                                                
-                                                // Try to parse as JSON if possible, otherwise use as text
-                                                let responseData;
-                                                try {
-                                                  responseData = JSON.parse(responseText);
-                                                } catch {
-                                                  responseData = responseText;
-                                                }
-                                                
-                                                console.log('Processed webhook response:', responseData);
-                                              } catch (error) {
-                                                console.error('Error processing webhook response:', error);
-                                              }
+                                               if (response.ok) {
+                                                 try {
+                                                   const responseText = await response.text();
+                                                   console.log('Webhook response:', responseText);
+                                                   
+                                                   // Try to parse as JSON if possible, otherwise use as text
+                                                   let responseData;
+                                                   try {
+                                                     responseData = JSON.parse(responseText);
+                                                   } catch {
+                                                     responseData = responseText;
+                                                   }
+                                                   
+                                                   console.log('Processed webhook response:', responseData);
+                                                 } catch (error) {
+                                                   console.error('Error processing webhook response:', error);
+                                                 }
+                                               }
+
+                                               // Update database to mark as longlisted
+                                               const { error: updateError } = await supabase
+                                                 .from('Jobs_CVs')
+                                                 .upsert({
+                                                   job_id: String(job?.job_id || id || ''),
+                                                   user_id: String(application.candidate_id),
+                                                   longlisted_at: new Date().toISOString(),
+                                                   candidate_name: application.candidate_name || application.name || `${application.Firstname} ${application.Lastname}`,
+                                                   candidate_email: application.candidate_email || application.email,
+                                                   candidate_phone_number: application.candidate_phone_number || application.phone_number
+                                                 });
+
+                                               if (updateError) {
+                                                 console.error('Error updating longlisted status:', updateError);
+                                               }
+
+                                               console.log('Webhook triggered successfully');
+                                            } catch (error) {
+                                              console.error('Error triggering webhook:', error);
                                             }
-
-                                            // Update database to mark as longlisted
-                                            const { error: updateError } = await supabase
-                                              .from('Jobs_CVs')
-                                              .upsert({
-                                                job_id: String(job?.job_id || id || ''),
-                                                user_id: String(application.candidate_id),
-                                                longlisted_at: new Date().toISOString(),
-                                                candidate_name: application.candidate_name || application.name || `${application.Firstname} ${application.Lastname}`,
-                                                candidate_email: application.candidate_email || application.email,
-                                                candidate_phone_number: application.candidate_phone_number || application.phone_number
-                                              });
-
-                                            if (updateError) {
-                                              console.error('Error updating longlisted status:', updateError);
-                                            }
-
-                                            console.log('Webhook triggered successfully');
-                                         } catch (error) {
-                                           console.error('Error triggering webhook:', error);
-                                         }
-                                       }}
-                                     >
-                                       {addedToLongList.has(application.candidate_id) ? 'Added to Long List' : 'Add to Long List'}
-                                     </Button>
+                                          }}
+                                        >
+                                          Add to Long List
+                                        </Button>
+                                      )}
                                    </div>
                                 </div>
                               </CardContent>
