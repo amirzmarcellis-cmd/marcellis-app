@@ -513,7 +513,7 @@ export default function TeamUsers() {
                       )}
                     </div>
                     
-                    <ScrollArea className="max-h-64">
+                    <ScrollArea className="h-80 pr-2">
                       {/* Display Managers First */}
                       {teamManagers.length > 0 && (
                         <div className="space-y-2 mb-4">
