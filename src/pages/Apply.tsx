@@ -61,7 +61,12 @@ export default function Apply() {
       jobApplied: "",
     },
   });
-
+  // Re-enable Submit Files when the file list changes (added/removed/replaced)
+  useEffect(() => {
+    if (!isSubmittingFiles) {
+      hasTriggeredWebhookRef.current = false;
+    }
+  }, [uploadedFiles, isSubmittingFiles]);
 
 
   // Generate next user ID and fetch job details
