@@ -380,22 +380,19 @@ export default function JobDetails() {
       if (longlistedError) throw longlistedError;
 
       const mappedLonglisted = (longlistedData || []).map((row: any) => {
-        // Handle name properly - prioritize candidate_name, fallback to first/last name construction
-        const candidateName = row.candidate_name || `${row.first_name || ''} ${row.last_name || ''}`.trim() || 'Unknown';
-        
         return {
           ...row,
           "Job ID": jobId,
-          "Candidate_ID": row.recordid?.toString() || row.user_id || '',
-          "Contacted": row.contacted ?? 'Ready to Contact',
+          "Candidate_ID": row.recordid?.toString() || '',
+          "Contacted": row.contacted ?? '',
           "Transcript": row.transcript ?? '',
-          "Summary": row.cv_score_reason ?? 'Added from Applications - Ready to Contact',
+          "Summary": row.cv_score_reason ?? '',
           "Success Score": row.after_call_score?.toString() ?? '',
-          "Score and Reason": row.cv_score_reason ?? 'Added from Applications - Ready to Contact',
-          "Candidate Name": candidateName,
+          "Score and Reason": row.cv_score_reason ?? '',
+          "Candidate Name": row.candidate_name ?? '',
           "Candidate Email": row.candidate_email ?? '',
           "Candidate Phone Number": row.candidate_phone_number ?? '',
-          "Source": row.source ?? 'Application',
+          "Source": row.source ?? '',
           "linkedin_score": row.linkedin_score ?? '',
           "linkedin_score_reason": row.linkedin_score_reason ?? '',
           "pros": row.after_call_pros,
@@ -407,11 +404,9 @@ export default function JobDetails() {
           "callid": row.recordid ?? Math.random() * 1000000,
           "duration": row.duration,
           "recording": row.recording,
-          "first_name": candidateName.split(' ')[0] || '',
-          "last_name": candidateName.split(' ').slice(1).join(' ') || '',
-          "score": row.cv_score ?? 85, // Default score for longlisted
-          "CV Score": row.cv_score?.toString() ?? '85',
-          "Score": row.cv_score?.toString() ?? '85',
+          "first_name": row.candidate_name?.split(' ')[0] || '',
+          "last_name": row.candidate_name?.split(' ').slice(1).join(' ') || '',
+          "score": row.cv_score ?? 0,
           "success_score": row.after_call_score ?? 0,
           "linkedin_id": row.linkedin_id ?? '',
           "longlisted_at": row.longlisted_at
@@ -1976,21 +1971,17 @@ export default function JobDetails() {
                                                  }
                                                }
 
-                                                // Update database to mark as longlisted
-                                                const { error: updateError } = await supabase
-                                                  .from('Jobs_CVs')
-                                                  .upsert({
-                                                    job_id: String(job?.job_id || id || ''),
-                                                    user_id: String(application.candidate_id),
-                                                    longlisted_at: new Date().toISOString(),
-                                                    candidate_name: application.candidate_name || application.name || `${application.Firstname || ''} ${application.Lastname || ''}`.trim(),
-                                                    candidate_email: application.candidate_email || application.email,
-                                                    candidate_phone_number: application.candidate_phone_number || application.phone_number,
-                                                    cv_score: 85, // Default score for longlisted applications
-                                                    cv_score_reason: 'Added from Applications - Ready to Contact',
-                                                    contacted: 'Ready to Contact',
-                                                    source: 'Application'
-                                                  });
+                                               // Update database to mark as longlisted
+                                               const { error: updateError } = await supabase
+                                                 .from('Jobs_CVs')
+                                                 .upsert({
+                                                   job_id: String(job?.job_id || id || ''),
+                                                   user_id: String(application.candidate_id),
+                                                   longlisted_at: new Date().toISOString(),
+                                                   candidate_name: application.candidate_name || application.name || `${application.Firstname} ${application.Lastname}`,
+                                                   candidate_email: application.candidate_email || application.email,
+                                                   candidate_phone_number: application.candidate_phone_number || application.phone_number
+                                                 });
 
                                                if (updateError) {
                                                console.error('Error updating longlisted status:', updateError);
@@ -2214,60 +2205,51 @@ export default function JobDetails() {
                                      </Button>
                                    </div>
                                   
-                                  <div className="space-y-2 text-xs md:text-sm">
-                                    {mainCandidate["Candidate Email"] && <div className="flex items-center text-muted-foreground min-w-0">
-                                        <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
-                                        <span className="truncate">{mainCandidate["Candidate Email"]}</span>
-                                      </div>}
-                                    
-                                     {mainCandidate["Candidate Phone Number"] && <div className="flex items-center text-muted-foreground min-w-0">
-                                        <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
-                                        <span className="truncate">{mainCandidate["Candidate Phone Number"]}</span>
-                                      </div>}
-                                      
-                                      {mainCandidate["Source"] && <div className="flex items-center text-muted-foreground min-w-0">
-                                        <Building className="w-4 h-4 mr-2 flex-shrink-0" />
-                                        <span className="truncate">{mainCandidate["Source"]}</span>
-                                      </div>}
-                                       {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && !["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && <div className="flex items-center text-muted-foreground min-w-0">
-                                           <Star className="w-4 h-4 mr-2 flex-shrink-0" />
-                                           <span className="truncate">LinkedIn Score: {mainCandidate["linkedin_score"] ?? mainCandidate["cv_score"] ?? mainCandidate["CV Score"] ?? 'N/A'}</span>
-                                         </div>}
-                                  </div>
-
-                                  {/* CV Score and Reason Section */}
-                                  <div className="space-y-2 pt-2 border-t">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                                       <div className="space-y-1">
-                                          {(!["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") || typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('itris')) && <div className="flex items-center justify-between">
-                                               <span className="text-muted-foreground">{typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? 'LinkedIn Score:' : 'CV Score:'}</span>
-                                               <span className="font-medium">{typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "N/A" : mainCandidate["cv_score"] || "N/A"}</span>
-                                             </div>}
-                                          {mainCandidate["after_call_score"] && mainCandidate["after_call_score"] !== 0 && <div className="flex items-center justify-between">
-                                            <span className="text-muted-foreground">After Call Score:</span>
-                                            <span className="font-medium">{mainCandidate["after_call_score"]}</span>
-                                          </div>}
-                                          <div className="flex items-center justify-between">
-                                            <span className="text-muted-foreground">User ID:</span>
-                                            <span className="font-mono text-xs">{mainCandidate["user_id"] || "N/A"}</span>
-                                          </div>
+                                   <div className="space-y-2 text-xs md:text-sm">
+                                     {/* Job ID */}
+                                     <div className="flex items-center text-muted-foreground min-w-0">
+                                       <FileText className="w-4 h-4 mr-2 flex-shrink-0" />
+                                       <span className="truncate">Job ID: {job?.job_id || id || "N/A"}</span>
+                                     </div>
+                                     
+                                     {mainCandidate["Candidate Email"] && <div className="flex items-center text-muted-foreground min-w-0">
+                                         <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+                                         <span className="truncate">{mainCandidate["Candidate Email"]}</span>
+                                       </div>}
+                                     
+                                      {mainCandidate["Candidate Phone Number"] && <div className="flex items-center text-muted-foreground min-w-0">
+                                         <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
+                                         <span className="truncate">{mainCandidate["Candidate Phone Number"]}</span>
+                                       </div>}
+                                       
+                                       {mainCandidate["Source"] && <div className="flex items-center text-muted-foreground min-w-0">
+                                         <Building className="w-4 h-4 mr-2 flex-shrink-0" />
+                                         <span className="truncate">Source: {mainCandidate["Source"]}</span>
+                                       </div>}
+                                       
+                                       {/* CV Score */}
+                                       <div className="flex items-center text-muted-foreground min-w-0">
+                                         <Star className="w-4 h-4 mr-2 flex-shrink-0" />
+                                         <span className="truncate">CV Score: {mainCandidate["cv_score"] || mainCandidate["CV Score"] || mainCandidate["linkedin_score"] || 'N/A'}</span>
                                        </div>
-                                      <div className="space-y-1">
-                                        
-                                      </div>
-                                    </div>
-                                    {mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score_reason"] ? <div className="pt-1">
-                                        <span className="text-muted-foreground text-xs">Reason:</span>
-                                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                                          {mainCandidate["linkedin_score_reason"]}
-                                        </p>
-                                      </div> : mainCandidate["cv_score_reason"] && <div className="pt-1">
-                                          <span className="text-muted-foreground text-xs">Reason:</span>
-                                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                                            {mainCandidate["cv_score_reason"]}
-                                          </p>
-                                        </div>}
-                                  </div>
+                                       
+                                       {/* Status */}
+                                       <div className="flex items-center text-muted-foreground min-w-0">
+                                         <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                           Ready to Contact
+                                         </Badge>
+                                       </div>
+                                   </div>
+
+                                   {/* CV Score Reason Section */}
+                                   <div className="space-y-2 pt-2 border-t">
+                                     {(mainCandidate["cv_score_reason"] || mainCandidate["linkedin_score_reason"]) && <div className="pt-1">
+                                         <span className="text-muted-foreground text-xs font-medium">CV Score Reason:</span>
+                                         <p className="text-xs text-muted-foreground mt-1 line-clamp-3 leading-relaxed">
+                                           {mainCandidate["cv_score_reason"] || mainCandidate["linkedin_score_reason"] || "No reason provided"}
+                                         </p>
+                                       </div>}
+                                   </div>
 
                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t gap-2">
                                      <div className="flex flex-wrap items-center gap-1">
