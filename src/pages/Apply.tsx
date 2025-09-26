@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -46,6 +46,8 @@ export default function Apply() {
   const [nextUserId, setNextUserId] = useState<string>("");
   const { toast } = useToast();
   const { id: jobId } = useParams();
+  const [isSubmittingFiles, setIsSubmittingFiles] = useState(false);
+  const hasTriggeredWebhookRef = useRef(false);
 
   const form = useForm<ApplicationForm>({
     resolver: zodResolver(applicationSchema),
@@ -363,56 +365,74 @@ export default function Apply() {
   };
 
   const handleSubmitFiles = async () => {
-    if (uploadedFiles.length === 0) return;
+    // Prevent duplicate triggers
+    if (hasTriggeredWebhookRef.current) return;
+    if (isSubmittingFiles) return;
     
-    const path = window.location.pathname;
-    const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
-    const resolvedJobId = pathMatch?.[1] || "general";
-    
-    // Use the form's user_id that starts with App000
-    const formUserId = form.getValues("user_id");
-    
-    // Filter out files that still have blob URLs (not yet uploaded to Supabase)
-    const validFiles = uploadedFiles.filter(file => 
-      file.url && file.url.startsWith('https://') && file.url.includes('supabase') && !file.isUploading
-    );
-    
-    // If there are still uploading files, wait for them to complete
+    // Do not proceed while files are still uploading
     const stillUploading = uploadedFiles.some(file => file.isUploading);
     if (stillUploading) {
-      // Don't show error, just wait for uploads to complete
       return;
     }
-    
-    const webhookPayload = {
-      type: "INSERT",
-      table: "CVs",
-      record: {
-        name: `${form.getValues("firstName")} ${form.getValues("lastName")}`,
-        email: form.getValues("email"),
-        cv_link: validFiles.map(f => f.url).join(', '),
-        cv_text: validFiles.map(f => f.text || '').join('\n'),
-        user_id: formUserId,
-        Lastname: form.getValues("lastName"),
-        Firstname: form.getValues("firstName"),
-        phone_number: form.getValues("phoneNumber"),
-        notes: form.getValues("notes") || "",
-        job_id: resolvedJobId
-      },
-      schema: "public",
-      old_record: null
-    };
-    
-    const success = await triggerWebhook(webhookPayload);
-    
-    if (success) {
-      toast({
-        title: "Application Submitted",
-        description: "Thank you for your application. We will review it and get back to you soon.",
-      });
+
+    setIsSubmittingFiles(true);
+
+    try {
+      const path = window.location.pathname;
+      const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
+      const resolvedJobId = pathMatch?.[1] || "general";
+
+      // Use the form's user_id that starts with App000
+      const formUserId = form.getValues("user_id");
+
+      // Only include files that are fully uploaded and have a Supabase public URL
+      const validFiles = uploadedFiles.filter(file => 
+        file.url && file.url.startsWith('https://') && file.url.includes('supabase') && !file.isUploading
+      );
+
+      if (validFiles.length === 0) {
+        setIsSubmittingFiles(false);
+        return;
+      }
+
+      const webhookPayload = {
+        type: "INSERT",
+        table: "CVs",
+        record: {
+          name: `${form.getValues("firstName")} ${form.getValues("lastName")}`,
+          email: form.getValues("email"),
+          cv_link: validFiles.map(f => f.url).join(', '),
+          cv_text: validFiles.map(f => f.text || '').join('\n'),
+          user_id: formUserId,
+          Lastname: form.getValues("lastName"),
+          Firstname: form.getValues("firstName"),
+          phone_number: form.getValues("phoneNumber"),
+          notes: form.getValues("notes") || "",
+          job_id: resolvedJobId
+        },
+        schema: "public",
+        old_record: null
+      };
+
+      // One-time gate: set just before making the request so it never triggers again
+      hasTriggeredWebhookRef.current = true;
+
+      const success = await triggerWebhook(webhookPayload);
+
+      if (success) {
+        toast({
+          title: "Application Submitted",
+          description: "Thank you for your application. We will review it and get back to you soon.",
+        });
+      }
+
+      setIsDialogOpen(false);
+    } catch (e) {
+      console.error("Submit files failed:", e);
+      // Intentionally keep hasTriggeredWebhookRef as-is to avoid re-triggering
+    } finally {
+      setIsSubmittingFiles(false);
     }
-    
-    setIsDialogOpen(false);
   };
 
   return (
@@ -573,9 +593,9 @@ export default function Apply() {
                                 type="button"
                                 onClick={handleSubmitFiles}
                                 className="w-full"
-                                disabled={uploadedFiles.length === 0}
+                                disabled={uploadedFiles.length === 0 || isSubmittingFiles || hasTriggeredWebhookRef.current}
                               >
-                                Submit Files
+                                {isSubmittingFiles ? "Submitting..." : "Submit Files"}
                               </Button>
                             </div>
                           </DialogContent>
