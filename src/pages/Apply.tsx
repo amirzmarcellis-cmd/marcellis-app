@@ -44,6 +44,7 @@ export default function Apply() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [jobName, setJobName] = useState<string>("");
   const [nextUserId, setNextUserId] = useState<string>("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
   const { id: jobId } = useParams();
   const [isSubmittingFiles, setIsSubmittingFiles] = useState(false);
@@ -207,31 +208,12 @@ export default function Apply() {
           throw insertError;
         }
 
-        toast({
-          title: "Application Submitted",
-          description: "Thank you for your application. We will review it and get back to you soon.",
-        });
+        setIsSubmitted(true);
       } else {
         toast({
           title: "Form Saved",
           description: "Your form data has been saved. Please submit your files to complete the application.",
         });
-      }
-
-      // Generate new user ID for next application
-      const newUserId = await generateNextUserId();
-      form.reset({
-        user_id: newUserId,
-        firstName: "",
-        lastName: "",
-        phoneNumber: "",
-        email: "",
-        notes: "",
-        jobApplied: jobName,
-      });
-      setNextUserId(newUserId);
-      if (uploadedFiles.length === 0) {
-        setUploadedFiles([]);
       }
     } catch (error) {
       console.error("Error submitting application:", error);
@@ -426,10 +408,7 @@ export default function Apply() {
       const success = await triggerWebhook(webhookPayload);
 
       if (success) {
-        toast({
-          title: "Application Submitted",
-          description: "Thank you for your application. We will review it and get back to you soon.",
-        });
+        setIsSubmitted(true);
       }
 
       // Keep the one-time flag set after a send attempt (even with no-cors opaque response)
@@ -442,6 +421,31 @@ export default function Apply() {
       setIsSubmittingFiles(false);
     }
   };
+
+  if (isSubmitted) {
+    return (
+      <MissionBackground>
+        <div className="min-h-screen p-4 relative z-10 flex items-center justify-center">
+          <Dialog open={true}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="text-center">Application Submitted Successfully!</DialogTitle>
+                <DialogDescription className="text-center">
+                  Thank you for your application. We will review it and get back to you soon.
+                </DialogDescription>
+              </DialogHeader>
+              <Button 
+                onClick={() => window.location.reload()} 
+                className="w-full mt-4"
+              >
+                Submit Another Application
+              </Button>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </MissionBackground>
+    );
+  }
 
   return (
     <MissionBackground>
