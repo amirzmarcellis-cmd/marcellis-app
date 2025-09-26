@@ -399,11 +399,33 @@ export default function JobDetails() {
       }));
       
       setApplications(mappedApplications);
+      
+      // Fetch longlisted status for all candidates
+      await fetchLonglistedStatus(jobId);
+      
     } catch (error) {
       console.error('Error fetching applications:', error);
       setApplications([]);
     } finally {
       setApplicationsLoading(false);
+    }
+  };
+
+  const fetchLonglistedStatus = async (jobId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('Jobs_CVs')
+        .select('user_id')
+        .eq('job_id', jobId)
+        .not('longlisted_at', 'is', null);
+      
+      if (error) throw error;
+      
+      const longlistedIds = new Set(data?.map(item => item.user_id) || []);
+      setAddedToLongList(longlistedIds);
+      
+    } catch (error) {
+      console.error('Error fetching longlisted status:', error);
     }
   };
   const fetchTaskCandidates = async (jobId: string) => {
@@ -1887,7 +1909,23 @@ export default function JobDetails() {
                                               console.log('Parsed webhook response:', parsedData);
                                             }
 
-                                            // Mark as added to long list
+                                            // Update database to mark as longlisted
+                                            const { error: updateError } = await supabase
+                                              .from('Jobs_CVs')
+                                              .upsert({
+                                                job_id: String(job?.job_id || id || ''),
+                                                user_id: String(application.candidate_id),
+                                                longlisted_at: new Date().toISOString(),
+                                                candidate_name: application.candidate_name || application.name || `${application.Firstname} ${application.Lastname}`,
+                                                candidate_email: application.candidate_email || application.email,
+                                                candidate_phone_number: application.candidate_phone_number || application.phone_number
+                                              });
+
+                                            if (updateError) {
+                                              console.error('Error updating longlisted status:', updateError);
+                                            }
+
+                                            // Mark as added to long list in state
                                             setAddedToLongList(prev => new Set([...prev, application.candidate_id]));
                                             
                                             console.log('Webhook triggered successfully');
