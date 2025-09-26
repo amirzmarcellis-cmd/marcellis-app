@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { BarChart3, Phone, Users, Settings, Home, TrendingUp, FileText, Briefcase, LogOut, PhoneCall, Activity, Sun, Moon, Building2, FolderOpen, User, Crown, UserCog } from "lucide-react";
+import { BarChart3, Phone, Users, Settings, Home, TrendingUp, FileText, Briefcase, LogOut, PhoneCall, Activity, Sun, Moon, Building2, FolderOpen, User, Crown } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -72,17 +72,9 @@ export function DashboardSidebar() {
     url: "/reports",
     icon: FileText
   }, ...(canManageUsers ? [{
-    title: "Users Panel",
+    title: "Users",
     url: "/users-panel",
     icon: Users
-  }, {
-    title: "Teams",
-    url: "/teams",
-    icon: Users
-  }, {
-    title: "Manage Users",
-    url: "/users",
-    icon: UserCog
   }] : []), {
     title: "Settings",
     url: "/settings",

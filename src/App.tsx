@@ -30,8 +30,6 @@ import Interviews from "./pages/Interviews";
 import Tasks from "./pages/Tasks";
 import Apply from "./pages/Apply";
 import UsersPanel from "./pages/UsersPanel";
-import Users from "./pages/Users";
-import Teams from "./pages/Teams";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import CompanySettings from "./pages/CompanySettings";
@@ -86,8 +84,6 @@ const App = () => (
                     <DashboardLayout><UsersPanel /></DashboardLayout>
                   </ProtectedRoute>
                 } />
-                <Route path="/users" element={<DashboardLayout><Users /></DashboardLayout>} />
-                <Route path="/teams" element={<DashboardLayout><Teams /></DashboardLayout>} />
                  <Route path="/company-settings" element={
                    <ProtectedRoute>
                      <DashboardLayout><CompanySettings /></DashboardLayout>
