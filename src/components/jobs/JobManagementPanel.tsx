@@ -9,6 +9,7 @@ import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Br
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { JobDialog } from "./JobDialog";
+import { useProfile } from "@/hooks/useProfile";
 interface Job {
   job_id: string;
   job_title: string | null;
@@ -43,29 +44,66 @@ export function JobManagementPanel() {
     name: string;
     color: string | null;
   }>>([]);
+  const [isTeamLeader, setIsTeamLeader] = useState(false);
   const navigate = useNavigate();
   const {
     toast
   } = useToast();
+  const { profile } = useProfile();
+
   useEffect(() => {
-    fetchJobs();
-    fetchGroups();
-  }, []);
-  const fetchJobs = async () => {
+    if (profile?.user_id) {
+      checkTeamLeaderStatus();
+    }
+  }, [profile]);
+
+  useEffect(() => {
+    if (profile?.user_id) {
+      fetchJobs();
+      fetchGroups();
+    }
+  }, [profile, isTeamLeader]);
+
+  const checkTeamLeaderStatus = async () => {
+    if (!profile?.user_id) return;
+    
     try {
-      const {
-        data: jobsData,
-        error
-      } = await supabase.from('Jobs').select(`
+      const { data, error } = await supabase.rpc('is_team_leader', {
+        user_uuid: profile.user_id
+      });
+      
+      if (error) throw error;
+      setIsTeamLeader(data || false);
+    } catch (error) {
+      console.error('Error checking team leader status:', error);
+      setIsTeamLeader(false);
+    }
+  };
+  const fetchJobs = async () => {
+    if (!profile?.user_id) return;
+    
+    try {
+      let query = supabase.from('Jobs').select(`
           *,
           groups (
             id,
             name,
             color
           )
-        `).order('Timestamp', {
+        `);
+
+      // If not a team leader, only show jobs assigned to this user
+      if (!isTeamLeader) {
+        query = query.eq('recruiter_id', profile.user_id);
+      }
+
+      const {
+        data: jobsData,
+        error
+      } = await query.order('Timestamp', {
         ascending: false
       });
+
       if (error) throw error;
 
       // Fetch candidate counts for each job
