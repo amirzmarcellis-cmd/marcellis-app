@@ -1854,21 +1854,43 @@ export default function JobDetails() {
                                               "job_id": String(job?.job_id || id || '')
                                             };
 
-                                           console.log('Triggering webhook with payload:', JSON.stringify(payload, null, 2));
-                                           
-                                           const response = await fetch(webhookUrl, {
-                                             method: "POST",
-                                             headers: {
-                                               "Content-Type": "application/json",
-                                             },
-                                             mode: "no-cors",
-                                             body: JSON.stringify(payload),
-                                           });
+                                            console.log('Triggering webhook with payload:', JSON.stringify(payload, null, 2));
+                                            
+                                            const response = await fetch(webhookUrl, {
+                                              method: "POST",
+                                              headers: {
+                                                "Content-Type": "application/json",
+                                              },
+                                              body: JSON.stringify(payload),
+                                            });
 
-                                           // Mark as added to long list
-                                           setAddedToLongList(prev => new Set([...prev, application.candidate_id]));
-                                           
-                                           console.log('Webhook triggered successfully');
+                                            if (response.ok) {
+                                              const responseData = await response.json();
+                                              console.log('Webhook response:', responseData);
+                                              
+                                              // Parse the response if it contains "value" field with stringified JSON
+                                              let parsedData = responseData;
+                                              if (Array.isArray(responseData)) {
+                                                parsedData = responseData.map(item => {
+                                                  if (item.value && typeof item.value === 'string') {
+                                                    try {
+                                                      return JSON.parse(item.value);
+                                                    } catch (error) {
+                                                      console.error('Error parsing value field:', error);
+                                                      return item;
+                                                    }
+                                                  }
+                                                  return item;
+                                                });
+                                              }
+                                              
+                                              console.log('Parsed webhook response:', parsedData);
+                                            }
+
+                                            // Mark as added to long list
+                                            setAddedToLongList(prev => new Set([...prev, application.candidate_id]));
+                                            
+                                            console.log('Webhook triggered successfully');
                                          } catch (error) {
                                            console.error('Error triggering webhook:', error);
                                          }
