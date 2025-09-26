@@ -388,7 +388,7 @@ export default function UsersPanel() {
                     </SelectContent>
                   </Select>
                 </div>
-                {(newUser.role === 'management' || newUser.role === 'team_member' || newUser.role === 'team_leader') && (
+                {(newUser.role === 'team_member' || newUser.role === 'team_leader') && (
                   <div className="space-y-2">
                     <Label htmlFor="team">Team</Label>
                     <Select value={newUser.team} onValueChange={(value: string) => setNewUser({ ...newUser, team: value })}>
