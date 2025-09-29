@@ -1659,7 +1659,7 @@ export default function JobDetails() {
               {showFloatingButton && (
                 <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
                   {job?.longlist && job.longlist > 0 ? (
-                    <Button onClick={handleSearchMoreCandidates} className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 text-sm border border-blue-400/20 px-6 py-3" size="sm">
+                    <Button onClick={handleSearchMoreCandidates} className="bg-white/95 hover:bg-white text-gray-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] text-sm border border-gray-200/80 hover:border-gray-300/90 px-6 py-3 backdrop-blur-sm" size="sm">
                       <Search className="w-4 h-4 mr-2" />
                       <span>AI Generate Longlist</span>
                     </Button>
