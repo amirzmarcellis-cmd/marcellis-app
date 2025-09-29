@@ -419,19 +419,110 @@ export default function Index() {
           <Building2 className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-bold">Admin Dashboard</h1>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <MetricCardPro
-            title="Total Users"
-            value="1"
-            icon={Users}
-            trend={[0, 0, 0, 0, 0]}
-          />
-          <MetricCardPro
-            title="System Health"
-            value="100%"
-            icon={Activity}
-            trend={[100, 100, 100, 100, 100]}
-          />
+        
+        <BentoKpis>
+          <TiltCard>
+            <MetricCardPro
+              title="Total Users"
+              value="1"
+              icon={Users}
+              trend={[1, 1, 1, 1, 1]}
+              accent="emerald"
+            />
+          </TiltCard>
+          <TiltCard>
+            <MetricCardPro
+              title="System Health"
+              value="100%"
+              icon={Activity}
+              trend={[100, 100, 100, 100, 100]}
+              accent="cyan"
+            />
+          </TiltCard>
+          <TiltCard>
+            <MetricCardPro
+              title="Active Jobs"
+              value={data?.totalJobs.toString() || "0"}
+              icon={Briefcase}
+              trend={[data?.totalJobs || 0, data?.totalJobs || 0, data?.totalJobs || 0, data?.totalJobs || 0, data?.totalJobs || 0]}
+              accent="purple"
+            />
+          </TiltCard>
+          <TiltCard>
+            <MetricCardPro
+              title="Total Candidates"
+              value={data?.totalCandidates.toString() || "0"}
+              icon={UserCheck}
+              trend={[data?.totalCandidates || 0, data?.totalCandidates || 0, data?.totalCandidates || 0, data?.totalCandidates || 0, data?.totalCandidates || 0]}
+              accent="primary"
+            />
+          </TiltCard>
+        </BentoKpis>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="bg-gradient-card backdrop-blur-sm border-border/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-primary" />
+                Quick Actions
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button 
+                onClick={() => navigate('/platform-admin')} 
+                className="w-full justify-start"
+                variant="outline"
+              >
+                <Building2 className="h-4 w-4 mr-2" />
+                Platform Administration
+              </Button>
+              <Button 
+                onClick={() => navigate('/team-users')} 
+                className="w-full justify-start"
+                variant="outline"
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Manage Users
+              </Button>
+              <Button 
+                onClick={() => navigate('/company-settings')} 
+                className="w-full justify-start"
+                variant="outline"
+              >
+                <Building2 className="h-4 w-4 mr-2" />
+                Company Settings
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-card backdrop-blur-sm border-border/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5 text-primary" />
+                System Status
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Database</span>
+                <Badge variant="secondary" className="bg-success/20 text-success border-success/40">
+                  Operational
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Authentication</span>
+                <Badge variant="secondary" className="bg-success/20 text-success border-success/40">
+                  Active
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Storage</span>
+                <Badge variant="secondary" className="bg-success/20 text-success border-success/40">
+                  Online
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
