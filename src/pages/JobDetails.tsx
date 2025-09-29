@@ -730,6 +730,35 @@ export default function JobDetails() {
     }
   };
   const handleSearchMoreCandidates = async () => {
+    // Trigger confetti animation immediately when clicked
+    const confetti = (await import('canvas-confetti')).default;
+    
+    // Multiple confetti bursts for dramatic effect
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.1 },
+      colors: ['#3B82F6', '#06B6D4', '#8B5CF6', '#EC4899']
+    });
+    
+    setTimeout(() => {
+      confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { y: 0.1, x: 0.3 },
+        colors: ['#10B981', '#F59E0B', '#EF4444']
+      });
+    }, 200);
+    
+    setTimeout(() => {
+      confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { y: 0.1, x: 0.7 },
+        colors: ['#8B5CF6', '#EC4899', '#06B6D4']
+      });
+    }, 400);
+
     try {
       // Get user_ids from AI Boolean Search candidates (filteredCandidates) as comma-separated string
       const booleanSearchUserIds = filteredCandidates.map(candidate => candidate.user_id).filter(Boolean).join(',');
@@ -750,13 +779,13 @@ export default function JobDetails() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       toast({
-        title: "Success",
-        description: "Search for more candidates initiated successfully"
+        title: "✨ Success! 🎉",
+        description: "🚀 AI is now searching for more amazing candidates!"
       });
     } catch (error) {
       console.error('Error searching for more candidates:', error);
       toast({
-        title: "Error",
+        title: "❌ Error",
         description: "Failed to search for more candidates",
         variant: "destructive"
       });
@@ -1642,10 +1671,11 @@ export default function JobDetails() {
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
               {job?.longlist && job.longlist > 0 ? (
-                <Button onClick={handleSearchMoreCandidates} className="relative bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] text-sm w-full sm:w-auto border border-gray-300/50 hover:border-gray-400/70" size="sm">
-                  <Search className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">AI Generate Longlist</span>
-                  <span className="sm:hidden">Search More</span>
+                <Button onClick={handleSearchMoreCandidates} className="relative bg-gradient-to-r from-white to-gray-50 hover:from-purple-50 hover:to-pink-50 text-gray-800 hover:text-purple-700 font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] hover:rotate-1 text-sm w-full sm:w-auto border border-gray-300/50 hover:border-purple-300/70 overflow-hidden group" size="sm">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-400/10 to-pink-400/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                  <Search className="w-4 h-4 mr-2 group-hover:animate-spin transition-transform duration-300 relative z-10" />
+                  <span className="hidden sm:inline relative z-10">🤖 AI Generate Longlist ✨</span>
+                  <span className="sm:hidden relative z-10">🔍 Search ✨</span>
                 </Button>
               ) : (
                 <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} className="relative bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 text-sm w-full sm:w-auto border border-purple-400/20" size="sm">
@@ -1659,9 +1689,10 @@ export default function JobDetails() {
               {showFloatingButton && (
                 <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
                   {job?.longlist && job.longlist > 0 ? (
-                    <Button onClick={handleSearchMoreCandidates} className="bg-white/95 hover:bg-white text-gray-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] text-sm border border-gray-200/80 hover:border-gray-300/90 px-6 py-3 backdrop-blur-sm" size="sm">
-                      <Search className="w-4 h-4 mr-2" />
-                      <span>AI Generate Longlist</span>
+                    <Button onClick={handleSearchMoreCandidates} className="bg-white/95 hover:bg-white text-gray-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.05] hover:rotate-1 text-sm border border-gray-200/80 hover:border-purple-300/90 px-6 py-3 backdrop-blur-sm animate-pulse hover:animate-none relative overflow-hidden group" size="sm">
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-400/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                      <Search className="w-4 h-4 mr-2 group-hover:animate-spin transition-transform duration-300" />
+                      <span className="relative z-10">🤖 AI Generate Longlist ✨</span>
                     </Button>
                   ) : (
                     <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 text-sm border border-purple-400/20 px-6 py-3" size="sm">
