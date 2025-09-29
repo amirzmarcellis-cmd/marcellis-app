@@ -1735,9 +1735,9 @@ export default function JobDetails() {
                   onClick={handleGenerateLongList} 
                   disabled={job?.longlist === 3} 
                   className="ai-longlist-button"
+                  title="AI Longlist"
                 >
-                  <Zap className="w-5 h-5 mr-3 drop-shadow-sm" />
-                  <span className="ai-longlist-text">AI Longlist</span>
+                  <Zap className="w-6 h-6 drop-shadow-sm" />
                 </button>
               )}
 
