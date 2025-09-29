@@ -1723,6 +1723,29 @@ export default function JobDetails() {
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 items-center lg:items-end justify-center lg:justify-end">
+              {job?.longlist && job.longlist > 0 ? (
+                <button 
+                  onClick={handleSearchMoreCandidates} 
+                  className="ai-longlist-button flex-col gap-1"
+                  title="AI Longlist"
+                >
+                  <Search className="w-5 h-5 drop-shadow-sm" />
+                  <span className="text-xs font-bold tracking-tight leading-tight">AI Longlist</span>
+                </button>
+              ) : (
+                <div className="flex justify-center">
+                  <button 
+                    onClick={handleGenerateLongList} 
+                    disabled={job?.longlist === 3} 
+                    className="ai-longlist-button flex-col gap-1"
+                    title="AI Longlist"
+                  >
+                    <Zap className="w-5 h-5 drop-shadow-sm" />
+                    <span className="text-xs font-bold tracking-tight leading-tight">AI Longlist</span>
+                  </button>
+                </div>
+              )}
+
               {/* Floating/Sticky AI Generate Longlist Button - Futuristic Design */}
               {showFloatingButton && (
                 <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
@@ -1794,30 +1817,6 @@ export default function JobDetails() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Centered AI Longlist Button */}
-        <div className="flex justify-center py-4">
-          {job?.longlist && job.longlist > 0 ? (
-            <button 
-              onClick={handleSearchMoreCandidates} 
-              className="ai-longlist-button flex-col gap-1"
-              title="AI Longlist"
-            >
-              <Search className="w-5 h-5 drop-shadow-sm" />
-              <span className="text-xs font-bold tracking-tight leading-tight">AI Longlist</span>
-            </button>
-          ) : (
-            <button 
-              onClick={handleGenerateLongList} 
-              disabled={job?.longlist === 3} 
-              className="ai-longlist-button flex-col gap-1"
-              title="AI Longlist"
-            >
-              <Zap className="w-5 h-5 drop-shadow-sm" />
-              <span className="text-xs font-bold tracking-tight leading-tight">AI Longlist</span>
-            </button>
-          )}
-        </div>
 
         {/* Job Funnel */}
         <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
