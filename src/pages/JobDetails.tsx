@@ -1650,6 +1650,26 @@ export default function JobDetails() {
                   <span className="hidden sm:inline">Generate Long List</span>
                   <span className="sm:hidden">Generate List</span>
                 </Button>}
+
+              {/* Floating/Sticky AI Generate Longlist Button */}
+              {showFloatingButton && (
+                <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
+                  <div className="relative group">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/50 via-blue-500/50 to-purple-500/50 rounded-full blur-lg opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
+                    {job?.longlist && job.longlist > 0 ? (
+                      <Button onClick={handleSearchMoreCandidates} className="relative bg-foreground text-background hover:bg-foreground/90 shadow-2xl backdrop-blur-md border border-white/30 transition-all duration-500 hover:scale-110 rounded-full px-6 py-3 font-semibold" size="lg">
+                        <Search className="w-5 h-5 mr-2 group-hover:animate-pulse" />
+                        <span className="font-bold tracking-wide">AI Generate Longlist</span>
+                      </Button>
+                    ) : (
+                      <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} className="relative bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 hover:from-cyan-500 hover:via-blue-500 hover:to-purple-500 text-white shadow-2xl backdrop-blur-md border border-white/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-500 hover:scale-110 rounded-full px-6 py-3 font-semibold" size="lg">
+                        <Zap className="w-5 h-5 mr-2 group-hover:animate-pulse transition-transform group-hover:rotate-12" />
+                        <span className="font-bold tracking-wide">Generate Long List</span>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
               <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto">
                 <FileText className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Edit Job</span>
