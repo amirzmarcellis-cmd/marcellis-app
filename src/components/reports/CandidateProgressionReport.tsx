@@ -130,12 +130,17 @@ export function CandidateProgressionReport() {
             }
           }
 
-          // Calculate time to submission: start from AI Shortlist time, fallback to longlist
-          const startTime = shortlistedTime || longlistedTime || null;
-          const submissionTime =
-            parsePossibleDate(item.contacted) ||
-            parsePossibleDate((item as any).notes_updated_at) ||
-            parsePossibleDate((item as any).lastcalltime);
+          // Calculate time to submission: start from AI Shortlist time only
+          const startTime = shortlistedTime; // Only use shortlisted time as start
+          
+          // Check if contacted status is "submitted" and parse the time
+          let submissionTime = null;
+          if (item.contacted && item.contacted.toLowerCase() === 'submitted') {
+            // If contacted is just "submitted" text, we need to look for actual timestamp
+            // Check notes_updated_at or lastcalltime for the actual submission timestamp
+            submissionTime = parsePossibleDate((item as any).notes_updated_at) || 
+                           parsePossibleDate((item as any).lastcalltime);
+          }
 
           try {
             if (startTime) {
@@ -144,6 +149,7 @@ export function CandidateProgressionReport() {
                 processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
                 processed.submissionPending = false;
               } else {
+                // If not submitted yet, calculate pending time from shortlist
                 const now = new Date();
                 const diffInMs = now.getTime() - startTime.getTime();
                 processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
