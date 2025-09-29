@@ -1642,7 +1642,7 @@ export default function JobDetails() {
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
               {job?.longlist && job.longlist > 0 ? (
-                <Button onClick={handleSearchMoreCandidates} className="relative bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 text-sm w-full sm:w-auto border border-blue-400/20" size="sm">
+                <Button onClick={handleSearchMoreCandidates} className="relative bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] text-sm w-full sm:w-auto border border-gray-300/50 hover:border-gray-400/70" size="sm">
                   <Search className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">AI Generate Longlist</span>
                   <span className="sm:hidden">Search More</span>
