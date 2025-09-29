@@ -2819,13 +2819,31 @@ export default function JobDetails() {
           </AlertDialogContent>
         </AlertDialog>
 
-        {/* Floating Generate Long List Button */}
-        {showFloatingButton && job && (!job.longlist || job.longlist === 0) && <div className="fixed bottom-6 right-6 z-50 animate-fade-in">
-            <Button onClick={() => handleGenerateLongList()} disabled={job?.longlist === 3} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-2xl backdrop-blur-sm border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed group transition-all duration-300 hover:scale-105" size="lg">
-              <Zap className="w-5 h-5 mr-2 group-hover:animate-pulse" />
-              Generate Long List
-            </Button>
-          </div>}
+        {/* Floating AI Generate Longlist Button */}
+        {showFloatingButton && job && (!job.longlist || job.longlist === 0) && (
+          <div className="fixed bottom-8 right-8 z-50 animate-fade-in">
+            <div className="relative group">
+              {/* Glow effect */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/50 via-blue-500/50 to-purple-500/50 rounded-full blur-lg opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
+              
+              {/* Button */}
+              <Button 
+                onClick={() => handleGenerateLongList()} 
+                disabled={job?.longlist === 3} 
+                className="relative bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 hover:from-cyan-500 hover:via-blue-500 hover:to-purple-500 text-white shadow-2xl backdrop-blur-md border border-white/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-500 hover:scale-110 hover:shadow-3xl rounded-full px-8 py-4 text-lg font-semibold"
+                size="lg"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <Zap className="w-6 h-6 group-hover:animate-pulse transition-transform group-hover:rotate-12" />
+                    <div className="absolute inset-0 bg-white/20 rounded-full blur-sm animate-pulse" />
+                  </div>
+                  <span className="font-bold tracking-wide">AI Generate Longlist</span>
+                </div>
+              </Button>
+            </div>
+          </div>
+        )}
 
       </div>;
 }
