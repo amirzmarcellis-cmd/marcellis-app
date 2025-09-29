@@ -647,13 +647,13 @@ export default function EditJob() {
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-lg font-semibold">AI Requirements Amendment</h3>
+                      <h3 className="text-lg font-semibold">Edit Job Requirements</h3>
                       <p className="text-sm text-muted-foreground">
-                        Toggle amend mode to edit AI requirements
+                        Edit all job requirements and descriptions. Changes will be reflected in AI Requirements.
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Label htmlFor="amendMode">Amend AI</Label>
+                      <Label htmlFor="amendMode">Enable Editing</Label>
                       <Switch
                         id="amendMode"
                         checked={isAmendMode}
@@ -662,133 +662,102 @@ export default function EditJob() {
                     </div>
                   </div>
 
-                  {isAmendMode && (
-                    <div className="space-y-6 p-4 border border-primary/20 rounded-lg bg-primary/5">
-                      <div className="space-y-2">
-                        <Label htmlFor="job_description">Job Description & Requirements</Label>
-                        <Textarea
-                          id="job_description"
-                          name="job_description"
-                          value={formData.job_description || ""}
-                          onChange={handleInputChange}
-                          placeholder="Enter detailed job description and requirements"
-                          rows={6}
-                          className="bg-background/50"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="client_description">Client Description</Label>
-                        <Textarea
-                          id="client_description"
-                          name="client_description"
-                          value={formData.client_description || ""}
-                          onChange={handleInputChange}
-                          placeholder="Enter client company description"
-                          rows={4}
-                          className="bg-background/50"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="musttohave">Must Have Requirements</Label>
-                        <Textarea
-                          id="musttohave"
-                          name="musttohave"
-                          value={formData.musttohave || ""}
-                          onChange={handleInputChange}
-                          placeholder="Enter critical skills and requirements"
-                          rows={4}
-                          className="bg-background/50"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="nicetohave">Nice to Have Requirements</Label>
-                        <Textarea
-                          id="nicetohave"
-                          name="nicetohave"
-                          value={formData.nicetohave || ""}
-                          onChange={handleInputChange}
-                          placeholder="Enter preferred skills and bonuses"
-                          rows={4}
-                          className="bg-background/50"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="jd_summary">JD Summary</Label>
-                        <Textarea
-                          id="jd_summary"
-                          name="jd_summary"
-                          value={formData.jd_summary}
-                          onChange={handleInputChange}
-                          placeholder="Enter job description summary"
-                          rows={3}
-                          className="bg-background/50"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="things_to_look_for">Things to Look For</Label>
-                        <Textarea
-                          id="things_to_look_for"
-                          name="things_to_look_for"
-                          value={formData.things_to_look_for}
-                          onChange={handleInputChange}
-                          placeholder="Enter specific things to look for in candidates"
-                          rows={3}
-                          className="bg-background/50"
-                        />
-                      </div>
+                  <div className="space-y-6 p-6 border border-primary/20 rounded-lg bg-gradient-to-br from-primary/5 to-primary/10">
+                    <div className="mb-4 p-3 bg-primary/10 rounded-md border border-primary/20">
+                      <h4 className="font-semibold text-primary mb-1">✏️ Editing Mode Active</h4>
+                      <p className="text-sm text-muted-foreground">Make your changes below and click 'Update Job' to save.</p>
                     </div>
-                  )}
 
-                  {!isAmendMode && (
-                    <div className="space-y-4 p-4 border border-border/30 rounded-lg bg-muted/20">
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-primary">Job Description & Requirements</h4>
-                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                          {formData.job_description || "No job description provided."}
-                        </p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-primary">Client Description</h4>
-                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                          {formData.client_description || "No client description provided."}
-                        </p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-primary">Must Have Requirements</h4>
-                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                          {formData.musttohave || "No must-have requirements specified."}
-                        </p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-primary">Nice to Have Requirements</h4>
-                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                          {formData.nicetohave || "No nice-to-have requirements specified."}
-                        </p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-primary">JD Summary</h4>
-                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                          {formData.jd_summary || "No summary provided."}
-                        </p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-primary">Things to Look For</h4>
-                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                          {formData.things_to_look_for || "No specific criteria provided."}
-                        </p>
-                      </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="job_description" className="text-base font-semibold">📋 Job Description & Requirements</Label>
+                      <Textarea
+                        id="job_description"
+                        name="job_description"
+                        value={formData.job_description || ""}
+                        onChange={handleInputChange}
+                        placeholder="Enter detailed job description and requirements..."
+                        rows={6}
+                        className="bg-background border-2 border-primary/30 focus:border-primary transition-colors"
+                      />
                     </div>
-                  )}
+
+                    <div className="space-y-2">
+                      <Label htmlFor="client_description" className="text-base font-semibold">🏢 Client Description</Label>
+                      <Textarea
+                        id="client_description"
+                        name="client_description"
+                        value={formData.client_description || ""}
+                        onChange={handleInputChange}
+                        placeholder="Enter client company description..."
+                        rows={4}
+                        className="bg-background border-2 border-primary/30 focus:border-primary transition-colors"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="musttohave" className="text-base font-semibold">⭐ Must Have Requirements</Label>
+                      <Textarea
+                        id="musttohave"
+                        name="musttohave"
+                        value={formData.musttohave || ""}
+                        onChange={handleInputChange}
+                        placeholder="Enter critical skills and requirements..."
+                        rows={4}
+                        className="bg-background border-2 border-red-300 focus:border-red-500 transition-colors"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="nicetohave" className="text-base font-semibold">💫 Nice to Have Requirements</Label>
+                      <Textarea
+                        id="nicetohave"
+                        name="nicetohave"
+                        value={formData.nicetohave || ""}
+                        onChange={handleInputChange}
+                        placeholder="Enter preferred skills and bonuses..."
+                        rows={4}
+                        className="bg-background border-2 border-green-300 focus:border-green-500 transition-colors"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="jd_summary" className="text-base font-semibold">📝 JD Summary</Label>
+                      <Textarea
+                        id="jd_summary"
+                        name="jd_summary"
+                        value={formData.jd_summary}
+                        onChange={handleInputChange}
+                        placeholder="Enter job description summary..."
+                        rows={3}
+                        className="bg-background border-2 border-primary/30 focus:border-primary transition-colors"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="things_to_look_for" className="text-base font-semibold">🔍 Things to Look For</Label>
+                      <Textarea
+                        id="things_to_look_for"
+                        name="things_to_look_for"
+                        value={formData.things_to_look_for}
+                        onChange={handleInputChange}
+                        placeholder="Enter specific things to look for in candidates..."
+                        rows={3}
+                        className="bg-background border-2 border-primary/30 focus:border-primary transition-colors"
+                      />
+                    </div>
+
+                    <div className="flex justify-end pt-4 border-t border-primary/20">
+                      <Button 
+                        type="submit" 
+                        disabled={saving}
+                        className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white px-8 py-2 font-semibold"
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        {saving ? "Updating..." : "Update Job Requirements"}
+                      </Button>
+                    </div>
+                  </div>
+
                 </div>
               </TabsContent>
             </Tabs>
