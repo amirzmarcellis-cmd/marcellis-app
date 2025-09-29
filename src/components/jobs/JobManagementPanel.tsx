@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Briefcase } from "lucide-react";
+import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Briefcase, Phone, PhoneOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { JobDialog } from "./JobDialog";
@@ -26,6 +27,7 @@ interface Job {
   nicetohave?: string | null;
   Timestamp: string | null;
   group_id?: string | null;
+  automatic_dial?: boolean | null;
   longlisted_count?: number;
   shortlisted_count?: number;
   groups?: {
@@ -193,6 +195,30 @@ export function JobManagementPanel() {
       });
     }
   };
+
+  const handleAutomaticDialToggle = async (jobId: string, currentValue: boolean | null) => {
+    const newValue = !currentValue;
+    try {
+      const {
+        error
+      } = await supabase.from('Jobs').update({
+        automatic_dial: newValue
+      }).eq('job_id', jobId);
+      if (error) throw error;
+      await fetchJobs();
+      toast({
+        title: "Success",
+        description: `Automatic dial ${newValue ? "enabled" : "disabled"}`
+      });
+    } catch (error) {
+      console.error('Error updating automatic dial:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update automatic dial setting",
+        variant: "destructive"
+      });
+    }
+  };
   const handleDelete = async (jobId: string) => {
     if (!confirm("Are you sure you want to delete this job?")) return;
     try {
@@ -328,21 +354,21 @@ export function JobManagementPanel() {
             <JobGrid jobs={filteredJobs.activeJobs} loading={false} onEdit={job => {
             setSelectedJob(job);
             setIsDialogOpen(true);
-          }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} navigate={navigate} />
+          }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} onAutomaticDialToggle={handleAutomaticDialToggle} navigate={navigate} />
           </TabsContent>
           
           <TabsContent value="paused">
             <JobGrid jobs={filteredJobs.pausedJobs} loading={false} onEdit={job => {
             setSelectedJob(job);
             setIsDialogOpen(true);
-          }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} navigate={navigate} />
+          }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} onAutomaticDialToggle={handleAutomaticDialToggle} navigate={navigate} />
           </TabsContent>
           
           <TabsContent value="all">
             <JobGrid jobs={filteredJobs.allJobs} loading={false} onEdit={job => {
             setSelectedJob(job);
             setIsDialogOpen(true);
-          }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} navigate={navigate} />
+          }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} onAutomaticDialToggle={handleAutomaticDialToggle} navigate={navigate} />
           </TabsContent>
         </Tabs>
       )}
@@ -365,6 +391,7 @@ interface JobGridProps {
   onEdit: (job: Job) => void;
   onDelete: (jobId: string) => void;
   onStatusToggle: (jobId: string, currentStatus: string | null) => void;
+  onAutomaticDialToggle: (jobId: string, currentValue: boolean | null) => void;
   navigate: (path: string) => void;
 }
 const JobGrid = memo(function JobGrid({
@@ -373,6 +400,7 @@ const JobGrid = memo(function JobGrid({
   onEdit,
   onDelete,
   onStatusToggle,
+  onAutomaticDialToggle,
   navigate
 }: JobGridProps) {
   const formatCurrency = (amountStr: string | null | undefined, currency?: string | null) => {
@@ -464,7 +492,24 @@ const JobGrid = memo(function JobGrid({
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-border/30">
+            {/* Automatic Dial Toggle */}
+            <div className="flex items-center justify-between py-2 border-t border-border/30">
+              <div className="flex items-center gap-2 text-sm">
+                {job.automatic_dial ? (
+                  <Phone className="h-4 w-4 text-green" />
+                ) : (
+                  <PhoneOff className="h-4 w-4 text-muted-foreground" />
+                )}
+                <span className="text-muted-foreground">Automatic Dial</span>
+              </div>
+              <Switch
+                checked={job.automatic_dial || false}
+                onCheckedChange={() => onAutomaticDialToggle(job.job_id, job.automatic_dial)}
+                className="data-[state=checked]:bg-green data-[state=unchecked]:bg-muted"
+              />
+            </div>
+
+            <div className="flex items-center justify-between pt-2">
               <div className="flex space-x-2">
                 <Button size="sm" variant="outline" onClick={() => navigate(`/jobs/edit/${job.job_id}`)} className="h-8 px-2">
                   <Edit className="h-3 w-3" />
