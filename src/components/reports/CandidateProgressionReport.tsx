@@ -199,7 +199,7 @@ export function CandidateProgressionReport() {
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-blue-500" />
                   <div>
-                    <p className="text-sm font-medium">Avg. Time to Shortlist</p>
+                    <p className="text-sm font-medium">Avg. Longlisted → Shortlisted</p>
                     <p className="text-2xl font-bold text-blue-600">
                       {formatDuration(averageTimeToShortlist)}
                     </p>
@@ -213,7 +213,7 @@ export function CandidateProgressionReport() {
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-green-500" />
                   <div>
-                    <p className="text-sm font-medium">Avg. Time to Submission</p>
+                    <p className="text-sm font-medium">Avg. Shortlisted → Submission</p>
                     <p className="text-2xl font-bold text-green-600">
                       {formatDuration(averageTimeToSubmission)}
                     </p>
@@ -249,8 +249,8 @@ export function CandidateProgressionReport() {
                   <TableHead>Status</TableHead>
                   <TableHead>Longlisted At</TableHead>
                   <TableHead>Shortlisted At</TableHead>
-                  <TableHead>Time to Shortlist</TableHead>
-                  <TableHead>Time to Submission</TableHead>
+                  <TableHead>Longlisted → Shortlisted</TableHead>
+                  <TableHead>Shortlisted → Submission</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
