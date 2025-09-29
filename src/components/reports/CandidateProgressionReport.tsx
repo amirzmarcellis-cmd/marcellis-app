@@ -72,7 +72,7 @@ export function CandidateProgressionReport() {
     try {
       let query = supabase
         .from('Jobs_CVs')
-        .select('job_id, candidate_name, longlisted_at, shortlisted_at, contacted, notes_updated_at, lastcalltime')
+        .select('job_id, candidate_name, longlisted_at, shortlisted_at, contacted, notes_updated_at, lastcalltime, submitted_at')
         .not('longlisted_at', 'is', null);
 
       if (selectedJobId !== "all") {
@@ -136,12 +136,12 @@ export function CandidateProgressionReport() {
           // Determine if the candidate is actually submitted
           const isSubmitted = typeof item.contacted === 'string' && item.contacted.trim().toLowerCase() === 'submitted';
 
-          // If submitted, try to infer a timestamp from available fields
+          // Use the new submitted_at timestamp if available
           let submissionTime = null as Date | null;
           if (isSubmitted) {
-            submissionTime =
-              parsePossibleDate((item as any).notes_updated_at) ||
-              parsePossibleDate((item as any).lastcalltime);
+            submissionTime = parsePossibleDate((item as any).submitted_at) ||
+                           parsePossibleDate((item as any).notes_updated_at) ||
+                           parsePossibleDate((item as any).lastcalltime);
           }
 
           try {
@@ -151,7 +151,7 @@ export function CandidateProgressionReport() {
                   const diffInMs = submissionTime.getTime() - startTime.getTime();
                   processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
                 } else {
-                  // No timestamp available for when it became Submitted — don't keep counting, just mark as completed without duration
+                  // No timestamp available for when it became Submitted
                   processed.timeToSubmission = undefined;
                 }
                 processed.submissionPending = false;

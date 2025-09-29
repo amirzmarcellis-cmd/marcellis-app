@@ -287,12 +287,14 @@ export type Database = {
           notes_updated_at: string | null
           notes_updated_by: string | null
           notice_period: string | null
+          qualifications: string | null
           recordid: number
           recording: string | null
           recruiter_id: string | null
           salary_expectations: string | null
           shortlisted_at: string | null
           source: string | null
+          submitted_at: string | null
           transcript: string | null
           two_questions_of_interview: string | null
           user_id: string | null
@@ -321,12 +323,14 @@ export type Database = {
           notes_updated_at?: string | null
           notes_updated_by?: string | null
           notice_period?: string | null
+          qualifications?: string | null
           recordid?: number
           recording?: string | null
           recruiter_id?: string | null
           salary_expectations?: string | null
           shortlisted_at?: string | null
           source?: string | null
+          submitted_at?: string | null
           transcript?: string | null
           two_questions_of_interview?: string | null
           user_id?: string | null
@@ -355,12 +359,14 @@ export type Database = {
           notes_updated_at?: string | null
           notes_updated_by?: string | null
           notice_period?: string | null
+          qualifications?: string | null
           recordid?: number
           recording?: string | null
           recruiter_id?: string | null
           salary_expectations?: string | null
           shortlisted_at?: string | null
           source?: string | null
+          submitted_at?: string | null
           transcript?: string | null
           two_questions_of_interview?: string | null
           user_id?: string | null
