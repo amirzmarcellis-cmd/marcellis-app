@@ -4,7 +4,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, Clock, TrendingUp } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Download, Clock, TrendingUp, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { format, parseISO, differenceInHours, differenceInDays } from "date-fns";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -24,6 +25,7 @@ export function CandidateProgressionReport() {
   const [loading, setLoading] = useState(true);
   const [selectedJobId, setSelectedJobId] = useState<string>("all");
   const [jobs, setJobs] = useState<{job_id: string, job_title: string}[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const { isAdmin, isTeamLeader } = useUserRole();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
@@ -111,13 +113,29 @@ export function CandidateProgressionReport() {
           if (item.shortlisted_at && item.contacted) {
             try {
               const shortlistedTime = new Date(item.shortlisted_at);
-              // contacted field might be text, so we'll try to parse it as a date if possible
-              if (item.contacted && item.contacted !== 'Contacted' && item.contacted !== 'Call Done') {
-                const contactedTime = new Date(item.contacted);
-                if (!isNaN(contactedTime.getTime())) {
-                  const diffInMs = contactedTime.getTime() - shortlistedTime.getTime();
-                  processed.timeToSubmission = diffInMs / (1000 * 60 * 60); // Convert to hours
+              
+              // Try to parse contacted field as a date
+              // It could be a timestamp or just text like 'Contacted' or 'Call Done'
+              let contactedTime: Date | null = null;
+              
+              if (item.contacted && !['Contacted', 'Call Done', 'Yes', 'No'].includes(item.contacted)) {
+                // Try parsing as ISO date first
+                contactedTime = new Date(item.contacted);
+                
+                // If that fails, try parsing as a more flexible date format
+                if (isNaN(contactedTime.getTime())) {
+                  // Could be other formats, try timestamp
+                  const timestamp = parseInt(item.contacted);
+                  if (!isNaN(timestamp)) {
+                    contactedTime = new Date(timestamp);
+                  }
                 }
+              }
+              
+              if (contactedTime && !isNaN(contactedTime.getTime())) {
+                const diffInMs = contactedTime.getTime() - shortlistedTime.getTime();
+                processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60)); // Convert to hours, ensure positive
+                console.log(`Submission time calc for ${item.candidate_name}: ${processed.timeToSubmission} hours`);
               }
             } catch (error) {
               console.error('Error parsing dates for submission calculation:', error);
@@ -174,6 +192,17 @@ export function CandidateProgressionReport() {
     .reduce((sum, item) => sum + (item.timeToSubmission || 0), 0) / 
     progressionData.filter(item => item.timeToSubmission).length || 0;
 
+  // Filter data based on search term
+  const filteredData = progressionData.filter(item => {
+    if (!searchTerm) return true;
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      (item.candidate_name && item.candidate_name.toLowerCase().includes(searchLower)) ||
+      (item.job_id && item.job_id.toLowerCase().includes(searchLower)) ||
+      getProgressionStatus(item).toLowerCase().includes(searchLower)
+    );
+  });
+
   return (
     <div className="space-y-6">
       <Card>
@@ -189,6 +218,15 @@ export function CandidateProgressionReport() {
               </CardDescription>
             </div>
             <div className="flex gap-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Search candidates..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-64"
+                />
+              </div>
               <Select value={selectedJobId} onValueChange={setSelectedJobId}>
                 <SelectTrigger className="w-48">
                   <SelectValue placeholder="Filter by job" />
@@ -272,7 +310,7 @@ export function CandidateProgressionReport() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {progressionData.map((item, index) => (
+                {filteredData.map((item, index) => (
                   <TableRow key={index}>
                     <TableCell className="font-medium">
                       {item.candidate_name || "—"}
