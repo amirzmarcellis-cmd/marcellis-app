@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -81,7 +81,7 @@ export function JobManagementPanel() {
       setIsTeamLeader(false);
     }
   };
-  const fetchJobs = async () => {
+  const fetchJobs = useCallback(async () => {
     if (!profile?.user_id) return;
     
     try {
@@ -109,35 +109,43 @@ export function JobManagementPanel() {
 
       if (error) throw error;
 
-      // Fetch candidate counts for each job
-      const jobsWithCounts = await Promise.all((jobsData || []).map(async job => {
-        const {
-          data: candidatesData,
-          error: candidatesError
-        } = await supabase.from('Jobs_CVs').select('cv_score, after_call_score').eq('job_id', job.job_id);
-        if (candidatesError) {
-          console.error('Error fetching candidate counts for job:', job.job_id, candidatesError);
-          return {
-            ...job,
-            longlisted_count: 0,
-            shortlisted_count: 0
-          };
-        }
+      // Optimize: Fetch all candidate counts in a single query
+      const jobIds = (jobsData || []).map(job => job.job_id);
+      const {
+        data: allCandidatesData,
+        error: candidatesError
+      } = await supabase
+        .from('Jobs_CVs')
+        .select('job_id, cv_score, after_call_score')
+        .in('job_id', jobIds);
 
-        // Longlist = total candidates for this job
-        const longlisted_count = candidatesData?.length || 0;
+      if (candidatesError) {
+        console.error('Error fetching candidate counts:', candidatesError);
+      }
 
-        // Shortlist = candidates with after_call_score >= 74 (matching JobFunnel logic)
-        const shortlisted_count = candidatesData?.filter(c => {
+      // Group candidates by job_id for faster lookup
+      const candidatesByJob = allCandidatesData?.reduce((acc, candidate) => {
+        if (!acc[candidate.job_id]) acc[candidate.job_id] = [];
+        acc[candidate.job_id].push(candidate);
+        return acc;
+      }, {} as Record<string, any[]>) || {};
+
+      // Calculate counts for each job
+      const jobsWithCounts = (jobsData || []).map(job => {
+        const candidates = candidatesByJob[job.job_id] || [];
+        const longlisted_count = candidates.length;
+        const shortlisted_count = candidates.filter(c => {
           const score = parseInt(c.after_call_score || "0");
           return score >= 74;
-        }).length || 0;
+        }).length;
+
         return {
           ...job,
           longlisted_count,
           shortlisted_count
         };
-      }));
+      });
+
       setJobs(jobsWithCounts);
     } catch (error) {
       console.error('Error fetching jobs:', error);
@@ -149,8 +157,8 @@ export function JobManagementPanel() {
     } finally {
       setLoading(false);
     }
-  };
-  const fetchGroups = async () => {
+  }, [profile?.user_id, isAdmin, isManager, isTeamLeader, toast]);
+  const fetchGroups = useCallback(async () => {
     try {
       const {
         data,
@@ -161,7 +169,7 @@ export function JobManagementPanel() {
     } catch (error) {
       console.error('Error fetching groups:', error);
     }
-  };
+  }, []);
   const handleStatusToggle = async (jobId: string, currentStatus: string | null) => {
     const newStatus = currentStatus === "Yes" ? "No" : "Yes";
     try {
@@ -215,20 +223,25 @@ export function JobManagementPanel() {
         Paused
       </Badge>;
   };
-  const activeJobs = jobs.filter(job => job.Processed === "Yes");
-  const pausedJobs = jobs.filter(job => job.Processed !== "Yes");
+  // Memoize expensive filtering operations
+  const filteredJobs = useMemo(() => {
+    const filterJobsByGroup = (jobList: Job[]) => {
+      if (!selectedGroupFilter) return jobList;
+      if (selectedGroupFilter === "ungrouped") {
+        return jobList.filter(job => !job.group_id);
+      }
+      return jobList.filter(job => job.group_id === selectedGroupFilter);
+    };
 
-  // Filter jobs by selected group
-  const filterJobsByGroup = (jobList: Job[]) => {
-    if (!selectedGroupFilter) return jobList;
-    if (selectedGroupFilter === "ungrouped") {
-      return jobList.filter(job => !job.group_id);
-    }
-    return jobList.filter(job => job.group_id === selectedGroupFilter);
-  };
-  const filteredActiveJobs = filterJobsByGroup(activeJobs);
-  const filteredPausedJobs = filterJobsByGroup(pausedJobs);
-  const filteredAllJobs = filterJobsByGroup(jobs);
+    const activeJobs = jobs.filter(job => job.Processed === "Yes");
+    const pausedJobs = jobs.filter(job => job.Processed !== "Yes");
+
+    return {
+      activeJobs: filterJobsByGroup(activeJobs),
+      pausedJobs: filterJobsByGroup(pausedJobs),
+      allJobs: filterJobsByGroup(jobs)
+    };
+  }, [jobs, selectedGroupFilter]);
   return <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -267,32 +280,32 @@ export function JobManagementPanel() {
       <Tabs defaultValue="active" className="space-y-6">
         <TabsList className="glass-card flex-nowrap whitespace-nowrap overflow-x-auto">
           <TabsTrigger value="active" className="data-[state=active]:bg-status-active data-[state=active]:text-white flex-shrink-0">
-            Active Jobs ({filteredActiveJobs.length})
+            Active Jobs ({filteredJobs.activeJobs.length})
           </TabsTrigger>
           <TabsTrigger value="paused" className="flex-shrink-0">
-            Paused Jobs ({filteredPausedJobs.length})
+            Paused Jobs ({filteredJobs.pausedJobs.length})
           </TabsTrigger>
           <TabsTrigger value="all" className="flex-shrink-0">
-            All Jobs ({filteredAllJobs.length})
+            All Jobs ({filteredJobs.allJobs.length})
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="active">
-          <JobGrid jobs={filteredActiveJobs} onEdit={job => {
+          <JobGrid jobs={filteredJobs.activeJobs} onEdit={job => {
           setSelectedJob(job);
           setIsDialogOpen(true);
         }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} navigate={navigate} />
         </TabsContent>
         
         <TabsContent value="paused">
-          <JobGrid jobs={filteredPausedJobs} onEdit={job => {
+          <JobGrid jobs={filteredJobs.pausedJobs} onEdit={job => {
           setSelectedJob(job);
           setIsDialogOpen(true);
         }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} navigate={navigate} />
         </TabsContent>
         
         <TabsContent value="all">
-          <JobGrid jobs={filteredAllJobs} onEdit={job => {
+          <JobGrid jobs={filteredJobs.allJobs} onEdit={job => {
           setSelectedJob(job);
           setIsDialogOpen(true);
         }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} navigate={navigate} />
@@ -318,7 +331,7 @@ interface JobGridProps {
   onStatusToggle: (jobId: string, currentStatus: string | null) => void;
   navigate: (path: string) => void;
 }
-function JobGrid({
+const JobGrid = memo(function JobGrid({
   jobs,
   onEdit,
   onDelete,
@@ -435,4 +448,4 @@ function JobGrid({
           </CardContent>
         </Card>)}
     </div>;
-}
+});
