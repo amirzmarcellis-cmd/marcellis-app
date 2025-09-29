@@ -16,7 +16,6 @@ interface CandidateProgression {
   longlisted_at: string | null;
   shortlisted_at: string | null;
   contacted: string | null;
-  lastcalltime: string | null;
   timeToShortlist?: number; // hours
   timeToSubmission?: number; // hours
 }
@@ -72,7 +71,8 @@ export function CandidateProgressionReport() {
     try {
       let query = supabase
         .from('Jobs_CVs')
-        .select('job_id, candidate_name, longlisted_at, shortlisted_at, contacted, lastcalltime');
+        .select('job_id, candidate_name, longlisted_at, shortlisted_at, contacted')
+        .not('longlisted_at', 'is', null);
 
       if (selectedJobId !== "all") {
         query = query.eq('job_id', selectedJobId);
@@ -109,14 +109,31 @@ export function CandidateProgressionReport() {
             }
           }
 
-          // Calculate time to submission (shortlisted_at to lastcalltime)
-          if (item.shortlisted_at && item.lastcalltime) {
+          // Calculate time to submission (shortlisted_at to contacted/submitted)
+          if (item.shortlisted_at && item.contacted) {
             try {
               const shortlistedTime = new Date(item.shortlisted_at);
-              const submissionTime = new Date(item.lastcalltime);
               
-              if (!isNaN(shortlistedTime.getTime()) && !isNaN(submissionTime.getTime())) {
-                const diffInMs = submissionTime.getTime() - shortlistedTime.getTime();
+              // Try to parse contacted field as a date
+              // It could be a timestamp or just text like 'Contacted' or 'Call Done'
+              let contactedTime: Date | null = null;
+              
+              if (item.contacted && !['Contacted', 'Call Done', 'Yes', 'No'].includes(item.contacted)) {
+                // Try parsing as ISO date first
+                contactedTime = new Date(item.contacted);
+                
+                // If that fails, try parsing as a more flexible date format
+                if (isNaN(contactedTime.getTime())) {
+                  // Could be other formats, try timestamp
+                  const timestamp = parseInt(item.contacted);
+                  if (!isNaN(timestamp)) {
+                    contactedTime = new Date(timestamp);
+                  }
+                }
+              }
+              
+              if (contactedTime && !isNaN(contactedTime.getTime())) {
+                const diffInMs = contactedTime.getTime() - shortlistedTime.getTime();
                 processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60)); // Convert to hours, ensure positive
                 console.log(`Submission time calc for ${item.candidate_name}: ${processed.timeToSubmission} hours`);
               }
@@ -334,7 +351,7 @@ export function CandidateProgressionReport() {
                         </span>
                       ) : (
                         <span className="text-muted-foreground">
-                          {!item.lastcalltime ? "No submission time" : "No data"}
+                          {!item.contacted || item.contacted === 'Contacted' || item.contacted === 'Call Done' ? "No submission date" : "No data"}
                         </span>
                       )}
                     </TableCell>
