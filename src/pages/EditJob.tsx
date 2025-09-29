@@ -665,32 +665,19 @@ export default function EditJob() {
                   <div className="space-y-6 p-6 border border-primary/20 rounded-lg bg-gradient-to-br from-primary/5 to-primary/10">
                     <div className="mb-4 p-3 bg-primary/10 rounded-md border border-primary/20">
                       <h4 className="font-semibold text-primary mb-1">✏️ Editing Mode Active</h4>
-                      <p className="text-sm text-muted-foreground">Make your changes below and click 'Update Job' to save.</p>
+                      <p className="text-sm text-muted-foreground">Edit the specific job requirements below and click 'Update Job Requirements' to save.</p>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="job_description" className="text-base font-semibold">📋 Job Description & Requirements</Label>
+                      <Label htmlFor="things_to_look_for" className="text-base font-semibold">🔍 Things to Look For</Label>
                       <Textarea
-                        id="job_description"
-                        name="job_description"
-                        value={formData.job_description || ""}
+                        id="things_to_look_for"
+                        name="things_to_look_for"
+                        value={formData.things_to_look_for}
                         onChange={handleInputChange}
-                        placeholder="Enter detailed job description and requirements..."
-                        rows={6}
-                        className="bg-background border-2 border-primary/30 focus:border-primary transition-colors"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="client_description" className="text-base font-semibold">🏢 Client Description</Label>
-                      <Textarea
-                        id="client_description"
-                        name="client_description"
-                        value={formData.client_description || ""}
-                        onChange={handleInputChange}
-                        placeholder="Enter client company description..."
+                        placeholder="Enter specific things to look for in candidates..."
                         rows={4}
-                        className="bg-background border-2 border-primary/30 focus:border-primary transition-colors"
+                        className="bg-background border-2 border-blue-300 focus:border-blue-500 transition-colors"
                       />
                     </div>
 
@@ -717,32 +704,6 @@ export default function EditJob() {
                         placeholder="Enter preferred skills and bonuses..."
                         rows={4}
                         className="bg-background border-2 border-green-300 focus:border-green-500 transition-colors"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="jd_summary" className="text-base font-semibold">📝 JD Summary</Label>
-                      <Textarea
-                        id="jd_summary"
-                        name="jd_summary"
-                        value={formData.jd_summary}
-                        onChange={handleInputChange}
-                        placeholder="Enter job description summary..."
-                        rows={3}
-                        className="bg-background border-2 border-primary/30 focus:border-primary transition-colors"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="things_to_look_for" className="text-base font-semibold">🔍 Things to Look For</Label>
-                      <Textarea
-                        id="things_to_look_for"
-                        name="things_to_look_for"
-                        value={formData.things_to_look_for}
-                        onChange={handleInputChange}
-                        placeholder="Enter specific things to look for in candidates..."
-                        rows={3}
-                        className="bg-background border-2 border-primary/30 focus:border-primary transition-colors"
                       />
                     </div>
 
