@@ -1737,10 +1737,10 @@ export default function JobDetails() {
               {showFloatingButton && (
                 <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
                   {job?.longlist && job.longlist > 0 ? (
-                    <Button onClick={handleSearchMoreCandidates} className="bg-white/95 hover:bg-white text-gray-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.05] hover:rotate-1 text-sm border border-gray-200/80 hover:border-purple-300/90 px-6 py-3 backdrop-blur-sm animate-pulse hover:animate-none relative overflow-hidden group" size="sm">
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-400/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                      <Search className="w-4 h-4 mr-2 group-hover:animate-spin transition-transform duration-300" />
-                      <span className="relative z-10">🤖 AI Generate Longlist ✨</span>
+                     <Button onClick={handleSearchMoreCandidates} className="relative bg-gradient-to-b from-white via-gray-50 to-gray-100 hover:from-gray-50 hover:via-white hover:to-gray-50 text-gray-800 hover:text-primary font-semibold text-sm px-6 py-3 border border-gray-200 hover:border-primary/30 overflow-hidden group transform transition-all duration-300 hover:translate-y-[-3px] shadow-[0_8px_20px_rgba(0,0,0,0.12),inset_0_2px_4px_rgba(255,255,255,0.4),0_1px_0_rgba(255,255,255,0.8)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.18),inset_0_3px_6px_rgba(255,255,255,0.6),0_2px_0_rgba(255,255,255,0.9)] active:translate-y-[-1px] active:shadow-[0_4px_12px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.4)]" size="sm">
+                       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                       <Search className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300 relative z-10" />
+                       <span className="relative z-10">AI Generate Longlist</span>
                     </Button>
                   ) : (
                     <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 text-sm border border-purple-400/20 px-6 py-3" size="sm">
