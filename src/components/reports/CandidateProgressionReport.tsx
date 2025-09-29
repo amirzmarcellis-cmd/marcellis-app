@@ -130,23 +130,28 @@ export function CandidateProgressionReport() {
             }
           }
 
-          // Calculate time to submission: only from AI Shortlist time to submitted status
+          // Calculate time to submission: from AI Shortlist to when Submit CV button is clicked
           const submissionTime = parsePossibleDate(item.contacted);
 
           try {
             if (shortlistedTime && submissionTime) {
+              // Calculate exact time difference when CV was submitted
               const diffInMs = submissionTime.getTime() - shortlistedTime.getTime();
               processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
               processed.submissionPending = false;
-            } else if (shortlistedTime) {
-              // Only show pending time if item is shortlisted but not yet submitted
+            } else if (shortlistedTime && !submissionTime) {
+              // Show elapsed time since shortlisted (still pending submission)
               const now = new Date();
               const diffInMs = now.getTime() - shortlistedTime.getTime();
               processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
               processed.submissionPending = true;
+            } else {
+              // No shortlist time or invalid data
+              processed.timeToSubmission = undefined;
+              processed.submissionPending = false;
             }
           } catch (error) {
-            console.error('Error parsing dates for submission calculation:', error);
+            console.error('Error calculating submission time:', error);
             processed.timeToSubmission = undefined;
             processed.submissionPending = undefined;
           }
