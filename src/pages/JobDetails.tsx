@@ -1712,7 +1712,7 @@ export default function JobDetails() {
   return <div className={cn("space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden", isShaking && "animate-shake")}>
         {/* Header */}
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 items-start">
             <div className="flex items-center space-x-2 md:space-x-4">
               <Button variant="ghost" size="sm" onClick={() => navigate('/jobs')}>
                 <ArrowLeft className="w-4 h-4 mr-1 md:mr-2" />
@@ -1722,7 +1722,7 @@ export default function JobDetails() {
               <div className="h-6 w-px bg-border hidden sm:block" />
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
             </div>
-            <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex flex-col sm:flex-row gap-3 items-center lg:items-end justify-center lg:justify-end">
               {job?.longlist && job.longlist > 0 ? (
                 <Button onClick={handleSearchMoreCandidates} className="relative bg-gradient-to-b from-white via-gray-50 to-gray-100 hover:from-gray-50 hover:via-white hover:to-gray-50 text-gray-800 hover:text-primary font-semibold text-sm w-full sm:w-auto border border-gray-200 hover:border-primary/30 overflow-hidden group transform transition-all duration-300 hover:translate-y-[-2px] shadow-[0_4px_14px_0_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.4)] hover:shadow-[0_8px_25px_0_rgba(0,0,0,0.15),inset_0_1px_0_0_rgba(255,255,255,0.6)] active:translate-y-[1px] active:shadow-[0_2px_8px_0_rgba(0,0,0,0.15)]" size="sm">
                   <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -1731,15 +1731,17 @@ export default function JobDetails() {
                   <span className="sm:hidden relative z-10">AI Search</span>
                 </Button>
               ) : (
-                <button 
-                  onClick={handleGenerateLongList} 
-                  disabled={job?.longlist === 3} 
-                  className="ai-longlist-button flex-col gap-1"
-                  title="AI Longlist"
-                >
-                  <Zap className="w-5 h-5 drop-shadow-sm" />
-                  <span className="text-xs font-bold tracking-tight leading-tight">AI Longlist</span>
-                </button>
+                <div className="flex justify-center">
+                  <button 
+                    onClick={handleGenerateLongList} 
+                    disabled={job?.longlist === 3} 
+                    className="ai-longlist-button flex-col gap-1"
+                    title="AI Longlist"
+                  >
+                    <Zap className="w-5 h-5 drop-shadow-sm" />
+                    <span className="text-xs font-bold tracking-tight leading-tight">AI Longlist</span>
+                  </button>
+                </div>
               )}
 
               {/* Floating/Sticky AI Generate Longlist Button - Futuristic Design */}
