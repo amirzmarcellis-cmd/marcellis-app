@@ -145,6 +145,11 @@ export default {
 				'pulse-glow': {
 					'0%, 100%': { boxShadow: 'var(--shadow-soft)' },
 					'50%': { boxShadow: 'var(--shadow-glow)' }
+				},
+				'shake': {
+					'0%, 100%': { transform: 'translateX(0)' },
+					'10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-2px)' },
+					'20%, 40%, 60%, 80%': { transform: 'translateX(2px)' }
 				}
 			},
 			animation: {
@@ -157,7 +162,8 @@ export default {
 				'float-slow': 'float 6s ease-in-out infinite',
 				'marquee': 'marquee 24s linear infinite',
 				'parallax-pan': 'parallax-pan 60s linear infinite',
-				'spotlight-fade': 'spotlight-fade 0.6s ease-out'
+				'spotlight-fade': 'spotlight-fade 0.6s ease-out',
+				'shake': 'shake 0.6s ease-in-out'
 			}
 		}
 	},

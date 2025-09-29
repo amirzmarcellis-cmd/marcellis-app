@@ -34,6 +34,7 @@ export default function JobDetails() {
   } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
+  const [isShaking, setIsShaking] = useState(false);
   const {
     profile
   } = useProfile();
@@ -730,6 +731,10 @@ export default function JobDetails() {
     }
   };
   const handleSearchMoreCandidates = async () => {
+    // Trigger screen shake effect
+    setIsShaking(true);
+    setTimeout(() => setIsShaking(false), 600);
+    
     // EPIC full-screen confetti animation with massive particle count
     const confetti = (await import('canvas-confetti')).default;
     
@@ -1704,7 +1709,7 @@ export default function JobDetails() {
     const expectedSalary = parseSalary(candidate["Salary Expectations"]);
     return expectedSalary > 0 && expectedSalary > budgetThreshold;
   }));
-  return <div className="space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden">
+  return <div className={cn("space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden", isShaking && "animate-shake")}>
         {/* Header */}
         <div className="flex flex-col gap-4">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
