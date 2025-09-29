@@ -359,7 +359,7 @@ export function CandidateProgressionReport() {
                     <TableCell>
                       {item.timeToSubmission !== undefined && item.timeToSubmission > 0 ? (
                         <span className="font-medium text-green-600">
-                          {formatDuration(item.timeToSubmission)}{item.submissionPending ? ' (pending)' : ''}
+                          {formatDuration(item.timeToSubmission)}
                         </span>
                       ) : (
                         <span className="text-muted-foreground">—</span>
