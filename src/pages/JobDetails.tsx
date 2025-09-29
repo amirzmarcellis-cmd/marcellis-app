@@ -1651,20 +1651,46 @@ export default function JobDetails() {
                   <span className="sm:hidden">Generate List</span>
                 </Button>}
 
-              {/* Floating/Sticky AI Generate Longlist Button */}
+              {/* Floating/Sticky AI Generate Longlist Button - Futuristic Design */}
               {showFloatingButton && (
-                <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
+                <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
                   <div className="relative group">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/50 via-blue-500/50 to-purple-500/50 rounded-full blur-lg opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
+                    {/* Outer glow ring */}
+                    <div className="absolute -inset-3 bg-gradient-to-r from-cyan-400/30 via-blue-500/30 via-purple-500/30 to-pink-500/30 rounded-full blur-xl opacity-60 group-hover:opacity-100 animate-pulse transition-all duration-700" />
+                    
+                    {/* Inner glow */}
+                    <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/50 via-blue-500/50 to-purple-500/50 rounded-full blur-md opacity-80 group-hover:opacity-100 transition-all duration-500" />
+                    
+                    {/* Main button */}
                     {job?.longlist && job.longlist > 0 ? (
-                      <Button onClick={handleSearchMoreCandidates} className="relative bg-foreground text-background hover:bg-foreground/90 shadow-2xl backdrop-blur-md border border-white/30 transition-all duration-500 hover:scale-110 rounded-full px-6 py-3 font-semibold" size="lg">
-                        <Search className="w-5 h-5 mr-2 group-hover:animate-pulse" />
-                        <span className="font-bold tracking-wide">AI Generate Longlist</span>
+                      <Button onClick={handleSearchMoreCandidates} className="relative bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 hover:from-slate-800 hover:via-blue-800 hover:to-slate-800 text-white border border-cyan-400/50 hover:border-cyan-400 shadow-2xl backdrop-blur-xl transition-all duration-500 hover:scale-105 rounded-full px-8 py-4 text-base font-bold tracking-wider group overflow-hidden" size="lg">
+                        {/* Animated background shimmer */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                        
+                        <div className="relative flex items-center gap-3">
+                          <div className="relative">
+                            <Search className="w-5 h-5 text-cyan-400 group-hover:text-cyan-300 transition-colors drop-shadow-lg group-hover:animate-pulse" />
+                            <div className="absolute inset-0 bg-cyan-400/30 rounded-full blur-sm animate-ping" />
+                          </div>
+                          <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent font-extrabold text-lg tracking-wide">
+                            AI GENERATE LONGLIST
+                          </span>
+                        </div>
                       </Button>
                     ) : (
-                      <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} className="relative bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 hover:from-cyan-500 hover:via-blue-500 hover:to-purple-500 text-white shadow-2xl backdrop-blur-md border border-white/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-500 hover:scale-110 rounded-full px-6 py-3 font-semibold" size="lg">
-                        <Zap className="w-5 h-5 mr-2 group-hover:animate-pulse transition-transform group-hover:rotate-12" />
-                        <span className="font-bold tracking-wide">Generate Long List</span>
+                      <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} className="relative bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 hover:from-slate-800 hover:via-purple-800 hover:to-slate-800 text-white border border-purple-400/50 hover:border-purple-400 shadow-2xl backdrop-blur-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-500 hover:scale-105 rounded-full px-8 py-4 text-base font-bold tracking-wider group overflow-hidden" size="lg">
+                        {/* Animated background shimmer */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                        
+                        <div className="relative flex items-center gap-3">
+                          <div className="relative">
+                            <Zap className="w-5 h-5 text-purple-400 group-hover:text-purple-300 transition-all duration-300 group-hover:rotate-12 drop-shadow-lg" />
+                            <div className="absolute inset-0 bg-purple-400/30 rounded-full blur-sm animate-ping" />
+                          </div>
+                          <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent font-extrabold text-lg tracking-wide">
+                            GENERATE LONGLIST
+                          </span>
+                        </div>
                       </Button>
                     )}
                   </div>
