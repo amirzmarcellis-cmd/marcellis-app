@@ -730,7 +730,7 @@ export default function JobDetails() {
     }
   };
   const handleSearchMoreCandidates = async () => {
-    // Epic full-screen confetti animation
+    // EPIC full-screen confetti animation with massive particle count
     const confetti = (await import('canvas-confetti')).default;
     
     // Function to create a burst from specific position
@@ -743,52 +743,69 @@ export default function JobDetails() {
       });
     };
 
-    // Center explosion
-    createBurst(0.5, 0.5, 200);
+    // CENTER EXPLOSION - 500 particles!
+    createBurst(0.5, 0.5, 500);
     
-    // Top explosions
-    setTimeout(() => createBurst(0.2, 0.1, 120), 100);
-    setTimeout(() => createBurst(0.5, 0.1, 120), 150);
-    setTimeout(() => createBurst(0.8, 0.1, 120), 200);
+    // TOP ROW - 6 bursts across the entire screen
+    setTimeout(() => createBurst(0.1, 0.1, 120), 100);
+    setTimeout(() => createBurst(0.25, 0.1, 120), 130);
+    setTimeout(() => createBurst(0.4, 0.1, 120), 160);
+    setTimeout(() => createBurst(0.6, 0.1, 120), 190);
+    setTimeout(() => createBurst(0.75, 0.1, 120), 220);
+    setTimeout(() => createBurst(0.9, 0.1, 120), 250);
     
-    // Side explosions
-    setTimeout(() => createBurst(0.1, 0.3, 100), 250);
-    setTimeout(() => createBurst(0.9, 0.3, 100), 300);
-    setTimeout(() => createBurst(0.1, 0.7, 100), 350);
-    setTimeout(() => createBurst(0.9, 0.7, 100), 400);
+    // SIDE EXPLOSIONS - Multiple bursts on each side
+    setTimeout(() => createBurst(0.05, 0.2, 100), 280);
+    setTimeout(() => createBurst(0.05, 0.4, 100), 310);
+    setTimeout(() => createBurst(0.05, 0.6, 100), 340);
+    setTimeout(() => createBurst(0.05, 0.8, 100), 370);
     
-    // Bottom explosions
-    setTimeout(() => createBurst(0.3, 0.9, 120), 450);
-    setTimeout(() => createBurst(0.7, 0.9, 120), 500);
+    setTimeout(() => createBurst(0.95, 0.2, 100), 300);
+    setTimeout(() => createBurst(0.95, 0.4, 100), 330);
+    setTimeout(() => createBurst(0.95, 0.6, 100), 360);
+    setTimeout(() => createBurst(0.95, 0.8, 100), 390);
     
-    // Continuous rain effect from top
+    // BOTTOM BURSTS - Complete perimeter coverage
+    setTimeout(() => createBurst(0.15, 0.9, 120), 420);
+    setTimeout(() => createBurst(0.35, 0.9, 120), 450);
+    setTimeout(() => createBurst(0.5, 0.9, 120), 480);
+    setTimeout(() => createBurst(0.65, 0.9, 120), 510);
+    setTimeout(() => createBurst(0.85, 0.9, 120), 540);
+    
+    // CONTINUOUS RAIN EFFECT - Enhanced with more particles
     const rainEffect = () => {
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 10; i++) {
         setTimeout(() => {
           confetti({
-            particleCount: 50,
+            particleCount: 80,
             spread: 360,
             origin: { x: Math.random(), y: -0.1 },
-            colors: ['#3B82F6', '#8B5CF6', '#EC4899', '#10B981'],
+            colors: ['#3B82F6', '#8B5CF6', '#EC4899', '#10B981', '#FFD700', '#FF6B6B'],
             gravity: 0.8,
-            scalar: 0.8
+            scalar: 1.2
           });
-        }, i * 100);
+        }, i * 80);
       }
     };
     
-    // Start rain effect after initial bursts
+    // Start enhanced rain effect
     setTimeout(rainEffect, 600);
     
-    // Final grand finale burst
+    // GRAND FINALE - 500 golden particles explosion!
     setTimeout(() => {
       confetti({
-        particleCount: 300,
+        particleCount: 500,
         spread: 180,
         origin: { x: 0.5, y: 0.3 },
-        colors: ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7']
+        colors: ['#FFD700', '#FFA500', '#FF8C00', '#FFB347', '#FFDF00', '#F0E68C']
       });
     }, 1200);
+    
+    // Extra finale bursts for maximum impact
+    setTimeout(() => {
+      createBurst(0.3, 0.4, 200);
+      createBurst(0.7, 0.4, 200);
+    }, 1400);
 
     try {
       // Get user_ids from AI Boolean Search candidates (filteredCandidates) as comma-separated string
@@ -810,8 +827,8 @@ export default function JobDetails() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       toast({
-        title: "🎊 AMAZING! 🎉",
-        description: "🚀 AI is unleashing its full power to find incredible candidates! ✨🔥"
+        title: "🎊 ABSOLUTELY EPIC! 🎉",
+        description: "🚀✨ AI is unleashing MAXIMUM POWER to find legendary candidates! 🔥💫"
       });
     } catch (error) {
       console.error('Error searching for more candidates:', error);
