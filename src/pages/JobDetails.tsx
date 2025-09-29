@@ -87,6 +87,7 @@ export default function JobDetails() {
   const [lastViewedApplications, setLastViewedApplications] = useState<string | null>(null);
   const [selectedCandidates, setSelectedCandidates] = useState<Set<string>>(new Set());
   const [selectedCandidateRecord, setSelectedCandidateRecord] = useState<any>(null);
+  const [showFloatingButton, setShowFloatingButton] = useState(false);
 
   // Interview scheduling state variables
   const [interviewDialogOpen, setInterviewDialogOpen] = useState(false);
@@ -132,6 +133,17 @@ export default function JobDetails() {
     }
 
   }, [id]);
+
+  // Scroll detection for floating button
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setShowFloatingButton(scrollY > 200);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Fetch group data when job is loaded
   useEffect(() => {
@@ -2846,6 +2858,21 @@ export default function JobDetails() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Floating Generate Long List Button */}
+        {showFloatingButton && job && (!job.longlist || job.longlist === 0) && (
+          <div className="fixed bottom-6 right-6 z-50 animate-fade-in">
+            <Button 
+              onClick={() => handleGenerateLongList()} 
+              disabled={job?.longlist === 3}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-2xl backdrop-blur-sm border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed group transition-all duration-300 hover:scale-105"
+              size="lg"
+            >
+              <Zap className="w-5 h-5 mr-2 group-hover:animate-pulse" />
+              Generate Long List
+            </Button>
+          </div>
+        )}
 
       </div>;
 }
