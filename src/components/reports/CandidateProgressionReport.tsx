@@ -170,7 +170,7 @@ export function CandidateProgressionReport() {
   };
 
   const formatDuration = (hours: number | undefined) => {
-    if (hours === undefined || hours === null || isNaN(hours)) return "—";
+    if (hours === undefined || hours === null || isNaN(hours) || hours <= 0) return "—";
     
     const totalMinutes = Math.round(Math.abs(hours) * 60);
     const hrs = Math.floor(totalMinutes / 60);
@@ -348,25 +348,21 @@ export function CandidateProgressionReport() {
                       }
                     </TableCell>
                     <TableCell>
-                      {item.timeToShortlist !== undefined && item.timeToShortlist >= 0 ? (
+                      {item.timeToShortlist !== undefined && item.timeToShortlist > 0 ? (
                         <span className="font-medium text-blue-600">
                           {formatDuration(item.timeToShortlist)}
                         </span>
                       ) : (
-                        <span className="text-muted-foreground">
-                          {!item.shortlisted_at ? "Not shortlisted" : "No data"}
-                        </span>
+                        <span className="text-muted-foreground">—</span>
                       )}
                     </TableCell>
                     <TableCell>
-                      {item.timeToSubmission !== undefined && item.timeToSubmission >= 0 ? (
+                      {item.timeToSubmission !== undefined && item.timeToSubmission > 0 ? (
                         <span className="font-medium text-green-600">
-                          {formatDuration(item.timeToSubmission)}
+                          {formatDuration(item.timeToSubmission)}{item.submissionPending ? ' (pending)' : ''}
                         </span>
                       ) : (
-                        <span className="text-muted-foreground">
-                          {!item.contacted || item.contacted === 'Contacted' || item.contacted === 'Call Done' ? "No submission date" : "No data"}
-                        </span>
+                        <span className="text-muted-foreground">—</span>
                       )}
                     </TableCell>
                   </TableRow>
