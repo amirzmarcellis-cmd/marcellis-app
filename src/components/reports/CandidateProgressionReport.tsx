@@ -95,16 +95,26 @@ export function CandidateProgressionReport() {
           
           // Calculate time to shortlist (longlisted_at to shortlisted_at)
           if (item.longlisted_at && item.shortlisted_at) {
-            const longlistedTime = parseISO(item.longlisted_at);
-            const shortlistedTime = parseISO(item.shortlisted_at);
-            processed.timeToShortlist = differenceInHours(shortlistedTime, longlistedTime);
+            try {
+              const longlistedTime = parseISO(item.longlisted_at);
+              const shortlistedTime = parseISO(item.shortlisted_at);
+              processed.timeToShortlist = differenceInHours(shortlistedTime, longlistedTime);
+            } catch (error) {
+              console.error('Error parsing dates for shortlist calculation:', error);
+              processed.timeToShortlist = undefined;
+            }
           }
 
           // Calculate time to submission (shortlisted_at to contacted/submitted)
           if (item.shortlisted_at && item.contacted) {
-            const shortlistedTime = parseISO(item.shortlisted_at);
-            const contactedTime = parseISO(item.contacted);
-            processed.timeToSubmission = differenceInHours(contactedTime, shortlistedTime);
+            try {
+              const shortlistedTime = parseISO(item.shortlisted_at);
+              const contactedTime = parseISO(item.contacted);
+              processed.timeToSubmission = differenceInHours(contactedTime, shortlistedTime);
+            } catch (error) {
+              console.error('Error parsing dates for submission calculation:', error);
+              processed.timeToSubmission = undefined;
+            }
           }
 
           return processed;
@@ -278,9 +288,15 @@ export function CandidateProgressionReport() {
                       }
                     </TableCell>
                     <TableCell>
-                      <span className={item.timeToShortlist ? "font-medium" : "text-muted-foreground"}>
-                        {formatDuration(item.timeToShortlist)}
-                      </span>
+                      {item.timeToShortlist !== undefined ? (
+                        <span className="font-medium text-blue-600">
+                          {formatDuration(item.timeToShortlist)}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          {!item.shortlisted_at ? "Not shortlisted" : "—"}
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <span className={item.timeToSubmission ? "font-medium" : "text-muted-foreground"}>
