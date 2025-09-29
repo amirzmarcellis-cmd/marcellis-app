@@ -218,25 +218,38 @@
   .ai-longlist-button {
     @apply relative inline-flex items-center justify-center w-32 h-32;
     @apply rounded-full font-bold text-sm;
-    @apply text-primary-foreground border-2;
+    @apply text-primary-foreground border-4;
     @apply transition-all duration-300 ease-out;
     @apply hover:scale-110 active:scale-95;
-    @apply focus:outline-none focus:ring-2;
+    @apply focus:outline-none focus:ring-4;
     background: var(--ai-button-gradient);
-    border-color: hsl(var(--cyan) / 0.3);
-    box-shadow: var(--ai-button-shadow), var(--ai-button-inner-shadow);
+    border-color: hsl(var(--cyan) / 0.4);
+    box-shadow: var(--ai-button-shadow), var(--ai-button-inner-shadow), 
+                0 0 0 8px hsl(var(--background)), 
+                0 0 0 12px hsl(var(--cyan) / 0.2);
+    outline: 4px solid hsl(var(--cyan) / 0.1);
+    outline-offset: 8px;
   }
   
   .ai-longlist-button:hover {
-    border-color: hsl(var(--cyan) / 0.4);
-    box-shadow: var(--ai-button-hover-shadow), var(--ai-button-glow), var(--ai-button-inner-shadow);
-    transform: translateY(-2px) scale(1.1);
+    border-color: hsl(var(--cyan) / 0.6);
+    box-shadow: var(--ai-button-hover-shadow), var(--ai-button-glow), var(--ai-button-inner-shadow),
+                0 0 0 8px hsl(var(--background)), 
+                0 0 0 16px hsl(var(--cyan) / 0.4),
+                0 0 60px hsl(var(--cyan) / 0.3);
+    outline: 6px solid hsl(var(--cyan) / 0.3);
+    outline-offset: 12px;
+    transform: translateY(-3px) scale(1.15);
   }
   
   .ai-longlist-button:active {
-    border-color: hsl(var(--cyan) / 0.5);
-    transform: translateY(1px) scale(0.98);
-    box-shadow: var(--ai-button-shadow), var(--ai-button-inner-shadow);
+    border-color: hsl(var(--cyan) / 0.7);
+    transform: translateY(1px) scale(1.05);
+    box-shadow: var(--ai-button-shadow), var(--ai-button-inner-shadow),
+                0 0 0 8px hsl(var(--background)), 
+                0 0 0 12px hsl(var(--cyan) / 0.3);
+    outline: 4px solid hsl(var(--cyan) / 0.2);
+    outline-offset: 8px;
   }
   
   .ai-longlist-button:disabled {
