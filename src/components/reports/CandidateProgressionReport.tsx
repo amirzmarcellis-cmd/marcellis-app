@@ -130,28 +130,28 @@ export function CandidateProgressionReport() {
             }
           }
 
-          // Calculate time to submission: from AI Shortlist to when Submit CV button is clicked
-          const submissionTime = parsePossibleDate(item.contacted);
+          // Calculate time to submission: start from AI Shortlist time, fallback to longlist
+          const startTime = shortlistedTime || longlistedTime || null;
+          const submissionTime =
+            parsePossibleDate(item.contacted) ||
+            parsePossibleDate((item as any).notes_updated_at) ||
+            parsePossibleDate((item as any).lastcalltime);
 
           try {
-            if (shortlistedTime && submissionTime) {
-              // Calculate exact time difference when CV was submitted
-              const diffInMs = submissionTime.getTime() - shortlistedTime.getTime();
-              processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
-              processed.submissionPending = false;
-            } else if (shortlistedTime && !submissionTime) {
-              // Show elapsed time since shortlisted (still pending submission)
-              const now = new Date();
-              const diffInMs = now.getTime() - shortlistedTime.getTime();
-              processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
-              processed.submissionPending = true;
-            } else {
-              // No shortlist time or invalid data
-              processed.timeToSubmission = undefined;
-              processed.submissionPending = false;
+            if (startTime) {
+              if (submissionTime) {
+                const diffInMs = submissionTime.getTime() - startTime.getTime();
+                processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
+                processed.submissionPending = false;
+              } else {
+                const now = new Date();
+                const diffInMs = now.getTime() - startTime.getTime();
+                processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
+                processed.submissionPending = true;
+              }
             }
           } catch (error) {
-            console.error('Error calculating submission time:', error);
+            console.error('Error parsing dates for submission calculation:', error);
             processed.timeToSubmission = undefined;
             processed.submissionPending = undefined;
           }
@@ -359,7 +359,7 @@ export function CandidateProgressionReport() {
                     <TableCell>
                       {item.timeToSubmission !== undefined && item.timeToSubmission > 0 ? (
                         <span className="font-medium text-green-600">
-                          {formatDuration(item.timeToSubmission)}
+                          {formatDuration(item.timeToSubmission)}{item.submissionPending ? ' (pending)' : ''}
                         </span>
                       ) : (
                         <span className="text-muted-foreground">—</span>
