@@ -1641,15 +1641,39 @@ export default function JobDetails() {
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
-              {job?.longlist && job.longlist > 0 ? <Button onClick={handleSearchMoreCandidates} className="bg-foreground text-background hover:bg-foreground/90 text-sm w-full sm:w-auto" size="sm">
-                  <Search className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">AI Generate Longlist</span>
-                  <span className="sm:hidden">Search More</span>
-                </Button> : <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm w-full sm:w-auto" size="sm">
-                  <Zap className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Generate Long List</span>
-                  <span className="sm:hidden">Generate List</span>
-                </Button>}
+              {job?.longlist && job.longlist > 0 ? (
+                <div className="relative group">
+                  {/* Outer glow ring for futuristic effect */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400/20 via-blue-500/20 to-purple-500/20 rounded-lg blur-sm opacity-60 group-hover:opacity-100 transition-all duration-300" />
+                  
+                  <Button onClick={handleSearchMoreCandidates} className="relative bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 hover:from-slate-800 hover:via-blue-800 hover:to-slate-800 text-white border border-cyan-400/30 hover:border-cyan-400/60 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-105 text-sm w-full sm:w-auto overflow-hidden group" size="sm">
+                    {/* Animated shimmer effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                    
+                    <div className="relative flex items-center gap-2">
+                      <Search className="w-4 h-4 text-cyan-400 group-hover:text-cyan-300 transition-colors" />
+                      <span className="hidden sm:inline bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent font-bold">AI Generate Longlist</span>
+                      <span className="sm:hidden bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent font-bold">Search More</span>
+                    </div>
+                  </Button>
+                </div>
+              ) : (
+                <div className="relative group">
+                  {/* Outer glow ring for futuristic effect */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-400/20 via-blue-500/20 to-pink-500/20 rounded-lg blur-sm opacity-60 group-hover:opacity-100 transition-all duration-300" />
+                  
+                  <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} className="relative bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 hover:from-slate-800 hover:via-purple-800 hover:to-slate-800 text-white border border-purple-400/30 hover:border-purple-400/60 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-105 text-sm w-full sm:w-auto overflow-hidden group" size="sm">
+                    {/* Animated shimmer effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                    
+                    <div className="relative flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-purple-400 group-hover:text-purple-300 transition-all duration-300 group-hover:rotate-12" />
+                      <span className="hidden sm:inline bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent font-bold">Generate Long List</span>
+                      <span className="sm:hidden bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent font-bold">Generate List</span>
+                    </div>
+                  </Button>
+                </div>
+              )}
 
               {/* Floating/Sticky AI Generate Longlist Button - Futuristic Design */}
               {showFloatingButton && (
