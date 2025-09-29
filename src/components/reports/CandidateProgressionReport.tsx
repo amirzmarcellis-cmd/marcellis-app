@@ -17,7 +17,8 @@ interface CandidateProgression {
   shortlisted_at: string | null;
   contacted: string | null;
   timeToShortlist?: number; // hours
-  timeToSubmission?: number; // hours
+  timeToSubmission?: number; // hours (includes pending elapsed time if not yet submitted)
+  submissionPending?: boolean; // true if submission hasn't happened yet
 }
 
 export function CandidateProgressionReport() {
@@ -71,7 +72,7 @@ export function CandidateProgressionReport() {
     try {
       let query = supabase
         .from('Jobs_CVs')
-        .select('job_id, candidate_name, longlisted_at, shortlisted_at, contacted')
+        .select('job_id, candidate_name, longlisted_at, shortlisted_at, contacted, notes_updated_at, lastcalltime')
         .not('longlisted_at', 'is', null);
 
       if (selectedJobId !== "all") {
@@ -92,61 +93,74 @@ export function CandidateProgressionReport() {
       const { data } = await query.order('longlisted_at', { ascending: false });
 
       if (data) {
+        // Robust date parsing helper
+        const parsePossibleDate = (value: string | null): Date | null => {
+          if (!value) return null;
+          const lowered = value.toLowerCase();
+          if (['contacted', 'call done', 'yes', 'no'].includes(lowered)) return null;
+          const d = new Date(value);
+          if (!isNaN(d.getTime())) return d;
+          const numeric = parseInt(value);
+          if (!isNaN(numeric)) {
+            const ts = new Date(numeric);
+            if (!isNaN(ts.getTime())) return ts;
+          }
+          return null;
+        };
+
         const processedData = data.map(item => {
-          const processed: CandidateProgression = { ...item };
-          
+          const processed: CandidateProgression = {
+            job_id: (item as any).job_id,
+            candidate_name: (item as any).candidate_name,
+            longlisted_at: (item as any).longlisted_at,
+            shortlisted_at: (item as any).shortlisted_at,
+            contacted: (item as any).contacted,
+          };
+
           // Calculate time to shortlist (longlisted_at to shortlisted_at)
-          if (item.longlisted_at && item.shortlisted_at) {
+          const longlistedTime = parsePossibleDate(item.longlisted_at);
+          const shortlistedTime = parsePossibleDate(item.shortlisted_at);
+          if (longlistedTime && shortlistedTime) {
             try {
-              const longlistedTime = new Date(item.longlisted_at);
-              const shortlistedTime = new Date(item.shortlisted_at);
               const diffInMs = shortlistedTime.getTime() - longlistedTime.getTime();
-              processed.timeToShortlist = diffInMs / (1000 * 60 * 60); // Convert to hours
-              console.log(`Time calc for ${item.candidate_name}: ${processed.timeToShortlist} hours`);
+              processed.timeToShortlist = diffInMs / (1000 * 60 * 60); // hours
             } catch (error) {
               console.error('Error parsing dates for shortlist calculation:', error);
               processed.timeToShortlist = undefined;
             }
           }
 
-          // Calculate time to submission (shortlisted_at to contacted/submitted)
-          if (item.shortlisted_at && item.contacted) {
-            try {
-              const shortlistedTime = new Date(item.shortlisted_at);
-              
-              // Try to parse contacted field as a date
-              // It could be a timestamp or just text like 'Contacted' or 'Call Done'
-              let contactedTime: Date | null = null;
-              
-              if (item.contacted && !['Contacted', 'Call Done', 'Yes', 'No'].includes(item.contacted)) {
-                // Try parsing as ISO date first
-                contactedTime = new Date(item.contacted);
-                
-                // If that fails, try parsing as a more flexible date format
-                if (isNaN(contactedTime.getTime())) {
-                  // Could be other formats, try timestamp
-                  const timestamp = parseInt(item.contacted);
-                  if (!isNaN(timestamp)) {
-                    contactedTime = new Date(timestamp);
-                  }
-                }
+          // Calculate time to submission: start from AI Shortlist time, fallback to longlist
+          const startTime = shortlistedTime || longlistedTime || null;
+          const submissionTime =
+            parsePossibleDate(item.contacted) ||
+            parsePossibleDate((item as any).notes_updated_at) ||
+            parsePossibleDate((item as any).lastcalltime);
+
+          try {
+            if (startTime) {
+              if (submissionTime) {
+                const diffInMs = submissionTime.getTime() - startTime.getTime();
+                processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
+                processed.submissionPending = false;
+              } else {
+                const now = new Date();
+                const diffInMs = now.getTime() - startTime.getTime();
+                processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
+                processed.submissionPending = true;
               }
-              
-              if (contactedTime && !isNaN(contactedTime.getTime())) {
-                const diffInMs = contactedTime.getTime() - shortlistedTime.getTime();
-                processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60)); // Convert to hours, ensure positive
-                console.log(`Submission time calc for ${item.candidate_name}: ${processed.timeToSubmission} hours`);
-              }
-            } catch (error) {
-              console.error('Error parsing dates for submission calculation:', error);
-              processed.timeToSubmission = undefined;
             }
+          } catch (error) {
+            console.error('Error parsing dates for submission calculation:', error);
+            processed.timeToSubmission = undefined;
+            processed.submissionPending = undefined;
           }
 
           return processed;
         });
 
         setProgressionData(processedData);
+
       }
     } catch (error) {
       console.error('Error fetching progression data:', error);
