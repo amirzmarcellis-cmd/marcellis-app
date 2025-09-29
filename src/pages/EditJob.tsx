@@ -259,6 +259,15 @@ export default function EditJob() {
     }
   };
 
+  const handleFileUpload = async (files: any[]) => {
+    if (files.length > 0) {
+      setUploadedFiles(prev => [...prev, ...files]);
+      toast("Files uploaded successfully", {
+        description: `${files.length} file(s) uploaded to the job.`
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto p-6">
