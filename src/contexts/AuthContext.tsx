@@ -45,11 +45,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(null);
         setUser(null);
       }
+      // Redirect to auth page after sign out
+      window.location.href = '/auth';
     } catch (error) {
       console.error('Error signing out:', error);
       // Clear local state even if sign out fails
       setSession(null);
       setUser(null);
+      // Redirect to auth page even if sign out fails
+      window.location.href = '/auth';
     }
   };
 
