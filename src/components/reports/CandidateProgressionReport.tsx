@@ -72,8 +72,7 @@ export function CandidateProgressionReport() {
     try {
       let query = supabase
         .from('Jobs_CVs')
-        .select('job_id, candidate_name, longlisted_at, shortlisted_at, contacted, lastcalltime')
-        .not('longlisted_at', 'is', null);
+        .select('job_id, candidate_name, longlisted_at, shortlisted_at, contacted, lastcalltime');
 
       if (selectedJobId !== "all") {
         query = query.eq('job_id', selectedJobId);
@@ -110,17 +109,16 @@ export function CandidateProgressionReport() {
             }
           }
 
-          // Calculate time to submission (AI Shortlist → Submission)
-          // Start at longlisted_at (AI shortlist). Fallback to shortlisted_at if available.
-          if (item.lastcalltime && (item.longlisted_at || item.shortlisted_at)) {
+          // Calculate time to submission (shortlisted_at to lastcalltime)
+          if (item.shortlisted_at && item.lastcalltime) {
             try {
-              const startTime = new Date(item.longlisted_at ?? item.shortlisted_at!);
+              const shortlistedTime = new Date(item.shortlisted_at);
               const submissionTime = new Date(item.lastcalltime);
               
-              if (!isNaN(startTime.getTime()) && !isNaN(submissionTime.getTime())) {
-                const diffInMs = submissionTime.getTime() - startTime.getTime();
-                processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60)); // hours
-                console.log(`Submission time calc for ${item.candidate_name}: ${processed.timeToSubmission} hours (start=${startTime.toISOString()}, end=${submissionTime.toISOString()})`);
+              if (!isNaN(shortlistedTime.getTime()) && !isNaN(submissionTime.getTime())) {
+                const diffInMs = submissionTime.getTime() - shortlistedTime.getTime();
+                processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60)); // Convert to hours, ensure positive
+                console.log(`Submission time calc for ${item.candidate_name}: ${processed.timeToSubmission} hours`);
               }
             } catch (error) {
               console.error('Error parsing dates for submission calculation:', error);
@@ -254,7 +252,7 @@ export function CandidateProgressionReport() {
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-green-500" />
                   <div>
-                    <p className="text-sm font-medium">Avg. AI Shortlist → Submission</p>
+                    <p className="text-sm font-medium">Avg. Shortlisted → Submission</p>
                     <p className="text-2xl font-bold text-green-600">
                       {formatDuration(averageTimeToSubmission)}
                     </p>
@@ -291,7 +289,7 @@ export function CandidateProgressionReport() {
                   <TableHead>Longlisted At</TableHead>
                   <TableHead>Shortlisted At</TableHead>
                   <TableHead>Longlisted → Shortlisted</TableHead>
-                  <TableHead>AI Shortlist → Submission</TableHead>
+                  <TableHead>Shortlisted → Submission</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
