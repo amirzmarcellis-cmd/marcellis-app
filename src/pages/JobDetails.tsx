@@ -1731,11 +1731,17 @@ export default function JobDetails() {
                   <span className="sm:hidden relative z-10">AI Search</span>
                 </Button>
               ) : (
-                <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} className="action-button relative rounded-full bg-gradient-primary text-primary-foreground hover:bg-gradient-accent disabled:opacity-50 disabled:cursor-not-allowed shadow-strong hover:shadow-elevated transition-all duration-200 ease-bounce hover:-translate-y-0.5 active:translate-y-[1px] active:shadow-medium text-sm w-full sm:w-auto border border-border/30" size="sm">
-                  <Zap className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Generate Long List</span>
-                  <span className="sm:hidden">Generate List</span>
-                </Button>
+                <button 
+                  onClick={handleGenerateLongList} 
+                  disabled={job?.longlist === 3} 
+                  className="ai-longlist-button group"
+                  aria-label="AI Longlist"
+                >
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white drop-shadow-lg mb-1" />
+                    <span className="ai-longlist-text leading-tight">AI<br />Longlist</span>
+                  </div>
+                </button>
               )}
 
               {/* Floating/Sticky AI Generate Longlist Button - Futuristic Design */}
