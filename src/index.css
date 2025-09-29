@@ -216,8 +216,8 @@
   
   /* AI Longlist 3D Button */
   .ai-longlist-button {
-    @apply relative inline-flex items-center justify-center w-16 h-16;
-    @apply rounded-full font-semibold;
+    @apply relative inline-flex items-center justify-center w-32 h-32;
+    @apply rounded-full font-bold text-sm;
     @apply text-primary-foreground border-2;
     @apply transition-all duration-300 ease-out;
     @apply hover:scale-110 active:scale-95;
