@@ -120,14 +120,6 @@
     --shadow-glow-purple: 0 0 28px hsl(270 95% 60% / 0.25);
     --shadow-card: 0 8px 24px hsl(220 25% 4% / 0.4);
     --shadow-elevated: 0 12px 40px hsl(220 25% 4% / 0.5);
-    
-    /* 3D Futuristic button effects */
-    --shadow-3d-base: 0 6px 20px hsl(220 25% 4% / 0.6), inset 0 1px 0 hsl(180 100% 50% / 0.3);
-    --shadow-3d-hover: 0 8px 32px hsl(180 100% 50% / 0.4), 0 0 40px hsl(180 100% 50% / 0.3), inset 0 1px 0 hsl(180 100% 70% / 0.4);
-    --shadow-3d-active: 0 2px 12px hsl(220 25% 4% / 0.8), inset 0 2px 4px hsl(220 25% 4% / 0.4);
-    --gradient-3d-button: linear-gradient(145deg, hsl(180 100% 50%), hsl(200 98% 39%), hsl(180 100% 45%));
-    --gradient-3d-button-hover: linear-gradient(145deg, hsl(180 100% 55%), hsl(200 98% 44%), hsl(180 100% 50%));
-    --neon-glow: 0 0 20px hsl(180 100% 50% / 0.6), 0 0 40px hsl(180 100% 50% / 0.4), 0 0 60px hsl(180 100% 50% / 0.2);
 
     /* Sidebar dark theme */
     --sidebar-background: 220 25% 8%;
@@ -213,64 +205,6 @@
   
   .action-button {
     @apply transition-all duration-200 hover:shadow-glow-blue active:scale-95;
-  }
-  
-  /* 3D Futuristic AI Longlist Button */
-  .ai-longlist-button {
-    @apply relative w-16 h-16 sm:w-20 sm:h-20 rounded-full;
-    @apply bg-gradient-to-br from-cyan via-blue to-cyan;
-    @apply border-2 border-cyan/50;
-    @apply transition-all duration-300 ease-out;
-    @apply cursor-pointer overflow-hidden;
-    box-shadow: var(--shadow-3d-base);
-    background: var(--gradient-3d-button);
-  }
-  
-  .ai-longlist-button::before {
-    @apply content-[''] absolute inset-0 rounded-full opacity-0;
-    @apply transition-opacity duration-300;
-    background: var(--gradient-3d-button-hover);
-  }
-  
-  .ai-longlist-button::after {
-    @apply content-[''] absolute inset-0 rounded-full;
-    box-shadow: var(--neon-glow);
-    opacity: 0;
-    @apply transition-opacity duration-300;
-  }
-  
-  .ai-longlist-button:hover {
-    @apply transform scale-110 -translate-y-1;
-    box-shadow: var(--shadow-3d-hover);
-  }
-  
-  .ai-longlist-button:hover::before {
-    @apply opacity-100;
-  }
-  
-  .ai-longlist-button:hover::after {
-    @apply opacity-60;
-  }
-  
-  .ai-longlist-button:active {
-    @apply transform scale-105 translate-y-0;
-    box-shadow: var(--shadow-3d-active);
-  }
-  
-  .ai-longlist-button:disabled {
-    @apply opacity-50 cursor-not-allowed;
-    @apply transform scale-100 translate-y-0;
-    box-shadow: var(--shadow-soft);
-  }
-  
-  .ai-longlist-button:disabled::after {
-    @apply opacity-0;
-  }
-  
-  .ai-longlist-text {
-    @apply relative z-10 text-white font-bold text-xs sm:text-sm;
-    @apply drop-shadow-lg select-none;
-    text-shadow: 0 0 10px hsl(180 100% 50% / 0.8);
   }
   
   /* Glow effects */
