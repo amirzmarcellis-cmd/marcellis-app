@@ -130,25 +130,20 @@ export function CandidateProgressionReport() {
             }
           }
 
-          // Calculate time to submission: start from AI Shortlist time, fallback to longlist
-          const startTime = shortlistedTime || longlistedTime || null;
-          const submissionTime =
-            parsePossibleDate(item.contacted) ||
-            parsePossibleDate((item as any).notes_updated_at) ||
-            parsePossibleDate((item as any).lastcalltime);
+          // Calculate time to submission: only from AI Shortlist time to submitted status
+          const submissionTime = parsePossibleDate(item.contacted);
 
           try {
-            if (startTime) {
-              if (submissionTime) {
-                const diffInMs = submissionTime.getTime() - startTime.getTime();
-                processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
-                processed.submissionPending = false;
-              } else {
-                const now = new Date();
-                const diffInMs = now.getTime() - startTime.getTime();
-                processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
-                processed.submissionPending = true;
-              }
+            if (shortlistedTime && submissionTime) {
+              const diffInMs = submissionTime.getTime() - shortlistedTime.getTime();
+              processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
+              processed.submissionPending = false;
+            } else if (shortlistedTime) {
+              // Only show pending time if item is shortlisted but not yet submitted
+              const now = new Date();
+              const diffInMs = now.getTime() - shortlistedTime.getTime();
+              processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
+              processed.submissionPending = true;
             }
           } catch (error) {
             console.error('Error parsing dates for submission calculation:', error);
