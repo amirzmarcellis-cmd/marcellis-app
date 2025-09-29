@@ -49,6 +49,8 @@ const noticePeriods = [
 ];
 
 const contractLengths = [
+  "1 Month",
+  "2 Months",
   "3 Months",
   "6 Months", 
   "9 Months",
