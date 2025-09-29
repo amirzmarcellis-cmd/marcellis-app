@@ -96,9 +96,11 @@ export function CandidateProgressionReport() {
           // Calculate time to shortlist (longlisted_at to shortlisted_at)
           if (item.longlisted_at && item.shortlisted_at) {
             try {
-              const longlistedTime = parseISO(item.longlisted_at);
-              const shortlistedTime = parseISO(item.shortlisted_at);
-              processed.timeToShortlist = differenceInHours(shortlistedTime, longlistedTime);
+              const longlistedTime = new Date(item.longlisted_at);
+              const shortlistedTime = new Date(item.shortlisted_at);
+              const diffInMs = shortlistedTime.getTime() - longlistedTime.getTime();
+              processed.timeToShortlist = diffInMs / (1000 * 60 * 60); // Convert to hours
+              console.log(`Time calc for ${item.candidate_name}: ${processed.timeToShortlist} hours`);
             } catch (error) {
               console.error('Error parsing dates for shortlist calculation:', error);
               processed.timeToShortlist = undefined;
@@ -108,9 +110,15 @@ export function CandidateProgressionReport() {
           // Calculate time to submission (shortlisted_at to contacted/submitted)
           if (item.shortlisted_at && item.contacted) {
             try {
-              const shortlistedTime = parseISO(item.shortlisted_at);
-              const contactedTime = parseISO(item.contacted);
-              processed.timeToSubmission = differenceInHours(contactedTime, shortlistedTime);
+              const shortlistedTime = new Date(item.shortlisted_at);
+              // contacted field might be text, so we'll try to parse it as a date if possible
+              if (item.contacted && item.contacted !== 'Contacted' && item.contacted !== 'Call Done') {
+                const contactedTime = new Date(item.contacted);
+                if (!isNaN(contactedTime.getTime())) {
+                  const diffInMs = contactedTime.getTime() - shortlistedTime.getTime();
+                  processed.timeToSubmission = diffInMs / (1000 * 60 * 60); // Convert to hours
+                }
+              }
             } catch (error) {
               console.error('Error parsing dates for submission calculation:', error);
               processed.timeToSubmission = undefined;
@@ -130,12 +138,12 @@ export function CandidateProgressionReport() {
   };
 
   const formatDuration = (hours: number | undefined) => {
-    if (!hours) return "—";
+    if (hours === undefined || hours === null || isNaN(hours)) return "—";
     
-    const totalMinutes = Math.round(hours * 60);
+    const totalMinutes = Math.round(Math.abs(hours) * 60);
     const hrs = Math.floor(totalMinutes / 60);
     const mins = Math.floor(totalMinutes % 60);
-    const secs = Math.round((hours * 3600) % 60);
+    const secs = Math.round((Math.abs(hours) * 3600) % 60);
     
     return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
@@ -288,20 +296,26 @@ export function CandidateProgressionReport() {
                       }
                     </TableCell>
                     <TableCell>
-                      {item.timeToShortlist !== undefined ? (
+                      {item.timeToShortlist !== undefined && item.timeToShortlist >= 0 ? (
                         <span className="font-medium text-blue-600">
                           {formatDuration(item.timeToShortlist)}
                         </span>
                       ) : (
                         <span className="text-muted-foreground">
-                          {!item.shortlisted_at ? "Not shortlisted" : "—"}
+                          {!item.shortlisted_at ? "Not shortlisted" : "No data"}
                         </span>
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className={item.timeToSubmission ? "font-medium" : "text-muted-foreground"}>
-                        {formatDuration(item.timeToSubmission)}
-                      </span>
+                      {item.timeToSubmission !== undefined && item.timeToSubmission >= 0 ? (
+                        <span className="font-medium text-green-600">
+                          {formatDuration(item.timeToSubmission)}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          {!item.contacted || item.contacted === 'Contacted' || item.contacted === 'Call Done' ? "No submission date" : "No data"}
+                        </span>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
