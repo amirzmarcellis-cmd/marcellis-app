@@ -16,8 +16,9 @@ interface CandidateProgression {
   longlisted_at: string | null;
   shortlisted_at: string | null;
   contacted: string | null;
+  submitted_at: string | null;
   timeToShortlist?: number; // hours
-  timeToSubmission?: number; // hours (includes pending elapsed time if not yet submitted)
+  timeToSubmission?: number; // hours
   submissionPending?: boolean; // true if submission hasn't happened yet
 }
 
@@ -115,6 +116,7 @@ export function CandidateProgressionReport() {
             longlisted_at: (item as any).longlisted_at,
             shortlisted_at: (item as any).shortlisted_at,
             contacted: (item as any).contacted,
+            submitted_at: (item as any).submitted_at,
           };
 
           // Calculate time to shortlist (longlisted_at to shortlisted_at)
@@ -139,9 +141,7 @@ export function CandidateProgressionReport() {
           // Use the new submitted_at timestamp if available
           let submissionTime = null as Date | null;
           if (isSubmitted) {
-            submissionTime = parsePossibleDate((item as any).submitted_at) ||
-                           parsePossibleDate((item as any).notes_updated_at) ||
-                           parsePossibleDate((item as any).lastcalltime);
+            submissionTime = parsePossibleDate((item as any).submitted_at);
           }
 
           try {
