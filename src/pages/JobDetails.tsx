@@ -730,34 +730,65 @@ export default function JobDetails() {
     }
   };
   const handleSearchMoreCandidates = async () => {
-    // Trigger confetti animation immediately when clicked
+    // Epic full-screen confetti animation
     const confetti = (await import('canvas-confetti')).default;
     
-    // Multiple confetti bursts for dramatic effect
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.1 },
-      colors: ['#3B82F6', '#06B6D4', '#8B5CF6', '#EC4899']
-    });
+    // Function to create a burst from specific position
+    const createBurst = (x: number, y: number, particleCount: number = 150) => {
+      confetti({
+        particleCount,
+        spread: 120,
+        origin: { x, y },
+        colors: ['#3B82F6', '#06B6D4', '#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#EF4444', '#84CC16']
+      });
+    };
+
+    // Center explosion
+    createBurst(0.5, 0.5, 200);
     
+    // Top explosions
+    setTimeout(() => createBurst(0.2, 0.1, 120), 100);
+    setTimeout(() => createBurst(0.5, 0.1, 120), 150);
+    setTimeout(() => createBurst(0.8, 0.1, 120), 200);
+    
+    // Side explosions
+    setTimeout(() => createBurst(0.1, 0.3, 100), 250);
+    setTimeout(() => createBurst(0.9, 0.3, 100), 300);
+    setTimeout(() => createBurst(0.1, 0.7, 100), 350);
+    setTimeout(() => createBurst(0.9, 0.7, 100), 400);
+    
+    // Bottom explosions
+    setTimeout(() => createBurst(0.3, 0.9, 120), 450);
+    setTimeout(() => createBurst(0.7, 0.9, 120), 500);
+    
+    // Continuous rain effect from top
+    const rainEffect = () => {
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          confetti({
+            particleCount: 50,
+            spread: 360,
+            origin: { x: Math.random(), y: -0.1 },
+            colors: ['#3B82F6', '#8B5CF6', '#EC4899', '#10B981'],
+            gravity: 0.8,
+            scalar: 0.8
+          });
+        }, i * 100);
+      }
+    };
+    
+    // Start rain effect after initial bursts
+    setTimeout(rainEffect, 600);
+    
+    // Final grand finale burst
     setTimeout(() => {
       confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.1, x: 0.3 },
-        colors: ['#10B981', '#F59E0B', '#EF4444']
+        particleCount: 300,
+        spread: 180,
+        origin: { x: 0.5, y: 0.3 },
+        colors: ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7']
       });
-    }, 200);
-    
-    setTimeout(() => {
-      confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.1, x: 0.7 },
-        colors: ['#8B5CF6', '#EC4899', '#06B6D4']
-      });
-    }, 400);
+    }, 1200);
 
     try {
       // Get user_ids from AI Boolean Search candidates (filteredCandidates) as comma-separated string
@@ -779,8 +810,8 @@ export default function JobDetails() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       toast({
-        title: "✨ Success! 🎉",
-        description: "🚀 AI is now searching for more amazing candidates!"
+        title: "🎊 AMAZING! 🎉",
+        description: "🚀 AI is unleashing its full power to find incredible candidates! ✨🔥"
       });
     } catch (error) {
       console.error('Error searching for more candidates:', error);
