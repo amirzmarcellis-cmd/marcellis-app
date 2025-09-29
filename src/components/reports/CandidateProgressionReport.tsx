@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Download, Clock, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { format, parseISO, differenceInHours, differenceInDays } from "date-fns";
+import { useUserRole } from "@/hooks/useUserRole";
 
 interface CandidateProgression {
   job_id: string;
@@ -23,22 +24,37 @@ export function CandidateProgressionReport() {
   const [loading, setLoading] = useState(true);
   const [selectedJobId, setSelectedJobId] = useState<string>("all");
   const [jobs, setJobs] = useState<{job_id: string, job_title: string}[]>([]);
+  const { isAdmin, isTeamLeader } = useUserRole();
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentUserId(user.id);
+      }
+    };
+    getUser();
     fetchJobs();
     fetchProgressionData();
   }, []);
 
   useEffect(() => {
     fetchProgressionData();
-  }, [selectedJobId]);
+  }, [selectedJobId, isAdmin, isTeamLeader, currentUserId, jobs]);
 
   const fetchJobs = async () => {
     try {
-      const { data } = await supabase
+      let query = supabase
         .from('Jobs')
-        .select('job_id, job_title')
-        .order('job_id');
+        .select('job_id, job_title, recruiter_id');
+
+      // Filter jobs based on user role
+      if (!isAdmin && !isTeamLeader && currentUserId) {
+        query = query.eq('recruiter_id', currentUserId);
+      }
+
+      const { data } = await query.order('job_id');
       
       if (data) {
         setJobs(data);
@@ -58,6 +74,17 @@ export function CandidateProgressionReport() {
 
       if (selectedJobId !== "all") {
         query = query.eq('job_id', selectedJobId);
+      } else if (!isAdmin && !isTeamLeader && currentUserId) {
+        // For non-admin/non-team-leader users, filter by jobs they created
+        const jobIds = jobs.map(job => job.job_id);
+        if (jobIds.length > 0) {
+          query = query.in('job_id', jobIds);
+        } else {
+          // If no jobs found for this user, return empty result
+          setProgressionData([]);
+          setLoading(false);
+          return;
+        }
       }
 
       const { data } = await query.order('longlisted_at', { ascending: false });
