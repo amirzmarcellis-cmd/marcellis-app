@@ -1754,10 +1754,15 @@ export default function JobDetails() {
                        <span className="relative z-10">AI Generate Longlist</span>
                     </Button>
                   ) : (
-                    <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} className="action-button relative rounded-full bg-gradient-primary text-primary-foreground hover:bg-gradient-accent disabled:opacity-50 disabled:cursor-not-allowed shadow-strong hover:shadow-elevated transition-all duration-200 ease-bounce hover:-translate-y-0.5 active:translate-y-[1px] active:shadow-medium text-sm border border-border/30 px-6 py-3" size="sm">
-                      <Zap className="w-4 h-4 mr-2" />
-                      <span>Generate Long List</span>
-                    </Button>
+                    <button 
+                      onClick={handleGenerateLongList} 
+                      disabled={job?.longlist === 3} 
+                      className="ai-longlist-button flex-col gap-1"
+                      title="AI Longlist"
+                    >
+                      <Zap className="w-5 h-5 drop-shadow-sm" />
+                      <span className="text-xs font-bold tracking-tight leading-tight">AI Longlist</span>
+                    </button>
                   )}
                 </div>
               )}
