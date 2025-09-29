@@ -665,6 +665,32 @@ export default function EditJob() {
                   {isAmendMode && (
                     <div className="space-y-6 p-4 border border-primary/20 rounded-lg bg-primary/5">
                       <div className="space-y-2">
+                        <Label htmlFor="job_description">Job Description & Requirements</Label>
+                        <Textarea
+                          id="job_description"
+                          name="job_description"
+                          value={formData.job_description || ""}
+                          onChange={handleInputChange}
+                          placeholder="Enter detailed job description and requirements"
+                          rows={6}
+                          className="bg-background/50"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="client_description">Client Description</Label>
+                        <Textarea
+                          id="client_description"
+                          name="client_description"
+                          value={formData.client_description || ""}
+                          onChange={handleInputChange}
+                          placeholder="Enter client company description"
+                          rows={4}
+                          className="bg-background/50"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
                         <Label htmlFor="musttohave">Must Have Requirements</Label>
                         <Textarea
                           id="musttohave"
@@ -720,6 +746,20 @@ export default function EditJob() {
 
                   {!isAmendMode && (
                     <div className="space-y-4 p-4 border border-border/30 rounded-lg bg-muted/20">
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-primary">Job Description & Requirements</h4>
+                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                          {formData.job_description || "No job description provided."}
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-primary">Client Description</h4>
+                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                          {formData.client_description || "No client description provided."}
+                        </p>
+                      </div>
+
                       <div className="space-y-2">
                         <h4 className="font-medium text-primary">Must Have Requirements</h4>
                         <p className="text-sm text-muted-foreground whitespace-pre-wrap">
