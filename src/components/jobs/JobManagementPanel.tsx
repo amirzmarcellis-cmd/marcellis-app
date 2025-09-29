@@ -118,7 +118,7 @@ export function JobManagementPanel() {
         error: candidatesError
       } = await supabase
         .from('Jobs_CVs')
-        .select('job_id, cv_score, after_call_score')
+        .select('job_id, cv_score, after_call_score, longlisted_at')
         .in('job_id', jobIds);
 
       if (candidatesError) {
@@ -135,8 +135,10 @@ export function JobManagementPanel() {
       // Calculate counts for each job
       const jobsWithCounts = (jobsData || []).map(job => {
         const candidates = candidatesByJob[job.job_id] || [];
-        const longlisted_count = candidates.length;
-        const shortlisted_count = candidates.filter(c => {
+        // Only count candidates that are actually longlisted (have longlisted_at value)
+        const longlistedCandidates = candidates.filter(c => c.longlisted_at != null);
+        const longlisted_count = longlistedCandidates.length;
+        const shortlisted_count = longlistedCandidates.filter(c => {
           const score = parseInt(c.after_call_score || "0");
           return score >= 74;
         }).length;

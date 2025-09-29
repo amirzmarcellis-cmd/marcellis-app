@@ -12,25 +12,27 @@ interface JobFunnelProps {
 export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
   // Calculate counts for each funnel stage
   const getCounts = () => {
-    const longlist = candidates.length;
+    // Only count candidates that are actually longlisted (have longlisted_at value)
+    const longlistedCandidates = candidates.filter(c => c.longlisted_at != null);
+    const longlist = longlistedCandidates.length;
     
-    // Count by contacted status
-    const firstNoAnswer = candidates.filter(c => c["contacted"] === "1st No Answer").length;
-    const secondNoAnswer = candidates.filter(c => c["contacted"] === "2nd No Answer").length;
-    const thirdNoAnswer = candidates.filter(c => c["contacted"] === "3rd No Answer").length;
-    const contacted = candidates.filter(c => c["contacted"] === "Contacted").length;
+    // Count by contacted status (only from longlisted candidates)
+    const firstNoAnswer = longlistedCandidates.filter(c => c["contacted"] === "1st No Answer").length;
+    const secondNoAnswer = longlistedCandidates.filter(c => c["contacted"] === "2nd No Answer").length;
+    const thirdNoAnswer = longlistedCandidates.filter(c => c["contacted"] === "3rd No Answer").length;
+    const contacted = longlistedCandidates.filter(c => c["contacted"] === "Contacted").length;
     
     // Low scored (contacted status is "Low Scored")
-    const lowScored = candidates.filter(c => c["contacted"] === "Low Scored").length;
+    const lowScored = longlistedCandidates.filter(c => c["contacted"] === "Low Scored").length;
     
     // Shortlist (score >= 74)
-    const shortlist = candidates.filter(c => {
+    const shortlist = longlistedCandidates.filter(c => {
       const score = parseInt(c["after_call_score"] || "0");
       return score >= 74;
     }).length;
     
     // Submitted (candidates with submitted status)
-    const submitted = candidates.filter(c => c["contacted"] === "Submitted").length;
+    const submitted = longlistedCandidates.filter(c => c["contacted"] === "Submitted").length;
     
     return {
       longlist,
