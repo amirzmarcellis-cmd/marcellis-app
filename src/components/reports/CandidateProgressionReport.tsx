@@ -132,24 +132,31 @@ export function CandidateProgressionReport() {
 
           // Calculate time to submission: start from AI Shortlist time only
           const startTime = shortlistedTime; // Only use shortlisted time as start
-          
-          // Check if contacted status is "submitted" and parse the time
-          let submissionTime = null;
-          if (item.contacted && item.contacted.toLowerCase() === 'submitted') {
-            // If contacted is just "submitted" text, we need to look for actual timestamp
-            // Check notes_updated_at or lastcalltime for the actual submission timestamp
-            submissionTime = parsePossibleDate((item as any).notes_updated_at) || 
-                           parsePossibleDate((item as any).lastcalltime);
+
+          // Determine if the candidate is actually submitted
+          const isSubmitted = typeof item.contacted === 'string' && item.contacted.trim().toLowerCase() === 'submitted';
+
+          // If submitted, try to infer a timestamp from available fields
+          let submissionTime = null as Date | null;
+          if (isSubmitted) {
+            submissionTime =
+              parsePossibleDate((item as any).notes_updated_at) ||
+              parsePossibleDate((item as any).lastcalltime);
           }
 
           try {
             if (startTime) {
-              if (submissionTime) {
-                const diffInMs = submissionTime.getTime() - startTime.getTime();
-                processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
+              if (isSubmitted) {
+                if (submissionTime) {
+                  const diffInMs = submissionTime.getTime() - startTime.getTime();
+                  processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
+                } else {
+                  // No timestamp available for when it became Submitted — don't keep counting, just mark as completed without duration
+                  processed.timeToSubmission = undefined;
+                }
                 processed.submissionPending = false;
               } else {
-                // If not submitted yet, calculate pending time from shortlist
+                // Not submitted yet — show pending time since shortlist
                 const now = new Date();
                 const diffInMs = now.getTime() - startTime.getTime();
                 processed.timeToSubmission = Math.max(0, diffInMs / (1000 * 60 * 60));
@@ -187,10 +194,11 @@ export function CandidateProgressionReport() {
   };
 
   const getProgressionStatus = (item: CandidateProgression) => {
-    if (item.contacted) return "Submitted";
-    if (item.shortlisted_at) return "Shortlisted";
-    if (item.longlisted_at) return "Longlisted";
-    return "Pending";
+    const contacted = (item.contacted || '').toString().trim().toLowerCase();
+    if (contacted === 'submitted') return 'Submitted';
+    if (item.shortlisted_at) return 'Shortlisted';
+    if (item.longlisted_at) return 'Longlisted';
+    return 'Pending';
   };
 
   const getStatusColor = (status: string) => {
