@@ -333,13 +333,14 @@ export function CandidateProgressionReport() {
                   <TableHead>Status</TableHead>
                   <TableHead>Longlisted At</TableHead>
                   <TableHead>Shortlisted At</TableHead>
+                  <TableHead>Submitted At</TableHead>
                   <TableHead>Longlisted → Shortlisted</TableHead>
                   <TableHead>Shortlisted → Submission</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredData.map((item, index) => (
-                  <TableRow key={index}>
+                <TableRow key={index}>
                     <TableCell className="font-medium">
                       {item.candidate_name || "—"}
                     </TableCell>
@@ -358,6 +359,12 @@ export function CandidateProgressionReport() {
                     <TableCell>
                       {item.shortlisted_at 
                         ? format(parseISO(item.shortlisted_at), 'MMM dd, yyyy HH:mm')
+                        : "—"
+                      }
+                    </TableCell>
+                    <TableCell>
+                      {item.submitted_at 
+                        ? format(parseISO(item.submitted_at), 'MMM dd, yyyy HH:mm')
                         : "—"
                       }
                     </TableCell>
