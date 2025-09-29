@@ -131,7 +131,6 @@ export default function JobDetails() {
       const tab = hash.substring(5);
       setActiveTab(tab);
     }
-
   }, [id]);
 
   // Scroll detection for floating button
@@ -140,7 +139,6 @@ export default function JobDetails() {
       const scrollY = window.scrollY;
       setShowFloatingButton(scrollY > 200);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -374,36 +372,37 @@ export default function JobDetails() {
       setCandidatesLoading(false);
     }
   };
-
   const fetchLonglistedCandidates = async (jobId: string) => {
     try {
       setLonglistedLoading(true);
-      
+
       // Fetch only longlisted candidates from Jobs_CVs
       const {
         data: longlistedData,
         error: longlistedError
-      } = await supabase
-        .from('Jobs_CVs')
-        .select('*')
-        .eq('job_id', jobId)
-        .not('longlisted_at', 'is', null)
-        .order('longlisted_at', { ascending: false });
-
+      } = await supabase.from('Jobs_CVs').select('*').eq('job_id', jobId).not('longlisted_at', 'is', null).order('longlisted_at', {
+        ascending: false
+      });
       if (longlistedError) throw longlistedError;
 
       // Fetch any existing scores for this job (regardless of longlisted status)
-      const { data: scoreRows, error: scoreErr } = await supabase
-        .from('Jobs_CVs')
-        .select('user_id, candidate_email, candidate_phone_number, cv_score, cv_score_reason')
-        .eq('job_id', jobId);
-
+      const {
+        data: scoreRows,
+        error: scoreErr
+      } = await supabase.from('Jobs_CVs').select('user_id, candidate_email, candidate_phone_number, cv_score, cv_score_reason').eq('job_id', jobId);
       if (scoreErr) console.warn('Error fetching score map:', scoreErr);
-
-      const scoreMap = new Map<string, { score: number | null, reason: string | null }>();
-      const emailScoreMap = new Map<string, { score: number | null, reason: string | null }>();
-      const phoneScoreMap = new Map<string, { score: number | null, reason: string | null }>();
-
+      const scoreMap = new Map<string, {
+        score: number | null;
+        reason: string | null;
+      }>();
+      const emailScoreMap = new Map<string, {
+        score: number | null;
+        reason: string | null;
+      }>();
+      const phoneScoreMap = new Map<string, {
+        score: number | null;
+        reason: string | null;
+      }>();
       (scoreRows || []).forEach((r: any) => {
         const nextScore = r?.cv_score ?? null;
         const nextReason = r?.cv_score_reason ?? null;
@@ -411,8 +410,10 @@ export default function JobDetails() {
         // by user_id
         if (r?.user_id) {
           const prev = scoreMap.get(String(r.user_id));
-          if (!prev) scoreMap.set(String(r.user_id), { score: nextScore, reason: nextReason });
-          else scoreMap.set(String(r.user_id), {
+          if (!prev) scoreMap.set(String(r.user_id), {
+            score: nextScore,
+            reason: nextReason
+          });else scoreMap.set(String(r.user_id), {
             score: prev.score ?? nextScore,
             reason: prev.reason ?? nextReason
           });
@@ -422,8 +423,10 @@ export default function JobDetails() {
         const email = (r?.candidate_email || '').toString().trim().toLowerCase();
         if (email) {
           const prevE = emailScoreMap.get(email);
-          if (!prevE) emailScoreMap.set(email, { score: nextScore, reason: nextReason });
-          else emailScoreMap.set(email, {
+          if (!prevE) emailScoreMap.set(email, {
+            score: nextScore,
+            reason: nextReason
+          });else emailScoreMap.set(email, {
             score: prevE.score ?? nextScore,
             reason: prevE.reason ?? nextReason
           });
@@ -433,14 +436,15 @@ export default function JobDetails() {
         const phone = (r?.candidate_phone_number || '').toString().replace(/[^0-9]/g, '');
         if (phone) {
           const prevP = phoneScoreMap.get(phone);
-          if (!prevP) phoneScoreMap.set(phone, { score: nextScore, reason: nextReason });
-          else phoneScoreMap.set(phone, {
+          if (!prevP) phoneScoreMap.set(phone, {
+            score: nextScore,
+            reason: nextReason
+          });else phoneScoreMap.set(phone, {
             score: prevP.score ?? nextScore,
             reason: prevP.reason ?? nextReason
           });
         }
       });
-
       const mappedLonglisted = (longlistedData || []).map((row: any) => {
         const sourceLower = (row.source || '').toLowerCase();
         const hasLinkedIn = sourceLower.includes('linkedin');
@@ -451,18 +455,8 @@ export default function JobDetails() {
         const phoneKey = (row.candidate_phone_number || '').toString().replace(/[^0-9]/g, '');
         const fromEmail = emailKey ? emailScoreMap.get(emailKey) : undefined;
         const fromPhone = phoneKey ? phoneScoreMap.get(phoneKey) : undefined;
-
-        const mergedScore = row.cv_score
-          ?? fromUser?.score
-          ?? fromEmail?.score
-          ?? fromPhone?.score
-          ?? (hasLinkedIn ? (row.linkedin_score ?? null) : null);
-        const mergedReason = row.cv_score_reason
-          ?? fromUser?.reason
-          ?? fromEmail?.reason
-          ?? fromPhone?.reason
-          ?? (hasLinkedIn ? (row.linkedin_score_reason ?? '') : '');
-
+        const mergedScore = row.cv_score ?? fromUser?.score ?? fromEmail?.score ?? fromPhone?.score ?? (hasLinkedIn ? row.linkedin_score ?? null : null);
+        const mergedReason = row.cv_score_reason ?? fromUser?.reason ?? fromEmail?.reason ?? fromPhone?.reason ?? (hasLinkedIn ? row.linkedin_score_reason ?? '' : '');
         return {
           ...row,
           "Job ID": jobId,
@@ -497,7 +491,6 @@ export default function JobDetails() {
           cv_score_reason: mergedReason || ''
         };
       });
-
       setLonglistedCandidates(mappedLonglisted);
     } catch (error) {
       console.error('Error fetching longlisted candidates:', error);
@@ -526,14 +519,11 @@ export default function JobDetails() {
       const {
         data,
         error
-      } = await supabase
-        .from('CVs')
-        .select('*')
-        .eq('job_id', jobId)
-        .order('updated_time', { ascending: false });
-      
+      } = await supabase.from('CVs').select('*').eq('job_id', jobId).order('updated_time', {
+        ascending: false
+      });
       if (error) throw error;
-      
+
       // Map the data to match the expected structure in the UI
       const mappedApplications = (data || []).map(cv => ({
         candidate_id: cv.user_id,
@@ -545,12 +535,10 @@ export default function JobDetails() {
         cv_summary: cv.cv_text ? cv.cv_text.substring(0, 200) + '...' : '',
         Timestamp: cv.updated_time
       }));
-      
       setApplications(mappedApplications);
-      
+
       // Fetch longlisted status for all candidates
       await fetchLonglistedStatus(jobId);
-      
     } catch (error) {
       console.error('Error fetching applications:', error);
       setApplications([]);
@@ -558,20 +546,15 @@ export default function JobDetails() {
       setApplicationsLoading(false);
     }
   };
-
   const fetchLonglistedStatus = async (jobId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('Jobs_CVs')
-        .select('user_id')
-        .eq('job_id', jobId)
-        .not('longlisted_at', 'is', null);
-      
+      const {
+        data,
+        error
+      } = await supabase.from('Jobs_CVs').select('user_id').eq('job_id', jobId).not('longlisted_at', 'is', null);
       if (error) throw error;
-      
       const longlistedIds = new Set(data?.map(item => item.user_id) || []);
       setAddedToLongList(longlistedIds);
-      
     } catch (error) {
       console.error('Error fetching longlisted status:', error);
     }
@@ -944,36 +927,34 @@ export default function JobDetails() {
   const handleRemoveFromLongList = async (candidateId: string) => {
     try {
       console.log('Attempting to remove candidate:', candidateId);
-      console.log('Available candidates:', candidates.map(c => ({ 
-        id: c["Candidate_ID"], 
-        recordid: c.recordid, 
-        name: c["Candidate Name"] 
+      console.log('Available candidates:', candidates.map(c => ({
+        id: c["Candidate_ID"],
+        recordid: c.recordid,
+        name: c["Candidate Name"]
       })));
 
       // Find the candidate record - try multiple approaches
       let candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
-      
+
       // If not found by Candidate_ID, try by recordid directly
       if (!candidate) {
         candidate = candidates.find(c => c.recordid?.toString() === candidateId);
       }
-      
+
       // If still not found, try by user_id
       if (!candidate) {
         candidate = candidates.find(c => c.user_id === candidateId);
       }
-
       if (!candidate) {
         console.error('Candidate not found. Searched for:', candidateId);
         console.error('Available candidate IDs:', candidates.map(c => c["Candidate_ID"]));
         throw new Error('Candidate not found in local data');
       }
-
       console.log('Found candidate:', candidate);
 
       // Use the actual recordid from the database for deletion
       const recordIdToDelete = candidate.recordid || candidateId;
-      
+
       // Remove the candidate from the Jobs_CVs table using recordid
       const {
         error
@@ -1372,11 +1353,9 @@ export default function JobDetails() {
     const cvScoreA = parseFloat(a["cv_score"] || a["CV Score"] || "0");
     const linkedinScoreA = parseFloat(a["linkedin_score"] || "0");
     const maxScoreA = Math.max(cvScoreA, linkedinScoreA);
-    
     const cvScoreB = parseFloat(b["cv_score"] || b["CV Score"] || "0");
     const linkedinScoreB = parseFloat(b["linkedin_score"] || "0");
     const maxScoreB = Math.max(cvScoreB, linkedinScoreB);
-    
     return maxScoreB - maxScoreA;
   });
   // Helper function to render candidate cards
@@ -1664,7 +1643,7 @@ export default function JobDetails() {
             <div className="flex flex-col sm:flex-row gap-2">
               {job?.longlist && job.longlist > 0 ? <Button onClick={handleSearchMoreCandidates} className="bg-foreground text-background hover:bg-foreground/90 text-sm w-full sm:w-auto" size="sm">
                   <Search className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Search for more candidates</span>
+                  <span className="hidden sm:inline">AI Generate Longlist</span>
                   <span className="sm:hidden">Search More</span>
                 </Button> : <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm w-full sm:w-auto" size="sm">
                   <Zap className="w-4 h-4 mr-2" />
@@ -2035,109 +2014,89 @@ export default function JobDetails() {
                                          </Link>
                                        </Button>
                                      </div>
-                                      {!addedToLongList.has(application.candidate_id) && (
-                                        <Button 
-                                          size="sm" 
-                                          className="bg-primary text-primary-foreground hover:bg-primary/90"
-                                          onClick={async () => {
-                                            try {
-                                               const webhookUrl = "https://hook.eu2.make.com/tv58ofd5rftm64t677f65phmbwrnq24e";
-                                               const payload = {
-                                                 "user_id": String(application.candidate_id),
-                                                 "job_id": String(job?.job_id || id || '')
-                                               };
+                                      {!addedToLongList.has(application.candidate_id) && <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={async () => {
+                            try {
+                              const webhookUrl = "https://hook.eu2.make.com/tv58ofd5rftm64t677f65phmbwrnq24e";
+                              const payload = {
+                                "user_id": String(application.candidate_id),
+                                "job_id": String(job?.job_id || id || '')
+                              };
+                              console.log('Triggering webhook with payload:', JSON.stringify(payload, null, 2));
 
-                                               console.log('Triggering webhook with payload:', JSON.stringify(payload, null, 2));
-                                               
-                                               // Optimistically disable the button immediately
-                                               setAddedToLongList(prev => new Set([...prev, application.candidate_id]));
-                                               
-                                               const response = await fetch(webhookUrl, {
-                                                 method: "POST",
-                                                 headers: {
-                                                   "Content-Type": "application/json",
-                                                 },
-                                                 body: JSON.stringify(payload),
-                                               });
+                              // Optimistically disable the button immediately
+                              setAddedToLongList(prev => new Set([...prev, application.candidate_id]));
+                              const response = await fetch(webhookUrl, {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(payload)
+                              });
+                              if (response.ok) {
+                                try {
+                                  const responseText = await response.text();
+                                  console.log('Webhook response:', responseText);
 
-                                               if (response.ok) {
-                                                 try {
-                                                   const responseText = await response.text();
-                                                   console.log('Webhook response:', responseText);
-                                                   
-                                                   // Try to parse as JSON if possible, otherwise use as text
-                                                   let responseData;
-                                                   try {
-                                                     responseData = JSON.parse(responseText);
-                                                   } catch {
-                                                     responseData = responseText;
-                                                   }
-                                                   
-                                                   console.log('Processed webhook response:', responseData);
-                                                 } catch (error) {
-                                                   console.error('Error processing webhook response:', error);
-                                                 }
-                                               }
+                                  // Try to parse as JSON if possible, otherwise use as text
+                                  let responseData;
+                                  try {
+                                    responseData = JSON.parse(responseText);
+                                  } catch {
+                                    responseData = responseText;
+                                  }
+                                  console.log('Processed webhook response:', responseData);
+                                } catch (error) {
+                                  console.error('Error processing webhook response:', error);
+                                }
+                              }
 
-                                                // Try to reuse any existing CV score/reason for this candidate on this job by user_id/email/phone
-                                                const email = (application.Email || application.email || '').toString().trim().toLowerCase();
-                                                const phone = (application.phone_number || '').toString().replace(/[^0-9]/g, '');
-                                                const orFilters = [
-                                                  `user_id.eq.${String(application.candidate_id)}`,
-                                                  email ? `candidate_email.eq.${email}` : null,
-                                                  phone ? `candidate_phone_number.eq.${phone}` : null,
-                                                ].filter(Boolean).join(',');
+                              // Try to reuse any existing CV score/reason for this candidate on this job by user_id/email/phone
+                              const email = (application.Email || application.email || '').toString().trim().toLowerCase();
+                              const phone = (application.phone_number || '').toString().replace(/[^0-9]/g, '');
+                              const orFilters = [`user_id.eq.${String(application.candidate_id)}`, email ? `candidate_email.eq.${email}` : null, phone ? `candidate_phone_number.eq.${phone}` : null].filter(Boolean).join(',');
+                              const {
+                                data: existingScore
+                              } = await supabase.from('Jobs_CVs').select('cv_score, cv_score_reason').eq('job_id', String(job?.job_id || id || '')).or(orFilters).order('cv_score', {
+                                ascending: false
+                              }).limit(1).maybeSingle();
 
-                                                const { data: existingScore } = await supabase
-                                                  .from('Jobs_CVs')
-                                                  .select('cv_score, cv_score_reason')
-                                                  .eq('job_id', String(job?.job_id || id || ''))
-                                                  .or(orFilters)
-                                                  .order('cv_score', { ascending: false })
-                                                  .limit(1)
-                                                  .maybeSingle();
+                              // Update database to mark as longlisted and carry over existing score/reason if present
+                              const {
+                                error: updateError
+                              } = await supabase.from('Jobs_CVs').upsert({
+                                job_id: String(job?.job_id || id || ''),
+                                user_id: String(application.candidate_id),
+                                longlisted_at: new Date().toISOString(),
+                                candidate_name: (() => {
+                                  const fn = application.first_name || application.Firstname || '';
+                                  const ln = application.last_name || application.Lastname || '';
+                                  const combined = `${fn} ${ln}`.trim();
+                                  if (combined && combined.toLowerCase() !== 'undefined undefined') return combined;
+                                  if (application.name) return application.name;
+                                  if (application.candidate_name) return application.candidate_name;
+                                  if (application.Email) return String(application.Email).split('@')[0];
+                                  if (application.email) return String(application.email).split('@')[0];
+                                  return `Candidate ${application.candidate_id}`;
+                                })(),
+                                candidate_email: application.Email || application.email || application.candidate_email || null,
+                                candidate_phone_number: application.phone_number || application.candidate_phone_number || null,
+                                cv_score: existingScore?.cv_score ?? undefined,
+                                cv_score_reason: existingScore?.cv_score_reason ?? undefined,
+                                contacted: 'Ready to Contact'
+                              });
+                              if (updateError) {
+                                console.error('Error updating longlisted status:', updateError);
+                              }
 
-                                                // Update database to mark as longlisted and carry over existing score/reason if present
-                                                const { error: updateError } = await supabase
-                                                  .from('Jobs_CVs')
-                                                  .upsert({
-                                                    job_id: String(job?.job_id || id || ''),
-                                                    user_id: String(application.candidate_id),
-                                                    longlisted_at: new Date().toISOString(),
-                                                    candidate_name: (() => {
-                                                      const fn = application.first_name || application.Firstname || '';
-                                                      const ln = application.last_name || application.Lastname || '';
-                                                      const combined = `${fn} ${ln}`.trim();
-                                                      if (combined && combined.toLowerCase() !== 'undefined undefined') return combined;
-                                                      if (application.name) return application.name;
-                                                      if (application.candidate_name) return application.candidate_name;
-                                                      if (application.Email) return String(application.Email).split('@')[0];
-                                                      if (application.email) return String(application.email).split('@')[0];
-                                                      return `Candidate ${application.candidate_id}`;
-                                                    })(),
-                                                    candidate_email: application.Email || application.email || application.candidate_email || null,
-                                                    candidate_phone_number: application.phone_number || application.candidate_phone_number || null,
-                                                    cv_score: existingScore?.cv_score ?? undefined,
-                                                    cv_score_reason: existingScore?.cv_score_reason ?? undefined,
-                                                    contacted: 'Ready to Contact'
-                                                  });
-
-                                               if (updateError) {
-                                               console.error('Error updating longlisted status:', updateError);
-                                             }
-
-                                             // Refresh longlisted candidates to show the new addition
-                                             await fetchLonglistedCandidates(String(job?.job_id || id || ''));
-
-                                             console.log('Webhook triggered successfully');
-                                          } catch (error) {
-                                            console.error('Error triggering webhook:', error);
-                                          }
-                                        }}
-                                      >
+                              // Refresh longlisted candidates to show the new addition
+                              await fetchLonglistedCandidates(String(job?.job_id || id || ''));
+                              console.log('Webhook triggered successfully');
+                            } catch (error) {
+                              console.error('Error triggering webhook:', error);
+                            }
+                          }}>
                                           Add to Long List
-                                        </Button>
-                                      )}
+                                        </Button>}
                                    </div>
                                 </div>
                               </CardContent>
@@ -2166,9 +2125,9 @@ export default function JobDetails() {
               </CardHeader>
                <CardContent>
                  {(() => {
-               const readyToContactCount = longlistedCandidates.filter(candidate => candidate["Contacted"] === "Ready to Contact").length;
-               if (readyToContactCount > 0) {
-                 return <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+              const readyToContactCount = longlistedCandidates.filter(candidate => candidate["Contacted"] === "Ready to Contact").length;
+              if (readyToContactCount > 0) {
+                return <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
                          <div className="flex items-center">
                            <Target className="w-4 h-4 mr-2 text-amber-600 dark:text-amber-400" />
                            <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
@@ -2176,9 +2135,9 @@ export default function JobDetails() {
                            </span>
                          </div>
                        </div>;
-               }
-               return null;
-             })()}
+              }
+              return null;
+            })()}
                  {longlistedLoading ? <div className="flex items-center justify-center py-8">
                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                    </div> : longlistedCandidates.length === 0 ? <div className="text-center py-8">
@@ -2276,44 +2235,49 @@ export default function JobDetails() {
 
                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                        {(() => {
-                   // Filter longlisted candidates based on filters
-                   const filteredLonglistedCandidates = longlistedCandidates.filter(candidate => {
-                     const nameMatch = !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
-                     const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
-                     const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
-                     const userIdMatch = !userIdFilter || (candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
-                     const sourceMatch = !longListSourceFilter || longListSourceFilter === "all" || (candidate["Source"] || "").toLowerCase().includes(longListSourceFilter.toLowerCase());
-                     
-                     let scoreMatch = true;
-                     if (scoreFilter !== "all") {
-                       const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
-                       switch (scoreFilter) {
-                         case "high": scoreMatch = score >= 75; break;
-                         case "moderate": scoreMatch = score >= 50 && score < 75; break;
-                         case "poor": scoreMatch = score >= 1 && score < 50; break;
-                         case "none": scoreMatch = score === 0 || isNaN(score); break;
-                       }
-                     }
-                     
-                     let contactedMatch = true;
-                     if (contactedFilter !== "all") {
-                       const contacted = candidate["Contacted"] || "";
-                       contactedMatch = contacted === contactedFilter || (contactedFilter === "Ready to Call" && contacted === "Ready to Contact");
-                     }
-                     
-                     return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceMatch && scoreMatch && contactedMatch;
-                   });
+                  // Filter longlisted candidates based on filters
+                  const filteredLonglistedCandidates = longlistedCandidates.filter(candidate => {
+                    const nameMatch = !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
+                    const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
+                    const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
+                    const userIdMatch = !userIdFilter || (candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
+                    const sourceMatch = !longListSourceFilter || longListSourceFilter === "all" || (candidate["Source"] || "").toLowerCase().includes(longListSourceFilter.toLowerCase());
+                    let scoreMatch = true;
+                    if (scoreFilter !== "all") {
+                      const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
+                      switch (scoreFilter) {
+                        case "high":
+                          scoreMatch = score >= 75;
+                          break;
+                        case "moderate":
+                          scoreMatch = score >= 50 && score < 75;
+                          break;
+                        case "poor":
+                          scoreMatch = score >= 1 && score < 50;
+                          break;
+                        case "none":
+                          scoreMatch = score === 0 || isNaN(score);
+                          break;
+                      }
+                    }
+                    let contactedMatch = true;
+                    if (contactedFilter !== "all") {
+                      const contacted = candidate["Contacted"] || "";
+                      contactedMatch = contacted === contactedFilter || contactedFilter === "Ready to Call" && contacted === "Ready to Contact";
+                    }
+                    return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceMatch && scoreMatch && contactedMatch;
+                  });
 
-                   // Group candidates by Candidate_ID to handle multiple contacts
-                   const groupedCandidates = filteredLonglistedCandidates.reduce((acc, candidate) => {
-                     const candidateId = candidate["Candidate_ID"];
-                     if (!acc[candidateId]) {
-                       acc[candidateId] = [];
-                     }
-                     acc[candidateId].push(candidate);
-                     return acc;
-                   }, {} as Record<string, any[]>);
-                   return Object.entries(groupedCandidates).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                  // Group candidates by Candidate_ID to handle multiple contacts
+                  const groupedCandidates = filteredLonglistedCandidates.reduce((acc, candidate) => {
+                    const candidateId = candidate["Candidate_ID"];
+                    if (!acc[candidateId]) {
+                      acc[candidateId] = [];
+                    }
+                    acc[candidateId].push(candidate);
+                    return acc;
+                  }, {} as Record<string, any[]>);
+                  return Object.entries(groupedCandidates).map(([candidateId, candidateContacts]: [string, any[]]) => {
                     // Use the first contact for display info
                     const mainCandidate = candidateContacts[0];
                     return <Card key={candidateId} className={cn("border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg", selectedCandidates.has(candidateId) && "border-primary bg-primary/5")}>
@@ -2323,7 +2287,7 @@ export default function JobDetails() {
                                      <div className="flex items-start gap-3 min-w-0 flex-1">
                                        <input type="checkbox" checked={selectedCandidates.has(candidateId)} onChange={() => toggleCandidateSelection(candidateId)} className="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" />
                                        <div className="min-w-0 flex-1">
-                                         <h4 className="font-semibold text-sm md:text-base truncate">{(mainCandidate["Candidate Name"] && !/undefined/i.test(String(mainCandidate["Candidate Name"]))) ? mainCandidate["Candidate Name"] : (mainCandidate["Candidate Email"] ? String(mainCandidate["Candidate Email"]).split('@')[0] : `Candidate ${candidateId}`)}</h4>
+                                         <h4 className="font-semibold text-sm md:text-base truncate">{mainCandidate["Candidate Name"] && !/undefined/i.test(String(mainCandidate["Candidate Name"])) ? mainCandidate["Candidate Name"] : mainCandidate["Candidate Email"] ? String(mainCandidate["Candidate Email"]).split('@')[0] : `Candidate ${candidateId}`}</h4>
                                          <div className="space-y-1">
                                            
                                            {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || mainCandidate["Contacted"]?.toLowerCase() === "contacted" || mainCandidate["Contacted"]?.toLowerCase() === "low scored" || mainCandidate["Contacted"]?.toLowerCase() === "tasked") && mainCandidate["lastcalltime"] && <div className="text-xs text-muted-foreground flex items-center">
@@ -2377,22 +2341,20 @@ export default function JobDetails() {
                                            {(!["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") || typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('itris')) && <div className="flex items-center justify-between">
                                                 <span className="text-muted-foreground">{typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? 'LinkedIn Score:' : 'CV Score:'}</span>
                                                 {(() => {
-                                                  const score = typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? 
-                                                    mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "N/A" : 
-                                                    mainCandidate["cv_score"] || "N/A";
-                                                  const numScore = parseInt(score);
-                                                  let scoreClass = "font-medium";
-                                                  if (!isNaN(numScore)) {
-                                                    if (numScore < 50) {
-                                                      scoreClass = "font-bold text-red-600 dark:text-red-400";
-                                                    } else if (numScore < 75) {
-                                                      scoreClass = "font-medium text-amber-600 dark:text-amber-400";
-                                                    } else {
-                                                      scoreClass = "font-medium text-green-600 dark:text-green-400";
-                                                    }
-                                                  }
-                                                  return <span className={scoreClass}>{score}</span>;
-                                                })()}
+                                    const score = typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "N/A" : mainCandidate["cv_score"] || "N/A";
+                                    const numScore = parseInt(score);
+                                    let scoreClass = "font-medium";
+                                    if (!isNaN(numScore)) {
+                                      if (numScore < 50) {
+                                        scoreClass = "font-bold text-red-600 dark:text-red-400";
+                                      } else if (numScore < 75) {
+                                        scoreClass = "font-medium text-amber-600 dark:text-amber-400";
+                                      } else {
+                                        scoreClass = "font-medium text-green-600 dark:text-green-400";
+                                      }
+                                    }
+                                    return <span className={scoreClass}>{score}</span>;
+                                  })()}
                                               </div>}
                                            {mainCandidate["after_call_score"] && mainCandidate["after_call_score"] !== 0 && <div className="flex items-center justify-between">
                                              <span className="text-muted-foreground">After Call Score:</span>
@@ -2421,18 +2383,16 @@ export default function JobDetails() {
                                      
                                      {/* Highlight Low Scores */}
                                      {(() => {
-                                       const score = typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? 
-                                         parseInt(mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "0") : 
-                                         parseInt(mainCandidate["cv_score"] || "0");
-                                       if (score > 0 && score < 50) {
-                                         return <div className="pt-2">
+                              const score = typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? parseInt(mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "0") : parseInt(mainCandidate["cv_score"] || "0");
+                              if (score > 0 && score < 50) {
+                                return <div className="pt-2">
                                            <Badge className="bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400 border border-red-200 dark:border-red-800">
                                              ⚠️ Low Score: {score}
                                            </Badge>
                                          </div>;
-                                       }
-                                       return null;
-                                     })()}
+                              }
+                              return null;
+                            })()}
                                   </div>
 
                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t gap-2">
@@ -2860,19 +2820,12 @@ export default function JobDetails() {
         </AlertDialog>
 
         {/* Floating Generate Long List Button */}
-        {showFloatingButton && job && (!job.longlist || job.longlist === 0) && (
-          <div className="fixed bottom-6 right-6 z-50 animate-fade-in">
-            <Button 
-              onClick={() => handleGenerateLongList()} 
-              disabled={job?.longlist === 3}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-2xl backdrop-blur-sm border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed group transition-all duration-300 hover:scale-105"
-              size="lg"
-            >
+        {showFloatingButton && job && (!job.longlist || job.longlist === 0) && <div className="fixed bottom-6 right-6 z-50 animate-fade-in">
+            <Button onClick={() => handleGenerateLongList()} disabled={job?.longlist === 3} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-2xl backdrop-blur-sm border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed group transition-all duration-300 hover:scale-105" size="lg">
               <Zap className="w-5 h-5 mr-2 group-hover:animate-pulse" />
               Generate Long List
             </Button>
-          </div>
-        )}
+          </div>}
 
       </div>;
 }
