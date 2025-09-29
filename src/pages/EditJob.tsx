@@ -95,7 +95,8 @@ export default function EditJob() {
   const [uploadedFiles, setUploadedFiles] = useState<Array<{ id: string; file_name: string; file_url: string; file_type: string; file_size: number }>>([]);
   const [groups, setGroups] = useState<Array<{id: string, name: string, color: string | null}>>([]);
   const [recruiters, setRecruiters] = useState<Array<{user_id: string, name: string, email: string}>>([]);
-  
+  const [isAmendMode, setIsAmendMode] = useState(false);
+  const [currentTab, setCurrentTab] = useState("details");
   const [formData, setFormData] = useState<JobData>({
     job_id: "",
     job_title: "",
@@ -251,8 +252,11 @@ export default function EditJob() {
     }
   };
 
-  const handleFileUpload = (files: Array<{ id: string; file_name: string; file_url: string; file_type: string; file_size: number }>) => {
-    setUploadedFiles(files);
+  const handleAmendToggle = () => {
+    setIsAmendMode(!isAmendMode);
+    if (!isAmendMode) {
+      setCurrentTab("amend");
+    }
   };
 
   if (loading) {
@@ -291,10 +295,11 @@ export default function EditJob() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <Tabs defaultValue="details" className="space-y-6">
+            <Tabs value={currentTab} onValueChange={setCurrentTab} className="space-y-6">
               <TabsList className="glass-card">
                 <TabsTrigger value="details">Job Details</TabsTrigger>
                 <TabsTrigger value="documents">Documents</TabsTrigger>
+                <TabsTrigger value="amend">Amend</TabsTrigger>
               </TabsList>
 
               <TabsContent value="details" className="space-y-6">
@@ -624,6 +629,115 @@ export default function EditJob() {
                           </li>
                         ))}
                       </ul>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="amend" className="space-y-6">
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold">AI Requirements Amendment</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Toggle amend mode to edit AI requirements
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Label htmlFor="amendMode">Amend AI</Label>
+                      <Switch
+                        id="amendMode"
+                        checked={isAmendMode}
+                        onCheckedChange={handleAmendToggle}
+                      />
+                    </div>
+                  </div>
+
+                  {isAmendMode && (
+                    <div className="space-y-6 p-4 border border-primary/20 rounded-lg bg-primary/5">
+                      <div className="space-y-2">
+                        <Label htmlFor="musttohave">Must Have Requirements</Label>
+                        <Textarea
+                          id="musttohave"
+                          name="musttohave"
+                          value={formData.musttohave || ""}
+                          onChange={handleInputChange}
+                          placeholder="Enter critical skills and requirements"
+                          rows={4}
+                          className="bg-background/50"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="nicetohave">Nice to Have Requirements</Label>
+                        <Textarea
+                          id="nicetohave"
+                          name="nicetohave"
+                          value={formData.nicetohave || ""}
+                          onChange={handleInputChange}
+                          placeholder="Enter preferred skills and bonuses"
+                          rows={4}
+                          className="bg-background/50"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="jd_summary">JD Summary</Label>
+                        <Textarea
+                          id="jd_summary"
+                          name="jd_summary"
+                          value={formData.jd_summary}
+                          onChange={handleInputChange}
+                          placeholder="Enter job description summary"
+                          rows={3}
+                          className="bg-background/50"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="things_to_look_for">Things to Look For</Label>
+                        <Textarea
+                          id="things_to_look_for"
+                          name="things_to_look_for"
+                          value={formData.things_to_look_for}
+                          onChange={handleInputChange}
+                          placeholder="Enter specific things to look for in candidates"
+                          rows={3}
+                          className="bg-background/50"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {!isAmendMode && (
+                    <div className="space-y-4 p-4 border border-border/30 rounded-lg bg-muted/20">
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-primary">Must Have Requirements</h4>
+                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                          {formData.musttohave || "No must-have requirements specified."}
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-primary">Nice to Have Requirements</h4>
+                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                          {formData.nicetohave || "No nice-to-have requirements specified."}
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-primary">JD Summary</h4>
+                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                          {formData.jd_summary || "No summary provided."}
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-primary">Things to Look For</h4>
+                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                          {formData.things_to_look_for || "No specific criteria provided."}
+                        </p>
+                      </div>
                     </div>
                   )}
                 </div>
