@@ -308,7 +308,7 @@ export default function EditJob() {
               <TabsList className="glass-card">
                 <TabsTrigger value="details">Job Details</TabsTrigger>
                 <TabsTrigger value="documents">Documents</TabsTrigger>
-                <TabsTrigger value="amend">Amend</TabsTrigger>
+                <TabsTrigger value="amend">Ai Requirements</TabsTrigger>
               </TabsList>
 
               <TabsContent value="details" className="space-y-6">
