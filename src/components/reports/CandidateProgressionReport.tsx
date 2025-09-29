@@ -72,8 +72,7 @@ export function CandidateProgressionReport() {
     try {
       let query = supabase
         .from('Jobs_CVs')
-        .select('job_id, candidate_name, longlisted_at, shortlisted_at, contacted, lastcalltime')
-        .not('longlisted_at', 'is', null);
+        .select('job_id, candidate_name, longlisted_at, shortlisted_at, contacted, lastcalltime');
 
       if (selectedJobId !== "all") {
         query = query.eq('job_id', selectedJobId);
