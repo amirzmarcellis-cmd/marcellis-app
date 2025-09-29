@@ -932,17 +932,40 @@ export default function JobDetails() {
   const handleRemoveFromLongList = async (candidateId: string) => {
     try {
       console.log('Attempting to remove candidate:', candidateId);
+      console.log('Available candidates:', candidates.map(c => ({ 
+        id: c["Candidate_ID"], 
+        recordid: c.recordid, 
+        name: c["Candidate Name"] 
+      })));
 
-      // Find the candidate record to get the correct recordid
-      const candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
+      // Find the candidate record - try multiple approaches
+      let candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
+      
+      // If not found by Candidate_ID, try by recordid directly
       if (!candidate) {
+        candidate = candidates.find(c => c.recordid?.toString() === candidateId);
+      }
+      
+      // If still not found, try by user_id
+      if (!candidate) {
+        candidate = candidates.find(c => c.user_id === candidateId);
+      }
+
+      if (!candidate) {
+        console.error('Candidate not found. Searched for:', candidateId);
+        console.error('Available candidate IDs:', candidates.map(c => c["Candidate_ID"]));
         throw new Error('Candidate not found in local data');
       }
 
-      // Remove the candidate from the Jobs_CVs table using recordid (which maps to Candidate_ID in our data transformation)
+      console.log('Found candidate:', candidate);
+
+      // Use the actual recordid from the database for deletion
+      const recordIdToDelete = candidate.recordid || candidateId;
+      
+      // Remove the candidate from the Jobs_CVs table using recordid
       const {
         error
-      } = await (supabase as any).from('Jobs_CVs').delete().eq('recordid', candidateId).eq('job_id', id);
+      } = await (supabase as any).from('Jobs_CVs').delete().eq('recordid', recordIdToDelete).eq('job_id', id);
       if (error) {
         console.error('Supabase delete error:', error);
         throw error;
