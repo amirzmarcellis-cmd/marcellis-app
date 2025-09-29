@@ -130,6 +130,7 @@ export default function JobDetails() {
       const tab = hash.substring(5);
       setActiveTab(tab);
     }
+
   }, [id]);
 
   // Fetch group data when job is loaded
