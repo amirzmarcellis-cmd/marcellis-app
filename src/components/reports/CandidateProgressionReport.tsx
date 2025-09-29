@@ -122,13 +122,12 @@ export function CandidateProgressionReport() {
   const formatDuration = (hours: number | undefined) => {
     if (!hours) return "—";
     
-    if (hours < 24) {
-      return `${Math.round(hours)}h`;
-    } else {
-      const days = Math.floor(hours / 24);
-      const remainingHours = Math.round(hours % 24);
-      return remainingHours > 0 ? `${days}d ${remainingHours}h` : `${days}d`;
-    }
+    const totalMinutes = Math.round(hours * 60);
+    const hrs = Math.floor(totalMinutes / 60);
+    const mins = Math.floor(totalMinutes % 60);
+    const secs = Math.round((hours * 3600) % 60);
+    
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   const getProgressionStatus = (item: CandidateProgression) => {
