@@ -1724,12 +1724,16 @@ export default function JobDetails() {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 items-center lg:items-end justify-center lg:justify-end">
               {job?.longlist && job.longlist > 0 ? (
-                <Button onClick={handleSearchMoreCandidates} className="relative bg-gradient-to-b from-white via-gray-50 to-gray-100 hover:from-gray-50 hover:via-white hover:to-gray-50 text-gray-800 hover:text-primary font-semibold text-sm w-full sm:w-auto border border-gray-200 hover:border-primary/30 overflow-hidden group transform transition-all duration-300 hover:translate-y-[-2px] shadow-[0_4px_14px_0_rgba(0,0,0,0.1),inset_0_1px_0_0_rgba(255,255,255,0.4)] hover:shadow-[0_8px_25px_0_rgba(0,0,0,0.15),inset_0_1px_0_0_rgba(255,255,255,0.6)] active:translate-y-[1px] active:shadow-[0_2px_8px_0_rgba(0,0,0,0.15)]" size="sm">
-                  <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <Search className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300 relative z-10" />
-                  <span className="hidden sm:inline relative z-10">AI Generate Longlist</span>
-                  <span className="sm:hidden relative z-10">AI Search</span>
-                </Button>
+                <div className="flex justify-center">
+                  <button 
+                    onClick={handleSearchMoreCandidates} 
+                    className="ai-longlist-button flex-col gap-1"
+                    title="AI Longlist"
+                  >
+                    <Search className="w-5 h-5 drop-shadow-sm" />
+                    <span className="text-xs font-bold tracking-tight leading-tight">AI Longlist</span>
+                  </button>
+                </div>
               ) : (
                 <div className="flex justify-center">
                   <button 
