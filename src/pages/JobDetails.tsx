@@ -1756,7 +1756,7 @@ export default function JobDetails() {
                      title="Search More Candidates"
                    >
                      {/* Outer glow ring */}
-                     <div className="absolute inset-[-8px] rounded-full bg-gradient-to-b from-gray-300/40 to-gray-400/40 opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 blur-sm"></div>
+                    <div className="absolute inset-[-8px] rounded-full bg-gradient-to-b from-red-300/40 to-red-400/40 opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 blur-sm"></div>
                      
                      {/* Inner highlight for glossy effect */}
                      <div className="absolute inset-2 rounded-full bg-gradient-to-b from-red-200/60 to-transparent opacity-80"></div>
