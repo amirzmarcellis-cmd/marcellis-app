@@ -1736,7 +1736,7 @@ export default function JobDetails() {
                   <span className="text-xs font-normal tracking-tight leading-tight">Regenerate AI Longlist</span>
                 </button> : <button onClick={handleGenerateLongList} disabled={job?.longlist === 3} className="ai-longlist-button flex-col gap-1" title="AI Longlist">
                   <Zap className="w-5 h-5 drop-shadow-sm" />
-                  <span className="text-xs font-normal tracking-tight leading-tight">Regenerate AI Longlist</span>
+                  <span className="text-xs font-normal tracking-tight leading-tight">Generate AI Longlist</span>
                 </button>}
 
               <button 
