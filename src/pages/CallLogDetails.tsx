@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
-import { ArrowLeft, Phone, Clock, User, Banknote, Calendar, Link2, Save, Search, CheckCircle, ClipboardList } from "lucide-react"
+import { ArrowLeft, Phone, Clock, User, Banknote, Calendar, Link2, Save, Search, CheckCircle, ClipboardList, FileText } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
 import { TimelineLog } from "@/components/timeline/TimelineLog"
@@ -45,6 +45,7 @@ interface CallLogDetail {
   linkedin_score: string | null
   linkedin_score_reason: string | null
   source: string | null
+  qualifications: string | null
 }
 
 export default function CallLogDetails() {
@@ -200,7 +201,8 @@ export default function CallLogDetails() {
         cv_score_reason: data.cv_score_reason,
         linkedin_score: data.linkedin_score?.toString(),
         linkedin_score_reason: data.linkedin_score_reason,
-        source: data.source
+        source: data.source,
+        qualifications: data.qualifications
       }
 
       console.log('Enriched data:', enrichedData);
@@ -697,6 +699,23 @@ export default function CallLogDetails() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Qualifications */}
+      {callLog?.qualifications && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Qualifications
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="p-4 bg-secondary/50 rounded-lg border">
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">{callLog.qualifications}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Transcript */}
       {(isManager || isCompanyAdmin) && (
