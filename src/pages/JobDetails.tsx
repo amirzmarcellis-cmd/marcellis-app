@@ -757,94 +757,6 @@ export default function JobDetails() {
     }
   };
   const handleSearchMoreCandidates = async () => {
-    // Trigger screen shake effect
-    setIsShaking(true);
-    setTimeout(() => setIsShaking(false), 600);
-
-    // EPIC full-screen confetti animation with massive particle count
-    const confetti = (await import('canvas-confetti')).default;
-
-    // Function to create a burst from specific position
-    const createBurst = (x: number, y: number, particleCount: number = 150) => {
-      confetti({
-        particleCount,
-        spread: 120,
-        origin: {
-          x,
-          y
-        },
-        colors: ['#3B82F6', '#06B6D4', '#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#EF4444', '#84CC16']
-      });
-    };
-
-    // CENTER EXPLOSION - 500 particles!
-    createBurst(0.5, 0.5, 500);
-
-    // TOP ROW - 6 bursts across the entire screen
-    setTimeout(() => createBurst(0.1, 0.1, 120), 100);
-    setTimeout(() => createBurst(0.25, 0.1, 120), 130);
-    setTimeout(() => createBurst(0.4, 0.1, 120), 160);
-    setTimeout(() => createBurst(0.6, 0.1, 120), 190);
-    setTimeout(() => createBurst(0.75, 0.1, 120), 220);
-    setTimeout(() => createBurst(0.9, 0.1, 120), 250);
-
-    // SIDE EXPLOSIONS - Multiple bursts on each side
-    setTimeout(() => createBurst(0.05, 0.2, 100), 280);
-    setTimeout(() => createBurst(0.05, 0.4, 100), 310);
-    setTimeout(() => createBurst(0.05, 0.6, 100), 340);
-    setTimeout(() => createBurst(0.05, 0.8, 100), 370);
-    setTimeout(() => createBurst(0.95, 0.2, 100), 300);
-    setTimeout(() => createBurst(0.95, 0.4, 100), 330);
-    setTimeout(() => createBurst(0.95, 0.6, 100), 360);
-    setTimeout(() => createBurst(0.95, 0.8, 100), 390);
-
-    // BOTTOM BURSTS - Complete perimeter coverage
-    setTimeout(() => createBurst(0.15, 0.9, 120), 420);
-    setTimeout(() => createBurst(0.35, 0.9, 120), 450);
-    setTimeout(() => createBurst(0.5, 0.9, 120), 480);
-    setTimeout(() => createBurst(0.65, 0.9, 120), 510);
-    setTimeout(() => createBurst(0.85, 0.9, 120), 540);
-
-    // CONTINUOUS RAIN EFFECT - Enhanced with more particles
-    const rainEffect = () => {
-      for (let i = 0; i < 10; i++) {
-        setTimeout(() => {
-          confetti({
-            particleCount: 80,
-            spread: 360,
-            origin: {
-              x: Math.random(),
-              y: -0.1
-            },
-            colors: ['#3B82F6', '#8B5CF6', '#EC4899', '#10B981', '#FFD700', '#FF6B6B'],
-            gravity: 0.8,
-            scalar: 1.2
-          });
-        }, i * 80);
-      }
-    };
-
-    // Start enhanced rain effect
-    setTimeout(rainEffect, 600);
-
-    // GRAND FINALE - 500 golden particles explosion!
-    setTimeout(() => {
-      confetti({
-        particleCount: 500,
-        spread: 180,
-        origin: {
-          x: 0.5,
-          y: 0.3
-        },
-        colors: ['#FFD700', '#FFA500', '#FF8C00', '#FFB347', '#FFDF00', '#F0E68C']
-      });
-    }, 1200);
-
-    // Extra finale bursts for maximum impact
-    setTimeout(() => {
-      createBurst(0.3, 0.4, 200);
-      createBurst(0.7, 0.4, 200);
-    }, 1400);
     try {
       // Get user_ids from AI Boolean Search candidates (filteredCandidates) as comma-separated string
       const booleanSearchUserIds = filteredCandidates.map(candidate => candidate.user_id).filter(Boolean).join(',');
@@ -865,13 +777,13 @@ export default function JobDetails() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       toast({
-        title: "🎊 ABSOLUTELY EPIC! 🎉",
-        description: "🚀✨ AI is unleashing MAXIMUM POWER to find legendary candidates! 🔥💫"
+        title: "Success",
+        description: "AI is searching for more candidates"
       });
     } catch (error) {
       console.error('Error searching for more candidates:', error);
       toast({
-        title: "❌ Error",
+        title: "Error",
         description: "Failed to search for more candidates",
         variant: "destructive"
       });
