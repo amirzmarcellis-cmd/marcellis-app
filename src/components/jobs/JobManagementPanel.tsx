@@ -128,13 +128,6 @@ export function JobManagementPanel() {
         .select('job_id, after_call_score, source')
         .in('job_id', initialJobs.map(j => j.job_id));
 
-      
-      // Fetch candidate counts in background
-      const candidatesResult = await supabase
-        .from('Jobs_CVs')
-        .select('job_id, after_call_score, source')
-        .in('job_id', initialJobs.map(j => j.job_id));
-
       if (!candidatesResult.error && candidatesResult.data) {
         // Group candidates by job_id for faster lookup
         const candidatesByJob = new Map<string, any[]>();
