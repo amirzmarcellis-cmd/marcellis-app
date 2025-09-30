@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -10,52 +10,70 @@ interface JobFunnelProps {
 }
 
 export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
-  // Calculate counts for each funnel stage
-  const getCounts = () => {
+  // Memoize the counts calculation to avoid recalculating on every render
+  const counts = useMemo(() => {
     // Only count Itris and LinkedIn candidates (matching AI Longlist tab logic)
     const longlistedCandidates = candidates.filter(c => {
       const source = (c["Source"] || c.source || "").toLowerCase();
       return source.includes("itris") || source.includes("linkedin");
     });
+    
     const longlist = longlistedCandidates.length;
     
-    // Count by contacted status (only from longlisted candidates)
-    const firstNoAnswer = longlistedCandidates.filter(c => c["contacted"] === "1st No Answer").length;
-    const secondNoAnswer = longlistedCandidates.filter(c => c["contacted"] === "2nd No Answer").length;
-    const thirdNoAnswer = longlistedCandidates.filter(c => c["contacted"] === "3rd No Answer").length;
-    const contacted = longlistedCandidates.filter(c => c["contacted"] === "Contacted").length;
-    
-    // Low scored (contacted status is "Low Scored")
-    const lowScored = longlistedCandidates.filter(c => c["contacted"] === "Low Scored").length;
-    
-    // Shortlist (score >= 74)
-    const shortlist = longlistedCandidates.filter(c => {
+    // Use reduce for better performance with single pass through data
+    const statusCounts = longlistedCandidates.reduce((acc, c) => {
+      const contacted = c["contacted"];
       const score = parseInt(c["after_call_score"] || "0");
-      return score >= 74;
-    }).length;
-    
-    // Submitted (candidates with submitted status)
-    const submitted = longlistedCandidates.filter(c => c["contacted"] === "Submitted").length;
-    
-    // Rejected (candidates with rejected status)
-    const rejected = longlistedCandidates.filter(c => c["contacted"] === "Rejected").length;
-    
+      
+      switch (contacted) {
+        case "1st No Answer":
+          acc.firstNoAnswer++;
+          break;
+        case "2nd No Answer":
+          acc.secondNoAnswer++;
+          break;
+        case "3rd No Answer":
+          acc.thirdNoAnswer++;
+          break;
+        case "Contacted":
+          acc.contacted++;
+          break;
+        case "Low Scored":
+          acc.lowScored++;
+          break;
+        case "Submitted":
+          acc.submitted++;
+          break;
+        case "Rejected":
+          acc.rejected++;
+          break;
+      }
+      
+      // Count shortlist candidates (score >= 74)
+      if (score >= 74) {
+        acc.shortlist++;
+      }
+      
+      return acc;
+    }, {
+      firstNoAnswer: 0,
+      secondNoAnswer: 0,
+      thirdNoAnswer: 0,
+      contacted: 0,
+      lowScored: 0,
+      submitted: 0,
+      rejected: 0,
+      shortlist: 0
+    });
+
     return {
       longlist,
-      firstNoAnswer,
-      secondNoAnswer,
-      thirdNoAnswer,
-      contacted,
-      lowScored,
-      shortlist,
-      submitted,
-      rejected
+      ...statusCounts
     };
-  };
+  }, [candidates]);
 
-  const counts = getCounts();
-  
-  const stages = [
+  // Memoize stages array
+  const stages = useMemo(() => [
     { name: "Longlist", count: counts.longlist, bgColor: "bg-blue-600", textColor: "text-black dark:text-white" },
     { name: "1st No Answer", count: counts.firstNoAnswer, bgColor: "bg-orange-500", textColor: "text-black dark:text-white" },
     { name: "2nd No Answer", count: counts.secondNoAnswer, bgColor: "bg-orange-600", textColor: "text-black dark:text-white" },
@@ -64,7 +82,7 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
     { name: "Low Scored", count: counts.lowScored, bgColor: "bg-red-600", textColor: "text-black dark:text-white" },
     { name: "Shortlist", count: counts.shortlist, bgColor: "bg-emerald-600", textColor: "text-black dark:text-white" },
     { name: "Submitted", count: counts.submitted, bgColor: "bg-purple-600", textColor: "text-black dark:text-white" }
-  ];
+  ], [counts]);
 
   return (
     <Card className="w-full">

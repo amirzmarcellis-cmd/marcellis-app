@@ -87,6 +87,7 @@ export function JobManagementPanel() {
     if (!profile?.user_id) return;
     
     try {
+      // Optimize: Build query with proper conditions
       let query = supabase.from('Jobs').select(`
           *,
           groups (
@@ -102,39 +103,40 @@ export function JobManagementPanel() {
         query = query.eq('recruiter_id', profile.user_id);
       }
 
-      const {
-        data: jobsData,
-        error
-      } = await query.order('Timestamp', {
-        ascending: false
-      });
+      // Optimize: Fetch jobs and candidates data in parallel
+      const [jobsResult, candidatesResult] = await Promise.all([
+        query.order('Timestamp', { ascending: false }),
+        supabase.from('Jobs_CVs').select('job_id, cv_score, after_call_score, longlisted_at, source')
+      ]);
 
-      if (error) throw error;
+      const jobsData = jobsResult.data;
+      const jobsError = jobsResult.error;
+      const allCandidatesData = candidatesResult.data;
+      const candidatesError = candidatesResult.error;
 
-      // Optimize: Fetch all candidate counts in a single query
-      const jobIds = (jobsData || []).map(job => job.job_id);
-      const {
-        data: allCandidatesData,
-        error: candidatesError
-      } = await supabase
-        .from('Jobs_CVs')
-        .select('job_id, cv_score, after_call_score, longlisted_at, source')
-        .in('job_id', jobIds);
-
+      if (jobsError) throw jobsError;
       if (candidatesError) {
         console.error('Error fetching candidate counts:', candidatesError);
       }
 
-      // Group candidates by job_id for faster lookup
-      const candidatesByJob = allCandidatesData?.reduce((acc, candidate) => {
-        if (!acc[candidate.job_id]) acc[candidate.job_id] = [];
-        acc[candidate.job_id].push(candidate);
-        return acc;
-      }, {} as Record<string, any[]>) || {};
+      // Filter candidates to only include those for fetched jobs
+      const jobIds = new Set((jobsData || []).map(job => job.job_id));
+      const filteredCandidatesData = (allCandidatesData || []).filter(candidate => 
+        jobIds.has(candidate.job_id)
+      );
+
+      // Group candidates by job_id for faster lookup using Map for better performance
+      const candidatesByJob = new Map<string, any[]>();
+      filteredCandidatesData?.forEach(candidate => {
+        if (!candidatesByJob.has(candidate.job_id)) {
+          candidatesByJob.set(candidate.job_id, []);
+        }
+        candidatesByJob.get(candidate.job_id)!.push(candidate);
+      });
 
       // Calculate counts for each job
       const jobsWithCounts = (jobsData || []).map(job => {
-        const candidates = candidatesByJob[job.job_id] || [];
+        const candidates = candidatesByJob.get(job.job_id) || [];
         // Only count Itris and LinkedIn candidates (matching AI Longlist tab logic)
         const longlistedCandidates = candidates.filter(c => {
           const source = (c.source || "").toLowerCase();

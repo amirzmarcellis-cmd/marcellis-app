@@ -114,13 +114,22 @@ export default function JobDetails() {
   const [interviewLink, setInterviewLink] = useState('');
   useEffect(() => {
     if (id) {
-      fetchJob(id);
-      fetchCandidates(id);
-      fetchLonglistedCandidates(id);
+      // Batch all API calls for better performance
+      Promise.all([
+        fetchJob(id),
+        fetchCandidates(id),
+        fetchLonglistedCandidates(id),
+        fetchApplications(id),
+        fetchTaskCandidates(id)
+      ]).then(() => {
+        checkShortListButtonStatus();
+      }).catch(error => {
+        console.error('Error loading job data:', error);
+      });
+      
+      // Load CV data separately as it's not job-specific
       fetchCvData();
-      fetchApplications(id);
-      fetchTaskCandidates(id);
-      checkShortListButtonStatus();
+      
       // Load last viewed timestamp for applications
       const lastViewed = localStorage.getItem(`lastViewedApplications_${id}`);
       setLastViewedApplications(lastViewed);
@@ -271,21 +280,21 @@ export default function JobDetails() {
   };
   const fetchCandidates = async (jobId: string) => {
     try {
-      // Fetch candidates from Jobs_CVs
-      const {
-        data: candidatesData,
-        error: candidatesError
-      } = await supabase.from('Jobs_CVs').select('*').eq('job_id', jobId).order('cv_score', {
-        ascending: false,
-        nullsFirst: false
-      });
+      // Optimize: Fetch both candidates and LinkedIn data in parallel
+      const [candidatesResult, linkedinResult] = await Promise.all([
+        supabase.from('Jobs_CVs').select('*').eq('job_id', jobId).order('cv_score', {
+          ascending: false,
+          nullsFirst: false
+        }),
+        supabase.from('linkedin_boolean_search').select('user_id, linkedin_id, linkedin_score, linkedin_score_reason').eq('job_id', jobId)
+      ]);
+      
+      const candidatesData = candidatesResult.data;
+      const candidatesError = candidatesResult.error;
+      const linkedinData = linkedinResult.data;
+      const linkedinError = linkedinResult.error;
+      
       if (candidatesError) throw candidatesError;
-
-      // Fetch LinkedIn boolean search data for this job
-      const {
-        data: linkedinData,
-        error: linkedinError
-      } = await supabase.from('linkedin_boolean_search').select('user_id, linkedin_id, linkedin_score, linkedin_score_reason').eq('job_id', jobId);
       if (linkedinError) console.warn('Error fetching LinkedIn data:', linkedinError);
 
       // Create a map of LinkedIn data by user_id for quick lookup

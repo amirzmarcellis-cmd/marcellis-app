@@ -91,15 +91,16 @@ export default function Index() {
   }, []);
   const fetchDashboardData = async () => {
     try {
-      // Fetch real data from Supabase
-      const { data: jobsData, error: jobsError } = await supabase
-        .from('Jobs')
-        .select('*')
-        .eq('Processed', 'Yes');
+      // Optimize: Fetch both jobs and jobs_cvs data in parallel
+      const [jobsResult, jobsCvsResult] = await Promise.all([
+        supabase.from('Jobs').select('*').eq('Processed', 'Yes'),
+        supabase.from('Jobs_CVs').select('*')
+      ]);
 
-      const { data: jobsCvsData, error: jobsCvsError } = await supabase
-        .from('Jobs_CVs')
-        .select('*');
+      const jobsData = jobsResult.data;
+      const jobsError = jobsResult.error;
+      const jobsCvsData = jobsCvsResult.data;
+      const jobsCvsError = jobsCvsResult.error;
 
       if (jobsError || jobsCvsError) {
         console.error('Error fetching data:', jobsError || jobsCvsError);
