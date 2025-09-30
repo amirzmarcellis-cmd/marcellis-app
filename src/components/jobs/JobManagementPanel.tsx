@@ -53,7 +53,7 @@ export function JobManagementPanel() {
   const {
     toast
   } = useToast();
-  const { profile } = useProfile();
+  const { profile, loading: profileLoading } = useProfile();
   const { isAdmin, isManager } = useUserRole();
 
   useEffect(() => {
@@ -85,7 +85,10 @@ export function JobManagementPanel() {
     }
   };
   const fetchJobs = useCallback(async () => {
-    if (!profile?.user_id) return;
+    if (!profile?.user_id) {
+      setLoading(false);
+      return;
+    }
     
     try {
       // Optimize: Build query with proper conditions
@@ -104,59 +107,66 @@ export function JobManagementPanel() {
         query = query.eq('recruiter_id', profile.user_id);
       }
 
-      // Optimize: Fetch jobs and candidates data in parallel
-      const [jobsResult, candidatesResult] = await Promise.all([
-        query.order('Timestamp', { ascending: false }),
-        supabase.from('Jobs_CVs').select('job_id, cv_score, after_call_score, longlisted_at, source')
-      ]);
+      // Optimize: Fetch jobs first to show UI quickly, then fetch candidate counts
+      const jobsResult = await query.order('Timestamp', { ascending: false });
+      
+      if (jobsResult.error) throw jobsResult.error;
+      
+      // Show jobs immediately with zero counts
+      const initialJobs = (jobsResult.data || []).map(job => ({
+        ...job,
+        longlisted_count: 0,
+        shortlisted_count: 0
+      }));
+      
+      setJobs(initialJobs);
+      setLoading(false);
+      
+      // Fetch candidate counts in background
+      const candidatesResult = await supabase
+        .from('Jobs_CVs')
+        .select('job_id, after_call_score, source')
+        .in('job_id', initialJobs.map(j => j.job_id));
 
-      const jobsData = jobsResult.data;
-      const jobsError = jobsResult.error;
-      const allCandidatesData = candidatesResult.data;
-      const candidatesError = candidatesResult.error;
+      
+      // Fetch candidate counts in background
+      const candidatesResult = await supabase
+        .from('Jobs_CVs')
+        .select('job_id, after_call_score, source')
+        .in('job_id', initialJobs.map(j => j.job_id));
 
-      if (jobsError) throw jobsError;
-      if (candidatesError) {
-        console.error('Error fetching candidate counts:', candidatesError);
-      }
-
-      // Filter candidates to only include those for fetched jobs
-      const jobIds = new Set((jobsData || []).map(job => job.job_id));
-      const filteredCandidatesData = (allCandidatesData || []).filter(candidate => 
-        jobIds.has(candidate.job_id)
-      );
-
-      // Group candidates by job_id for faster lookup using Map for better performance
-      const candidatesByJob = new Map<string, any[]>();
-      filteredCandidatesData?.forEach(candidate => {
-        if (!candidatesByJob.has(candidate.job_id)) {
-          candidatesByJob.set(candidate.job_id, []);
-        }
-        candidatesByJob.get(candidate.job_id)!.push(candidate);
-      });
-
-      // Calculate counts for each job
-      const jobsWithCounts = (jobsData || []).map(job => {
-        const candidates = candidatesByJob.get(job.job_id) || [];
-        // Only count Itris and LinkedIn candidates (matching AI Longlist tab logic)
-        const longlistedCandidates = candidates.filter(c => {
-          const source = (c.source || "").toLowerCase();
-          return source.includes("itris") || source.includes("linkedin");
+      if (!candidatesResult.error && candidatesResult.data) {
+        // Group candidates by job_id for faster lookup
+        const candidatesByJob = new Map<string, any[]>();
+        candidatesResult.data.forEach(candidate => {
+          if (!candidatesByJob.has(candidate.job_id)) {
+            candidatesByJob.set(candidate.job_id, []);
+          }
+          candidatesByJob.get(candidate.job_id)!.push(candidate);
         });
-        const longlisted_count = longlistedCandidates.length;
-        const shortlisted_count = longlistedCandidates.filter(c => {
-          const score = parseInt(c.after_call_score || "0");
-          return score >= 74;
-        }).length;
 
-        return {
-          ...job,
-          longlisted_count,
-          shortlisted_count
-        };
-      });
+        // Update jobs with actual counts
+        const jobsWithCounts = initialJobs.map(job => {
+          const candidates = candidatesByJob.get(job.job_id) || [];
+          const longlistedCandidates = candidates.filter(c => {
+            const source = (c.source || "").toLowerCase();
+            return source.includes("itris") || source.includes("linkedin");
+          });
+          const longlisted_count = longlistedCandidates.length;
+          const shortlisted_count = longlistedCandidates.filter(c => {
+            const score = parseInt(c.after_call_score || "0");
+            return score >= 74;
+          }).length;
 
-      setJobs(jobsWithCounts);
+          return {
+            ...job,
+            longlisted_count,
+            shortlisted_count
+          };
+        });
+
+        setJobs(jobsWithCounts);
+      }
     } catch (error) {
       console.error('Error fetching jobs:', error);
       toast({
@@ -164,7 +174,6 @@ export function JobManagementPanel() {
         description: "Failed to load jobs",
         variant: "destructive"
       });
-    } finally {
       setLoading(false);
     }
   }, [profile?.user_id, isAdmin, isManager, isTeamLeader, toast]);
