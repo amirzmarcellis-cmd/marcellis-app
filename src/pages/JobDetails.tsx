@@ -1728,15 +1728,15 @@ export default function JobDetails() {
               <button 
                 onClick={() => {
                   toast({
-                    title: "Call initiated",
-                    description: "Starting call process..."
+                    title: "Automatic dial initiated",
+                    description: "Starting automatic dial process..."
                   });
                 }}
                 className="call-button flex-col gap-1"
-                title="Call"
+                title="Automatic Dial"
               >
                 <Phone className="w-5 h-5 drop-shadow-sm" />
-                <span className="text-xs font-bold tracking-tight leading-tight">Call</span>
+                <span className="text-xs font-bold tracking-tight leading-tight">Automatic Dial</span>
               </button>
 
               {job?.longlist && job.longlist > 0 ? (
@@ -1763,15 +1763,15 @@ export default function JobDetails() {
               <button 
                 onClick={() => {
                   toast({
-                    title: "Call stopped",
-                    description: "Call process has been stopped."
+                    title: "Paused",
+                    description: "Automatic dial process has been paused."
                   });
                 }}
                 className="stop-button flex-col gap-1"
-                title="Stop"
+                title="Pause"
               >
                 <X className="w-5 h-5 drop-shadow-sm" />
-                <span className="text-xs font-bold tracking-tight leading-tight">Stop</span>
+                <span className="text-xs font-bold tracking-tight leading-tight">Pause</span>
               </button>
             </div>
 
