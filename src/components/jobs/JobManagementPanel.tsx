@@ -107,59 +107,50 @@ export function JobManagementPanel() {
         query = query.eq('recruiter_id', profile.user_id);
       }
 
-      // Optimize: Fetch jobs first to show UI quickly, then fetch candidate counts
-      const jobsResult = await query.order('Timestamp', { ascending: false });
+      // Fetch jobs and candidate counts in parallel for faster loading
+      const [jobsResult, candidatesResult] = await Promise.all([
+        query.order('Timestamp', { ascending: false }),
+        supabase.from('Jobs_CVs').select('job_id, after_call_score, source')
+      ]);
       
       if (jobsResult.error) throw jobsResult.error;
       
-      // Show jobs immediately with zero counts
-      const initialJobs = (jobsResult.data || []).map(job => ({
-        ...job,
-        longlisted_count: 0,
-        shortlisted_count: 0
-      }));
+      const initialJobs = jobsResult.data || [];
       
-      setJobs(initialJobs);
-      setLoading(false);
-      
-      // Fetch candidate counts in background
-      const candidatesResult = await supabase
-        .from('Jobs_CVs')
-        .select('job_id, after_call_score, source')
-        .in('job_id', initialJobs.map(j => j.job_id));
-
+      // Group candidates by job_id for faster lookup
+      const candidatesByJob = new Map<string, any[]>();
       if (!candidatesResult.error && candidatesResult.data) {
-        // Group candidates by job_id for faster lookup
-        const candidatesByJob = new Map<string, any[]>();
         candidatesResult.data.forEach(candidate => {
           if (!candidatesByJob.has(candidate.job_id)) {
             candidatesByJob.set(candidate.job_id, []);
           }
           candidatesByJob.get(candidate.job_id)!.push(candidate);
         });
-
-        // Update jobs with actual counts
-        const jobsWithCounts = initialJobs.map(job => {
-          const candidates = candidatesByJob.get(job.job_id) || [];
-          const longlistedCandidates = candidates.filter(c => {
-            const source = (c.source || "").toLowerCase();
-            return source.includes("itris") || source.includes("linkedin");
-          });
-          const longlisted_count = longlistedCandidates.length;
-          const shortlisted_count = longlistedCandidates.filter(c => {
-            const score = parseInt(c.after_call_score || "0");
-            return score >= 74;
-          }).length;
-
-          return {
-            ...job,
-            longlisted_count,
-            shortlisted_count
-          };
-        });
-
-        setJobs(jobsWithCounts);
       }
+
+      // Calculate counts for all jobs before setting state
+      const jobsWithCounts = initialJobs.map(job => {
+        const candidates = candidatesByJob.get(job.job_id) || [];
+        const longlistedCandidates = candidates.filter(c => {
+          const source = (c.source || "").toLowerCase();
+          return source.includes("itris") || source.includes("linkedin");
+        });
+        const longlisted_count = longlistedCandidates.length;
+        const shortlisted_count = longlistedCandidates.filter(c => {
+          const score = parseInt(c.after_call_score || "0");
+          return score >= 74;
+        }).length;
+
+        return {
+          ...job,
+          longlisted_count,
+          shortlisted_count
+        };
+      });
+
+      // Set jobs once with all data complete
+      setJobs(jobsWithCounts);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching jobs:', error);
       toast({
