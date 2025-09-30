@@ -283,6 +283,25 @@ export default function Index() {
     }
   };
 
+  const handleCVSubmitted = async (candidateId: string, jobId: string) => {
+    try {
+      const { error } = await supabase
+        .from('Jobs_CVs')
+        .update({ 'contacted': 'Submitted' })
+        .eq('recordid', parseInt(candidateId))
+        .eq('job_id', jobId);
+
+      if (error) throw error;
+
+      toast.success("Candidate's CV has been marked as submitted");
+      // Reload the page to refresh data
+      window.location.reload();
+    } catch (error) {
+      console.error('Error submitting CV:', error);
+      toast.error("Failed to submit CV. Please try again.");
+    }
+  };
+
   const handleScheduleInterview = async () => {
     if (!selectedCandidate) return;
 
@@ -605,32 +624,12 @@ export default function Index() {
                                 <XCircle className="w-3 h-3 mr-1" />
                                 Reject Candidate
                               </Button>
-                              {(() => {
-                                const interviewStatus = getCandidateInterviewStatus(candidate.Candidate_ID);
-                                if (interviewStatus) {
-                                  return (
-                                    <Button size="xs" variant="outline" disabled className="border-blue-400/40 text-blue-400 text-xs">
-                                      <Calendar className="w-3 h-3 mr-1" />
-                                      {interviewStatus}
-                                    </Button>
-                                  );
-                                }
-                                return (
-                                  <Button size="xs" variant="outline" onClick={e => {
-                                    e.stopPropagation();
-                                    handleArrangeInterview(candidate.Candidate_ID, candidate.job_id);
-                                  }} className="bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200 text-xs">
-                                    <Calendar className="w-3 h-3 mr-1" />
-                                    Arrange an Interview
-                                  </Button>
-                                );
-                              })()}
-                              <Button size="xs" variant="default" onClick={e => {
+                              <Button size="xs" variant="outline" onClick={e => {
                                 e.stopPropagation();
-                                handleHireCandidate(candidate.Candidate_ID, candidate.job_id);
-                              }} className="bg-amber-500 hover:bg-amber-600 text-white text-xs">
-                                <UserCheck className="w-3 h-3 mr-1" />
-                                Hire Candidate
+                                handleCVSubmitted(candidate.Candidate_ID, candidate.job_id);
+                              }} className="bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200 text-xs">
+                                <CheckCircle className="w-3 h-3 mr-1" />
+                                Submit CV
                               </Button>
                             </div>
                           </div>
