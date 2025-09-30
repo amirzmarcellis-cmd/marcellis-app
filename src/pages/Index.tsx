@@ -421,7 +421,7 @@ export default function Index() {
   }
 
   // Admin interface for amir.z@marc-ellis.com
-  if (profile?.is_admin) {
+  if (false && profile?.is_admin) {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3">
