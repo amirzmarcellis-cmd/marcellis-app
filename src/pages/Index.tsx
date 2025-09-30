@@ -411,6 +411,15 @@ export default function Index() {
       job_title: job?.job_title || 'Unknown Position'
     };
   });
+  if (loading) {
+    return <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="flex items-center space-x-3">
+          <Activity className="h-8 w-8 animate-spin text-cyan-400" />
+          <span className="text-xl text-foreground">Loading Mission Control...</span>
+        </div>
+      </div>;
+  }
+
   // Admin interface for amir.z@marc-ellis.com
   if (profile?.is_admin) {
     return (
@@ -435,15 +444,6 @@ export default function Index() {
         </div>
       </div>
     );
-  }
-
-  if (loading) {
-    return <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="flex items-center space-x-3">
-          <Activity className="h-8 w-8 animate-spin text-cyan-400" />
-          <span className="text-xl text-foreground">Loading Mission Control...</span>
-        </div>
-      </div>;
   }
   return <div className="min-h-screen bg-background text-foreground p-4 sm:p-6 relative overflow-hidden mx-auto max-w-screen-2xl">
       
