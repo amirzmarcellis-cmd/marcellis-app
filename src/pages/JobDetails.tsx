@@ -377,12 +377,13 @@ export default function JobDetails() {
     try {
       setLonglistedLoading(true);
 
-      // Fetch only longlisted candidates from Jobs_CVs
+      // Fetch all Itris and LinkedIn candidates from Jobs_CVs
       const {
         data: longlistedData,
         error: longlistedError
-      } = await supabase.from('Jobs_CVs').select('*').eq('job_id', jobId).not('longlisted_at', 'is', null).order('longlisted_at', {
-        ascending: false
+      } = await supabase.from('Jobs_CVs').select('*').eq('job_id', jobId).order('cv_score', {
+        ascending: false,
+        nullsLast: true
       });
       if (longlistedError) throw longlistedError;
 
@@ -2371,13 +2372,19 @@ export default function JobDetails() {
 
                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                        {(() => {
-                  // Filter longlisted candidates based on filters
+                  // Filter longlisted candidates based on filters (ONLY show Itris and LinkedIn sources)
                   const filteredLonglistedCandidates = longlistedCandidates.filter(candidate => {
+                    const source = (candidate["Source"] || "").toLowerCase();
+                    const isItrisOrLinkedIn = source.includes("itris") || source.includes("linkedin");
+                    
+                    // Base filter: only Itris or LinkedIn
+                    if (!isItrisOrLinkedIn) return false;
+                    
                     const nameMatch = !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
                     const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
                     const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
                     const userIdMatch = !userIdFilter || (candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
-                    const sourceMatch = !longListSourceFilter || longListSourceFilter === "all" || (candidate["Source"] || "").toLowerCase().includes(longListSourceFilter.toLowerCase());
+                    const sourceFilterMatch = !longListSourceFilter || longListSourceFilter === "all" || source.includes(longListSourceFilter.toLowerCase());
                     let scoreMatch = true;
                     if (scoreFilter !== "all") {
                       const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
@@ -2401,7 +2408,7 @@ export default function JobDetails() {
                       const contacted = candidate["Contacted"] || "";
                       contactedMatch = contacted === contactedFilter || contactedFilter === "Ready to Call" && contacted === "Ready to Contact";
                     }
-                    return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceMatch && scoreMatch && contactedMatch;
+                    return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceFilterMatch && scoreMatch && contactedMatch;
                   });
 
                   // Group candidates by Candidate_ID to handle multiple contacts
