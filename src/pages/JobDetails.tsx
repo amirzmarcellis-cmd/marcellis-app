@@ -221,6 +221,13 @@ export default function JobDetails() {
   };
   const handleAutomaticDialToggle = async (checked: boolean) => {
     if (!job?.job_id) return;
+    
+    // Optimistic update for immediate feedback
+    setJob(prev => ({
+      ...prev,
+      automatic_dial: checked
+    }));
+    
     setAutomaticDialSaving(true);
     try {
       const {
@@ -228,17 +235,20 @@ export default function JobDetails() {
       } = await supabase.from('Jobs').update({
         automatic_dial: checked
       }).eq('job_id', job.job_id);
+      
       if (error) throw error;
-      setJob(prev => ({
-        ...prev,
-        automatic_dial: checked
-      }));
+      
       toast({
         title: "Success",
         description: `Automatic dial ${checked ? 'enabled' : 'disabled'} for this job`
       });
     } catch (error) {
       console.error('Error updating automatic dial:', error);
+      // Revert on error
+      setJob(prev => ({
+        ...prev,
+        automatic_dial: !checked
+      }));
       toast({
         title: "Error",
         description: "Failed to update automatic dial setting",
@@ -251,9 +261,17 @@ export default function JobDetails() {
 
   const handlePauseJob = async () => {
     if (!job?.job_id) return;
-    setAutomaticDialSaving(true);
     
     const isCurrentlyActive = job?.Processed === "Yes";
+    
+    // Optimistic update for immediate feedback
+    setJob(prev => ({
+      ...prev,
+      automatic_dial: isCurrentlyActive ? false : prev?.automatic_dial,
+      Processed: isCurrentlyActive ? "No" : "Yes"
+    }));
+    
+    setAutomaticDialSaving(true);
     
     try {
       const {
@@ -263,12 +281,9 @@ export default function JobDetails() {
         Processed: isCurrentlyActive ? "No" : "Yes",
         status: isCurrentlyActive ? "paused" : "active"
       }).eq('job_id', job.job_id);
+      
       if (error) throw error;
-      setJob(prev => ({
-        ...prev,
-        automatic_dial: isCurrentlyActive ? false : prev?.automatic_dial,
-        Processed: isCurrentlyActive ? "No" : "Yes"
-      }));
+      
       toast({
         title: "Success",
         description: isCurrentlyActive ? "Job paused successfully" : "Job activated successfully"
@@ -1681,7 +1696,6 @@ export default function JobDetails() {
                 icon={Phone}
                 label={`Auto Dial ${job?.automatic_dial ? 'ON' : 'OFF'}`}
                 variant="success"
-                delay={0}
               />
               
               {job?.longlist && job.longlist > 0 ? (
@@ -1690,7 +1704,6 @@ export default function JobDetails() {
                   icon={Search}
                   label="Regenerate AI"
                   variant="amber"
-                  delay={100}
                 />
               ) : (
                 <ActionButton
@@ -1699,7 +1712,6 @@ export default function JobDetails() {
                   icon={Zap}
                   label="Generate AI"
                   variant="success"
-                  delay={100}
                 />
               )}
               
@@ -1709,7 +1721,6 @@ export default function JobDetails() {
                 icon={job?.Processed === "Yes" ? Pause : Play}
                 label={job?.Processed === "Yes" ? "Pause Job" : "Run Job"}
                 variant="danger"
-                delay={200}
               />
             </FuturisticActionButton>
 
