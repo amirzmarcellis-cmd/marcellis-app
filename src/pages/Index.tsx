@@ -641,9 +641,9 @@ export default function Index() {
                           <div className="text-sm text-gray-400">
                             Updated: {new Date(candidate.lastcalltime || Date.now()).toLocaleDateString()}
                           </div>
-                          <Badge className="bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-300 border-emerald-400/40 animate-pulse">
-                            ⭐ Shortlisted
-                          </Badge>
+                           <Badge className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 border-blue-400/40 animate-pulse">
+                             📞 Call Done
+                           </Badge>
                         </div>
                       </div>;
                 })}
