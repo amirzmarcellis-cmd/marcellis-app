@@ -152,7 +152,8 @@ export default function Index() {
           shortlist: jobLinks.filter((jc: any) => jc.shortlisted_at !== null).length,
           contacted: jobLinks.filter((jc: any) => jc.contacted && ['contacted', 'call done'].includes(jc.contacted.toLowerCase())).length,
           lowScored: jobLinks.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase() === 'low scored').length,
-          submittedCv: jobLinks.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase() === 'submitted').length
+          submittedCv: jobLinks.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase() === 'submitted').length,
+          rejected: jobLinks.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase() === 'rejected').length
         };
       });
       setJobStats(stats);
@@ -528,26 +529,36 @@ export default function Index() {
                       <h3 className="font-semibold text-sm truncate">{job.job_title}</h3>
                     </div>
                     <p className="text-xs text-gray-400 mb-3">{job.job_location}</p>
-                    <div className="grid grid-cols-5 gap-1 text-xs mb-3">
-                      <div className="text-center">
-                        <div className="text-cyan-300 font-bold">{jobStats[job.job_id]?.longlist || 0}</div>
-                        <div className="text-gray-500">Longlist</div>
+                    <div className="space-y-2 mb-3">
+                      {/* First Row: Longlist, Shortlist, Contacted */}
+                      <div className="grid grid-cols-3 gap-1 text-xs">
+                        <div className="text-center">
+                          <div className="text-cyan-300 font-bold">{jobStats[job.job_id]?.longlist || 0}</div>
+                          <div className="text-gray-500">Longlist</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-purple-300 font-bold">{jobStats[job.job_id]?.shortlist || 0}</div>
+                          <div className="text-gray-500">Shortlist</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-orange-300 font-bold">{jobStats[job.job_id]?.contacted || 0}</div>
+                          <div className="text-gray-500">Contacted</div>
+                        </div>
                       </div>
-                      <div className="text-center">
-                        <div className="text-purple-300 font-bold">{jobStats[job.job_id]?.shortlist || 0}</div>
-                        <div className="text-gray-500">Shortlist</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-orange-300 font-bold">{jobStats[job.job_id]?.contacted || 0}</div>
-                        <div className="text-gray-500">Contacted</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-red-300 font-bold">{jobStats[job.job_id]?.lowScored || 0}</div>
-                        <div className="text-gray-500">Low Scored</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-emerald-300 font-bold">{jobStats[job.job_id]?.submittedCv || 0}</div>
-                        <div className="text-gray-500">Submitted</div>
+                      {/* Second Row: Low Scored, Submitted, Rejected */}
+                      <div className="grid grid-cols-3 gap-1 text-xs">
+                        <div className="text-center">
+                          <div className="text-red-300 font-bold">{jobStats[job.job_id]?.lowScored || 0}</div>
+                          <div className="text-gray-500">Low Scored</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-emerald-300 font-bold">{jobStats[job.job_id]?.submittedCv || 0}</div>
+                          <div className="text-gray-500">Submitted</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-gray-300 font-bold">{jobStats[job.job_id]?.rejected || 0}</div>
+                          <div className="text-gray-500">Rejected</div>
+                        </div>
                       </div>
                     </div>
                     <Button size="sm" variant="ghost" onClick={() => navigate(`/job/${job.job_id}`)} className="w-full mt-2 text-xs text-cyan-400 hover:bg-cyan-400/10">
