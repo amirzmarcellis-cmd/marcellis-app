@@ -118,7 +118,7 @@ export function JobManagementPanel() {
         error: candidatesError
       } = await supabase
         .from('Jobs_CVs')
-        .select('job_id, cv_score, after_call_score, longlisted_at')
+        .select('job_id, cv_score, after_call_score, longlisted_at, source')
         .in('job_id', jobIds);
 
       if (candidatesError) {
@@ -135,8 +135,11 @@ export function JobManagementPanel() {
       // Calculate counts for each job
       const jobsWithCounts = (jobsData || []).map(job => {
         const candidates = candidatesByJob[job.job_id] || [];
-        // Only count candidates that are actually longlisted (have longlisted_at value)
-        const longlistedCandidates = candidates.filter(c => c.longlisted_at != null);
+        // Count all Itris and LinkedIn candidates (matching AI Longlisted tab logic)
+        const longlistedCandidates = candidates.filter(c => {
+          const source = (c.source || "").toLowerCase();
+          return source.includes("itris") || source.includes("linkedin");
+        });
         const longlisted_count = longlistedCandidates.length;
         const shortlisted_count = longlistedCandidates.filter(c => {
           const score = parseInt(c.after_call_score || "0");

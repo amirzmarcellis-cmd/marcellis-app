@@ -12,8 +12,11 @@ interface JobFunnelProps {
 export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
   // Calculate counts for each funnel stage
   const getCounts = () => {
-    // Only count candidates that are actually longlisted (have longlisted_at value)
-    const longlistedCandidates = candidates.filter(c => c.longlisted_at != null);
+    // Count all Itris and LinkedIn candidates (matching AI Longlisted tab logic)
+    const longlistedCandidates = candidates.filter(c => {
+      const source = (c["Source"] || c.source || "").toLowerCase();
+      return source.includes("itris") || source.includes("linkedin");
+    });
     const longlist = longlistedCandidates.length;
     
     // Count by contacted status (only from longlisted candidates)
