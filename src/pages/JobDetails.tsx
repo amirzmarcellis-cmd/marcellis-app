@@ -15,7 +15,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, AlertTriangle, Hourglass, User, FileCheck, Building, Pause, Play } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, AlertTriangle, Hourglass, User, FileCheck, Building, Pause, Play, Sparkles } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { JobFunnel } from "@/components/jobs/JobFunnel";
@@ -41,6 +41,7 @@ export default function JobDetails() {
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [automaticDialSaving, setAutomaticDialSaving] = useState(false);
+  const [isFabExpanded, setIsFabExpanded] = useState(false);
   const [candidates, setCandidates] = useState<any[]>([]);
   const [candidatesLoading, setCandidatesLoading] = useState(true);
   const [longlistedCandidates, setLonglistedCandidates] = useState<any[]>([]);
@@ -1667,43 +1668,99 @@ export default function JobDetails() {
               <div className="h-6 w-px bg-border hidden sm:block" />
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
             </div>
-            {/* Sticky Action Buttons - Bottom Right */}
-            <div className="fixed bottom-6 right-6 z-50 flex items-center gap-6">
-              <button 
-                onClick={() => handleAutomaticDialToggle(!job?.automatic_dial)} 
-                disabled={automaticDialSaving}
-                className="call-button flex-col gap-1" 
-                title="Automatic Dial"
-              >
-                <Phone className="w-8 h-8 drop-shadow-sm" />
-                <span className="tracking-tight leading-tight font-normal text-xs">
-                  Automatic Dial {job?.automatic_dial ? 'ON' : 'OFF'}
-                </span>
-              </button>
-
-              {job?.longlist && job.longlist > 0 ? <button onClick={handleSearchMoreCandidates} className="ai-longlist-button flex-col gap-1" title="AI Longlist">
-                  <Search className="w-8 h-8 drop-shadow-sm" />
-                  <span className="text-xs font-normal tracking-tight leading-tight">Regenerate AI Longlist</span>
-                </button> : <button onClick={handleGenerateLongList} disabled={job?.longlist === 3} className="ai-longlist-button flex-col gap-1" title="AI Longlist">
-                  <Zap className="w-8 h-8 drop-shadow-sm" />
-                  <span className="text-xs font-normal tracking-tight leading-tight">Generate AI Longlist</span>
-                </button>}
-
-              <button 
-                onClick={handlePauseJob} 
-                disabled={automaticDialSaving}
-                className={job?.Processed === "Yes" ? "stop-button flex-col gap-1" : "call-button flex-col gap-1"}
-                title={job?.Processed === "Yes" ? "Pause Job" : "Run Job"}
-              >
-                {job?.Processed === "Yes" ? (
-                  <Pause className="w-8 h-8 drop-shadow-sm" />
-                ) : (
-                  <Play className="w-8 h-8 drop-shadow-sm" />
+            {/* Expandable FAB Menu - Bottom Right */}
+            <div className="fixed bottom-6 right-6 z-50">
+              {/* Main FAB Toggle Button */}
+              <button
+                onClick={() => setIsFabExpanded(!isFabExpanded)}
+                className={cn(
+                  "relative inline-flex items-center justify-center rounded-full font-bold",
+                  "text-white border-4 hover:scale-110 active:scale-95",
+                  "focus:outline-none focus:ring-4 cursor-pointer select-none transition-all duration-300",
+                  "w-[100px] h-[100px]",
+                  isFabExpanded 
+                    ? "bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700 border-purple-400/80 shadow-[0_8px_32px_-6px_rgba(168,85,247,0.4)] focus:ring-purple-300/50 rotate-45"
+                    : "bg-gradient-to-br from-primary via-primary/90 to-primary/80 border-primary/60 shadow-[0_8px_32px_-6px_hsl(var(--primary)/0.4)] focus:ring-primary/30"
                 )}
-                <span className="text-xs font-normal tracking-tight leading-tight">
-                  {job?.Processed === "Yes" ? "Pause" : "Run"}
-                </span>
+                title={isFabExpanded ? "Close Menu" : "Open Actions"}
+              >
+                <Sparkles className={cn("w-10 h-10 drop-shadow-lg transition-transform duration-300", isFabExpanded && "-rotate-45")} />
               </button>
+
+              {/* Expanded Action Buttons */}
+              <div className={cn(
+                "absolute bottom-0 right-0 flex flex-col gap-4 transition-all duration-500 ease-out",
+                isFabExpanded ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+              )}>
+                {/* Automatic Dial Button */}
+                <button 
+                  onClick={() => handleAutomaticDialToggle(!job?.automatic_dial)} 
+                  disabled={automaticDialSaving}
+                  className={cn(
+                    "call-button flex-col gap-1 transition-all duration-500",
+                    isFabExpanded ? "translate-y-[-130px]" : "translate-y-0"
+                  )}
+                  style={{ transitionDelay: isFabExpanded ? "50ms" : "0ms" }}
+                  title="Automatic Dial"
+                >
+                  <Phone className="w-8 h-8 drop-shadow-sm" />
+                  <span className="tracking-tight leading-tight font-normal text-xs">
+                    Automatic Dial {job?.automatic_dial ? 'ON' : 'OFF'}
+                  </span>
+                </button>
+
+                {/* AI Longlist Button */}
+                {job?.longlist && job.longlist > 0 ? (
+                  <button 
+                    onClick={handleSearchMoreCandidates} 
+                    className={cn(
+                      "ai-longlist-button flex-col gap-1 transition-all duration-500",
+                      isFabExpanded ? "translate-y-[-270px]" : "translate-y-0"
+                    )}
+                    style={{ transitionDelay: isFabExpanded ? "100ms" : "0ms" }}
+                    title="AI Longlist"
+                  >
+                    <Search className="w-8 h-8 drop-shadow-sm" />
+                    <span className="text-xs font-normal tracking-tight leading-tight">Regenerate AI Longlist</span>
+                  </button>
+                ) : (
+                  <button 
+                    onClick={handleGenerateLongList} 
+                    disabled={job?.longlist === 3} 
+                    className={cn(
+                      "ai-longlist-button flex-col gap-1 transition-all duration-500",
+                      isFabExpanded ? "translate-y-[-270px]" : "translate-y-0"
+                    )}
+                    style={{ transitionDelay: isFabExpanded ? "100ms" : "0ms" }}
+                    title="AI Longlist"
+                  >
+                    <Zap className="w-8 h-8 drop-shadow-sm" />
+                    <span className="text-xs font-normal tracking-tight leading-tight">Generate AI Longlist</span>
+                  </button>
+                )}
+
+                {/* Pause/Run Button */}
+                <button 
+                  onClick={handlePauseJob} 
+                  disabled={automaticDialSaving}
+                  className={cn(
+                    job?.Processed === "Yes" ? "stop-button flex-col gap-1" : "call-button flex-col gap-1",
+                    "transition-all duration-500",
+                    isFabExpanded ? "translate-y-[-410px]" : "translate-y-0"
+                  )}
+                  style={{ transitionDelay: isFabExpanded ? "150ms" : "0ms" }}
+                  title={job?.Processed === "Yes" ? "Pause Job" : "Run Job"}
+                >
+                  {job?.Processed === "Yes" ? (
+                    <Pause className="w-8 h-8 drop-shadow-sm" />
+                  ) : (
+                    <Play className="w-8 h-8 drop-shadow-sm" />
+                  )}
+                  <span className="text-xs font-normal tracking-tight leading-tight">
+                    {job?.Processed === "Yes" ? "Pause" : "Run"}
+                  </span>
+                </button>
+              </div>
             </div>
 
             {/* Action Buttons */}
