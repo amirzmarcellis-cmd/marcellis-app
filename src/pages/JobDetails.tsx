@@ -1675,17 +1675,17 @@ export default function JobDetails() {
                 className="call-button flex-col gap-1" 
                 title="Automatic Dial"
               >
-                <Phone className="w-5 h-5 drop-shadow-sm" />
+                <Phone className="w-8 h-8 drop-shadow-sm" />
                 <span className="tracking-tight leading-tight font-normal text-xs">
                   Automatic Dial {job?.automatic_dial ? 'ON' : 'OFF'}
                 </span>
               </button>
 
               {job?.longlist && job.longlist > 0 ? <button onClick={handleSearchMoreCandidates} className="ai-longlist-button flex-col gap-1" title="AI Longlist">
-                  <Search className="w-5 h-5 drop-shadow-sm" />
+                  <Search className="w-8 h-8 drop-shadow-sm" />
                   <span className="text-xs font-normal tracking-tight leading-tight">Regenerate AI Longlist</span>
                 </button> : <button onClick={handleGenerateLongList} disabled={job?.longlist === 3} className="ai-longlist-button flex-col gap-1" title="AI Longlist">
-                  <Zap className="w-5 h-5 drop-shadow-sm" />
+                  <Zap className="w-8 h-8 drop-shadow-sm" />
                   <span className="text-xs font-normal tracking-tight leading-tight">Generate AI Longlist</span>
                 </button>}
 
@@ -1696,9 +1696,9 @@ export default function JobDetails() {
                 title={job?.Processed === "Yes" ? "Pause Job" : "Run Job"}
               >
                 {job?.Processed === "Yes" ? (
-                  <Pause className="w-5 h-5 drop-shadow-sm" />
+                  <Pause className="w-8 h-8 drop-shadow-sm" />
                 ) : (
-                  <Play className="w-5 h-5 drop-shadow-sm" />
+                  <Play className="w-8 h-8 drop-shadow-sm" />
                 )}
                 <span className="text-xs font-normal tracking-tight leading-tight">
                   {job?.Processed === "Yes" ? "Pause" : "Run"}

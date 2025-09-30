@@ -217,13 +217,13 @@
   /* AI Longlist 3D Button - Sleek Modern Circular - Amber */
   .ai-longlist-button {
     @apply relative inline-flex flex-col items-center justify-center;
-    @apply rounded-full font-bold text-xs;
+    @apply rounded-full font-bold text-sm;
     @apply text-white border-4;
     @apply hover:scale-110 active:scale-95;
     @apply focus:outline-none focus:ring-4;
     @apply cursor-pointer select-none;
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
     background: linear-gradient(145deg, hsl(45 96% 53%), hsl(43 96% 56%), hsl(38 92% 50%));
     border-color: hsl(45 90% 45% / 0.8);
     box-shadow: 0 8px 24px -6px hsl(45 90% 45% / 0.3), 
@@ -272,13 +272,13 @@
   /* Call Button - Green */
   .call-button {
     @apply relative inline-flex flex-col items-center justify-center;
-    @apply rounded-full font-bold text-xs;
+    @apply rounded-full font-bold text-sm;
     @apply text-white border-4;
     @apply hover:scale-110 active:scale-95;
     @apply focus:outline-none focus:ring-4;
     @apply cursor-pointer select-none;
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
     background: linear-gradient(145deg, hsl(142 76% 36%), hsl(142 71% 45%), hsl(142 69% 58%));
     border-color: hsl(142 76% 30% / 0.8);
     box-shadow: 0 8px 24px -6px hsl(142 76% 30% / 0.3), 
@@ -327,13 +327,13 @@
   /* Stop Button - Red */
   .stop-button {
     @apply relative inline-flex flex-col items-center justify-center;
-    @apply rounded-full font-bold text-xs;
+    @apply rounded-full font-bold text-sm;
     @apply text-white border-4;
     @apply hover:scale-110 active:scale-95;
     @apply focus:outline-none focus:ring-4;
     @apply cursor-pointer select-none;
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
     background: linear-gradient(145deg, hsl(0 72% 51%), hsl(0 84% 60%), hsl(0 65% 45%));
     border-color: hsl(0 70% 45% / 0.8);
     box-shadow: 0 8px 24px -6px hsl(0 70% 50% / 0.3), 
