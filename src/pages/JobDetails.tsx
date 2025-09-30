@@ -1680,7 +1680,7 @@ export default function JobDetails() {
                 disabled={automaticDialSaving}
                 icon={Phone}
                 label={`Auto Dial ${job?.automatic_dial ? 'ON' : 'OFF'}`}
-                variant="default"
+                variant="success"
                 delay={0}
               />
               
@@ -1689,7 +1689,7 @@ export default function JobDetails() {
                   onClick={handleSearchMoreCandidates}
                   icon={Search}
                   label="Regenerate AI"
-                  variant="success"
+                  variant="amber"
                   delay={100}
                 />
               ) : (
@@ -1708,7 +1708,7 @@ export default function JobDetails() {
                 disabled={automaticDialSaving}
                 icon={job?.Processed === "Yes" ? Pause : Play}
                 label={job?.Processed === "Yes" ? "Pause Job" : "Run Job"}
-                variant={job?.Processed === "Yes" ? "danger" : "default"}
+                variant="danger"
                 delay={200}
               />
             </FuturisticActionButton>
