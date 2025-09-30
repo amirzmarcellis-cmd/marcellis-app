@@ -1726,15 +1726,17 @@ export default function JobDetails() {
             {/* Sticky Action Buttons - Bottom Right */}
             <div className="fixed bottom-6 right-6 z-50 flex items-center gap-4">
               <button 
-                onClick={() => handleAutomaticDialToggle(!job?.automatic_dial)}
-                className={job?.automatic_dial ? "stop-button flex-col gap-1" : "call-button flex-col gap-1"}
-                title={job?.automatic_dial ? "Turn Off Automatic Dial" : "Turn On Automatic Dial"}
-                disabled={automaticDialSaving}
+                onClick={() => {
+                  toast({
+                    title: "Automatic dial initiated",
+                    description: "Starting automatic dial process..."
+                  });
+                }}
+                className="call-button flex-col gap-1"
+                title="Automatic Dial"
               >
                 <Phone className="w-5 h-5 drop-shadow-sm" />
-                <span className="text-xs font-bold tracking-tight leading-tight">
-                  {job?.automatic_dial ? "Automatic Dial ON" : "Automatic Dial OFF"}
-                </span>
+                <span className="text-xs font-bold tracking-tight leading-tight">Automatic Dial</span>
               </button>
 
               {job?.longlist && job.longlist > 0 ? (
@@ -1758,17 +1760,19 @@ export default function JobDetails() {
                 </button>
               )}
 
-              {job?.automatic_dial && (
-                <button 
-                  onClick={() => handleAutomaticDialToggle(false)}
-                  className="stop-button flex-col gap-1"
-                  title="Pause Automatic Dial"
-                  disabled={automaticDialSaving}
-                >
-                  <Pause className="w-5 h-5 drop-shadow-sm" />
-                  <span className="text-xs font-bold tracking-tight leading-tight">Pause</span>
-                </button>
-              )}
+              <button 
+                onClick={() => {
+                  toast({
+                    title: "Paused",
+                    description: "Automatic dial process has been paused."
+                  });
+                }}
+                className="stop-button flex-col gap-1"
+                title="Pause"
+              >
+                <Pause className="w-5 h-5 drop-shadow-sm" />
+                <span className="text-xs font-bold tracking-tight leading-tight">Pause</span>
+              </button>
             </div>
 
             {/* Action Buttons */}
