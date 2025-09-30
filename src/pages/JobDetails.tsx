@@ -1731,7 +1731,7 @@ export default function JobDetails() {
                   title="AI Longlist"
                 >
                   <Search className="w-5 h-5 drop-shadow-sm" />
-                  <span className="text-xs font-bold tracking-tight leading-tight">AI Longlist</span>
+                  <span className="text-xs font-bold tracking-tight leading-tight">Regenerate AI Longlist</span>
                 </button>
               ) : (
                 <button 
@@ -1741,7 +1741,7 @@ export default function JobDetails() {
                   title="AI Longlist"
                 >
                   <Zap className="w-5 h-5 drop-shadow-sm" />
-                  <span className="text-xs font-bold tracking-tight leading-tight">AI Longlist</span>
+                  <span className="text-xs font-bold tracking-tight leading-tight">Regenerate AI Longlist</span>
                 </button>
               )}
             </div>
