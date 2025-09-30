@@ -100,19 +100,28 @@ export default function Index() {
   const fetchDashboardData = async () => {
     try {
       console.log('Starting dashboard data fetch...');
-      // Optimize: Fetch both jobs and jobs_cvs data in parallel
-      const [jobsResult, jobsCvsResult] = await Promise.all([
-        supabase.from('Jobs').select('*').eq('Processed', 'Yes'),
-        supabase.from('Jobs_CVs').select('*')
-      ]);
+    // Optimize: Fetch jobs first, then only related candidates (avoid missing column and large payload)
+    const { data: jobsData, error: jobsError } = await supabase
+      .from('Jobs')
+      .select('job_id, job_title, job_location, status, Timestamp, jd_summary')
+      .eq('Processed', 'Yes');
 
-      console.log('Query results received');
-      const jobsData = jobsResult.data;
-      const jobsError = jobsResult.error;
-      const jobsCvsData = jobsCvsResult.data;
-      const jobsCvsError = jobsCvsResult.error;
+    let jobsCvsData: any[] | null = [];
+    let jobsCvsError: any = null;
 
-      if (jobsError || jobsCvsError) {
+    const jobIds = (jobsData || []).map((j: any) => j.job_id).filter(Boolean);
+    if (jobIds.length > 0) {
+      const { data, error } = await supabase
+        .from('Jobs_CVs')
+        .select('job_id, recordid, cv_score, after_call_score, shortlisted_at, contacted, candidate_name, candidate_email, candidate_phone_number, call_summary, after_call_reason, lastcalltime, user_id')
+        .in('job_id', jobIds);
+      jobsCvsData = data || [];
+      jobsCvsError = error;
+    }
+
+    console.log('Query results received');
+
+    if (jobsError || jobsCvsError) {
         console.error('Error fetching data:', jobsError || jobsCvsError);
         toast.error('Failed to load dashboard data');
         // Still set loading to false even on error
@@ -145,11 +154,14 @@ export default function Index() {
         activeJobIds.has(c.job_id) && c.contacted === 'Call Done'
       );
       
-      const recentCandidates = callDoneActiveCandidates.sort((a: any, b: any) => {
-        const scoreA = parseFloat(a.cv_score) || 0;
-        const scoreB = parseFloat(b.cv_score) || 0;
-        return scoreB - scoreA; // Highest score first
-      }).slice(0, 10);
+      const recentCandidates = callDoneActiveCandidates
+        .sort((a: any, b: any) => {
+          const scoreA = parseFloat(a.cv_score) || 0;
+          const scoreB = parseFloat(b.cv_score) || 0;
+          return scoreB - scoreA; // Highest score first
+        })
+        .slice(0, 10)
+        .map((c: any) => ({ ...c, callid: c.recordid }));
       
       setCandidates(recentCandidates);
       setJobs(activeJobs);
