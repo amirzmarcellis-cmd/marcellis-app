@@ -20,22 +20,23 @@ export function useUserRole() {
       }
 
       try {
-        // Check admin status
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('is_admin')
-          .eq('user_id', user.id)
-          .single();
+        // Optimize: Fetch both profile and memberships in parallel
+        const [profileResult, membershipResult] = await Promise.all([
+          supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('user_id', user.id)
+            .single(),
+          supabase
+            .from('memberships')
+            .select('role')
+            .eq('user_id', user.id)
+        ]);
 
-        const isAdmin = profileData?.is_admin || false;
+        const isAdmin = profileResult.data?.is_admin || false;
+        const isLeader = Array.isArray(membershipResult.data) && 
+          membershipResult.data.some((m: any) => m.role === 'MANAGER');
         
-        // Check if user is a team leader (MANAGER in any team)
-        const { data: membershipData } = await supabase
-          .from('memberships')
-          .select('role')
-          .eq('user_id', user.id);
-
-        const isLeader = Array.isArray(membershipData) && membershipData.some((m: any) => m.role === 'MANAGER');
         setIsTeamLeader(isLeader);
 
         if (isAdmin) {

@@ -15,6 +15,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user, loading } = useAuth();
   const isMobile = useIsMobile();
 
+  // Don't block rendering on auth check - redirect happens in ProtectedRoute
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">

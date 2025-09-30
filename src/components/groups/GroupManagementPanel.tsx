@@ -32,28 +32,29 @@ export function GroupManagementPanel() {
 
   const fetchGroupsWithJobCount = async () => {
     try {
-      // First get all groups
-      const { data: groupsData, error: groupsError } = await supabase
-        .from('groups')
-        .select('*')
-        .order('name');
+      setLoading(true);
+      
+      // Optimize: Fetch groups and all job counts in parallel
+      const [groupsResult, jobsResult] = await Promise.all([
+        supabase.from('groups').select('*').order('name'),
+        supabase.from('Jobs').select('group_id')
+      ]);
 
-      if (groupsError) throw groupsError;
+      if (groupsResult.error) throw groupsResult.error;
 
-      // Then get job counts for each group
-      const groupsWithCounts = await Promise.all(
-        (groupsData || []).map(async (group) => {
-          const { count } = await supabase
-            .from('Jobs')
-            .select('*', { count: 'exact', head: true })
-            .eq('group_id', group.id);
+      // Count jobs per group
+      const jobCountsByGroup = new Map<string, number>();
+      jobsResult.data?.forEach(job => {
+        if (job.group_id) {
+          jobCountsByGroup.set(job.group_id, (jobCountsByGroup.get(job.group_id) || 0) + 1);
+        }
+      });
 
-          return {
-            ...group,
-            job_count: count || 0,
-          };
-        })
-      );
+      // Add job counts to groups
+      const groupsWithCounts = (groupsResult.data || []).map(group => ({
+        ...group,
+        job_count: jobCountsByGroup.get(group.id) || 0
+      }));
 
       setGroups(groupsWithCounts);
     } catch (error) {
