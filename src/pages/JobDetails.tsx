@@ -2331,9 +2331,9 @@ export default function JobDetails() {
                               <SelectValue placeholder="Source" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="all">All Sources</SelectItem>
-                              <SelectItem value="Itris">Itris</SelectItem>
-                              <SelectItem value="Linkedin">LinkedIn</SelectItem>
+                               <SelectItem value="all">All Sources</SelectItem>
+                               <SelectItem value="itris">Itris</SelectItem>
+                               <SelectItem value="linkedin">LinkedIn</SelectItem>
                             </SelectContent>
                           </Select>
                           <Select value={scoreFilter} onValueChange={setScoreFilter}>
@@ -2377,7 +2377,10 @@ export default function JobDetails() {
                     const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
                     const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
                     const userIdMatch = !userIdFilter || (candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
-                    const sourceMatch = !longListSourceFilter || longListSourceFilter === "all" || (candidate["Source"] || "").toLowerCase().includes(longListSourceFilter.toLowerCase());
+                     const sourceMatch = !longListSourceFilter || longListSourceFilter === "all" || 
+                       (longListSourceFilter.toLowerCase() === "linkedin" && (candidate["Source"] || "").toLowerCase().includes("linkedin")) ||
+                       (longListSourceFilter.toLowerCase() === "itris" && (candidate["Source"] || "").toLowerCase().includes("itris")) ||
+                       (candidate["Source"] || "").toLowerCase().includes(longListSourceFilter.toLowerCase());
                     let scoreMatch = true;
                     if (scoreFilter !== "all") {
                       const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
