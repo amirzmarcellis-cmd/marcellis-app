@@ -66,8 +66,11 @@ export function JobManagementPanel() {
     if (profile?.user_id) {
       fetchJobs();
       fetchGroups();
+    } else if (!profileLoading) {
+      // No profile available (not logged in or failed to load) -> don't block UI
+      setLoading(false);
     }
-  }, [profile, isAdmin, isManager]);
+  }, [profile?.user_id, isAdmin, isManager, isTeamLeader, profileLoading]);
 
   const checkTeamLeaderStatus = async () => {
     if (!profile?.user_id) return;
@@ -93,27 +96,11 @@ export function JobManagementPanel() {
     try {
       // Optimize: Build query with proper conditions
       let query = supabase.from('Jobs').select(`
-          *,
-          groups (
-            id,
-            name,
-            color
-          )
+          job_id, job_title, job_location, job_salary_range, Currency, Processed, status, Timestamp, group_id, automatic_dial, jd_summary,
+          groups ( id, name, color )
         `);
 
-      // If user is not admin or manager, check team leader status once to decide scope
-      let canViewAllJobs = isAdmin || isManager;
-      if (!canViewAllJobs) {
-        try {
-          const { data: tl, error: tlError } = await supabase.rpc('is_team_leader', {
-            user_uuid: profile.user_id
-          });
-          if (tlError) console.warn('is_team_leader RPC error:', tlError);
-          canViewAllJobs = !!tl;
-        } catch (e) {
-          console.warn('is_team_leader RPC failed:', e);
-        }
-      }
+      const canViewAllJobs = isAdmin || isManager || isTeamLeader;
       if (!canViewAllJobs) {
         query = query.eq('recruiter_id', profile.user_id);
       }
