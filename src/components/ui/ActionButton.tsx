@@ -35,23 +35,23 @@ export function ActionButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "relative flex items-center justify-center w-16 h-16 rounded-full",
+        "relative flex flex-col items-center justify-center gap-2 px-6 py-4 rounded-xl",
         "transition-all duration-300 ease-out",
         "group",
+        "min-w-[120px]",
         disabled && "opacity-50 cursor-not-allowed"
       )}
       style={{
         animation: `spring-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) ${delay}ms both`,
         transformStyle: "preserve-3d",
       }}
-      title={label}
     >
       {/* Glossy 3D Background */}
       <div 
         className={cn(
-          "absolute inset-0 rounded-full bg-gradient-to-br",
+          "absolute inset-0 rounded-xl bg-gradient-to-br",
           getVariantStyles(),
-          "group-hover:scale-110 transition-transform duration-300"
+          "group-hover:scale-105 transition-transform duration-300"
         )}
         style={{
           boxShadow: "0 8px 24px rgba(0,0,0,0.3), inset 0 -2px 6px rgba(0,0,0,0.4), inset 0 2px 6px rgba(255,255,255,0.2)",
@@ -60,7 +60,7 @@ export function ActionButton({
       
       {/* Glossy Highlight */}
       <div 
-        className="absolute inset-0 rounded-full"
+        className="absolute inset-0 rounded-xl"
         style={{
           background: "linear-gradient(160deg, rgba(255,255,255,0.3) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)",
           pointerEvents: "none",
@@ -69,7 +69,7 @@ export function ActionButton({
 
       {/* Glowing Border */}
       <div 
-        className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{
           boxShadow: variant === "danger" 
             ? "0 0 20px rgba(239, 68, 68, 0.6)" 
@@ -81,11 +81,16 @@ export function ActionButton({
 
       {/* Icon */}
       <Icon 
-        className="w-6 h-6 text-white relative z-10 drop-shadow-lg" 
+        className="w-8 h-8 text-white relative z-10 drop-shadow-lg" 
         style={{
           filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))",
         }}
       />
+      
+      {/* Label */}
+      <span className="text-xs font-medium text-white relative z-10 drop-shadow-md tracking-wide">
+        {label}
+      </span>
     </button>
   )
 }
