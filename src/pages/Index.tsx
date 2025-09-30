@@ -126,12 +126,12 @@ export default function Index() {
       const interviewCandidates = links.filter((c: any) => c.contacted === 'Interview Scheduled');
       const taskedCandidates = links.filter((c: any) => c.contacted === 'Tasked');
 
-      // Recent candidates from Jobs_CVs data - only shortlisted candidates
-      const shortlistedActiveCandidates = links.filter((c: any) => 
-        activeJobIds.has(c.job_id) && c.shortlisted_at !== null
+      // Recent candidates from Jobs_CVs data - only call done candidates
+      const callDoneActiveCandidates = links.filter((c: any) => 
+        activeJobIds.has(c.job_id) && c.qualification_status === 'call done'
       );
       
-      const recentCandidates = shortlistedActiveCandidates.sort((a: any, b: any) => {
+      const recentCandidates = callDoneActiveCandidates.sort((a: any, b: any) => {
         const scoreA = parseFloat(a.cv_score) || 0;
         const scoreB = parseFloat(b.cv_score) || 0;
         return scoreB - scoreA; // Highest score first
@@ -158,12 +158,12 @@ export default function Index() {
       setJobStats(stats);
 
       // Candidates needing review: Shortlisted candidates count
-      const highScoreActiveCountVal = shortlistedActiveCandidates.length;
+      const highScoreActiveCountVal = callDoneActiveCandidates.length;
       setHighScoreActiveCount(highScoreActiveCountVal);
       setData({
         totalCandidates: links.length,
         totalJobs: activeJobs.length,
-        candidatesAwaitingReview: shortlistedActiveCandidates.length,
+        candidatesAwaitingReview: callDoneActiveCandidates.length,
         tasksToday: taskedCandidates.length,
         interviewsThisWeek: interviewCandidates.length,
         averageTimeToHire: 14,
