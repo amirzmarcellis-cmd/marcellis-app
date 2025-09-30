@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Search, Filter, Users, Zap, Activity, Star, Mail, Phone, Briefcase, XCircle, CheckCircle } from 'lucide-react';
+import { Search, Filter, Users, Zap, Activity, Star, Mail, Phone, Briefcase, XCircle, CheckCircle, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Candidate {
@@ -326,47 +326,90 @@ export default function LiveCandidateFeed() {
                     </div>
 
                     {/* Candidate Info */}
-                    <div className="flex items-start space-x-4 mb-4">
-                      <Avatar className="w-16 h-16 border-2 border-cyan-400/50">
-                        <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-purple-600 text-white text-lg font-bold">
-                          {candidate.candidate_name?.charAt(0) || 'C'}
-                        </AvatarFallback>
-                      </Avatar>
+                    <div className="flex items-start space-x-6 mb-6">
+                      {/* Avatar */}
+                      <div className="relative">
+                        <Avatar className="w-20 h-20 border-3 border-gradient-to-r from-cyan-400 to-purple-600 shadow-lg">
+                          <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-purple-600 text-white text-2xl font-bold">
+                            {candidate.candidate_name?.charAt(0) || 'C'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border-2 border-white flex items-center justify-center">
+                          <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                        </div>
+                      </div>
                       
-                      <div className="flex-1">
-                        <div className="mb-3">
-                          <h3 className="text-xl font-bold text-foreground">{candidate.candidate_name}</h3>
+                      {/* Candidate Details */}
+                      <div className="flex-1 space-y-4">
+                        {/* Name and Job Title */}
+                        <div>
+                          <h3 className="text-2xl font-bold text-foreground mb-1 group-hover:text-cyan-400 transition-colors">
+                            {candidate.candidate_name}
+                          </h3>
+                          <div className="flex items-center space-x-2 mb-3">
+                            <Briefcase className="w-5 h-5 text-cyan-400" />
+                            <span className="text-lg font-semibold text-cyan-300">{candidate['Job Title']}</span>
+                            <Badge variant="outline" className="text-xs border-cyan-400/50 text-cyan-400 bg-cyan-400/10">
+                              {candidate.job_id || candidate['Job ID']}
+                            </Badge>
+                          </div>
                         </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                          <div className="flex items-center text-purple-300">
-                            <Zap className="w-4 h-4 mr-2 text-yellow-400" />
-                            <span className="font-medium">{candidate['Job Title']}</span>
+                        {/* Contact Information Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* Email */}
+                          <div className="flex items-center space-x-3 p-3 bg-black/30 rounded-lg border border-white/10">
+                            <div className="flex-shrink-0">
+                              <Mail className="w-5 h-5 text-cyan-400" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Email</p>
+                              <p className="text-sm text-white truncate">{candidate.candidate_email}</p>
+                            </div>
                           </div>
-                          <div className="flex items-center text-purple-300">
-                            <Mail className="w-4 h-4 mr-2 text-cyan-400" />
-                            <span>{candidate.candidate_email}</span>
-                          </div>
-                          <div className="flex items-center text-purple-300">
-                            <Phone className="w-4 h-4 mr-2 text-green-400" />
-                            <span>{candidate.candidate_phone_number}</span>
-                          </div>
-                          <div className="flex items-center text-purple-300">
-                            <Briefcase className="w-4 h-4 mr-2 text-orange-400" />
-                            <span>💰 {candidate['Salary Expectations'] || 'Negotiable'}</span>
+                          
+                          {/* Phone */}
+                          <div className="flex items-center space-x-3 p-3 bg-black/30 rounded-lg border border-white/10">
+                            <div className="flex-shrink-0">
+                              <Phone className="w-5 h-5 text-green-400" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Phone</p>
+                              <p className="text-sm text-white">{candidate.candidate_phone_number}</p>
+                            </div>
                           </div>
                         </div>
 
-                        {/* After Call Reason */}
-                        {candidate.after_call_reason && (
-                          <div className="mt-3 p-3 bg-black/20 rounded-lg">
-                            <p className="text-sm text-gray-300 leading-relaxed">
-                              {candidate.after_call_reason.slice(0, 200)}...
-                            </p>
+                        {/* Additional Info */}
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center space-x-4">
+                            {candidate['Notice Period'] && (
+                              <div className="flex items-center space-x-1 text-yellow-400">
+                                <Clock className="w-4 h-4" />
+                                <span>{candidate['Notice Period']}</span>
+                              </div>
+                            )}
                           </div>
-                        )}
+                          <Badge className="bg-blue-500/20 text-blue-300 border-blue-400/40">
+                            📞 Call Done
+                          </Badge>
+                        </div>
                       </div>
-                    </div>
+                     </div>
+
+                    {/* After Call Reason */}
+                    {candidate.after_call_reason && (
+                      <div className="mb-4 p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 rounded-xl border border-slate-600/30">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
+                          <span className="text-sm font-medium text-cyan-300 uppercase tracking-wide">Call Summary</span>
+                        </div>
+                        <p className="text-sm text-gray-300 leading-relaxed">
+                          {candidate.after_call_reason.slice(0, 250)}
+                          {candidate.after_call_reason.length > 250 ? '...' : ''}
+                        </p>
+                      </div>
+                    )}
 
                     {/* Action Buttons */}
                     <div className="mt-4 pt-4 border-t border-border/20">
