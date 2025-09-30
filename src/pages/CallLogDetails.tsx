@@ -346,29 +346,7 @@ export default function CallLogDetails() {
     <div className="container mx-auto p-4 sm:p-6 space-y-6 overflow-x-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6">
-        <Button variant="outline" onClick={() => {
-          console.log('Back button clicked. Current location:', window.location.href);
-          console.log('Document referrer:', document.referrer);
-          console.log('JobId:', jobId);
-          
-          // Check if we came from a job details page with tab info
-          if (jobId && document.referrer.includes(`/job/${jobId}`)) {
-            const url = new URL(document.referrer);
-            const hash = url.hash || window.location.hash;
-            console.log('Found hash:', hash);
-            
-            if (hash && hash.startsWith('#tab=')) {
-              console.log('Navigating to job with hash:', `/job/${jobId}${hash}`);
-              navigate(`/job/${jobId}${hash}`);
-            } else {
-              console.log('Navigating to job without hash:', `/job/${jobId}`);
-              navigate(`/job/${jobId}`);
-            }
-          } else {
-            console.log('Using navigate(-1)');
-            navigate(-1);
-          }
-        }}>
+        <Button variant="outline" onClick={() => navigate(-1)}>
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </Button>
