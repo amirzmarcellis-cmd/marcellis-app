@@ -348,26 +348,7 @@ export default function CallLogDetails() {
     <div className="container mx-auto p-4 sm:p-6 space-y-6 overflow-x-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6">
-        <Button variant="outline" onClick={() => {
-          console.log('Back button clicked');
-          // Try multiple fallback strategies
-          try {
-            // First try using document.referrer if available
-            if (document.referrer && document.referrer !== window.location.href) {
-              console.log('Using document.referrer:', document.referrer);
-              window.location.href = document.referrer;
-              return;
-            }
-            
-            // Fallback to dashboard
-            console.log('Navigating to dashboard');
-            navigate('/');
-          } catch (error) {
-            console.error('Navigation error:', error);
-            // Ultimate fallback - direct navigation
-            window.location.href = '/';
-          }
-        }}>
+        <Button variant="outline" onClick={() => navigate('/')}>
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </Button>
