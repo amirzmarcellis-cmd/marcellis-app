@@ -600,13 +600,18 @@ export default function Index() {
                               </div>
                               <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border-2 border-white animate-pulse"></div>
                             </div>
-                            <div>
-                              <h4 className="font-semibold text-foreground text-lg group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors">{candidate.candidate_name}</h4>
-                              <p className="text-sm text-purple-300 font-medium">{jobTitle}</p>
-                              <Badge variant="outline" className="mt-1 text-xs border-cyan-400/50 text-cyan-400 bg-cyan-400/10">
-                                ID: {candidate.job_id}
-                              </Badge>
-                            </div>
+                             <div>
+                               <h4 className="font-semibold text-foreground text-lg group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors">{candidate.candidate_name}</h4>
+                               <p className="text-sm text-purple-300 font-medium">{jobTitle}</p>
+                               <div className="flex flex-wrap gap-2 mt-1">
+                                 <Badge variant="outline" className="text-xs border-cyan-400/50 text-cyan-400 bg-cyan-400/10">
+                                   Candidate ID: {candidate.recordid}
+                                 </Badge>
+                                 <Badge variant="outline" className="text-xs border-purple-400/50 text-purple-400 bg-purple-400/10">
+                                   Job ID: {candidate.job_id}
+                                 </Badge>
+                               </div>
+                             </div>
                           </div>
                           <div className="text-right">
                             <div className={`text-2xl font-bold mb-2 ${getScoreColor(score)}`}>
