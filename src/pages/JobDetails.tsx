@@ -1719,14 +1719,16 @@ export default function JobDetails() {
             </div>
             {/* Sticky Action Buttons - Bottom Right */}
             <div className="fixed bottom-6 right-6 z-50 flex items-center gap-6">
-              <button onClick={() => {
-            toast({
-              title: "Automatic dial initiated",
-              description: "Starting automatic dial process..."
-            });
-          }} className="call-button flex-col gap-1" title="Automatic Dial">
+              <button 
+                onClick={() => handleAutomaticDialToggle(!job?.automatic_dial)} 
+                disabled={automaticDialSaving}
+                className={`${job?.automatic_dial ? 'stop-button' : 'call-button'} flex-col gap-1`} 
+                title="Automatic Dial"
+              >
                 <Phone className="w-5 h-5 drop-shadow-sm" />
-                <span className="tracking-tight leading-tight font-normal text-xs">Automatic Dial</span>
+                <span className="tracking-tight leading-tight font-normal text-xs">
+                  Automatic Dial {job?.automatic_dial ? 'ON' : 'OFF'}
+                </span>
               </button>
 
               {job?.longlist && job.longlist > 0 ? <button onClick={handleSearchMoreCandidates} className="ai-longlist-button flex-col gap-1" title="AI Longlist">
@@ -1737,12 +1739,12 @@ export default function JobDetails() {
                   <span className="text-xs font-normal tracking-tight leading-tight">Regenerate AI Longlist</span>
                 </button>}
 
-              <button onClick={() => {
-            toast({
-              title: "Paused",
-              description: "Automatic dial process has been paused."
-            });
-          }} className="stop-button flex-col gap-1" title="Pause">
+              <button 
+                onClick={() => handleAutomaticDialToggle(false)} 
+                disabled={automaticDialSaving || !job?.automatic_dial}
+                className="stop-button flex-col gap-1" 
+                title="Pause"
+              >
                 <Pause className="w-5 h-5 drop-shadow-sm" />
                 <span className="text-xs font-normal tracking-tight leading-tight">Pause</span>
               </button>
