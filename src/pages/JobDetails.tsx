@@ -1722,7 +1722,7 @@ export default function JobDetails() {
               <button 
                 onClick={() => handleAutomaticDialToggle(!job?.automatic_dial)} 
                 disabled={automaticDialSaving}
-                className={`${job?.automatic_dial ? 'stop-button' : 'call-button'} flex-col gap-1`} 
+                className="call-button flex-col gap-1" 
                 title="Automatic Dial"
               >
                 <Phone className="w-5 h-5 drop-shadow-sm" />
