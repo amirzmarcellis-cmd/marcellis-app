@@ -218,48 +218,55 @@
   .ai-longlist-button {
     @apply relative inline-flex flex-col items-center justify-center;
     @apply rounded-full font-bold text-xs;
-    @apply text-gray-900 border-4;
+    @apply text-white border-4;
     @apply hover:scale-110 active:scale-95;
-    @apply focus:outline-none focus:ring-4 focus:ring-gray-400/50;
+    @apply focus:outline-none focus:ring-4 focus:ring-red-400/50;
     @apply cursor-pointer select-none;
     width: 128px;
     height: 128px;
-    background: var(--ai-button-gradient);
-    border-color: hsl(220 12% 68% / 0.7);
-    box-shadow: var(--ai-button-shadow), var(--ai-button-inner-shadow), 
+    background: linear-gradient(145deg, hsl(0 80% 65%), hsl(0 75% 70%), hsl(0 85% 60%));
+    border-color: hsl(0 70% 55% / 0.8);
+    box-shadow: 0 8px 24px -6px hsl(0 70% 50% / 0.3), 
+                0 4px 12px -3px hsl(0 75% 45% / 0.25),
+                inset 0 2px 8px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 8px rgba(0, 0, 0, 0.1),
                 0 0 0 6px hsl(var(--background)), 
-                0 0 0 10px hsl(220 8% 75% / 0.4),
-                0 0 0 14px hsl(220 8% 75% / 0.2);
-    outline: 3px solid hsl(220 8% 75% / 0.25);
+                0 0 0 10px hsl(0 70% 60% / 0.4),
+                0 0 0 14px hsl(0 70% 60% / 0.2);
+    outline: 3px solid hsl(0 70% 60% / 0.25);
     outline-offset: 6px;
     transform-style: preserve-3d;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .ai-longlist-button:hover {
-    border-color: hsl(220 12% 62% / 0.9);
-    box-shadow: var(--ai-button-hover-shadow), var(--ai-button-glow), var(--ai-button-inner-shadow),
+    border-color: hsl(0 75% 50% / 0.9);
+    box-shadow: 0 12px 32px -6px hsl(0 70% 50% / 0.4), 
+                0 6px 16px -3px hsl(0 75% 45% / 0.35),
+                inset 0 2px 12px rgba(255, 255, 255, 0.4),
+                inset 0 -2px 12px rgba(0, 0, 0, 0.15),
                 0 0 0 6px hsl(var(--background)), 
-                0 0 0 12px hsl(220 8% 75% / 0.6),
-                0 0 0 18px hsl(220 8% 75% / 0.4),
-                0 0 0 24px hsl(220 8% 75% / 0.2);
-    outline: 5px solid hsl(220 8% 75% / 0.5);
+                0 0 0 12px hsl(0 70% 60% / 0.6),
+                0 0 0 18px hsl(0 70% 60% / 0.4),
+                0 0 0 24px hsl(0 70% 60% / 0.2);
+    outline: 5px solid hsl(0 70% 60% / 0.5);
     outline-offset: 10px;
     transform: translateY(-3px) scale(1.15);
-    background: linear-gradient(145deg, hsl(220 8% 90%), hsl(220 6% 94%), hsl(220 10% 87%));
+    background: linear-gradient(145deg, hsl(0 85% 70%), hsl(0 80% 75%), hsl(0 90% 65%));
   }
   
   .ai-longlist-button:active {
-    border-color: hsl(220 15% 58% / 0.95);
+    border-color: hsl(0 80% 45% / 0.95);
     transform: translateY(2px) scale(0.98);
-    box-shadow: 0 4px 16px -6px hsl(220 12% 60% / 0.4), 
-                0 2px 8px -3px hsl(220 15% 55% / 0.3),
-                var(--ai-button-inner-shadow),
+    box-shadow: 0 4px 16px -6px hsl(0 70% 50% / 0.4), 
+                0 2px 8px -3px hsl(0 75% 45% / 0.3),
+                inset 0 1px 6px rgba(255, 255, 255, 0.2),
+                inset 0 -1px 6px rgba(0, 0, 0, 0.2),
                 0 0 0 6px hsl(var(--background)), 
-                0 0 0 10px hsl(220 8% 75% / 0.3);
-    outline: 2px solid hsl(220 8% 75% / 0.3);
+                0 0 0 10px hsl(0 70% 60% / 0.3);
+    outline: 2px solid hsl(0 70% 60% / 0.3);
     outline-offset: 4px;
-    background: linear-gradient(145deg, hsl(220 10% 82%), hsl(220 8% 86%), hsl(220 12% 80%));
+    background: linear-gradient(145deg, hsl(0 75% 60%), hsl(0 70% 65%), hsl(0 80% 55%));
   }
   
   .ai-longlist-button:disabled {
