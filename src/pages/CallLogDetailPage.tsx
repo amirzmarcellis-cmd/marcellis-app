@@ -315,6 +315,23 @@ export default function CallLogDetailPage() {
         </GlassCard>
       )}
 
+      {/* Qualifications */}
+      {record.qualifications && (
+        <GlassCard>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Qualifications
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="p-4 bg-secondary/50 rounded-lg border">
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">{record.qualifications}</p>
+            </div>
+          </CardContent>
+        </GlassCard>
+      )}
+
       {/* Timeline Information */}
       <GlassCard>
         <CardHeader>
