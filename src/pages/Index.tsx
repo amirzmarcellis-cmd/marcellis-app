@@ -91,29 +91,54 @@ export default function Index() {
   }, []);
   const fetchDashboardData = async () => {
     try {
-      // Mock data for demonstration since tables don't exist
-      const cvs: any[] = [];
-      const jobsData: any[] = [];
-      const links: any[] = [];
-      const activeJobs = jobsData.filter((job: any) => job.Processed === 'Yes');
+      // Fetch real data from Supabase
+      const { data: jobsData, error: jobsError } = await supabase
+        .from('Jobs')
+        .select('*')
+        .eq('Processed', 'Yes');
+
+      const { data: jobsCvsData, error: jobsCvsError } = await supabase
+        .from('Jobs_CVs')
+        .select('*');
+
+      if (jobsError || jobsCvsError) {
+        console.error('Error fetching data:', jobsError || jobsCvsError);
+        return;
+      }
+
+      console.log('Fetched jobs:', jobsData?.length || 0);
+      console.log('Fetched jobs_cvs:', jobsCvsData?.length || 0);
+
+      const activeJobs = jobsData || [];
+      const links = jobsCvsData || [];
       const activeJobIds = new Set(activeJobs.map((j: any) => j.job_id));
+
+      console.log('Active jobs:', activeJobs.length);
+      console.log('Active job IDs:', Array.from(activeJobIds));
 
       // Keep 'all' to show candidates across all jobs by default
 
+      // Mock data for candidates - will be replaced with real candidate data later
+      const cvs: any[] = [];
+      
       // Metrics
-      const shortlistedCandidates = cvs.filter((c: any) => c.CandidateStatus === 'Shortlisted');
-      const interviewCandidates = cvs.filter((c: any) => c.CandidateStatus === 'Interview');
-      const taskedCandidates = cvs.filter((c: any) => c.CandidateStatus === 'Tasked');
+      const shortlistedCandidates = links.filter((c: any) => c.shortlisted_at !== null);
+      const interviewCandidates = links.filter((c: any) => c.contacted === 'Interview Scheduled');
+      const taskedCandidates = links.filter((c: any) => c.contacted === 'Tasked');
 
-      // Mock data for candidates
-      const shortlistedActiveCandidates: any[] = [];
+      // Recent candidates from Jobs_CVs data
+      const shortlistedActiveCandidates = links.filter((c: any) => 
+        activeJobIds.has(c.job_id) && c.after_call_score && c.after_call_score > 70
+      );
+      
       const recentCandidates = shortlistedActiveCandidates.sort((a: any, b: any) => {
-        const scoreA = parseFloat(a.success_score) || 0;
-        const scoreB = parseFloat(b.success_score) || 0;
+        const scoreA = parseFloat(a.after_call_score) || 0;
+        const scoreB = parseFloat(b.after_call_score) || 0;
         return scoreB - scoreA; // Highest score first
       }).slice(0, 10);
+      
       setCandidates(recentCandidates);
-      setJobs(jobsData);
+      setJobs(activeJobs);
       setCvData(cvs);
 
       // Per-job stats (for Active Jobs Funnel)
@@ -132,17 +157,14 @@ export default function Index() {
       });
       setJobStats(stats);
 
-      // Calculate total tasked candidates across all active jobs
-      const totalTaskedCandidates = Object.values(stats).reduce((sum: number, jobStat: any) => sum + jobStat.tasked, 0);
-
       // Candidates needing review: Shortlisted candidates count
       const highScoreActiveCountVal = shortlistedActiveCandidates.length;
       setHighScoreActiveCount(highScoreActiveCountVal);
       setData({
-        totalCandidates: cvs.length,
+        totalCandidates: links.length,
         totalJobs: activeJobs.length,
-        candidatesAwaitingReview: taskedCandidates.length,
-        tasksToday: totalTaskedCandidates, // Changed to show tasked candidates count
+        candidatesAwaitingReview: shortlistedActiveCandidates.length,
+        tasksToday: taskedCandidates.length,
         interviewsThisWeek: interviewCandidates.length,
         averageTimeToHire: 14,
         recentCandidates,
