@@ -1845,7 +1845,7 @@ export default function JobDetails() {
             </TabsList>
           </div>
 
-          <TabsContent value="overview" className="space-y-4">
+          <TabsContent value="overview" className="space-y-4 pb-32">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
@@ -1940,7 +1940,7 @@ export default function JobDetails() {
             </div>
           </TabsContent>
 
-          <TabsContent value="description" className="space-y-4">
+          <TabsContent value="description" className="space-y-4 pb-32">
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -1999,7 +1999,7 @@ export default function JobDetails() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="requirements" className="space-y-4">
+          <TabsContent value="requirements" className="space-y-4 pb-32">
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -2043,7 +2043,7 @@ export default function JobDetails() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="applications" className="space-y-4">
+          <TabsContent value="applications" className="space-y-4 pb-32">
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -2235,7 +2235,7 @@ export default function JobDetails() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="boolean-search" className="space-y-4">
+          <TabsContent value="boolean-search" className="space-y-4 pb-32">
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -2610,7 +2610,7 @@ export default function JobDetails() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="shortlist" className="space-y-4">
+          <TabsContent value="shortlist" className="space-y-4 pb-32">
             <div className="space-y-6">
               {/* Within Budget Section */}
               <Card>
