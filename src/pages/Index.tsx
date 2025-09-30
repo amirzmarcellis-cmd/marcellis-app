@@ -124,11 +124,10 @@ export default function Index() {
         const cvsForJob = cvs.filter((cv: any) => jobLinks.some((jc: any) => jc.Candidate_ID === cv.candidate_id));
         stats[jobId] = {
           longlist: jobLinks.length,
-          contacted: jobLinks.filter((jc: any) => jc.contacted && ['Contacted', 'Call Done', '1st No Answer', '2nd No Answer', '3rd No Answer'].includes(jc.contacted)).length,
-          lowScored: jobLinks.filter((jc: any) => jc.contacted === 'Low Scored').length,
           shortlist: jobLinks.filter((jc: any) => jc.shortlisted_at !== null).length,
-          tasked: jobLinks.filter((jc: any) => jc.contacted === 'Tasked').length,
-          hired: cvsForJob.filter((cv: any) => cv.CandidateStatus === 'Hired').length
+          contacted: jobLinks.filter((jc: any) => jc.contacted && ['contacted', 'call done'].includes(jc.contacted.toLowerCase())).length,
+          lowScored: jobLinks.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase() === 'low scored').length,
+          submittedCv: jobLinks.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase() === 'submitted').length
         };
       });
       setJobStats(stats);
@@ -476,85 +475,6 @@ export default function Index() {
         </div>
       </div>
 
-      {/* Interviews Section */}
-      <div className="mb-6 relative z-10">
-        <Card className="bg-card border-border dark:bg-gradient-to-br dark:from-white/5 dark:via-white/3 dark:to-white/5 dark:backdrop-blur-lg dark:border-white/20">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-bold text-cyan-300 flex items-center">
-                <Calendar className="h-5 w-5 mr-2" />
-                Recent Interviews
-              </CardTitle>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => navigate('/interviews')}
-                className="text-cyan-400 border-cyan-400/40 hover:bg-cyan-400/10"
-              >
-                View All
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {interviews.slice(0, 5).map((interview) => {
-                const candidate = getCandidate(interview.candidate_id);
-                const job = getJob(interview.job_id);
-                const candidateName = `${candidate?.first_name || ''} ${candidate?.last_name || ''}`.trim();
-                const candidateInitials = `${candidate?.first_name?.[0] || ''}${candidate?.last_name?.[0] || ''}`;
-
-                return (
-                  <div 
-                    key={interview.intid} 
-                    className="flex items-center justify-between p-3 bg-background/50 rounded-lg border border-border hover:border-primary/40 transition-all duration-300 cursor-pointer"
-                    onClick={() => handleCandidateClick(interview.candidate_id, interview.job_id, interview.callid)}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <Avatar className="w-10 h-10 border-2 border-cyan-400/50">
-                        <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-purple-600 text-white font-bold text-sm">
-                          {candidateInitials || 'C'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-foreground truncate">
-                          {candidateName || 'Unknown Candidate'}
-                        </h4>
-                        <p className="text-sm text-muted-foreground truncate">
-                          {job?.job_title || 'Unknown Position'}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center space-x-3">
-                      <div className="flex items-center space-x-2">
-                        {getTypeIcon(interview.inttype)}
-                        <span className="text-sm text-muted-foreground">{interview.inttype}</span>
-                      </div>
-                      
-                      <Badge className={getStatusColor(interview.intstatus)} variant="outline">
-                        {interview.intstatus}
-                      </Badge>
-                      
-                      {interview.chosen_time && (
-                        <div className="text-sm font-medium text-cyan-400">
-                          {format(parseISO(interview.chosen_time), 'MMM d, HH:mm')}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-              
-              {interviews.length === 0 && (
-                <div className="text-center py-8">
-                  <Calendar className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
-                  <p className="text-muted-foreground">No interviews scheduled yet</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
         {/* Left Side - Job Control Panels - 30% width */}
@@ -571,10 +491,14 @@ export default function Index() {
                       <h3 className="font-semibold text-sm truncate">{job.job_title}</h3>
                     </div>
                     <p className="text-xs text-gray-400 mb-3">{job.job_location}</p>
-                    <div className="grid grid-cols-3 gap-1 text-xs mb-2">
+                    <div className="grid grid-cols-5 gap-1 text-xs mb-3">
                       <div className="text-center">
                         <div className="text-cyan-300 font-bold">{jobStats[job.job_id]?.longlist || 0}</div>
                         <div className="text-gray-500">Longlist</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-purple-300 font-bold">{jobStats[job.job_id]?.shortlist || 0}</div>
+                        <div className="text-gray-500">Shortlist</div>
                       </div>
                       <div className="text-center">
                         <div className="text-orange-300 font-bold">{jobStats[job.job_id]?.contacted || 0}</div>
@@ -584,19 +508,9 @@ export default function Index() {
                         <div className="text-red-300 font-bold">{jobStats[job.job_id]?.lowScored || 0}</div>
                         <div className="text-gray-500">Low Scored</div>
                       </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-1 text-xs">
                       <div className="text-center">
-                        <div className="text-purple-300 font-bold">{jobStats[job.job_id]?.shortlist || 0}</div>
-                        <div className="text-gray-500">Shortlist</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-blue-300 font-bold">{jobStats[job.job_id]?.tasked || 0}</div>
-                        <div className="text-gray-500">Tasked</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-emerald-300 font-bold">{jobStats[job.job_id]?.hired || 0}</div>
-                        <div className="text-gray-500">Hired</div>
+                        <div className="text-emerald-300 font-bold">{jobStats[job.job_id]?.submittedCv || 0}</div>
+                        <div className="text-gray-500">Submitted</div>
                       </div>
                     </div>
                     <Button size="sm" variant="ghost" onClick={() => navigate(`/job/${job.job_id}`)} className="w-full mt-2 text-xs text-cyan-400 hover:bg-cyan-400/10">
