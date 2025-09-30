@@ -635,7 +635,8 @@ export default function Index() {
                           </div>
                         </div>
                         <p className="text-sm text-gray-300 mb-4 leading-relaxed bg-black/20 p-3 rounded-lg">
-                          {candidate.score_and_reason?.slice(0, 120)}...
+                          <span className="font-semibold text-cyan-400">CV Score Reason:</span><br/>
+                          {candidate.cv_score_reason ? candidate.cv_score_reason.slice(0, 200) + "..." : "No CV reason available"}
                         </p>
                          <div className="flex items-center justify-between">
                           <div className="text-sm text-gray-400">
