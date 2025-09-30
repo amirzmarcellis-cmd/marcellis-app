@@ -116,15 +116,16 @@ export default function JobDetails() {
   const [interviewLink, setInterviewLink] = useState('');
   useEffect(() => {
     if (id) {
-      // Batch all API calls for better performance
-      Promise.all([fetchJob(id), fetchCandidates(id), fetchLonglistedCandidates(id), fetchApplications(id), fetchTaskCandidates(id)]).then(() => {
-        checkShortListButtonStatus();
-      }).catch(error => {
-        console.error('Error loading job data:', error);
-      });
-
-      // Load CV data separately as it's not job-specific
+      // Load job data first to show page immediately
+      fetchJob(id);
+      
+      // Load other data in background (non-blocking)
+      fetchCandidates(id);
+      fetchLonglistedCandidates(id);
+      fetchApplications(id);
+      fetchTaskCandidates(id);
       fetchCvData();
+      checkShortListButtonStatus();
 
       // Load last viewed timestamp for applications
       const lastViewed = localStorage.getItem(`lastViewedApplications_${id}`);
@@ -319,6 +320,7 @@ export default function JobDetails() {
   };
   const fetchCandidates = async (jobId: string) => {
     try {
+      setCandidatesLoading(true);
       // Optimize: Fetch both candidates and LinkedIn data in parallel
       const [candidatesResult, linkedinResult] = await Promise.all([supabase.from('Jobs_CVs').select('*').eq('job_id', jobId).order('cv_score', {
         ascending: false,
