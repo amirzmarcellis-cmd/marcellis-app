@@ -194,6 +194,7 @@ export type Database = {
           notice_period: string | null
           Processed: string | null
           recruiter_id: string | null
+          status: string | null
           things_to_look_for: string | null
           Timestamp: string | null
           Type: string | null
@@ -221,6 +222,7 @@ export type Database = {
           notice_period?: string | null
           Processed?: string | null
           recruiter_id?: string | null
+          status?: string | null
           things_to_look_for?: string | null
           Timestamp?: string | null
           Type?: string | null
@@ -248,6 +250,7 @@ export type Database = {
           notice_period?: string | null
           Processed?: string | null
           recruiter_id?: string | null
+          status?: string | null
           things_to_look_for?: string | null
           Timestamp?: string | null
           Type?: string | null
@@ -268,6 +271,7 @@ export type Database = {
           after_call_pros: string | null
           after_call_reason: string | null
           after_call_score: number | null
+          call_summary: string | null
           callcount: number | null
           candidate_email: string | null
           candidate_name: string | null
@@ -287,6 +291,7 @@ export type Database = {
           notes_updated_at: string | null
           notes_updated_by: string | null
           notice_period: string | null
+          qualification_status: string | null
           qualifications: string | null
           recordid: number
           recording: string | null
@@ -304,6 +309,7 @@ export type Database = {
           after_call_pros?: string | null
           after_call_reason?: string | null
           after_call_score?: number | null
+          call_summary?: string | null
           callcount?: number | null
           candidate_email?: string | null
           candidate_name?: string | null
@@ -323,6 +329,7 @@ export type Database = {
           notes_updated_at?: string | null
           notes_updated_by?: string | null
           notice_period?: string | null
+          qualification_status?: string | null
           qualifications?: string | null
           recordid?: number
           recording?: string | null
@@ -340,6 +347,7 @@ export type Database = {
           after_call_pros?: string | null
           after_call_reason?: string | null
           after_call_score?: number | null
+          call_summary?: string | null
           callcount?: number | null
           candidate_email?: string | null
           candidate_name?: string | null
@@ -359,6 +367,7 @@ export type Database = {
           notes_updated_at?: string | null
           notes_updated_by?: string | null
           notice_period?: string | null
+          qualification_status?: string | null
           qualifications?: string | null
           recordid?: number
           recording?: string | null

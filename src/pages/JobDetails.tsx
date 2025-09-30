@@ -245,6 +245,41 @@ export default function JobDetails() {
       setAutomaticDialSaving(false);
     }
   };
+
+  const handlePauseJob = async () => {
+    if (!job?.job_id) return;
+    setAutomaticDialSaving(true);
+    try {
+      const {
+        error
+      } = await supabase.from('Jobs').update({
+        automatic_dial: false,
+        Processed: "No",
+        status: "paused"
+      }).eq('job_id', job.job_id);
+      if (error) throw error;
+      setJob(prev => ({
+        ...prev,
+        automatic_dial: false,
+        Processed: "No"
+      }));
+      toast({
+        title: "Success",
+        description: "Job paused successfully"
+      });
+      // Navigate back to jobs page to see it in the paused section
+      setTimeout(() => navigate('/jobs'), 1000);
+    } catch (error) {
+      console.error('Error pausing job:', error);
+      toast({
+        title: "Error",
+        description: "Failed to pause job",
+        variant: "destructive"
+      });
+    } finally {
+      setAutomaticDialSaving(false);
+    }
+  };
   const fetchJobGroup = async (groupId: string) => {
     try {
       const {
@@ -1740,10 +1775,10 @@ export default function JobDetails() {
                 </button>}
 
               <button 
-                onClick={() => handleAutomaticDialToggle(false)} 
-                disabled={automaticDialSaving || !job?.automatic_dial}
+                onClick={handlePauseJob} 
+                disabled={automaticDialSaving}
                 className="stop-button flex-col gap-1" 
-                title="Pause"
+                title="Pause Job"
               >
                 <Pause className="w-5 h-5 drop-shadow-sm" />
                 <span className="text-xs font-normal tracking-tight leading-tight">Pause</span>

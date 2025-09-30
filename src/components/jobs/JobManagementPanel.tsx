@@ -21,6 +21,7 @@ interface Job {
   job_salary_range: string | null;
   Currency?: string | null;
   Processed: string | null;
+  status?: string | null;
   things_to_look_for: string | null;
   jd_summary: string | null;
   musttohave?: string | null;
