@@ -1748,7 +1748,7 @@ export default function JobDetails() {
 
             {/* Floating/Sticky AI Generate Longlist Button - Futuristic Design */}
             {showFloatingButton && (
-              <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
+              <div className="fixed inset-x-0 top-6 z-50 flex justify-center transition-opacity duration-500">
                 {job?.longlist && job.longlist > 0 ? (
                    <Button onClick={handleSearchMoreCandidates} className="relative rounded-xl bg-gradient-to-b from-white via-gray-50 to-gray-100 hover:from-primary/10 hover:via-primary/5 hover:to-white text-gray-800 hover:text-primary font-semibold text-sm px-6 py-3 border border-gray-200 hover:border-primary/40 overflow-hidden group transform transition-all duration-200 ease-out hover:translate-y-[-4px] shadow-[0_6px_16px_rgba(0,0,0,0.15),0_2px_4px_rgba(0,0,0,0.1)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.2),0_4px_8px_rgba(0,0,0,0.15)] active:translate-y-[-1px] active:shadow-[0_3px_8px_rgba(0,0,0,0.2),0_1px_2px_rgba(0,0,0,0.1)] active:scale-[0.98]" size="sm">
                      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
