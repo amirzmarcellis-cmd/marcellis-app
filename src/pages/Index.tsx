@@ -101,39 +101,21 @@ export default function Index() {
     try {
       console.log('Starting dashboard data fetch...');
       // Optimize: Fetch both jobs and jobs_cvs data in parallel
-      // Fetch jobs first (lightweight select)
-      const jobsResult = await supabase
-        .from('Jobs')
-        .select('job_id, job_title, Timestamp, status')
-        .eq('Processed', 'Yes');
+      const [jobsResult, jobsCvsResult] = await Promise.all([
+        supabase.from('Jobs').select('*').eq('Processed', 'Yes'),
+        supabase.from('Jobs_CVs').select('*')
+      ]);
 
-      console.log('Query results received (jobs)');
+      console.log('Query results received');
       const jobsData = jobsResult.data;
       const jobsError = jobsResult.error;
-
-      if (jobsError) {
-        console.error('Error fetching jobs:', jobsError);
-        toast.error('Failed to load dashboard data');
-        setLoading(false);
-        return;
-      }
-
-      // Only fetch Jobs_CVs for active jobs to reduce payload
-      const activeJobIdsForFilter = Array.from(new Set((jobsData || []).map((j: any) => j.job_id).filter(Boolean)));
-      let jobsCvsResult: { data: any[] | null; error: any } = { data: [], error: null };
-      if (activeJobIdsForFilter.length > 0) {
-        jobsCvsResult = await supabase
-          .from('Jobs_CVs')
-          .select('job_id, recordid, cv_score, after_call_score, shortlisted_at, contacted, callid')
-          .in('job_id', activeJobIdsForFilter);
-      }
-
       const jobsCvsData = jobsCvsResult.data;
       const jobsCvsError = jobsCvsResult.error;
 
-      if (jobsCvsError) {
-        console.error('Error fetching job candidate links:', jobsCvsError);
+      if (jobsError || jobsCvsError) {
+        console.error('Error fetching data:', jobsError || jobsCvsError);
         toast.error('Failed to load dashboard data');
+        // Still set loading to false even on error
         setLoading(false);
         return;
       }
@@ -483,6 +465,14 @@ export default function Index() {
       success_score: candidate.cv_score || candidate.after_call_score || 0
     };
   });
+  if (loading) {
+    return <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="flex items-center space-x-3">
+          <Activity className="h-8 w-8 animate-spin text-cyan-400" />
+          <span className="text-xl text-foreground">Loading Mission Control...</span>
+        </div>
+      </div>;
+  }
 
   // Admin interface for amir.z@marc-ellis.com
   if (false && profile?.is_admin) {
