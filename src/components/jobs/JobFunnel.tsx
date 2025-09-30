@@ -12,8 +12,11 @@ interface JobFunnelProps {
 export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
   // Calculate counts for each funnel stage
   const getCounts = () => {
-    // Only count candidates that are actually longlisted (have longlisted_at value)
-    const longlistedCandidates = candidates.filter(c => c.longlisted_at != null);
+    // Only count Itris and LinkedIn candidates (matching AI Longlist tab logic)
+    const longlistedCandidates = candidates.filter(c => {
+      const source = (c["Source"] || c.source || "").toLowerCase();
+      return source.includes("itris") || source.includes("linkedin");
+    });
     const longlist = longlistedCandidates.length;
     
     // Count by contacted status (only from longlisted candidates)
@@ -34,6 +37,9 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
     // Submitted (candidates with submitted status)
     const submitted = longlistedCandidates.filter(c => c["contacted"] === "Submitted").length;
     
+    // Rejected (candidates with rejected status)
+    const rejected = longlistedCandidates.filter(c => c["contacted"] === "Rejected").length;
+    
     return {
       longlist,
       firstNoAnswer,
@@ -42,7 +48,8 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
       contacted,
       lowScored,
       shortlist,
-      submitted
+      submitted,
+      rejected
     };
   };
 
