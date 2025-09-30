@@ -7,7 +7,7 @@ interface ActionButtonProps {
   disabled?: boolean
   icon: LucideIcon
   label: string
-  variant?: "default" | "danger" | "success"
+  variant?: "default" | "danger" | "success" | "amber"
   delay?: number
 }
 
@@ -25,6 +25,8 @@ export function ActionButton({
         return "from-red-500 via-red-600 to-red-700 hover:from-red-600 hover:via-red-700 hover:to-red-800"
       case "success":
         return "from-emerald-500 via-emerald-600 to-emerald-700 hover:from-emerald-600 hover:via-emerald-700 hover:to-emerald-800"
+      case "amber":
+        return "from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:via-amber-700 hover:to-amber-800"
       default:
         return "from-primary via-primary/90 to-primary/80 hover:from-primary/90 hover:via-primary/80 hover:to-primary/70"
     }
@@ -76,6 +78,8 @@ export function ActionButton({
               ? "0 0 20px rgba(239, 68, 68, 0.6)" 
               : variant === "success"
               ? "0 0 20px rgba(16, 185, 129, 0.6)"
+              : variant === "amber"
+              ? "0 0 20px rgba(245, 158, 11, 0.6)"
               : "0 0 20px hsl(var(--primary) / 0.6)",
           }}
         />
