@@ -126,9 +126,9 @@ export default function Index() {
       const interviewCandidates = links.filter((c: any) => c.contacted === 'Interview Scheduled');
       const taskedCandidates = links.filter((c: any) => c.contacted === 'Tasked');
 
-      // Recent candidates from Jobs_CVs data - only call done candidates
+      // Recent candidates from Jobs_CVs data - only Call Done candidates
       const callDoneActiveCandidates = links.filter((c: any) => 
-        activeJobIds.has(c.job_id) && c.qualification_status === 'call done'
+        activeJobIds.has(c.job_id) && c.contacted === 'Call Done'
       );
       
       const recentCandidates = callDoneActiveCandidates.sort((a: any, b: any) => {
