@@ -103,7 +103,7 @@ export default function Index() {
     // Optimize: Fetch jobs first, then only related candidates (avoid missing column and large payload)
     const { data: jobsData, error: jobsError } = await supabase
       .from('Jobs')
-      .select('job_id, job_title, job_location, status, Timestamp, jd_summary')
+      .select('job_id, job_title, job_location, status, Timestamp, jd_summary, assignment')
       .eq('Processed', 'Yes');
 
     let jobsCvsData: any[] | null = [];
@@ -113,11 +113,14 @@ export default function Index() {
     if (jobIds.length > 0) {
       const { data, error } = await supabase
         .from('Jobs_CVs')
-        .select('job_id, recordid, cv_score, after_call_score, shortlisted_at, contacted, candidate_name, candidate_email, candidate_phone_number, call_summary, after_call_reason, lastcalltime, user_id')
+        .select('job_id, recordid, cv_score, after_call_score, shortlisted_at, contacted, candidate_name, candidate_email, candidate_phone_number, call_summary, after_call_reason, lastcalltime, user_id, source')
         .in('job_id', jobIds);
       jobsCvsData = data || [];
       jobsCvsError = error;
     }
+
+    console.log('Jobs fetched:', jobsData?.length || 0);
+    console.log('Jobs_CVs fetched:', jobsCvsData?.length || 0);
 
     console.log('Query results received');
 
