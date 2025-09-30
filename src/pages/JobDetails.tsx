@@ -15,7 +15,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, AlertTriangle, Hourglass, User, FileCheck, Building } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, AlertTriangle, Hourglass, User, FileCheck, Building, Pause } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { JobFunnel } from "@/components/jobs/JobFunnel";
@@ -1770,7 +1770,7 @@ export default function JobDetails() {
                 className="stop-button flex-col gap-1"
                 title="Pause"
               >
-                <X className="w-5 h-5 drop-shadow-sm" />
+                <Pause className="w-5 h-5 drop-shadow-sm" />
                 <span className="text-xs font-bold tracking-tight leading-tight">Pause</span>
               </button>
             </div>
