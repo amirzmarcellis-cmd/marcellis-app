@@ -218,12 +218,8 @@ export default function Index() {
     // But keeping it for potential future use
     setOpenTasksCount(count);
   };
-  const handleCandidateClick = (candidateId: string, jobId: string, callid?: number) => {
-    if (callid) {
-      navigate(`/call-log-details/${callid}`);
-    } else {
-      navigate(`/call-log-details?candidate=${candidateId}&job=${jobId}`);
-    }
+  const handleCandidateClick = (recordid: number, jobId: string) => {
+    navigate(`/call-log-details/${recordid}`);
   };
   const handleRejectCandidate = async (candidateId: string, jobId: string) => {
     // Show confirmation alert
@@ -595,7 +591,7 @@ export default function Index() {
                   {enrichedCandidates.slice(0, 5).map((candidate, index) => {
                   const score = parseFloat(candidate.success_score) || 0;
                   const jobTitle = candidate.job_title || 'Unknown Position';
-                  return <div key={index} className={`bg-gradient-to-r rounded-xl p-4 border ${index < 3 ? 'from-amber-400/20 to-yellow-500/20 border-yellow-400/40' : 'from-white/5 to-white/10 border-white/20'} hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group cursor-pointer`} onClick={() => handleCandidateClick(candidate.Candidate_ID, candidate.job_id, candidate.callid)}>
+                  return <div key={index} className={`bg-gradient-to-r rounded-xl p-4 border ${index < 3 ? 'from-amber-400/20 to-yellow-500/20 border-yellow-400/40' : 'from-white/5 to-white/10 border-white/20'} hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group cursor-pointer`} onClick={() => handleCandidateClick(candidate.recordid, candidate.job_id)}>
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center space-x-3">
                             <div className="relative">
