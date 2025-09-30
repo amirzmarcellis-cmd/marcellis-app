@@ -1750,20 +1750,35 @@ export default function JobDetails() {
             {showFloatingButton && (
               <div className="fixed inset-x-0 top-6 z-50 flex justify-center transition-opacity duration-500">
                 {job?.longlist && job.longlist > 0 ? (
-                   <Button onClick={handleSearchMoreCandidates} className="relative rounded-xl bg-gradient-to-b from-white via-gray-50 to-gray-100 hover:from-primary/10 hover:via-primary/5 hover:to-white text-gray-800 hover:text-primary font-semibold text-sm px-6 py-3 border border-gray-200 hover:border-primary/40 overflow-hidden group transform transition-all duration-200 ease-out hover:translate-y-[-4px] shadow-[0_6px_16px_rgba(0,0,0,0.15),0_2px_4px_rgba(0,0,0,0.1)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.2),0_4px_8px_rgba(0,0,0,0.15)] active:translate-y-[-1px] active:shadow-[0_3px_8px_rgba(0,0,0,0.2),0_1px_2px_rgba(0,0,0,0.1)] active:scale-[0.98]" size="sm">
-                     <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                     <Search className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform duration-300 relative z-10" />
-                     <span className="relative z-10">AI Generate Longlist</span>
-                  </Button>
+                   <button 
+                     onClick={handleSearchMoreCandidates}
+                     className="group relative w-32 h-32 rounded-full bg-gradient-to-b from-gray-100 via-gray-200 to-gray-300 border-4 border-gray-300/80 shadow-[inset_0_2px_8px_rgba(255,255,255,0.6),inset_0_-2px_8px_rgba(0,0,0,0.1),0_4px_16px_rgba(0,0,0,0.1),0_8px_32px_rgba(0,0,0,0.05)] hover:scale-[1.15] hover:-translate-y-1 hover:shadow-[inset_0_2px_12px_rgba(255,255,255,0.8),inset_0_-2px_12px_rgba(0,0,0,0.15),0_8px_32px_rgba(128,128,128,0.3),0_16px_48px_rgba(0,0,0,0.1)] active:scale-95 active:translate-y-0 active:shadow-[inset_0_1px_6px_rgba(255,255,255,0.4),inset_0_-1px_6px_rgba(0,0,0,0.2),0_2px_8px_rgba(0,0,0,0.2)] transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-gray-400/50 disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center justify-center text-black font-bold text-xs"
+                     title="Search More Candidates"
+                   >
+                     {/* Outer glow ring */}
+                     <div className="absolute inset-[-8px] rounded-full bg-gradient-to-b from-gray-300/40 to-gray-400/40 opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 blur-sm"></div>
+                     
+                     {/* Inner highlight for glossy effect */}
+                     <div className="absolute inset-2 rounded-full bg-gradient-to-b from-white/60 to-transparent opacity-80"></div>
+                     
+                     <Search className="w-6 h-6 mb-1 group-hover:scale-110 transition-transform duration-300 relative z-10" />
+                     <span className="relative z-10 leading-tight">AI<br />Longlist</span>
+                   </button>
                 ) : (
                   <button 
                     onClick={handleGenerateLongList} 
                     disabled={job?.longlist === 3} 
-                    className="ai-longlist-button flex-col gap-1"
+                    className="group relative w-32 h-32 rounded-full bg-gradient-to-b from-gray-100 via-gray-200 to-gray-300 border-4 border-gray-300/80 shadow-[inset_0_2px_8px_rgba(255,255,255,0.6),inset_0_-2px_8px_rgba(0,0,0,0.1),0_4px_16px_rgba(0,0,0,0.1),0_8px_32px_rgba(0,0,0,0.05)] hover:scale-[1.15] hover:-translate-y-1 hover:shadow-[inset_0_2px_12px_rgba(255,255,255,0.8),inset_0_-2px_12px_rgba(0,0,0,0.15),0_8px_32px_rgba(128,128,128,0.3),0_16px_48px_rgba(0,0,0,0.1)] active:scale-95 active:translate-y-0 active:shadow-[inset_0_1px_6px_rgba(255,255,255,0.4),inset_0_-1px_6px_rgba(0,0,0,0.2),0_2px_8px_rgba(0,0,0,0.2)] transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-gray-400/50 disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center justify-center text-black font-bold text-xs"
                     title="AI Longlist"
                   >
-                    <Zap className="w-5 h-5 drop-shadow-sm" />
-                    <span className="text-xs font-bold tracking-tight leading-tight">AI Longlist</span>
+                    {/* Outer glow ring */}
+                    <div className="absolute inset-[-8px] rounded-full bg-gradient-to-b from-gray-300/40 to-gray-400/40 opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 blur-sm"></div>
+                    
+                    {/* Inner highlight for glossy effect */}
+                    <div className="absolute inset-2 rounded-full bg-gradient-to-b from-white/60 to-transparent opacity-80"></div>
+                    
+                    <Zap className="w-6 h-6 mb-1 group-hover:scale-110 transition-transform duration-300 relative z-10" />
+                    <span className="relative z-10 leading-tight">AI<br />Longlist</span>
                   </button>
                 )}
               </div>
