@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 interface CallLogDetail {
   job_id: string | null
+  user_id: string | null
   candidate_name: string | null
   candidate_email: string | null
   candidate_phone_number: string | null
@@ -177,6 +178,7 @@ export default function CallLogDetails() {
       // Direct mapping using snake_case field names from database
       const enrichedData: CallLogDetail = {
         job_id: data.job_id,
+        user_id: data.user_id,
         candidate_name: data.candidate_name,
         candidate_email: data.candidate_email,
         candidate_phone_number: data.candidate_phone_number,
@@ -366,9 +368,17 @@ export default function CallLogDetails() {
               <h2 className="text-2xl font-bold">{callLog.candidate_name}</h2>
               <p className="text-muted-foreground">{callLog.candidate_email}</p>
               <p className="text-sm">{callLog.job_title}</p>
-              <Badge variant="outline" className="mt-2">
-                Score: {callLog.after_call_score}/100
-              </Badge>
+              <div className="flex flex-wrap gap-2 mt-2">
+                <Badge variant="outline" className="text-xs">
+                  User ID: {callLog.user_id}
+                </Badge>
+                <Badge variant="outline" className="text-xs">
+                  Job ID: {callLog.job_id}
+                </Badge>
+                <Badge variant="outline">
+                  Score: {callLog.after_call_score}/100
+                </Badge>
+              </div>
               <div className="flex items-center space-x-2 mt-2">
                 <Button 
                   variant="outline" 
