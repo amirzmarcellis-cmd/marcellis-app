@@ -2373,16 +2373,22 @@ export default function JobDetails() {
 
                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                        {(() => {
-                  // Filter longlisted candidates based on filters
+                  // Filter longlisted candidates based on filters - show only itris and linkedin sources
                   const filteredLonglistedCandidates = longlistedCandidates.filter(candidate => {
+                    const candidateSource = (candidate["Source"] || "").toLowerCase();
+                    
+                    // Only show candidates from itris and linkedin sources
+                    const sourceMatch = candidateSource.includes("itris") || candidateSource.includes("linkedin");
+                    
                     const nameMatch = !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
                     const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
                     const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
                     const userIdMatch = !userIdFilter || (candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
-                     const sourceMatch = !longListSourceFilter || longListSourceFilter === "all" || 
-                       (longListSourceFilter.toLowerCase() === "linkedin" && (candidate["Source"] || "").toLowerCase().includes("linkedin")) ||
-                       (longListSourceFilter.toLowerCase() === "itris" && (candidate["Source"] || "").toLowerCase().includes("itris")) ||
-                       (candidate["Source"] || "").toLowerCase().includes(longListSourceFilter.toLowerCase());
+                    
+                    // Apply source filter if specified
+                    const sourceFilterMatch = !longListSourceFilter || longListSourceFilter === "all" || 
+                       (longListSourceFilter.toLowerCase() === "linkedin" && candidateSource.includes("linkedin")) ||
+                       (longListSourceFilter.toLowerCase() === "itris" && candidateSource.includes("itris"));
                     let scoreMatch = true;
                     if (scoreFilter !== "all") {
                       const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
@@ -2406,7 +2412,7 @@ export default function JobDetails() {
                       const contacted = candidate["Contacted"] || "";
                       contactedMatch = contacted === contactedFilter || contactedFilter === "Ready to Call" && contacted === "Ready to Contact";
                     }
-                    return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceMatch && scoreMatch && contactedMatch;
+                    return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceMatch && sourceFilterMatch && scoreMatch && contactedMatch;
                   });
 
                   // Group candidates by Candidate_ID to handle multiple contacts
@@ -2480,34 +2486,75 @@ export default function JobDetails() {
                                         <Building className="w-4 h-4 mr-2 flex-shrink-0" />
                                         <span className="truncate">{mainCandidate["Source"]}</span>
                                       </div>}
-                                       {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && !["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && <div className="flex items-center text-muted-foreground min-w-0">
-                                           <Star className="w-4 h-4 mr-2 flex-shrink-0" />
-                                           <span className="truncate">LinkedIn Score: {mainCandidate["linkedin_score"] ?? mainCandidate["cv_score"] ?? mainCandidate["CV Score"] ?? 'N/A'}</span>
-                                         </div>}
+                                        {/* Display score based on source */}
+                                        {(() => {
+                                          const candidateSource = (mainCandidate["Source"] || "").toLowerCase();
+                                          if (candidateSource.includes('linkedin')) {
+                                            return (
+                                              <div className="flex items-center text-muted-foreground min-w-0">
+                                                <Star className="w-4 h-4 mr-2 flex-shrink-0" />
+                                                <span className="truncate">LinkedIn Score: {mainCandidate["linkedin_score"] ?? 'N/A'}</span>
+                                              </div>
+                                            );
+                                          } else if (candidateSource.includes('itris')) {
+                                            return (
+                                              <div className="flex items-center text-muted-foreground min-w-0">
+                                                <Star className="w-4 h-4 mr-2 flex-shrink-0" />
+                                                <span className="truncate">CV Score: {mainCandidate["cv_score"] ?? 'N/A'}</span>
+                                              </div>
+                                            );
+                                          }
+                                          return null;
+                                        })()}
                                   </div>
 
                                    {/* CV Score and Reason Section */}
                                    <div className="space-y-2 pt-2 border-t">
                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                                         <div className="space-y-1">
-                                           {(!["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") || typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('itris')) && <div className="flex items-center justify-between">
-                                                <span className="text-muted-foreground">{typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? 'LinkedIn Score:' : 'CV Score:'}</span>
-                                                {(() => {
-                                    const score = typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "N/A" : mainCandidate["cv_score"] || "N/A";
-                                    const numScore = parseInt(score);
-                                    let scoreClass = "font-medium";
-                                    if (!isNaN(numScore)) {
-                                      if (numScore < 50) {
-                                        scoreClass = "font-bold text-red-600 dark:text-red-400";
-                                      } else if (numScore < 75) {
-                                        scoreClass = "font-medium text-amber-600 dark:text-amber-400";
-                                      } else {
-                                        scoreClass = "font-medium text-green-600 dark:text-green-400";
-                                      }
-                                    }
-                                    return <span className={scoreClass}>{score}</span>;
-                                  })()}
-                                              </div>}
+                                            {/* Display score and reason based on source */}
+                                            {(() => {
+                                              const candidateSource = (mainCandidate["Source"] || "").toLowerCase();
+                                              let score, scoreLabel, reason;
+                                              
+                                              if (candidateSource.includes('linkedin')) {
+                                                score = mainCandidate["linkedin_score"] || "N/A";
+                                                scoreLabel = "LinkedIn Score:";
+                                                reason = mainCandidate["linkedin_score_reason"] || "";
+                                              } else if (candidateSource.includes('itris')) {
+                                                score = mainCandidate["cv_score"] || "N/A";
+                                                scoreLabel = "CV Score:";
+                                                reason = mainCandidate["cv_score_reason"] || "";
+                                              } else {
+                                                return null;
+                                              }
+                                              
+                                              const numScore = parseInt(score);
+                                              let scoreClass = "font-medium";
+                                              if (!isNaN(numScore)) {
+                                                if (numScore < 50) {
+                                                  scoreClass = "font-bold text-red-600 dark:text-red-400";
+                                                } else if (numScore < 75) {
+                                                  scoreClass = "font-medium text-amber-600 dark:text-amber-400";
+                                                } else {
+                                                  scoreClass = "font-medium text-green-600 dark:text-green-400";
+                                                }
+                                              }
+                                              
+                                              return (
+                                                <div className="space-y-1">
+                                                  <div className="flex items-center justify-between">
+                                                    <span className="text-muted-foreground">{scoreLabel}</span>
+                                                    <span className={scoreClass}>{score}</span>
+                                                  </div>
+                                                  {reason && (
+                                                    <div className="text-xs text-muted-foreground">
+                                                      <span className="font-medium">Reason:</span> {reason}
+                                                    </div>
+                                                  )}
+                                                </div>
+                                              );
+                                            })()}
                                            {mainCandidate["after_call_score"] && mainCandidate["after_call_score"] !== 0 && <div className="flex items-center justify-between">
                                              <span className="text-muted-foreground">After Call Score:</span>
                                              <span className="font-medium">{mainCandidate["after_call_score"]}</span>
