@@ -88,7 +88,7 @@ export default function JobDetails() {
   const [lastViewedApplications, setLastViewedApplications] = useState<string | null>(null);
   const [selectedCandidates, setSelectedCandidates] = useState<Set<string>>(new Set());
   const [selectedCandidateRecord, setSelectedCandidateRecord] = useState<any>(null);
-  const [showFloatingButton, setShowFloatingButton] = useState(false);
+  
 
   // Interview scheduling state variables
   const [interviewDialogOpen, setInterviewDialogOpen] = useState(false);
@@ -143,15 +143,6 @@ export default function JobDetails() {
     }
   }, [id]);
 
-  // Scroll detection for floating button
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      setShowFloatingButton(scrollY > 200);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Fetch group data when job is loaded
   useEffect(() => {
@@ -1732,8 +1723,8 @@ export default function JobDetails() {
               <div className="h-6 w-px bg-border hidden sm:block" />
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
             </div>
-            {/* Centered AI Longlist Button with Call and Stop */}
-            <div className="flex justify-center items-center gap-6 py-4">
+            {/* Sticky Action Buttons - Bottom Right */}
+            <div className="fixed bottom-6 right-6 z-50 flex items-center gap-4">
               <button 
                 onClick={() => {
                   toast({
@@ -1783,44 +1774,6 @@ export default function JobDetails() {
                 <span className="text-xs font-bold tracking-tight leading-tight">Stop</span>
               </button>
             </div>
-
-            {/* Floating/Sticky AI Generate Longlist Button - Futuristic Design */}
-            {showFloatingButton && (
-              <div className="fixed inset-x-0 top-6 z-50 flex justify-center transition-opacity duration-500">
-                {job?.longlist && job.longlist > 0 ? (
-                   <button 
-                     onClick={handleSearchMoreCandidates}
-                     className="group relative w-32 h-32 rounded-full bg-gradient-to-b from-gray-100 via-gray-200 to-gray-300 border-4 border-gray-300/80 shadow-[inset_0_2px_8px_rgba(255,255,255,0.6),inset_0_-2px_8px_rgba(0,0,0,0.1),0_4px_16px_rgba(0,0,0,0.1),0_8px_32px_rgba(0,0,0,0.05)] hover:scale-[1.15] hover:-translate-y-1 hover:shadow-[inset_0_2px_12px_rgba(255,255,255,0.8),inset_0_-2px_12px_rgba(0,0,0,0.15),0_8px_32px_rgba(128,128,128,0.3),0_16px_48px_rgba(0,0,0,0.1)] active:scale-95 active:translate-y-0 active:shadow-[inset_0_1px_6px_rgba(255,255,255,0.4),inset_0_-1px_6px_rgba(0,0,0,0.2),0_2px_8px_rgba(0,0,0,0.2)] transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-gray-400/50 disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center justify-center text-black font-bold text-xs"
-                     title="Search More Candidates"
-                   >
-                     {/* Outer glow ring */}
-                    <div className="absolute inset-[-8px] rounded-full bg-gradient-to-b from-red-300/40 to-red-400/40 opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 blur-sm"></div>
-                     
-                     {/* Inner highlight for glossy effect */}
-                     <div className="absolute inset-2 rounded-full bg-gradient-to-b from-red-600 to-transparent opacity-100"></div>
-                     
-                     <Search className="w-6 h-6 mb-1 text-white group-hover:scale-110 transition-transform duration-300 relative z-10" />
-                     <span className="relative z-10 leading-tight text-center">Regenerate<br />AI Longlist</span>
-                   </button>
-                ) : (
-                  <button 
-                    onClick={handleGenerateLongList} 
-                    disabled={job?.longlist === 3} 
-                    className="group relative w-32 h-32 rounded-full bg-gradient-to-b from-gray-100 via-gray-200 to-gray-300 border-4 border-gray-300/80 shadow-[inset_0_2px_8px_rgba(255,255,255,0.6),inset_0_-2px_8px_rgba(0,0,0,0.1),0_4px_16px_rgba(0,0,0,0.1),0_8px_32px_rgba(0,0,0,0.05)] hover:scale-[1.15] hover:-translate-y-1 hover:shadow-[inset_0_2px_12px_rgba(255,255,255,0.8),inset_0_-2px_12px_rgba(0,0,0,0.15),0_8px_32px_rgba(128,128,128,0.3),0_16px_48px_rgba(0,0,0,0.1)] active:scale-95 active:translate-y-0 active:shadow-[inset_0_1px_6px_rgba(255,255,255,0.4),inset_0_-1px_6px_rgba(0,0,0,0.2),0_2px_8px_rgba(0,0,0,0.2)] transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-gray-400/50 disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center justify-center text-black font-bold text-xs"
-                    title="AI Longlist"
-                  >
-                    {/* Outer glow ring */}
-                    <div className="absolute inset-[-8px] rounded-full bg-gradient-to-b from-gray-300/40 to-gray-400/40 opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 blur-sm"></div>
-                    
-                    {/* Inner highlight for glossy effect */}
-                    <div className="absolute inset-2 rounded-full bg-gradient-to-b from-white/60 to-transparent opacity-80"></div>
-                    
-                    <Zap className="w-6 h-6 mb-1 group-hover:scale-110 transition-transform duration-300 relative z-10" />
-                    <span className="relative z-10 leading-tight">AI<br />Longlist</span>
-                  </button>
-                )}
-              </div>
-            )}
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 items-center justify-center lg:justify-end">
