@@ -126,14 +126,14 @@ export default function Index() {
       const interviewCandidates = links.filter((c: any) => c.contacted === 'Interview Scheduled');
       const taskedCandidates = links.filter((c: any) => c.contacted === 'Tasked');
 
-      // Recent candidates from Jobs_CVs data
+      // Recent candidates from Jobs_CVs data - only shortlisted candidates
       const shortlistedActiveCandidates = links.filter((c: any) => 
-        activeJobIds.has(c.job_id) && c.after_call_score && c.after_call_score > 70
+        activeJobIds.has(c.job_id) && c.shortlisted_at !== null
       );
       
       const recentCandidates = shortlistedActiveCandidates.sort((a: any, b: any) => {
-        const scoreA = parseFloat(a.after_call_score) || 0;
-        const scoreB = parseFloat(b.after_call_score) || 0;
+        const scoreA = parseFloat(a.cv_score) || 0;
+        const scoreB = parseFloat(b.cv_score) || 0;
         return scoreB - scoreA; // Highest score first
       }).slice(0, 10);
       
@@ -288,7 +288,7 @@ export default function Index() {
       const { error } = await supabase
         .from('Jobs_CVs')
         .update({ 'contacted': 'Submitted' })
-        .eq('recordid', parseInt(candidateId))
+        .eq('recordid', parseInt(candidateId)) // Convert to number since recordid is bigint
         .eq('job_id', jobId);
 
       if (error) throw error;
@@ -441,14 +441,14 @@ export default function Index() {
   };
 
   // Filter candidates based on selected job
-  const filteredCandidates = selectedJobFilter === 'all' ? candidates || [] : candidates?.filter(c => c.job_id === selectedJobFilter) || [];
-
-  // Enrich candidates with job titles
-  const enrichedCandidates = filteredCandidates.map(candidate => {
+  // Helper function to get enriched candidates with job titles
+  const enrichedCandidates = candidates.map(candidate => {
     const job = jobs.find(j => j.job_id === candidate.job_id);
     return {
       ...candidate,
-      job_title: job?.job_title || 'Unknown Position'
+      Candidate_ID: candidate.recordid, // Map recordid to Candidate_ID for compatibility
+      job_title: job?.job_title || 'Unknown Position',
+      success_score: candidate.cv_score || candidate.after_call_score || 0
     };
   });
   if (loading) {
