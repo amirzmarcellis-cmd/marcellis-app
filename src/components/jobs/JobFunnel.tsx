@@ -34,6 +34,9 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
     // Submitted (candidates with submitted status)
     const submitted = longlistedCandidates.filter(c => c["contacted"] === "Submitted").length;
     
+    // Rejected (candidates with rejected status)
+    const rejected = longlistedCandidates.filter(c => c["contacted"] === "Rejected").length;
+    
     return {
       longlist,
       firstNoAnswer,
@@ -42,21 +45,24 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
       contacted,
       lowScored,
       shortlist,
-      submitted
+      submitted,
+      rejected
     };
   };
 
   const counts = getCounts();
   
-  const stages = [
-    { name: "Longlist", count: counts.longlist, bgColor: "bg-blue-600", textColor: "text-black dark:text-white" },
-    { name: "1st No Answer", count: counts.firstNoAnswer, bgColor: "bg-orange-500", textColor: "text-black dark:text-white" },
-    { name: "2nd No Answer", count: counts.secondNoAnswer, bgColor: "bg-orange-600", textColor: "text-black dark:text-white" },
-    { name: "3rd No Answer", count: counts.thirdNoAnswer, bgColor: "bg-orange-700", textColor: "text-black dark:text-white" },
-    { name: "Contacted", count: counts.contacted, bgColor: "bg-green-600", textColor: "text-black dark:text-white" },
-    { name: "Low Scored", count: counts.lowScored, bgColor: "bg-red-600", textColor: "text-black dark:text-white" },
-    { name: "Shortlist", count: counts.shortlist, bgColor: "bg-emerald-600", textColor: "text-black dark:text-white" },
-    { name: "Submitted", count: counts.submitted, bgColor: "bg-purple-600", textColor: "text-black dark:text-white" }
+  // Organize stages into two rows
+  const firstRowStages = [
+    { name: "Longlist", count: counts.longlist, bgColor: "bg-blue-600", textColor: "text-white" },
+    { name: "Shortlist", count: counts.shortlist, bgColor: "bg-emerald-600", textColor: "text-white" },
+    { name: "Contacted", count: counts.contacted, bgColor: "bg-green-600", textColor: "text-white" }
+  ];
+
+  const secondRowStages = [
+    { name: "Low Scored", count: counts.lowScored, bgColor: "bg-red-600", textColor: "text-white" },
+    { name: "Submitted", count: counts.submitted, bgColor: "bg-purple-600", textColor: "text-white" },
+    { name: "Rejected", count: counts.rejected, bgColor: "bg-gray-600", textColor: "text-white" }
   ];
 
   return (
@@ -70,23 +76,45 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        {/* Horizontal funnel layout */}
-        <div className="flex items-center justify-between space-x-2 mb-4">
-          {stages.map((stage, index) => (
-            <div key={stage.name} className="flex items-center space-x-2">
-              <div className="flex flex-col items-center space-y-1 min-w-0 flex-1">
-                <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold", stage.bgColor, stage.textColor)}>
-                  {stage.count}
+        {/* Two-row funnel layout */}
+        <div className="space-y-3">
+          {/* First row: Longlist, Shortlist, Contacted */}
+          <div className="flex items-center justify-center space-x-2">
+            {firstRowStages.map((stage, index) => (
+              <div key={stage.name} className="flex items-center space-x-2">
+                <div className="flex flex-col items-center space-y-1 min-w-0">
+                  <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold", stage.bgColor, stage.textColor)}>
+                    {stage.count}
+                  </div>
+                  <span className="text-xs text-center text-muted-foreground truncate">
+                    {stage.name}
+                  </span>
                 </div>
-                <span className="text-xs text-center text-muted-foreground truncate w-full">
-                  {stage.name}
-                </span>
+                {index < firstRowStages.length - 1 && (
+                  <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                )}
               </div>
-              {index < stages.length - 1 && (
-                <ChevronRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
+          
+          {/* Second row: Low Scored, Submitted, Rejected */}
+          <div className="flex items-center justify-center space-x-2">
+            {secondRowStages.map((stage, index) => (
+              <div key={stage.name} className="flex items-center space-x-2">
+                <div className="flex flex-col items-center space-y-1 min-w-0">
+                  <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold", stage.bgColor, stage.textColor)}>
+                    {stage.count}
+                  </div>
+                  <span className="text-xs text-center text-muted-foreground truncate">
+                    {stage.name}
+                  </span>
+                </div>
+                {index < secondRowStages.length - 1 && (
+                  <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </CardContent>
     </Card>
