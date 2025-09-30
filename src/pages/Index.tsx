@@ -605,7 +605,7 @@ export default function Index() {
                                <p className="text-sm text-purple-300 font-medium">{jobTitle}</p>
                                <div className="flex flex-wrap gap-2 mt-1">
                                  <Badge variant="outline" className="text-xs border-cyan-400/50 text-cyan-400 bg-cyan-400/10">
-                                   Candidate ID: {candidate.recordid}
+                                   User ID: {candidate.user_id}
                                  </Badge>
                                  <Badge variant="outline" className="text-xs border-purple-400/50 text-purple-400 bg-purple-400/10">
                                    Job ID: {candidate.job_id}
