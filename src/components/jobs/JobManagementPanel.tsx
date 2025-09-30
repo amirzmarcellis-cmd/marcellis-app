@@ -67,7 +67,7 @@ export function JobManagementPanel() {
       fetchJobs();
       fetchGroups();
     }
-  }, [profile, isTeamLeader, isAdmin, isManager]);
+  }, [profile, isAdmin, isManager]);
 
   const checkTeamLeaderStatus = async () => {
     if (!profile?.user_id) return;
@@ -101,31 +101,45 @@ export function JobManagementPanel() {
           )
         `);
 
-      // If user is not admin, manager, or team leader, only show jobs assigned to this user
-      const canViewAllJobs = isAdmin || isManager || isTeamLeader;
+      // If user is not admin or manager, check team leader status once to decide scope
+      let canViewAllJobs = isAdmin || isManager;
+      if (!canViewAllJobs) {
+        try {
+          const { data: tl, error: tlError } = await supabase.rpc('is_team_leader', {
+            user_uuid: profile.user_id
+          });
+          if (tlError) console.warn('is_team_leader RPC error:', tlError);
+          canViewAllJobs = !!tl;
+        } catch (e) {
+          console.warn('is_team_leader RPC failed:', e);
+        }
+      }
       if (!canViewAllJobs) {
         query = query.eq('recruiter_id', profile.user_id);
       }
 
-      // Fetch jobs and candidate counts in parallel for faster loading
-      const [jobsResult, candidatesResult] = await Promise.all([
-        query.order('Timestamp', { ascending: false }),
-        supabase.from('Jobs_CVs').select('job_id, after_call_score, source')
-      ]);
-      
+      // Fetch jobs first
+      const jobsResult = await query.order('Timestamp', { ascending: false });
       if (jobsResult.error) throw jobsResult.error;
-      
       const initialJobs = jobsResult.data || [];
-      
-      // Group candidates by job_id for faster lookup
+      const jobIds = initialJobs.map(j => j.job_id).filter(Boolean);
+
+      // Fetch candidate counts only for these jobs
       const candidatesByJob = new Map<string, any[]>();
-      if (!candidatesResult.error && candidatesResult.data) {
-        candidatesResult.data.forEach(candidate => {
-          if (!candidatesByJob.has(candidate.job_id)) {
-            candidatesByJob.set(candidate.job_id, []);
-          }
-          candidatesByJob.get(candidate.job_id)!.push(candidate);
-        });
+      if (jobIds.length > 0) {
+        const candidatesResult = await supabase
+          .from('Jobs_CVs')
+          .select('job_id, after_call_score, source')
+          .in('job_id', jobIds);
+
+        if (!candidatesResult.error && candidatesResult.data) {
+          candidatesResult.data.forEach(candidate => {
+            if (!candidatesByJob.has(candidate.job_id)) {
+              candidatesByJob.set(candidate.job_id, []);
+            }
+            candidatesByJob.get(candidate.job_id)!.push(candidate);
+          });
+        }
       }
 
       // Calculate counts for all jobs before setting state
@@ -148,7 +162,6 @@ export function JobManagementPanel() {
         };
       });
 
-      // Set jobs once with all data complete
       setJobs(jobsWithCounts);
       setLoading(false);
     } catch (error) {
