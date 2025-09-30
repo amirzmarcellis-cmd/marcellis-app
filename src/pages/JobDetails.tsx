@@ -2424,19 +2424,30 @@ export default function JobDetails() {
                                        <input type="checkbox" checked={selectedCandidates.has(candidateId)} onChange={() => toggleCandidateSelection(candidateId)} className="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" />
                                        <div className="min-w-0 flex-1">
                                          <h4 className="font-semibold text-sm md:text-base truncate">{mainCandidate["Candidate Name"] && !/undefined/i.test(String(mainCandidate["Candidate Name"])) ? mainCandidate["Candidate Name"] : mainCandidate["Candidate Email"] ? String(mainCandidate["Candidate Email"]).split('@')[0] : `Candidate ${candidateId}`}</h4>
-                                         <div className="space-y-1">
-                                           
-                                           {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || mainCandidate["Contacted"]?.toLowerCase() === "contacted" || mainCandidate["Contacted"]?.toLowerCase() === "low scored" || mainCandidate["Contacted"]?.toLowerCase() === "tasked") && mainCandidate["lastcalltime"] && <div className="text-xs text-muted-foreground flex items-center">
-                                                <Clock className="w-3 h-3 mr-1" />
-                                                {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
-                                                <span className="ml-2">
-                                                  {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], {
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                      })}
-                                                </span>
+                                          <div className="space-y-1">
+                                            
+                                            {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || mainCandidate["Contacted"]?.toLowerCase() === "contacted" || mainCandidate["Contacted"]?.toLowerCase() === "low scored" || mainCandidate["Contacted"]?.toLowerCase() === "tasked") && mainCandidate["lastcalltime"] && <div className="text-xs text-muted-foreground flex items-center">
+                                                 <Clock className="w-3 h-3 mr-1" />
+                                                 {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
+                                                 <span className="ml-2">
+                                                   {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], {
+                                         hour: '2-digit',
+                                         minute: '2-digit'
+                                       })}
+                                                 </span>
+                                               </div>}
+                                            
+                                            {/* Qualifications Section - only show when call log is available and qualifications exist */}
+                                            {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || mainCandidate["Contacted"]?.toLowerCase() === "contacted" || mainCandidate["Contacted"]?.toLowerCase() === "low scored" || mainCandidate["Contacted"]?.toLowerCase() === "tasked") && mainCandidate["qualifications"] && <div className="mt-2 p-2 bg-muted/30 rounded-sm border-l-2 border-primary/30">
+                                                <div className="text-xs font-medium text-foreground mb-1 flex items-center">
+                                                  <FileText className="w-3 h-3 mr-1" />
+                                                  Qualifications
+                                                </div>
+                                                <p className="text-xs text-muted-foreground line-clamp-3">
+                                                  {mainCandidate["qualifications"]}
+                                                </p>
                                               </div>}
-                                         </div>
+                                          </div>
                                        </div>
                                      </div>
                                      <Button variant="ghost" size="sm" onClick={() => showRemoveConfirmation(candidateId, mainCandidate["Candidate Name"] || "Unknown")} className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive" title="Remove from Long List">
