@@ -2252,7 +2252,10 @@ export default function JobDetails() {
                   <div>
                      <CardTitle className="flex items-center">
                        <Users className="w-5 h-5 mr-2" />
-                       AI Longlist ({longlistedCandidates.length} candidates)
+                       AI Longlist ({longlistedCandidates.filter(c => {
+                         const source = (c["Source"] || c.source || "").toLowerCase();
+                         return source.includes("itris") || source.includes("linkedin");
+                       }).length} candidates)
                      </CardTitle>
                      <CardDescription>
                        Candidates added to the longlist for this position
