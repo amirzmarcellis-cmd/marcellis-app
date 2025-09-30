@@ -37,7 +37,7 @@ export function ActionButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "relative",
+        "relative flex flex-col items-center justify-center gap-3",
         "transition-all duration-300 ease-out",
         "group",
         disabled && "opacity-50 cursor-not-allowed"
@@ -47,14 +47,14 @@ export function ActionButton({
         transformStyle: "preserve-3d",
       }}
     >
-      {/* Button Container with Text Inside */}
-      <div className="relative px-6 py-4 rounded-2xl">
+      {/* Circular Button Container */}
+      <div className="relative w-20 h-20">
         {/* Glossy 3D Background */}
         <div 
           className={cn(
-            "absolute inset-0 rounded-2xl bg-gradient-to-br",
+            "absolute inset-0 rounded-full bg-gradient-to-br",
             getVariantStyles(),
-            "group-hover:scale-105 transition-transform duration-300"
+            "group-hover:scale-110 transition-transform duration-300"
           )}
           style={{
             boxShadow: "0 8px 24px rgba(0,0,0,0.3), inset 0 -2px 6px rgba(0,0,0,0.4), inset 0 2px 6px rgba(255,255,255,0.2)",
@@ -63,7 +63,7 @@ export function ActionButton({
         
         {/* Glossy Highlight */}
         <div 
-          className="absolute inset-0 rounded-2xl"
+          className="absolute inset-0 rounded-full"
           style={{
             background: "linear-gradient(160deg, rgba(255,255,255,0.3) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)",
             pointerEvents: "none",
@@ -72,7 +72,7 @@ export function ActionButton({
 
         {/* Glowing Border */}
         <div 
-          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           style={{
             boxShadow: variant === "danger" 
               ? "0 0 20px rgba(239, 68, 68, 0.6)" 
@@ -84,19 +84,19 @@ export function ActionButton({
           }}
         />
 
-        {/* Content: Icon + Text */}
-        <div className="relative z-10 flex items-center gap-3">
-          <Icon 
-            className="w-5 h-5 text-white drop-shadow-lg" 
-            style={{
-              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))",
-            }}
-          />
-          <span className="text-sm font-medium text-white drop-shadow-md tracking-wide whitespace-nowrap">
-            {label}
-          </span>
-        </div>
+        {/* Icon */}
+        <Icon 
+          className="w-8 h-8 text-white relative z-10 drop-shadow-lg absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" 
+          style={{
+            filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))",
+          }}
+        />
       </div>
+      
+      {/* Label */}
+      <span className="text-xs font-medium text-white relative z-10 drop-shadow-md tracking-wide">
+        {label}
+      </span>
     </button>
   )
 }
