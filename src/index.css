@@ -451,6 +451,21 @@
   .marquee-row { @apply overflow-hidden whitespace-nowrap; }
   .marquee-inner { @apply inline-block animate-marquee; }
 
+  /* Spring animation for 3D buttons */
+  @keyframes spring-in {
+    0% {
+      opacity: 0;
+      transform: translateX(40px) scale(0.8);
+    }
+    50% {
+      transform: translateX(-10px) scale(1.05);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .marquee-inner { animation: none !important; }
     .spotlight-overlay { display: none; }

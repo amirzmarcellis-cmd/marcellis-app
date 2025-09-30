@@ -15,7 +15,9 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, AlertTriangle, Hourglass, User, FileCheck, Building, Pause, Play, Settings } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, AlertTriangle, Hourglass, User, FileCheck, Building, Pause, Play } from "lucide-react";
+import { FuturisticActionButton } from "@/components/ui/FuturisticActionButton";
+import { ActionButton } from "@/components/ui/ActionButton";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { JobFunnel } from "@/components/jobs/JobFunnel";
@@ -1668,96 +1670,48 @@ export default function JobDetails() {
               <div className="h-6 w-px bg-border hidden sm:block" />
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
             </div>
-            {/* Expandable Action Menu - Bottom Right */}
-            <div className="fixed bottom-6 right-6 z-50 flex items-center gap-4">
-              {/* Action Buttons - Slide in horizontally */}
-              <div 
-                className={cn(
-                  "flex items-center gap-4 transition-all duration-500 ease-out",
-                  isActionMenuExpanded 
-                    ? "opacity-100 translate-x-0" 
-                    : "opacity-0 translate-x-8 pointer-events-none"
-                )}
-              >
-                <button 
-                  onClick={() => handleAutomaticDialToggle(!job?.automatic_dial)} 
-                  disabled={automaticDialSaving}
-                  className="call-button flex-col gap-1" 
-                  title="Automatic Dial"
-                >
-                  <Phone className="w-8 h-8 drop-shadow-sm" />
-                  <span className="tracking-tight leading-tight font-normal text-xs">
-                    Automatic Dial {job?.automatic_dial ? 'ON' : 'OFF'}
-                  </span>
-                </button>
-
-                {job?.longlist && job.longlist > 0 ? (
-                  <button 
-                    onClick={handleSearchMoreCandidates} 
-                    className="ai-longlist-button flex-col gap-1" 
-                    title="AI Longlist"
-                  >
-                    <Search className="w-8 h-8 drop-shadow-sm" />
-                    <span className="text-xs font-normal tracking-tight leading-tight">Regenerate AI Longlist</span>
-                  </button>
-                ) : (
-                  <button 
-                    onClick={handleGenerateLongList} 
-                    disabled={job?.longlist === 3} 
-                    className="ai-longlist-button flex-col gap-1" 
-                    title="AI Longlist"
-                  >
-                    <Zap className="w-8 h-8 drop-shadow-sm" />
-                    <span className="text-xs font-normal tracking-tight leading-tight">Generate AI Longlist</span>
-                  </button>
-                )}
-
-                <button 
-                  onClick={handlePauseJob} 
-                  disabled={automaticDialSaving}
-                  className={job?.Processed === "Yes" ? "stop-button flex-col gap-1" : "call-button flex-col gap-1"}
-                  title={job?.Processed === "Yes" ? "Pause Job" : "Run Job"}
-                >
-                  {job?.Processed === "Yes" ? (
-                    <Pause className="w-8 h-8 drop-shadow-sm" />
-                  ) : (
-                    <Play className="w-8 h-8 drop-shadow-sm" />
-                  )}
-                  <span className="text-xs font-normal tracking-tight leading-tight">
-                    {job?.Processed === "Yes" ? "Pause" : "Run"}
-                  </span>
-                </button>
-              </div>
-
-              {/* Main Toggle Button */}
-              <button
-                onClick={() => setIsActionMenuExpanded(!isActionMenuExpanded)}
-                className={cn(
-                  "relative flex items-center justify-center w-16 h-16 rounded-full",
-                  "bg-gradient-to-br from-primary via-primary/90 to-primary/80",
-                  "hover:from-primary/90 hover:via-primary/80 hover:to-primary/70",
-                  "shadow-lg hover:shadow-xl",
-                  "transition-all duration-300 ease-out",
-                  "border-2 border-primary-foreground/10",
-                  "group",
-                  isActionMenuExpanded && "scale-95"
-                )}
-                title="Actions"
-              >
-                <Settings 
-                  className={cn(
-                    "w-7 h-7 text-primary-foreground transition-transform duration-300",
-                    isActionMenuExpanded && "rotate-90"
-                  )} 
+            {/* Futuristic 3D Action Menu */}
+            <FuturisticActionButton
+              isExpanded={isActionMenuExpanded}
+              onToggle={() => setIsActionMenuExpanded(!isActionMenuExpanded)}
+            >
+              <ActionButton
+                onClick={() => handleAutomaticDialToggle(!job?.automatic_dial)}
+                disabled={automaticDialSaving}
+                icon={Phone}
+                label={`Auto Dial ${job?.automatic_dial ? 'ON' : 'OFF'}`}
+                variant="default"
+                delay={0}
+              />
+              
+              {job?.longlist && job.longlist > 0 ? (
+                <ActionButton
+                  onClick={handleSearchMoreCandidates}
+                  icon={Search}
+                  label="Regenerate AI"
+                  variant="success"
+                  delay={100}
                 />
-                <div 
-                  className={cn(
-                    "absolute inset-0 rounded-full bg-primary-foreground/20",
-                    "opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  )}
+              ) : (
+                <ActionButton
+                  onClick={handleGenerateLongList}
+                  disabled={job?.longlist === 3}
+                  icon={Zap}
+                  label="Generate AI"
+                  variant="success"
+                  delay={100}
                 />
-              </button>
-            </div>
+              )}
+              
+              <ActionButton
+                onClick={handlePauseJob}
+                disabled={automaticDialSaving}
+                icon={job?.Processed === "Yes" ? Pause : Play}
+                label={job?.Processed === "Yes" ? "Pause Job" : "Run Job"}
+                variant={job?.Processed === "Yes" ? "danger" : "default"}
+                delay={200}
+              />
+            </FuturisticActionButton>
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 items-center justify-center lg:justify-end">
