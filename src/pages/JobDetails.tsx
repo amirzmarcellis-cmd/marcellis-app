@@ -285,7 +285,7 @@ export default function JobDetails() {
       const {
         data: linkedinData,
         error: linkedinError
-      } = await supabase.from('linkedin_boolean_search').select('user_id, linkedin_id, linkedin_score, linkedin_score_reason').eq('job_id', jobId);
+      } = await supabase.from('linkedin_boolean_search').select('user_id, linkedin_id').eq('job_id', jobId);
       if (linkedinError) console.warn('Error fetching LinkedIn data:', linkedinError);
 
       // Create a map of LinkedIn data by user_id for quick lookup
@@ -293,20 +293,22 @@ export default function JobDetails() {
       (linkedinData || []).forEach(item => {
         if (item.user_id) {
           linkedinMap.set(item.user_id, {
-            linkedin_score: item.linkedin_score,
-            linkedin_score_reason: item.linkedin_score_reason
+            linkedin_id: item.linkedin_id,
+            source: 'LinkedIn' // Mark these as LinkedIn candidates
           });
         }
       });
       const mapped = (candidatesData || []).map((row: any) => {
-        // Determine effective CV score (prioritize LinkedIn score for LinkedIn-sourced candidates)
+        // Determine effective CV score 
         const sourceLower = (row.source || '').toLowerCase();
-        const effectiveCvScore = sourceLower.includes('linkedin') ? row.linkedin_score ?? row.cv_score ?? null : row.cv_score ?? row.linkedin_score ?? null;
+        const effectiveCvScore = row.cv_score ?? null;
 
         // Get LinkedIn data for this candidate by user_id (if available from map)
         const linkedinInfo = linkedinMap.get(row.user_id) || {};
-        const linkedinScore = linkedinInfo.linkedin_score ?? row.linkedin_score ?? null;
-        const linkedinReason = linkedinInfo.linkedin_score_reason ?? row.linkedin_score_reason ?? '';
+        // If this candidate is from LinkedIn boolean search, mark source as LinkedIn
+        const candidateSource = linkedinInfo.source || row.source || '';
+        const linkedinScore = row.linkedin_score ?? null;
+        const linkedinReason = row.linkedin_score_reason ?? '';
         return {
           ...row,
           "Job ID": jobId,
@@ -319,7 +321,7 @@ export default function JobDetails() {
           "Candidate Name": row.candidate_name ?? '',
           "Candidate Email": row.candidate_email ?? '',
           "Candidate Phone Number": row.candidate_phone_number ?? '',
-          "Source": row.source ?? '',
+           "Source": candidateSource,
           // Keep LinkedIn fields for UI/debug
           "linkedin_score": linkedinScore ?? '',
           "linkedin_score_reason": linkedinReason ?? '',
