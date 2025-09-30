@@ -1731,10 +1731,10 @@ export default function JobDetails() {
 
               {job?.longlist && job.longlist > 0 ? <button onClick={handleSearchMoreCandidates} className="ai-longlist-button flex-col gap-1" title="AI Longlist">
                   <Search className="w-5 h-5 drop-shadow-sm" />
-                  <span className="text-xs font-bold tracking-tight leading-tight">Regenerate AI Longlist</span>
+                  <span className="text-xs font-normal tracking-tight leading-tight">Regenerate AI Longlist</span>
                 </button> : <button onClick={handleGenerateLongList} disabled={job?.longlist === 3} className="ai-longlist-button flex-col gap-1" title="AI Longlist">
                   <Zap className="w-5 h-5 drop-shadow-sm" />
-                  <span className="text-xs font-bold tracking-tight leading-tight">Regenerate AI Longlist</span>
+                  <span className="text-xs font-normal tracking-tight leading-tight">Regenerate AI Longlist</span>
                 </button>}
 
               <button onClick={() => {
@@ -1744,7 +1744,7 @@ export default function JobDetails() {
             });
           }} className="stop-button flex-col gap-1" title="Pause">
                 <Pause className="w-5 h-5 drop-shadow-sm" />
-                <span className="text-xs font-bold tracking-tight leading-tight">Pause</span>
+                <span className="text-xs font-normal tracking-tight leading-tight">Pause</span>
               </button>
             </div>
 
