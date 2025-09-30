@@ -85,18 +85,28 @@ export default function Index() {
       document.head.appendChild(m);
     }
 
-    // Fetch initial data
+    // Fetch initial data with timeout fallback
     fetchDashboardData();
     fetchInterviews();
+    
+    // Fallback timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      console.warn('Dashboard loading timeout reached');
+      setLoading(false);
+    }, 5000);
+    
+    return () => clearTimeout(timeout);
   }, []);
   const fetchDashboardData = async () => {
     try {
+      console.log('Starting dashboard data fetch...');
       // Optimize: Fetch both jobs and jobs_cvs data in parallel
       const [jobsResult, jobsCvsResult] = await Promise.all([
         supabase.from('Jobs').select('*').eq('Processed', 'Yes'),
         supabase.from('Jobs_CVs').select('*')
       ]);
 
+      console.log('Query results received');
       const jobsData = jobsResult.data;
       const jobsError = jobsResult.error;
       const jobsCvsData = jobsCvsResult.data;
@@ -104,6 +114,9 @@ export default function Index() {
 
       if (jobsError || jobsCvsError) {
         console.error('Error fetching data:', jobsError || jobsCvsError);
+        toast.error('Failed to load dashboard data');
+        // Still set loading to false even on error
+        setLoading(false);
         return;
       }
 
@@ -174,7 +187,10 @@ export default function Index() {
       });
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      toast.error('Failed to load dashboard data');
+      setLoading(false); // Ensure loading is set to false on error
     } finally {
+      console.log('Dashboard data fetch complete');
       setLoading(false);
     }
   };
