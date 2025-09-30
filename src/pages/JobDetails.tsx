@@ -88,7 +88,6 @@ export default function JobDetails() {
   const [lastViewedApplications, setLastViewedApplications] = useState<string | null>(null);
   const [selectedCandidates, setSelectedCandidates] = useState<Set<string>>(new Set());
   const [selectedCandidateRecord, setSelectedCandidateRecord] = useState<any>(null);
-  
 
   // Interview scheduling state variables
   const [interviewDialogOpen, setInterviewDialogOpen] = useState(false);
@@ -115,21 +114,15 @@ export default function JobDetails() {
   useEffect(() => {
     if (id) {
       // Batch all API calls for better performance
-      Promise.all([
-        fetchJob(id),
-        fetchCandidates(id),
-        fetchLonglistedCandidates(id),
-        fetchApplications(id),
-        fetchTaskCandidates(id)
-      ]).then(() => {
+      Promise.all([fetchJob(id), fetchCandidates(id), fetchLonglistedCandidates(id), fetchApplications(id), fetchTaskCandidates(id)]).then(() => {
         checkShortListButtonStatus();
       }).catch(error => {
         console.error('Error loading job data:', error);
       });
-      
+
       // Load CV data separately as it's not job-specific
       fetchCvData();
-      
+
       // Load last viewed timestamp for applications
       const lastViewed = localStorage.getItem(`lastViewedApplications_${id}`);
       setLastViewedApplications(lastViewed);
@@ -142,7 +135,6 @@ export default function JobDetails() {
       setActiveTab(tab);
     }
   }, [id]);
-
 
   // Fetch group data when job is loaded
   useEffect(() => {
@@ -272,19 +264,14 @@ export default function JobDetails() {
   const fetchCandidates = async (jobId: string) => {
     try {
       // Optimize: Fetch both candidates and LinkedIn data in parallel
-      const [candidatesResult, linkedinResult] = await Promise.all([
-        supabase.from('Jobs_CVs').select('*').eq('job_id', jobId).order('cv_score', {
-          ascending: false,
-          nullsFirst: false
-        }),
-        supabase.from('linkedin_boolean_search').select('user_id, linkedin_id, linkedin_score, linkedin_score_reason').eq('job_id', jobId)
-      ]);
-      
+      const [candidatesResult, linkedinResult] = await Promise.all([supabase.from('Jobs_CVs').select('*').eq('job_id', jobId).order('cv_score', {
+        ascending: false,
+        nullsFirst: false
+      }), supabase.from('linkedin_boolean_search').select('user_id, linkedin_id, linkedin_score, linkedin_score_reason').eq('job_id', jobId)]);
       const candidatesData = candidatesResult.data;
       const candidatesError = candidatesResult.error;
       const linkedinData = linkedinResult.data;
       const linkedinError = linkedinResult.error;
-      
       if (candidatesError) throw candidatesError;
       if (linkedinError) console.warn('Error fetching LinkedIn data:', linkedinError);
 
@@ -735,23 +722,26 @@ export default function JobDetails() {
     // Trigger screen shake effect
     setIsShaking(true);
     setTimeout(() => setIsShaking(false), 600);
-    
+
     // EPIC full-screen confetti animation with massive particle count
     const confetti = (await import('canvas-confetti')).default;
-    
+
     // Function to create a burst from specific position
     const createBurst = (x: number, y: number, particleCount: number = 150) => {
       confetti({
         particleCount,
         spread: 120,
-        origin: { x, y },
+        origin: {
+          x,
+          y
+        },
         colors: ['#3B82F6', '#06B6D4', '#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#EF4444', '#84CC16']
       });
     };
 
     // CENTER EXPLOSION - 500 particles!
     createBurst(0.5, 0.5, 500);
-    
+
     // TOP ROW - 6 bursts across the entire screen
     setTimeout(() => createBurst(0.1, 0.1, 120), 100);
     setTimeout(() => createBurst(0.25, 0.1, 120), 130);
@@ -759,25 +749,24 @@ export default function JobDetails() {
     setTimeout(() => createBurst(0.6, 0.1, 120), 190);
     setTimeout(() => createBurst(0.75, 0.1, 120), 220);
     setTimeout(() => createBurst(0.9, 0.1, 120), 250);
-    
+
     // SIDE EXPLOSIONS - Multiple bursts on each side
     setTimeout(() => createBurst(0.05, 0.2, 100), 280);
     setTimeout(() => createBurst(0.05, 0.4, 100), 310);
     setTimeout(() => createBurst(0.05, 0.6, 100), 340);
     setTimeout(() => createBurst(0.05, 0.8, 100), 370);
-    
     setTimeout(() => createBurst(0.95, 0.2, 100), 300);
     setTimeout(() => createBurst(0.95, 0.4, 100), 330);
     setTimeout(() => createBurst(0.95, 0.6, 100), 360);
     setTimeout(() => createBurst(0.95, 0.8, 100), 390);
-    
+
     // BOTTOM BURSTS - Complete perimeter coverage
     setTimeout(() => createBurst(0.15, 0.9, 120), 420);
     setTimeout(() => createBurst(0.35, 0.9, 120), 450);
     setTimeout(() => createBurst(0.5, 0.9, 120), 480);
     setTimeout(() => createBurst(0.65, 0.9, 120), 510);
     setTimeout(() => createBurst(0.85, 0.9, 120), 540);
-    
+
     // CONTINUOUS RAIN EFFECT - Enhanced with more particles
     const rainEffect = () => {
       for (let i = 0; i < 10; i++) {
@@ -785,7 +774,10 @@ export default function JobDetails() {
           confetti({
             particleCount: 80,
             spread: 360,
-            origin: { x: Math.random(), y: -0.1 },
+            origin: {
+              x: Math.random(),
+              y: -0.1
+            },
             colors: ['#3B82F6', '#8B5CF6', '#EC4899', '#10B981', '#FFD700', '#FF6B6B'],
             gravity: 0.8,
             scalar: 1.2
@@ -793,26 +785,28 @@ export default function JobDetails() {
         }, i * 80);
       }
     };
-    
+
     // Start enhanced rain effect
     setTimeout(rainEffect, 600);
-    
+
     // GRAND FINALE - 500 golden particles explosion!
     setTimeout(() => {
       confetti({
         particleCount: 500,
         spread: 180,
-        origin: { x: 0.5, y: 0.3 },
+        origin: {
+          x: 0.5,
+          y: 0.3
+        },
         colors: ['#FFD700', '#FFA500', '#FF8C00', '#FFB347', '#FFDF00', '#F0E68C']
       });
     }, 1200);
-    
+
     // Extra finale bursts for maximum impact
     setTimeout(() => {
       createBurst(0.3, 0.4, 200);
       createBurst(0.7, 0.4, 200);
     }, 1400);
-
     try {
       // Get user_ids from AI Boolean Search candidates (filteredCandidates) as comma-separated string
       const booleanSearchUserIds = filteredCandidates.map(candidate => candidate.user_id).filter(Boolean).join(',');
@@ -1725,51 +1719,30 @@ export default function JobDetails() {
             </div>
             {/* Sticky Action Buttons - Bottom Right */}
             <div className="fixed bottom-6 right-6 z-50 flex items-center gap-4">
-              <button 
-                onClick={() => {
-                  toast({
-                    title: "Automatic dial initiated",
-                    description: "Starting automatic dial process..."
-                  });
-                }}
-                className="call-button flex-col gap-1"
-                title="Automatic Dial"
-              >
+              <button onClick={() => {
+            toast({
+              title: "Automatic dial initiated",
+              description: "Starting automatic dial process..."
+            });
+          }} className="call-button flex-col gap-1" title="Automatic Dial">
                 <Phone className="w-5 h-5 drop-shadow-sm" />
-                <span className="text-xs font-bold tracking-tight leading-tight">Automatic Dial</span>
+                <span className="tracking-tight leading-tight font-normal text-xs">Automatic Dial</span>
               </button>
 
-              {job?.longlist && job.longlist > 0 ? (
-                <button 
-                  onClick={handleSearchMoreCandidates} 
-                  className="ai-longlist-button flex-col gap-1"
-                  title="AI Longlist"
-                >
+              {job?.longlist && job.longlist > 0 ? <button onClick={handleSearchMoreCandidates} className="ai-longlist-button flex-col gap-1" title="AI Longlist">
                   <Search className="w-5 h-5 drop-shadow-sm" />
                   <span className="text-xs font-bold tracking-tight leading-tight">Regenerate AI Longlist</span>
-                </button>
-              ) : (
-                <button 
-                  onClick={handleGenerateLongList} 
-                  disabled={job?.longlist === 3} 
-                  className="ai-longlist-button flex-col gap-1"
-                  title="AI Longlist"
-                >
+                </button> : <button onClick={handleGenerateLongList} disabled={job?.longlist === 3} className="ai-longlist-button flex-col gap-1" title="AI Longlist">
                   <Zap className="w-5 h-5 drop-shadow-sm" />
                   <span className="text-xs font-bold tracking-tight leading-tight">Regenerate AI Longlist</span>
-                </button>
-              )}
+                </button>}
 
-              <button 
-                onClick={() => {
-                  toast({
-                    title: "Paused",
-                    description: "Automatic dial process has been paused."
-                  });
-                }}
-                className="stop-button flex-col gap-1"
-                title="Pause"
-              >
+              <button onClick={() => {
+            toast({
+              title: "Paused",
+              description: "Automatic dial process has been paused."
+            });
+          }} className="stop-button flex-col gap-1" title="Pause">
                 <Pause className="w-5 h-5 drop-shadow-sm" />
                 <span className="text-xs font-bold tracking-tight leading-tight">Pause</span>
               </button>
@@ -2243,9 +2216,9 @@ export default function JobDetails() {
                      <CardTitle className="flex items-center">
                        <Users className="w-5 h-5 mr-2" />
                        AI Longlist ({longlistedCandidates.filter(c => {
-                         const source = (c["Source"] || c.source || "").toLowerCase();
-                         return source.includes("itris") || source.includes("linkedin");
-                       }).length} candidates)
+                    const source = (c["Source"] || c.source || "").toLowerCase();
+                    return source.includes("itris") || source.includes("linkedin");
+                  }).length} candidates)
                      </CardTitle>
                      <CardDescription>
                        Candidates added to the longlist for this position
@@ -2369,10 +2342,9 @@ export default function JobDetails() {
                   const filteredLonglistedCandidates = longlistedCandidates.filter(candidate => {
                     const source = (candidate["Source"] || "").toLowerCase();
                     const isItrisOrLinkedIn = source.includes("itris") || source.includes("linkedin");
-                    
+
                     // Base filter: only Itris or LinkedIn
                     if (!isItrisOrLinkedIn) return false;
-                    
                     const nameMatch = !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
                     const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
                     const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
@@ -2431,9 +2403,9 @@ export default function JobDetails() {
                                                  {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
                                                  <span className="ml-2">
                                                    {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], {
-                                         hour: '2-digit',
-                                         minute: '2-digit'
-                                       })}
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                      })}
                                                  </span>
                                                </div>}
                                             
