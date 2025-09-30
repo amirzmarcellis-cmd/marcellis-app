@@ -1732,8 +1732,22 @@ export default function JobDetails() {
               <div className="h-6 w-px bg-border hidden sm:block" />
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
             </div>
-            {/* Centered AI Longlist Button */}
-            <div className="flex justify-center py-4">
+            {/* Centered AI Longlist Button with Call and Stop */}
+            <div className="flex justify-center items-center gap-6 py-4">
+              <button 
+                onClick={() => {
+                  toast({
+                    title: "Call initiated",
+                    description: "Starting call process..."
+                  });
+                }}
+                className="call-button flex-col gap-1"
+                title="Call"
+              >
+                <Phone className="w-5 h-5 drop-shadow-sm" />
+                <span className="text-xs font-bold tracking-tight leading-tight">Call</span>
+              </button>
+
               {job?.longlist && job.longlist > 0 ? (
                 <button 
                   onClick={handleSearchMoreCandidates} 
@@ -1754,6 +1768,20 @@ export default function JobDetails() {
                   <span className="text-xs font-bold tracking-tight leading-tight">Regenerate AI Longlist</span>
                 </button>
               )}
+
+              <button 
+                onClick={() => {
+                  toast({
+                    title: "Call stopped",
+                    description: "Call process has been stopped."
+                  });
+                }}
+                className="stop-button flex-col gap-1"
+                title="Stop"
+              >
+                <X className="w-5 h-5 drop-shadow-sm" />
+                <span className="text-xs font-bold tracking-tight leading-tight">Stop</span>
+              </button>
             </div>
 
             {/* Floating/Sticky AI Generate Longlist Button - Futuristic Design */}
