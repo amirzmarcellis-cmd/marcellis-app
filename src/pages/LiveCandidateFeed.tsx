@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Updated version v2.0
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -45,6 +45,9 @@ interface Job {
 }
 
 export default function LiveCandidateFeed() {
+  console.log('LiveCandidateFeed component loaded - v2.0');
+  
+  // Force cache reload - this is the updated version without interview functionality
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
