@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { Search, Filter, Users, Zap, Activity, Star, Clock, Mail, Phone, MapPin, Briefcase, XCircle, Calendar, UserCheck } from 'lucide-react';
+import { Search, Filter, Users, Zap, Activity, Star, Clock, Mail, Phone, MapPin, Briefcase, XCircle, Calendar, UserCheck, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Candidate {
@@ -63,36 +63,53 @@ export default function LiveCandidateFeed() {
       return; // User cancelled, don't proceed
     }
     try {
-      // Update database
-      await supabase.from('Jobs_CVs').update({
-        contacted: 'Rejected'
-      }).eq('Candidate_ID', candidateId).eq('job_id', jobId);
-
-      // Send webhook to Make.com
-      const candidate = candidates.find(c => (c.Candidate_ID || c.candidate_id) === candidateId);
+      // Send webhook to Make.com first
+      const candidate = candidates.find(c => c.candidate_id === candidateId || c['Candidate_ID'] === candidateId);
       if (candidate) {
         try {
-          await fetch('https://hook.eu2.make.com/castzb5q0mllr7eq9zzyqll4ffcpet7j', {
+          await fetch('https://hook.eu2.make.com/mk46k4ibvs5n5nk1lto9csljygesv75f', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              job_id: jobId,
               candidate_id: candidateId,
-              callid: candidate.callid,
-              company_id: null
+              Job_Title: candidate['Job Title'],
+              Name: candidate['Candidate Name'],
+              company_id: 'your_company_id_here'
             })
           });
+          
+          toast('Rejection webhook sent successfully!');
         } catch (webhookError) {
           console.error('Webhook error:', webhookError);
+          toast('Failed to send rejection notification');
         }
       }
 
-      // Reload the page
-      window.location.reload();
+      // Refresh data to show updated status
+      fetchData();
     } catch (error) {
       console.error('Error rejecting candidate:', error);
+      toast('Failed to reject candidate');
+    }
+  };
+
+  const handleCVSubmitted = async (candidateId: string, jobId: string) => {
+    try {
+      const { error } = await supabase
+        .from('Jobs_CVs')
+        .update({ 'contacted': 'Submitted' })
+        .eq('recordid', parseInt(candidateId))
+        .eq('job_id', jobId);
+
+      if (error) throw error;
+
+      toast('CV submitted successfully!');
+      fetchData(); // Refresh the data
+    } catch (error) {
+      console.error('Error submitting CV:', error);
+      toast('Failed to submit CV');
     }
   };
   const handleArrangeInterview = (candidateId: string) => {
@@ -250,14 +267,66 @@ export default function LiveCandidateFeed() {
     fetchData();
   }, []);
   const fetchData = async () => {
-    // Mock data for single-company structure
     try {
-      setCandidates([]);
-      setJobs([]);
+      setLoading(true);
+      
+      // Fetch jobs
+      const { data: jobsData, error: jobsError } = await supabase
+        .from('Jobs')
+        .select('*')
+        .eq('Processed', 'Yes');
+      
+      if (jobsError) throw jobsError;
+      
+      // Fetch Jobs_CVs data (candidates)
+      const { data: jobsCvsData, error: jobsCvsError } = await supabase
+        .from('Jobs_CVs')
+        .select('*');
+      
+      if (jobsCvsError) throw jobsCvsError;
+      
+      // Set jobs data
+      setJobs(jobsData?.map(job => ({
+        'Job ID': job.job_id,
+        'Job Title': job.job_title,
+        'Processed': job.Processed
+      })) || []);
+      
+      // Filter for "Call Done" candidates and map to expected format
+      const callDoneCandidates = jobsCvsData?.filter(c => c.contacted === 'Call Done').map(candidate => ({
+        'Candidate_ID': candidate.recordid?.toString() || '',
+        'Candidate Name': candidate.candidate_name || '',
+        'Candidate Email': candidate.candidate_email || '',
+        'Candidate Phone Number': candidate.candidate_phone_number || '',
+        'Job ID': candidate.job_id || '',
+        'Job Title': jobsData?.find(job => job.job_id === candidate.job_id)?.job_title || '',
+        'Success Score': candidate.after_call_score?.toString() || candidate.cv_score?.toString() || '0',
+        'Score and Reason': candidate.after_call_reason || candidate.cv_score_reason || '',
+        'Contacted': candidate.contacted || '',
+        'Summary': candidate.call_summary || '',
+        'pros': candidate.after_call_pros || '',
+        'cons': candidate.after_call_cons || '',
+        'Notice Period': candidate.notice_period || '',
+        'Salary Expectations': candidate.salary_expectations || '',
+        // Additional fields for compatibility
+        candidate_id: candidate.recordid?.toString() || '',
+        candidate_name: candidate.candidate_name || '',
+        candidate_email: candidate.candidate_email || '',
+        candidate_phone_number: candidate.candidate_phone_number || '',
+        job_id: candidate.job_id || '',
+        success_score: candidate.after_call_score?.toString() || candidate.cv_score?.toString() || '0',
+        after_call_reason: candidate.after_call_reason || '',
+        callid: candidate.recordid || 0,
+        recordid: candidate.recordid || 0
+      })) || [];
+      
+      setCandidates(callDoneCandidates);
       setCvData([]);
       setInterviews([]);
+      
     } catch (error) {
       console.error('Error fetching data:', error);
+      toast('Failed to load candidate data');
     } finally {
       setLoading(false);
     }
@@ -476,13 +545,13 @@ export default function LiveCandidateFeed() {
                               </Button>;
                       })()}
                           
-                          <Button size="sm" variant="default" onClick={e => {
-                        e.stopPropagation();
-                        handleHireCandidate(candidate.Candidate_ID || candidate.candidate_id);
-                      }} className="bg-amber-500 hover:bg-amber-600 text-white border-2 border-amber-400 hover:border-amber-300 shadow-md hover:shadow-lg transition-all duration-200">
-                            <UserCheck className="w-4 h-4 mr-1" />
-                            Hire Candidate
-                          </Button>
+                           <Button size="sm" variant="default" onClick={e => {
+                         e.stopPropagation();
+                         handleCVSubmitted(candidate.Candidate_ID || candidate.candidate_id, candidate.job_id || candidate['Job ID']);
+                       }} className="bg-green-500 hover:bg-green-600 text-white border-2 border-green-400 hover:border-green-300 shadow-md hover:shadow-lg transition-all duration-200">
+                             <CheckCircle className="w-4 h-4 mr-1" />
+                             Submit CV
+                           </Button>
                         </div>
                       </div>
                     </div>
