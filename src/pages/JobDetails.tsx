@@ -1761,7 +1761,7 @@ export default function JobDetails() {
                      {/* Inner highlight for glossy effect */}
                      <div className="absolute inset-2 rounded-full bg-gradient-to-b from-red-600 to-transparent opacity-100"></div>
                      
-                     <Search className="w-6 h-6 mb-1 group-hover:scale-110 transition-transform duration-300 relative z-10" />
+                     <Search className="w-6 h-6 mb-1 text-white group-hover:scale-110 transition-transform duration-300 relative z-10" />
                      <span className="relative z-10 leading-tight">AI<br />Longlist</span>
                    </button>
                 ) : (
