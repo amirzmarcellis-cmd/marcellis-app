@@ -103,20 +103,19 @@ export default function LiveCandidateFeed() {
 
   const fetchData = async () => {
     try {
-      setLoading(true);
-      
-      // Fetch jobs
+      // Fetch jobs - only necessary fields
       const { data: jobsData, error: jobsError } = await supabase
         .from('Jobs')
-        .select('*')
+        .select('job_id, job_title, Processed')
         .eq('Processed', 'Yes');
       
       if (jobsError) throw jobsError;
       
-      // Fetch Jobs_CVs data (candidates)
+      // Fetch Jobs_CVs data (candidates) - only necessary fields for Call Done candidates
       const { data: jobsCvsData, error: jobsCvsError } = await supabase
         .from('Jobs_CVs')
-        .select('*');
+        .select('recordid, candidate_name, candidate_email, candidate_phone_number, job_id, after_call_score, cv_score, after_call_reason, cv_score_reason, contacted, call_summary, after_call_pros, after_call_cons, notice_period, salary_expectations')
+        .eq('contacted', 'Call Done');
       
       if (jobsCvsError) throw jobsCvsError;
       
@@ -129,8 +128,8 @@ export default function LiveCandidateFeed() {
         job_title: job.job_title
       })) || []);
       
-      // Filter for "Call Done" candidates and map to expected format
-      const callDoneCandidates = jobsCvsData?.filter(c => c.contacted === 'Call Done').map(candidate => ({
+      // Map candidates to expected format (already filtered by query)
+      const callDoneCandidates = jobsCvsData?.map(candidate => ({
         'Candidate_ID': candidate.recordid?.toString() || '',
         'Candidate Name': candidate.candidate_name || '',
         'Candidate Email': candidate.candidate_email || '',
@@ -160,8 +159,6 @@ export default function LiveCandidateFeed() {
     } catch (error) {
       console.error('Error fetching data:', error);
       toast('Failed to load candidate data');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -192,21 +189,6 @@ export default function LiveCandidateFeed() {
     return 'from-red-400/20 to-red-600/40';
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900 dark:to-blue-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative">
-            <div className="w-20 h-20 border-4 border-cyan-400/30 rounded-full animate-spin"></div>
-            <div className="absolute inset-0 w-20 h-20 border-4 border-t-cyan-400 rounded-full animate-spin"></div>
-          </div>
-          <p className="text-cyan-400 text-xl font-medium mt-6 animate-pulse">
-            Initializing Live Feed...
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900 dark:to-blue-900 p-4 sm:p-6 overflow-x-auto">
