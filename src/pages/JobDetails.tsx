@@ -1718,7 +1718,7 @@ export default function JobDetails() {
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
             </div>
             {/* Sticky Action Buttons - Bottom Right */}
-            <div className="fixed bottom-6 right-6 z-50 flex items-center gap-4">
+            <div className="fixed bottom-6 right-6 z-50 flex items-center gap-6">
               <button onClick={() => {
             toast({
               title: "Automatic dial initiated",
