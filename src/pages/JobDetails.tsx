@@ -15,7 +15,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, AlertTriangle, Hourglass, User, FileCheck, Building, Pause } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, AlertTriangle, Hourglass, User, FileCheck, Building, Pause, Play } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { JobFunnel } from "@/components/jobs/JobFunnel";
@@ -249,31 +249,34 @@ export default function JobDetails() {
   const handlePauseJob = async () => {
     if (!job?.job_id) return;
     setAutomaticDialSaving(true);
+    
+    const isCurrentlyActive = job?.Processed === "Yes";
+    
     try {
       const {
         error
       } = await supabase.from('Jobs').update({
-        automatic_dial: false,
-        Processed: "No",
-        status: "paused"
+        automatic_dial: isCurrentlyActive ? false : job?.automatic_dial,
+        Processed: isCurrentlyActive ? "No" : "Yes",
+        status: isCurrentlyActive ? "paused" : "active"
       }).eq('job_id', job.job_id);
       if (error) throw error;
       setJob(prev => ({
         ...prev,
-        automatic_dial: false,
-        Processed: "No"
+        automatic_dial: isCurrentlyActive ? false : prev?.automatic_dial,
+        Processed: isCurrentlyActive ? "No" : "Yes"
       }));
       toast({
         title: "Success",
-        description: "Job paused successfully"
+        description: isCurrentlyActive ? "Job paused successfully" : "Job activated successfully"
       });
-      // Navigate back to jobs page to see it in the paused section
+      // Navigate back to jobs page to see it in the correct section
       setTimeout(() => navigate('/jobs'), 1000);
     } catch (error) {
-      console.error('Error pausing job:', error);
+      console.error('Error toggling job status:', error);
       toast({
         title: "Error",
-        description: "Failed to pause job",
+        description: "Failed to update job status",
         variant: "destructive"
       });
     } finally {
@@ -1777,11 +1780,17 @@ export default function JobDetails() {
               <button 
                 onClick={handlePauseJob} 
                 disabled={automaticDialSaving}
-                className="stop-button flex-col gap-1" 
-                title="Pause Job"
+                className={job?.Processed === "Yes" ? "stop-button flex-col gap-1" : "call-button flex-col gap-1"}
+                title={job?.Processed === "Yes" ? "Pause Job" : "Run Job"}
               >
-                <Pause className="w-5 h-5 drop-shadow-sm" />
-                <span className="text-xs font-normal tracking-tight leading-tight">Pause</span>
+                {job?.Processed === "Yes" ? (
+                  <Pause className="w-5 h-5 drop-shadow-sm" />
+                ) : (
+                  <Play className="w-5 h-5 drop-shadow-sm" />
+                )}
+                <span className="text-xs font-normal tracking-tight leading-tight">
+                  {job?.Processed === "Yes" ? "Pause" : "Run"}
+                </span>
               </button>
             </div>
 
