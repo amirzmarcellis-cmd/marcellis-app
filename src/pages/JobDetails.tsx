@@ -2547,7 +2547,7 @@ export default function JobDetails() {
                                     
                                     
                                     <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
-                                      <Link to={`/candidate/${candidateId}`}>
+                                      <Link to={`/candidate/${candidateId}`} state={{ fromJob: id, tab: 'longlist' }}>
                                         <Users className="w-3 h-3 mr-1" />
                                         View Profile
                                       </Link>

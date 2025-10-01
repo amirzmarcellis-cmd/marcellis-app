@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,9 +16,13 @@ interface Candidate {
 export default function CandidateDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  const fromJob = location.state?.fromJob;
+  const fromTab = location.state?.tab;
 
   const fetchCandidate = async (candidateId: string) => {
     try {
@@ -128,7 +132,7 @@ export default function CandidateDetails() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate('/candidates')}
+            onClick={() => navigate(fromJob ? `/job/${fromJob}` : '/candidates')}
             className="h-8 w-8 p-0"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -155,7 +159,7 @@ export default function CandidateDetails() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate('/candidates')}
+            onClick={() => navigate(fromJob ? `/job/${fromJob}` : '/candidates')}
             className="h-8 w-8 p-0"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -178,7 +182,7 @@ export default function CandidateDetails() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate('/candidates')}
+          onClick={() => navigate(fromJob ? `/job/${fromJob}` : '/candidates')}
           className="h-8 w-8 p-0"
         >
           <ArrowLeft className="h-4 w-4" />
