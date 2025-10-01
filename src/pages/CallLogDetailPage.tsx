@@ -75,7 +75,24 @@ export default function CallLogDetailPage() {
           title="Record Not Found"
           subtitle="The requested call log record could not be found"
         />
-        <Button onClick={() => navigate(jobId ? `/job/${jobId}` : '/jobs')} variant="outline">
+        <Button onClick={() => {
+          if (jobId) {
+            const hash = window.location.hash;
+            let fromTab = 'boolean-search';
+            
+            if (hash.includes('tab=shortlist')) {
+              fromTab = 'shortlist';
+            } else if (hash.includes('tab=boolean-search')) {
+              fromTab = 'boolean-search';
+            }
+            
+            navigate(`/job/${jobId}`, {
+              state: { tab: fromTab }
+            });
+          } else {
+            navigate('/jobs');
+          }
+        }} variant="outline">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Go Back
         </Button>
@@ -89,7 +106,25 @@ export default function CallLogDetailPage() {
         title="Call Log Details"
         subtitle={`Complete information for ${record.candidate_name || 'candidate'}`}
         actions={
-          <Button onClick={() => navigate(jobId ? `/job/${jobId}` : '/jobs')} variant="outline">
+          <Button onClick={() => {
+            if (jobId) {
+              // Check URL hash to determine which tab to return to
+              const hash = window.location.hash;
+              let fromTab = 'boolean-search';
+              
+              if (hash.includes('tab=shortlist')) {
+                fromTab = 'shortlist';
+              } else if (hash.includes('tab=boolean-search')) {
+                fromTab = 'boolean-search';
+              }
+              
+              navigate(`/job/${jobId}`, {
+                state: { tab: fromTab }
+              });
+            } else {
+              navigate('/jobs');
+            }
+          }} variant="outline">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
