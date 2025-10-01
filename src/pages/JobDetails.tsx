@@ -2704,20 +2704,18 @@ export default function JobDetails() {
                                     {/* Show All Record Info Button */}
                                     
                                     
-                                    {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? (
-                                      <Button 
-                                        variant="ghost" 
-                                        size="sm" 
-                                        className="w-full text-xs md:text-sm"
-                                        onClick={() => handleViewLinkedInProfile(
-                                          candidateId, 
-                                          mainCandidate["Candidate Name"] || '', 
-                                          id || '',
-                                          mainCandidate["Source"]
-                                        )}
-                                      >
-                                        <Users className="w-3 h-3 mr-1" />
-                                        View Profile
+                                    {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && mainCandidate["linkedin_id"] ? (
+                                      <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
+                                        <a
+                                          href={(typeof mainCandidate["linkedin_id"] === 'string' && /^https?:\/\//i.test(mainCandidate["linkedin_id"])) 
+                                            ? mainCandidate["linkedin_id"] 
+                                            : `https://www.linkedin.com/in/${String(mainCandidate["linkedin_id"] || '').replace(/^\/+/, '').replace(/\/+$/, '')}/`}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                        >
+                                          <Users className="w-3 h-3 mr-1" />
+                                          View Profile
+                                        </a>
                                       </Button>
                                     ) : (
                                       <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
