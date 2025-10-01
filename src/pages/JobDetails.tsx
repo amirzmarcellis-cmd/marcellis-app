@@ -1686,20 +1686,23 @@ export default function JobDetails() {
               </Button>
               <div className="h-6 w-px bg-border hidden sm:block" />
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
+              <Button 
+                onClick={() => handleAutomaticDialToggle(!job?.automatic_dial)}
+                disabled={automaticDialSaving}
+                size="sm"
+                variant={job?.automatic_dial ? "default" : "outline"}
+                className="ml-2"
+              >
+                <Phone className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Auto Dial {job?.automatic_dial ? 'ON' : 'OFF'}</span>
+                <span className="sm:hidden">{job?.automatic_dial ? 'ON' : 'OFF'}</span>
+              </Button>
             </div>
             {/* Futuristic 3D Action Menu */}
             <FuturisticActionButton
               isExpanded={isActionMenuExpanded}
               onToggle={() => setIsActionMenuExpanded(!isActionMenuExpanded)}
             >
-              <ActionButton
-                onClick={() => handleAutomaticDialToggle(!job?.automatic_dial)}
-                disabled={automaticDialSaving}
-                icon={Phone}
-                label={`Auto Dial ${job?.automatic_dial ? 'ON' : 'OFF'}`}
-                variant="success"
-              />
-              
               {job?.longlist && job.longlist > 0 ? (
                 <ActionButton
                   onClick={handleSearchMoreCandidates}
