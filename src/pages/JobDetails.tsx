@@ -87,65 +87,78 @@ export default function JobDetails() {
 
   // Function to fetch LinkedIn ID and redirect to profile
   const handleViewLinkedInProfile = async (candidateId: string, candidateName: string, jobId: string, source: string) => {
-    if (source.toLowerCase().includes('linkedin')) {
-      try {
-        console.log('Searching for LinkedIn profile:', { candidateId, candidateName, jobId });
-        
-        // Try searching by user_id first
-        let { data, error } = await supabase
+    if (!source || !source.toLowerCase().includes('linkedin')) return;
+
+    // Open a blank tab immediately on user click to avoid iframe/X-Frame-Options issues and popup blockers
+    const preOpened = window.open('', '_blank');
+    try {
+      preOpened?.document.write('<p style="font-family:sans-serif; color:#444;">Opening LinkedIn…</p>');
+      preOpened?.document.close();
+    } catch {}
+
+    try {
+      console.log('Searching for LinkedIn profile:', { candidateId, candidateName, jobId });
+
+      // Try searching by user_id first (Jobs_CVs.user_id like "Lin-319")
+      let { data, error } = await supabase
+        .from('linkedin_boolean_search')
+        .select('linkedin_id, user_id')
+        .eq('user_id', candidateId)
+        .maybeSingle();
+
+      console.log('LinkedIn search by user_id result:', { data, error });
+
+      // If not found by user_id, try searching by job_id
+      if (!data && jobId) {
+        const { data: allProfiles, error: jobError } = await supabase
           .from('linkedin_boolean_search')
           .select('linkedin_id, user_id')
-          .eq('user_id', candidateId)
-          .maybeSingle();
-        
-        console.log('LinkedIn search by user_id result:', { data, error });
-        
-        // If not found by user_id, try searching by job_id and match by name similarity
-        if (!data && jobId) {
-          const { data: allProfiles, error: jobError } = await supabase
-            .from('linkedin_boolean_search')
-            .select('linkedin_id, user_id')
-            .eq('job_id', jobId);
-          
-          console.log('LinkedIn profiles for job:', { allProfiles, jobError });
-          
-          // For now, if there's only one LinkedIn profile for this job, use it
-          // This is a temporary solution - ideally we need a better way to match
-          if (allProfiles && allProfiles.length > 0) {
-            data = allProfiles[0];
-          }
+          .eq('job_id', jobId);
+
+        console.log('LinkedIn profiles for job:', { allProfiles, jobError });
+
+        if (allProfiles && allProfiles.length > 0) {
+          data = allProfiles[0];
         }
-        
-        if (error && error.code !== 'PGRST116') {
-          console.error('Error fetching LinkedIn ID:', error);
-          toast({
-            title: "Error",
-            description: "Could not fetch LinkedIn profile: " + error.message,
-            variant: "destructive"
-          });
-          return;
-        }
-        
-        if (data && data.linkedin_id) {
-          const linkedInUrl = `https://www.linkedin.com/in/${data.linkedin_id}/`;
-          console.log('Opening LinkedIn URL:', linkedInUrl);
-          window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
-        } else {
-          console.log('No LinkedIn ID found for candidate:', { candidateId, candidateName });
-          toast({
-            title: "Not Found",
-            description: "LinkedIn profile ID not found. The candidate may not have been sourced from LinkedIn boolean search.",
-            variant: "destructive"
-          });
-        }
-      } catch (err) {
-        console.error('Error:', err);
+      }
+
+      if (error && (error as any).code !== 'PGRST116') {
+        console.error('Error fetching LinkedIn ID:', error);
+        preOpened?.close();
         toast({
-          title: "Error",
-          description: "An error occurred while fetching the profile",
-          variant: "destructive"
+          title: 'Error',
+          description: 'Could not fetch LinkedIn profile: ' + (error as any).message,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (data && data.linkedin_id) {
+        const linkedInUrl = `https://www.linkedin.com/in/${data.linkedin_id}/`;
+        console.log('Opening LinkedIn URL:', linkedInUrl);
+        if (preOpened) {
+          preOpened.location.href = linkedInUrl;
+        } else {
+          window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
+        }
+      } else {
+        console.log('No LinkedIn ID found for candidate:', { candidateId, candidateName });
+        preOpened?.close();
+        toast({
+          title: 'Not Found',
+          description:
+            'LinkedIn profile ID not found. The candidate may not have been sourced from LinkedIn boolean search.',
+          variant: 'destructive',
         });
       }
+    } catch (err) {
+      console.error('Error:', err);
+      preOpened?.close();
+      toast({
+        title: 'Error',
+        description: 'An error occurred while fetching the profile',
+        variant: 'destructive',
+      });
     }
   };
   const [callingCandidateId, setCallingCandidateId] = useState<string | null>(null);
