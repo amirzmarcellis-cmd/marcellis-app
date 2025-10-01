@@ -2607,7 +2607,7 @@ export default function JobDetails() {
                                     : mainCandidate;
                                   
                                   return <Button variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
-                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid || latestContact.recordid || candidateId}`} className="truncate" onClick={() => {
+                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid || latestContact.recordid || candidateId}&longListSourceFilter=${encodeURIComponent(longListSourceFilter)}`} className="truncate" onClick={() => {
                                     // Store current tab in URL hash for back navigation
                                     window.location.hash = 'tab=boolean-search';
                                   }}>
@@ -2623,7 +2623,7 @@ export default function JobDetails() {
                                 // Get the latest call log (highest callid)
                                 const latestContact = contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest);
                                 return <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
-                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} className="truncate" onClick={() => {
+                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}&longListSourceFilter=${encodeURIComponent(longListSourceFilter)}`} className="truncate" onClick={() => {
                                     // Store current tab in URL hash for back navigation
                                     window.location.hash = 'tab=boolean-search';
                                   }}>

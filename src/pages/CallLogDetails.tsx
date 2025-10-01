@@ -356,10 +356,12 @@ export default function CallLogDetails() {
                           hash.includes('tab=shortlist') ? 'shortlist' : 
                           'boolean-search'; // default to AI Long List
             
+            const filter = searchParams.get('longListSourceFilter');
             navigate(`/job/${jobId}`, {
               state: { 
                 tab: fromTab, 
-                focusCandidateId: candidateId 
+                focusCandidateId: candidateId,
+                ...(filter ? { longListSourceFilter: filter } : {})
               }
             });
           } else if (jobId) {
