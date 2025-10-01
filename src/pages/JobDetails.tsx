@@ -145,6 +145,12 @@ export default function JobDetails() {
     // Check for tab in location state (from navigation)
     if (location.state?.tab) {
       setActiveTab(location.state.tab);
+      
+      // Restore filter if provided
+      if (location.state?.longListSourceFilter) {
+        setLongListSourceFilter(location.state.longListSourceFilter);
+      }
+      
       // Only clear state if there's no focus candidate to process
       if (!location.state?.focusCandidateId) {
         window.history.replaceState({}, document.title);
@@ -2638,7 +2644,7 @@ export default function JobDetails() {
                                           View Profile
                                         </a>
                                       ) : (
-                                        <Link to={`/candidate/${candidateId}`} state={{ fromJob: id, tab: 'boolean-search', focusCandidateId: candidateId }}>
+                                        <Link to={`/candidate/${candidateId}`} state={{ fromJob: id, tab: 'boolean-search', focusCandidateId: candidateId, longListSourceFilter }}>
                                           <Users className="w-3 h-3 mr-1" />
                                           View Profile
                                         </Link>

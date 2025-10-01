@@ -23,6 +23,7 @@ export default function CandidateDetails() {
   
   const fromJob = location.state?.fromJob;
   const fromTab = location.state?.tab;
+  const longListSourceFilter = location.state?.longListSourceFilter;
 
   const fetchCandidate = async (candidateId: string) => {
     try {
@@ -134,7 +135,13 @@ export default function CandidateDetails() {
             size="sm"
             onClick={() => {
               if (fromJob) {
-                navigate(`/job/${fromJob}#tab=${fromTab || 'boolean-search'}`, { state: { tab: fromTab || 'boolean-search', focusCandidateId: id } });
+                navigate(`/job/${fromJob}#tab=${fromTab || 'boolean-search'}`, { 
+                  state: { 
+                    tab: fromTab || 'boolean-search', 
+                    focusCandidateId: id,
+                    longListSourceFilter 
+                  } 
+                });
               } else {
                 navigate('/candidates');
               }
@@ -167,7 +174,13 @@ export default function CandidateDetails() {
             size="sm"
             onClick={() => {
               if (fromJob) {
-                navigate(`/job/${fromJob}#tab=${fromTab || 'boolean-search'}`, { state: { tab: fromTab || 'boolean-search', focusCandidateId: id } });
+                navigate(`/job/${fromJob}#tab=${fromTab || 'boolean-search'}`, { 
+                  state: { 
+                    tab: fromTab || 'boolean-search', 
+                    focusCandidateId: id,
+                    longListSourceFilter 
+                  } 
+                });
               } else {
                 navigate('/candidates');
               }
@@ -196,7 +209,13 @@ export default function CandidateDetails() {
           size="sm"
           onClick={() => {
             if (fromJob) {
-              navigate(`/job/${fromJob}#tab=${fromTab || 'boolean-search'}`, { state: { tab: fromTab || 'boolean-search', focusCandidateId: id } });
+              navigate(`/job/${fromJob}#tab=${fromTab || 'boolean-search'}`, { 
+                state: { 
+                  tab: fromTab || 'boolean-search', 
+                  focusCandidateId: id,
+                  longListSourceFilter 
+                } 
+              });
             } else {
               navigate('/candidates');
             }
