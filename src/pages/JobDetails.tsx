@@ -2705,20 +2705,71 @@ export default function JobDetails() {
                                     
                                     
                                     {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? (
-                                      <Button 
-                                        variant="ghost" 
-                                        size="sm" 
-                                        className="w-full text-xs md:text-sm"
-                                        onClick={() => handleViewLinkedInProfile(
-                                          candidateId, 
-                                          mainCandidate["Candidate Name"] || '', 
-                                          id || '',
-                                          mainCandidate["Source"]
-                                        )}
-                                      >
-                                        <Users className="w-3 h-3 mr-1" />
-                                        View Profile
-                                      </Button>
+                                      <div className="flex gap-2 w-full">
+                                        <Button 
+                                          variant="ghost" 
+                                          size="sm" 
+                                          className="flex-1 text-xs md:text-sm"
+                                          onClick={() => handleViewLinkedInProfile(
+                                            candidateId, 
+                                            mainCandidate["Candidate Name"] || '', 
+                                            id || '',
+                                            mainCandidate["Source"]
+                                          )}
+                                        >
+                                          <Users className="w-3 h-3 mr-1" />
+                                          View Profile
+                                        </Button>
+                                        <Button 
+                                          variant="outline" 
+                                          size="sm" 
+                                          className="flex-1 text-xs md:text-sm"
+                                          onClick={async () => {
+                                            try {
+                                              let { data, error } = await supabase
+                                                .from('linkedin_boolean_search')
+                                                .select('linkedin_id, user_id')
+                                                .eq('user_id', candidateId)
+                                                .maybeSingle();
+
+                                              if (!data && id) {
+                                                const { data: allProfiles } = await supabase
+                                                  .from('linkedin_boolean_search')
+                                                  .select('linkedin_id, user_id')
+                                                  .eq('job_id', id);
+                                                
+                                                if (allProfiles && allProfiles.length > 0) {
+                                                  data = allProfiles[0];
+                                                }
+                                              }
+
+                                              if (data && data.linkedin_id) {
+                                                const linkedInUrl = `https://www.linkedin.com/in/${data.linkedin_id}/`;
+                                                await navigator.clipboard.writeText(linkedInUrl);
+                                                toast({
+                                                  title: 'Copied!',
+                                                  description: 'LinkedIn URL copied to clipboard',
+                                                });
+                                              } else {
+                                                toast({
+                                                  title: 'Not Found',
+                                                  description: 'LinkedIn profile ID not found',
+                                                  variant: 'destructive',
+                                                });
+                                              }
+                                            } catch (err) {
+                                              toast({
+                                                title: 'Error',
+                                                description: 'Failed to copy LinkedIn URL',
+                                                variant: 'destructive',
+                                              });
+                                            }
+                                          }}
+                                        >
+                                          <ExternalLink className="w-3 h-3 mr-1" />
+                                          Copy URL
+                                        </Button>
+                                      </div>
                                     ) : (
                                       <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
                                         <Link to={`/candidate/${candidateId}`} state={{ fromJob: id, tab: 'boolean-search', focusCandidateId: candidateId, longListSourceFilter }}>
