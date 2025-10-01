@@ -1864,23 +1864,6 @@ export default function JobDetails() {
               isExpanded={isActionMenuExpanded}
               onToggle={() => setIsActionMenuExpanded(!isActionMenuExpanded)}
             >
-              {job?.longlist && job.longlist > 0 ? (
-                <ActionButton
-                  onClick={handleSearchMoreCandidates}
-                  icon={Search}
-                  label="Regenerate AI"
-                  variant="amber"
-                />
-              ) : (
-                <ActionButton
-                  onClick={handleGenerateLongList}
-                  disabled={job?.longlist === 3}
-                  icon={Zap}
-                  label="Generate AI"
-                  variant="success"
-                />
-              )}
-              
               <ActionButton
                 onClick={handlePauseJob}
                 disabled={automaticDialSaving}
@@ -2365,17 +2348,30 @@ export default function JobDetails() {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <div>
-                     <CardTitle className="flex items-center">
-                       <Users className="w-5 h-5 mr-2" />
-                       AI Longlist ({longlistedCandidates.filter(c => {
-                    const source = (c["Source"] || c.source || "").toLowerCase();
-                    return source.includes("itris") || source.includes("linkedin");
-                  }).length} candidates)
-                     </CardTitle>
-                     <CardDescription>
-                       Candidates added to the longlist for this position
-                     </CardDescription>
+                  <div className="flex items-center gap-4">
+                    <div>
+                      <CardTitle className="flex items-center">
+                        <Users className="w-5 h-5 mr-2" />
+                        AI Longlist ({longlistedCandidates.filter(c => {
+                      const source = (c["Source"] || c.source || "").toLowerCase();
+                      return source.includes("itris") || source.includes("linkedin");
+                    }).length} candidates)
+                      </CardTitle>
+                      <CardDescription>
+                        Candidates added to the longlist for this position
+                      </CardDescription>
+                    </div>
+                    {job?.longlist && job.longlist > 0 ? (
+                      <Button onClick={handleSearchMoreCandidates} size="sm" variant="outline">
+                        <Search className="w-4 h-4 mr-2" />
+                        Regenerate AI
+                      </Button>
+                    ) : (
+                      <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} size="sm">
+                        <Zap className="w-4 h-4 mr-2" />
+                        Generate AI
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardHeader>
