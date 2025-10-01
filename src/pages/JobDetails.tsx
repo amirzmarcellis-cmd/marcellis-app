@@ -42,6 +42,7 @@ export default function JobDetails() {
   const {
     profile
   } = useProfile();
+  const { toast } = useToast();
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [automaticDialSaving, setAutomaticDialSaving] = useState(false);
@@ -83,9 +84,83 @@ export default function JobDetails() {
     id: string;
     name: string;
   } | null>(null);
-  const {
-    toast
-  } = useToast();
+
+  // Function to fetch LinkedIn ID and redirect to profile
+  const handleViewLinkedInProfile = async (candidateId: string, candidateName: string, jobId: string, source: string) => {
+    if (!source || !source.toLowerCase().includes('linkedin')) return;
+
+    // Open a blank tab immediately on user click to avoid iframe/X-Frame-Options issues and popup blockers
+    const preOpened = window.open('', '_blank');
+    try {
+      preOpened?.document.write('<p style="font-family:sans-serif; color:#444;">Opening LinkedIn…</p>');
+      preOpened?.document.close();
+    } catch {}
+
+    try {
+      console.log('Searching for LinkedIn profile:', { candidateId, candidateName, jobId });
+
+      // Try searching by user_id first (Jobs_CVs.user_id like "Lin-319")
+      let { data, error } = await supabase
+        .from('linkedin_boolean_search')
+        .select('linkedin_id, user_id')
+        .eq('user_id', candidateId)
+        .maybeSingle();
+
+      console.log('LinkedIn search by user_id result:', { data, error });
+
+      // If not found by user_id, try searching by job_id
+      if (!data && jobId) {
+        const { data: allProfiles, error: jobError } = await supabase
+          .from('linkedin_boolean_search')
+          .select('linkedin_id, user_id')
+          .eq('job_id', jobId);
+
+        console.log('LinkedIn profiles for job:', { allProfiles, jobError });
+
+        if (allProfiles && allProfiles.length > 0) {
+          data = allProfiles[0];
+        }
+      }
+
+      if (error && (error as any).code !== 'PGRST116') {
+        console.error('Error fetching LinkedIn ID:', error);
+        preOpened?.close();
+        toast({
+          title: 'Error',
+          description: 'Could not fetch LinkedIn profile: ' + (error as any).message,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (data && data.linkedin_id) {
+        const linkedInUrl = `https://www.linkedin.com/in/${data.linkedin_id}/`;
+        console.log('Opening LinkedIn URL:', linkedInUrl);
+        if (preOpened) {
+          preOpened.location.href = linkedInUrl;
+        } else {
+          window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
+        }
+      } else {
+        console.log('No LinkedIn ID found for candidate:', { candidateId, candidateName });
+        preOpened?.close();
+        toast({
+          title: 'Not Found',
+          description:
+            'LinkedIn profile ID not found. The candidate may not have been sourced from LinkedIn boolean search.',
+          variant: 'destructive',
+        });
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      preOpened?.close();
+      toast({
+        title: 'Error',
+        description: 'An error occurred while fetching the profile',
+        variant: 'destructive',
+      });
+    }
+  };
   const [callingCandidateId, setCallingCandidateId] = useState<string | null>(null);
   const [newApplicationsCount, setNewApplicationsCount] = useState(0);
   const [addedToLongList, setAddedToLongList] = useState<Set<string>>(new Set());
@@ -120,20 +195,18 @@ export default function JobDetails() {
     if (id) {
       // Load job data first to show page immediately
       fetchJob(id);
-
+      
       // Load other data in background (non-blocking)
       fetchCandidates(id);
       fetchLonglistedCandidates(id);
       fetchApplications(id);
       fetchTaskCandidates(id);
-
+      
       // Check for shortlist disabled status
       const storageKey = `shortlist_${id}_disabled`;
       const storedData = localStorage.getItem(storageKey);
       if (storedData) {
-        const {
-          disabledUntil
-        } = JSON.parse(storedData);
+        const { disabledUntil } = JSON.parse(storedData);
         const now = Date.now();
         if (disabledUntil > now) {
           setShortListButtonDisabled(true);
@@ -143,10 +216,16 @@ export default function JobDetails() {
         }
       }
     }
-
+    
     // Check for tab in location state (from navigation)
     if (location.state?.tab) {
       setActiveTab(location.state.tab);
+      
+      // Restore filter if provided
+      if (location.state?.longListSourceFilter) {
+        setLongListSourceFilter(location.state.longListSourceFilter);
+      }
+      
       // Only clear state if there's no focus candidate to process
       if (!location.state?.focusCandidateId) {
         window.history.replaceState({}, document.title);
@@ -164,13 +243,10 @@ export default function JobDetails() {
   // Scroll to focused candidate when returning from profile
   useEffect(() => {
     const focusId = location.state?.focusCandidateId;
-    if (activeTab === 'boolean-search' && focusId) {
+    if ((activeTab === 'boolean-search' || activeTab === 'shortlist') && focusId) {
       const el = document.getElementById(`candidate-card-${focusId}`);
       if (el) {
-        el.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center'
-        });
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         el.classList.add('ring-2', 'ring-primary', 'animate-pulse');
         setTimeout(() => {
           el.classList.remove('animate-pulse', 'ring-2', 'ring-primary');
@@ -256,12 +332,13 @@ export default function JobDetails() {
   };
   const handleAutomaticDialToggle = async (checked: boolean) => {
     if (!job?.job_id) return;
-
+    
     // Optimistic update for immediate feedback
     setJob(prev => ({
       ...prev,
       automatic_dial: checked
     }));
+    
     setAutomaticDialSaving(true);
     try {
       const {
@@ -269,7 +346,9 @@ export default function JobDetails() {
       } = await supabase.from('Jobs').update({
         automatic_dial: checked
       }).eq('job_id', job.job_id);
+      
       if (error) throw error;
+      
       toast({
         title: "Success",
         description: `Automatic dial ${checked ? 'enabled' : 'disabled'} for this job`
@@ -290,17 +369,21 @@ export default function JobDetails() {
       setAutomaticDialSaving(false);
     }
   };
+
   const handlePauseJob = async () => {
     if (!job?.job_id) return;
+    
     const isCurrentlyActive = job?.Processed === "Yes";
-
+    
     // Optimistic update for immediate feedback
     setJob(prev => ({
       ...prev,
       automatic_dial: isCurrentlyActive ? false : prev?.automatic_dial,
       Processed: isCurrentlyActive ? "No" : "Yes"
     }));
+    
     setAutomaticDialSaving(true);
+    
     try {
       const {
         error
@@ -309,7 +392,9 @@ export default function JobDetails() {
         Processed: isCurrentlyActive ? "No" : "Yes",
         status: isCurrentlyActive ? "paused" : "active"
       }).eq('job_id', job.job_id);
+      
       if (error) throw error;
+      
       toast({
         title: "Success",
         description: isCurrentlyActive ? "Job paused successfully" : "Job activated successfully"
@@ -363,6 +448,7 @@ export default function JobDetails() {
       (linkedinData || []).forEach(item => {
         if (item.user_id) {
           linkedinMap.set(item.user_id, {
+            linkedin_id: item.linkedin_id,
             linkedin_score: item.linkedin_score,
             linkedin_score_reason: item.linkedin_score_reason
           });
@@ -375,6 +461,7 @@ export default function JobDetails() {
 
         // Get LinkedIn data for this candidate by user_id (if available from map)
         const linkedinInfo = linkedinMap.get(row.user_id) || {};
+        const linkedinId = linkedinInfo.linkedin_id ?? row.linkedin_id ?? '';
         const linkedinScore = linkedinInfo.linkedin_score ?? row.linkedin_score ?? null;
         const linkedinReason = linkedinInfo.linkedin_score_reason ?? row.linkedin_score_reason ?? '';
         return {
@@ -391,6 +478,7 @@ export default function JobDetails() {
           "Candidate Phone Number": row.candidate_phone_number ?? '',
           "Source": row.source ?? '',
           // Keep LinkedIn fields for UI/debug
+          "linkedin_id": linkedinId ?? '',
           "linkedin_score": linkedinScore ?? '',
           "linkedin_score_reason": linkedinReason ?? '',
           "pros": row.after_call_pros,
@@ -517,6 +605,17 @@ export default function JobDetails() {
           });
         }
       });
+      // Also fetch LinkedIn profile IDs for this job to enrich candidates
+      const { data: liRows, error: liErr } = await supabase
+        .from('linkedin_boolean_search')
+        .select('user_id, linkedin_id')
+        .eq('job_id', jobId);
+      if (liErr) console.warn('Error fetching LinkedIn IDs:', liErr);
+      const liMap = new Map<string, { linkedin_id: string | null }>();
+      (liRows || []).forEach((r: any) => {
+        if (r?.user_id) liMap.set(String(r.user_id), { linkedin_id: r.linkedin_id ?? null });
+      });
+
       const mappedLonglisted = (longlistedData || []).map((row: any) => {
         const sourceLower = (row.source || '').toLowerCase();
         const hasLinkedIn = sourceLower.includes('linkedin');
@@ -529,6 +628,10 @@ export default function JobDetails() {
         const fromPhone = phoneKey ? phoneScoreMap.get(phoneKey) : undefined;
         const mergedScore = row.cv_score ?? fromUser?.score ?? fromEmail?.score ?? fromPhone?.score ?? (hasLinkedIn ? row.linkedin_score ?? null : null);
         const mergedReason = row.cv_score_reason ?? fromUser?.reason ?? fromEmail?.reason ?? fromPhone?.reason ?? (hasLinkedIn ? row.linkedin_score_reason ?? '' : '');
+
+        // Prefer linkedin_id from Jobs_CVs row, else fall back to linkedin_boolean_search mapping
+        const mappedLinkedInId = row.linkedin_id ?? liMap.get(String(row.user_id))?.linkedin_id ?? '';
+
         return {
           ...row,
           "Job ID": jobId,
@@ -558,7 +661,7 @@ export default function JobDetails() {
           cv_score: mergedScore ?? 0,
           "CV Score": mergedScore != null ? String(mergedScore) : '',
           "success_score": row.after_call_score ?? 0,
-          "linkedin_id": row.linkedin_id ?? '',
+          "linkedin_id": mappedLinkedInId,
           "longlisted_at": row.longlisted_at,
           cv_score_reason: mergedReason || ''
         };
@@ -1433,7 +1536,7 @@ export default function JobDetails() {
   // Helper function to render candidate cards
   const renderCandidateCard = (candidateId: string, candidateContacts: any[], mainCandidate: any, isTopCandidate: boolean = false) => {
     const cardClassName = isTopCandidate ? "relative border-2 border-yellow-400 hover:border-yellow-500 transition-all duration-300 hover:shadow-2xl bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 dark:from-yellow-950/50 dark:via-amber-950/50 dark:to-orange-950/50 shadow-xl shadow-yellow-200/50 dark:shadow-yellow-900/30 ring-2 ring-yellow-300/60 dark:ring-yellow-600/40 before:absolute before:inset-0 before:bg-gradient-to-r before:from-yellow-300/10 before:via-amber-300/10 before:to-orange-300/10 before:rounded-lg before:animate-pulse" : "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20";
-    return <Card key={candidateId} className={cardClassName}>
+    return <Card key={candidateId} id={`candidate-card-${candidateId}`} className={cardClassName}>
         <CardContent className="p-4 relative">
           {isTopCandidate && <Badge className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-gradient-to-br from-amber-300 via-yellow-300 to-amber-400 hover:from-amber-400 hover:via-yellow-400 hover:to-amber-500 border-2 border-amber-200 shadow-lg hover:shadow-xl transition-all duration-200 w-8 h-8 rounded-full p-0 flex items-center justify-center group z-10">
               <Star className="w-4 h-4 fill-amber-800 text-amber-800 group-hover:scale-110 transition-transform duration-200" />
@@ -1546,7 +1649,7 @@ export default function JobDetails() {
           })()}
 
             <div className="flex items-center justify-between pt-2 border-t">
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 flex-wrap gap-2">
                 <StatusDropdown currentStatus={mainCandidate["Contacted"]} candidateId={mainCandidate["Candidate_ID"]} jobId={id!} onStatusChange={newStatus => {
                 setCandidates(prev => prev.map(c => c["Candidate_ID"] === mainCandidate["Candidate_ID"] ? {
                   ...c,
@@ -1559,6 +1662,18 @@ export default function JobDetails() {
                   CandidateStatus: newStatus
                 } : cv));
               }} variant="badge" />}
+                {/* Qualification Status Badge */}
+                {mainCandidate["qualifications"] !== null && mainCandidate["qualifications"] !== undefined && mainCandidate["qualifications"] !== "" ? (
+                  <Badge className="bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200">
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Qualification Received
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="border-2 border-amber-500 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50 transition-all duration-200">
+                    <Clock className="w-3 h-3 mr-1" />
+                    Qualification Send
+                  </Badge>
+                )}
               </div>
               <div className="flex flex-col gap-1 items-end">
                 {/* Only show overall score when status is Call Done */}
@@ -1580,24 +1695,24 @@ export default function JobDetails() {
                 const latestContact = contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest);
                 console.log('AI Short List - latestContact:', latestContact);
                 return <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-[100px]">
-                      <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} onClick={() => {
-                    // Store current tab in URL hash for back navigation
-                    window.location.hash = 'tab=shortlist';
-                  }}>
+                      <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}&fromTab=shortlist`}>
                         <FileText className="w-3 h-3 mr-1" />
                         Call Log
                       </Link>
                     </Button>;
               })()}
                 <Button variant="ghost" size="sm" asChild className="flex-1 min-w-[100px]">
-                  <Link to={`/candidate/${candidateId}`} state={{
-                  fromJob: id,
-                  tab: 'shortlist',
-                  focusCandidateId: candidateId
-                }}>
-                    <Users className="w-3 h-3 mr-1" />
-                    View Profile
-                  </Link>
+                  {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && mainCandidate["linkedin_id"] ? (
+                    <a href={(typeof mainCandidate["linkedin_id"] === 'string' && /^https?:\/\//i.test(mainCandidate["linkedin_id"])) ? mainCandidate["linkedin_id"] : `https://www.linkedin.com/in/${String(mainCandidate["linkedin_id"] || '').replace(/^\/+/, '').replace(/\/+$/, '')}/`} target="_blank" rel="noopener noreferrer">
+                      <Users className="w-3 h-3 mr-1" />
+                      View Profile
+                    </a>
+                  ) : (
+                    <Link to={`/candidate/${candidateId}`} state={{ fromJob: id, tab: 'shortlist', focusCandidateId: candidateId }}>
+                      <Users className="w-3 h-3 mr-1" />
+                      View Profile
+                    </Link>
+                  )}
                 </Button>
               </div>
               {/* Action Buttons - CV Submitted and Reject */}
@@ -1717,14 +1832,45 @@ export default function JobDetails() {
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
               <div className="ml-2 flex items-center gap-2">
                 <span className="text-sm font-medium hidden sm:inline">Auto Dial</span>
-                <ToggleSwitch checked={job?.automatic_dial || false} onChange={handleAutomaticDialToggle} disabled={automaticDialSaving} size="sm" onLabel="ON" offLabel="OFF" />
+                <ToggleSwitch 
+                  checked={job?.automatic_dial || false}
+                  onChange={handleAutomaticDialToggle}
+                  disabled={automaticDialSaving}
+                  size="sm"
+                  onLabel="ON"
+                  offLabel="OFF"
+                />
               </div>
             </div>
             {/* Futuristic 3D Action Menu */}
-            <FuturisticActionButton isExpanded={isActionMenuExpanded} onToggle={() => setIsActionMenuExpanded(!isActionMenuExpanded)}>
-              {job?.longlist && job.longlist > 0 ? <ActionButton onClick={handleSearchMoreCandidates} icon={Search} label="Regenerate AI" variant="amber" /> : <ActionButton onClick={handleGenerateLongList} disabled={job?.longlist === 3} icon={Zap} label="Generate AI" variant="success" />}
+            <FuturisticActionButton
+              isExpanded={isActionMenuExpanded}
+              onToggle={() => setIsActionMenuExpanded(!isActionMenuExpanded)}
+            >
+              {job?.longlist && job.longlist > 0 ? (
+                <ActionButton
+                  onClick={handleSearchMoreCandidates}
+                  icon={Search}
+                  label="Regenerate AI"
+                  variant="amber"
+                />
+              ) : (
+                <ActionButton
+                  onClick={handleGenerateLongList}
+                  disabled={job?.longlist === 3}
+                  icon={Zap}
+                  label="Generate AI"
+                  variant="success"
+                />
+              )}
               
-              <ActionButton onClick={handlePauseJob} disabled={automaticDialSaving} icon={job?.Processed === "Yes" ? Pause : Play} label={job?.Processed === "Yes" ? "Pause Job" : "Run Job"} variant="danger" />
+              <ActionButton
+                onClick={handlePauseJob}
+                disabled={automaticDialSaving}
+                icon={job?.Processed === "Yes" ? Pause : Play}
+                label={job?.Processed === "Yes" ? "Pause Job" : "Run Job"}
+                variant="danger"
+              />
             </FuturisticActionButton>
 
             {/* Action Buttons */}
@@ -1799,7 +1945,7 @@ export default function JobDetails() {
 
           <TabsContent value="overview" className="space-y-4 pb-32">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="mx-0 py-0">
+              <Card>
                 <CardHeader>
                   <CardTitle>Job Information</CardTitle>
                 </CardHeader>
@@ -2088,11 +2234,7 @@ export default function JobDetails() {
                                            </a>
                                          </Button>}
                     <Button variant="outline" size="sm" asChild>
-                      <Link to={`/candidate/${application.candidate_id}`} state={{
-                                fromJob: id,
-                                tab: 'applications',
-                                focusCandidateId: application.candidate_id
-                              }}>
+                      <Link to={`/candidate/${application.candidate_id}`} state={{ fromJob: id, tab: 'applications', focusCandidateId: application.candidate_id }}>
                         View Profile
                       </Link>
                     </Button>
@@ -2359,9 +2501,10 @@ export default function JobDetails() {
                     return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceFilterMatch && scoreMatch && contactedMatch;
                   });
 
-                  // Group candidates by Candidate_ID to handle multiple contacts
+                  // Group candidates by user_id (for LinkedIn) or Candidate_ID (for others) to handle multiple contacts
                   const groupedCandidates = filteredLonglistedCandidates.reduce((acc, candidate) => {
-                    const candidateId = candidate["Candidate_ID"];
+                    // Use user_id for grouping as it's unique for each candidate
+                    const candidateId = candidate["user_id"] || candidate["Candidate_ID"];
                     if (!acc[candidateId]) {
                       acc[candidateId] = [];
                     }
@@ -2527,16 +2670,30 @@ export default function JobDetails() {
                                         {callingCandidateId === candidateId ? 'Calling...' : 'Call Candidate'}
                                       </Button>
                                       {(() => {
+                                const isLinkedInCandidate = typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin');
                                 const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
+                                
+                                // For LinkedIn candidates, always show Call Log button
+                                if (isLinkedInCandidate) {
+                                  const latestContact = contactsWithCalls.length > 0 
+                                    ? contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest)
+                                    : mainCandidate;
+                                  
+                                  return <Button variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
+                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid || latestContact.recordid || candidateId}&longListSourceFilter=${encodeURIComponent(longListSourceFilter)}&fromTab=boolean-search`} className="truncate">
+                                              <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
+                                              <span className="truncate">Call Log</span>
+                                            </Link>
+                                          </Button>;
+                                }
+                                
+                                // For non-LinkedIn candidates, only show if they have call logs
                                 if (contactsWithCalls.length === 0) return null;
 
                                 // Get the latest call log (highest callid)
                                 const latestContact = contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest);
                                 return <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
-                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} className="truncate" onClick={() => {
-                                    // Store current tab in URL hash for back navigation
-                                    window.location.hash = 'tab=boolean-search';
-                                  }}>
+                                             <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}&longListSourceFilter=${encodeURIComponent(longListSourceFilter)}&fromTab=boolean-search`} className="truncate">
                                               <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
                                               <span className="truncate">Call Log</span>
                                             </Link>
@@ -2547,16 +2704,29 @@ export default function JobDetails() {
                                     {/* Show All Record Info Button */}
                                     
                                     
-                                    <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
-                                      <Link to={`/candidate/${candidateId}`} state={{
-                                fromJob: id,
-                                tab: 'boolean-search',
-                                focusCandidateId: candidateId
-                              }}>
+                                    {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? (
+                                      <Button 
+                                        variant="ghost" 
+                                        size="sm" 
+                                        className="w-full text-xs md:text-sm"
+                                        onClick={() => handleViewLinkedInProfile(
+                                          candidateId, 
+                                          mainCandidate["Candidate Name"] || '', 
+                                          id || '',
+                                          mainCandidate["Source"]
+                                        )}
+                                      >
                                         <Users className="w-3 h-3 mr-1" />
                                         View Profile
-                                      </Link>
-                                    </Button>
+                                      </Button>
+                                    ) : (
+                                      <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
+                                        <Link to={`/candidate/${candidateId}`} state={{ fromJob: id, tab: 'boolean-search', focusCandidateId: candidateId, longListSourceFilter }}>
+                                          <Users className="w-3 h-3 mr-1" />
+                                          View Profile
+                                        </Link>
+                                      </Button>
+                                    )}
                                   </div>
                                 </div>
                               </CardContent>
