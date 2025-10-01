@@ -132,7 +132,13 @@ export default function CandidateDetails() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate(fromJob ? `/job/${fromJob}` : '/candidates')}
+            onClick={() => {
+              if (fromJob) {
+                navigate(`/job/${fromJob}#tab=${fromTab || 'boolean-search'}`, { state: { tab: fromTab || 'boolean-search', focusCandidateId: id } });
+              } else {
+                navigate('/candidates');
+              }
+            }}
             className="h-8 w-8 p-0"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -159,7 +165,13 @@ export default function CandidateDetails() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate(fromJob ? `/job/${fromJob}` : '/candidates')}
+            onClick={() => {
+              if (fromJob) {
+                navigate(`/job/${fromJob}#tab=${fromTab || 'boolean-search'}`, { state: { tab: fromTab || 'boolean-search', focusCandidateId: id } });
+              } else {
+                navigate('/candidates');
+              }
+            }}
             className="h-8 w-8 p-0"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -182,7 +194,13 @@ export default function CandidateDetails() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate(fromJob ? `/job/${fromJob}` : '/candidates')}
+          onClick={() => {
+            if (fromJob) {
+              navigate(`/job/${fromJob}#tab=${fromTab || 'boolean-search'}`, { state: { tab: fromTab || 'boolean-search', focusCandidateId: id } });
+            } else {
+              navigate('/candidates');
+            }
+          }}
           className="h-8 w-8 p-0"
         >
           <ArrowLeft className="h-4 w-4" />

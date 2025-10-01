@@ -131,9 +131,7 @@ export default function JobDetails() {
       const storageKey = `shortlist_${id}_disabled`;
       const storedData = localStorage.getItem(storageKey);
       if (storedData) {
-        const {
-          disabledUntil
-        } = JSON.parse(storedData);
+        const { disabledUntil } = JSON.parse(storedData);
         const now = Date.now();
         if (disabledUntil > now) {
           setShortListButtonDisabled(true);
@@ -147,8 +145,10 @@ export default function JobDetails() {
     // Check for tab in location state (from navigation)
     if (location.state?.tab) {
       setActiveTab(location.state.tab);
-      // Clear the state so it doesn't persist on refresh
-      window.history.replaceState({}, document.title);
+      // Only clear state if there's no focus candidate to process
+      if (!location.state?.focusCandidateId) {
+        window.history.replaceState({}, document.title);
+      }
     } else {
       // Check for tab in URL hash
       const hash = window.location.hash;
@@ -159,12 +159,22 @@ export default function JobDetails() {
     }
   }, [id, location.state]);
 
-  // Fetch group data when job is loaded
+  // Scroll to focused candidate when returning from profile
   useEffect(() => {
-    if (job?.group_id) {
-      fetchJobGroup(job.group_id);
+    const focusId = location.state?.focusCandidateId;
+    if (activeTab === 'boolean-search' && focusId) {
+      const el = document.getElementById(`candidate-card-${focusId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('ring-2', 'ring-primary', 'animate-pulse');
+        setTimeout(() => {
+          el.classList.remove('animate-pulse', 'ring-2', 'ring-primary');
+          // Clear the focus state after highlighting
+          window.history.replaceState({}, document.title);
+        }, 1500);
+      }
     }
-  }, [job?.group_id]);
+  }, [activeTab, candidates, longlistedCandidates, location.state]);
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (shortListButtonDisabled && shortListTimeRemaining > 0) {
@@ -1584,7 +1594,7 @@ export default function JobDetails() {
                     </Button>;
               })()}
                 <Button variant="ghost" size="sm" asChild className="flex-1 min-w-[100px]">
-                  <Link to={`/candidate/${candidateId}`}>
+                  <Link to={`/candidate/${candidateId}`} state={{ fromJob: id, tab: 'shortlist', focusCandidateId: candidateId }}>
                     <Users className="w-3 h-3 mr-1" />
                     View Profile
                   </Link>
@@ -2108,11 +2118,11 @@ export default function JobDetails() {
                                              CV
                                            </a>
                                          </Button>}
-                                       <Button variant="outline" size="sm" asChild>
-                                         <Link to={`/candidate/${application.candidate_id}`}>
-                                           View Profile
-                                         </Link>
-                                       </Button>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to={`/candidate/${application.candidate_id}`} state={{ fromJob: id, tab: 'applications', focusCandidateId: application.candidate_id }}>
+                        View Profile
+                      </Link>
+                    </Button>
                                      </div>
                                       {!addedToLongList.has(application.candidate_id) && <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={async () => {
                             try {
@@ -2388,7 +2398,7 @@ export default function JobDetails() {
                   return Object.entries(groupedCandidates).map(([candidateId, candidateContacts]: [string, any[]]) => {
                     // Use the first contact for display info
                     const mainCandidate = candidateContacts[0];
-                    return <Card key={candidateId} className={cn("border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg", selectedCandidates.has(candidateId) && "border-primary bg-primary/5")}>
+                    return <Card key={candidateId} id={`candidate-card-${candidateId}`} className={cn("border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg", selectedCandidates.has(candidateId) && "border-primary bg-primary/5")}>
                               <CardContent className="p-3 md:p-4">
                                  <div className="space-y-3">
                                    <div className="flex items-start justify-between">
@@ -2565,7 +2575,7 @@ export default function JobDetails() {
                                     
                                     
                                     <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
-                                      <Link to={`/candidate/${candidateId}`} state={{ fromJob: id, tab: 'longlist' }}>
+                                      <Link to={`/candidate/${candidateId}`} state={{ fromJob: id, tab: 'boolean-search', focusCandidateId: candidateId }}>
                                         <Users className="w-3 h-3 mr-1" />
                                         View Profile
                                       </Link>
