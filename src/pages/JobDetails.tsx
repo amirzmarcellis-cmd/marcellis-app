@@ -125,9 +125,6 @@ export default function JobDetails() {
       }
     }
   };
-  const {
-    toast
-  } = useToast();
   const [callingCandidateId, setCallingCandidateId] = useState<string | null>(null);
   const [newApplicationsCount, setNewApplicationsCount] = useState(0);
   const [addedToLongList, setAddedToLongList] = useState<Set<string>>(new Set());
