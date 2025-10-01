@@ -42,6 +42,7 @@ export default function JobDetails() {
   const {
     profile
   } = useProfile();
+  const { toast } = useToast();
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [automaticDialSaving, setAutomaticDialSaving] = useState(false);
@@ -83,6 +84,47 @@ export default function JobDetails() {
     id: string;
     name: string;
   } | null>(null);
+
+  // Function to fetch LinkedIn ID and redirect to profile
+  const handleViewLinkedInProfile = async (candidateId: string, source: string) => {
+    if (source.toLowerCase().includes('linkedin')) {
+      try {
+        const { data, error } = await supabase
+          .from('linkedin_boolean_search')
+          .select('linkedin_id')
+          .eq('user_id', candidateId)
+          .maybeSingle();
+        
+        if (error) {
+          console.error('Error fetching LinkedIn ID:', error);
+          toast({
+            title: "Error",
+            description: "Could not fetch LinkedIn profile",
+            variant: "destructive"
+          });
+          return;
+        }
+        
+        if (data && data.linkedin_id) {
+          const linkedInUrl = `https://www.linkedin.com/in/${data.linkedin_id}/`;
+          window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
+        } else {
+          toast({
+            title: "Not Found",
+            description: "LinkedIn profile ID not found for this candidate",
+            variant: "destructive"
+          });
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        toast({
+          title: "Error",
+          description: "An error occurred while fetching the profile",
+          variant: "destructive"
+        });
+      }
+    }
+  };
   const {
     toast
   } = useToast();
@@ -2637,19 +2679,24 @@ export default function JobDetails() {
                                     {/* Show All Record Info Button */}
                                     
                                     
-                                    <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
-                                      {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && mainCandidate["linkedin_id"] ? (
-                                        <a href={(typeof mainCandidate["linkedin_id"] === 'string' && /^https?:\/\//i.test(mainCandidate["linkedin_id"])) ? mainCandidate["linkedin_id"] : `https://www.linkedin.com/in/${String(mainCandidate["linkedin_id"] || '').replace(/^\/+/, '').replace(/\/+$/, '')}/`} target="_blank" rel="noopener noreferrer">
-                                          <Users className="w-3 h-3 mr-1" />
-                                          View Profile
-                                        </a>
-                                      ) : (
+                                    {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? (
+                                      <Button 
+                                        variant="ghost" 
+                                        size="sm" 
+                                        className="w-full text-xs md:text-sm"
+                                        onClick={() => handleViewLinkedInProfile(candidateId, mainCandidate["Source"])}
+                                      >
+                                        <Users className="w-3 h-3 mr-1" />
+                                        View Profile
+                                      </Button>
+                                    ) : (
+                                      <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
                                         <Link to={`/candidate/${candidateId}`} state={{ fromJob: id, tab: 'boolean-search', focusCandidateId: candidateId, longListSourceFilter }}>
                                           <Users className="w-3 h-3 mr-1" />
                                           View Profile
                                         </Link>
-                                      )}
-                                    </Button>
+                                      </Button>
+                                    )}
                                   </div>
                                 </div>
                               </CardContent>
