@@ -187,17 +187,7 @@ export default function JobDetails() {
       }
       return `https://www.linkedin.com/in/${s.replace(/^\/+/, '').replace(/\/+$/, '')}/`;
     }
-  return null;
-  };
-  const openLinkedInWindow = (url: string) => {
-    try {
-      const win = window.open(url, 'linkedin_profile', 'noopener,noreferrer,width=1200,height=900');
-      if (!win) {
-        window.location.href = url;
-      }
-    } catch {
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }
+    return null;
   };
   const [callingCandidateId, setCallingCandidateId] = useState<string | null>(null);
   const [newApplicationsCount, setNewApplicationsCount] = useState(0);
@@ -1739,30 +1729,19 @@ export default function JobDetails() {
                       </Link>
                     </Button>;
               })()}
-                {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && getLinkedInUrl(mainCandidate) ? (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex-1 min-w-[100px]"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const url = getLinkedInUrl(mainCandidate);
-                      if (url) {
-                        openLinkedInWindow(url);
-                      }
-                    }}
-                  >
-                    <Users className="w-3 h-3 mr-1" />
-                    View Profile
-                  </Button>
-                ) : (
-                  <Button variant="ghost" size="sm" asChild className="flex-1 min-w-[100px]">
+                <Button variant="ghost" size="sm" asChild className="flex-1 min-w-[100px]">
+                  {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && getLinkedInUrl(mainCandidate) ? (
+                    <a href={getLinkedInUrl(mainCandidate)!} target="_blank" rel="noopener noreferrer">
+                      <Users className="w-3 h-3 mr-1" />
+                      View Profile
+                    </a>
+                  ) : (
                     <Link to={`/candidate/${candidateId}`} state={{ fromJob: id, tab: 'shortlist', focusCandidateId: candidateId }}>
                       <Users className="w-3 h-3 mr-1" />
                       View Profile
                     </Link>
-                  </Button>
-                )}
+                  )}
+                </Button>
               </div>
               {/* Action Buttons - CV Submitted and Reject */}
               <div className="flex gap-2">
@@ -2754,20 +2733,15 @@ export default function JobDetails() {
                                     
                                     
                                     {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && getLinkedInUrl(mainCandidate) ? (
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="w-full text-xs md:text-sm"
-                                        onClick={(e) => {
-                                          e.preventDefault();
-                                          const url = getLinkedInUrl(mainCandidate);
-                                          if (url) {
-                                            openLinkedInWindow(url);
-                                          }
-                                        }}
-                                      >
-                                        <Users className="w-3 h-3 mr-1" />
-                                        View Profile
+                                      <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
+                                        <a
+                                          href={getLinkedInUrl(mainCandidate)!}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                        >
+                                          <Users className="w-3 h-3 mr-1" />
+                                          View Profile
+                                        </a>
                                       </Button>
                                     ) : (
                                       <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
