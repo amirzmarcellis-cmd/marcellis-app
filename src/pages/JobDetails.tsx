@@ -1664,7 +1664,7 @@ export default function JobDetails() {
               }} variant="badge" />}
                 {/* Qualification Status Badge */}
                 {mainCandidate["qualifications"] !== null && mainCandidate["qualifications"] !== undefined && mainCandidate["qualifications"] !== "" ? (
-                  <Badge className="bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200">
+                  <Badge className="border-2 border-green-600 text-green-600 dark:text-green-400 dark:border-green-400 bg-transparent hover:bg-green-50 dark:hover:bg-green-950/20 transition-all duration-200">
                     <CheckCircle className="w-3 h-3 mr-1" />
                     Qualification Received
                   </Badge>
