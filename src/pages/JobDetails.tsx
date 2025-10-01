@@ -161,6 +161,34 @@ export default function JobDetails() {
       });
     }
   };
+  // Helper to derive a robust LinkedIn profile URL for a candidate
+  const getLinkedInUrl = (c: any): string | null => {
+    if (!c) return null;
+    const fields: { v: any; treatAsId: boolean }[] = [
+      { v: c.linkedin_id ?? c["linkedin_id"], treatAsId: true },
+      { v: c["LinkedIn ID"], treatAsId: true },
+      { v: c.linkedin_url ?? c["linkedin_url"], treatAsId: false },
+      { v: c["LinkedIn URL"], treatAsId: false },
+      { v: c["Source URL"], treatAsId: false },
+      { v: c["Source"], treatAsId: false },
+    ];
+    for (const f of fields) {
+      const raw = f.v;
+      if (!raw) continue;
+      const s = String(raw).trim();
+      if (!s) continue;
+      if (/^https?:\/\//i.test(s)) {
+        if (/linkedin\.com/i.test(s)) return s;
+        continue;
+      }
+      if (!f.treatAsId) {
+        if (/linkedin\.com/i.test(s)) return `https://${s.replace(/^\/+/,'')}`;
+        continue;
+      }
+      return `https://www.linkedin.com/in/${s.replace(/^\/+/, '').replace(/\/+$/, '')}/`;
+    }
+    return null;
+  };
   const [callingCandidateId, setCallingCandidateId] = useState<string | null>(null);
   const [newApplicationsCount, setNewApplicationsCount] = useState(0);
   const [addedToLongList, setAddedToLongList] = useState<Set<string>>(new Set());
@@ -1702,8 +1730,8 @@ export default function JobDetails() {
                     </Button>;
               })()}
                 <Button variant="ghost" size="sm" asChild className="flex-1 min-w-[100px]">
-                  {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && mainCandidate["linkedin_id"] ? (
-                    <a href={(typeof mainCandidate["linkedin_id"] === 'string' && /^https?:\/\//i.test(mainCandidate["linkedin_id"])) ? mainCandidate["linkedin_id"] : `https://www.linkedin.com/in/${String(mainCandidate["linkedin_id"] || '').replace(/^\/+/, '').replace(/\/+$/, '')}/`} target="_blank" rel="noopener noreferrer">
+                  {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && getLinkedInUrl(mainCandidate) ? (
+                    <a href={getLinkedInUrl(mainCandidate)!} target="_blank" rel="noopener noreferrer">
                       <Users className="w-3 h-3 mr-1" />
                       View Profile
                     </a>
@@ -2704,12 +2732,10 @@ export default function JobDetails() {
                                     {/* Show All Record Info Button */}
                                     
                                     
-                                    {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && mainCandidate["linkedin_id"] ? (
+                                    {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && getLinkedInUrl(mainCandidate) ? (
                                       <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
                                         <a
-                                          href={(typeof mainCandidate["linkedin_id"] === 'string' && /^https?:\/\//i.test(mainCandidate["linkedin_id"])) 
-                                            ? mainCandidate["linkedin_id"] 
-                                            : `https://www.linkedin.com/in/${String(mainCandidate["linkedin_id"] || '').replace(/^\/+/, '').replace(/\/+$/, '')}/`}
+                                          href={getLinkedInUrl(mainCandidate)!}
                                           target="_blank"
                                           rel="noopener noreferrer"
                                         >
