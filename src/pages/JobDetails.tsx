@@ -524,6 +524,17 @@ export default function JobDetails() {
           });
         }
       });
+      // Also fetch LinkedIn profile IDs for this job to enrich candidates
+      const { data: liRows, error: liErr } = await supabase
+        .from('linkedin_boolean_search')
+        .select('user_id, linkedin_id')
+        .eq('job_id', jobId);
+      if (liErr) console.warn('Error fetching LinkedIn IDs:', liErr);
+      const liMap = new Map<string, { linkedin_id: string | null }>();
+      (liRows || []).forEach((r: any) => {
+        if (r?.user_id) liMap.set(String(r.user_id), { linkedin_id: r.linkedin_id ?? null });
+      });
+
       const mappedLonglisted = (longlistedData || []).map((row: any) => {
         const sourceLower = (row.source || '').toLowerCase();
         const hasLinkedIn = sourceLower.includes('linkedin');
@@ -536,6 +547,10 @@ export default function JobDetails() {
         const fromPhone = phoneKey ? phoneScoreMap.get(phoneKey) : undefined;
         const mergedScore = row.cv_score ?? fromUser?.score ?? fromEmail?.score ?? fromPhone?.score ?? (hasLinkedIn ? row.linkedin_score ?? null : null);
         const mergedReason = row.cv_score_reason ?? fromUser?.reason ?? fromEmail?.reason ?? fromPhone?.reason ?? (hasLinkedIn ? row.linkedin_score_reason ?? '' : '');
+
+        // Prefer linkedin_id from Jobs_CVs row, else fall back to linkedin_boolean_search mapping
+        const mappedLinkedInId = row.linkedin_id ?? liMap.get(String(row.user_id))?.linkedin_id ?? '';
+
         return {
           ...row,
           "Job ID": jobId,
@@ -565,7 +580,7 @@ export default function JobDetails() {
           cv_score: mergedScore ?? 0,
           "CV Score": mergedScore != null ? String(mergedScore) : '',
           "success_score": row.after_call_score ?? 0,
-          "linkedin_id": row.linkedin_id ?? '',
+          "linkedin_id": mappedLinkedInId,
           "longlisted_at": row.longlisted_at,
           cv_score_reason: mergedReason || ''
         };
@@ -1610,7 +1625,7 @@ export default function JobDetails() {
               })()}
                 <Button variant="ghost" size="sm" asChild className="flex-1 min-w-[100px]">
                   {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && mainCandidate["linkedin_id"] ? (
-                    <a href={`https://www.linkedin.com/in/${mainCandidate["linkedin_id"]}/`} target="_blank" rel="noopener noreferrer">
+                    <a href={(typeof mainCandidate["linkedin_id"] === 'string' && /^https?:\/\//i.test(mainCandidate["linkedin_id"])) ? mainCandidate["linkedin_id"] : `https://www.linkedin.com/in/${String(mainCandidate["linkedin_id"] || '').replace(/^\/+/, '').replace(/\/+$/, '')}/`} target="_blank" rel="noopener noreferrer">
                       <Users className="w-3 h-3 mr-1" />
                       View Profile
                     </a>
@@ -2618,7 +2633,7 @@ export default function JobDetails() {
                                     
                                     <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
                                       {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && mainCandidate["linkedin_id"] ? (
-                                        <a href={`https://www.linkedin.com/in/${mainCandidate["linkedin_id"]}/`} target="_blank" rel="noopener noreferrer">
+                                        <a href={(typeof mainCandidate["linkedin_id"] === 'string' && /^https?:\/\//i.test(mainCandidate["linkedin_id"])) ? mainCandidate["linkedin_id"] : `https://www.linkedin.com/in/${String(mainCandidate["linkedin_id"] || '').replace(/^\/+/, '').replace(/\/+$/, '')}/`} target="_blank" rel="noopener noreferrer">
                                           <Users className="w-3 h-3 mr-1" />
                                           View Profile
                                         </a>
