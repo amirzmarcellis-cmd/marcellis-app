@@ -27,6 +27,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { formatDate } from "@/lib/utils";
 import { useProfile } from "@/hooks/useProfile";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 
 // Using any type to avoid TypeScript complexity with quoted property names
 
@@ -1686,17 +1687,17 @@ export default function JobDetails() {
               </Button>
               <div className="h-6 w-px bg-border hidden sm:block" />
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
-              <Button 
-                onClick={() => handleAutomaticDialToggle(!job?.automatic_dial)}
-                disabled={automaticDialSaving}
-                size="sm"
-                variant={job?.automatic_dial ? "default" : "outline"}
-                className="ml-2"
-              >
-                <Phone className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Auto Dial {job?.automatic_dial ? 'ON' : 'OFF'}</span>
-                <span className="sm:hidden">{job?.automatic_dial ? 'ON' : 'OFF'}</span>
-              </Button>
+              <div className="ml-2 flex items-center gap-2">
+                <span className="text-sm font-medium hidden sm:inline">Auto Dial</span>
+                <ToggleSwitch 
+                  checked={job?.automatic_dial || false}
+                  onChange={handleAutomaticDialToggle}
+                  disabled={automaticDialSaving}
+                  size="sm"
+                  onLabel="ON"
+                  offLabel="OFF"
+                />
+              </div>
             </div>
             {/* Futuristic 3D Action Menu */}
             <FuturisticActionButton
