@@ -2491,9 +2491,10 @@ export default function JobDetails() {
                     return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceFilterMatch && scoreMatch && contactedMatch;
                   });
 
-                  // Group candidates by Candidate_ID to handle multiple contacts
+                  // Group candidates by user_id (for LinkedIn) or Candidate_ID (for others) to handle multiple contacts
                   const groupedCandidates = filteredLonglistedCandidates.reduce((acc, candidate) => {
-                    const candidateId = candidate["Candidate_ID"];
+                    // Use user_id for grouping as it's unique for each candidate
+                    const candidateId = candidate["user_id"] || candidate["Candidate_ID"];
                     if (!acc[candidateId]) {
                       acc[candidateId] = [];
                     }
