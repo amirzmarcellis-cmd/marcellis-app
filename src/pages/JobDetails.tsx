@@ -1550,7 +1550,7 @@ export default function JobDetails() {
           })()}
 
             <div className="flex items-center justify-between pt-2 border-t">
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 flex-wrap gap-2">
                 <StatusDropdown currentStatus={mainCandidate["Contacted"]} candidateId={mainCandidate["Candidate_ID"]} jobId={id!} onStatusChange={newStatus => {
                 setCandidates(prev => prev.map(c => c["Candidate_ID"] === mainCandidate["Candidate_ID"] ? {
                   ...c,
@@ -1563,6 +1563,18 @@ export default function JobDetails() {
                   CandidateStatus: newStatus
                 } : cv));
               }} variant="badge" />}
+                {/* Qualification Status Badge */}
+                {mainCandidate["qualifications"] !== null && mainCandidate["qualifications"] !== undefined && mainCandidate["qualifications"] !== "" ? (
+                  <Badge className="bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200">
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Qualification Received
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="border-2 border-amber-500 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50 transition-all duration-200">
+                    <Clock className="w-3 h-3 mr-1" />
+                    Qualification Send
+                  </Badge>
+                )}
               </div>
               <div className="flex flex-col gap-1 items-end">
                 {/* Only show overall score when status is Call Done */}
