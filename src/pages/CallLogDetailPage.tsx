@@ -75,7 +75,7 @@ export default function CallLogDetailPage() {
           title="Record Not Found"
           subtitle="The requested call log record could not be found"
         />
-        <Button onClick={() => navigate(-1)} variant="outline">
+        <Button onClick={() => navigate(jobId ? `/job/${jobId}` : '/jobs')} variant="outline">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Go Back
         </Button>
@@ -89,7 +89,7 @@ export default function CallLogDetailPage() {
         title="Call Log Details"
         subtitle={`Complete information for ${record.candidate_name || 'candidate'}`}
         actions={
-          <Button onClick={() => navigate(-1)} variant="outline">
+          <Button onClick={() => navigate(jobId ? `/job/${jobId}` : '/jobs')} variant="outline">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
