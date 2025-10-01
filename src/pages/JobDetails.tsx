@@ -243,7 +243,7 @@ export default function JobDetails() {
   // Scroll to focused candidate when returning from profile
   useEffect(() => {
     const focusId = location.state?.focusCandidateId;
-    if (activeTab === 'boolean-search' && focusId) {
+    if ((activeTab === 'boolean-search' || activeTab === 'shortlist') && focusId) {
       const el = document.getElementById(`candidate-card-${focusId}`);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1536,7 +1536,7 @@ export default function JobDetails() {
   // Helper function to render candidate cards
   const renderCandidateCard = (candidateId: string, candidateContacts: any[], mainCandidate: any, isTopCandidate: boolean = false) => {
     const cardClassName = isTopCandidate ? "relative border-2 border-yellow-400 hover:border-yellow-500 transition-all duration-300 hover:shadow-2xl bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 dark:from-yellow-950/50 dark:via-amber-950/50 dark:to-orange-950/50 shadow-xl shadow-yellow-200/50 dark:shadow-yellow-900/30 ring-2 ring-yellow-300/60 dark:ring-yellow-600/40 before:absolute before:inset-0 before:bg-gradient-to-r before:from-yellow-300/10 before:via-amber-300/10 before:to-orange-300/10 before:rounded-lg before:animate-pulse" : "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20";
-    return <Card key={candidateId} className={cardClassName}>
+    return <Card key={candidateId} id={`candidate-card-${candidateId}`} className={cardClassName}>
         <CardContent className="p-4 relative">
           {isTopCandidate && <Badge className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-gradient-to-br from-amber-300 via-yellow-300 to-amber-400 hover:from-amber-400 hover:via-yellow-400 hover:to-amber-500 border-2 border-amber-200 shadow-lg hover:shadow-xl transition-all duration-200 w-8 h-8 rounded-full p-0 flex items-center justify-center group z-10">
               <Star className="w-4 h-4 fill-amber-800 text-amber-800 group-hover:scale-110 transition-transform duration-200" />
@@ -1695,10 +1695,7 @@ export default function JobDetails() {
                 const latestContact = contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest);
                 console.log('AI Short List - latestContact:', latestContact);
                 return <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-[100px]">
-                      <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}`} onClick={() => {
-                    // Store current tab in URL hash for back navigation
-                    window.location.hash = 'tab=shortlist';
-                  }}>
+                      <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}&fromTab=shortlist`}>
                         <FileText className="w-3 h-3 mr-1" />
                         Call Log
                       </Link>
@@ -2683,10 +2680,7 @@ export default function JobDetails() {
                                     : mainCandidate;
                                   
                                   return <Button variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
-                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid || latestContact.recordid || candidateId}&longListSourceFilter=${encodeURIComponent(longListSourceFilter)}`} className="truncate" onClick={() => {
-                                    // Store current tab in URL hash for back navigation
-                                    window.location.hash = 'tab=boolean-search';
-                                  }}>
+                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid || latestContact.recordid || candidateId}&longListSourceFilter=${encodeURIComponent(longListSourceFilter)}&fromTab=boolean-search`} className="truncate">
                                               <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
                                               <span className="truncate">Call Log</span>
                                             </Link>
@@ -2699,10 +2693,7 @@ export default function JobDetails() {
                                 // Get the latest call log (highest callid)
                                 const latestContact = contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest);
                                 return <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
-                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}&longListSourceFilter=${encodeURIComponent(longListSourceFilter)}`} className="truncate" onClick={() => {
-                                    // Store current tab in URL hash for back navigation
-                                    window.location.hash = 'tab=boolean-search';
-                                  }}>
+                                             <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}&longListSourceFilter=${encodeURIComponent(longListSourceFilter)}&fromTab=boolean-search`} className="truncate">
                                               <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
                                               <span className="truncate">Call Log</span>
                                             </Link>

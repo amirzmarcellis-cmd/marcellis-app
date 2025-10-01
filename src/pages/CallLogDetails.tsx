@@ -350,27 +350,12 @@ export default function CallLogDetails() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6">
         <Button variant="outline" onClick={() => {
           if (jobId && candidateId) {
-            // Check both URL hash and search params to determine which tab to return to
-            const hash = window.location.hash;
-            const sourceParam = searchParams.get('source');
-            
-            let fromTab = 'boolean-search'; // default to AI Long List
-            
-            // Check hash first
-            if (hash.includes('tab=shortlist')) {
-              fromTab = 'shortlist';
-            } else if (hash.includes('tab=boolean-search')) {
-              fromTab = 'boolean-search';
-            }
-            // If no hash, check if source is LinkedIn (likely from AI Short List)
-            else if (sourceParam && sourceParam.toLowerCase().includes('linkedin')) {
-              fromTab = 'shortlist';
-            }
-            
+            const fromTabParam = searchParams.get('fromTab');
+            const fromTab = fromTabParam === 'shortlist' ? 'shortlist' : 'boolean-search';
             const filter = searchParams.get('longListSourceFilter');
             navigate(`/job/${jobId}`, {
-              state: { 
-                tab: fromTab, 
+              state: {
+                tab: fromTab,
                 focusCandidateId: candidateId,
                 ...(filter ? { longListSourceFilter: filter } : {})
               }

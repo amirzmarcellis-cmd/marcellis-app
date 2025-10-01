@@ -77,15 +77,8 @@ export default function CallLogDetailPage() {
         />
         <Button onClick={() => {
           if (jobId) {
-            const hash = window.location.hash;
-            let fromTab = 'boolean-search';
-            
-            if (hash.includes('tab=shortlist')) {
-              fromTab = 'shortlist';
-            } else if (hash.includes('tab=boolean-search')) {
-              fromTab = 'boolean-search';
-            }
-            
+            const fromTabParam = searchParams.get('fromTab');
+            const fromTab = fromTabParam === 'shortlist' ? 'shortlist' : 'boolean-search';
             navigate(`/job/${jobId}`, {
               state: { tab: fromTab }
             });
@@ -93,9 +86,9 @@ export default function CallLogDetailPage() {
             navigate('/jobs');
           }
         }} variant="outline">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Go Back
-        </Button>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Go Back
+          </Button>
       </div>
     );
   }
@@ -108,16 +101,8 @@ export default function CallLogDetailPage() {
         actions={
           <Button onClick={() => {
             if (jobId) {
-              // Check URL hash to determine which tab to return to
-              const hash = window.location.hash;
-              let fromTab = 'boolean-search';
-              
-              if (hash.includes('tab=shortlist')) {
-                fromTab = 'shortlist';
-              } else if (hash.includes('tab=boolean-search')) {
-                fromTab = 'boolean-search';
-              }
-              
+              const fromTabParam = searchParams.get('fromTab');
+              const fromTab = fromTabParam === 'shortlist' ? 'shortlist' : 'boolean-search';
               navigate(`/job/${jobId}`, {
                 state: { tab: fromTab }
               });
