@@ -367,6 +367,7 @@ export default function JobDetails() {
       (linkedinData || []).forEach(item => {
         if (item.user_id) {
           linkedinMap.set(item.user_id, {
+            linkedin_id: item.linkedin_id,
             linkedin_score: item.linkedin_score,
             linkedin_score_reason: item.linkedin_score_reason
           });
@@ -379,6 +380,7 @@ export default function JobDetails() {
 
         // Get LinkedIn data for this candidate by user_id (if available from map)
         const linkedinInfo = linkedinMap.get(row.user_id) || {};
+        const linkedinId = linkedinInfo.linkedin_id ?? row.linkedin_id ?? '';
         const linkedinScore = linkedinInfo.linkedin_score ?? row.linkedin_score ?? null;
         const linkedinReason = linkedinInfo.linkedin_score_reason ?? row.linkedin_score_reason ?? '';
         return {
@@ -395,6 +397,7 @@ export default function JobDetails() {
           "Candidate Phone Number": row.candidate_phone_number ?? '',
           "Source": row.source ?? '',
           // Keep LinkedIn fields for UI/debug
+          "linkedin_id": linkedinId ?? '',
           "linkedin_score": linkedinScore ?? '',
           "linkedin_score_reason": linkedinReason ?? '',
           "pros": row.after_call_pros,
@@ -1606,10 +1609,17 @@ export default function JobDetails() {
                     </Button>;
               })()}
                 <Button variant="ghost" size="sm" asChild className="flex-1 min-w-[100px]">
-                  <Link to={`/candidate/${candidateId}`} state={{ fromJob: id, tab: 'shortlist', focusCandidateId: candidateId }}>
-                    <Users className="w-3 h-3 mr-1" />
-                    View Profile
-                  </Link>
+                  {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && mainCandidate["linkedin_id"] ? (
+                    <a href={`https://www.linkedin.com/in/${mainCandidate["linkedin_id"]}/`} target="_blank" rel="noopener noreferrer">
+                      <Users className="w-3 h-3 mr-1" />
+                      View Profile
+                    </a>
+                  ) : (
+                    <Link to={`/candidate/${candidateId}`} state={{ fromJob: id, tab: 'shortlist', focusCandidateId: candidateId }}>
+                      <Users className="w-3 h-3 mr-1" />
+                      View Profile
+                    </Link>
+                  )}
                 </Button>
               </div>
               {/* Action Buttons - CV Submitted and Reject */}
@@ -2607,10 +2617,17 @@ export default function JobDetails() {
                                     
                                     
                                     <Button variant="ghost" size="sm" asChild className="w-full text-xs md:text-sm">
-                                      <Link to={`/candidate/${candidateId}`} state={{ fromJob: id, tab: 'boolean-search', focusCandidateId: candidateId }}>
-                                        <Users className="w-3 h-3 mr-1" />
-                                        View Profile
-                                      </Link>
+                                      {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && mainCandidate["linkedin_id"] ? (
+                                        <a href={`https://www.linkedin.com/in/${mainCandidate["linkedin_id"]}/`} target="_blank" rel="noopener noreferrer">
+                                          <Users className="w-3 h-3 mr-1" />
+                                          View Profile
+                                        </a>
+                                      ) : (
+                                        <Link to={`/candidate/${candidateId}`} state={{ fromJob: id, tab: 'boolean-search', focusCandidateId: candidateId }}>
+                                          <Users className="w-3 h-3 mr-1" />
+                                          View Profile
+                                        </Link>
+                                      )}
                                     </Button>
                                   </div>
                                 </div>
