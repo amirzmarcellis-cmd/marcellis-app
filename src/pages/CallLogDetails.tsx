@@ -379,20 +379,6 @@ export default function CallLogDetails() {
                   Score: {callLog.after_call_score}/100
                 </Badge>
               </div>
-              <div className="flex items-center space-x-2 mt-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => {
-                    if (candidateId) {
-                      navigate(`/candidate/${candidateId}`);
-                    }
-                  }}
-                >
-                  <User className="w-4 h-4 mr-2" />
-                  View Profile
-                </Button>
-              </div>
               
               {/* Task Status and Assignments Section */}
               <div className="mt-4 space-y-3">
