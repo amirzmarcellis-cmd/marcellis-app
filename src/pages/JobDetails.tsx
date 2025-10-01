@@ -2566,7 +2566,27 @@ export default function JobDetails() {
                                         {callingCandidateId === candidateId ? 'Calling...' : 'Call Candidate'}
                                       </Button>
                                       {(() => {
+                                const isLinkedInCandidate = typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin');
                                 const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
+                                
+                                // For LinkedIn candidates, always show Call Log button
+                                if (isLinkedInCandidate) {
+                                  const latestContact = contactsWithCalls.length > 0 
+                                    ? contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest)
+                                    : mainCandidate;
+                                  
+                                  return <Button variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
+                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid || latestContact.recordid || candidateId}`} className="truncate" onClick={() => {
+                                    // Store current tab in URL hash for back navigation
+                                    window.location.hash = 'tab=boolean-search';
+                                  }}>
+                                              <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
+                                              <span className="truncate">Call Log</span>
+                                            </Link>
+                                          </Button>;
+                                }
+                                
+                                // For non-LinkedIn candidates, only show if they have call logs
                                 if (contactsWithCalls.length === 0) return null;
 
                                 // Get the latest call log (highest callid)
