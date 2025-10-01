@@ -15,7 +15,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, AlertTriangle, Hourglass, User, FileCheck, Building, Pause, Play, Linkedin } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, AlertTriangle, Hourglass, User, FileCheck, Building, Pause, Play } from "lucide-react";
 import { FuturisticActionButton } from "@/components/ui/FuturisticActionButton";
 import { ActionButton } from "@/components/ui/ActionButton";
 import { Switch } from "@/components/ui/switch";
@@ -119,7 +119,7 @@ export default function JobDetails() {
     if (id) {
       // Load job data first to show page immediately
       fetchJob(id);
-
+      
       // Load other data in background (non-blocking)
       fetchCandidates(id);
       fetchLonglistedCandidates(id);
@@ -223,12 +223,13 @@ export default function JobDetails() {
   };
   const handleAutomaticDialToggle = async (checked: boolean) => {
     if (!job?.job_id) return;
-
+    
     // Optimistic update for immediate feedback
     setJob(prev => ({
       ...prev,
       automatic_dial: checked
     }));
+    
     setAutomaticDialSaving(true);
     try {
       const {
@@ -236,7 +237,9 @@ export default function JobDetails() {
       } = await supabase.from('Jobs').update({
         automatic_dial: checked
       }).eq('job_id', job.job_id);
+      
       if (error) throw error;
+      
       toast({
         title: "Success",
         description: `Automatic dial ${checked ? 'enabled' : 'disabled'} for this job`
@@ -257,17 +260,21 @@ export default function JobDetails() {
       setAutomaticDialSaving(false);
     }
   };
+
   const handlePauseJob = async () => {
     if (!job?.job_id) return;
+    
     const isCurrentlyActive = job?.Processed === "Yes";
-
+    
     // Optimistic update for immediate feedback
     setJob(prev => ({
       ...prev,
       automatic_dial: isCurrentlyActive ? false : prev?.automatic_dial,
       Processed: isCurrentlyActive ? "No" : "Yes"
     }));
+    
     setAutomaticDialSaving(true);
+    
     try {
       const {
         error
@@ -276,7 +283,9 @@ export default function JobDetails() {
         Processed: isCurrentlyActive ? "No" : "Yes",
         status: isCurrentlyActive ? "paused" : "active"
       }).eq('job_id', job.job_id);
+      
       if (error) throw error;
+      
       toast({
         title: "Success",
         description: isCurrentlyActive ? "Job paused successfully" : "Job activated successfully"
@@ -1562,15 +1571,6 @@ export default function JobDetails() {
                     View Profile
                   </Link>
                 </Button>
-                {/* LinkedIn Profile Button - only for LinkedIn sourced candidates */}
-                {mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_id"] && <Button variant="outline" size="sm" onClick={() => {
-                const linkedinId = mainCandidate["linkedin_id"];
-                const linkedinUrl = linkedinId.startsWith('http') ? linkedinId : `https://www.linkedin.com/in/${linkedinId}`;
-                window.open(linkedinUrl, '_blank');
-              }} className="flex-1 min-w-[100px] bg-[#0077B5] hover:bg-[#006399] text-white border-[#0077B5]">
-                    <Linkedin className="w-3 h-3 mr-1" />
-                    LinkedIn Profile
-                  </Button>}
               </div>
               {/* Action Buttons - CV Submitted and Reject */}
               <div className="flex gap-2">
@@ -1687,16 +1687,47 @@ export default function JobDetails() {
               </Button>
               <div className="h-6 w-px bg-border hidden sm:block" />
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
-              <div className="ml-2 flex items-center gap-2 px-0 py-0 my-0 mx-[300px]">
+              <div className="ml-2 flex items-center gap-2">
                 <span className="text-sm font-medium hidden sm:inline">Auto Dial</span>
-                <ToggleSwitch checked={job?.automatic_dial || false} onChange={handleAutomaticDialToggle} disabled={automaticDialSaving} size="sm" onLabel="ON" offLabel="OFF" />
+                <ToggleSwitch 
+                  checked={job?.automatic_dial || false}
+                  onChange={handleAutomaticDialToggle}
+                  disabled={automaticDialSaving}
+                  size="sm"
+                  onLabel="ON"
+                  offLabel="OFF"
+                />
               </div>
             </div>
             {/* Futuristic 3D Action Menu */}
-            <FuturisticActionButton isExpanded={isActionMenuExpanded} onToggle={() => setIsActionMenuExpanded(!isActionMenuExpanded)}>
-              {job?.longlist && job.longlist > 0 ? <ActionButton onClick={handleSearchMoreCandidates} icon={Search} label="Regenerate AI" variant="amber" /> : <ActionButton onClick={handleGenerateLongList} disabled={job?.longlist === 3} icon={Zap} label="Generate AI" variant="success" />}
+            <FuturisticActionButton
+              isExpanded={isActionMenuExpanded}
+              onToggle={() => setIsActionMenuExpanded(!isActionMenuExpanded)}
+            >
+              {job?.longlist && job.longlist > 0 ? (
+                <ActionButton
+                  onClick={handleSearchMoreCandidates}
+                  icon={Search}
+                  label="Regenerate AI"
+                  variant="amber"
+                />
+              ) : (
+                <ActionButton
+                  onClick={handleGenerateLongList}
+                  disabled={job?.longlist === 3}
+                  icon={Zap}
+                  label="Generate AI"
+                  variant="success"
+                />
+              )}
               
-              <ActionButton onClick={handlePauseJob} disabled={automaticDialSaving} icon={job?.Processed === "Yes" ? Pause : Play} label={job?.Processed === "Yes" ? "Pause Job" : "Run Job"} variant="danger" />
+              <ActionButton
+                onClick={handlePauseJob}
+                disabled={automaticDialSaving}
+                icon={job?.Processed === "Yes" ? Pause : Play}
+                label={job?.Processed === "Yes" ? "Pause Job" : "Run Job"}
+                variant="danger"
+              />
             </FuturisticActionButton>
 
             {/* Action Buttons */}
