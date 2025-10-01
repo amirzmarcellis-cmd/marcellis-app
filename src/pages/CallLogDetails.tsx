@@ -348,7 +348,26 @@ export default function CallLogDetails() {
     <div className="container mx-auto p-4 sm:p-6 space-y-6 overflow-x-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6">
-        <Button variant="outline" onClick={() => jobId ? navigate(`/job/${jobId}`) : navigate(-1)}>
+        <Button variant="outline" onClick={() => {
+          if (jobId && candidateId) {
+            // Check the URL hash to determine which tab to return to
+            const hash = window.location.hash;
+            const fromTab = hash.includes('tab=boolean-search') ? 'boolean-search' : 
+                          hash.includes('tab=shortlist') ? 'shortlist' : 
+                          'boolean-search'; // default to AI Long List
+            
+            navigate(`/job/${jobId}`, {
+              state: { 
+                tab: fromTab, 
+                focusCandidateId: candidateId 
+              }
+            });
+          } else if (jobId) {
+            navigate(`/job/${jobId}`);
+          } else {
+            navigate(-1);
+          }
+        }}>
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </Button>
