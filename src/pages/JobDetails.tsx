@@ -1858,17 +1858,6 @@ export default function JobDetails() {
               </Button>
               <div className="h-6 w-px bg-border hidden sm:block" />
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
-              <div className="ml-2 flex items-center gap-2">
-                <span className="text-sm font-medium hidden sm:inline">Auto Dial</span>
-                <ToggleSwitch 
-                  checked={job?.automatic_dial || false}
-                  onChange={handleAutomaticDialToggle}
-                  disabled={automaticDialSaving}
-                  size="sm"
-                  onLabel="ON"
-                  offLabel="OFF"
-                />
-              </div>
             </div>
             {/* Futuristic 3D Action Menu */}
             <FuturisticActionButton
@@ -1903,6 +1892,17 @@ export default function JobDetails() {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 items-center justify-center lg:justify-end">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">Auto Dial</span>
+                <ToggleSwitch 
+                  checked={job?.automatic_dial || false}
+                  onChange={handleAutomaticDialToggle}
+                  disabled={automaticDialSaving}
+                  size="sm"
+                  onLabel="ON"
+                  offLabel="OFF"
+                />
+              </div>
               <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto">
                 <FileText className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Edit Job</span>
