@@ -15,7 +15,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, AlertTriangle, Hourglass, User, FileCheck, Building, Pause, Play } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, AlertTriangle, Hourglass, User, FileCheck, Building, Pause, Play, Linkedin } from "lucide-react";
 import { FuturisticActionButton } from "@/components/ui/FuturisticActionButton";
 import { ActionButton } from "@/components/ui/ActionButton";
 import { Switch } from "@/components/ui/switch";
@@ -1571,6 +1571,27 @@ export default function JobDetails() {
                     View Profile
                   </Link>
                 </Button>
+                {/* LinkedIn Profile Button - only for LinkedIn sourced candidates */}
+                {mainCandidate["Source"] && 
+                 typeof mainCandidate["Source"] === 'string' && 
+                 mainCandidate["Source"].toLowerCase().includes("linkedin") && 
+                 mainCandidate["linkedin_id"] && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => {
+                      const linkedinId = mainCandidate["linkedin_id"];
+                      const linkedinUrl = linkedinId.startsWith('http') 
+                        ? linkedinId 
+                        : `https://www.linkedin.com/in/${linkedinId}`;
+                      window.open(linkedinUrl, '_blank');
+                    }}
+                    className="flex-1 min-w-[100px] bg-[#0077B5] hover:bg-[#006399] text-white border-[#0077B5]"
+                  >
+                    <Linkedin className="w-3 h-3 mr-1" />
+                    LinkedIn Profile
+                  </Button>
+                )}
               </div>
               {/* Action Buttons - CV Submitted and Reject */}
               <div className="flex gap-2">
