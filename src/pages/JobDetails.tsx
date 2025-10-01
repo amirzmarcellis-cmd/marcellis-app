@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,6 +36,7 @@ export default function JobDetails() {
     id
   } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState("overview");
   const [isShaking, setIsShaking] = useState(false);
   const {
@@ -125,21 +126,38 @@ export default function JobDetails() {
       fetchLonglistedCandidates(id);
       fetchApplications(id);
       fetchTaskCandidates(id);
-      fetchCvData();
-      checkShortListButtonStatus();
-
-      // Load last viewed timestamp for applications
-      const lastViewed = localStorage.getItem(`lastViewedApplications_${id}`);
-      setLastViewedApplications(lastViewed);
+      
+      // Check for shortlist disabled status
+      const storageKey = `shortlist_${id}_disabled`;
+      const storedData = localStorage.getItem(storageKey);
+      if (storedData) {
+        const {
+          disabledUntil
+        } = JSON.parse(storedData);
+        const now = Date.now();
+        if (disabledUntil > now) {
+          setShortListButtonDisabled(true);
+          setShortListTimeRemaining(Math.ceil((disabledUntil - now) / 1000));
+        } else {
+          localStorage.removeItem(storageKey);
+        }
+      }
     }
-
-    // Check for tab in URL hash
-    const hash = window.location.hash;
-    if (hash.startsWith('#tab=')) {
-      const tab = hash.substring(5);
-      setActiveTab(tab);
+    
+    // Check for tab in location state (from navigation)
+    if (location.state?.tab) {
+      setActiveTab(location.state.tab);
+      // Clear the state so it doesn't persist on refresh
+      window.history.replaceState({}, document.title);
+    } else {
+      // Check for tab in URL hash
+      const hash = window.location.hash;
+      if (hash.startsWith('#tab=')) {
+        const tab = hash.substring(5);
+        setActiveTab(tab);
+      }
     }
-  }, [id]);
+  }, [id, location.state]);
 
   // Fetch group data when job is loaded
   useEffect(() => {
