@@ -263,20 +263,40 @@ export default function Teams() {
 
   const handleDeleteTeam = async (teamId: string) => {
     try {
-      const { error } = await supabase
+      console.log('Attempting to delete team:', teamId);
+      
+      // First, delete all memberships for this team
+      const { error: membershipError } = await supabase
+        .from('memberships')
+        .delete()
+        .eq('team_id', teamId);
+
+      if (membershipError) {
+        console.error('Error deleting memberships:', membershipError);
+        throw new Error(`Failed to remove team members: ${membershipError.message}`);
+      }
+
+      // Then delete the team
+      const { error, data } = await supabase
         .from('teams')
         .delete()
-        .eq('id', teamId);
+        .eq('id', teamId)
+        .select();
 
-      if (error) throw error;
+      console.log('Delete result:', { error, data });
+
+      if (error) {
+        console.error('Error deleting team:', error);
+        throw error;
+      }
 
       toast({
         title: "Success",
         description: "Team deleted successfully",
       });
 
-      fetchTeams();
       setDeleteTeamId(null);
+      fetchTeams();
     } catch (error: any) {
       console.error('Error deleting team:', error);
       toast({
