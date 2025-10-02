@@ -197,7 +197,7 @@ serve(async (req) => {
                 user_id: existingUser.id,
                 role: userData.org_role === 'admin' ? 'ADMIN' : 
                       userData.org_role === 'management' ? 'MANAGEMENT' : 'EMPLOYEE'
-              });
+              }, { onConflict: 'user_id' });
 
             // Create team membership if team is specified
             if (userData.team && (userData.org_role === 'team_member' || userData.org_role === 'team_leader')) {
@@ -325,7 +325,7 @@ serve(async (req) => {
           .upsert({ 
             user_id: userId,
             role: orgRoleValue 
-          });
+          }, { onConflict: 'user_id' });
 
         if (roleUpdateError) {
           console.error('Role update error:', roleUpdateError);
