@@ -93,7 +93,8 @@ export default function UsersPanel() {
   const [editUserData, setEditUserData] = useState({
     name: '',
     email: '',
-    is_admin: false
+    role: 'admin' as UserRole,
+    team: undefined as string | undefined
   });
   const { toast } = useToast();
   const { session } = useAuth();
@@ -347,10 +348,27 @@ export default function UsersPanel() {
   const openEditUserDialog = (user: Profile) => {
     setEditingUser(user);
     const orgRole = userOrgRoles[user.user_id] || 'EMPLOYEE';
+    const userMemberships = userMembershipsMap[user.user_id] || [];
+    
+    // Determine the role to display
+    let role: UserRole = 'admin';
+    let team: string | undefined = undefined;
+    
+    if (orgRole === 'ADMIN') {
+      role = 'admin';
+    } else if (orgRole === 'MANAGEMENT') {
+      role = 'management';
+    } else if (userMemberships.length > 0) {
+      const membership = userMemberships[0];
+      role = membership.role === 'TEAM_LEADER' ? 'team_leader' : 'team_member';
+      team = membership.team_id;
+    }
+    
     setEditUserData({
       name: user.name || '',
       email: user.email,
-      is_admin: orgRole === 'ADMIN' // For backwards compatibility
+      role: role,
+      team: team
     });
     setIsEditUserOpen(true);
   };
@@ -366,19 +384,34 @@ export default function UsersPanel() {
       return;
     }
 
+    if ((editUserData.role === 'team_member' || editUserData.role === 'team_leader') && !editUserData.team) {
+      toast({
+        title: "Error",
+        description: "Please select a team",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setSubmitting(true);
 
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          name: editUserData.name,
-          email: editUserData.email,
-          is_admin: editUserData.is_admin
-        })
-        .eq('user_id', editingUser.user_id);
+      const { error } = await supabase.functions.invoke('admin-user-management', {
+        body: {
+          action: 'update_user',
+          userId: editingUser.user_id,
+          userData: {
+            name: editUserData.name,
+            email: editUserData.email,
+            org_role: editUserData.role,
+            team: editUserData.team
+          }
+        }
+      });
 
-      if (error) throw error;
+      if (error) {
+        throw new Error(error.message || 'Failed to update user');
+      }
 
       toast({
         title: "Success",
@@ -387,9 +420,10 @@ export default function UsersPanel() {
 
       setIsEditUserOpen(false);
       setEditingUser(null);
-      setEditUserData({ name: '', email: '', is_admin: false });
+      setEditUserData({ name: '', email: '', role: 'admin', team: undefined });
       fetchUsers();
       fetchUserMemberships();
+      fetchUserOrgRoles();
     } catch (error: any) {
       console.error('Error updating user:', error);
       toast({
@@ -656,18 +690,51 @@ export default function UsersPanel() {
                 required
               />
             </div>
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="edit-is-admin"
-                checked={editUserData.is_admin}
-                onChange={(e) => setEditUserData({ ...editUserData, is_admin: e.target.checked })}
-                className="rounded border-gray-300"
-              />
-              <Label htmlFor="edit-is-admin" className="text-sm font-medium">
-                Administrator privileges
-              </Label>
+            <div className="space-y-2">
+              <Label htmlFor="edit-role">Role</Label>
+              <Select value={editUserData.role} onValueChange={(value: UserRole) => setEditUserData({ ...editUserData, role: value, team: undefined })}>
+                <SelectTrigger className="bg-background border-input z-50">
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent className="bg-background border border-border shadow-md z-50">
+                  {roleOptions.map((option) => {
+                    const Icon = option.icon;
+                    return (
+                      <SelectItem key={option.value} value={option.value} className="hover:bg-accent hover:text-accent-foreground">
+                        <div className="flex items-center gap-2">
+                          <Icon className="h-4 w-4" />
+                          {option.label}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
             </div>
+            {(editUserData.role === 'team_member' || editUserData.role === 'team_leader') && (
+              <div className="space-y-2">
+                <Label htmlFor="edit-team">Team</Label>
+                <Select value={editUserData.team} onValueChange={(value: string) => setEditUserData({ ...editUserData, team: value })}>
+                  <SelectTrigger className="bg-background border-input z-50">
+                    <SelectValue placeholder="Select a team" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border border-border shadow-md z-50">
+                    {teams.map((team) => {
+                      const TeamIcon = team.name.toLowerCase().includes('sales') ? DollarSign : 
+                                      team.name.toLowerCase().includes('delivery') ? Truck : Users2;
+                      return (
+                        <SelectItem key={team.id} value={team.id} className="hover:bg-accent hover:text-accent-foreground">
+                          <div className="flex items-center gap-2">
+                            <TeamIcon className="h-4 w-4" />
+                            {team.name}
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsEditUserOpen(false)}>
                 Cancel

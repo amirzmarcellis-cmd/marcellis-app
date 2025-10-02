@@ -277,16 +277,17 @@ serve(async (req) => {
       }
 
       case 'update_user': {
-        console.log('Updating user:', userData.userId);
+        console.log('Updating user:', userId, 'with role:', userData.org_role);
         
         // Update user profile
         const { error: profileError } = await supabaseAdmin
           .from('profiles')
           .update({
             name: userData.name,
-            email: userData.email
+            email: userData.email,
+            is_admin: userData.org_role === 'admin' // backwards compatibility
           })
-          .eq('user_id', userData.userId);
+          .eq('user_id', userId);
 
         if (profileError) {
           console.error('Profile update error:', profileError);
@@ -298,7 +299,7 @@ serve(async (req) => {
 
         // Update user email in auth if it changed
         const { error: authUpdateError } = await supabaseAdmin.auth.admin.updateUserById(
-          userData.userId,
+          userId,
           { 
             email: userData.email,
             user_metadata: { name: userData.name }
@@ -309,17 +310,55 @@ serve(async (req) => {
           console.error('Auth update error:', authUpdateError);
         }
 
-        // Update team membership role if changed
-        if (userData.role && userData.teamId) {
-          const { error: membershipError } = await supabaseAdmin
-            .from('memberships')
-            .update({ role: userData.role })
-            .eq('user_id', userData.userId)
-            .eq('team_id', userData.teamId);
+        // Update organization role
+        const roleMapping = {
+          'admin': 'ADMIN',
+          'management': 'MANAGEMENT',
+          'team_leader': 'EMPLOYEE', // team_leader is team-based, not org-level
+          'team_member': 'EMPLOYEE'
+        };
+        
+        const orgRoleValue = roleMapping[userData.org_role] || 'EMPLOYEE';
+        
+        const { error: roleUpdateError } = await supabaseAdmin
+          .from('user_roles')
+          .upsert({ 
+            user_id: userId,
+            role: orgRoleValue 
+          });
 
-          if (membershipError) {
-            console.error('Membership update error:', membershipError);
+        if (roleUpdateError) {
+          console.error('Role update error:', roleUpdateError);
+        }
+
+        // Handle team memberships
+        if (userData.org_role === 'team_member' || userData.org_role === 'team_leader') {
+          if (userData.team) {
+            // First, remove all existing memberships for this user
+            await supabaseAdmin
+              .from('memberships')
+              .delete()
+              .eq('user_id', userId);
+
+            // Then add the new membership
+            const { error: membershipError } = await supabaseAdmin
+              .from('memberships')
+              .insert({
+                user_id: userId,
+                team_id: userData.team,
+                role: userData.org_role === 'team_leader' ? 'TEAM_LEADER' : 'EMPLOYEE'
+              });
+
+            if (membershipError) {
+              console.error('Membership creation error:', membershipError);
+            }
           }
+        } else {
+          // If role is admin or management, remove all team memberships
+          await supabaseAdmin
+            .from('memberships')
+            .delete()
+            .eq('user_id', userId);
         }
 
         return new Response(
