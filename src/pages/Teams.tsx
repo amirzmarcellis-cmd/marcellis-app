@@ -27,6 +27,7 @@ interface TeamMember {
   email: string;
   is_admin: boolean;
   role: string; // Add role from membership
+  jobCount?: number; // Number of jobs assigned
 }
 
 interface NewTeamData {
@@ -160,12 +161,33 @@ export default function Teams() {
           const userIds = memberships.map((m) => m.user_id);
           const { data: profiles, error: profilesError } = await supabase
             .from('profiles')
-            .select('user_id, name, email, is_admin')
+            .select('user_id, name, email, is_admin, linkedin_id')
             .in('user_id', userIds);
 
           if (profilesError) {
             console.error('Error fetching profiles for team', team.name, ':', profilesError);
             return { teamId: team.id, members: [] };
+          }
+
+          // Fetch job counts for each user
+          const jobCountsMap: Record<string, number> = {};
+          if (profiles && profiles.length > 0) {
+            const linkedinIds = profiles.map(p => p.linkedin_id).filter(Boolean);
+            
+            if (linkedinIds.length > 0) {
+              const { data: jobs, error: jobsError } = await supabase
+                .from('Jobs')
+                .select('recruiter_id')
+                .in('recruiter_id', linkedinIds);
+              
+              if (!jobsError && jobs) {
+                jobs.forEach((job) => {
+                  if (job.recruiter_id) {
+                    jobCountsMap[job.recruiter_id] = (jobCountsMap[job.recruiter_id] || 0) + 1;
+                  }
+                });
+              }
+            }
           }
 
           const members = (profiles || [])
@@ -177,6 +199,7 @@ export default function Teams() {
                 email: p.email,
                 is_admin: p.is_admin,
                 role: membership?.role || 'EMPLOYEE',
+                jobCount: jobCountsMap[p.linkedin_id || ''] || 0,
               };
             });
 
@@ -576,6 +599,9 @@ export default function Teams() {
                                    </div>
                                  </div>
                                  <div className="flex items-center gap-2">
+                                   <Badge variant="outline" className="text-xs">
+                                     {member.jobCount || 0} jobs
+                                   </Badge>
                                    <RoleIcon className="h-3 w-3" />
                                    <span className="text-xs text-muted-foreground">
                                      {roleDisplay.label}
