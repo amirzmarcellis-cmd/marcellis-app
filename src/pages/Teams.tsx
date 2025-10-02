@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Users2, Plus, DollarSign, Truck, User, Crown, Trash2, UserPlus, UserMinus } from 'lucide-react';
+import { Users2, Plus, DollarSign, Truck, User, Crown, Trash2, UserPlus, UserMinus, Pencil } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -47,6 +47,9 @@ export default function Teams() {
   const [deleteTeamId, setDeleteTeamId] = useState<string | null>(null);
   const [newTeam, setNewTeam] = useState<NewTeamData>({ name: '' });
   const [submitting, setSubmitting] = useState(false);
+  const [isEditTeamOpen, setIsEditTeamOpen] = useState(false);
+  const [editTeamId, setEditTeamId] = useState<string | null>(null);
+  const [editTeamName, setEditTeamName] = useState('');
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const [availableUsers, setAvailableUsers] = useState<AvailableUser[]>([]);
@@ -258,6 +261,48 @@ export default function Teams() {
         description: error.message || "Failed to delete team",
         variant: "destructive"
       });
+    }
+  };
+
+  const openEditTeamDialog = (team: Team) => {
+    setEditTeamId(team.id);
+    setEditTeamName(team.name);
+    setIsEditTeamOpen(true);
+  };
+
+  const handleEditTeam = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!editTeamId) return;
+
+    try {
+      setSubmitting(true);
+      
+      const { error } = await supabase
+        .from('teams')
+        .update({ name: editTeamName })
+        .eq('id', editTeamId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Team updated successfully",
+      });
+
+      setIsEditTeamOpen(false);
+      setEditTeamId(null);
+      setEditTeamName('');
+      fetchTeams();
+    } catch (error: any) {
+      console.error('Error updating team:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update team",
+        variant: "destructive"
+      });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -475,14 +520,24 @@ export default function Teams() {
                       <TeamIcon className="h-5 w-5 text-primary" />
                       {team.name}
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setDeleteTeamId(team.id)}
-                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openEditTeamDialog(team)}
+                        className="h-8 w-8 p-0 text-muted-foreground hover:text-primary"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDeleteTeamId(team.id)}
+                        className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -556,6 +611,38 @@ export default function Teams() {
           })}
         </div>
       )}
+
+      {/* Edit Team Dialog */}
+      <Dialog open={isEditTeamOpen} onOpenChange={setIsEditTeamOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Team</DialogTitle>
+            <DialogDescription>
+              Update the team name.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleEditTeam} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="editTeamName">Team Name</Label>
+              <Input
+                id="editTeamName"
+                type="text"
+                value={editTeamName}
+                onChange={(e) => setEditTeamName(e.target.value)}
+                required
+              />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsEditTeamOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={submitting}>
+                {submitting ? 'Updating...' : 'Update Team'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Team Confirmation Dialog */}
       <Dialog open={deleteTeamId !== null} onOpenChange={() => setDeleteTeamId(null)}>
