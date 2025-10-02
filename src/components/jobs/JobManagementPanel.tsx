@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Briefcase, Phone, PhoneOff } from "lucide-react";
+import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Briefcase, Phone, PhoneOff, UserCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { JobDialog } from "./JobDialog";
@@ -31,6 +31,8 @@ interface Job {
   automatic_dial?: boolean | null;
   longlisted_count?: number;
   shortlisted_count?: number;
+  recruiter_id?: string | null;
+  recruiter_name?: string | null;
   groups?: {
     id: string;
     name: string;
@@ -96,7 +98,7 @@ export function JobManagementPanel() {
     try {
       // Optimize: Build query with proper conditions
       let query = supabase.from('Jobs').select(`
-          job_id, job_title, job_location, job_salary_range, Currency, Processed, status, Timestamp, group_id, automatic_dial, jd_summary,
+          job_id, job_title, job_location, job_salary_range, Currency, Processed, status, Timestamp, group_id, automatic_dial, jd_summary, recruiter_id,
           groups ( id, name, color )
         `);
 
@@ -109,6 +111,25 @@ export function JobManagementPanel() {
       const jobsResult = await query.order('Timestamp', { ascending: false });
       if (jobsResult.error) throw jobsResult.error;
       const initialJobs = jobsResult.data || [];
+      
+      // Fetch recruiter names
+      const recruiterIds = [...new Set(initialJobs.map(j => j.recruiter_id).filter(Boolean))];
+      const recruiterNamesMap = new Map<string, string>();
+      
+      if (recruiterIds.length > 0) {
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('linkedin_id, name')
+          .in('linkedin_id', recruiterIds);
+        
+        if (!profilesError && profiles) {
+          profiles.forEach(p => {
+            if (p.linkedin_id && p.name) {
+              recruiterNamesMap.set(p.linkedin_id, p.name);
+            }
+          });
+        }
+      }
       const jobIds = initialJobs.map(j => j.job_id).filter(Boolean);
 
       // Fetch candidate counts only for these jobs
@@ -145,7 +166,8 @@ export function JobManagementPanel() {
         return {
           ...job,
           longlisted_count,
-          shortlisted_count
+          shortlisted_count,
+          recruiter_name: job.recruiter_id ? recruiterNamesMap.get(job.recruiter_id) || null : null
         };
       });
 
@@ -464,6 +486,10 @@ const JobGrid = memo(function JobGrid({
           
           <CardContent className="space-y-4">
             <div className="space-y-2 text-sm">
+              {job.recruiter_name && <div className="flex items-center text-muted-foreground">
+                  <UserCircle className="h-4 w-4 mr-2 text-primary" />
+                  <span className="font-medium">{job.recruiter_name}</span>
+                </div>}
               {job.job_location && <div className="flex items-center text-muted-foreground">
                   <MapPin className="h-4 w-4 mr-2 text-cyan" />
                   {job.job_location}
