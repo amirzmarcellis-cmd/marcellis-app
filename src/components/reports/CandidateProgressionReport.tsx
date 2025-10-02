@@ -268,10 +268,6 @@ export function CandidateProgressionReport() {
                   ))}
                 </SelectContent>
               </Select>
-              <Button variant="outline" size="sm">
-                <Download className="w-4 h-4 mr-2" />
-                Export
-              </Button>
             </div>
           </div>
         </CardHeader>
