@@ -40,31 +40,25 @@ serve(async (req) => {
     }
 
     // Check if user has admin privileges or is a team leader
-    const { data: profileData, error: roleError } = await supabaseAdmin
-      .from('profiles')
-      .select('is_admin')
-      .eq('user_id', user.id)
-      .single();
+    const [userRoleData, membershipData] = await Promise.all([
+      supabaseAdmin
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .maybeSingle(),
+      supabaseAdmin
+        .from('memberships')
+        .select('role')
+        .eq('user_id', user.id)
+    ]);
 
-    if (roleError) {
-      console.error('Error checking user roles:', roleError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to check user roles' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    const orgRole = userRoleData.data?.role || 'EMPLOYEE';
+    const isAdmin = orgRole === 'ADMIN';
+    const isManagement = orgRole === 'MANAGEMENT';
+    const isTeamLeader = membershipData.data?.some((m: any) => m.role === 'TEAM_LEADER');
 
-    // Check if user is team leader
-    const { data: membershipData } = await supabaseAdmin
-      .from('memberships')
-      .select('role')
-      .eq('user_id', user.id);
-
-    const isAdmin = profileData?.is_admin;
-    const isTeamLeader = membershipData?.some((m: any) => m.role === 'MANAGER');
-
-    if (!isAdmin && !isTeamLeader) {
-      console.error('User does not have admin or team leader role');
+    if (!isAdmin && !isManagement && !isTeamLeader) {
+      console.error('User does not have sufficient permissions');
       return new Response(
         JSON.stringify({ error: 'Insufficient permissions' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -192,17 +186,27 @@ serve(async (req) => {
               .upsert({
                 user_id: existingUser.id,
                 name: userData.name,
-                email: userData.email
+                email: userData.email,
+                is_admin: userData.org_role === 'admin' // backwards compatibility
+              });
+
+            // Update or insert organization role
+            await supabaseAdmin
+              .from('user_roles')
+              .upsert({
+                user_id: existingUser.id,
+                role: userData.org_role === 'admin' ? 'ADMIN' : 
+                      userData.org_role === 'management' ? 'MANAGEMENT' : 'EMPLOYEE'
               });
 
             // Create team membership if team is specified
-            if (userData.team) {
+            if (userData.team && (userData.org_role === 'team_member' || userData.org_role === 'team_leader')) {
               await supabaseAdmin
                 .from('memberships')
                 .upsert({
                   user_id: existingUser.id,
                   team_id: userData.team,
-                  role: userData.role === 'team_leader' ? 'MANAGER' : 'EMPLOYEE'
+                  role: userData.org_role === 'team_leader' ? 'TEAM_LEADER' : 'EMPLOYEE'
                 });
             }
             
@@ -227,7 +231,7 @@ serve(async (req) => {
               user_id: newUser.user.id,
               name: userData.name,
               email: userData.email,
-              is_admin: userData.is_admin || false,
+              is_admin: userData.org_role === 'admin', // backwards compatibility
               slug: 'me'
             });
 
@@ -235,14 +239,29 @@ serve(async (req) => {
             console.error('Profile creation error:', profileError);
           }
 
+          // Organization role is automatically created by trigger, but update if needed
+          const roleMapping = {
+            'admin': 'ADMIN',
+            'management': 'MANAGEMENT',
+            'team_leader': 'EMPLOYEE', // team_leader is team-based, not org-level
+            'team_member': 'EMPLOYEE'
+          };
+          
+          const orgRoleValue = roleMapping[userData.org_role] || 'EMPLOYEE';
+          
+          await supabaseAdmin
+            .from('user_roles')
+            .update({ role: orgRoleValue })
+            .eq('user_id', newUser.user.id);
+
           // Create team membership if team is specified
-          if (userData.team) {
+          if (userData.team && (userData.org_role === 'team_member' || userData.org_role === 'team_leader')) {
             const { error: membershipError } = await supabaseAdmin
               .from('memberships')
               .insert({
                 user_id: newUser.user.id,
                 team_id: userData.team,
-                role: userData.role === 'team_leader' ? 'MANAGER' : 'EMPLOYEE'
+                role: userData.org_role === 'team_leader' ? 'TEAM_LEADER' : 'EMPLOYEE'
               });
 
             if (membershipError) {

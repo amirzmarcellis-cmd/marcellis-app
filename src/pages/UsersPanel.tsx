@@ -48,30 +48,35 @@ const roleOptions: { value: UserRole; label: string; icon: any }[] = [
   { value: 'team_leader', label: 'Team Leader', icon: UserCheck },
 ];
 
-const getRoleDisplay = (user: Profile, userMemberships: Array<{team_id: string, role: string, team_name: string}>, isAdmin?: boolean) => {
-  // For backwards compatibility, check is_admin first
-  if (isAdmin || user.is_admin) {
+const getRoleDisplay = (user: Profile, userMemberships: Array<{team_id: string, role: string, team_name: string}>, orgRole?: string) => {
+  // Check organization role first (from user_roles table)
+  if (orgRole === 'ADMIN') {
     return { label: 'Admin', icon: Crown, variant: 'default' as const };
   }
   
-  // Check if user has team roles
+  if (orgRole === 'MANAGEMENT') {
+    return { label: 'Management', icon: Briefcase, variant: 'default' as const };
+  }
+  
+  // Check if user has team roles (from memberships table)
   if (userMemberships.length > 0) {
     const membership = userMemberships[0]; // Take the first membership
     switch (membership.role) {
-      case 'MANAGER':
+      case 'TEAM_LEADER':
         return { label: 'Team Leader', icon: UserCheck, variant: 'secondary' as const };
       case 'EMPLOYEE':
         return { label: 'Team Member', icon: Users, variant: 'secondary' as const };
     }
   }
   
-  return { label: 'User', icon: User, variant: 'secondary' as const };
+  return { label: 'Employee', icon: User, variant: 'secondary' as const };
 };
 
 export default function UsersPanel() {
   const [users, setUsers] = useState<Profile[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
   const [userMembershipsMap, setUserMembershipsMap] = useState<Record<string, Array<{team_id: string, role: string, team_name: string}>>>({});
+  const [userOrgRoles, setUserOrgRoles] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [newUser, setNewUser] = useState<NewUserData>({
@@ -101,6 +106,7 @@ export default function UsersPanel() {
       fetchTeams();
       fetchUserTeams();
       fetchUserMemberships();
+      fetchUserOrgRoles();
     }
   }, [session, canAccessUsersPanel, roleLoading]);
 
@@ -190,6 +196,25 @@ export default function UsersPanel() {
     }
   };
 
+  const fetchUserOrgRoles = async () => {
+    try {
+      const { data: roles, error } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      if (error) throw error;
+
+      const rolesMap: Record<string, string> = {};
+      roles?.forEach((r) => {
+        rolesMap[r.user_id] = r.role;
+      });
+
+      setUserOrgRoles(rolesMap);
+    } catch (error) {
+      console.error('Error fetching user org roles:', error);
+    }
+  };
+
   const fetchTeams = async () => {
     try {
       const { data, error } = await supabase
@@ -238,15 +263,14 @@ export default function UsersPanel() {
     try {
       setSubmitting(true);
       
-      const { data, error } = await supabase.functions.invoke('admin-user-management', {
+      const { error } = await supabase.functions.invoke('admin-user-management', {
         body: {
           action: 'create_user',
           userData: {
             email: newUser.email,
             password: newUser.password,
             name: newUser.name,
-            is_admin: newUser.role === 'admin', // Set admin based on role
-            role: newUser.role,
+            org_role: newUser.role, // Use org_role for organization-level roles
             team: newUser.team
           }
         }
@@ -264,8 +288,8 @@ export default function UsersPanel() {
       setNewUser({ email: '', password: '', name: '', role: 'admin' });
       setIsAddUserOpen(false);
       fetchUsers();
-      fetchUserMemberships(); // Refresh memberships when user is deleted
-      fetchUserMemberships(); // Refresh memberships when new user is added
+      fetchUserMemberships();
+      fetchUserOrgRoles();
     } catch (error: any) {
       console.error('Error creating user:', error);
       toast({
@@ -322,10 +346,11 @@ export default function UsersPanel() {
 
   const openEditUserDialog = (user: Profile) => {
     setEditingUser(user);
+    const orgRole = userOrgRoles[user.user_id] || 'EMPLOYEE';
     setEditUserData({
       name: user.name || '',
       email: user.email,
-      is_admin: user.is_admin
+      is_admin: orgRole === 'ADMIN' // For backwards compatibility
     });
     setIsEditUserOpen(true);
   };
@@ -542,7 +567,8 @@ export default function UsersPanel() {
                     </TableCell>
                     <TableCell>
                       {(() => {
-                        const roleDisplay = getRoleDisplay(user, userMembershipsMap[user.user_id] || [], user.is_admin);
+                        const orgRole = userOrgRoles[user.user_id] || 'EMPLOYEE';
+                        const roleDisplay = getRoleDisplay(user, userMembershipsMap[user.user_id] || [], orgRole);
                         const Icon = roleDisplay.icon;
                         const userMemberships = userMembershipsMap[user.user_id] || [];
                         return (
@@ -551,11 +577,11 @@ export default function UsersPanel() {
                               <Icon className="h-3 w-3 mr-1" />
                               {roleDisplay.label}
                             </Badge>
-                            {userMemberships.length > 0 && !user.is_admin && (
+                            {userMemberships.length > 0 && orgRole === 'EMPLOYEE' && (
                               <div className="text-xs text-muted-foreground">
                                 {userMemberships.map((membership, idx) => (
                                   <div key={idx}>
-                                    {membership.team_name} ({membership.role === 'MANAGER' ? 'Leader' : 'Member'})
+                                    {membership.team_name} ({membership.role === 'TEAM_LEADER' ? 'Leader' : 'Member'})
                                   </div>
                                 ))}
                               </div>

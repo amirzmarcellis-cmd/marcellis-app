@@ -653,19 +653,25 @@ export type Database = {
       }
       user_roles: {
         Row: {
-          id: string | null
-          role: string | null
-          user_id: string | null
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["org_role"]
+          updated_at: string | null
+          user_id: string
         }
         Insert: {
-          id?: string | null
-          role?: string | null
-          user_id?: string | null
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["org_role"]
+          updated_at?: string | null
+          user_id: string
         }
         Update: {
-          id?: string | null
-          role?: string | null
-          user_id?: string | null
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["org_role"]
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -677,6 +683,10 @@ export type Database = {
       binary_quantize: {
         Args: { "": string } | { "": unknown }
         Returns: unknown
+      }
+      get_org_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["org_role"]
       }
       get_user_team_role: {
         Args: { team_name: string; user_uuid: string }
@@ -704,6 +714,13 @@ export type Database = {
       halfvec_typmod_in: {
         Args: { "": unknown[] }
         Returns: number
+      }
+      has_org_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["org_role"]
+          _user_id: string
+        }
+        Returns: boolean
       }
       hnsw_bit_support: {
         Args: { "": unknown }
@@ -792,8 +809,9 @@ export type Database = {
       }
     }
     Enums: {
+      org_role: "ADMIN" | "MANAGEMENT" | "EMPLOYEE"
       task_status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED"
-      user_role: "MANAGER" | "EMPLOYEE"
+      user_role: "TEAM_LEADER" | "EMPLOYEE"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -921,8 +939,9 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      org_role: ["ADMIN", "MANAGEMENT", "EMPLOYEE"],
       task_status: ["NOT_STARTED", "IN_PROGRESS", "COMPLETED"],
-      user_role: ["MANAGER", "EMPLOYEE"],
+      user_role: ["TEAM_LEADER", "EMPLOYEE"],
     },
   },
 } as const

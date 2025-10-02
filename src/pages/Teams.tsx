@@ -55,7 +55,7 @@ export default function Teams() {
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const [availableUsers, setAvailableUsers] = useState<AvailableUser[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
-  const [selectedRole, setSelectedRole] = useState<'EMPLOYEE' | 'MANAGER'>('EMPLOYEE');
+  const [selectedRole, setSelectedRole] = useState<'EMPLOYEE' | 'TEAM_LEADER'>('EMPLOYEE');
   const [removeMemberId, setRemoveMemberId] = useState<string | null>(null);
   const [removeMemberTeamId, setRemoveMemberTeamId] = useState<string | null>(null);
   const { toast } = useToast();
@@ -445,10 +445,10 @@ export default function Teams() {
   const checkIfTeamLeader = () => {
     if (!profile?.user_id) return false;
     
-    // Check if user is a manager in any team
+    // Check if user is a team leader in any team
     for (const members of Object.values(teamMembers)) {
       const member = members.find(m => m.id === profile.user_id);
-      if (member && member.role === 'MANAGER') {
+      if (member && member.role === 'TEAM_LEADER') {
         return true;
       }
     }
@@ -469,7 +469,7 @@ export default function Teams() {
     
     // Then check membership role
     switch (member.role) {
-      case 'MANAGER':
+      case 'TEAM_LEADER':
         return { label: 'Team Leader', icon: Crown };
       case 'EMPLOYEE':
         return { label: 'Team Member', icon: User };
@@ -720,13 +720,13 @@ export default function Teams() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="role">Role</Label>
-              <Select value={selectedRole} onValueChange={(value: 'EMPLOYEE' | 'MANAGER') => setSelectedRole(value)}>
+              <Select value={selectedRole} onValueChange={(value: 'EMPLOYEE' | 'TEAM_LEADER') => setSelectedRole(value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="EMPLOYEE">Team Member</SelectItem>
-                  <SelectItem value="MANAGER">Team Leader</SelectItem>
+                  <SelectItem value="TEAM_LEADER">Team Leader</SelectItem>
                 </SelectContent>
               </Select>
             </div>

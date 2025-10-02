@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
-export type UserRole = 'admin' | 'manager' | 'recruiter';
+export type UserRole = 'admin' | 'management' | 'team_leader' | 'employee';
 
 export function useUserRole() {
   const { user } = useAuth();
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [isTeamLeader, setIsTeamLeader] = useState(false);
+  const [isManagement, setIsManagement] = useState(false);
 
   useEffect(() => {
     async function fetchUserRoles() {
@@ -16,40 +17,49 @@ export function useUserRole() {
         setRoles([]);
         setLoading(false);
         setIsTeamLeader(false);
+        setIsManagement(false);
         return;
       }
 
       try {
-        // Optimize: Fetch both profile and memberships in parallel
-        const [profileResult, membershipResult] = await Promise.all([
+        // Fetch organization role first, then team memberships
+        const [userRoleResult, membershipResult] = await Promise.all([
           supabase
-            .from('profiles')
-            .select('is_admin')
+            .from('user_roles')
+            .select('role')
             .eq('user_id', user.id)
-            .single(),
+            .maybeSingle(),
           supabase
             .from('memberships')
             .select('role')
             .eq('user_id', user.id)
         ]);
 
-        const isAdmin = profileResult.data?.is_admin || false;
+        // Get organization role (ADMIN, MANAGEMENT, or EMPLOYEE)
+        const orgRole = userRoleResult.data?.role || 'EMPLOYEE';
+        
+        // Check if user is team leader in any team
         const isLeader = Array.isArray(membershipResult.data) && 
-          membershipResult.data.some((m: any) => m.role === 'MANAGER');
+          membershipResult.data.some((m: any) => m.role === 'TEAM_LEADER');
         
         setIsTeamLeader(isLeader);
+        setIsManagement(orgRole === 'MANAGEMENT');
 
-        if (isAdmin) {
+        // Set roles based on hierarchy: Admin > Management > Team Leader > Employee
+        if (orgRole === 'ADMIN') {
           setRoles(['admin']);
+        } else if (orgRole === 'MANAGEMENT') {
+          setRoles(['management']);
         } else if (isLeader) {
-          setRoles(['manager']);
+          setRoles(['team_leader']);
         } else {
-          setRoles(['recruiter']);
+          setRoles(['employee']);
         }
       } catch (error) {
         console.error('Error fetching user roles:', error);
         setRoles([]);
         setIsTeamLeader(false);
+        setIsManagement(false);
       } finally {
         setLoading(false);
       }
@@ -60,21 +70,22 @@ export function useUserRole() {
 
   const hasRole = (role: UserRole) => roles.includes(role);
   const isAdmin = hasRole('admin');
-  const canManageUsers = isAdmin;
-  const canAccessAnalytics = isAdmin;
-  const canAccessUsersPanel = isAdmin;
-  const canManageTeamMembers = isAdmin || isTeamLeader;
+  const canManageUsers = isAdmin || isManagement;
+  const canAccessAnalytics = isAdmin || isManagement;
+  const canAccessUsersPanel = isAdmin || isManagement;
+  const canManageTeamMembers = isAdmin || isManagement || isTeamLeader;
 
   return {
     roles,
     hasRole,
     isAdmin,
     isSuperAdmin: isAdmin,
-    isManager: hasRole('manager'),
-    isRecruiter: hasRole('recruiter'),
+    isManagement,
+    isManager: hasRole('management'), // For backwards compatibility
     isTeamLeader,
+    isRecruiter: hasRole('employee'),
     canManageUsers,
-    canDeleteUsers: isAdmin,
+    canDeleteUsers: isAdmin || isManagement,
     canAccessAnalytics,
     canAccessUsersPanel,
     canManageTeamMembers,
