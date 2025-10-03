@@ -71,16 +71,18 @@ export default function CandidateDetails() {
       if (data && data.length > 0) {
         const candidateData = data[0];
         
-        // Try to get CV text from CVs table using user_id
+        // Try to get CV text and cv_link from CVs table using user_id
         let cvText = '';
+        let cvLink = null;
         if (candidateData.user_id) {
           const cvTextQueryResult: any = await (supabase as any)
             .from('CVs')
-            .select('cv_text')
+            .select('cv_text, cv_link')
             .eq('user_id', candidateData.user_id.toString());
           
           if (cvTextQueryResult.data && cvTextQueryResult.data.length > 0) {
             cvText = cvTextQueryResult.data[0].cv_text || '';
+            cvLink = cvTextQueryResult.data[0].cv_link || null;
           }
         }
         
@@ -90,7 +92,7 @@ export default function CandidateDetails() {
           email: candidateData.candidate_email || '',
           phone_number: candidateData.candidate_phone_number || '',
           cv_text: cvText,
-          cv_link: candidateData.cv_link || null
+          cv_link: cvLink
         });
       } else {
         setCandidate(null);
