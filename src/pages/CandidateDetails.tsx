@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { User, Mail, Phone, FileText, Search, ArrowLeft } from 'lucide-react';
+import { User, Mail, Phone, FileText, Search, ArrowLeft, ExternalLink } from 'lucide-react';
 
 interface Candidate {
   user_id: string;
@@ -11,6 +11,7 @@ interface Candidate {
   email: string;
   phone_number: string;
   cv_text: string;
+  cv_link?: string | null;
 }
 
 export default function CandidateDetails() {
@@ -47,7 +48,8 @@ export default function CandidateDetails() {
           name: candidateData.name || `${candidateData.Firstname || ''} ${candidateData.Lastname || ''}`.trim() || 'Unknown Candidate',
           email: candidateData.email || '',
           phone_number: candidateData.phone_number || '',
-          cv_text: candidateData.cv_text || ''
+          cv_text: candidateData.cv_text || '',
+          cv_link: candidateData.cv_link || null
         });
         return;
       }
@@ -87,7 +89,8 @@ export default function CandidateDetails() {
           name: candidateData.candidate_name || 'Unknown Candidate',
           email: candidateData.candidate_email || '',
           phone_number: candidateData.candidate_phone_number || '',
-          cv_text: cvText
+          cv_text: cvText,
+          cv_link: candidateData.cv_link || null
         });
       } else {
         setCandidate(null);
@@ -254,6 +257,17 @@ export default function CandidateDetails() {
             <User className="h-4 w-4 text-muted-foreground" />
             <span>User ID: {candidate.user_id}</span>
           </div>
+          {candidate.cv_link && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open(candidate.cv_link!, '_blank')}
+              className="w-full sm:w-auto"
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              View CV Link
+            </Button>
+          )}
         </CardContent>
       </Card>
 
