@@ -113,6 +113,9 @@ export default function Index() {
     }
     try {
       console.log('Starting dashboard data fetch...');
+      console.log('User roles:', { isAdmin, isManager, isTeamLeader });
+      console.log('User profile:', { email: profile?.email, name: profile?.name });
+      
     // Optimize: Fetch jobs first, then only related candidates (avoid missing column and large payload)
     let jobsQuery = supabase
       .from('Jobs')
@@ -121,6 +124,7 @@ export default function Index() {
     
     // Filter jobs based on user role
     const canViewAllJobs = isAdmin || isManager || isTeamLeader;
+    console.log('Can view all jobs:', canViewAllJobs);
     if (!canViewAllJobs) {
       if (profileLoading) {
         return; // wait until profile is loaded to decide access
@@ -150,8 +154,16 @@ export default function Index() {
 
     const { data: jobsData, error: jobsError } = await jobsQuery;
 
+    console.log('Jobs query result:', { 
+      count: jobsData?.length || 0, 
+      canViewAllJobs,
+      hasJobsData: !!jobsData,
+      error: jobsError 
+    });
+
     // If employee has no assigned jobs, set empty state and return early
     if (!canViewAllJobs && (!jobsData || jobsData.length === 0)) {
+      console.log('Employee with no assigned jobs - setting empty state');
       setData({
         totalCandidates: 0,
         totalJobs: 0,
@@ -174,6 +186,7 @@ export default function Index() {
     let jobsCvsError: any = null;
 
     const jobIds = (jobsData || []).map((j: any) => j.job_id).filter(Boolean);
+    console.log('Fetching Jobs_CVs for job IDs:', jobIds);
     if (jobIds.length > 0) {
       const { data, error } = await supabase
         .from('Jobs_CVs')
