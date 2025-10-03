@@ -50,19 +50,12 @@ export function JobManagementPanel() {
     name: string;
     color: string | null;
   }>>([]);
-  const [isTeamLeader, setIsTeamLeader] = useState(false);
   const navigate = useNavigate();
   const {
     toast
   } = useToast();
   const { profile, loading: profileLoading } = useProfile();
-  const { isAdmin, isManager } = useUserRole();
-
-  useEffect(() => {
-    if (profile?.user_id) {
-      checkTeamLeaderStatus();
-    }
-  }, [profile]);
+  const { isAdmin, isManager, isTeamLeader } = useUserRole();
 
   useEffect(() => {
     if (profile?.user_id) {
@@ -73,22 +66,6 @@ export function JobManagementPanel() {
       setLoading(false);
     }
   }, [profile?.user_id, isAdmin, isManager, isTeamLeader, profileLoading]);
-
-  const checkTeamLeaderStatus = async () => {
-    if (!profile?.user_id) return;
-    
-    try {
-      const { data, error } = await supabase.rpc('is_team_leader', {
-        user_uuid: profile.user_id
-      });
-      
-      if (error) throw error;
-      setIsTeamLeader(data || false);
-    } catch (error) {
-      console.error('Error checking team leader status:', error);
-      setIsTeamLeader(false);
-    }
-  };
   const fetchJobs = useCallback(async () => {
     if (!profile?.user_id) {
       setLoading(false);
