@@ -83,8 +83,8 @@ export function JobManagementPanel() {
       const canViewAllJobs = isAdmin || isManager || isTeamLeader;
       
       if (!canViewAllJobs) {
-        // Regular employees only see their own jobs
-        query = query.eq('recruiter_id', profile.linkedin_id || profile.user_id);
+        // Regular employees only see jobs assigned to them
+        query = query.eq('assignment', profile.email);
       }
 
       // Fetch jobs first

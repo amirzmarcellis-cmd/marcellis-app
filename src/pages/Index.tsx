@@ -14,6 +14,7 @@ import { format, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
 import { StatusDropdown } from '@/components/candidates/StatusDropdown';
 import { useProfile } from '@/hooks/useProfile';
+import { useUserRole } from '@/hooks/useUserRole';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Play, Pause, Search, FileText, Upload, Users, Briefcase, Clock, Star, TrendingUp, Calendar, CheckCircle, XCircle, ClipboardList, Video, Target, Activity, Timer, Phone, UserCheck, Building2 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -53,6 +54,7 @@ interface Interview {
 }
 export default function Index() {
   const { profile } = useProfile();
+  const { isAdmin, isManager, isTeamLeader } = useUserRole();
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -101,10 +103,19 @@ export default function Index() {
     try {
       console.log('Starting dashboard data fetch...');
     // Optimize: Fetch jobs first, then only related candidates (avoid missing column and large payload)
-    const { data: jobsData, error: jobsError } = await supabase
+    let jobsQuery = supabase
       .from('Jobs')
       .select('job_id, job_title, job_location, status, Timestamp, jd_summary, assignment')
       .eq('Processed', 'Yes');
+    
+    // Filter jobs based on user role
+    const canViewAllJobs = isAdmin || isManager || isTeamLeader;
+    if (!canViewAllJobs && profile?.email) {
+      // Regular employees only see jobs assigned to them
+      jobsQuery = jobsQuery.eq('assignment', profile.email);
+    }
+
+    const { data: jobsData, error: jobsError } = await jobsQuery;
 
     let jobsCvsData: any[] | null = [];
     let jobsCvsError: any = null;
