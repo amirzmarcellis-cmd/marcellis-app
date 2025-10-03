@@ -908,7 +908,6 @@ const handleRemoveSelectedCandidates = async () => {
             }
           }
         }
-      }
       };
       collectFrom(candidates);
       collectFrom(longlistedCandidates);
