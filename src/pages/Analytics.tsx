@@ -95,44 +95,104 @@ export default function Analytics() {
 
   const fetchAnalyticsData = async () => {
     try {
-      // Use setTimeout to defer data loading and show skeleton first
-      setTimeout(() => {
-        setData({
-          totalCandidates: 0,
-          activeCandidates: 0,
-          activeJobs: 0,
-          totalCallLogs: 0,
-          contactedCount: 0,
-          averageScore: 0,
-          avgDaysToHire: 0,
-          scoreDistribution: {
-            high: 0,
-            medium: 0,
-            low: 0
-          },
-          contactStatus: {
-            callDone: 0,
-            contacted: 0,
-            readyToContact: 0,
-            notContacted: 0,
-            rejected: 0,
-            shortlisted: 0,
-            tasked: 0,
-            interview: 0,
-            hired: 0,
-          },
-          candidatesPerJob: [],
-          topPerformingJobs: [],
-          averageScoresByJob: [],
-          averageSalariesByJob: [],
-          callSuccessRate: 0,
-          contactRate: 0,
-          avgCandidatesPerJob: 0
-        });
-        setLoading(false);
-      }, 0);
+      // Fetch all candidates
+      const { data: candidates, error: candidatesError } = await supabase
+        .from('Jobs_CVs')
+        .select('*');
+
+      if (candidatesError) throw candidatesError;
+
+      // Fetch all jobs
+      const { data: jobs, error: jobsError } = await supabase
+        .from('Jobs')
+        .select('job_id, job_title, Processed');
+
+      if (jobsError) throw jobsError;
+
+      const totalCandidates = candidates?.length || 0;
+      const activeJobs = jobs?.filter(j => j.Processed === 'Yes').length || 0;
+
+      // Calculate contact status counts
+      const contactStatus = {
+        callDone: candidates?.filter(c => c.contacted === 'Call Done').length || 0,
+        contacted: candidates?.filter(c => c.contacted === 'Contacted').length || 0,
+        readyToContact: candidates?.filter(c => c.contacted === 'Ready to Contact').length || 0,
+        notContacted: candidates?.filter(c => !c.contacted || c.contacted === 'Not Contacted').length || 0,
+        rejected: candidates?.filter(c => c.contacted === 'Rejected').length || 0,
+        shortlisted: candidates?.filter(c => c.contacted === 'Shortlisted').length || 0,
+        tasked: candidates?.filter(c => c.contacted === 'Tasked').length || 0,
+        interview: candidates?.filter(c => c.contacted === 'Interview').length || 0,
+        hired: candidates?.filter(c => c.contacted === 'Hired').length || 0,
+      };
+
+      const totalCallLogs = candidates?.filter(c => c.callcount && c.callcount > 0).length || 0;
+      const contactedCount = contactStatus.callDone + contactStatus.contacted;
+
+      // Calculate average scores
+      const candidatesWithScores = candidates?.filter(c => c.cv_score !== null && c.cv_score !== undefined) || [];
+      const averageScore = candidatesWithScores.length > 0
+        ? Math.round(candidatesWithScores.reduce((sum, c) => sum + (c.cv_score || 0), 0) / candidatesWithScores.length)
+        : 0;
+
+      // Score distribution
+      const scoreDistribution = {
+        high: candidates?.filter(c => c.cv_score && c.cv_score >= 75).length || 0,
+        medium: candidates?.filter(c => c.cv_score && c.cv_score >= 50 && c.cv_score < 75).length || 0,
+        low: candidates?.filter(c => c.cv_score && c.cv_score > 0 && c.cv_score < 50).length || 0,
+      };
+
+      // Candidates per job
+      const jobCandidateCounts = jobs?.map(job => {
+        const count = candidates?.filter(c => c.job_id === job.job_id).length || 0;
+        return {
+          jobTitle: job.job_title || 'Unknown',
+          count
+        };
+      }).filter(j => j.count > 0) || [];
+
+      // Average scores by job
+      const averageScoresByJob = jobs?.map(job => {
+        const jobCandidates = candidates?.filter(c => c.job_id === job.job_id && c.cv_score) || [];
+        const avgScore = jobCandidates.length > 0
+          ? Math.round(jobCandidates.reduce((sum, c) => sum + (c.cv_score || 0), 0) / jobCandidates.length)
+          : 0;
+        return {
+          jobTitle: job.job_title || 'Unknown',
+          averageScore: avgScore
+        };
+      }).filter(j => j.averageScore > 0) || [];
+
+      // Top performing jobs
+      const topPerformingJobs = averageScoresByJob
+        .map((job, index) => ({
+          ...job,
+          candidateCount: candidates?.filter(c => c.job_id === jobs?.find(j => j.job_title === job.jobTitle)?.job_id).length || 0,
+          rank: index + 1
+        }))
+        .sort((a, b) => b.averageScore - a.averageScore)
+        .slice(0, 5);
+
+      setData({
+        totalCandidates,
+        activeCandidates: totalCandidates,
+        activeJobs,
+        totalCallLogs,
+        contactedCount,
+        averageScore,
+        avgDaysToHire: 0,
+        scoreDistribution,
+        contactStatus,
+        candidatesPerJob: jobCandidateCounts,
+        topPerformingJobs,
+        averageScoresByJob,
+        averageSalariesByJob: [],
+        callSuccessRate: totalCallLogs > 0 ? Math.round((contactedCount / totalCallLogs) * 100) : 0,
+        contactRate: totalCandidates > 0 ? Math.round((contactedCount / totalCandidates) * 100) : 0,
+        avgCandidatesPerJob: activeJobs > 0 ? Math.round(totalCandidates / activeJobs) : 0
+      });
     } catch (error) {
       console.error('Error fetching analytics data:', error);
+    } finally {
       setLoading(false);
     }
   };
