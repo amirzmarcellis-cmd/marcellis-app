@@ -102,8 +102,10 @@ export function JobManagementPanel() {
           groups ( id, name, color )
         `);
 
-      const canViewAllJobs = isAdmin || isManager || isTeamLeader;
+      // Admins and Managers can view all jobs
+      const canViewAllJobs = isAdmin || isManager;
       if (!canViewAllJobs) {
+        // Team leaders and employees only see their own jobs
         query = query.eq('recruiter_id', profile.user_id);
       }
 
