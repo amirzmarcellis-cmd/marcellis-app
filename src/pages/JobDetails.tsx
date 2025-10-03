@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
@@ -83,6 +84,13 @@ export default function JobDetails() {
   const [candidateToRemove, setCandidateToRemove] = useState<{
     id: string;
     name: string;
+  } | null>(null);
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+  const [rejectCandidateData, setRejectCandidateData] = useState<{
+    jobId: string;
+    candidateId: string;
+    callid: number;
   } | null>(null);
 
   // Function to fetch LinkedIn ID and redirect to profile
@@ -1089,7 +1097,11 @@ const handleRemoveSelectedCandidates = async () => {
       });
     }
   };
-  const handleRejectCandidate = async (jobId: string, candidateId: string, callid: number) => {
+  const handleRejectCandidate = async (reason: string) => {
+    if (!rejectCandidateData) return;
+    
+    const { jobId, candidateId, callid } = rejectCandidateData;
+    
     try {
       // Find the candidate data from the candidates array
       const candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
@@ -1101,6 +1113,20 @@ const handleRemoveSelectedCandidates = async () => {
         });
         return;
       }
+
+      // Update the database with the rejection reason
+      const { error: updateError } = await supabase
+        .from('Jobs_CVs')
+        .update({ 
+          contacted: 'Rejected',
+          Reason_to_reject: reason 
+        })
+        .eq('recordid', candidate.recordid);
+
+      if (updateError) {
+        throw updateError;
+      }
+
       const response = await fetch('https://hook.eu2.make.com/mk46k4ibvs5n5nk1lto9csljygesv75f', {
         method: 'POST',
         headers: {
@@ -1113,11 +1139,17 @@ const handleRemoveSelectedCandidates = async () => {
           itris_job_id: job?.itris_job_id || ""
         })
       });
+      
       if (response.ok) {
         toast({
           title: "Candidate Rejected",
           description: "The candidate has been successfully rejected."
         });
+        setShowRejectDialog(false);
+        setRejectReason("");
+        setRejectCandidateData(null);
+        // Refresh data
+        fetchCandidates();
       } else {
         throw new Error('Failed to reject candidate');
       }
@@ -1129,6 +1161,11 @@ const handleRemoveSelectedCandidates = async () => {
         variant: "destructive"
       });
     }
+  };
+
+  const openRejectDialog = (jobId: string, candidateId: string, callid: number) => {
+    setRejectCandidateData({ jobId, candidateId, callid });
+    setShowRejectDialog(true);
   };
   const handleGenerateShortList = async () => {
     if (!job?.job_id || candidates.length === 0) {
@@ -1880,7 +1917,7 @@ const handleRemoveSelectedCandidates = async () => {
                 {mainCandidate["Contacted"] === "Rejected" ? <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed" disabled>
                     <X className="w-3 h-3 mr-1" />
                     Rejected
-                  </Button> : <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200" onClick={() => handleRejectCandidate(id!, candidateId, candidateContacts[0].callid)}>
+                  </Button> : <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200" onClick={() => openRejectDialog(id!, candidateId, candidateContacts[0].callid)}>
                     <X className="w-3 h-3 mr-1" />
                     Reject Candidate
                   </Button>}
@@ -3239,6 +3276,45 @@ const handleRemoveSelectedCandidates = async () => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Reject Candidate Dialog */}
+        <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Reject Candidate</DialogTitle>
+              <DialogDescription>
+                Please provide a reason for rejecting this candidate.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <Textarea
+                placeholder="Enter rejection reason..."
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowRejectDialog(false);
+                  setRejectReason("");
+                  setRejectCandidateData(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => handleRejectCandidate(rejectReason)}
+                disabled={!rejectReason.trim()}
+              >
+                Reject
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
 
       </div>;

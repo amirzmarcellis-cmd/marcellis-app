@@ -293,6 +293,7 @@ export type Database = {
           notice_period: string | null
           qualification_status: string | null
           qualifications: string | null
+          Reason_to_reject: string | null
           recordid: number
           recording: string | null
           recruiter_id: string | null
@@ -331,6 +332,7 @@ export type Database = {
           notice_period?: string | null
           qualification_status?: string | null
           qualifications?: string | null
+          Reason_to_reject?: string | null
           recordid?: number
           recording?: string | null
           recruiter_id?: string | null
@@ -369,6 +371,7 @@ export type Database = {
           notice_period?: string | null
           qualification_status?: string | null
           qualifications?: string | null
+          Reason_to_reject?: string | null
           recordid?: number
           recording?: string | null
           recruiter_id?: string | null
