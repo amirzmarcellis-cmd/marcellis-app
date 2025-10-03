@@ -172,6 +172,30 @@ export default function Analytics() {
         .sort((a, b) => b.averageScore - a.averageScore)
         .slice(0, 5);
 
+      // Average salaries by job
+      const averageSalariesByJob = jobs?.map(job => {
+        const jobCandidates = candidates?.filter(c => c.job_id === job.job_id) || [];
+        const candidatesWithCurrentSalary = jobCandidates.filter(c => c.current_salary);
+        const candidatesWithExpectedSalary = jobCandidates.filter(c => c.salary_expectations);
+        
+        const avgCurrent = candidatesWithCurrentSalary.length > 0
+          ? Math.round(candidatesWithCurrentSalary.reduce((sum, c) => sum + (c.current_salary || 0), 0) / candidatesWithCurrentSalary.length)
+          : 0;
+        
+        const avgExpected = candidatesWithExpectedSalary.length > 0
+          ? Math.round(candidatesWithExpectedSalary.reduce((sum, c) => {
+              const salary = parseInt(c.salary_expectations?.replace(/[^\d]/g, '') || '0');
+              return sum + salary;
+            }, 0) / candidatesWithExpectedSalary.length)
+          : 0;
+        
+        return {
+          jobTitle: job.job_title || 'Unknown',
+          avgCurrent,
+          avgExpected
+        };
+      }).filter(j => j.avgCurrent > 0 || j.avgExpected > 0) || [];
+
       setData({
         totalCandidates,
         activeCandidates: totalCandidates,
@@ -185,7 +209,7 @@ export default function Analytics() {
         candidatesPerJob: jobCandidateCounts,
         topPerformingJobs,
         averageScoresByJob,
-        averageSalariesByJob: [],
+        averageSalariesByJob,
         callSuccessRate: totalCallLogs > 0 ? Math.round((contactedCount / totalCallLogs) * 100) : 0,
         contactRate: totalCandidates > 0 ? Math.round((contactedCount / totalCandidates) * 100) : 0,
         avgCandidatesPerJob: activeJobs > 0 ? Math.round(totalCandidates / activeJobs) : 0
@@ -482,32 +506,30 @@ export default function Analytics() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[300px]">
-              <div className="space-y-4">
-                {data?.topPerformingJobs.map((job, index) => (
-                  <div 
-                    key={index}
-                    className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border hover:border-primary/30 transition-all"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center text-foreground font-bold text-sm">
-                        #{job.rank}
-                      </div>
-                      <div>
-                        <p className="text-foreground font-medium text-sm">{job.jobTitle}</p>
-                        <p className="text-blue-300 text-xs">{job.candidateCount} candidates</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Badge className="bg-red-500/20 text-red-400 border-red-400/30">
-                        {job.averageScore}/100
-                      </Badge>
-                      <Star className="w-4 h-4 text-yellow-400" fill="currentColor" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
+            <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={data?.topPerformingJobs}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                  <XAxis 
+                    dataKey="jobTitle" 
+                    angle={-45}
+                    textAnchor="end"
+                    height={100}
+                    tick={{ fontSize: 10, fill: '#93c5fd' }}
+                  />
+                  <YAxis tick={{ fill: '#93c5fd' }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1f2937', 
+                      border: '1px solid #374151',
+                      borderRadius: '8px'
+                    }}
+                  />
+                  <Bar dataKey="averageScore" name="Avg Score" fill="#10b981" />
+                  <Bar dataKey="candidateCount" name="Candidates" fill="#f59e0b" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Suspense>
           </CardContent>
         </Card>
 
@@ -555,28 +577,30 @@ export default function Analytics() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={data?.averageSalariesByJob}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis 
-                  dataKey="jobTitle" 
-                  angle={-45}
-                  textAnchor="end"
-                  height={100}
-                  tick={{ fontSize: 10, fill: '#93c5fd' }}
-                />
-                <YAxis tick={{ fill: '#93c5fd' }} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1f2937', 
-                    border: '1px solid #374151',
-                    borderRadius: '8px'
-                  }}
-                />
-                <Bar dataKey="avgCurrent" name="Avg Current" fill="#3b82f6" />
-                <Bar dataKey="avgExpected" name="Avg Expected" fill="#f59e0b" />
-              </BarChart>
-            </ResponsiveContainer>
+            <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={data?.averageSalariesByJob}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                  <XAxis 
+                    dataKey="jobTitle" 
+                    angle={-45}
+                    textAnchor="end"
+                    height={100}
+                    tick={{ fontSize: 10, fill: '#93c5fd' }}
+                  />
+                  <YAxis tick={{ fill: '#93c5fd' }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1f2937', 
+                      border: '1px solid #374151',
+                      borderRadius: '8px'
+                    }}
+                  />
+                  <Bar dataKey="avgCurrent" name="Avg Current" fill="#3b82f6" />
+                  <Bar dataKey="avgExpected" name="Avg Expected" fill="#f59e0b" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Suspense>
           </CardContent>
         </Card>
       </div>
