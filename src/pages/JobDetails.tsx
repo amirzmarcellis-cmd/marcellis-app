@@ -2759,17 +2759,13 @@ const handleRemoveSelectedCandidates = async () => {
                                         <Building className="w-4 h-4 mr-2 flex-shrink-0" />
                                         <span className="truncate">{mainCandidate["Source"]}</span>
                                       </div>}
-                                       {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && !["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && <div className="flex items-center text-muted-foreground min-w-0">
-                                           <Star className="w-4 h-4 mr-2 flex-shrink-0" />
-                                           <span className="truncate">LinkedIn Score: {mainCandidate["linkedin_score"] ?? mainCandidate["cv_score"] ?? mainCandidate["CV Score"] ?? 'N/A'}</span>
-                                         </div>}
                                   </div>
 
                                    {/* CV Score and Reason Section */}
                                    <div className="space-y-2 pt-2 border-t">
                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                                         <div className="space-y-1">
-                                           {(!["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") || typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('itris')) && <div className="flex items-center justify-between">
+                                           {<div className="flex items-center justify-between">
                                                 <span className="text-muted-foreground">{typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? 'LinkedIn Score:' : 'CV Score:'}</span>
                                                 {(() => {
                                     const score = typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "N/A" : mainCandidate["cv_score"] || "N/A";
