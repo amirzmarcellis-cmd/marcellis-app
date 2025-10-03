@@ -95,22 +95,37 @@ export default function Analytics() {
 
   const fetchAnalyticsData = async () => {
     try {
+      console.log('Fetching analytics data...');
+      
       // Fetch all candidates
       const { data: candidates, error: candidatesError } = await supabase
         .from('Jobs_CVs')
         .select('*');
 
-      if (candidatesError) throw candidatesError;
+      if (candidatesError) {
+        console.error('Error fetching candidates:', candidatesError);
+        throw candidatesError;
+      }
+
+      console.log('Candidates fetched:', candidates?.length || 0);
 
       // Fetch all jobs
       const { data: jobs, error: jobsError } = await supabase
         .from('Jobs')
         .select('job_id, job_title, Processed');
 
-      if (jobsError) throw jobsError;
+      if (jobsError) {
+        console.error('Error fetching jobs:', jobsError);
+        throw jobsError;
+      }
+
+      console.log('Jobs fetched:', jobs?.length || 0);
 
       const totalCandidates = candidates?.length || 0;
       const activeJobs = jobs?.filter(j => j.Processed === 'Yes').length || 0;
+
+      console.log('Total candidates:', totalCandidates);
+      console.log('Active jobs:', activeJobs);
 
       // Calculate contact status counts
       const contactStatus = {
@@ -196,7 +211,7 @@ export default function Analytics() {
         };
       }).filter(j => j.avgCurrent > 0 || j.avgExpected > 0) || [];
 
-      setData({
+      const analyticsData = {
         totalCandidates,
         activeCandidates: totalCandidates,
         activeJobs,
@@ -213,9 +228,41 @@ export default function Analytics() {
         callSuccessRate: totalCallLogs > 0 ? Math.round((contactedCount / totalCallLogs) * 100) : 0,
         contactRate: totalCandidates > 0 ? Math.round((contactedCount / totalCandidates) * 100) : 0,
         avgCandidatesPerJob: activeJobs > 0 ? Math.round(totalCandidates / activeJobs) : 0
-      });
+      };
+
+      console.log('Analytics data prepared:', analyticsData);
+      setData(analyticsData);
     } catch (error) {
       console.error('Error fetching analytics data:', error);
+      // Set empty data on error so UI doesn't show null
+      setData({
+        totalCandidates: 0,
+        activeCandidates: 0,
+        activeJobs: 0,
+        totalCallLogs: 0,
+        contactedCount: 0,
+        averageScore: 0,
+        avgDaysToHire: 0,
+        scoreDistribution: { high: 0, medium: 0, low: 0 },
+        contactStatus: {
+          callDone: 0,
+          contacted: 0,
+          readyToContact: 0,
+          notContacted: 0,
+          rejected: 0,
+          shortlisted: 0,
+          tasked: 0,
+          interview: 0,
+          hired: 0,
+        },
+        candidatesPerJob: [],
+        topPerformingJobs: [],
+        averageScoresByJob: [],
+        averageSalariesByJob: [],
+        callSuccessRate: 0,
+        contactRate: 0,
+        avgCandidatesPerJob: 0
+      });
     } finally {
       setLoading(false);
     }
