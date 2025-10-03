@@ -1,12 +1,24 @@
 // @ts-nocheck
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Users, Briefcase, Phone, TrendingUp, Star, CheckCircle, PhoneCall, Clock } from 'lucide-react';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+// Lazy load chart components
+const PieChart = lazy(() => import('recharts').then(mod => ({ default: mod.PieChart })));
+const Pie = lazy(() => import('recharts').then(mod => ({ default: mod.Pie })));
+const Cell = lazy(() => import('recharts').then(mod => ({ default: mod.Cell })));
+const BarChart = lazy(() => import('recharts').then(mod => ({ default: mod.BarChart })));
+const Bar = lazy(() => import('recharts').then(mod => ({ default: mod.Bar })));
+const XAxis = lazy(() => import('recharts').then(mod => ({ default: mod.XAxis })));
+const YAxis = lazy(() => import('recharts').then(mod => ({ default: mod.YAxis })));
+const CartesianGrid = lazy(() => import('recharts').then(mod => ({ default: mod.CartesianGrid })));
+const Tooltip = lazy(() => import('recharts').then(mod => ({ default: mod.Tooltip })));
+const ResponsiveContainer = lazy(() => import('recharts').then(mod => ({ default: mod.ResponsiveContainer })));
 
 interface AnalyticsData {
   totalCandidates: number;
@@ -82,53 +94,73 @@ export default function Analytics() {
   }, []);
 
   const fetchAnalyticsData = async () => {
-    // Mock analytics data for single-company structure
     try {
-      setData({
-        totalCandidates: 0,
-        activeCandidates: 0,
-        activeJobs: 0,
-        totalCallLogs: 0,
-        contactedCount: 0,
-        averageScore: 0,
-        avgDaysToHire: 0,
-        scoreDistribution: {
-          high: 0,
-          medium: 0,
-          low: 0
-        },
-        contactStatus: {
-          callDone: 0,
-          contacted: 0,
-          readyToContact: 0,
-          notContacted: 0,
-          rejected: 0,
-          shortlisted: 0,
-          tasked: 0,
-          interview: 0,
-          hired: 0,
-        },
-        candidatesPerJob: [],
-        topPerformingJobs: [],
-        averageScoresByJob: [],
-        averageSalariesByJob: [],
-        callSuccessRate: 0,
-        contactRate: 0,
-        avgCandidatesPerJob: 0
-      });
+      // Use setTimeout to defer data loading and show skeleton first
+      setTimeout(() => {
+        setData({
+          totalCandidates: 0,
+          activeCandidates: 0,
+          activeJobs: 0,
+          totalCallLogs: 0,
+          contactedCount: 0,
+          averageScore: 0,
+          avgDaysToHire: 0,
+          scoreDistribution: {
+            high: 0,
+            medium: 0,
+            low: 0
+          },
+          contactStatus: {
+            callDone: 0,
+            contacted: 0,
+            readyToContact: 0,
+            notContacted: 0,
+            rejected: 0,
+            shortlisted: 0,
+            tasked: 0,
+            interview: 0,
+            hired: 0,
+          },
+          candidatesPerJob: [],
+          topPerformingJobs: [],
+          averageScoresByJob: [],
+          averageSalariesByJob: [],
+          callSuccessRate: 0,
+          contactRate: 0,
+          avgCandidatesPerJob: 0
+        });
+        setLoading(false);
+      }, 0);
     } catch (error) {
       console.error('Error fetching analytics data:', error);
-    } finally {
       setLoading(false);
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-br dark:from-slate-900 dark:via-blue-900 dark:to-slate-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-cyan-400 text-lg">Loading Analytics...</p>
+      <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-br dark:from-slate-900 dark:via-blue-900 dark:to-slate-900 p-6">
+        <div className="mb-8">
+          <Skeleton className="h-10 w-80 mb-2" />
+          <Skeleton className="h-5 w-64" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+          {[...Array(5)].map((_, i) => (
+            <Card key={i} className="bg-card border-border dark:bg-white/10">
+              <CardContent className="p-6">
+                <Skeleton className="h-20 w-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {[...Array(2)].map((_, i) => (
+            <Card key={i} className="bg-card border-border dark:bg-white/10">
+              <CardContent className="p-6">
+                <Skeleton className="h-[300px] w-full" />
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     );
@@ -256,9 +288,10 @@ export default function Analytics() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-center h-[300px]">
-              <ResponsiveContainer width="50%" height="100%">
-                <PieChart>
+            <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
+              <div className="flex items-center justify-center h-[300px]">
+                <ResponsiveContainer width="50%" height="100%">
+                  <PieChart>
                   <Pie
                     data={scoreDistributionData}
                     cx="50%"
@@ -290,6 +323,7 @@ export default function Analytics() {
                 ))}
               </div>
             </div>
+            </Suspense>
           </CardContent>
         </Card>
 
@@ -302,9 +336,10 @@ export default function Analytics() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-center h-[300px]">
-              <ResponsiveContainer width="50%" height="100%">
-                <PieChart>
+            <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
+              <div className="flex items-center justify-center h-[300px]">
+                <ResponsiveContainer width="50%" height="100%">
+                  <PieChart>
                   <Pie
                     data={contactStatusData}
                     cx="50%"
@@ -336,6 +371,7 @@ export default function Analytics() {
                 ))}
               </div>
             </div>
+            </Suspense>
           </CardContent>
         </Card>
       </div>
@@ -351,8 +387,9 @@ export default function Analytics() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={data?.candidatesPerJob}>
+            <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={data?.candidatesPerJob}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis 
                   dataKey="jobTitle" 
@@ -372,6 +409,7 @@ export default function Analytics() {
                 <Bar dataKey="count" fill={COLORS.primary} />
               </BarChart>
             </ResponsiveContainer>
+            </Suspense>
           </CardContent>
         </Card>
 
@@ -422,8 +460,9 @@ export default function Analytics() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={data?.averageScoresByJob}>
+            <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={data?.averageScoresByJob}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis 
                   dataKey="jobTitle" 
@@ -443,6 +482,7 @@ export default function Analytics() {
                 <Bar dataKey="averageScore" fill={COLORS.primary} />
               </BarChart>
             </ResponsiveContainer>
+            </Suspense>
           </CardContent>
         </Card>
 
