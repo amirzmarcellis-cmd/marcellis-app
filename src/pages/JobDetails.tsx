@@ -1924,7 +1924,7 @@ const handleRemoveSelectedCandidates = async () => {
                 ) : (
                   <Badge variant="outline" className="border-2 border-amber-500 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50 transition-all duration-200">
                     <Clock className="w-3 h-3 mr-1" />
-                    Qualification Send
+                    Qualification Sent
                   </Badge>
                 )}
               </div>
