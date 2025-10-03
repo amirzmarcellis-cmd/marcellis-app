@@ -1130,9 +1130,11 @@ export default function JobDetails() {
   const handleRemoveFromLongList = async (candidateId: string) => {
     try {
       console.log('Attempting to remove candidate:', candidateId);
+      console.log('Job ID:', id);
       console.log('Available candidates:', candidates.map(c => ({
         id: c["Candidate_ID"],
         recordid: c.recordid,
+        user_id: c.user_id,
         name: c["Candidate Name"]
       })));
 
@@ -1148,27 +1150,53 @@ export default function JobDetails() {
       if (!candidate) {
         candidate = candidates.find(c => c.user_id === candidateId);
       }
+      
       if (!candidate) {
         console.error('Candidate not found. Searched for:', candidateId);
         console.error('Available candidate IDs:', candidates.map(c => c["Candidate_ID"]));
         throw new Error('Candidate not found in local data');
       }
-      console.log('Found candidate:', candidate);
+      
+      console.log('Found candidate to remove:', {
+        recordid: candidate.recordid,
+        user_id: candidate.user_id,
+        name: candidate["Candidate Name"]
+      });
 
       // Use the actual recordid from the database for deletion
-      const recordIdToDelete = candidate.recordid || candidateId;
+      const recordIdToDelete = candidate.recordid;
+      
+      if (!recordIdToDelete) {
+        console.error('No recordid found for candidate:', candidate);
+        throw new Error('Cannot delete candidate: missing recordid');
+      }
+
+      console.log('Deleting from Jobs_CVs with recordid:', recordIdToDelete, 'and job_id:', id);
 
       // Remove the candidate from the Jobs_CVs table using recordid
-      const {
-        error
-      } = await (supabase as any).from('Jobs_CVs').delete().eq('recordid', recordIdToDelete).eq('job_id', id);
+      const { data, error } = await supabase
+        .from('Jobs_CVs')
+        .delete()
+        .eq('recordid', recordIdToDelete)
+        .eq('job_id', id)
+        .select();
+        
+      console.log('Delete result:', { data, error });
+      
       if (error) {
         console.error('Supabase delete error:', error);
         throw error;
       }
 
+      console.log('Successfully deleted candidate from database');
+
       // Update the local state to remove the candidate
       setCandidates(prev => prev.filter(c => c["Candidate_ID"] !== candidateId));
+      setLonglistedCandidates(prev => prev.filter(c => c["Candidate_ID"] !== candidateId));
+      
+      // Refresh the data to ensure UI is in sync
+      await fetchLonglistedCandidates(String(id));
+      
       toast({
         title: "Success",
         description: "Candidate removed from long list"
@@ -1177,7 +1205,7 @@ export default function JobDetails() {
       console.error('Error removing candidate from long list:', error);
       toast({
         title: "Error",
-        description: "Failed to remove candidate from long list",
+        description: `Failed to remove candidate: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive"
       });
     }
