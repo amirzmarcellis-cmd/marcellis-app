@@ -53,8 +53,8 @@ interface Interview {
   updated_at: string;
 }
 export default function Index() {
-  const { profile } = useProfile();
-  const { isAdmin, isManager, isTeamLeader } = useUserRole();
+  const { profile, loading: profileLoading } = useProfile();
+  const { isAdmin, isManager, isTeamLeader, loading: rolesLoading } = useUserRole();
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -97,9 +97,20 @@ export default function Index() {
       setLoading(false);
     }, 5000);
     
-    return () => clearTimeout(timeout);
+  return () => clearTimeout(timeout);
   }, []);
+
+  // Fetch when auth roles and profile are ready
+  useEffect(() => {
+    if (!rolesLoading && !profileLoading) {
+      fetchDashboardData();
+    }
+  }, [rolesLoading, profileLoading, isAdmin, isManager, isTeamLeader, profile?.email]);
   const fetchDashboardData = async () => {
+    if (rolesLoading || profileLoading) {
+      console.log('Waiting for roles/profile to load...');
+      return;
+    }
     try {
       console.log('Starting dashboard data fetch...');
     // Optimize: Fetch jobs first, then only related candidates (avoid missing column and large payload)
@@ -111,6 +122,9 @@ export default function Index() {
     // Filter jobs based on user role
     const canViewAllJobs = isAdmin || isManager || isTeamLeader;
     if (!canViewAllJobs) {
+      if (profileLoading) {
+        return; // wait until profile is loaded to decide access
+      }
       if (!profile?.email) {
         // No identifier to filter by — ensure empty dashboard for team members with no email
         setData({
