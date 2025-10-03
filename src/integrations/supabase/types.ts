@@ -173,6 +173,7 @@ export type Database = {
       Jobs: {
         Row: {
           assignment: string | null
+          auto_dial_enabled_at: string | null
           automatic_dial: boolean | null
           client_description: string | null
           client_name: string | null
@@ -202,6 +203,7 @@ export type Database = {
         }
         Insert: {
           assignment?: string | null
+          auto_dial_enabled_at?: string | null
           automatic_dial?: boolean | null
           client_description?: string | null
           client_name?: string | null
@@ -231,6 +233,7 @@ export type Database = {
         }
         Update: {
           assignment?: string | null
+          auto_dial_enabled_at?: string | null
           automatic_dial?: boolean | null
           client_description?: string | null
           client_name?: string | null

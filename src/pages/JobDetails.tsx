@@ -283,6 +283,47 @@ export default function JobDetails() {
     }
   }, [id, location.state]);
 
+  // Check if auto dial should be turned off after 48 hours
+  useEffect(() => {
+    const checkAutoDialExpiry = async () => {
+      if (!job?.automatic_dial || !job?.auto_dial_enabled_at || !job?.job_id) return;
+
+      const enabledAt = new Date(job.auto_dial_enabled_at);
+      const now = new Date();
+      const hoursPassed = (now.getTime() - enabledAt.getTime()) / (1000 * 60 * 60);
+
+      if (hoursPassed >= 48) {
+        // Auto dial has been on for 48+ hours, turn it off
+        try {
+          const { error } = await supabase
+            .from('Jobs')
+            .update({
+              automatic_dial: false,
+              auto_dial_enabled_at: null
+            })
+            .eq('job_id', job.job_id);
+
+          if (error) throw error;
+
+          setJob(prev => ({
+            ...prev,
+            automatic_dial: false,
+            auto_dial_enabled_at: null
+          }));
+
+          toast({
+            title: "Auto Dial Disabled",
+            description: "Auto dial has been automatically disabled after 48 hours",
+          });
+        } catch (error) {
+          console.error('Error disabling auto dial:', error);
+        }
+      }
+    };
+
+    checkAutoDialExpiry();
+  }, [job?.automatic_dial, job?.auto_dial_enabled_at, job?.job_id]);
+
   // Scroll to focused candidate when returning from profile
   useEffect(() => {
     const focusId = location.state?.focusCandidateId;
@@ -379,7 +420,8 @@ export default function JobDetails() {
     // Optimistic update for immediate feedback
     setJob(prev => ({
       ...prev,
-      automatic_dial: checked
+      automatic_dial: checked,
+      auto_dial_enabled_at: checked ? new Date().toISOString() : null
     }));
     
     setAutomaticDialSaving(true);
@@ -387,7 +429,8 @@ export default function JobDetails() {
       const {
         error
       } = await supabase.from('Jobs').update({
-        automatic_dial: checked
+        automatic_dial: checked,
+        auto_dial_enabled_at: checked ? new Date().toISOString() : null
       }).eq('job_id', job.job_id);
       
       if (error) throw error;
