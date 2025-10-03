@@ -67,6 +67,7 @@ export default function AddJob() {
   const [formData, setFormData] = useState({
     jobTitle: "",
     jobDescription: "",
+    clientName: "",
     clientDescription: "",
     jobLocation: "",
     jobSalaryRange: [10000] as number[],
@@ -201,6 +202,7 @@ export default function AddJob() {
           job_id: jobId,
           job_title: formData.jobTitle,
           job_description: formData.jobDescription,
+          client_name: formData.clientName,
           client_description: formData.clientDescription,
           job_location: formData.jobLocation,
           job_salary_range: formData.jobSalaryRange[0],
@@ -327,6 +329,16 @@ export default function AddJob() {
                 placeholder="Enter detailed job description"
                 rows={6}
                 required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="clientName">Client Name</Label>
+              <Input
+                id="clientName"
+                value={formData.clientName}
+                onChange={(e) => handleInputChange("clientName", e.target.value)}
+                placeholder="Enter client name"
               />
             </div>
 

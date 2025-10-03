@@ -175,6 +175,7 @@ export type Database = {
           assignment: string | null
           automatic_dial: boolean | null
           client_description: string | null
+          client_name: string | null
           contract_length: string | null
           Currency: string | null
           group_id: string | null
@@ -203,6 +204,7 @@ export type Database = {
           assignment?: string | null
           automatic_dial?: boolean | null
           client_description?: string | null
+          client_name?: string | null
           contract_length?: string | null
           Currency?: string | null
           group_id?: string | null
@@ -231,6 +233,7 @@ export type Database = {
           assignment?: string | null
           automatic_dial?: boolean | null
           client_description?: string | null
+          client_name?: string | null
           contract_length?: string | null
           Currency?: string | null
           group_id?: string | null
