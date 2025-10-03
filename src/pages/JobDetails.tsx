@@ -1129,6 +1129,7 @@ export default function JobDetails() {
   };
   const handleRemoveFromLongList = async (candidateId: string) => {
     try {
+      console.log('=== REMOVE CANDIDATE START ===');
       console.log('Attempting to remove candidate:', candidateId);
       console.log('Job ID:', id);
       console.log('Available candidates:', candidates.map(c => ({
@@ -1160,7 +1161,8 @@ export default function JobDetails() {
       console.log('Found candidate to remove:', {
         recordid: candidate.recordid,
         user_id: candidate.user_id,
-        name: candidate["Candidate Name"]
+        name: candidate["Candidate Name"],
+        email: candidate["Candidate Email"]
       });
 
       // Use the actual recordid from the database for deletion
@@ -1171,9 +1173,10 @@ export default function JobDetails() {
         throw new Error('Cannot delete candidate: missing recordid');
       }
 
-      console.log('Deleting from Jobs_CVs with recordid:', recordIdToDelete, 'and job_id:', id);
+      console.log('Deleting from Jobs_CVs table...');
+      console.log('Parameters:', { recordid: recordIdToDelete, job_id: id });
 
-      // Remove the candidate from the Jobs_CVs table using recordid
+      // Delete the candidate from the Jobs_CVs table permanently
       const { data, error } = await supabase
         .from('Jobs_CVs')
         .delete()
@@ -1181,28 +1184,52 @@ export default function JobDetails() {
         .eq('job_id', id)
         .select();
         
-      console.log('Delete result:', { data, error });
+      console.log('Delete response:', { 
+        success: !error, 
+        deletedRows: data?.length || 0,
+        data, 
+        error 
+      });
       
       if (error) {
         console.error('Supabase delete error:', error);
         throw error;
       }
 
-      console.log('Successfully deleted candidate from database');
+      if (!data || data.length === 0) {
+        console.warn('No rows were deleted - candidate may not exist in database');
+        throw new Error('Candidate not found in database or already deleted');
+      }
+
+      console.log('Successfully deleted candidate from Jobs_CVs table');
+      console.log('Deleted record:', data[0]);
 
       // Update the local state to remove the candidate
-      setCandidates(prev => prev.filter(c => c["Candidate_ID"] !== candidateId));
-      setLonglistedCandidates(prev => prev.filter(c => c["Candidate_ID"] !== candidateId));
+      setCandidates(prev => {
+        const updated = prev.filter(c => c["Candidate_ID"] !== candidateId);
+        console.log('Updated candidates count:', updated.length);
+        return updated;
+      });
       
-      // Refresh the data to ensure UI is in sync
+      setLonglistedCandidates(prev => {
+        const updated = prev.filter(c => c["Candidate_ID"] !== candidateId);
+        console.log('Updated longlisted candidates count:', updated.length);
+        return updated;
+      });
+      
+      // Refresh the data to ensure UI is in sync with database
+      console.log('Refreshing longlisted candidates...');
       await fetchLonglistedCandidates(String(id));
+      
+      console.log('=== REMOVE CANDIDATE SUCCESS ===');
       
       toast({
         title: "Success",
-        description: "Candidate removed from long list"
+        description: `Candidate "${candidate["Candidate Name"]}" has been permanently removed from the database`
       });
     } catch (error) {
-      console.error('Error removing candidate from long list:', error);
+      console.error('=== REMOVE CANDIDATE ERROR ===');
+      console.error('Error details:', error);
       toast({
         title: "Error",
         description: `Failed to remove candidate: ${error instanceof Error ? error.message : 'Unknown error'}`,
