@@ -110,6 +110,9 @@ export default function LiveCandidateFeed() {
 
   const fetchData = async () => {
     try {
+      setLoading(true);
+      console.log('LiveFeed: Fetching data for user:', profile?.user_id, 'Roles:', { isAdmin, isManager, isTeamLeader });
+      
       // Fetch jobs - only necessary fields, filtered by role
       let jobsQuery = supabase
         .from('Jobs')
@@ -118,9 +121,13 @@ export default function LiveCandidateFeed() {
       
       // Filter jobs based on user role
       const canViewAllJobs = isAdmin || isManager || isTeamLeader;
+      console.log('LiveFeed: Can view all jobs:', canViewAllJobs);
+      
       if (!canViewAllJobs) {
         const userId = profile?.user_id;
         const email = profile?.email;
+        console.log('LiveFeed: Filtering for team member - userId:', userId, 'email:', email);
+        
         if (userId && email) {
           jobsQuery = jobsQuery.or(`recruiter_id.eq.${userId},assignment.eq.${email}`);
         } else if (userId) {
@@ -131,11 +138,13 @@ export default function LiveCandidateFeed() {
       }
       
       const { data: jobsData, error: jobsError } = await jobsQuery;
+      console.log('LiveFeed: Jobs fetched:', jobsData?.length || 0, 'Error:', jobsError);
       
       if (jobsError) throw jobsError;
       
       // Fetch Jobs_CVs data (candidates) - only for jobs user has access to
       const jobIds = (jobsData || []).map(job => job.job_id).filter(Boolean);
+      console.log('LiveFeed: Job IDs for candidates:', jobIds);
       
       let jobsCvsData: any[] = [];
       if (jobIds.length > 0) {
@@ -145,8 +154,11 @@ export default function LiveCandidateFeed() {
           .eq('contacted', 'Call Done')
           .in('job_id', jobIds);
         
+        console.log('LiveFeed: Candidates fetched:', data?.length || 0, 'Error:', jobsCvsError);
         if (jobsCvsError) throw jobsCvsError;
         jobsCvsData = data || [];
+      } else {
+        console.log('LiveFeed: No job IDs, skipping candidate fetch');
       }
       
       // Set jobs data
@@ -184,11 +196,14 @@ export default function LiveCandidateFeed() {
         recordid: candidate.recordid || 0
       })) || [];
       
+      console.log('LiveFeed: Final candidates count:', callDoneCandidates.length);
       setCandidates(callDoneCandidates);
+      setLoading(false);
       
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('LiveFeed: Error fetching data:', error);
       toast('Failed to load candidate data');
+      setLoading(false);
     }
   };
 
