@@ -119,7 +119,7 @@ export default function Index() {
     // Optimize: Fetch jobs first, then only related candidates (avoid missing column and large payload)
     let jobsQuery = supabase
       .from('Jobs')
-      .select('job_id, job_title, job_location, status, Timestamp, jd_summary, assignment')
+      .select('job_id, job_title, job_location, status, Timestamp, jd_summary, recruiter_id')
       .eq('Processed', 'Yes');
     
     // Filter jobs based on user role
@@ -129,8 +129,8 @@ export default function Index() {
       if (profileLoading) {
         return; // wait until profile is loaded to decide access
       }
-      if (!profile?.email) {
-        // No identifier to filter by — ensure empty dashboard for team members with no email
+      if (!profile?.linkedin_id) {
+        // No identifier to filter by — ensure empty dashboard for team members with no linkedin_id
         setData({
           totalCandidates: 0,
           totalJobs: 0,
@@ -148,8 +148,8 @@ export default function Index() {
         setLoading(false);
         return;
       }
-      // Regular employees only see jobs assigned to them
-      jobsQuery = jobsQuery.eq('assignment', profile.email);
+      // Regular employees only see jobs assigned to them (by recruiter_id)
+      jobsQuery = jobsQuery.eq('recruiter_id', profile.linkedin_id);
     }
 
     const { data: jobsData, error: jobsError } = await jobsQuery;

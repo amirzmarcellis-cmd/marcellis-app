@@ -10,6 +10,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Search, Filter, Users, Zap, Activity, Star, Mail, Phone, Briefcase, XCircle, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useProfile } from '@/hooks/useProfile';
+import { useUserRole } from '@/hooks/useUserRole';
 
 interface Candidate {
   'Candidate_ID': string;
@@ -46,6 +48,9 @@ interface Job {
 
 export default function LiveCandidateFeed() {
   console.log('LiveCandidateFeed component loaded - v2.0');
+  
+  const { profile } = useProfile();
+  const { isAdmin, isManager, isTeamLeader } = useUserRole();
   
   // Force cache reload - this is the updated version without interview functionality
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -98,26 +103,44 @@ export default function LiveCandidateFeed() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (profile?.linkedin_id) {
+      fetchData();
+    }
+  }, [profile?.linkedin_id, isAdmin, isManager, isTeamLeader]);
 
   const fetchData = async () => {
     try {
-      // Fetch jobs - only necessary fields
-      const { data: jobsData, error: jobsError } = await supabase
+      // Fetch jobs - only necessary fields, filtered by role
+      let jobsQuery = supabase
         .from('Jobs')
-        .select('job_id, job_title, Processed')
+        .select('job_id, job_title, Processed, recruiter_id')
         .eq('Processed', 'Yes');
+      
+      // Filter jobs based on user role
+      const canViewAllJobs = isAdmin || isManager || isTeamLeader;
+      if (!canViewAllJobs && profile?.linkedin_id) {
+        // Regular employees only see jobs assigned to them (by recruiter_id)
+        jobsQuery = jobsQuery.eq('recruiter_id', profile.linkedin_id);
+      }
+      
+      const { data: jobsData, error: jobsError } = await jobsQuery;
       
       if (jobsError) throw jobsError;
       
-      // Fetch Jobs_CVs data (candidates) - only necessary fields for Call Done candidates
-      const { data: jobsCvsData, error: jobsCvsError } = await supabase
-        .from('Jobs_CVs')
-        .select('recordid, candidate_name, candidate_email, candidate_phone_number, job_id, after_call_score, cv_score, after_call_reason, cv_score_reason, contacted, call_summary, after_call_pros, after_call_cons, notice_period, salary_expectations')
-        .eq('contacted', 'Call Done');
+      // Fetch Jobs_CVs data (candidates) - only for jobs user has access to
+      const jobIds = (jobsData || []).map(job => job.job_id).filter(Boolean);
       
-      if (jobsCvsError) throw jobsCvsError;
+      let jobsCvsData: any[] = [];
+      if (jobIds.length > 0) {
+        const { data, error: jobsCvsError } = await supabase
+          .from('Jobs_CVs')
+          .select('recordid, candidate_name, candidate_email, candidate_phone_number, job_id, after_call_score, cv_score, after_call_reason, cv_score_reason, contacted, call_summary, after_call_pros, after_call_cons, notice_period, salary_expectations')
+          .eq('contacted', 'Call Done')
+          .in('job_id', jobIds);
+        
+        if (jobsCvsError) throw jobsCvsError;
+        jobsCvsData = data || [];
+      }
       
       // Set jobs data
       setJobs(jobsData?.map(job => ({
