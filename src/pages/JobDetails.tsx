@@ -286,15 +286,19 @@ export default function JobDetails() {
   // Check if auto dial should be turned off after 48 hours
   useEffect(() => {
     const checkAutoDialExpiry = async () => {
-      if (!job?.automatic_dial || !job?.auto_dial_enabled_at || !job?.job_id) return;
+      if (!job?.automatic_dial || !job?.job_id) return;
+      
+      // Check if auto_dial_enabled_at exists (column might not exist in older data)
+      const autoDialEnabledAt = (job as any).auto_dial_enabled_at;
+      if (!autoDialEnabledAt) return;
 
-      const enabledAt = new Date(job.auto_dial_enabled_at);
-      const now = new Date();
-      const hoursPassed = (now.getTime() - enabledAt.getTime()) / (1000 * 60 * 60);
+      try {
+        const enabledAt = new Date(autoDialEnabledAt);
+        const now = new Date();
+        const hoursPassed = (now.getTime() - enabledAt.getTime()) / (1000 * 60 * 60);
 
-      if (hoursPassed >= 48) {
-        // Auto dial has been on for 48+ hours, turn it off
-        try {
+        if (hoursPassed >= 48) {
+          // Auto dial has been on for 48+ hours, turn it off
           const { error } = await supabase
             .from('Jobs')
             .update({
@@ -315,14 +319,16 @@ export default function JobDetails() {
             title: "Auto Dial Disabled",
             description: "Auto dial has been automatically disabled after 48 hours",
           });
-        } catch (error) {
-          console.error('Error disabling auto dial:', error);
         }
+      } catch (error) {
+        console.error('Error checking/disabling auto dial:', error);
       }
     };
 
-    checkAutoDialExpiry();
-  }, [job?.automatic_dial, job?.auto_dial_enabled_at, job?.job_id]);
+    if (job) {
+      checkAutoDialExpiry();
+    }
+  }, [job, toast]);
 
   // Scroll to focused candidate when returning from profile
   useEffect(() => {
