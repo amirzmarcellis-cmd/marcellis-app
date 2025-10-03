@@ -85,7 +85,6 @@ export default function AddJob() {
   const [groups, setGroups] = useState<Array<{id: string, name: string, color: string | null}>>([]);
   const [recruiters, setRecruiters] = useState<Array<{user_id: string, name: string, email: string}>>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isTeamLeader, setIsTeamLeader] = useState(false);
 
   useEffect(() => {
     // Auto-assign recruiter to current user for team members if not selected
@@ -97,12 +96,8 @@ export default function AddJob() {
 
   useEffect(() => {
     fetchGroups();
-    checkTeamLeaderStatus();
-  }, [profile?.user_id]);
-
-  useEffect(() => {
     fetchRecruiters();
-  }, [isTeamLeader]);
+  }, [profile?.user_id]);
 
   const fetchGroups = async () => {
     try {
@@ -115,22 +110,6 @@ export default function AddJob() {
       setGroups(data || []);
     } catch (error) {
       console.error('Error fetching groups:', error);
-    }
-  };
-
-  const checkTeamLeaderStatus = async () => {
-    if (!profile?.user_id) return;
-    
-    try {
-      const { data, error } = await supabase.rpc('is_team_leader', {
-        user_uuid: profile.user_id
-      });
-
-      if (error) throw error;
-      setIsTeamLeader(data || false);
-    } catch (error) {
-      console.error('Error checking team leader status:', error);
-      setIsTeamLeader(false);
     }
   };
 
