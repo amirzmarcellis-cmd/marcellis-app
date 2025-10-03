@@ -117,6 +117,26 @@ export default function Index() {
 
     const { data: jobsData, error: jobsError } = await jobsQuery;
 
+    // If employee has no assigned jobs, set empty state and return early
+    if (!canViewAllJobs && (!jobsData || jobsData.length === 0)) {
+      setData({
+        totalCandidates: 0,
+        totalJobs: 0,
+        candidatesAwaitingReview: 0,
+        tasksToday: 0,
+        interviewsThisWeek: 0,
+        averageTimeToHire: 0,
+        recentCandidates: [],
+        activeJobs: []
+      });
+      setJobs([]);
+      setCandidates([]);
+      setCvData([]);
+      setJobStats({});
+      setLoading(false);
+      return;
+    }
+
     let jobsCvsData: any[] | null = [];
     let jobsCvsError: any = null;
 
