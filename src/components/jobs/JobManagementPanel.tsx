@@ -102,54 +102,12 @@ export function JobManagementPanel() {
           groups ( id, name, color )
         `);
 
-      // Admins and Managers can view all jobs
-      const canViewAllJobs = isAdmin || isManager;
+      // Admins, Managers, and Team Leaders can view all jobs
+      const canViewAllJobs = isAdmin || isManager || isTeamLeader;
       
       if (!canViewAllJobs) {
-        if (isTeamLeader) {
-          // Team leaders see jobs from their team members
-          const { data: teamMemberships } = await supabase
-            .from('memberships')
-            .select('user_id, team_id')
-            .eq('user_id', profile.user_id);
-          
-          if (teamMemberships && teamMemberships.length > 0) {
-            const teamIds = teamMemberships.map(m => m.team_id);
-            
-            // Get all members from these teams
-            const { data: teamMembers } = await supabase
-              .from('memberships')
-              .select('user_id')
-              .in('team_id', teamIds);
-            
-            if (teamMembers && teamMembers.length > 0) {
-              const memberIds = [...new Set(teamMembers.map(m => m.user_id))];
-              
-              // Get profile linkedin_ids for these user_ids
-              const { data: memberProfiles } = await supabase
-                .from('profiles')
-                .select('linkedin_id')
-                .in('user_id', memberIds);
-              
-              if (memberProfiles && memberProfiles.length > 0) {
-                const linkedinIds = memberProfiles.map(p => p.linkedin_id).filter(Boolean);
-                query = query.in('recruiter_id', linkedinIds);
-              } else {
-                // No profiles found, show only own jobs
-                query = query.eq('recruiter_id', profile.linkedin_id || profile.user_id);
-              }
-            } else {
-              // No team members found, show only own jobs
-              query = query.eq('recruiter_id', profile.linkedin_id || profile.user_id);
-            }
-          } else {
-            // Not in any team, show only own jobs
-            query = query.eq('recruiter_id', profile.linkedin_id || profile.user_id);
-          }
-        } else {
-          // Regular employees only see their own jobs
-          query = query.eq('recruiter_id', profile.linkedin_id || profile.user_id);
-        }
+        // Regular employees only see their own jobs
+        query = query.eq('recruiter_id', profile.linkedin_id || profile.user_id);
       }
 
       // Fetch jobs first
