@@ -110,7 +110,26 @@ export default function Index() {
     
     // Filter jobs based on user role
     const canViewAllJobs = isAdmin || isManager || isTeamLeader;
-    if (!canViewAllJobs && profile?.email) {
+    if (!canViewAllJobs) {
+      if (!profile?.email) {
+        // No identifier to filter by — ensure empty dashboard for team members with no email
+        setData({
+          totalCandidates: 0,
+          totalJobs: 0,
+          candidatesAwaitingReview: 0,
+          tasksToday: 0,
+          interviewsThisWeek: 0,
+          averageTimeToHire: 0,
+          recentCandidates: [],
+          activeJobs: []
+        });
+        setJobs([]);
+        setCandidates([]);
+        setCvData([]);
+        setJobStats({});
+        setLoading(false);
+        return;
+      }
       // Regular employees only see jobs assigned to them
       jobsQuery = jobsQuery.eq('assignment', profile.email);
     }
