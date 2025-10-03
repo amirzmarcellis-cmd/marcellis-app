@@ -73,6 +73,9 @@ export function JobManagementPanel() {
     }
     
     try {
+      console.log('JobManagementPanel: Starting fetch for user:', profile.user_id);
+      const startTime = performance.now();
+      
       // Optimize: Build query with proper conditions
       let query = supabase.from('Jobs').select(`
           job_id, job_title, job_location, job_salary_range, Currency, Processed, status, Timestamp, group_id, automatic_dial, jd_summary, recruiter_id,
@@ -95,45 +98,52 @@ export function JobManagementPanel() {
         }
       }
 
-      // Fetch jobs first
-      const jobsResult = await query.order('Timestamp', { ascending: false });
+      // Fetch jobs and candidates in parallel
+      const [jobsResult, candidatesResult] = await Promise.all([
+        query.order('Timestamp', { ascending: false }),
+        supabase
+          .from('Jobs_CVs')
+          .select('job_id, after_call_score, source, contacted, shortlisted_at')
+      ]);
+
       if (jobsResult.error) throw jobsResult.error;
       const initialJobs = jobsResult.data || [];
       
-      // Fetch recruiter names
+      console.log('JobManagementPanel: Jobs fetched:', initialJobs.length);
+      
+      // Filter candidates by job access
+      const jobIds = new Set(initialJobs.map(j => j.job_id).filter(Boolean));
+      const allCandidates = candidatesResult.data || [];
+      
+      // Build candidates by job map
+      const candidatesByJob = new Map<string, any[]>();
+      allCandidates.forEach(candidate => {
+        if (jobIds.has(candidate.job_id)) {
+          if (!candidatesByJob.has(candidate.job_id)) {
+            candidatesByJob.set(candidate.job_id, []);
+          }
+          candidatesByJob.get(candidate.job_id)!.push(candidate);
+        }
+      });
+
+      // Fetch recruiter names only if needed
       const recruiterIds = [...new Set(initialJobs.map(j => j.recruiter_id).filter(Boolean))];
       const recruiterNamesMap = new Map<string, string>();
       
       if (recruiterIds.length > 0) {
         const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
-          .select('linkedin_id, name')
-          .in('linkedin_id', recruiterIds);
+          .select('user_id, linkedin_id, name')
+          .or(`user_id.in.(${recruiterIds.join(',')}),linkedin_id.in.(${recruiterIds.join(',')})`);
         
         if (!profilesError && profiles) {
           profiles.forEach(p => {
+            if (p.user_id && p.name) {
+              recruiterNamesMap.set(p.user_id, p.name);
+            }
             if (p.linkedin_id && p.name) {
               recruiterNamesMap.set(p.linkedin_id, p.name);
             }
-          });
-        }
-      }
-      const jobIds = initialJobs.map(j => j.job_id).filter(Boolean);
-
-      // Fetch candidate counts only for these jobs
-      const candidatesByJob = new Map<string, any[]>();
-      if (jobIds.length > 0) {
-        const candidatesResult = await supabase
-          .from('Jobs_CVs')
-          .select('job_id, after_call_score, source')
-          .in('job_id', jobIds);
-
-        if (!candidatesResult.error && candidatesResult.data) {
-          candidatesResult.data.forEach(candidate => {
-            if (!candidatesByJob.has(candidate.job_id)) {
-              candidatesByJob.set(candidate.job_id, []);
-            }
-            candidatesByJob.get(candidate.job_id)!.push(candidate);
           });
         }
       }
@@ -141,14 +151,19 @@ export function JobManagementPanel() {
       // Calculate counts for all jobs before setting state
       const jobsWithCounts = initialJobs.map(job => {
         const candidates = candidatesByJob.get(job.job_id) || [];
+        
+        // Longlisted: candidates with source containing 'itris' or 'linkedin'
         const longlistedCandidates = candidates.filter(c => {
           const source = (c.source || "").toLowerCase();
           return source.includes("itris") || source.includes("linkedin");
         });
+        
         const longlisted_count = longlistedCandidates.length;
+        
+        // Shortlisted: longlisted candidates with after_call_score >= 74 OR shortlisted_at is not null
         const shortlisted_count = longlistedCandidates.filter(c => {
           const score = parseInt(c.after_call_score || "0");
-          return score >= 74;
+          return score >= 74 || c.shortlisted_at !== null;
         }).length;
 
         return {
@@ -158,6 +173,10 @@ export function JobManagementPanel() {
           recruiter_name: job.recruiter_id ? recruiterNamesMap.get(job.recruiter_id) || null : null
         };
       });
+
+      const endTime = performance.now();
+      console.log(`JobManagementPanel: Fetch completed in ${(endTime - startTime).toFixed(2)}ms`);
+      console.log('JobManagementPanel: Jobs with counts:', jobsWithCounts.length);
 
       setJobs(jobsWithCounts);
       setLoading(false);
