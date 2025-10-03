@@ -92,6 +92,13 @@ export default function JobDetails() {
     candidateId: string;
     callid: number;
   } | null>(null);
+  const [showHireDialog, setShowHireDialog] = useState(false);
+  const [hireReason, setHireReason] = useState("");
+  const [hireCandidateData, setHireCandidateData] = useState<{
+    jobId: string;
+    candidateId: string;
+    callid: number;
+  } | null>(null);
 
   // Function to fetch LinkedIn ID and redirect to profile
   const handleViewLinkedInProfile = async (candidateId: string, candidateName: string, jobId: string, source: string) => {
@@ -1167,6 +1174,56 @@ const handleRemoveSelectedCandidates = async () => {
     setRejectCandidateData({ jobId, candidateId, callid });
     setShowRejectDialog(true);
   };
+  
+  const openHireDialog = (jobId: string, candidateId: string, callid: number) => {
+    setHireCandidateData({
+      jobId,
+      candidateId,
+      callid
+    });
+    setHireReason("");
+    setShowHireDialog(true);
+  };
+  
+  const handleHireCandidate = async () => {
+    if (!hireCandidateData) return;
+    
+    try {
+      const { error } = await supabase
+        .from('Jobs_CVs')
+        .update({ 
+          Reason_to_Hire: hireReason,
+          contacted: 'Hired'
+        })
+        .eq('user_id', hireCandidateData.candidateId)
+        .eq('job_id', hireCandidateData.jobId);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: "Hire reason saved successfully"
+      });
+      
+      // Refresh candidates data
+      if (id) {
+        fetchCandidates(id);
+        fetchLonglistedCandidates(id);
+      }
+      
+      setShowHireDialog(false);
+      setHireReason("");
+      setHireCandidateData(null);
+    } catch (error) {
+      console.error('Error saving hire reason:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save hire reason",
+        variant: "destructive"
+      });
+    }
+  };
+  
   const handleGenerateShortList = async () => {
     if (!job?.job_id || candidates.length === 0) {
       toast({
@@ -1905,21 +1962,32 @@ const handleRemoveSelectedCandidates = async () => {
                   )}
                 </Button>
               </div>
-              {/* Action Buttons - CV Submitted and Reject */}
-              <div className="flex gap-2">
-                {mainCandidate["Contacted"] === "Submitted" ? <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-blue-500 text-blue-600 cursor-default" disabled>
-                    <FileCheck className="w-3 h-3 mr-1" />
-                    Submit CV
-                  </Button> : <Button variant="outline" size="sm" onClick={() => handleCVSubmitted(candidateId)} className="flex-1 min-w-[100px] bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200">
-                    <FileCheck className="w-3 h-3 mr-1" />
-                    Submit CV
-                  </Button>}
-                {mainCandidate["Contacted"] === "Rejected" ? <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed" disabled>
-                    <X className="w-3 h-3 mr-1" />
-                    Rejected
-                  </Button> : <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200" onClick={() => openRejectDialog(id!, candidateId, candidateContacts[0].callid)}>
-                    <X className="w-3 h-3 mr-1" />
-                    Reject Candidate
+              {/* Action Buttons - CV Submitted, Hire, and Reject */}
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  {mainCandidate["Contacted"] === "Submitted" ? <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-blue-500 text-blue-600 cursor-default" disabled>
+                      <FileCheck className="w-3 h-3 mr-1" />
+                      Submit CV
+                    </Button> : <Button variant="outline" size="sm" onClick={() => handleCVSubmitted(candidateId)} className="flex-1 min-w-[100px] bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200">
+                      <FileCheck className="w-3 h-3 mr-1" />
+                      Submit CV
+                    </Button>}
+                  {mainCandidate["Contacted"] === "Rejected" ? <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed" disabled>
+                      <X className="w-3 h-3 mr-1" />
+                      Rejected
+                    </Button> : <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200" onClick={() => openRejectDialog(id!, candidateId, candidateContacts[0].callid)}>
+                      <X className="w-3 h-3 mr-1" />
+                      Reject Candidate
+                    </Button>}
+                </div>
+                
+                {/* Hire Candidate Button */}
+                {mainCandidate["Contacted"] === "Hired" ? <Button variant="outline" size="sm" className="w-full bg-transparent border-2 border-emerald-500 text-emerald-600 cursor-default" disabled>
+                    <UserCheck className="w-3 h-3 mr-1" />
+                    Hired
+                  </Button> : <Button variant="outline" size="sm" onClick={() => openHireDialog(id!, candidateId, candidateContacts[0].callid)} className="w-full bg-transparent border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-100 hover:border-emerald-600 hover:text-emerald-700 dark:border-emerald-400 dark:text-emerald-400 dark:hover:bg-emerald-950/30 dark:hover:border-emerald-300 dark:hover:text-emerald-300 transition-all duration-200">
+                    <UserCheck className="w-3 h-3 mr-1" />
+                    Hire Candidate
                   </Button>}
               </div>
             </div>
@@ -3307,6 +3375,45 @@ const handleRemoveSelectedCandidates = async () => {
                 disabled={!rejectReason.trim()}
               >
                 Reject
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Hire Candidate Dialog */}
+        <Dialog open={showHireDialog} onOpenChange={setShowHireDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Hire Candidate</DialogTitle>
+              <DialogDescription>
+                Please provide a reason for hiring this candidate.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <Textarea
+                placeholder="Enter hire reason..."
+                value={hireReason}
+                onChange={(e) => setHireReason(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowHireDialog(false);
+                  setHireReason("");
+                  setHireCandidateData(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleHireCandidate}
+                disabled={!hireReason.trim()}
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
+                Save
               </Button>
             </DialogFooter>
           </DialogContent>
