@@ -103,10 +103,10 @@ export default function LiveCandidateFeed() {
   };
 
   useEffect(() => {
-    if (profile?.linkedin_id) {
+    if (profile?.user_id) {
       fetchData();
     }
-  }, [profile?.linkedin_id, isAdmin, isManager, isTeamLeader]);
+  }, [profile?.user_id, isAdmin, isManager, isTeamLeader]);
 
   const fetchData = async () => {
     try {
@@ -118,9 +118,9 @@ export default function LiveCandidateFeed() {
       
       // Filter jobs based on user role
       const canViewAllJobs = isAdmin || isManager || isTeamLeader;
-      if (!canViewAllJobs && profile?.linkedin_id) {
-        // Regular employees only see jobs assigned to them (by recruiter_id)
-        jobsQuery = jobsQuery.eq('recruiter_id', profile.linkedin_id);
+      if (!canViewAllJobs && profile?.user_id) {
+        // Regular employees only see jobs assigned to them (by recruiter_id matching user_id)
+        jobsQuery = jobsQuery.eq('recruiter_id', profile.user_id);
       }
       
       const { data: jobsData, error: jobsError } = await jobsQuery;

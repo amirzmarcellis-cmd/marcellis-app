@@ -129,8 +129,8 @@ export default function Index() {
       if (profileLoading) {
         return; // wait until profile is loaded to decide access
       }
-      if (!profile?.linkedin_id) {
-        // No identifier to filter by — ensure empty dashboard for team members with no linkedin_id
+      if (!profile?.user_id) {
+        // No identifier to filter by — ensure empty dashboard for team members with no user_id
         setData({
           totalCandidates: 0,
           totalJobs: 0,
@@ -148,8 +148,8 @@ export default function Index() {
         setLoading(false);
         return;
       }
-      // Regular employees only see jobs assigned to them (by recruiter_id)
-      jobsQuery = jobsQuery.eq('recruiter_id', profile.linkedin_id);
+      // Regular employees only see jobs assigned to them (by recruiter_id matching user_id)
+      jobsQuery = jobsQuery.eq('recruiter_id', profile.user_id);
     }
 
     const { data: jobsData, error: jobsError } = await jobsQuery;
