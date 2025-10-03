@@ -111,15 +111,15 @@
     --glass-border: hsla(210, 40%, 98%, 0.15);
     --glass-bg: hsla(220, 25%, 8%, 0.95);
     
-    /* Enhanced shadows with glow */
+    /* Enhanced shadows with glow - optimized for performance */
     --shadow-soft: 0 2px 8px -2px hsl(220 25% 4% / 0.3);
     --shadow-medium: 0 8px 16px -4px hsl(220 25% 4% / 0.4);
     --shadow-strong: 0 16px 32px -8px hsl(220 25% 4% / 0.5);
-    --shadow-glow: 0 0 40px hsl(180 100% 50% / 0.25);
-    --shadow-glow-blue: 0 0 32px hsl(200 98% 39% / 0.3);
-    --shadow-glow-purple: 0 0 28px hsl(270 95% 60% / 0.25);
-    --shadow-card: 0 8px 24px hsl(220 25% 4% / 0.4);
-    --shadow-elevated: 0 12px 40px hsl(220 25% 4% / 0.5);
+    --shadow-glow: 0 0 20px hsl(180 100% 50% / 0.2);
+    --shadow-glow-blue: 0 0 16px hsl(200 98% 39% / 0.25);
+    --shadow-glow-purple: 0 0 14px hsl(270 95% 60% / 0.2);
+    --shadow-card: 0 4px 16px hsl(220 25% 4% / 0.3);
+    --shadow-elevated: 0 8px 24px hsl(220 25% 4% / 0.4);
     
     /* 3D AI Longlist Button - Sleek Modern Design */
     --ai-button-gradient: linear-gradient(145deg, hsl(220 8% 88%), hsl(220 6% 92%), hsl(220 10% 85%));
@@ -159,7 +159,13 @@
   }
   
   .mission-card {
-    @apply bg-gradient-card backdrop-blur-lg border border-border/40 rounded-lg shadow-card hover:shadow-glow transition-all duration-300 hover:scale-[1.02];
+    @apply bg-gradient-card backdrop-blur-lg border border-border/40 rounded-lg shadow-card transition-all duration-200;
+    will-change: transform;
+  }
+  
+  .mission-card:hover {
+    @apply shadow-glow;
+    transform: translateY(-2px);
   }
   
   .status-indicator {
@@ -205,13 +211,19 @@
     @apply bg-background/80 backdrop-blur-lg border-b border-border/30;
   }
   
-  /* Interactive elements */
+  /* Interactive elements - optimized */
   .metric-card {
-    @apply transition-all duration-300 hover:scale-[1.02] hover:shadow-glow;
+    @apply transition-transform duration-200;
+    will-change: transform;
+  }
+  
+  .metric-card:hover {
+    transform: translateY(-2px);
   }
   
   .action-button {
-    @apply transition-all duration-200 hover:shadow-glow-blue active:scale-95;
+    @apply transition-transform duration-150 active:scale-95;
+    will-change: transform;
   }
   
   /* AI Longlist 3D Button - Sleek Modern Circular - Amber */

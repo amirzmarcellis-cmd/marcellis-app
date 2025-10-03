@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -51,7 +51,7 @@ export function CandidateManagementPanel() {
     fetchData();
   }, []);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     // Mock data for single-company structure
     try {
       setCandidates([]);
@@ -66,15 +66,17 @@ export function CandidateManagementPanel() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
-  const filteredCandidates = candidates.filter(candidate => {
-    const searchString = `${candidate["First Name"] || ""} ${candidate["Last Name"] || ""} ${candidate.Email || ""} ${candidate.Title || ""}`.toLowerCase();
-    const matchesSearch = searchString.includes(searchTerm.toLowerCase());
-    
-    // Add more filtering logic here for status, salary, source when those fields are available
-    return matchesSearch;
-  });
+  const filteredCandidates = useMemo(() => {
+    return candidates.filter(candidate => {
+      const searchString = `${candidate["First Name"] || ""} ${candidate["Last Name"] || ""} ${candidate.Email || ""} ${candidate.Title || ""}`.toLowerCase();
+      const matchesSearch = searchString.includes(searchTerm.toLowerCase());
+      
+      // Add more filtering logic here for status, salary, source when those fields are available
+      return matchesSearch;
+    });
+  }, [candidates, searchTerm]);
 
   const getStatusBadge = (status: string) => {
     const statusColors = {
