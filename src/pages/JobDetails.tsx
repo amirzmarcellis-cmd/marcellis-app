@@ -872,7 +872,7 @@ export default function JobDetails() {
       setIsGeneratingShortList(false);
     }
   };
-  const handleRemoveSelectedCandidates = async () => {
+const handleRemoveSelectedCandidates = async () => {
     if (selectedCandidates.size === 0) {
       toast({
         title: "Error",
@@ -881,22 +881,74 @@ export default function JobDetails() {
       });
       return;
     }
+
+    if (!id) {
+      toast({
+        title: "Error",
+        description: "Missing job ID",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
-      for (const candidateId of selectedCandidates) {
-        const candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
-        if (candidate) {
-          await handleRemoveFromLongList(candidateId);
+      console.log('=== BULK REMOVE START ===');
+      const selectedIds = Array.from(selectedCandidates);
+      const selectedSet = new Set(selectedIds);
+
+// Collect ALL recordids for the selected candidates (some candidates may have multiple rows)
+      const recordIdsToDelete = new Set<any>();
+      const collectFrom = (list: any[]) => {
+        for (const c of list) {
+          if (selectedSet.has(c["Candidate_ID"])) {
+            if (c.recordid !== undefined && c.recordid !== null) {
+              recordIdsToDelete.add(c.recordid);
+            }
+          }
         }
+      };
+      collectFrom(candidates);
+      collectFrom(longlistedCandidates);
+
+      if (recordIdsToDelete.size === 0) {
+        console.warn('No recordids found for selected candidates');
+        toast({
+          title: "Nothing to delete",
+          description: "Selected candidates have no associated records",
+        });
+        return;
       }
 
-      // Clear selection after successful removal
+      console.log('Deleting from Jobs_CVs for job:', id, 'recordids:', Array.from(recordIdsToDelete));
+      const { data, error } = await supabase
+        .from('Jobs_CVs')
+        .delete()
+        .in('recordid', Array.from(recordIdsToDelete))
+        .eq('job_id', id)
+        .select();
+
+      console.log('Bulk delete response:', { success: !error, deletedRows: data?.length || 0, data, error });
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        console.warn('No rows deleted in bulk remove - they may have been already removed');
+      }
+
+      // Update UI state: remove all selected candidates from both lists
+      setCandidates(prev => prev.filter(c => !selectedSet.has(c["Candidate_ID"])));
+      setLonglistedCandidates(prev => prev.filter(c => !selectedSet.has(c["Candidate_ID"])));
+
+      // Clear selection
       setSelectedCandidates(new Set());
+
       toast({
-        title: "Success",
-        description: `${selectedCandidates.size} candidates removed from long list`
+        title: "Removed",
+        description: `${selectedIds.length} candidate${selectedIds.length > 1 ? 's' : ''} removed from long list`
       });
+
+      console.log('=== BULK REMOVE SUCCESS ===');
     } catch (error) {
-      console.error('Error removing selected candidates:', error);
+      console.error('=== BULK REMOVE ERROR ===', error);
       toast({
         title: "Error",
         description: "Failed to remove selected candidates",
