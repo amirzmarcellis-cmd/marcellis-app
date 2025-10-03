@@ -1973,7 +1973,7 @@ const handleRemoveSelectedCandidates = async () => {
                 {mainCandidate["Contacted"] === "Submitted" ? <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-blue-500 text-blue-600 cursor-default" disabled>
                     <FileCheck className="w-3 h-3 mr-1" />
                     CV Submitted
-                  </Button> : <Button variant="outline" size="sm" onClick={() => handleCVSubmitted(candidateId)} className="flex-1 min-w-[100px] bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200">
+                  </Button> : <Button variant="outline" size="sm" onClick={() => handleCVSubmitted(candidateId)} className="flex-1 min-w-[100px] bg-transparent border-2 border-green-600 text-green-600 hover:bg-green-100 hover:border-green-700 hover:text-green-700 dark:border-green-500 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-400 dark:hover:text-green-300 transition-all duration-200">
                     <FileCheck className="w-3 h-3 mr-1" />
                     Submit CV
                   </Button>}
