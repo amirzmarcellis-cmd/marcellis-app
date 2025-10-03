@@ -900,12 +900,15 @@ const handleRemoveSelectedCandidates = async () => {
       const recordIdsToDelete = new Set<any>();
       const collectFrom = (list: any[]) => {
         for (const c of list) {
-          if (selectedSet.has(c["Candidate_ID"])) {
+          const cid = c["Candidate_ID"] ? String(c["Candidate_ID"]) : "";
+          const uid = c.user_id ? String(c.user_id) : "";
+          if ((cid && selectedSet.has(cid)) || (uid && selectedSet.has(uid))) {
             if (c.recordid !== undefined && c.recordid !== null) {
               recordIdsToDelete.add(c.recordid);
             }
           }
         }
+      }
       };
       collectFrom(candidates);
       collectFrom(longlistedCandidates);
@@ -935,8 +938,16 @@ const handleRemoveSelectedCandidates = async () => {
       }
 
       // Update UI state: remove all selected candidates from both lists
-      setCandidates(prev => prev.filter(c => !selectedSet.has(c["Candidate_ID"])));
-      setLonglistedCandidates(prev => prev.filter(c => !selectedSet.has(c["Candidate_ID"])));
+      setCandidates(prev => prev.filter(c => {
+        const cid = c["Candidate_ID"] ? String(c["Candidate_ID"]) : "";
+        const uid = c.user_id ? String(c.user_id) : "";
+        return !(cid && selectedSet.has(cid)) && !(uid && selectedSet.has(uid));
+      }));
+      setLonglistedCandidates(prev => prev.filter(c => {
+        const cid = c["Candidate_ID"] ? String(c["Candidate_ID"]) : "";
+        const uid = c.user_id ? String(c.user_id) : "";
+        return !(cid && selectedSet.has(cid)) && !(uid && selectedSet.has(uid));
+      }));
 
       // Clear selection
       setSelectedCandidates(new Set());
@@ -1258,13 +1269,21 @@ const handleRemoveSelectedCandidates = async () => {
 
       // Update the local state to remove the candidate
       setCandidates(prev => {
-        const updated = prev.filter(c => c["Candidate_ID"] !== candidateId);
+        const updated = prev.filter(c => {
+          const cid = c["Candidate_ID"] ? String(c["Candidate_ID"]) : "";
+          const uid = c.user_id ? String(c.user_id) : "";
+          return cid !== String(candidateId) && uid !== String(candidateId);
+        });
         console.log('Updated candidates count:', updated.length);
         return updated;
       });
       
       setLonglistedCandidates(prev => {
-        const updated = prev.filter(c => c["Candidate_ID"] !== candidateId);
+        const updated = prev.filter(c => {
+          const cid = c["Candidate_ID"] ? String(c["Candidate_ID"]) : "";
+          const uid = c.user_id ? String(c.user_id) : "";
+          return cid !== String(candidateId) && uid !== String(candidateId);
+        });
         console.log('Updated longlisted candidates count:', updated.length);
         return updated;
       });
