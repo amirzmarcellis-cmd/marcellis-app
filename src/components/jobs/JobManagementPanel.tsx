@@ -83,8 +83,16 @@ export function JobManagementPanel() {
       const canViewAllJobs = isAdmin || isManager || isTeamLeader;
       
       if (!canViewAllJobs) {
-        // Regular employees only see jobs assigned to them (by recruiter_id matching user_id)
-        query = query.eq('recruiter_id', profile.user_id);
+        // Regular employees only see jobs assigned to them (support both new and legacy fields)
+        const userId = profile.user_id;
+        const email = profile.email;
+        if (userId && email) {
+          query = query.or(`recruiter_id.eq.${userId},assignment.eq.${email}`);
+        } else if (userId) {
+          query = query.eq('recruiter_id', userId);
+        } else if (email) {
+          query = query.eq('assignment', email);
+        }
       }
 
       // Fetch jobs first

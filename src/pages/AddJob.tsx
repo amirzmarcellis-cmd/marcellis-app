@@ -12,6 +12,7 @@ import { Slider } from "@/components/ui/slider";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useProfile } from "@/hooks/useProfile";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -62,6 +63,7 @@ const contractLengths = [
 export default function AddJob() {
   const navigate = useNavigate();
   const { profile } = useProfile();
+  const { isAdmin, isManager, isTeamLeader } = useUserRole();
   const [formData, setFormData] = useState({
     jobTitle: "",
     jobDescription: "",
@@ -84,6 +86,14 @@ export default function AddJob() {
   const [recruiters, setRecruiters] = useState<Array<{user_id: string, name: string, email: string}>>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTeamLeader, setIsTeamLeader] = useState(false);
+
+  useEffect(() => {
+    // Auto-assign recruiter to current user for team members if not selected
+    const isTeamMember = !(isAdmin || isManager || isTeamLeader);
+    if (profile?.user_id && isTeamMember && !formData.recruiterId) {
+      setFormData(prev => ({ ...prev, recruiterId: profile.user_id }));
+    }
+  }, [profile?.user_id, isAdmin, isManager, isTeamLeader]);
 
   useEffect(() => {
     fetchGroups();
@@ -202,6 +212,9 @@ export default function AddJob() {
     
     try {
       const jobId = await generateJobId();
+      const isTeamMember = !(isAdmin || isManager || isTeamLeader);
+      const recruiterIdToSave = formData.recruiterId || (isTeamMember ? profile?.user_id : null);
+      console.log('Creating job with recruiter_id:', recruiterIdToSave, 'for user_id:', profile?.user_id);
       
       const { error } = await supabase
         .from('Jobs')
@@ -221,7 +234,7 @@ export default function AddJob() {
           Currency: formData.currency,
           itris_job_id: formData.itrisId,
           group_id: formData.groupId || null,
-          recruiter_id: formData.recruiterId || null,
+          recruiter_id: recruiterIdToSave || null,
           Timestamp: new Date().toISOString()
         });
 

@@ -113,14 +113,21 @@ export default function LiveCandidateFeed() {
       // Fetch jobs - only necessary fields, filtered by role
       let jobsQuery = supabase
         .from('Jobs')
-        .select('job_id, job_title, Processed, recruiter_id')
+        .select('job_id, job_title, Processed, recruiter_id, assignment')
         .eq('Processed', 'Yes');
       
       // Filter jobs based on user role
       const canViewAllJobs = isAdmin || isManager || isTeamLeader;
-      if (!canViewAllJobs && profile?.user_id) {
-        // Regular employees only see jobs assigned to them (by recruiter_id matching user_id)
-        jobsQuery = jobsQuery.eq('recruiter_id', profile.user_id);
+      if (!canViewAllJobs) {
+        const userId = profile?.user_id;
+        const email = profile?.email;
+        if (userId && email) {
+          jobsQuery = jobsQuery.or(`recruiter_id.eq.${userId},assignment.eq.${email}`);
+        } else if (userId) {
+          jobsQuery = jobsQuery.eq('recruiter_id', userId);
+        } else if (email) {
+          jobsQuery = jobsQuery.eq('assignment', email);
+        }
       }
       
       const { data: jobsData, error: jobsError } = await jobsQuery;
