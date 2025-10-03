@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, memo } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -99,7 +99,7 @@ export default function Index() {
     
     return () => clearTimeout(timeout);
   }, []);
-  const fetchDashboardData = useCallback(async () => {
+  const fetchDashboardData = async () => {
     try {
       console.log('Starting dashboard data fetch...');
     // Optimize: Fetch jobs first, then only related candidates (avoid missing column and large payload)
@@ -258,16 +258,16 @@ export default function Index() {
       console.log('Dashboard data fetch complete');
       setLoading(false);
     }
-  }, [isAdmin, isManager, isTeamLeader, profile?.email]);
+  };
 
-  const fetchInterviews = useCallback(async () => {
+  const fetchInterviews = async () => {
     try {
       // Mock data for interviews since table doesn't exist
       setInterviews([]);
     } catch (error) {
       console.error('Error fetching interviews:', error);
     }
-  }, []);
+  };
 
   const getCandidate = (candidateId: string) => {
     return cvData.find(c => c.candidate_id === candidateId);
@@ -301,10 +301,10 @@ export default function Index() {
     // But keeping it for potential future use
     setOpenTasksCount(count);
   };
-  const handleCandidateClick = useCallback((recordid: number, jobId: string) => {
+  const handleCandidateClick = (recordid: number, jobId: string) => {
     navigate(`/call-log-details/${recordid}`);
-  }, [navigate]);
-  const handleRejectCandidate = useCallback(async (candidateId: string, jobId: string) => {
+  };
+  const handleRejectCandidate = async (candidateId: string, jobId: string) => {
     // Show confirmation alert
     const confirmed = window.confirm('Are you sure you want to Reject Candidate?');
     if (!confirmed) {
@@ -340,8 +340,8 @@ export default function Index() {
     } catch (error) {
       console.error('Error rejecting candidate:', error);
     }
-  }, [candidates]);
-  const handleArrangeInterview = useCallback((candidateId: string, jobId: string, intid?: string) => {
+  };
+  const handleArrangeInterview = (candidateId: string, jobId: string, intid?: string) => {
     const candidate = candidates.find(c => c.Candidate_ID === candidateId);
     if (candidate) {
       setSelectedCandidate({
@@ -360,9 +360,9 @@ export default function Index() {
       setInterviewType('Phone');
       setInterviewLink('');
     }
-  }, [candidates]);
+  };
 
-  const handleCVSubmitted = useCallback(async (candidateId: string, jobId: string) => {
+  const handleCVSubmitted = async (candidateId: string, jobId: string) => {
     try {
       const { error } = await supabase
         .from('Jobs_CVs')
@@ -379,9 +379,9 @@ export default function Index() {
       console.error('Error submitting CV:', error);
       toast.error("Failed to submit CV. Please try again.");
     }
-  }, []);
+  };
 
-  const handleScheduleInterview = useCallback(async () => {
+  const handleScheduleInterview = async () => {
     if (!selectedCandidate) return;
 
     // Validate that all slots are filled
@@ -464,7 +464,7 @@ export default function Index() {
       console.error('Error scheduling interview:', error);
       alert('Error scheduling interview. Please try again.');
     }
-  }, [selectedCandidate, interviewSlots, interviewType, interviewLink, fetchDashboardData]);
+  };
 
   const updateInterviewSlot = (index: number, field: 'date' | 'time', value: Date | string) => {
     setInterviewSlots(prev => {

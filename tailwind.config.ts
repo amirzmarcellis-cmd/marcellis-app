@@ -114,13 +114,8 @@ export default {
 				'glass': '20px',
 			},
 			transitionTimingFunction: {
-				'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
-				'bounce': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)'
-			},
-			transitionDuration: {
-				'fast': '150ms',
-				'normal': '200ms',
-				'slow': '300ms',
+				'smooth': 'var(--transition-smooth)',
+				'bounce': 'var(--transition-bounce)'
 			},
 			keyframes: {
 				'accordion-down': {
@@ -160,15 +155,15 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'fade-in': 'fade-in 0.3s ease-out',
-				'slide-in': 'slide-in 0.2s ease-out',
-				'pulse-glow': 'pulse-glow 3s ease-in-out infinite',
+				'fade-in': 'fade-in 0.5s ease-out',
+				'slide-in': 'slide-in 0.3s ease-out',
+				'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
 				'radar-sweep': 'radar-sweep 6s linear infinite',
 				'float-slow': 'float 6s ease-in-out infinite',
 				'marquee': 'marquee 24s linear infinite',
 				'parallax-pan': 'parallax-pan 60s linear infinite',
-				'spotlight-fade': 'spotlight-fade 0.4s ease-out',
-				'shake': 'shake 0.4s ease-in-out'
+				'spotlight-fade': 'spotlight-fade 0.6s ease-out',
+				'shake': 'shake 0.6s ease-in-out'
 			}
 		}
 	},
