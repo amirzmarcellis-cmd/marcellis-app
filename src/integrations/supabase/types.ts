@@ -75,6 +75,7 @@ export type Database = {
           done_questions: string | null
           email: string | null
           Firstname: string | null
+          formatted_cv: string | null
           job_id: string | null
           Lastname: string | null
           name: string | null
@@ -89,6 +90,7 @@ export type Database = {
           done_questions?: string | null
           email?: string | null
           Firstname?: string | null
+          formatted_cv?: string | null
           job_id?: string | null
           Lastname?: string | null
           name?: string | null
@@ -103,6 +105,7 @@ export type Database = {
           done_questions?: string | null
           email?: string | null
           Firstname?: string | null
+          formatted_cv?: string | null
           job_id?: string | null
           Lastname?: string | null
           name?: string | null
