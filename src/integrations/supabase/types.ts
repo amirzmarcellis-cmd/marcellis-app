@@ -699,6 +699,10 @@ export type Database = {
         Args: { "": string } | { "": unknown }
         Returns: unknown
       }
+      disable_expired_auto_dial: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_org_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["org_role"]
