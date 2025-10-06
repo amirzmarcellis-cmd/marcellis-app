@@ -89,10 +89,66 @@ export default function CVViewer() {
       </div>
 
       <GlassCard className="p-8">
-        <div className="prose prose-sm max-w-none dark:prose-invert">
-          <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
-            {cvText}
-          </pre>
+        <div className="max-w-4xl mx-auto">
+          <div 
+            className="cv-content space-y-4"
+            style={{
+              whiteSpace: 'pre-wrap',
+              lineHeight: '1.8',
+              fontSize: '0.95rem',
+              fontFamily: 'system-ui, -apple-system, sans-serif'
+            }}
+          >
+            {cvText.split('\n').map((line, index) => {
+              // Clean the line
+              const cleanLine = line
+                .replace(/[•●▪◦▸▹►▻]/g, '•')  // Normalize bullet points
+                .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
+                .trim();
+              
+              // Skip empty lines
+              if (!cleanLine) {
+                return <div key={index} className="h-3" />;
+              }
+              
+              // Detect section headers (all caps or ends with colon)
+              const isHeader = cleanLine === cleanLine.toUpperCase() && cleanLine.length > 3 && cleanLine.length < 50;
+              const isSubHeader = cleanLine.endsWith(':') && cleanLine.length < 100;
+              
+              if (isHeader) {
+                return (
+                  <h2 key={index} className="text-lg font-bold text-primary mt-6 mb-2 border-b border-border pb-2">
+                    {cleanLine}
+                  </h2>
+                );
+              }
+              
+              if (isSubHeader) {
+                return (
+                  <h3 key={index} className="text-base font-semibold text-foreground mt-4 mb-1">
+                    {cleanLine}
+                  </h3>
+                );
+              }
+              
+              // Bullet points
+              if (cleanLine.startsWith('•') || cleanLine.startsWith('-') || cleanLine.startsWith('*')) {
+                return (
+                  <div key={index} className="flex gap-3 ml-4 text-muted-foreground">
+                    <span className="text-primary mt-1">•</span>
+                    <span className="flex-1">{cleanLine.replace(/^[•\-*]\s*/, '')}</span>
+                  </div>
+                );
+              }
+              
+              // Regular paragraph
+              return (
+                <p key={index} className="text-foreground leading-relaxed">
+                  {cleanLine}
+                </p>
+              );
+            })}
+          </div>
         </div>
       </GlassCard>
     </div>
