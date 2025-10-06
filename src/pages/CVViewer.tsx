@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, FileText, Sparkles } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { toast } from "sonner";
@@ -39,26 +39,45 @@ export default function CVViewer() {
           });
         }
 
-        // Fetch formatted CV from CVs table
-        const { data: cvData, error: cvError } = await supabase
-          .from("CVs")
-          .select("formatted_cv, name")
-          .eq("user_id", candidateId)
-          .single();
+        // Poll for formatted CV
+        const pollInterval = setInterval(async () => {
+          const { data: cvData, error: cvError } = await supabase
+            .from("CVs")
+            .select("formatted_cv, name")
+            .eq("user_id", candidateId)
+            .single();
 
-        if (cvError) {
-          console.error("Error fetching from CVs table:", cvError);
-          setCvText("No CV available");
-          setCandidateName(candidateId);
-        } else {
-          setCvText(cvData?.formatted_cv || "No CV available");
-          setCandidateName(cvData?.name || candidateId);
-        }
+          if (cvError) {
+            console.error("Error fetching from CVs table:", cvError);
+            clearInterval(pollInterval);
+            setCvText("No CV available");
+            setCandidateName(candidateId);
+            setLoading(false);
+            return;
+          }
+
+          // Check if formatted_cv is populated
+          if (cvData?.formatted_cv) {
+            clearInterval(pollInterval);
+            setCvText(cvData.formatted_cv);
+            setCandidateName(cvData.name || candidateId);
+            setLoading(false);
+          }
+        }, 2000); // Poll every 2 seconds
+
+        // Set timeout after 60 seconds
+        setTimeout(() => {
+          clearInterval(pollInterval);
+          if (loading) {
+            toast.error("CV formatting is taking longer than expected");
+            setLoading(false);
+          }
+        }, 60000);
+
       } catch (error) {
         console.error("Error fetching CV:", error);
         toast.error("Failed to load CV");
-        setCvText("Error loading CV text");
-      } finally {
+        setCvText("Error loading CV");
         setLoading(false);
       }
     };
@@ -68,8 +87,36 @@ export default function CVViewer() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+        <div className="text-center space-y-6 p-8">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-32 h-32 border-4 border-primary/20 rounded-full animate-pulse" />
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-24 h-24 border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin" />
+            </div>
+            <div className="relative z-10 flex items-center justify-center pt-8">
+              <FileText className="h-16 w-16 text-primary animate-pulse" />
+            </div>
+          </div>
+          
+          <div className="space-y-2 animate-fade-in">
+            <h3 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
+              <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+              Formatting CV
+              <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+            </h3>
+            <p className="text-muted-foreground">
+              Our AI is formatting the CV for optimal readability...
+            </p>
+            <div className="flex items-center justify-center gap-1 mt-4">
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
