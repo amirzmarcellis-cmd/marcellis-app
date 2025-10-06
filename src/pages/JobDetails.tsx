@@ -3016,17 +3016,19 @@ const handleRemoveSelectedCandidates = async () => {
                                           </Link>
                                         </Button>
                                       )}
-                                      <Button 
-                                        variant="outline" 
-                                        size="sm" 
-                                        className="flex-1 text-xs md:text-sm"
-                                        onClick={() => {
-                                            navigate(`/cv-viewer/${candidateId}/${id}`);
-                                        }}
-                                      >
-                                        <FileText className="w-3 h-3 mr-1" />
-                                        View CV
-                                      </Button>
+                                      {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('itris') && (
+                                        <Button 
+                                          variant="outline" 
+                                          size="sm" 
+                                          className="flex-1 text-xs md:text-sm"
+                                          onClick={() => {
+                                              navigate(`/cv-viewer/${candidateId}/${id}`);
+                                          }}
+                                        >
+                                          <FileText className="w-3 h-3 mr-1" />
+                                          View CV
+                                        </Button>
+                                      )}
                                     </div>
                                   </div>
                                 </div>
