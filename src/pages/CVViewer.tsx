@@ -19,7 +19,30 @@ export default function CVViewer() {
       if (!candidateId || !jobId) return;
 
       try {
-        // First, trigger the webhook
+        // Check if formatted_cv already exists
+        const { data: initialCvData, error: initialError } = await supabase
+          .from("CVs")
+          .select("formatted_cv, name")
+          .eq("user_id", candidateId)
+          .single();
+
+        if (initialError) {
+          console.error("Error fetching from CVs table:", initialError);
+          setCvText("No CV available");
+          setCandidateName(candidateId);
+          setLoading(false);
+          return;
+        }
+
+        // If formatted_cv already exists, show it immediately
+        if (initialCvData?.formatted_cv) {
+          setCvText(initialCvData.formatted_cv);
+          setCandidateName(initialCvData.name || candidateId);
+          setLoading(false);
+          return;
+        }
+
+        // If formatted_cv is null, trigger webhook and start polling
         const { data: jobCvData } = await supabase
           .from("Jobs_CVs")
           .select("itris_job_id")
