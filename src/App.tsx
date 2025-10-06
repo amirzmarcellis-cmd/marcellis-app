@@ -20,6 +20,7 @@ const JobDetails = lazy(() => import("./pages/JobDetails"));
 const Candidates = lazy(() => import("./pages/Candidates"));
 const EditCandidate = lazy(() => import("./pages/EditCandidate"));
 const CandidateDetails = lazy(() => import("./pages/CandidateDetails"));
+const CVViewer = lazy(() => import("./pages/CVViewer"));
 const Calls = lazy(() => import("./pages/Calls"));
 const CallLog = lazy(() => import("./pages/CallLog"));
 const CallLogDetails = lazy(() => import("./pages/CallLogDetails"));
@@ -74,6 +75,7 @@ const App = () => (
                   <Route path="/interviews" element={<DashboardLayout><Interviews /></DashboardLayout>} />
                   <Route path="/candidate/:id" element={<DashboardLayout><CandidateDetails /></DashboardLayout>} />
                   <Route path="/candidate/edit/:id" element={<DashboardLayout><EditCandidate /></DashboardLayout>} />
+                  <Route path="/cv-viewer/:candidateId/:jobId" element={<DashboardLayout><CVViewer /></DashboardLayout>} />
                   <Route path="/calls" element={<DashboardLayout><Calls /></DashboardLayout>} />
                   <Route path="/call-log" element={<DashboardLayout><CallLog /></DashboardLayout>} />
                   <Route path="/call-log-details" element={<DashboardLayout><CallLogDetails /></DashboardLayout>} />

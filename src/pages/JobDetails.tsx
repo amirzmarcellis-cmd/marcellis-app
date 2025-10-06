@@ -3020,45 +3020,8 @@ const handleRemoveSelectedCandidates = async () => {
                                         variant="outline" 
                                         size="sm" 
                                         className="flex-1 text-xs md:text-sm"
-                                        onClick={async () => {
-                                          try {
-                                            // Fetch itris_job_id from database
-                                            const { data, error } = await supabase
-                                              .from('Jobs_CVs')
-                                              .select('itris_job_id')
-                                              .eq('job_id', id)
-                                              .eq('user_id', candidateId)
-                                              .single();
-
-                                            if (error) throw error;
-
-                                            const itrisId = data?.itris_job_id;
-                                            
-                                            // Trigger webhook
-                                            await fetch('https://hook.eu2.make.com/3xzjwgget94o2nco3rsm3ix9jm42pyuu', {
-                                              method: 'POST',
-                                              headers: {
-                                                'Content-Type': 'application/json',
-                                              },
-                                              body: JSON.stringify({
-                                                itris_job_id: itrisId,
-                                                candidate_id: candidateId,
-                                                job_id: id
-                                              })
-                                            });
-
-                                            toast({
-                                              title: "CV Viewed",
-                                              description: "CV view has been recorded",
-                                            });
-                                          } catch (error) {
-                                            console.error('Error triggering CV view webhook:', error);
-                                            toast({
-                                              title: "Error",
-                                              description: "Failed to record CV view",
-                                              variant: "destructive"
-                                            });
-                                          }
+                                        onClick={() => {
+                                            navigate(`/cv-viewer/${candidateId}/${id}`);
                                         }}
                                       >
                                         <FileText className="w-3 h-3 mr-1" />
