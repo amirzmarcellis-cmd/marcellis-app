@@ -80,7 +80,7 @@ export default function CVViewer() {
         <SectionHeader title={`CV - ${candidateName}`} />
         <Button
           variant="outline"
-          onClick={() => navigate(`/candidate/${candidateId}`)}
+          onClick={() => navigate(`/job/${jobId}`)}
           className="gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
