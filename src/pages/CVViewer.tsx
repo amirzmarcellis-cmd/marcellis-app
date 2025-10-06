@@ -150,7 +150,7 @@ export default function CVViewer() {
         <SectionHeader title={`CV - ${candidateName}`} />
         <Button
           variant="outline"
-          onClick={() => navigate(`/job/${jobId}#tab=ai-longlist&candidate=${candidateId}`)}
+          onClick={() => navigate(`/job/${jobId}#tab=boolean-search`, { state: { tab: 'boolean-search', focusCandidateId: candidateId } })}
           className="gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
