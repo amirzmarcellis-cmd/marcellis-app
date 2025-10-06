@@ -2244,7 +2244,11 @@ const handleRemoveSelectedCandidates = async () => {
                     <span className="font-mono text-sm">{job.itris_job_id || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Client:</span>
+                    <span className="text-muted-foreground">Client Name:</span>
+                    <span>{job.client_name || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Client Description:</span>
                     <span>{job.client_description || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">

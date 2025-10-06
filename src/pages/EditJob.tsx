@@ -63,6 +63,7 @@ interface JobData {
   job_id: string;
   job_title: string;
   job_description: string;
+  client_name: string;
   client_description: string;
   job_location: string;
   job_salary_range: string;
@@ -101,6 +102,7 @@ export default function EditJob() {
     job_id: "",
     job_title: "",
     job_description: "",
+    client_name: "",
     client_description: "",
     job_location: "",
     job_salary_range: "",
@@ -390,6 +392,17 @@ export default function EditJob() {
                       rows={6}
                       placeholder="Enter detailed job description"
                       required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="client_name">Client Name</Label>
+                    <Input
+                      id="client_name"
+                      name="client_name"
+                      value={formData.client_name}
+                      onChange={handleInputChange}
+                      placeholder="Enter client name"
                     />
                   </div>
 
