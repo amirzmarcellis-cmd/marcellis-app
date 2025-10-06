@@ -39,19 +39,19 @@ export default function CVViewer() {
           });
         }
 
-        // Fetch CV text from CVs table
+        // Fetch formatted CV from CVs table
         const { data: cvData, error: cvError } = await supabase
           .from("CVs")
-          .select("cv_text, name")
+          .select("formatted_cv, name")
           .eq("user_id", candidateId)
           .single();
 
         if (cvError) {
           console.error("Error fetching from CVs table:", cvError);
-          setCvText("No CV text available");
+          setCvText("No CV available");
           setCandidateName(candidateId);
         } else {
-          setCvText(cvData?.cv_text || "No CV text available");
+          setCvText(cvData?.formatted_cv || "No CV available");
           setCandidateName(cvData?.name || candidateId);
         }
       } catch (error) {
@@ -88,36 +88,38 @@ export default function CVViewer() {
         </Button>
       </div>
 
-      <GlassCard className="p-8">
-        <div className="max-w-4xl mx-auto">
+      <GlassCard className="p-0 overflow-hidden">
+        <div className="bg-gradient-to-br from-primary/5 via-background to-accent/5 p-8 border-b border-border/50">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold text-foreground mb-2">Curriculum Vitae</h2>
+            <p className="text-muted-foreground">Professional Profile</p>
+          </div>
+        </div>
+        
+        <div className="max-w-4xl mx-auto p-8 lg:p-12">
           <div 
-            className="cv-content space-y-4"
+            className="cv-content prose prose-neutral dark:prose-invert max-w-none"
             style={{
               whiteSpace: 'pre-wrap',
-              lineHeight: '1.8',
-              fontSize: '0.95rem',
-              fontFamily: 'system-ui, -apple-system, sans-serif'
+              lineHeight: '1.75',
             }}
           >
             {cvText.split('\n').map((line, index) => {
-              // Clean the line
               const cleanLine = line
-                .replace(/[•●▪◦▸▹►▻]/g, '•')  // Normalize bullet points
-                .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
+                .replace(/[•●▪◦▸▹►▻]/g, '•')
+                .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
                 .trim();
               
-              // Skip empty lines
               if (!cleanLine) {
-                return <div key={index} className="h-3" />;
+                return <div key={index} className="h-4" />;
               }
               
-              // Detect section headers (all caps or ends with colon)
               const isHeader = cleanLine === cleanLine.toUpperCase() && cleanLine.length > 3 && cleanLine.length < 50;
               const isSubHeader = cleanLine.endsWith(':') && cleanLine.length < 100;
               
               if (isHeader) {
                 return (
-                  <h2 key={index} className="text-lg font-bold text-primary mt-6 mb-2 border-b border-border pb-2">
+                  <h2 key={index} className="text-xl font-bold text-primary mt-8 mb-4 pb-2 border-b-2 border-primary/20 uppercase tracking-wide">
                     {cleanLine}
                   </h2>
                 );
@@ -125,25 +127,23 @@ export default function CVViewer() {
               
               if (isSubHeader) {
                 return (
-                  <h3 key={index} className="text-base font-semibold text-foreground mt-4 mb-1">
+                  <h3 key={index} className="text-lg font-semibold text-foreground mt-6 mb-3">
                     {cleanLine}
                   </h3>
                 );
               }
               
-              // Bullet points
               if (cleanLine.startsWith('•') || cleanLine.startsWith('-') || cleanLine.startsWith('*')) {
                 return (
-                  <div key={index} className="flex gap-3 ml-4 text-muted-foreground">
-                    <span className="text-primary mt-1">•</span>
-                    <span className="flex-1">{cleanLine.replace(/^[•\-*]\s*/, '')}</span>
+                  <div key={index} className="flex gap-3 ml-6 mb-2 text-muted-foreground">
+                    <span className="text-primary font-bold mt-1.5 text-sm">●</span>
+                    <span className="flex-1 leading-relaxed">{cleanLine.replace(/^[•\-*]\s*/, '')}</span>
                   </div>
                 );
               }
               
-              // Regular paragraph
               return (
-                <p key={index} className="text-foreground leading-relaxed">
+                <p key={index} className="text-foreground leading-relaxed mb-3">
                   {cleanLine}
                 </p>
               );
