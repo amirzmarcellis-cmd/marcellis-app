@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Briefcase, Phone, PhoneOff, UserCircle } from "lucide-react";
+import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Briefcase, Phone, PhoneOff, UserCircle, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { format } from "date-fns";
 import { JobDialog } from "./JobDialog";
 import { useProfile } from "@/hooks/useProfile";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -525,6 +526,11 @@ const JobGrid = memo(function JobGrid({
               {job.job_salary_range && <div className="flex items-center text-muted-foreground">
                   <Banknote className="h-4 w-4 mr-2 text-green" />
                   {formatCurrency(job.job_salary_range, job["Currency"] as string | null)}
+                </div>}
+              
+              {job.Timestamp && <div className="flex items-center text-muted-foreground">
+                  <Calendar className="h-4 w-4 mr-2 text-primary" />
+                  Created: {format(new Date(job.Timestamp), 'MMM dd, yyyy')}
                 </div>}
             </div>
 
