@@ -111,10 +111,11 @@ export function JobManagementPanel() {
             .from('Jobs_CVs')
             .select('job_id, source, contacted, shortlisted_at, longlisted_at, after_call_score')
             .in('job_id', jobIds)
-            .limit(10000)
+            .limit(50000)  // Increased limit to ensure all candidates are fetched across all jobs
         : { data: [], error: null };
 
       console.log('JobManagementPanel: Jobs fetched:', initialJobs.length);
+      console.log('JobManagementPanel: Total candidates fetched across all jobs:', candidatesResult.data?.length || 0);
       
       // Build candidates by job map (candidates are already filtered by job_id in SQL)
       const allCandidates = candidatesResult.data || [];
@@ -152,6 +153,11 @@ export function JobManagementPanel() {
       const jobsWithCounts = initialJobs.map(job => {
         const candidates = candidatesByJob.get(job.job_id) || [];
         
+        // Debug logging for the specific job
+        if (job.job_id === 'me-j-0023') {
+          console.log(`JobManagementPanel: Job "${job.job_title}" (${job.job_id}) has ${candidates.length} total candidates from Jobs_CVs`);
+        }
+        
         // Longlisted: candidates with source containing 'itris' or 'linkedin'
         const longlistedCandidates = candidates.filter(c => {
           const source = (c.source || "").toLowerCase();
@@ -159,6 +165,11 @@ export function JobManagementPanel() {
         });
         
         const longlisted_count = longlistedCandidates.length;
+        
+        // Debug logging for the specific job
+        if (job.job_id === 'me-j-0023') {
+          console.log(`JobManagementPanel: Job "${job.job_title}" longlisted count: ${longlisted_count}`);
+        }
         
         // Shortlisted: only longlisted candidates with score >= 74 (matches JobFunnel exactly)
         const shortlisted_count = longlistedCandidates.filter(c => {
