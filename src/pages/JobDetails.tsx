@@ -43,7 +43,9 @@ export default function JobDetails() {
   const {
     profile
   } = useProfile();
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [automaticDialSaving, setAutomaticDialSaving] = useState(false);
@@ -110,44 +112,47 @@ export default function JobDetails() {
       preOpened?.document.write('<p style="font-family:sans-serif; color:#444;">Opening LinkedIn…</p>');
       preOpened?.document.close();
     } catch {}
-
     try {
-      console.log('Searching for LinkedIn profile:', { candidateId, candidateName, jobId });
+      console.log('Searching for LinkedIn profile:', {
+        candidateId,
+        candidateName,
+        jobId
+      });
 
       // Try searching by user_id first (Jobs_CVs.user_id like "Lin-319")
-      let { data, error } = await supabase
-        .from('linkedin_boolean_search')
-        .select('linkedin_id, user_id')
-        .eq('user_id', candidateId)
-        .maybeSingle();
-
-      console.log('LinkedIn search by user_id result:', { data, error });
+      let {
+        data,
+        error
+      } = await supabase.from('linkedin_boolean_search').select('linkedin_id, user_id').eq('user_id', candidateId).maybeSingle();
+      console.log('LinkedIn search by user_id result:', {
+        data,
+        error
+      });
 
       // If not found by user_id, try searching by job_id
       if (!data && jobId) {
-        const { data: allProfiles, error: jobError } = await supabase
-          .from('linkedin_boolean_search')
-          .select('linkedin_id, user_id')
-          .eq('job_id', jobId);
-
-        console.log('LinkedIn profiles for job:', { allProfiles, jobError });
-
+        const {
+          data: allProfiles,
+          error: jobError
+        } = await supabase.from('linkedin_boolean_search').select('linkedin_id, user_id').eq('job_id', jobId);
+        console.log('LinkedIn profiles for job:', {
+          allProfiles,
+          jobError
+        });
         if (allProfiles && allProfiles.length > 0) {
           data = allProfiles[0];
         }
       }
-
       if (error && (error as any).code !== 'PGRST116') {
         console.error('Error fetching LinkedIn ID:', error);
         preOpened?.close();
         toast({
           title: 'Error',
           description: 'Could not fetch LinkedIn profile: ' + (error as any).message,
-          variant: 'destructive',
+          variant: 'destructive'
         });
         return;
       }
-
       if (data && data.linkedin_id) {
         const linkedInUrl = `https://www.linkedin.com/in/${data.linkedin_id}/`;
         console.log('Opening LinkedIn URL:', linkedInUrl);
@@ -157,13 +162,15 @@ export default function JobDetails() {
           window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
         }
       } else {
-        console.log('No LinkedIn ID found for candidate:', { candidateId, candidateName });
+        console.log('No LinkedIn ID found for candidate:', {
+          candidateId,
+          candidateName
+        });
         preOpened?.close();
         toast({
           title: 'Not Found',
-          description:
-            'LinkedIn profile ID not found. The candidate may not have been sourced from LinkedIn boolean search.',
-          variant: 'destructive',
+          description: 'LinkedIn profile ID not found. The candidate may not have been sourced from LinkedIn boolean search.',
+          variant: 'destructive'
         });
       }
     } catch (err) {
@@ -172,21 +179,35 @@ export default function JobDetails() {
       toast({
         title: 'Error',
         description: 'An error occurred while fetching the profile',
-        variant: 'destructive',
+        variant: 'destructive'
       });
     }
   };
   // Helper to derive a robust LinkedIn profile URL for a candidate
   const getLinkedInUrl = (c: any): string | null => {
     if (!c) return null;
-    const fields: { v: any; treatAsId: boolean }[] = [
-      { v: c.linkedin_id ?? c["linkedin_id"], treatAsId: true },
-      { v: c["LinkedIn ID"], treatAsId: true },
-      { v: c.linkedin_url ?? c["linkedin_url"], treatAsId: false },
-      { v: c["LinkedIn URL"], treatAsId: false },
-      { v: c["Source URL"], treatAsId: false },
-      { v: c["Source"], treatAsId: false },
-    ];
+    const fields: {
+      v: any;
+      treatAsId: boolean;
+    }[] = [{
+      v: c.linkedin_id ?? c["linkedin_id"],
+      treatAsId: true
+    }, {
+      v: c["LinkedIn ID"],
+      treatAsId: true
+    }, {
+      v: c.linkedin_url ?? c["linkedin_url"],
+      treatAsId: false
+    }, {
+      v: c["LinkedIn URL"],
+      treatAsId: false
+    }, {
+      v: c["Source URL"],
+      treatAsId: false
+    }, {
+      v: c["Source"],
+      treatAsId: false
+    }];
     for (const f of fields) {
       const raw = f.v;
       if (!raw) continue;
@@ -197,7 +218,7 @@ export default function JobDetails() {
         continue;
       }
       if (!f.treatAsId) {
-        if (/linkedin\.com/i.test(s)) return `https://${s.replace(/^\/+/,'')}`;
+        if (/linkedin\.com/i.test(s)) return `https://${s.replace(/^\/+/, '')}`;
         continue;
       }
       return `https://www.linkedin.com/in/${s.replace(/^\/+/, '').replace(/\/+$/, '')}/`;
@@ -239,18 +260,20 @@ export default function JobDetails() {
     if (id) {
       // Load job data first to show page immediately
       fetchJob(id);
-      
+
       // Load other data in background (non-blocking)
       fetchCandidates(id);
       fetchLonglistedCandidates(id);
       fetchApplications(id);
       fetchTaskCandidates(id);
-      
+
       // Check for shortlist disabled status
       const storageKey = `shortlist_${id}_disabled`;
       const storedData = localStorage.getItem(storageKey);
       if (storedData) {
-        const { disabledUntil } = JSON.parse(storedData);
+        const {
+          disabledUntil
+        } = JSON.parse(storedData);
         const now = Date.now();
         if (disabledUntil > now) {
           setShortListButtonDisabled(true);
@@ -260,16 +283,16 @@ export default function JobDetails() {
         }
       }
     }
-    
+
     // Check for tab in location state (from navigation)
     if (location.state?.tab) {
       setActiveTab(location.state.tab);
-      
+
       // Restore filter if provided
       if (location.state?.longListSourceFilter) {
         setLongListSourceFilter(location.state.longListSourceFilter);
       }
-      
+
       // Only clear state if there's no focus candidate to process
       if (!location.state?.focusCandidateId) {
         window.history.replaceState({}, document.title);
@@ -288,44 +311,37 @@ export default function JobDetails() {
   useEffect(() => {
     const checkAutoDialExpiry = async () => {
       if (!job?.automatic_dial || !job?.job_id) return;
-      
+
       // Check if auto_dial_enabled_at exists (column might not exist in older data)
       const autoDialEnabledAt = (job as any).auto_dial_enabled_at;
       if (!autoDialEnabledAt) return;
-
       try {
         const enabledAt = new Date(autoDialEnabledAt);
         const now = new Date();
         const hoursPassed = (now.getTime() - enabledAt.getTime()) / (1000 * 60 * 60);
-
         if (hoursPassed >= 48) {
           // Auto dial has been on for 48+ hours, turn it off
-          const { error } = await supabase
-            .from('Jobs')
-            .update({
-              automatic_dial: false,
-              auto_dial_enabled_at: null
-            })
-            .eq('job_id', job.job_id);
-
+          const {
+            error
+          } = await supabase.from('Jobs').update({
+            automatic_dial: false,
+            auto_dial_enabled_at: null
+          }).eq('job_id', job.job_id);
           if (error) throw error;
-
           setJob(prev => ({
             ...prev,
             automatic_dial: false,
             auto_dial_enabled_at: null
           }));
-
           toast({
             title: "Auto Dial Disabled",
-            description: "Auto dial has been automatically disabled after 48 hours",
+            description: "Auto dial has been automatically disabled after 48 hours"
           });
         }
       } catch (error) {
         console.error('Error checking/disabling auto dial:', error);
       }
     };
-
     if (job) {
       checkAutoDialExpiry();
     }
@@ -337,7 +353,10 @@ export default function JobDetails() {
     if ((activeTab === 'boolean-search' || activeTab === 'shortlist') && focusId) {
       const el = document.getElementById(`candidate-card-${focusId}`);
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
         el.classList.add('ring-2', 'ring-primary', 'animate-pulse');
         setTimeout(() => {
           el.classList.remove('animate-pulse', 'ring-2', 'ring-primary');
@@ -414,15 +433,12 @@ export default function JobDetails() {
         return;
       }
       setJob(data);
-      
+
       // Fetch recruiter name if recruiter_id exists
       if (data.recruiter_id) {
-        const { data: recruiterData } = await supabase
-          .from('profiles')
-          .select('name')
-          .eq('user_id', data.recruiter_id)
-          .maybeSingle();
-        
+        const {
+          data: recruiterData
+        } = await supabase.from('profiles').select('name').eq('user_id', data.recruiter_id).maybeSingle();
         if (recruiterData?.name) {
           setRecruiterName(recruiterData.name);
         }
@@ -436,14 +452,13 @@ export default function JobDetails() {
   };
   const handleAutomaticDialToggle = async (checked: boolean) => {
     if (!job?.job_id) return;
-    
+
     // Optimistic update for immediate feedback
     setJob(prev => ({
       ...prev,
       automatic_dial: checked,
       auto_dial_enabled_at: checked ? new Date().toISOString() : null
     }));
-    
     setAutomaticDialSaving(true);
     try {
       const {
@@ -452,9 +467,7 @@ export default function JobDetails() {
         automatic_dial: checked,
         auto_dial_enabled_at: checked ? new Date().toISOString() : null
       }).eq('job_id', job.job_id);
-      
       if (error) throw error;
-      
       toast({
         title: "Success",
         description: `Automatic dial ${checked ? 'enabled' : 'disabled'} for this job`
@@ -475,21 +488,17 @@ export default function JobDetails() {
       setAutomaticDialSaving(false);
     }
   };
-
   const handlePauseJob = async () => {
     if (!job?.job_id) return;
-    
     const isCurrentlyActive = job?.Processed === "Yes";
-    
+
     // Optimistic update for immediate feedback
     setJob(prev => ({
       ...prev,
       automatic_dial: isCurrentlyActive ? false : prev?.automatic_dial,
       Processed: isCurrentlyActive ? "No" : "Yes"
     }));
-    
     setAutomaticDialSaving(true);
-    
     try {
       const {
         error
@@ -498,9 +507,7 @@ export default function JobDetails() {
         Processed: isCurrentlyActive ? "No" : "Yes",
         status: isCurrentlyActive ? "paused" : "active"
       }).eq('job_id', job.job_id);
-      
       if (error) throw error;
-      
       toast({
         title: "Success",
         description: isCurrentlyActive ? "Job paused successfully" : "Job activated successfully"
@@ -712,16 +719,19 @@ export default function JobDetails() {
         }
       });
       // Also fetch LinkedIn profile IDs for this job to enrich candidates
-      const { data: liRows, error: liErr } = await supabase
-        .from('linkedin_boolean_search')
-        .select('user_id, linkedin_id')
-        .eq('job_id', jobId);
+      const {
+        data: liRows,
+        error: liErr
+      } = await supabase.from('linkedin_boolean_search').select('user_id, linkedin_id').eq('job_id', jobId);
       if (liErr) console.warn('Error fetching LinkedIn IDs:', liErr);
-      const liMap = new Map<string, { linkedin_id: string | null }>();
+      const liMap = new Map<string, {
+        linkedin_id: string | null;
+      }>();
       (liRows || []).forEach((r: any) => {
-        if (r?.user_id) liMap.set(String(r.user_id), { linkedin_id: r.linkedin_id ?? null });
+        if (r?.user_id) liMap.set(String(r.user_id), {
+          linkedin_id: r.linkedin_id ?? null
+        });
       });
-
       const mappedLonglisted = (longlistedData || []).map((row: any) => {
         const sourceLower = (row.source || '').toLowerCase();
         const hasLinkedIn = sourceLower.includes('linkedin');
@@ -737,7 +747,6 @@ export default function JobDetails() {
 
         // Prefer linkedin_id from Jobs_CVs row, else fall back to linkedin_boolean_search mapping
         const mappedLinkedInId = row.linkedin_id ?? liMap.get(String(row.user_id))?.linkedin_id ?? '';
-
         return {
           ...row,
           "Job ID": jobId,
@@ -950,7 +959,7 @@ export default function JobDetails() {
       setIsGeneratingShortList(false);
     }
   };
-const handleRemoveSelectedCandidates = async () => {
+  const handleRemoveSelectedCandidates = async () => {
     if (selectedCandidates.size === 0) {
       toast({
         title: "Error",
@@ -959,7 +968,6 @@ const handleRemoveSelectedCandidates = async () => {
       });
       return;
     }
-
     if (!id) {
       toast({
         title: "Error",
@@ -968,19 +976,18 @@ const handleRemoveSelectedCandidates = async () => {
       });
       return;
     }
-
     try {
       console.log('=== BULK REMOVE START ===');
       const selectedIds = Array.from(selectedCandidates);
       const selectedSet = new Set(selectedIds);
 
-// Collect ALL recordids for the selected candidates (some candidates may have multiple rows)
+      // Collect ALL recordids for the selected candidates (some candidates may have multiple rows)
       const recordIdsToDelete = new Set<any>();
       const collectFrom = (list: any[]) => {
         for (const c of list) {
           const cid = c["Candidate_ID"] ? String(c["Candidate_ID"]) : "";
           const uid = c.user_id ? String(c.user_id) : "";
-          if ((cid && selectedSet.has(cid)) || (uid && selectedSet.has(uid))) {
+          if (cid && selectedSet.has(cid) || uid && selectedSet.has(uid)) {
             if (c.recordid !== undefined && c.recordid !== null) {
               recordIdsToDelete.add(c.recordid);
             }
@@ -989,27 +996,26 @@ const handleRemoveSelectedCandidates = async () => {
       };
       collectFrom(candidates);
       collectFrom(longlistedCandidates);
-
       if (recordIdsToDelete.size === 0) {
         console.warn('No recordids found for selected candidates');
         toast({
           title: "Nothing to delete",
-          description: "Selected candidates have no associated records",
+          description: "Selected candidates have no associated records"
         });
         return;
       }
-
       console.log('Deleting from Jobs_CVs for job:', id, 'recordids:', Array.from(recordIdsToDelete));
-      const { data, error } = await supabase
-        .from('Jobs_CVs')
-        .delete()
-        .in('recordid', Array.from(recordIdsToDelete))
-        .eq('job_id', id)
-        .select();
-
-      console.log('Bulk delete response:', { success: !error, deletedRows: data?.length || 0, data, error });
+      const {
+        data,
+        error
+      } = await supabase.from('Jobs_CVs').delete().in('recordid', Array.from(recordIdsToDelete)).eq('job_id', id).select();
+      console.log('Bulk delete response:', {
+        success: !error,
+        deletedRows: data?.length || 0,
+        data,
+        error
+      });
       if (error) throw error;
-
       if (!data || data.length === 0) {
         console.warn('No rows deleted in bulk remove - they may have been already removed');
       }
@@ -1028,12 +1034,10 @@ const handleRemoveSelectedCandidates = async () => {
 
       // Clear selection
       setSelectedCandidates(new Set());
-
       toast({
         title: "Removed",
         description: `${selectedIds.length} candidate${selectedIds.length > 1 ? 's' : ''} removed from long list`
       });
-
       console.log('=== BULK REMOVE SUCCESS ===');
     } catch (error) {
       console.error('=== BULK REMOVE ERROR ===', error);
@@ -1169,9 +1173,11 @@ const handleRemoveSelectedCandidates = async () => {
   };
   const handleRejectCandidate = async (reason: string) => {
     if (!rejectCandidateData) return;
-    
-    const { jobId, candidateId, callid } = rejectCandidateData;
-    
+    const {
+      jobId,
+      candidateId,
+      callid
+    } = rejectCandidateData;
     try {
       // Find the candidate data from the candidates array
       const candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
@@ -1185,18 +1191,15 @@ const handleRemoveSelectedCandidates = async () => {
       }
 
       // Update the database with the rejection reason
-      const { error: updateError } = await supabase
-        .from('Jobs_CVs')
-        .update({ 
-          contacted: 'Rejected',
-          Reason_to_reject: reason 
-        })
-        .eq('recordid', candidate.recordid);
-
+      const {
+        error: updateError
+      } = await supabase.from('Jobs_CVs').update({
+        contacted: 'Rejected',
+        Reason_to_reject: reason
+      }).eq('recordid', candidate.recordid);
       if (updateError) {
         throw updateError;
       }
-
       const response = await fetch('https://hook.eu2.make.com/mk46k4ibvs5n5nk1lto9csljygesv75f', {
         method: 'POST',
         headers: {
@@ -1209,7 +1212,6 @@ const handleRemoveSelectedCandidates = async () => {
           itris_job_id: job?.itris_job_id || ""
         })
       });
-      
       if (response.ok) {
         toast({
           title: "Candidate Rejected",
@@ -1232,12 +1234,14 @@ const handleRemoveSelectedCandidates = async () => {
       });
     }
   };
-
   const openRejectDialog = (jobId: string, candidateId: string, callid: number) => {
-    setRejectCandidateData({ jobId, candidateId, callid });
+    setRejectCandidateData({
+      jobId,
+      candidateId,
+      callid
+    });
     setShowRejectDialog(true);
   };
-  
   const openHireDialog = (jobId: string, candidateId: string, callid: number) => {
     setHireCandidateData({
       jobId,
@@ -1247,39 +1251,32 @@ const handleRemoveSelectedCandidates = async () => {
     setHireReason("");
     setShowHireDialog(true);
   };
-  
   const handleHireCandidate = async () => {
     if (!hireCandidateData) return;
-    
     try {
-      const { error } = await supabase
-        .from('Jobs_CVs')
-        .update({ 
-          Reason_to_Hire: hireReason,
-          contacted: 'Submitted'
-        })
-        .eq('recordid', parseInt(hireCandidateData.candidateId))
-        .eq('job_id', hireCandidateData.jobId);
-      
+      const {
+        error
+      } = await supabase.from('Jobs_CVs').update({
+        Reason_to_Hire: hireReason,
+        contacted: 'Submitted'
+      }).eq('recordid', parseInt(hireCandidateData.candidateId)).eq('job_id', hireCandidateData.jobId);
       if (error) throw error;
-      
+
       // Update local state
       setCandidates(prev => prev.map(c => c["Candidate_ID"] === hireCandidateData.candidateId ? {
         ...c,
         Contacted: 'Submitted'
       } : c));
-      
       toast({
         title: "CV Submitted",
         description: "Candidate's CV has been submitted with hiring reason"
       });
-      
+
       // Refresh candidates data
       if (id) {
         fetchCandidates(id);
         fetchLonglistedCandidates(id);
       }
-      
       setShowHireDialog(false);
       setHireReason("");
       setHireCandidateData(null);
@@ -1292,7 +1289,6 @@ const handleRemoveSelectedCandidates = async () => {
       });
     }
   };
-  
   const handleGenerateShortList = async () => {
     if (!job?.job_id || candidates.length === 0) {
       toast({
@@ -1376,13 +1372,11 @@ const handleRemoveSelectedCandidates = async () => {
       if (!candidate) {
         candidate = candidates.find(c => c.user_id === candidateId);
       }
-      
       if (!candidate) {
         console.error('Candidate not found. Searched for:', candidateId);
         console.error('Available candidate IDs:', candidates.map(c => c["Candidate_ID"]));
         throw new Error('Candidate not found in local data');
       }
-      
       console.log('Found candidate to remove:', {
         recordid: candidate.recordid,
         user_id: candidate.user_id,
@@ -1392,40 +1386,35 @@ const handleRemoveSelectedCandidates = async () => {
 
       // Use the actual recordid from the database for deletion
       const recordIdToDelete = candidate.recordid;
-      
       if (!recordIdToDelete) {
         console.error('No recordid found for candidate:', candidate);
         throw new Error('Cannot delete candidate: missing recordid');
       }
-
       console.log('Deleting from Jobs_CVs table...');
-      console.log('Parameters:', { recordid: recordIdToDelete, job_id: id });
+      console.log('Parameters:', {
+        recordid: recordIdToDelete,
+        job_id: id
+      });
 
       // Delete the candidate from the Jobs_CVs table permanently
-      const { data, error } = await supabase
-        .from('Jobs_CVs')
-        .delete()
-        .eq('recordid', recordIdToDelete)
-        .eq('job_id', id)
-        .select();
-        
-      console.log('Delete response:', { 
-        success: !error, 
+      const {
+        data,
+        error
+      } = await supabase.from('Jobs_CVs').delete().eq('recordid', recordIdToDelete).eq('job_id', id).select();
+      console.log('Delete response:', {
+        success: !error,
         deletedRows: data?.length || 0,
-        data, 
-        error 
+        data,
+        error
       });
-      
       if (error) {
         console.error('Supabase delete error:', error);
         throw error;
       }
-
       if (!data || data.length === 0) {
         console.warn('No rows were deleted - candidate may not exist in database');
         throw new Error('Candidate not found in database or already deleted');
       }
-
       console.log('Successfully deleted candidate from Jobs_CVs table');
       console.log('Deleted record:', data[0]);
 
@@ -1439,7 +1428,6 @@ const handleRemoveSelectedCandidates = async () => {
         console.log('Updated candidates count:', updated.length);
         return updated;
       });
-      
       setLonglistedCandidates(prev => {
         const updated = prev.filter(c => {
           const cid = c["Candidate_ID"] ? String(c["Candidate_ID"]) : "";
@@ -1449,13 +1437,11 @@ const handleRemoveSelectedCandidates = async () => {
         console.log('Updated longlisted candidates count:', updated.length);
         return updated;
       });
-      
+
       // Refresh the data to ensure UI is in sync with database
       console.log('Refreshing longlisted candidates...');
       await fetchLonglistedCandidates(String(id));
-      
       console.log('=== REMOVE CANDIDATE SUCCESS ===');
-      
       toast({
         title: "Success",
         description: `Candidate "${candidate["Candidate Name"]}" has been permanently removed from the database`
@@ -1849,9 +1835,7 @@ const handleRemoveSelectedCandidates = async () => {
                   {mainCandidate["after_call_score"] && <span className="text-muted-foreground">After Call Score: {mainCandidate["after_call_score"]}</span>}
                   {mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score"] !== undefined && mainCandidate["linkedin_score"] !== null && mainCandidate["linkedin_score"] !== "" && !["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && <span className="text-muted-foreground">Overall: {mainCandidate["linkedin_score"]}</span>}
                 </div>
-                {mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score_reason"] !== undefined && mainCandidate["linkedin_score_reason"] !== null && mainCandidate["linkedin_score_reason"] !== "" && <div className="text-sm text-muted-foreground mt-1">
-                    <span className="font-medium">Reason:</span> {mainCandidate["linkedin_score_reason"]}
-                  </div>}
+                {mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score_reason"] !== undefined && mainCandidate["linkedin_score_reason"] !== null && mainCandidate["linkedin_score_reason"] !== ""}
                 {mainCandidate["Salary Expectations"] && <div className="flex items-center gap-2 text-sm mt-1">
                     <Banknote className="w-3 h-3 text-muted-foreground" />
                     <span className="text-muted-foreground">Expected: {formatCurrency(mainCandidate["Salary Expectations"], job?.Currency)}</span>
@@ -1959,17 +1943,13 @@ const handleRemoveSelectedCandidates = async () => {
                 } : cv));
               }} variant="badge" />}
                 {/* Qualification Status Badge */}
-                {mainCandidate["qualifications"] !== null && mainCandidate["qualifications"] !== undefined && mainCandidate["qualifications"] !== "" ? (
-                  <Badge className="border-2 border-green-600 text-green-600 bg-green-100 shadow-md">
+                {mainCandidate["qualifications"] !== null && mainCandidate["qualifications"] !== undefined && mainCandidate["qualifications"] !== "" ? <Badge className="border-2 border-green-600 text-green-600 bg-green-100 shadow-md">
                     <CheckCircle className="w-3 h-3 mr-1" />
                     Qualification Received
-                  </Badge>
-                ) : (
-                  <Badge variant="outline" className="border-2 border-amber-500 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50 transition-all duration-200">
+                  </Badge> : <Badge variant="outline" className="border-2 border-amber-500 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50 transition-all duration-200">
                     <Clock className="w-3 h-3 mr-1" />
                     Qualification Sent
-                  </Badge>
-                )}
+                  </Badge>}
               </div>
               <div className="flex flex-col gap-1 items-end">
                 {/* Only show overall score when status is Call Done */}
@@ -1998,17 +1978,17 @@ const handleRemoveSelectedCandidates = async () => {
                     </Button>;
               })()}
                 <Button variant="ghost" size="sm" asChild className="flex-1 min-w-[100px]">
-                  {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && getLinkedInUrl(mainCandidate) ? (
-                    <a href={getLinkedInUrl(mainCandidate)!} target="_blank" rel="noopener noreferrer">
+                  {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && getLinkedInUrl(mainCandidate) ? <a href={getLinkedInUrl(mainCandidate)!} target="_blank" rel="noopener noreferrer">
                       <Users className="w-3 h-3 mr-1" />
                       View Profile
-                    </a>
-                  ) : (
-                    <Link to={`/candidate/${candidateId}`} state={{ fromJob: id, tab: 'shortlist', focusCandidateId: candidateId }}>
+                    </a> : <Link to={`/candidate/${candidateId}`} state={{
+                  fromJob: id,
+                  tab: 'shortlist',
+                  focusCandidateId: candidateId
+                }}>
                       <Users className="w-3 h-3 mr-1" />
                       View Profile
-                    </Link>
-                  )}
+                    </Link>}
                 </Button>
               </div>
               {/* Action Buttons - CV Submitted and Reject */}
@@ -2128,31 +2108,15 @@ const handleRemoveSelectedCandidates = async () => {
               <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
             </div>
             {/* Futuristic 3D Action Menu */}
-            <FuturisticActionButton
-              isExpanded={isActionMenuExpanded}
-              onToggle={() => setIsActionMenuExpanded(!isActionMenuExpanded)}
-            >
-              <ActionButton
-                onClick={handlePauseJob}
-                disabled={automaticDialSaving}
-                icon={job?.Processed === "Yes" ? Pause : Play}
-                label={job?.Processed === "Yes" ? "Pause Job" : "Run Job"}
-                variant="danger"
-              />
+            <FuturisticActionButton isExpanded={isActionMenuExpanded} onToggle={() => setIsActionMenuExpanded(!isActionMenuExpanded)}>
+              <ActionButton onClick={handlePauseJob} disabled={automaticDialSaving} icon={job?.Processed === "Yes" ? Pause : Play} label={job?.Processed === "Yes" ? "Pause Job" : "Run Job"} variant="danger" />
             </FuturisticActionButton>
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 items-center justify-center lg:justify-end">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">Auto Dial</span>
-                <ToggleSwitch 
-                  checked={job?.automatic_dial || false}
-                  onChange={handleAutomaticDialToggle}
-                  disabled={automaticDialSaving}
-                  size="sm"
-                  onLabel="ON"
-                  offLabel="OFF"
-                />
+                <ToggleSwitch checked={job?.automatic_dial || false} onChange={handleAutomaticDialToggle} disabled={automaticDialSaving} size="sm" onLabel="ON" offLabel="OFF" />
               </div>
               <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto">
                 <FileText className="w-4 h-4 mr-2" />
@@ -2521,7 +2485,11 @@ const handleRemoveSelectedCandidates = async () => {
                                            </a>
                                          </Button>}
                     <Button variant="outline" size="sm" asChild>
-                      <Link to={`/candidate/${application.candidate_id}`} state={{ fromJob: id, tab: 'applications', focusCandidateId: application.candidate_id }}>
+                      <Link to={`/candidate/${application.candidate_id}`} state={{
+                                fromJob: id,
+                                tab: 'applications',
+                                focusCandidateId: application.candidate_id
+                              }}>
                         View Profile
                       </Link>
                     </Button>
@@ -2637,17 +2605,13 @@ const handleRemoveSelectedCandidates = async () => {
                         Candidates added to the longlist for this position
                       </CardDescription>
                     </div>
-                    {job?.longlist && job.longlist > 0 ? (
-                      <Button onClick={handleSearchMoreCandidates} size="sm" variant="outline">
+                    {job?.longlist && job.longlist > 0 ? <Button onClick={handleSearchMoreCandidates} size="sm" variant="outline">
                         <Search className="w-4 h-4 mr-2" />
                         Regenerate AI
-                      </Button>
-                    ) : (
-                      <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} size="sm">
+                      </Button> : <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} size="sm">
                         <Zap className="w-4 h-4 mr-2" />
                         Generate AI
-                      </Button>
-                    )}
+                      </Button>}
                   </div>
                 </div>
               </CardHeader>
@@ -2763,8 +2727,8 @@ const handleRemoveSelectedCandidates = async () => {
 
                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                        {(() => {
-                 // Filter longlisted candidates based on filters (show all candidates in Jobs_CVs)
-                   const filteredLonglistedCandidates = longlistedCandidates.filter(candidate => {
+                  // Filter longlisted candidates based on filters (show all candidates in Jobs_CVs)
+                  const filteredLonglistedCandidates = longlistedCandidates.filter(candidate => {
                     const nameMatch = !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
                     const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
                     const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
@@ -2807,21 +2771,15 @@ const handleRemoveSelectedCandidates = async () => {
                     acc[candidateId].push(candidate);
                     return acc;
                   }, {} as Record<string, any[]>);
-                  
+
                   // Sort grouped candidates by highest score (CV or LinkedIn) first
                   const sortedGroupedCandidates = Object.entries(groupedCandidates).sort(([, contactsA], [, contactsB]) => {
                     // Get max score from any contact in the group
                     const getMaxScore = (contacts: any[]) => {
-                      return Math.max(...contacts.map(c => 
-                        Math.max(
-                          parseInt(c["cv_score"] || c["CV Score"] || "0"),
-                          parseInt(c["linkedin_score"] || c["LinkedIn Score"] || "0")
-                        )
-                      ));
+                      return Math.max(...contacts.map(c => Math.max(parseInt(c["cv_score"] || c["CV Score"] || "0"), parseInt(c["linkedin_score"] || c["LinkedIn Score"] || "0"))));
                     };
                     return getMaxScore(contactsB) - getMaxScore(contactsA); // Descending order (highest first)
                   });
-                  
                   return sortedGroupedCandidates.map(([candidateId, candidateContacts]: [string, any[]]) => {
                     // Use the first contact for display info
                     const mainCandidate = candidateContacts[0];
@@ -2979,13 +2937,10 @@ const handleRemoveSelectedCandidates = async () => {
                                       {(() => {
                                 const isLinkedInCandidate = typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin');
                                 const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
-                                
+
                                 // For LinkedIn candidates, always show Call Log button
                                 if (isLinkedInCandidate) {
-                                  const latestContact = contactsWithCalls.length > 0 
-                                    ? contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest)
-                                    : mainCandidate;
-                                  
+                                  const latestContact = contactsWithCalls.length > 0 ? contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest) : mainCandidate;
                                   return <Button variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
                                             <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid || latestContact.recordid || candidateId}&longListSourceFilter=${encodeURIComponent(longListSourceFilter)}&fromTab=boolean-search`} className="truncate">
                                               <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
@@ -2993,7 +2948,7 @@ const handleRemoveSelectedCandidates = async () => {
                                             </Link>
                                           </Button>;
                                 }
-                                
+
                                 // For non-LinkedIn candidates, only show if they have call logs
                                 if (contactsWithCalls.length === 0) return null;
 
@@ -3010,38 +2965,28 @@ const handleRemoveSelectedCandidates = async () => {
                                     
                                     {/* Show All Record Info Button */}
                                     <div className="flex gap-2">
-                                      {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && getLinkedInUrl(mainCandidate) ? (
-                                        <Button variant="ghost" size="sm" asChild className="flex-1 text-xs md:text-sm">
-                                          <a
-                                            href={getLinkedInUrl(mainCandidate)!}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                          >
+                                      {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && getLinkedInUrl(mainCandidate) ? <Button variant="ghost" size="sm" asChild className="flex-1 text-xs md:text-sm">
+                                          <a href={getLinkedInUrl(mainCandidate)!} target="_blank" rel="noopener noreferrer">
                                             <Users className="w-3 h-3 mr-1" />
                                             View Profile
                                           </a>
-                                        </Button>
-                                      ) : (
-                                        <Button variant="ghost" size="sm" asChild className="flex-1 text-xs md:text-sm">
-                                          <Link to={`/candidate/${candidateId}`} state={{ fromJob: id, tab: 'boolean-search', focusCandidateId: candidateId, longListSourceFilter }}>
+                                        </Button> : <Button variant="ghost" size="sm" asChild className="flex-1 text-xs md:text-sm">
+                                          <Link to={`/candidate/${candidateId}`} state={{
+                                  fromJob: id,
+                                  tab: 'boolean-search',
+                                  focusCandidateId: candidateId,
+                                  longListSourceFilter
+                                }}>
                                             <Users className="w-3 h-3 mr-1" />
                                             View Profile
                                           </Link>
-                                        </Button>
-                                      )}
-                                      {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('itris') && (
-                                        <Button 
-                                          variant="outline" 
-                                          size="sm" 
-                                          className="flex-1 text-xs md:text-sm"
-                                          onClick={() => {
-                                              navigate(`/cv-viewer/${candidateId}/${id}`);
-                                          }}
-                                        >
+                                        </Button>}
+                                      {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('itris') && <Button variant="outline" size="sm" className="flex-1 text-xs md:text-sm" onClick={() => {
+                                navigate(`/cv-viewer/${candidateId}/${id}`);
+                              }}>
                                           <FileText className="w-3 h-3 mr-1" />
                                           View CV
-                                        </Button>
-                                      )}
+                                        </Button>}
                                     </div>
                                   </div>
                                 </div>
@@ -3421,29 +3366,17 @@ const handleRemoveSelectedCandidates = async () => {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
-              <Textarea
-                placeholder="Enter rejection reason..."
-                value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
-                className="min-h-[100px]"
-              />
+              <Textarea placeholder="Enter rejection reason..." value={rejectReason} onChange={e => setRejectReason(e.target.value)} className="min-h-[100px]" />
             </div>
             <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowRejectDialog(false);
-                  setRejectReason("");
-                  setRejectCandidateData(null);
-                }}
-              >
+              <Button variant="outline" onClick={() => {
+            setShowRejectDialog(false);
+            setRejectReason("");
+            setRejectCandidateData(null);
+          }}>
                 Cancel
               </Button>
-              <Button
-                variant="destructive"
-                onClick={() => handleRejectCandidate(rejectReason)}
-                disabled={!rejectReason.trim()}
-              >
+              <Button variant="destructive" onClick={() => handleRejectCandidate(rejectReason)} disabled={!rejectReason.trim()}>
                 Reject
               </Button>
             </DialogFooter>
@@ -3451,14 +3384,14 @@ const handleRemoveSelectedCandidates = async () => {
         </Dialog>
 
         {/* Hire Candidate Dialog */}
-        <Dialog open={showHireDialog} onOpenChange={(open) => {
-          if (!open) {
-            // If closing, reset state
-            setShowHireDialog(false);
-            setHireReason("");
-            setHireCandidateData(null);
-          }
-        }}>
+        <Dialog open={showHireDialog} onOpenChange={open => {
+      if (!open) {
+        // If closing, reset state
+        setShowHireDialog(false);
+        setHireReason("");
+        setHireCandidateData(null);
+      }
+    }}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Submit CV - Hiring Reason Required</DialogTitle>
@@ -3467,29 +3400,17 @@ const handleRemoveSelectedCandidates = async () => {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
-              <Textarea
-                placeholder="Enter hire reason (required)..."
-                value={hireReason}
-                onChange={(e) => setHireReason(e.target.value)}
-                className="min-h-[100px]"
-              />
+              <Textarea placeholder="Enter hire reason (required)..." value={hireReason} onChange={e => setHireReason(e.target.value)} className="min-h-[100px]" />
             </div>
             <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowHireDialog(false);
-                  setHireReason("");
-                  setHireCandidateData(null);
-                }}
-              >
+              <Button variant="outline" onClick={() => {
+            setShowHireDialog(false);
+            setHireReason("");
+            setHireCandidateData(null);
+          }}>
                 Cancel
               </Button>
-              <Button
-                onClick={handleHireCandidate}
-                disabled={!hireReason.trim()}
-                className="bg-emerald-600 hover:bg-emerald-700"
-              >
+              <Button onClick={handleHireCandidate} disabled={!hireReason.trim()} className="bg-emerald-600 hover:bg-emerald-700">
                 Save & Submit CV
               </Button>
             </DialogFooter>
