@@ -2763,7 +2763,7 @@ const handleRemoveSelectedCandidates = async () => {
 
                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                        {(() => {
-                   // Filter longlisted candidates based on filters (show all candidates in Jobs_CVs)
+                 // Filter longlisted candidates based on filters (show all candidates in Jobs_CVs)
                    const filteredLonglistedCandidates = longlistedCandidates.filter(candidate => {
                     const nameMatch = !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
                     const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
@@ -2795,6 +2795,17 @@ const handleRemoveSelectedCandidates = async () => {
                       contactedMatch = contacted === contactedFilter || contactedFilter === "Ready to Call" && contacted === "Ready to Contact";
                     }
                     return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceFilterMatch && scoreMatch && contactedMatch;
+                  }).sort((a, b) => {
+                    // Sort by highest score (CV or LinkedIn) first
+                    const aMaxScore = Math.max(
+                      parseInt(a["cv_score"] || a["CV Score"] || "0"),
+                      parseInt(a["linkedin_score"] || a["LinkedIn Score"] || "0")
+                    );
+                    const bMaxScore = Math.max(
+                      parseInt(b["cv_score"] || b["CV Score"] || "0"),
+                      parseInt(b["linkedin_score"] || b["LinkedIn Score"] || "0")
+                    );
+                    return bMaxScore - aMaxScore; // Descending order (highest first)
                   });
 
                   // Group candidates by user_id (for LinkedIn) or Candidate_ID (for others) to handle multiple contacts
