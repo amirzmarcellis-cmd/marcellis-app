@@ -173,6 +173,20 @@ export function JobManagementPanel() {
           return contacted === 'Submitted';
         }).length;
 
+        // Debug logging for verification
+        if (job.job_id === 'me-j-0022') {
+          console.log('Job me-j-0022 counts:', {
+            total_candidates: candidates.length,
+            longlisted: longlisted_count,
+            shortlisted: shortlisted_count,
+            submitted: submitted_count,
+            candidates_with_scores: longlistedCandidates.filter(c => c.after_call_score).map(c => ({ 
+              score: c.after_call_score, 
+              contacted: c.contacted 
+            }))
+          });
+        }
+
         return {
           ...job,
           longlisted_count,
