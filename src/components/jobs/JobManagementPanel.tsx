@@ -99,17 +99,20 @@ export function JobManagementPanel() {
         }
       }
 
-      // Fetch jobs and candidates in parallel
-      const [jobsResult, candidatesResult] = await Promise.all([
-        query.order('Timestamp', { ascending: false }),
-        supabase
-          .from('Jobs_CVs')
-          .select('job_id, source, contacted, shortlisted_at, after_call_score')
-      ]);
+      const jobsResult = await query.order('Timestamp', { ascending: false });
 
       if (jobsResult.error) throw jobsResult.error;
       const initialJobs = jobsResult.data || [];
       
+      // Fetch candidates only for the jobs we have access to
+      const jobIds = initialJobs.map(j => j.job_id).filter(Boolean);
+      const candidatesResult = jobIds.length > 0 
+        ? await supabase
+            .from('Jobs_CVs')
+            .select('job_id, source, contacted, shortlisted_at, longlisted_at, after_call_score')
+            .in('job_id', jobIds)
+        : { data: [], error: null };
+
       console.log('JobManagementPanel: Jobs fetched:', initialJobs.length);
       
       // Filter candidates by job access
@@ -172,20 +175,6 @@ export function JobManagementPanel() {
           const contacted = (c.contacted || "").trim();
           return contacted === 'Submitted';
         }).length;
-
-        // Debug logging for verification
-        if (job.job_id === 'me-j-0022') {
-          console.log('Job me-j-0022 counts:', {
-            total_candidates: candidates.length,
-            longlisted: longlisted_count,
-            shortlisted: shortlisted_count,
-            submitted: submitted_count,
-            candidates_with_scores: longlistedCandidates.filter(c => c.after_call_score).map(c => ({ 
-              score: c.after_call_score, 
-              contacted: c.contacted 
-            }))
-          });
-        }
 
         return {
           ...job,
