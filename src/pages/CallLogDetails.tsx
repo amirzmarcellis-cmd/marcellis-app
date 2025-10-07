@@ -696,41 +696,39 @@ export default function CallLogDetails() {
       </div>
 
       {/* Rejection & Hiring Reasons */}
-      {(callLog?.Reason_to_reject || callLog?.Reason_to_Hire) && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {callLog.Reason_to_reject && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-red-600">
-                  <XCircle className="h-5 w-5" />
-                  Rejection Reason
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-900">
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{callLog.Reason_to_reject}</p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-red-600">
+              <XCircle className="h-5 w-5" />
+              Rejection Reason
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-900">
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                {callLog.Reason_to_reject || 'No rejection reason recorded'}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
-          {callLog.Reason_to_Hire && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-green-600">
-                  <ThumbsUp className="h-5 w-5" />
-                  Hired Reason
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-900">
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{callLog.Reason_to_Hire}</p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      )}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-green-600">
+              <ThumbsUp className="h-5 w-5" />
+              Hired Reason
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-900">
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                {callLog.Reason_to_Hire || 'No hiring reason recorded'}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Qualifications */}
       {callLog?.qualifications && (
