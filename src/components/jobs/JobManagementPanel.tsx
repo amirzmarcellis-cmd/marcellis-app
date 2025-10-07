@@ -66,15 +66,14 @@ export function JobManagementPanel() {
   const { isAdmin, isManager, isTeamLeader } = useUserRole();
 
   useEffect(() => {
-    if (profile?.user_id && !profileLoading) {
+    if (profile?.user_id) {
       fetchJobs();
       fetchGroups();
     } else if (!profileLoading) {
       // No profile available (not logged in or failed to load) -> don't block UI
       setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile?.user_id, profileLoading]);
+  }, [profile?.user_id, isAdmin, isManager, isTeamLeader, profileLoading]);
   const fetchJobs = useCallback(async () => {
     if (!profile?.user_id) {
       setLoading(false);
