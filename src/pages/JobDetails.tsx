@@ -2783,14 +2783,13 @@ const handleRemoveSelectedCandidates = async () => {
 
                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                        {(() => {
-                   // Filter longlisted candidates based on filters (ONLY show candidates with longlisted_at not null)
+                   // Filter longlisted candidates based on filters (show all candidates in Jobs_CVs)
                    const filteredLonglistedCandidates = longlistedCandidates.filter(candidate => {
-                     // Base filter: only candidates that are actually longlisted
-                     if (!candidate.longlisted_at) return false;
                     const nameMatch = !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
                     const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
                     const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
                     const userIdMatch = !userIdFilter || (candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
+                    const source = (candidate["Source"] || candidate.source || "").toLowerCase();
                     const sourceFilterMatch = !longListSourceFilter || longListSourceFilter === "all" || source.includes(longListSourceFilter.toLowerCase());
                     let scoreMatch = true;
                     if (scoreFilter !== "all") {
