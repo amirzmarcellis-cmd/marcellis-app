@@ -2765,13 +2765,10 @@ const handleRemoveSelectedCandidates = async () => {
 
                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                        {(() => {
-                  // Filter longlisted candidates based on filters (ONLY show Itris and LinkedIn sources)
-                  const filteredLonglistedCandidates = longlistedCandidates.filter(candidate => {
-                    const source = (candidate["Source"] || "").toLowerCase();
-                    const isItrisOrLinkedIn = source.includes("itris") || source.includes("linkedin");
-
-                    // Base filter: only Itris or LinkedIn
-                    if (!isItrisOrLinkedIn) return false;
+                   // Filter longlisted candidates based on filters (ONLY show candidates with longlisted_at not null)
+                   const filteredLonglistedCandidates = longlistedCandidates.filter(candidate => {
+                     // Base filter: only candidates that are actually longlisted
+                     if (!candidate.longlisted_at) return false;
                     const nameMatch = !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
                     const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
                     const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);

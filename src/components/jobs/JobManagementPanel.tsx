@@ -161,10 +161,9 @@ export function JobManagementPanel() {
           console.log(`JobManagementPanel: Job "${job.job_title}" (${job.job_id}) has ${candidates.length} total candidates from Jobs_CVs`);
         }
         
-        // Longlisted: candidates with source containing 'itris' or 'linkedin'
+        // Longlisted: candidates with longlisted_at not null (actually longlisted)
         const longlistedCandidates = candidates.filter(c => {
-          const source = (c.source || "").toLowerCase();
-          return source.includes("itris") || source.includes("linkedin");
+          return c.longlisted_at != null;
         });
         
         const longlisted_count = longlistedCandidates.length;
