@@ -631,7 +631,7 @@ export default function JobDetails() {
       const {
         data: longlistedData,
         error: longlistedError
-      } = await supabase.from('Jobs_CVs').select('*').eq('job_id', jobId).order('cv_score', {
+      } = await supabase.from('Jobs_CVs').select('*').eq('job_id', jobId).limit(10000).order('cv_score', {
         ascending: false,
         nullsLast: true
       });
