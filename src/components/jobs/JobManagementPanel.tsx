@@ -161,14 +161,14 @@ export function JobManagementPanel() {
         
         const longlisted_count = longlistedCandidates.length;
         
-        // Shortlisted: candidates with score >= 74 OR shortlisted_at is set (matches JobFunnel logic)
-        const shortlisted_count = candidates.filter(c => {
+        // Shortlisted: only longlisted candidates with score >= 74 (matches JobFunnel exactly)
+        const shortlisted_count = longlistedCandidates.filter(c => {
           const score = parseInt(c.after_call_score || "0");
-          return score >= 74 || c.shortlisted_at !== null;
+          return score >= 74;
         }).length;
         
-        // Submitted: candidates with contacted status = 'Submitted'
-        const submitted_count = candidates.filter(c => {
+        // Submitted: only longlisted candidates with contacted status = 'Submitted' (matches JobFunnel)
+        const submitted_count = longlistedCandidates.filter(c => {
           const contacted = (c.contacted || "").trim();
           return contacted === 'Submitted';
         }).length;
