@@ -20,68 +20,29 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
     
     const longlist = longlistedCandidates.length;
     
-    // Use reduce for better performance with single pass through data
-    const statusCounts = longlistedCandidates.reduce((acc, c) => {
-      const contacted = c["contacted"];
-      const score = parseInt(c["after_call_score"] || "0");
-      
-      switch (contacted) {
-        case "1st No Answer":
-          acc.firstNoAnswer++;
-          break;
-        case "2nd No Answer":
-          acc.secondNoAnswer++;
-          break;
-        case "3rd No Answer":
-          acc.thirdNoAnswer++;
-          break;
-        case "Contacted":
-          acc.contacted++;
-          break;
-        case "Low Scored":
-          acc.lowScored++;
-          break;
-        case "Submitted":
-          acc.submitted++;
-          break;
-        case "Rejected":
-          acc.rejected++;
-          break;
-      }
-      
-      // Count shortlist candidates (score >= 74)
-      if (score >= 74) {
-        acc.shortlist++;
-      }
-      
-      return acc;
-    }, {
-      firstNoAnswer: 0,
-      secondNoAnswer: 0,
-      thirdNoAnswer: 0,
-      contacted: 0,
-      lowScored: 0,
-      submitted: 0,
-      rejected: 0,
-      shortlist: 0
-    });
+    // Calculate shortlist (score >= 74) and submitted counts
+    const shortlist = longlistedCandidates.filter(c => {
+      const score = parseInt(c["after_call_score"] || c.after_call_score || "0");
+      return score >= 74;
+    }).length;
+    
+    const submitted = longlistedCandidates.filter(c => {
+      const contacted = (c["contacted"] || c.contacted || "").trim();
+      return contacted === 'Submitted';
+    }).length;
 
     return {
       longlist,
-      ...statusCounts
+      shortlist,
+      submitted
     };
   }, [candidates]);
 
   // Memoize stages array
   const stages = useMemo(() => [
-    { name: "Longlist", count: counts.longlist, bgColor: "bg-blue-600", textColor: "text-black dark:text-white" },
-    { name: "1st No Answer", count: counts.firstNoAnswer, bgColor: "bg-orange-500", textColor: "text-black dark:text-white" },
-    { name: "2nd No Answer", count: counts.secondNoAnswer, bgColor: "bg-orange-600", textColor: "text-black dark:text-white" },
-    { name: "3rd No Answer", count: counts.thirdNoAnswer, bgColor: "bg-orange-700", textColor: "text-black dark:text-white" },
-    { name: "Contacted", count: counts.contacted, bgColor: "bg-green-600", textColor: "text-black dark:text-white" },
-    { name: "Low Scored", count: counts.lowScored, bgColor: "bg-red-600", textColor: "text-black dark:text-white" },
-    { name: "Shortlist", count: counts.shortlist, bgColor: "bg-emerald-600", textColor: "text-black dark:text-white" },
-    { name: "Submitted", count: counts.submitted, bgColor: "bg-purple-600", textColor: "text-black dark:text-white" }
+    { name: "Longlist", count: counts.longlist, bgColor: "bg-blue-600", textColor: "text-white" },
+    { name: "Shortlist", count: counts.shortlist, bgColor: "bg-emerald-600", textColor: "text-white" },
+    { name: "Submitted", count: counts.submitted, bgColor: "bg-purple-600", textColor: "text-white" }
   ], [counts]);
 
   return (
