@@ -31,6 +31,7 @@ interface Job {
   automatic_dial?: boolean | null;
   longlisted_count?: number;
   shortlisted_count?: number;
+  submitted_count?: number;
   recruiter_id?: string | null;
   recruiter_name?: string | null;
   groups?: {
@@ -103,7 +104,7 @@ export function JobManagementPanel() {
         query.order('Timestamp', { ascending: false }),
         supabase
           .from('Jobs_CVs')
-          .select('job_id, source, contacted')
+          .select('job_id, source, contacted, shortlisted_at')
       ]);
 
       if (jobsResult.error) throw jobsResult.error;
@@ -160,16 +161,20 @@ export function JobManagementPanel() {
         
         const longlisted_count = longlistedCandidates.length;
         
-        // Shortlisted: candidates with contacted status = 'Shortlisted'
-        const shortlisted_count = candidates.filter(c => {
+        // Shortlisted: candidates with shortlisted_at timestamp set
+        const shortlisted_count = candidates.filter(c => c.shortlisted_at !== null).length;
+        
+        // Submitted: candidates with contacted status = 'Submitted'
+        const submitted_count = candidates.filter(c => {
           const contacted = (c.contacted || "").trim();
-          return contacted === 'Shortlisted';
+          return contacted === 'Submitted';
         }).length;
 
         return {
           ...job,
           longlisted_count,
           shortlisted_count,
+          submitted_count,
           recruiter_name: job.recruiter_id ? recruiterNamesMap.get(job.recruiter_id) || null : null
         };
       });
@@ -513,16 +518,27 @@ const JobGrid = memo(function JobGrid({
               </p>}
 
             {/* Candidate Counts */}
-            <div className="flex items-center gap-4 text-sm">
-              <div className="flex items-center text-muted-foreground">
-                <Users className="h-4 w-4 mr-1 text-blue" />
-                <span className="font-medium text-foreground">{job.longlisted_count || 0}</span>
-                <span className="ml-1">Longlisted</span>
+            <div className="grid grid-cols-3 gap-2 text-sm">
+              <div className="flex flex-col items-center p-2 rounded-md bg-blue/10 border border-blue/20">
+                <div className="flex items-center gap-1 text-blue">
+                  <Users className="h-3 w-3" />
+                  <span className="font-bold text-lg">{job.longlisted_count || 0}</span>
+                </div>
+                <span className="text-xs text-muted-foreground mt-1">Longlisted</span>
               </div>
-              <div className="flex items-center text-muted-foreground">
-                <Users className="h-4 w-4 mr-1 text-green" />
-                <span className="font-medium text-foreground">{job.shortlisted_count || 0}</span>
-                <span className="ml-1">Shortlisted</span>
+              <div className="flex flex-col items-center p-2 rounded-md bg-yellow/10 border border-yellow/20">
+                <div className="flex items-center gap-1 text-yellow">
+                  <Users className="h-3 w-3" />
+                  <span className="font-bold text-lg">{job.shortlisted_count || 0}</span>
+                </div>
+                <span className="text-xs text-muted-foreground mt-1">Shortlisted</span>
+              </div>
+              <div className="flex flex-col items-center p-2 rounded-md bg-green/10 border border-green/20">
+                <div className="flex items-center gap-1 text-green">
+                  <Users className="h-3 w-3" />
+                  <span className="font-bold text-lg">{job.submitted_count || 0}</span>
+                </div>
+                <span className="text-xs text-muted-foreground mt-1">Submitted</span>
               </div>
             </div>
 
