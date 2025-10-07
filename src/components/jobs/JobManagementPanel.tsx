@@ -106,26 +106,29 @@ export function JobManagementPanel() {
       
       // Fetch candidates only for the jobs we have access to
       const jobIds = initialJobs.map(j => j.job_id).filter(Boolean);
-      const candidatesResult = jobIds.length > 0 
-        ? await supabase
+      // Fetch candidates per job to avoid PostgREST max-rows cap on multi-job queries
+      const candidatesByJob = new Map<string, any[]>();
+      if (jobIds.length > 0) {
+        const perJobPromises = jobIds.map(jid =>
+          supabase
             .from('Jobs_CVs')
             .select('job_id, source, contacted, shortlisted_at, longlisted_at, after_call_score')
-            .in('job_id', jobIds)
-            .limit(50000)  // Increased limit to ensure all candidates are fetched across all jobs
-        : { data: [], error: null };
+            .eq('job_id', jid)
+            .limit(10000)
+        );
+        const perJobResults = await Promise.all(perJobPromises);
+        perJobResults.forEach((res, idx) => {
+          if (res.error) {
+            console.warn('JobManagementPanel: error fetching candidates for', jobIds[idx], res.error);
+            return;
+          }
+          const rows = res.data || [];
+          candidatesByJob.set(jobIds[idx], rows);
+        });
+      }
 
       console.log('JobManagementPanel: Jobs fetched:', initialJobs.length);
-      console.log('JobManagementPanel: Total candidates fetched across all jobs:', candidatesResult.data?.length || 0);
-      
-      // Build candidates by job map (candidates are already filtered by job_id in SQL)
-      const allCandidates = candidatesResult.data || [];
-      const candidatesByJob = new Map<string, any[]>();
-      allCandidates.forEach(candidate => {
-        if (!candidatesByJob.has(candidate.job_id)) {
-          candidatesByJob.set(candidate.job_id, []);
-        }
-        candidatesByJob.get(candidate.job_id)!.push(candidate);
-      });
+      console.log('JobManagementPanel: candidatesByJob built for jobs:', candidatesByJob.size);
 
       // Fetch recruiter names only if needed
       const recruiterIds = [...new Set(initialJobs.map(j => j.recruiter_id).filter(Boolean))];
