@@ -49,6 +49,10 @@ export function JobManagementPanel() {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedGroupFilter, setSelectedGroupFilter] = useState<string>("");
+  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
+    from: undefined,
+    to: undefined
+  });
   const [groups, setGroups] = useState<Array<{
     id: string;
     name: string;
