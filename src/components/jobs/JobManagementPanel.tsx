@@ -111,6 +111,7 @@ export function JobManagementPanel() {
             .from('Jobs_CVs')
             .select('job_id, source, contacted, shortlisted_at, longlisted_at, after_call_score')
             .in('job_id', jobIds)
+            .limit(10000)
         : { data: [], error: null };
 
       console.log('JobManagementPanel: Jobs fetched:', initialJobs.length);
