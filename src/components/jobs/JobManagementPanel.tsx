@@ -115,19 +115,14 @@ export function JobManagementPanel() {
 
       console.log('JobManagementPanel: Jobs fetched:', initialJobs.length);
       
-      // Filter candidates by job access
-      const jobIds = new Set(initialJobs.map(j => j.job_id).filter(Boolean));
+      // Build candidates by job map (candidates are already filtered by job_id in SQL)
       const allCandidates = candidatesResult.data || [];
-      
-      // Build candidates by job map
       const candidatesByJob = new Map<string, any[]>();
       allCandidates.forEach(candidate => {
-        if (jobIds.has(candidate.job_id)) {
-          if (!candidatesByJob.has(candidate.job_id)) {
-            candidatesByJob.set(candidate.job_id, []);
-          }
-          candidatesByJob.get(candidate.job_id)!.push(candidate);
+        if (!candidatesByJob.has(candidate.job_id)) {
+          candidatesByJob.set(candidate.job_id, []);
         }
+        candidatesByJob.get(candidate.job_id)!.push(candidate);
       });
 
       // Fetch recruiter names only if needed
