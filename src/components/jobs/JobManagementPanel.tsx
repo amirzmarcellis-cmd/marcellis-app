@@ -104,7 +104,7 @@ export function JobManagementPanel() {
         query.order('Timestamp', { ascending: false }),
         supabase
           .from('Jobs_CVs')
-          .select('job_id, source, contacted, shortlisted_at')
+          .select('job_id, source, contacted, shortlisted_at, after_call_score')
       ]);
 
       if (jobsResult.error) throw jobsResult.error;
@@ -161,8 +161,11 @@ export function JobManagementPanel() {
         
         const longlisted_count = longlistedCandidates.length;
         
-        // Shortlisted: candidates with shortlisted_at timestamp set
-        const shortlisted_count = candidates.filter(c => c.shortlisted_at !== null).length;
+        // Shortlisted: candidates with score >= 74 OR shortlisted_at is set (matches JobFunnel logic)
+        const shortlisted_count = candidates.filter(c => {
+          const score = parseInt(c.after_call_score || "0");
+          return score >= 74 || c.shortlisted_at !== null;
+        }).length;
         
         // Submitted: candidates with contacted status = 'Submitted'
         const submitted_count = candidates.filter(c => {
