@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Briefcase, Phone, PhoneOff, UserCircle, Calendar } from "lucide-react";
+import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Briefcase, Phone, PhoneOff, UserCircle, Calendar, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import { JobDialog } from "./JobDialog";
 import { useProfile } from "@/hooks/useProfile";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -310,15 +312,52 @@ export function JobManagementPanel() {
       return jobList.filter(job => job.group_id === selectedGroupFilter);
     };
 
+    const filterJobsByDate = (jobList: Job[]) => {
+      if (!dateRange.from && !dateRange.to) return jobList;
+      
+      return jobList.filter(job => {
+        if (!job.Timestamp) return false;
+        const jobDate = new Date(job.Timestamp);
+        
+        if (dateRange.from && dateRange.to) {
+          const fromDate = new Date(dateRange.from);
+          fromDate.setHours(0, 0, 0, 0);
+          const toDate = new Date(dateRange.to);
+          toDate.setHours(23, 59, 59, 999);
+          return jobDate >= fromDate && jobDate <= toDate;
+        }
+        
+        if (dateRange.from) {
+          const fromDate = new Date(dateRange.from);
+          fromDate.setHours(0, 0, 0, 0);
+          return jobDate >= fromDate;
+        }
+        
+        if (dateRange.to) {
+          const toDate = new Date(dateRange.to);
+          toDate.setHours(23, 59, 59, 999);
+          return jobDate <= toDate;
+        }
+        
+        return true;
+      });
+    };
+
+    const applyFilters = (jobList: Job[]) => {
+      let filtered = filterJobsByGroup(jobList);
+      filtered = filterJobsByDate(filtered);
+      return filtered;
+    };
+
     const activeJobs = jobs.filter(job => job.Processed === "Yes");
     const pausedJobs = jobs.filter(job => job.Processed !== "Yes");
 
     return {
-      activeJobs: filterJobsByGroup(activeJobs),
-      pausedJobs: filterJobsByGroup(pausedJobs),
-      allJobs: filterJobsByGroup(jobs)
+      activeJobs: applyFilters(activeJobs),
+      pausedJobs: applyFilters(pausedJobs),
+      allJobs: applyFilters(jobs)
     };
-  }, [jobs, selectedGroupFilter]);
+  }, [jobs, selectedGroupFilter, dateRange]);
   return <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -337,8 +376,9 @@ export function JobManagementPanel() {
         </div>
       </div>
 
-      {/* Group Filter */}
-      <div className="flex items-center gap-4">
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-4">
+        {/* Group Filter */}
         <div className="flex items-center gap-2">
           <label className="text-sm font-medium">Filter by Group:</label>
           <select value={selectedGroupFilter} onChange={e => setSelectedGroupFilter(e.target.value)} className="px-3 py-1 rounded-md border border-border bg-background text-sm">
@@ -352,6 +392,76 @@ export function JobManagementPanel() {
         {selectedGroupFilter && <Button variant="ghost" size="sm" onClick={() => setSelectedGroupFilter("")} className="text-xs">
             Clear Filter
           </Button>}
+
+        {/* Date Range Filter */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium">Filter by Date:</label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-[280px] justify-start text-left font-normal",
+                  !dateRange.from && !dateRange.to && "text-muted-foreground"
+                )}
+              >
+                <Calendar className="mr-2 h-4 w-4" />
+                {dateRange.from ? (
+                  dateRange.to ? (
+                    <>
+                      {format(dateRange.from, "MMM dd, yyyy")} - {format(dateRange.to, "MMM dd, yyyy")}
+                    </>
+                  ) : (
+                    format(dateRange.from, "MMM dd, yyyy")
+                  )
+                ) : (
+                  <span>Pick a date range</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <div className="p-3 pointer-events-auto bg-background">
+                <div className="space-y-2">
+                  <div>
+                    <label className="text-xs font-medium mb-1 block">From:</label>
+                    <input
+                      type="date"
+                      value={dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : ''}
+                      onChange={(e) => {
+                        const newDate = e.target.value ? new Date(e.target.value) : undefined;
+                        setDateRange(prev => ({ ...prev, from: newDate }));
+                      }}
+                      className="w-full px-2 py-1 text-sm border border-border rounded-md bg-background"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium mb-1 block">To:</label>
+                    <input
+                      type="date"
+                      value={dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : ''}
+                      onChange={(e) => {
+                        const newDate = e.target.value ? new Date(e.target.value) : undefined;
+                        setDateRange(prev => ({ ...prev, to: newDate }));
+                      }}
+                      className="w-full px-2 py-1 text-sm border border-border rounded-md bg-background"
+                    />
+                  </div>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+          
+          {(dateRange.from || dateRange.to) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setDateRange({ from: undefined, to: undefined })}
+              className="h-8 px-2"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
 
       {loading ? (
