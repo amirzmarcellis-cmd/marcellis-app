@@ -154,7 +154,7 @@ export function JobManagementPanel() {
         
         // Longlisted: candidates with source containing 'itris' or 'linkedin'
         const longlistedCandidates = candidates.filter(c => {
-          const source = (c["Source"] || c.source || "").toLowerCase();
+          const source = (c.source || "").toLowerCase();
           return source.includes("itris") || source.includes("linkedin");
         });
         
@@ -162,13 +162,13 @@ export function JobManagementPanel() {
         
         // Shortlisted: only longlisted candidates with score >= 74 (matches JobFunnel exactly)
         const shortlisted_count = longlistedCandidates.filter(c => {
-          const score = parseInt(c["after_call_score"] || c.after_call_score || "0");
+          const score = parseInt(c.after_call_score || "0");
           return score >= 74;
         }).length;
         
         // Submitted: only longlisted candidates with contacted status = 'Submitted' (matches JobFunnel)
         const submitted_count = longlistedCandidates.filter(c => {
-          const contacted = (c["contacted"] || c.contacted || "").trim();
+          const contacted = (c.contacted || "").trim();
           return contacted === 'Submitted';
         }).length;
 
