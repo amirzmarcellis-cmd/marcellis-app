@@ -2795,17 +2795,6 @@ const handleRemoveSelectedCandidates = async () => {
                       contactedMatch = contacted === contactedFilter || contactedFilter === "Ready to Call" && contacted === "Ready to Contact";
                     }
                     return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceFilterMatch && scoreMatch && contactedMatch;
-                  }).sort((a, b) => {
-                    // Sort by highest score (CV or LinkedIn) first
-                    const aMaxScore = Math.max(
-                      parseInt(a["cv_score"] || a["CV Score"] || "0"),
-                      parseInt(a["linkedin_score"] || a["LinkedIn Score"] || "0")
-                    );
-                    const bMaxScore = Math.max(
-                      parseInt(b["cv_score"] || b["CV Score"] || "0"),
-                      parseInt(b["linkedin_score"] || b["LinkedIn Score"] || "0")
-                    );
-                    return bMaxScore - aMaxScore; // Descending order (highest first)
                   });
 
                   // Group candidates by user_id (for LinkedIn) or Candidate_ID (for others) to handle multiple contacts
@@ -2818,7 +2807,22 @@ const handleRemoveSelectedCandidates = async () => {
                     acc[candidateId].push(candidate);
                     return acc;
                   }, {} as Record<string, any[]>);
-                  return Object.entries(groupedCandidates).map(([candidateId, candidateContacts]: [string, any[]]) => {
+                  
+                  // Sort grouped candidates by highest score (CV or LinkedIn) first
+                  const sortedGroupedCandidates = Object.entries(groupedCandidates).sort(([, contactsA], [, contactsB]) => {
+                    // Get max score from any contact in the group
+                    const getMaxScore = (contacts: any[]) => {
+                      return Math.max(...contacts.map(c => 
+                        Math.max(
+                          parseInt(c["cv_score"] || c["CV Score"] || "0"),
+                          parseInt(c["linkedin_score"] || c["LinkedIn Score"] || "0")
+                        )
+                      ));
+                    };
+                    return getMaxScore(contactsB) - getMaxScore(contactsA); // Descending order (highest first)
+                  });
+                  
+                  return sortedGroupedCandidates.map(([candidateId, candidateContacts]: [string, any[]]) => {
                     // Use the first contact for display info
                     const mainCandidate = candidateContacts[0];
                     return <Card key={candidateId} id={`candidate-card-${candidateId}`} className={cn("border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg", selectedCandidates.has(candidateId) && "border-primary bg-primary/5")}>
