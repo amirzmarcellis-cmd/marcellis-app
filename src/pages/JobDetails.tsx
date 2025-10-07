@@ -211,6 +211,7 @@ export default function JobDetails() {
   const [selectedCandidates, setSelectedCandidates] = useState<Set<string>>(new Set());
   const [selectedCandidateRecord, setSelectedCandidateRecord] = useState<any>(null);
   const [isActionMenuExpanded, setIsActionMenuExpanded] = useState(false);
+  const [recruiterName, setRecruiterName] = useState<string | null>(null);
 
   // Interview scheduling state variables
   const [interviewDialogOpen, setInterviewDialogOpen] = useState(false);
@@ -413,6 +414,19 @@ export default function JobDetails() {
         return;
       }
       setJob(data);
+      
+      // Fetch recruiter name if recruiter_id exists
+      if (data.recruiter_id) {
+        const { data: recruiterData } = await supabase
+          .from('profiles')
+          .select('name')
+          .eq('user_id', data.recruiter_id)
+          .maybeSingle();
+        
+        if (recruiterData?.name) {
+          setRecruiterName(recruiterData.name);
+        }
+      }
     } catch (error) {
       console.error("Error fetching job:", error);
       setJob(null);
@@ -2258,8 +2272,12 @@ const handleRemoveSelectedCandidates = async () => {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Salary Range:</span>
                     <span className="font-medium">
-                      {formatCurrency(job["Job Salary Range (ex: 15000 AED)"], job["Currency"])}
+                      {formatCurrency(job.job_salary_range?.toString(), job.Currency)}
                     </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Assigned Recruiter:</span>
+                    <span>{recruiterName || job.recruiter_id || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Notice Period:</span>
