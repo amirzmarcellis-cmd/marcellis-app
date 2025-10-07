@@ -103,7 +103,7 @@ export function JobManagementPanel() {
         query.order('Timestamp', { ascending: false }),
         supabase
           .from('Jobs_CVs')
-          .select('job_id, after_call_score, source, contacted, shortlisted_at')
+          .select('job_id, source, contacted')
       ]);
 
       if (jobsResult.error) throw jobsResult.error;
@@ -160,10 +160,10 @@ export function JobManagementPanel() {
         
         const longlisted_count = longlistedCandidates.length;
         
-        // Shortlisted: longlisted candidates with after_call_score >= 74 OR shortlisted_at is not null
-        const shortlisted_count = longlistedCandidates.filter(c => {
-          const score = parseInt(c.after_call_score || "0");
-          return score >= 74 || c.shortlisted_at !== null;
+        // Shortlisted: candidates with contacted status = 'Shortlisted'
+        const shortlisted_count = candidates.filter(c => {
+          const contacted = (c.contacted || "").trim();
+          return contacted === 'Shortlisted';
         }).length;
 
         return {
