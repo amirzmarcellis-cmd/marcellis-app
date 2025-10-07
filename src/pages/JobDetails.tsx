@@ -1255,16 +1255,23 @@ const handleRemoveSelectedCandidates = async () => {
       const { error } = await supabase
         .from('Jobs_CVs')
         .update({ 
-          Reason_to_Hire: hireReason
+          Reason_to_Hire: hireReason,
+          contacted: 'Submitted'
         })
         .eq('recordid', parseInt(hireCandidateData.candidateId))
         .eq('job_id', hireCandidateData.jobId);
       
       if (error) throw error;
       
+      // Update local state
+      setCandidates(prev => prev.map(c => c["Candidate_ID"] === hireCandidateData.candidateId ? {
+        ...c,
+        Contacted: 'Submitted'
+      } : c));
+      
       toast({
-        title: "Success",
-        description: "Hire reason saved successfully"
+        title: "CV Submitted",
+        description: "Candidate's CV has been submitted with hiring reason"
       });
       
       // Refresh candidates data
@@ -1280,7 +1287,7 @@ const handleRemoveSelectedCandidates = async () => {
       console.error('Error saving hire reason:', error);
       toast({
         title: "Error",
-        description: "Failed to save hire reason",
+        description: "Failed to submit CV",
         variant: "destructive"
       });
     }
@@ -1541,37 +1548,10 @@ const handleRemoveSelectedCandidates = async () => {
     console.log('Dialog should now be open. interviewDialogOpen state set to true');
   };
   const handleCVSubmitted = async (candidateId: string) => {
-    try {
-      const {
-        error
-      } = await supabase.from('Jobs_CVs').update({
-        'contacted': 'Submitted'
-      }).eq('recordid', parseInt(candidateId)).eq('job_id', id);
-      if (error) throw error;
-
-      // Update local state
-      setCandidates(prev => prev.map(c => c["Candidate_ID"] === candidateId ? {
-        ...c,
-        Contacted: 'Submitted'
-      } : c));
-      
-      toast({
-        title: "CV Submitted",
-        description: "Candidate's CV has been marked as submitted"
-      });
-
-      // Open hire reason dialog after successful submission
-      const candidateContact = candidates.find(c => c["Candidate_ID"] === candidateId);
-      if (candidateContact) {
-        openHireDialog(id!, candidateId, candidateContact.callid);
-      }
-    } catch (error) {
-      console.error('Error submitting CV:', error);
-      toast({
-        title: "Error",
-        description: "Failed to submit CV",
-        variant: "destructive"
-      });
+    // Open hire reason dialog first, before updating status
+    const candidateContact = candidates.find(c => c["Candidate_ID"] === candidateId);
+    if (candidateContact) {
+      openHireDialog(id!, candidateId, candidateContact.callid);
     }
   };
   const handleScheduleInterview = async () => {
@@ -3456,17 +3436,24 @@ const handleRemoveSelectedCandidates = async () => {
         </Dialog>
 
         {/* Hire Candidate Dialog */}
-        <Dialog open={showHireDialog} onOpenChange={setShowHireDialog}>
+        <Dialog open={showHireDialog} onOpenChange={(open) => {
+          if (!open) {
+            // If closing, reset state
+            setShowHireDialog(false);
+            setHireReason("");
+            setHireCandidateData(null);
+          }
+        }}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Hire Reason</DialogTitle>
+              <DialogTitle>Submit CV - Hiring Reason Required</DialogTitle>
               <DialogDescription>
-                Please provide a reason for hiring this candidate. This will be saved with the CV submission.
+                Please provide a reason for hiring this candidate. The CV will be marked as "Submitted" once you save this reason.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <Textarea
-                placeholder="Enter hire reason..."
+                placeholder="Enter hire reason (required)..."
                 value={hireReason}
                 onChange={(e) => setHireReason(e.target.value)}
                 className="min-h-[100px]"
@@ -3488,7 +3475,7 @@ const handleRemoveSelectedCandidates = async () => {
                 disabled={!hireReason.trim()}
                 className="bg-emerald-600 hover:bg-emerald-700"
               >
-                Save
+                Save & Submit CV
               </Button>
             </DialogFooter>
           </DialogContent>
