@@ -73,7 +73,8 @@ export function JobManagementPanel() {
       // No profile available (not logged in or failed to load) -> don't block UI
       setLoading(false);
     }
-  }, [profile?.user_id, profileLoading, fetchJobs, fetchGroups]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.user_id, profileLoading]);
   const fetchJobs = useCallback(async () => {
     if (!profile?.user_id) {
       setLoading(false);
