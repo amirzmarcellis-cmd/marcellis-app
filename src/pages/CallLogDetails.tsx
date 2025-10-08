@@ -783,27 +783,27 @@ export default function CallLogDetails() {
                     <td className="px-6 py-4 text-center">
                       <div className="flex flex-col items-center gap-2">
                         <div className={`text-3xl font-bold ${
-                          callLog.comm_score && parseInt(callLog.comm_score) >= 80 
+                          callLog.comm_score && parseInt(callLog.comm_score) >= 8 
                             ? 'text-green-600 dark:text-green-400' 
-                            : callLog.comm_score && parseInt(callLog.comm_score) >= 50 
+                            : callLog.comm_score && parseInt(callLog.comm_score) >= 5 
                             ? 'text-yellow-600 dark:text-yellow-400' 
                             : 'text-red-600 dark:text-red-400'
                         }`}>
                           {callLog.comm_score || 'N/A'}
-                          {callLog.comm_score && '/100'}
+                          {callLog.comm_score && '/10'}
                         </div>
                         {callLog.comm_score && (
                           <div className="w-full max-w-[120px]">
                             <div className="h-2 bg-muted rounded-full overflow-hidden">
                               <div 
                                 className={`h-full transition-all duration-1000 ease-out ${
-                                  parseInt(callLog.comm_score) >= 80 
+                                  parseInt(callLog.comm_score) >= 8 
                                     ? 'bg-green-600' 
-                                    : parseInt(callLog.comm_score) >= 50 
+                                    : parseInt(callLog.comm_score) >= 5 
                                     ? 'bg-yellow-600' 
                                     : 'bg-red-600'
                                 }`}
-                                style={{ width: `${callLog.comm_score}%` }}
+                                style={{ width: `${parseInt(callLog.comm_score) * 10}%` }}
                               />
                             </div>
                           </div>
