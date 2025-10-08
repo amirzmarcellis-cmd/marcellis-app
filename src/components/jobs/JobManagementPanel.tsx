@@ -49,6 +49,7 @@ export function JobManagementPanel() {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedGroupFilter, setSelectedGroupFilter] = useState<string>("");
+  const [selectedRecruiterFilter, setSelectedRecruiterFilter] = useState<string>("");
   const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
     from: undefined,
     to: undefined
@@ -57,6 +58,10 @@ export function JobManagementPanel() {
     id: string;
     name: string;
     color: string | null;
+  }>>([]);
+  const [recruiters, setRecruiters] = useState<Array<{
+    id: string;
+    name: string;
   }>>([]);
   const navigate = useNavigate();
   const {
@@ -202,6 +207,16 @@ export function JobManagementPanel() {
       console.log(`JobManagementPanel: Fetch completed in ${(endTime - startTime).toFixed(2)}ms`);
       console.log('JobManagementPanel: Jobs with counts:', jobsWithCounts.length);
 
+      // Extract unique recruiters
+      const uniqueRecruiters = Array.from(
+        new Map(
+          jobsWithCounts
+            .filter(job => job.recruiter_id && job.recruiter_name)
+            .map(job => [job.recruiter_id, { id: job.recruiter_id!, name: job.recruiter_name! }])
+        ).values()
+      ).sort((a, b) => a.name.localeCompare(b.name));
+      
+      setRecruiters(uniqueRecruiters);
       setJobs(jobsWithCounts);
       setLoading(false);
     } catch (error) {
@@ -344,9 +359,15 @@ export function JobManagementPanel() {
       });
     };
 
+    const filterJobsByRecruiter = (jobList: Job[]) => {
+      if (!selectedRecruiterFilter) return jobList;
+      return jobList.filter(job => job.recruiter_id === selectedRecruiterFilter);
+    };
+
     const applyFilters = (jobList: Job[]) => {
       let filtered = filterJobsByGroup(jobList);
       filtered = filterJobsByDate(filtered);
+      filtered = filterJobsByRecruiter(filtered);
       return filtered;
     };
 
@@ -358,7 +379,7 @@ export function JobManagementPanel() {
       pausedJobs: applyFilters(pausedJobs),
       allJobs: applyFilters(jobs)
     };
-  }, [jobs, selectedGroupFilter, dateRange]);
+  }, [jobs, selectedGroupFilter, selectedRecruiterFilter, dateRange]);
   return <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -391,6 +412,20 @@ export function JobManagementPanel() {
           </select>
         </div>
         {selectedGroupFilter && <Button variant="ghost" size="sm" onClick={() => setSelectedGroupFilter("")} className="text-xs">
+            Clear Filter
+          </Button>}
+
+        {/* Recruiter Filter */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium">Filter by Recruiter:</label>
+          <select value={selectedRecruiterFilter} onChange={e => setSelectedRecruiterFilter(e.target.value)} className="px-3 py-1 rounded-md border border-border bg-background text-sm">
+            <option value="">All Recruiters</option>
+            {recruiters.map(recruiter => <option key={recruiter.id} value={recruiter.id}>
+                {recruiter.name}
+              </option>)}
+          </select>
+        </div>
+        {selectedRecruiterFilter && <Button variant="ghost" size="sm" onClick={() => setSelectedRecruiterFilter("")} className="text-xs">
             Clear Filter
           </Button>}
 
