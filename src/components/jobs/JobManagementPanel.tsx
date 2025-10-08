@@ -34,6 +34,7 @@ interface Job {
   automatic_dial?: boolean | null;
   longlisted_count?: number;
   shortlisted_count?: number;
+  rejected_count?: number;
   submitted_count?: number;
   recruiter_id?: string | null;
   recruiter_name?: string | null;
@@ -188,6 +189,12 @@ export function JobManagementPanel() {
           return score >= 74;
         }).length;
         
+        // Rejected: longlisted candidates with contacted status = 'Rejected'
+        const rejected_count = longlistedCandidates.filter(c => {
+          const contacted = (c.contacted || "").trim();
+          return contacted === 'Rejected';
+        }).length;
+        
         // Submitted: only longlisted candidates with contacted status = 'Submitted' (matches JobFunnel)
         const submitted_count = longlistedCandidates.filter(c => {
           const contacted = (c.contacted || "").trim();
@@ -198,6 +205,7 @@ export function JobManagementPanel() {
           ...job,
           longlisted_count,
           shortlisted_count,
+          rejected_count,
           submitted_count,
           recruiter_name: job.recruiter_id ? recruiterNamesMap.get(job.recruiter_id) || null : null
         };
@@ -685,7 +693,7 @@ const JobGrid = memo(function JobGrid({
               </p>}
 
             {/* Candidate Counts */}
-            <div className="grid grid-cols-3 gap-2 text-sm">
+            <div className="grid grid-cols-4 gap-2 text-sm">
               <div className="flex flex-col items-center p-2 rounded-md bg-blue/10 border border-blue/20">
                 <div className="flex items-center gap-1 text-blue">
                   <Users className="h-3 w-3" />
@@ -699,6 +707,13 @@ const JobGrid = memo(function JobGrid({
                   <span className="font-bold text-lg">{job.shortlisted_count || 0}</span>
                 </div>
                 <span className="text-xs text-muted-foreground mt-1">Shortlisted</span>
+              </div>
+              <div className="flex flex-col items-center p-2 rounded-md bg-destructive/10 border border-destructive/20">
+                <div className="flex items-center gap-1 text-destructive">
+                  <Users className="h-3 w-3" />
+                  <span className="font-bold text-lg">{job.rejected_count || 0}</span>
+                </div>
+                <span className="text-xs text-muted-foreground mt-1">Rejected</span>
               </div>
               <div className="flex flex-col items-center p-2 rounded-md bg-green/10 border border-green/20">
                 <div className="flex items-center gap-1 text-green">
