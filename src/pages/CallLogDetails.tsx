@@ -49,6 +49,8 @@ interface CallLogDetail {
   linkedin_score_reason: string | null
   source: string | null
   qualifications: string | null
+  comm_summary: string | null
+  comm_score: string | null
 }
 
 export default function CallLogDetails() {
@@ -208,7 +210,9 @@ export default function CallLogDetails() {
         source: data.source,
         qualifications: data.qualifications,
         Reason_to_reject: data.Reason_to_reject,
-        Reason_to_Hire: data.Reason_to_Hire
+        Reason_to_Hire: data.Reason_to_Hire,
+        comm_summary: data.comm_summary,
+        comm_score: data.comm_score?.toString()
       }
 
       console.log('Enriched data:', enrichedData);
@@ -742,6 +746,73 @@ export default function CallLogDetails() {
           <CardContent>
             <div className="p-4 bg-secondary/50 rounded-lg border">
               <p className="text-sm leading-relaxed whitespace-pre-wrap">{callLog.qualifications}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Communication Skills */}
+      {(callLog?.comm_summary || callLog?.comm_score) && (
+        <Card className="overflow-hidden animate-fade-in">
+          <CardHeader className="bg-gradient-primary/10">
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Communication Skills Assessment
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border bg-muted/50">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">
+                      Communication Skill Summary
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-foreground w-48">
+                      Communication Skill Score
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-border/50 hover:bg-accent/50 transition-colors duration-200">
+                    <td className="px-6 py-4">
+                      <div className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
+                        {callLog.comm_summary || 'No summary available'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <div className={`text-3xl font-bold ${
+                          callLog.comm_score && parseInt(callLog.comm_score) >= 80 
+                            ? 'text-green-600 dark:text-green-400' 
+                            : callLog.comm_score && parseInt(callLog.comm_score) >= 50 
+                            ? 'text-yellow-600 dark:text-yellow-400' 
+                            : 'text-red-600 dark:text-red-400'
+                        }`}>
+                          {callLog.comm_score || 'N/A'}
+                          {callLog.comm_score && '/100'}
+                        </div>
+                        {callLog.comm_score && (
+                          <div className="w-full max-w-[120px]">
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full transition-all duration-1000 ease-out ${
+                                  parseInt(callLog.comm_score) >= 80 
+                                    ? 'bg-green-600' 
+                                    : parseInt(callLog.comm_score) >= 50 
+                                    ? 'bg-yellow-600' 
+                                    : 'bg-red-600'
+                                }`}
+                                style={{ width: `${callLog.comm_score}%` }}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </CardContent>
         </Card>
