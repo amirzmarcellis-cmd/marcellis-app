@@ -285,6 +285,8 @@ export type Database = {
           candidate_email: string | null
           candidate_name: string | null
           candidate_phone_number: string | null
+          comm_score: number | null
+          comm_summary: string | null
           contacted: string | null
           current_salary: number | null
           cv_score: number | null
@@ -325,6 +327,8 @@ export type Database = {
           candidate_email?: string | null
           candidate_name?: string | null
           candidate_phone_number?: string | null
+          comm_score?: number | null
+          comm_summary?: string | null
           contacted?: string | null
           current_salary?: number | null
           cv_score?: number | null
@@ -365,6 +369,8 @@ export type Database = {
           candidate_email?: string | null
           candidate_name?: string | null
           candidate_phone_number?: string | null
+          comm_score?: number | null
+          comm_summary?: string | null
           contacted?: string | null
           current_salary?: number | null
           cv_score?: number | null
