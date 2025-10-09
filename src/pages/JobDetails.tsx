@@ -1977,14 +1977,14 @@ export default function JobDetails() {
                       </Link>
                     </Button>;
               })()}
-              <Button variant="ghost" size="sm" asChild className="flex-1 min-w-[100px]">
+                <Button variant="ghost" size="sm" asChild className="flex-1 min-w-[100px]">
                   {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && getLinkedInUrl(mainCandidate) ? <a href={getLinkedInUrl(mainCandidate)!} target="_blank" rel="noopener noreferrer">
                       <Users className="w-3 h-3 mr-1" />
                       View Profile
-                    </a> : <Link to={`/candidate/${mainCandidate["Candidate_ID"] || mainCandidate.user_id || candidateId}`} state={{
+                    </a> : <Link to={`/candidate/${candidateId}`} state={{
                   fromJob: id,
                   tab: 'shortlist',
-                  focusCandidateId: mainCandidate["Candidate_ID"] || mainCandidate.user_id || candidateId
+                  focusCandidateId: candidateId
                 }}>
                       <Users className="w-3 h-3 mr-1" />
                       View Profile
