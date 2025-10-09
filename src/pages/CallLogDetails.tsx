@@ -819,33 +819,31 @@ export default function CallLogDetails() {
       )}
 
       {/* Transcript */}
-      {(isManager || isCompanyAdmin) && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Transcript</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="relative">
-                <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
-                <Input
-                  placeholder="Search transcript keywords..."
-                  className="pl-9"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </div>
-              <div className="max-h-60 overflow-y-auto text-sm leading-relaxed">
-                {callLog?.transcript ? (
-                  <div className="whitespace-pre-wrap break-words">{highlightedTranscript}</div>
-                ) : (
-                  <p className="text-muted-foreground">No transcript available</p>
-                )}
-              </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Transcript</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="relative">
+              <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+              <Input
+                placeholder="Search transcript keywords..."
+                className="pl-9"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
             </div>
-          </CardContent>
-        </Card>
-      )}
+            <div className="max-h-60 overflow-y-auto text-sm leading-relaxed">
+              {callLog?.transcript ? (
+                <div className="whitespace-pre-wrap break-words">{highlightedTranscript}</div>
+              ) : (
+                <p className="text-muted-foreground">No transcript available</p>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Timeline Log */}
       {candidateId && jobId && (
