@@ -24,6 +24,12 @@ const europeanCountries = [
   "Norway", "Luxembourg", "Serbia", "Slovakia", "Slovenia", "Spain", "Switzerland", "Sweden"
 ];
 
+const arabianCountries = [
+  "Algeria", "Bahrain", "Egypt", "Iraq", "Jordan", "Kuwait", "Lebanon", "Libya", 
+  "Morocco", "Oman", "Palestine", "Qatar", "Saudi Arabia", "Sudan", "Syria", 
+  "Tunisia", "United Arab Emirates", "Yemen"
+];
+
 const countries = [
   "Afghanistan", "Albania", "Algeria", "United States", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia",
   "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium",
@@ -642,6 +648,10 @@ export default function EditJob() {
                           // Add all European countries that aren't already included
                           const newCountries = europeanCountries.filter(country => !nationalityToInclude.includes(country));
                           setNationalityToInclude([...nationalityToInclude, ...newCountries]);
+                        } else if (value === "Arabian Countries") {
+                          // Add all Arabian countries that aren't already included
+                          const newCountries = arabianCountries.filter(country => !nationalityToInclude.includes(country));
+                          setNationalityToInclude([...nationalityToInclude, ...newCountries]);
                         } else if (!nationalityToInclude.includes(value)) {
                           setNationalityToInclude([...nationalityToInclude, value]);
                         }
@@ -652,6 +662,9 @@ export default function EditJob() {
                         <SelectContent className="max-h-60 z-[60] bg-popover">
                           <SelectItem value="European Countries" className="font-semibold text-primary">
                             🇪🇺 European Countries (Select All)
+                          </SelectItem>
+                          <SelectItem value="Arabian Countries" className="font-semibold text-primary">
+                            🕌 Arabian Countries (Select All)
                           </SelectItem>
                           {countries.filter(country => 
                             !nationalityToInclude.includes(country)
@@ -691,6 +704,10 @@ export default function EditJob() {
                           // Add all European countries that aren't already excluded
                           const newCountries = europeanCountries.filter(country => !nationalityToExclude.includes(country));
                           setNationalityToExclude([...nationalityToExclude, ...newCountries]);
+                        } else if (value === "Arabian Countries") {
+                          // Add all Arabian countries that aren't already excluded
+                          const newCountries = arabianCountries.filter(country => !nationalityToExclude.includes(country));
+                          setNationalityToExclude([...nationalityToExclude, ...newCountries]);
                         } else if (!nationalityToExclude.includes(value)) {
                           setNationalityToExclude([...nationalityToExclude, value]);
                         }
@@ -701,6 +718,9 @@ export default function EditJob() {
                         <SelectContent className="max-h-60 z-[60] bg-popover">
                           <SelectItem value="European Countries" className="font-semibold text-destructive">
                             🇪🇺 European Countries (Select All)
+                          </SelectItem>
+                          <SelectItem value="Arabian Countries" className="font-semibold text-destructive">
+                            🕌 Arabian Countries (Select All)
                           </SelectItem>
                           {countries.filter(country => 
                             !nationalityToExclude.includes(country)
