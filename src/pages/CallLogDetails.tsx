@@ -846,8 +846,8 @@ export default function CallLogDetails() {
       </Card>
 
       {/* Timeline Log */}
-      {candidateId && jobId && (
-        <TimelineLog candidateId={candidateId} jobId={jobId} />
+      {callLog?.user_id && callLog?.job_id && (
+        <TimelineLog candidateId={callLog.user_id} jobId={callLog.job_id} />
       )}
     </div>
   )

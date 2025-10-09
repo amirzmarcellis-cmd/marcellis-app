@@ -32,9 +32,13 @@ export function TimelineLog({ candidateId, jobId }: TimelineLogProps) {
           .select('*')
           .eq('user_id', candidateId)
           .eq('job_id', jobId)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
+        if (!data) {
+          setLoading(false);
+          return;
+        }
 
         const timeline: TimelineEvent[] = [];
 
