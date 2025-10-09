@@ -586,7 +586,7 @@ export default function AddJob() {
                   {formData.headhuntingCompanies.map((url, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-secondary/10 text-secondary"
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-secondary/10 text-foreground"
                     >
                       <a
                         href={url}
@@ -602,7 +602,7 @@ export default function AddJob() {
                           const updated = formData.headhuntingCompanies.filter((_, i) => i !== index);
                           handleInputChange("headhuntingCompanies", updated);
                         }}
-                        className="ml-1 text-secondary/60 hover:text-secondary"
+                        className="ml-1 text-foreground/60 hover:text-foreground"
                       >
                         ×
                       </button>

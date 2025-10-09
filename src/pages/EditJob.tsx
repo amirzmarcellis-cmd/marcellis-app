@@ -517,7 +517,7 @@ export default function EditJob() {
                         {headhuntingCompanies.map((url, index) => (
                           <span
                             key={index}
-                            className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-secondary/10 text-secondary"
+                            className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-secondary/10 text-foreground"
                           >
                             <a
                               href={url}
@@ -532,7 +532,7 @@ export default function EditJob() {
                               onClick={() => {
                                 setHeadhuntingCompanies(headhuntingCompanies.filter((_, i) => i !== index));
                               }}
-                              className="ml-1 text-secondary/60 hover:text-secondary"
+                              className="ml-1 text-foreground/60 hover:text-foreground"
                             >
                               ×
                             </button>
