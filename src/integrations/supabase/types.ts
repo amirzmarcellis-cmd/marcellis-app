@@ -183,6 +183,7 @@ export type Database = {
           contract_length: string | null
           Currency: string | null
           group_id: string | null
+          headhunting_companies: string | null
           industry: string | null
           itris_job_id: string | null
           jd_link: string | null
@@ -214,6 +215,7 @@ export type Database = {
           contract_length?: string | null
           Currency?: string | null
           group_id?: string | null
+          headhunting_companies?: string | null
           industry?: string | null
           itris_job_id?: string | null
           jd_link?: string | null
@@ -245,6 +247,7 @@ export type Database = {
           contract_length?: string | null
           Currency?: string | null
           group_id?: string | null
+          headhunting_companies?: string | null
           industry?: string | null
           itris_job_id?: string | null
           jd_link?: string | null

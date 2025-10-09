@@ -215,6 +215,7 @@ export default function AddJob() {
     jobTitle: "",
     jobDescription: "",
     industries: [] as string[],
+    headhuntingCompanies: [] as string[],
     clientName: "",
     clientDescription: "",
     jobLocation: "",
@@ -231,6 +232,7 @@ export default function AddJob() {
     groupId: "",
     recruiterId: ""
   });
+  const [newHeadhuntingUrl, setNewHeadhuntingUrl] = useState("");
   const [groups, setGroups] = useState<Array<{id: string, name: string, color: string | null}>>([]);
   const [recruiters, setRecruiters] = useState<Array<{user_id: string, name: string, email: string}>>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -352,6 +354,7 @@ export default function AddJob() {
           job_title: formData.jobTitle,
           job_description: formData.jobDescription,
           industry: formData.industries.join(", "),
+          headhunting_companies: formData.headhuntingCompanies.join(", "),
           client_name: formData.clientName,
           client_description: formData.clientDescription,
           job_location: formData.jobLocation,
@@ -544,6 +547,62 @@ export default function AddJob() {
                           handleInputChange("industries", updated);
                         }}
                         className="ml-1 text-primary/60 hover:text-primary"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>Headhunting Company URLs</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={newHeadhuntingUrl}
+                  onChange={(e) => setNewHeadhuntingUrl(e.target.value)}
+                  placeholder="Enter headhunting company URL"
+                  type="url"
+                />
+                <Button
+                  type="button"
+                  onClick={() => {
+                    if (newHeadhuntingUrl.trim()) {
+                      handleInputChange("headhuntingCompanies", [
+                        ...formData.headhuntingCompanies,
+                        newHeadhuntingUrl.trim()
+                      ]);
+                      setNewHeadhuntingUrl("");
+                    }
+                  }}
+                  variant="secondary"
+                >
+                  Add
+                </Button>
+              </div>
+              {formData.headhuntingCompanies.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {formData.headhuntingCompanies.map((url, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-secondary/10 text-secondary"
+                    >
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline max-w-[200px] truncate"
+                      >
+                        {url}
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = formData.headhuntingCompanies.filter((_, i) => i !== index);
+                          handleInputChange("headhuntingCompanies", updated);
+                        }}
+                        className="ml-1 text-secondary/60 hover:text-secondary"
                       >
                         ×
                       </button>

@@ -2238,6 +2238,31 @@ export default function JobDetails() {
                         </> : "No Group"}
                     </span>
                   </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Industry:</span>
+                    <span>{job.industry || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Headhunting Companies:</span>
+                    <div className="flex flex-col gap-1 items-end">
+                      {job.headhunting_companies ? (
+                        job.headhunting_companies.split(",").map((url: string, index: number) => (
+                          <a
+                            key={index}
+                            href={url.trim()}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline flex items-center gap-1"
+                          >
+                            {url.trim()}
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        ))
+                      ) : (
+                        <span>N/A</span>
+                      )}
+                    </div>
+                  </div>
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Automatic Dial:</span>
                     <div className="flex items-center gap-2">

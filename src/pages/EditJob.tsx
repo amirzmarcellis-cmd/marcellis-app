@@ -59,10 +59,49 @@ const contractLengths = [
   "24 Months"
 ];
 
+const industriesList = [
+  "Accounting", "Airlines / Aviation", "Alternative Dispute Resolution", "Alternative Medicine",
+  "Animation", "Apparel & Fashion", "Architecture & Planning", "Arts & Crafts", "Automotive",
+  "Aviation & Aerospace", "Banking", "Biotechnology", "Broadcast Media", "Building Materials",
+  "Business Supplies & Equipment", "Capital Markets", "Chemicals", "Civic & Social Organization",
+  "Civil Engineering", "Commercial Real Estate", "Computer & Network Security", "Computer Games",
+  "Computer Hardware", "Computer Networking", "Computer Software", "Construction",
+  "Consumer Electronics", "Consumer Goods", "Consumer Services", "Cosmetics", "Dairy",
+  "Defense & Space", "Design", "E-Learning", "Education Management",
+  "Electrical/Electronic Manufacturing", "Entertainment", "Environmental Services",
+  "Events Services", "Executive Office", "Facilities Services", "Farming", "Financial Services",
+  "Fine Art", "Fishery", "Food & Beverages", "Food Production", "Fund‐Raising", "Furniture",
+  "Gambling & Casinos", "Glass, Ceramics & Concrete", "Government Administration",
+  "Government Relations", "Graphic Design", "Health, Wellness and Fitness", "Higher Education",
+  "Hospital & Health Care", "Hospitality", "Human Resources", "Import and Export",
+  "Individual & Family Services", "Industrial Automation", "Information Services",
+  "Information Technology & Services", "Insurance", "International Affairs",
+  "International Trade & Development", "Internet", "Investment Banking", "Investment Management",
+  "Judiciary", "Law Enforcement", "Law Practice", "Legal Services", "Legislative Office",
+  "Leisure, Travel & Tourism", "Libraries", "Logistics & Supply Chain", "Luxury Goods & Jewelry",
+  "Machinery", "Management Consulting", "Maritime", "Market Research", "Marketing & Advertising",
+  "Mechanical or Industrial Engineering", "Media Production", "Medical Devices", "Medical Practice",
+  "Mental Health Care", "Military", "Mining & Metals", "Motion Pictures & Film",
+  "Museums & Institutions", "Music", "Nanotechnology", "Newspapers",
+  "Nonprofit Organization Management", "Oil & Energy", "Online Media", "Outsourcing / Offshoring",
+  "Package / Freight Delivery", "Packaging & Containers", "Paper & Forest Products",
+  "Performing Arts", "Pharmaceuticals", "Photography", "Plastics", "Political Organization",
+  "Primary / Secondary Education", "Printing", "Professional Training & Coaching",
+  "Program Development", "Public Policy", "Public Relations & Communications", "Public Safety",
+  "Publishing", "Real Estate", "Recreational Facilities & Services", "Religious Institutions",
+  "Renewables & Environment", "Research", "Restaurants", "Retail", "Security & Investigations",
+  "Semiconductors", "Shipbuilding", "Sporting Goods", "Sports", "Staffing & Recruiting",
+  "Supermarkets", "Telecommunications", "Textiles", "Transportation / Trucking / Railroad",
+  "Utilities", "Venture Capital & Private Equity", "Veterinary", "Warehousing", "Wholesale",
+  "Wine & Spirits", "Wireless", "Writing & Editing"
+];
+
 interface JobData {
   job_id: string;
   job_title: string;
   job_description: string;
+  industry?: string;
+  headhunting_companies?: string;
   client_name: string;
   client_description: string;
   job_location: string;
@@ -98,10 +137,15 @@ export default function EditJob() {
   const [recruiters, setRecruiters] = useState<Array<{user_id: string, name: string, email: string}>>([]);
   const [isAmendMode, setIsAmendMode] = useState(false);
   const [currentTab, setCurrentTab] = useState("details");
+  const [industries, setIndustries] = useState<string[]>([]);
+  const [headhuntingCompanies, setHeadhuntingCompanies] = useState<string[]>([]);
+  const [newHeadhuntingUrl, setNewHeadhuntingUrl] = useState("");
   const [formData, setFormData] = useState<JobData>({
     job_id: "",
     job_title: "",
     job_description: "",
+    industry: "",
+    headhunting_companies: "",
     client_name: "",
     client_description: "",
     job_location: "",
@@ -198,6 +242,14 @@ export default function EditJob() {
         if (data.nationality_to_exclude) {
           setNationalityToExclude(data.nationality_to_exclude.split(", ").filter(Boolean));
         }
+        
+        // Parse industries and headhunting companies
+        if (data.industry) {
+          setIndustries(data.industry.split(", ").filter(Boolean));
+        }
+        if (data.headhunting_companies) {
+          setHeadhuntingCompanies(data.headhunting_companies.split(", ").filter(Boolean));
+        }
       }
     } catch (error) {
       console.error('Error fetching job:', error);
@@ -232,6 +284,8 @@ export default function EditJob() {
         job_salary_range: salaryRange[0].toString(),
         nationality_to_include: nationalityToInclude.join(", "),
         nationality_to_exclude: nationalityToExclude.join(", "),
+        industry: industries.join(", "),
+        headhunting_companies: headhuntingCompanies.join(", "),
         contract_length: formData.Type === "Contract" ? formData.contract_length : null,
         assignment: hasAssignment ? formData.assignment : null,
         group_id: formData.group_id || null
@@ -393,6 +447,99 @@ export default function EditJob() {
                       placeholder="Enter detailed job description"
                       required
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Industry</Label>
+                    <Select onValueChange={(value) => {
+                      if (!industries.includes(value)) {
+                        setIndustries([...industries, value]);
+                      }
+                    }}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select industries..." />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-60">
+                        {industriesList.filter(industry => !industries.includes(industry)).map((industry) => (
+                          <SelectItem key={industry} value={industry}>
+                            {industry}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {industries.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {industries.map((industry, index) => (
+                          <span
+                            key={index}
+                            className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
+                          >
+                            {industry}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIndustries(industries.filter((_, i) => i !== index));
+                              }}
+                              className="ml-1 text-primary/60 hover:text-primary"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Headhunting Company URLs</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={newHeadhuntingUrl}
+                        onChange={(e) => setNewHeadhuntingUrl(e.target.value)}
+                        placeholder="Enter headhunting company URL"
+                        type="url"
+                      />
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          if (newHeadhuntingUrl.trim()) {
+                            setHeadhuntingCompanies([...headhuntingCompanies, newHeadhuntingUrl.trim()]);
+                            setNewHeadhuntingUrl("");
+                          }
+                        }}
+                        variant="secondary"
+                      >
+                        Add
+                      </Button>
+                    </div>
+                    {headhuntingCompanies.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {headhuntingCompanies.map((url, index) => (
+                          <span
+                            key={index}
+                            className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-secondary/10 text-secondary"
+                          >
+                            <a
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:underline max-w-[200px] truncate"
+                            >
+                              {url}
+                            </a>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setHeadhuntingCompanies(headhuntingCompanies.filter((_, i) => i !== index));
+                              }}
+                              className="ml-1 text-secondary/60 hover:text-secondary"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-2">
