@@ -16,6 +16,14 @@ import { useToast } from "@/components/ui/use-toast";
 import { toast } from "sonner";
 import FileUpload from "@/components/upload/FileUpload";
 
+const europeanCountries = [
+  "Albania", "Andorra", "Austria", "Azerbaijan", "Belgium", "Bosnia and Herzegovina", 
+  "United Kingdom", "Cyprus", "Denmark", "Croatia", "France", "Finland", "Netherlands", 
+  "Germany", "Georgia", "Estonia", "Greece", "Iceland", "Ireland", "Italy", "Kazakhstan", 
+  "Poland", "Portugal", "Romania", "Russia", "Malta", "Moldova", "Northern Ireland", 
+  "Norway", "Luxembourg", "Serbia", "Slovakia", "Slovenia", "Spain", "Switzerland", "Sweden"
+];
+
 const countries = [
   "Afghanistan", "Albania", "Algeria", "United States", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia",
   "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium",
@@ -630,7 +638,11 @@ export default function EditJob() {
                     <div className="space-y-2">
                       <Label>Countries to Include</Label>
                       <Select onValueChange={(value) => {
-                        if (!nationalityToInclude.includes(value)) {
+                        if (value === "European Countries") {
+                          // Add all European countries that aren't already included
+                          const newCountries = europeanCountries.filter(country => !nationalityToInclude.includes(country));
+                          setNationalityToInclude([...nationalityToInclude, ...newCountries]);
+                        } else if (!nationalityToInclude.includes(value)) {
                           setNationalityToInclude([...nationalityToInclude, value]);
                         }
                       }}>
@@ -638,6 +650,9 @@ export default function EditJob() {
                           <SelectValue placeholder="Select countries to include..." />
                         </SelectTrigger>
                         <SelectContent className="max-h-60 z-[60] bg-popover">
+                          <SelectItem value="European Countries" className="font-semibold text-primary">
+                            🇪🇺 European Countries (Select All)
+                          </SelectItem>
                           {countries.filter(country => 
                             !nationalityToInclude.includes(country)
                           ).map((country) => (
@@ -672,7 +687,11 @@ export default function EditJob() {
                     <div className="space-y-2">
                       <Label>Countries to Exclude</Label>
                       <Select onValueChange={(value) => {
-                        if (!nationalityToExclude.includes(value)) {
+                        if (value === "European Countries") {
+                          // Add all European countries that aren't already excluded
+                          const newCountries = europeanCountries.filter(country => !nationalityToExclude.includes(country));
+                          setNationalityToExclude([...nationalityToExclude, ...newCountries]);
+                        } else if (!nationalityToExclude.includes(value)) {
                           setNationalityToExclude([...nationalityToExclude, value]);
                         }
                       }}>
@@ -680,6 +699,9 @@ export default function EditJob() {
                           <SelectValue placeholder="Select countries to exclude..." />
                         </SelectTrigger>
                         <SelectContent className="max-h-60 z-[60] bg-popover">
+                          <SelectItem value="European Countries" className="font-semibold text-destructive">
+                            🇪🇺 European Countries (Select All)
+                          </SelectItem>
                           {countries.filter(country => 
                             !nationalityToExclude.includes(country)
                           ).map((country) => (
