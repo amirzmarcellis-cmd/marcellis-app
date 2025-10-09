@@ -9,12 +9,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Check, ChevronsUpDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useProfile } from "@/hooks/useProfile";
 import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 
 const countries = [
@@ -231,6 +234,7 @@ export default function AddJob() {
   const [groups, setGroups] = useState<Array<{id: string, name: string, color: string | null}>>([]);
   const [recruiters, setRecruiters] = useState<Array<{user_id: string, name: string, email: string}>>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [industryPopoverOpen, setIndustryPopoverOpen] = useState(false);
 
   useEffect(() => {
     // Auto-assign recruiter to current user for team members if not selected
@@ -480,25 +484,50 @@ export default function AddJob() {
 
             <div className="space-y-2">
               <Label>Industry</Label>
-              <Select onValueChange={(value) => {
-                const currentIndustries = formData.industries || [];
-                if (!currentIndustries.includes(value)) {
-                  handleInputChange("industries", [...currentIndustries, value]);
-                }
-              }}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select industries..." />
-                </SelectTrigger>
-                <SelectContent className="max-h-60">
-                  {industries.filter(industry => 
-                    !(formData.industries || []).includes(industry)
-                  ).map((industry) => (
-                    <SelectItem key={industry} value={industry}>
-                      {industry}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={industryPopoverOpen} onOpenChange={setIndustryPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={industryPopoverOpen}
+                    className="w-full justify-between"
+                  >
+                    Select industries...
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search industry..." />
+                    <CommandList>
+                      <CommandEmpty>No industry found.</CommandEmpty>
+                      <CommandGroup>
+                        {industries.filter(industry => 
+                          !(formData.industries || []).includes(industry)
+                        ).map((industry) => (
+                          <CommandItem
+                            key={industry}
+                            value={industry}
+                            onSelect={() => {
+                              const currentIndustries = formData.industries || [];
+                              handleInputChange("industries", [...currentIndustries, industry]);
+                              setIndustryPopoverOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                "opacity-0"
+                              )}
+                            />
+                            {industry}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
               {(formData.industries || []).length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-2">
                   {(formData.industries || []).map((industry) => (
