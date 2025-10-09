@@ -1981,10 +1981,10 @@ export default function JobDetails() {
                   {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && getLinkedInUrl(mainCandidate) ? <a href={getLinkedInUrl(mainCandidate)!} target="_blank" rel="noopener noreferrer">
                       <Users className="w-3 h-3 mr-1" />
                       View Profile
-                    </a> : <Link to={`/candidate/${candidateId}`} state={{
+                    </a> : <Link to={`/candidate/${mainCandidate["user_id"] || candidateId}`} state={{
                   fromJob: id,
                   tab: 'shortlist',
-                  focusCandidateId: candidateId
+                  focusCandidateId: mainCandidate["user_id"] || candidateId
                 }}>
                       <Users className="w-3 h-3 mr-1" />
                       View Profile
@@ -3084,9 +3084,9 @@ export default function JobDetails() {
                     </div> : <ScrollArea className="h-[600px] w-full">
                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
                         {(() => {
-                    // Group within budget candidates by Candidate_ID and sort by score
+                    // Group within budget candidates by user_id and sort by score
                     const groupedWithinBudget = withinBudgetCandidates.reduce((acc, candidate) => {
-                      const candidateId = candidate["Candidate_ID"];
+                      const candidateId = candidate["user_id"] || candidate["Candidate_ID"];
                       if (!acc[candidateId]) {
                         acc[candidateId] = [];
                       }
@@ -3172,9 +3172,9 @@ export default function JobDetails() {
                     </div> : <ScrollArea className="h-[600px] w-full">
                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
                         {(() => {
-                    // Group above budget candidates by Candidate_ID and sort by Overall Score
+                    // Group above budget candidates by user_id and sort by Overall Score
                     const groupedAboveBudget = aboveBudgetCandidates.reduce((acc, candidate) => {
-                      const candidateId = candidate["Candidate_ID"];
+                      const candidateId = candidate["user_id"] || candidate["Candidate_ID"];
                       if (!acc[candidateId]) {
                         acc[candidateId] = [];
                       }
