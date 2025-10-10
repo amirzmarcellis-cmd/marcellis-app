@@ -129,6 +129,7 @@ interface JobData {
   notice_period: string;
   nationality_to_include: string;
   nationality_to_exclude: string;
+  prefered_nationality?: string;
   Type: string;
   contract_length: string | null;
   Currency: string;
@@ -146,6 +147,7 @@ export default function EditJob() {
   const [salaryRange, setSalaryRange] = useState([10000]);
   const [nationalityToInclude, setNationalityToInclude] = useState<string[]>([]);
   const [nationalityToExclude, setNationalityToExclude] = useState<string[]>([]);
+  const [preferedNationality, setPreferedNationality] = useState<string[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<Array<{ id: string; file_name: string; file_url: string; file_type: string; file_size: number }>>([]);
   const [groups, setGroups] = useState<Array<{id: string, name: string, color: string | null}>>([]);
   const [recruiters, setRecruiters] = useState<Array<{user_id: string, name: string, email: string}>>([]);
@@ -256,6 +258,9 @@ export default function EditJob() {
         if (data.nationality_to_exclude) {
           setNationalityToExclude(data.nationality_to_exclude.split(", ").filter(Boolean));
         }
+        if (data.prefered_nationality) {
+          setPreferedNationality(data.prefered_nationality.split(", ").filter(Boolean));
+        }
         
         // Parse industries and headhunting companies
         if (data.industry) {
@@ -298,6 +303,7 @@ export default function EditJob() {
         job_salary_range: salaryRange[0].toString(),
         nationality_to_include: nationalityToInclude.join(", "),
         nationality_to_exclude: nationalityToExclude.join(", "),
+        prefered_nationality: preferedNationality.length > 0 ? preferedNationality.join(", ") : null,
         industry: industries.join(", "),
         headhunting_companies: headhuntingCompanies.join(", "),
         contract_length: formData.Type === "Contract" ? formData.contract_length : null,
@@ -753,6 +759,61 @@ export default function EditJob() {
                         </div>
                       )}
                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Preferred Nationality</Label>
+                    <Select onValueChange={(value) => {
+                      if (value === "European Countries") {
+                        const newCountries = europeanCountries.filter(country => !preferedNationality.includes(country));
+                        setPreferedNationality([...preferedNationality, ...newCountries]);
+                      } else if (value === "Arabian Countries") {
+                        const newCountries = arabianCountries.filter(country => !preferedNationality.includes(country));
+                        setPreferedNationality([...preferedNationality, ...newCountries]);
+                      } else if (!preferedNationality.includes(value)) {
+                        setPreferedNationality([...preferedNationality, value]);
+                      }
+                    }}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select preferred nationalities..." />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-60 z-[60] bg-popover">
+                        <SelectItem value="European Countries" className="font-semibold text-primary">
+                          🇪🇺 European Countries (Select All)
+                        </SelectItem>
+                        <SelectItem value="Arabian Countries" className="font-semibold text-primary">
+                          🕌 Arabian Countries (Select All)
+                        </SelectItem>
+                        {countries.filter(country => 
+                          !preferedNationality.includes(country)
+                        ).map((country) => (
+                          <SelectItem key={country} value={country}>
+                            {country}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {preferedNationality.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {preferedNationality.map((country) => (
+                          <span
+                            key={country}
+                            className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-500/20 text-green-700 dark:text-green-300 border border-green-500/30"
+                          >
+                            {country}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPreferedNationality(preferedNationality.filter((n) => n !== country));
+                              }}
+                              className="ml-1 text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-100"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-4">
