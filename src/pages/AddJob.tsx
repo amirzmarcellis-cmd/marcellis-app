@@ -869,7 +869,7 @@ export default function AddJob() {
                   {(formData.preferedNationality || []).map((country) => (
                     <span
                       key={country}
-                      className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-accent/10 text-accent-foreground"
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-500/20 text-green-700 dark:text-green-300"
                     >
                       {country}
                       <button
@@ -879,7 +879,7 @@ export default function AddJob() {
                           const updated = currentPrefered.filter((n) => n !== country);
                           handleInputChange("preferedNationality", updated);
                         }}
-                        className="ml-1 text-accent-foreground/60 hover:text-accent-foreground"
+                        className="ml-1 text-green-600/70 hover:text-green-700 dark:text-green-300/70 dark:hover:text-green-300"
                       >
                         ×
                       </button>
