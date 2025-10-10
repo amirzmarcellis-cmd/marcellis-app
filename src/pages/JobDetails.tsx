@@ -2319,6 +2319,10 @@ export default function JobDetails() {
                     <span>{job.notice_period || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
+                    <span className="text-muted-foreground">Preferred Nationality:</span>
+                    <span>{job.prefered_nationality || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
                     <span className="text-muted-foreground">Group:</span>
                     <span className="flex items-center gap-2">
                       {jobGroup ? <>
