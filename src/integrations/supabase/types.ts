@@ -291,6 +291,7 @@ export type Database = {
           candidate_email: string | null
           candidate_name: string | null
           candidate_phone_number: string | null
+          client_status: string | null
           comm_score: number | null
           comm_summary: string | null
           contacted: string | null
@@ -333,6 +334,7 @@ export type Database = {
           candidate_email?: string | null
           candidate_name?: string | null
           candidate_phone_number?: string | null
+          client_status?: string | null
           comm_score?: number | null
           comm_summary?: string | null
           contacted?: string | null
@@ -375,6 +377,7 @@ export type Database = {
           candidate_email?: string | null
           candidate_name?: string | null
           candidate_phone_number?: string | null
+          client_status?: string | null
           comm_score?: number | null
           comm_summary?: string | null
           contacted?: string | null
@@ -546,6 +549,33 @@ export type Database = {
           name?: string | null
           slug?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      "Rejection table": {
+        Row: {
+          itris_job_id: string | null
+          job_id: string
+          recordid: string | null
+          scheduled_time: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          itris_job_id?: string | null
+          job_id: string
+          recordid?: string | null
+          scheduled_time?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          itris_job_id?: string | null
+          job_id?: string
+          recordid?: string | null
+          scheduled_time?: string | null
+          status?: string | null
           user_id?: string
         }
         Relationships: []

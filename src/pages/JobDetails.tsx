@@ -1540,6 +1540,40 @@ export default function JobDetails() {
       openHireDialog(id!, candidateId, candidateContact.callid);
     }
   };
+  
+  const handleClientStatusChange = async (candidateId: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from("Jobs_CVs")
+        .update({ client_status: newStatus })
+        .eq("user_id", candidateId)
+        .eq("job_id", id!);
+
+      if (error) throw error;
+
+      // Update local state
+      setCandidates(prev =>
+        prev.map(c =>
+          (c["user_id"] === candidateId || c["Candidate_ID"] === candidateId)
+            ? { ...c, client_status: newStatus }
+            : c
+        )
+      );
+
+      toast({
+        title: "Client Status Updated",
+        description: `Client status changed to ${newStatus}`,
+      });
+    } catch (error) {
+      console.error("Error updating client status:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update client status",
+        variant: "destructive",
+      });
+    }
+  };
+  
   const handleScheduleInterview = async () => {
     if (!selectedCandidate) return;
 
@@ -2008,6 +2042,28 @@ export default function JobDetails() {
                     Reject Candidate
                   </Button>}
               </div>
+              
+              {/* Client Status Dropdown - Shows when CV is Submitted */}
+              {mainCandidate["Contacted"] === "Submitted" && (
+                <div className="pt-2 border-t">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Client Status:</span>
+                    <Select
+                      value={mainCandidate["client_status"] || "Interview Requested"}
+                      onValueChange={(value) => handleClientStatusChange(candidateId, value)}
+                    >
+                      <SelectTrigger className="h-9 flex-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background border border-border shadow-lg z-50">
+                        <SelectItem value="Interview Requested">Interview Requested</SelectItem>
+                        <SelectItem value="Rejected From Client">Rejected From Client</SelectItem>
+                        <SelectItem value="Selected">Selected</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
