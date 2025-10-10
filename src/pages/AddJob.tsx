@@ -239,6 +239,7 @@ export default function AddJob() {
     noticePeriod: "",
     nationalityToInclude: [] as string[],
     nationalityToExclude: [] as string[],
+    preferedNationality: [] as string[],
     type: "",
     contractLength: "",
     currency: "",
@@ -377,6 +378,7 @@ export default function AddJob() {
           notice_period: formData.noticePeriod,
           nationality_to_include: formData.nationalityToInclude.join(", "),
           nationality_to_exclude: formData.nationalityToExclude.join(", "),
+          prefered_nationality: formData.preferedNationality.join(", "),
           Type: formData.type,
           contract_length: formData.type === "Contract" ? formData.contractLength : null,
           Currency: formData.currency,
@@ -827,6 +829,64 @@ export default function AddJob() {
                   </div>
                 )}
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Prefered Nationality</Label>
+              <Select onValueChange={(value) => {
+                const currentPrefered = formData.preferedNationality || [];
+                if (value === "European Countries") {
+                  const newCountries = europeanCountries.filter(country => !currentPrefered.includes(country));
+                  handleInputChange("preferedNationality", [...currentPrefered, ...newCountries]);
+                } else if (value === "Arabian Countries") {
+                  const newCountries = arabianCountries.filter(country => !currentPrefered.includes(country));
+                  handleInputChange("preferedNationality", [...currentPrefered, ...newCountries]);
+                } else if (!currentPrefered.includes(value)) {
+                  handleInputChange("preferedNationality", [...currentPrefered, value]);
+                }
+              }}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select prefered nationalities..." />
+                </SelectTrigger>
+                <SelectContent className="max-h-60">
+                  <SelectItem value="European Countries" className="font-semibold text-primary">
+                    🇪🇺 European Countries (Select All)
+                  </SelectItem>
+                  <SelectItem value="Arabian Countries" className="font-semibold text-primary">
+                    🕌 Arabian Countries (Select All)
+                  </SelectItem>
+                  {countries.filter(country => 
+                    !(formData.preferedNationality || []).includes(country)
+                  ).map((country) => (
+                    <SelectItem key={country} value={country}>
+                      {country}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {(formData.preferedNationality || []).length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {(formData.preferedNationality || []).map((country) => (
+                    <span
+                      key={country}
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-accent/10 text-accent-foreground"
+                    >
+                      {country}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentPrefered = formData.preferedNationality || [];
+                          const updated = currentPrefered.filter((n) => n !== country);
+                          handleInputChange("preferedNationality", updated);
+                        }}
+                        className="ml-1 text-accent-foreground/60 hover:text-accent-foreground"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="space-y-4">

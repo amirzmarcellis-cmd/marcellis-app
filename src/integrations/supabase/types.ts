@@ -199,6 +199,7 @@ export type Database = {
           nationality_to_include: string | null
           nicetohave: string | null
           notice_period: string | null
+          prefered_nationality: string | null
           Processed: string | null
           recruiter_id: string | null
           status: string | null
@@ -231,6 +232,7 @@ export type Database = {
           nationality_to_include?: string | null
           nicetohave?: string | null
           notice_period?: string | null
+          prefered_nationality?: string | null
           Processed?: string | null
           recruiter_id?: string | null
           status?: string | null
@@ -263,6 +265,7 @@ export type Database = {
           nationality_to_include?: string | null
           nicetohave?: string | null
           notice_period?: string | null
+          prefered_nationality?: string | null
           Processed?: string | null
           recruiter_id?: string | null
           status?: string | null
@@ -414,6 +417,7 @@ export type Database = {
       }
       linkedin_boolean_search: {
         Row: {
+          apollo_id: string | null
           chat_id: string | null
           id: number
           job_id: string | null
@@ -425,6 +429,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          apollo_id?: string | null
           chat_id?: string | null
           id?: number
           job_id?: string | null
@@ -436,6 +441,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          apollo_id?: string | null
           chat_id?: string | null
           id?: number
           job_id?: string | null
