@@ -769,7 +769,7 @@ export default function AddJob() {
                 )}
               </div>
               <div className="space-y-2">
-                <Label>Countries to Exclude</Label>
+                <Label>Location to be Exclude</Label>
                 <Select onValueChange={(value) => {
                   const currentExclude = formData.nationalityToExclude || [];
                   if (value === "European Countries") {
