@@ -1254,19 +1254,26 @@ export default function JobDetails() {
   const handleHireCandidate = async () => {
     if (!hireCandidateData) return;
     try {
-      const {
-        error
-      } = await supabase.from('Jobs_CVs').update({
-        Reason_to_Hire: hireReason,
-        contacted: 'Submitted'
-      }).eq('recordid', parseInt(hireCandidateData.candidateId)).eq('job_id', hireCandidateData.jobId);
+      // Use callid to update the correct record (recordid in Jobs_CVs equals the callid)
+      const { error } = await supabase
+        .from('Jobs_CVs')
+        .update({
+          Reason_to_Hire: hireReason,
+          contacted: 'Submitted'
+        })
+        .eq('recordid', hireCandidateData.callid)
+        .eq('job_id', hireCandidateData.jobId);
+
       if (error) throw error;
 
-      // Update local state
-      setCandidates(prev => prev.map(c => c["Candidate_ID"] === hireCandidateData.candidateId ? {
-        ...c,
-        Contacted: 'Submitted'
-      } : c));
+      // Update local state using both user_id and Candidate_ID
+      setCandidates(prev => prev.map(c => 
+        (c["user_id"] === hireCandidateData.candidateId || 
+         c["Candidate_ID"] === hireCandidateData.candidateId) 
+          ? { ...c, Contacted: 'Submitted' }
+          : c
+      ));
+
       toast({
         title: "CV Submitted",
         description: "Candidate's CV has been submitted with hiring reason"
@@ -1277,6 +1284,7 @@ export default function JobDetails() {
         fetchCandidates(id);
         fetchLonglistedCandidates(id);
       }
+      
       setShowHireDialog(false);
       setHireReason("");
       setHireCandidateData(null);
@@ -1284,7 +1292,7 @@ export default function JobDetails() {
       console.error('Error saving hire reason:', error);
       toast({
         title: "Error",
-        description: "Failed to submit CV",
+        description: "Failed to submit CV. Please try again.",
         variant: "destructive"
       });
     }
