@@ -559,6 +559,7 @@ export type Database = {
           job_id: string
           recordid: string | null
           scheduled_time: string | null
+          scheduled_time_iso: string | null
           status: string | null
           user_id: string
         }
@@ -567,6 +568,7 @@ export type Database = {
           job_id: string
           recordid?: string | null
           scheduled_time?: string | null
+          scheduled_time_iso?: string | null
           status?: string | null
           user_id: string
         }
@@ -575,6 +577,7 @@ export type Database = {
           job_id?: string
           recordid?: string | null
           scheduled_time?: string | null
+          scheduled_time_iso?: string | null
           status?: string | null
           user_id?: string
         }
@@ -747,6 +750,10 @@ export type Database = {
       disable_expired_auto_dial: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      format_scheduled_time_iso: {
+        Args: { ts: string }
+        Returns: string
       }
       get_org_role: {
         Args: { _user_id: string }
