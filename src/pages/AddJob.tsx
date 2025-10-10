@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -252,6 +252,8 @@ export default function AddJob() {
   const [recruiters, setRecruiters] = useState<Array<{user_id: string, name: string, email: string}>>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [industryPopoverOpen, setIndustryPopoverOpen] = useState(false);
+  const [currentJobId, setCurrentJobId] = useState<string | null>(null);
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // Auto-assign recruiter to current user for team members if not selected
@@ -295,8 +297,50 @@ export default function AddJob() {
     }
   };
 
+  const autoSaveNationality = useCallback(async (field: string, value: string[]) => {
+    // Only auto-save if we have a job_id (after initial creation)
+    if (!currentJobId) return;
+
+    try {
+      const fieldMap = {
+        'nationalityToInclude': 'nationality_to_include',
+        'nationalityToExclude': 'nationality_to_exclude',
+        'preferedNationality': 'prefered_nationality'
+      };
+
+      const dbField = fieldMap[field];
+      if (!dbField) return;
+
+      // Set to null if array is empty, otherwise join with comma
+      const dbValue = value.length > 0 ? value.join(", ") : null;
+
+      const { error } = await supabase
+        .from('Jobs')
+        .update({ [dbField]: dbValue })
+        .eq('job_id', currentJobId);
+
+      if (error) {
+        console.error('Error auto-saving nationality:', error);
+      } else {
+        toast.success("Saved automatically", { duration: 1000 });
+      }
+    } catch (error) {
+      console.error('Error auto-saving:', error);
+    }
+  }, [currentJobId]);
+
   const handleInputChange = (field: string, value: string | boolean | number[] | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+
+    // Auto-save nationality fields with debounce
+    if (['nationalityToInclude', 'nationalityToExclude', 'preferedNationality'].includes(field)) {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+      autoSaveTimerRef.current = setTimeout(() => {
+        autoSaveNationality(field, value as string[]);
+      }, 1000);
+    }
   };
 
   const generateJobId = async () => {
@@ -376,9 +420,9 @@ export default function AddJob() {
           job_salary_range: formData.jobSalaryRange[0],
           assignment: formData.hasAssignment ? formData.assignmentLink : null,
           notice_period: formData.noticePeriod,
-          nationality_to_include: formData.nationalityToInclude.join(", "),
-          nationality_to_exclude: formData.nationalityToExclude.join(", "),
-          prefered_nationality: formData.preferedNationality.join(", "),
+          nationality_to_include: formData.nationalityToInclude.length > 0 ? formData.nationalityToInclude.join(", ") : null,
+          nationality_to_exclude: formData.nationalityToExclude.length > 0 ? formData.nationalityToExclude.join(", ") : null,
+          prefered_nationality: formData.preferedNationality.length > 0 ? formData.preferedNationality.join(", ") : null,
           Type: formData.type,
           contract_length: formData.type === "Contract" ? formData.contractLength : null,
           Currency: formData.currency,
@@ -393,6 +437,9 @@ export default function AddJob() {
         toast.error("Failed to create job");
         return;
       }
+      
+      // Set the current job ID to enable auto-save for future changes
+      setCurrentJobId(jobId);
       
       toast.success("Job created successfully");
       navigate("/jobs");
