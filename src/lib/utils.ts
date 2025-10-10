@@ -15,3 +15,9 @@ export function formatDate(date: string | Date): string {
   
   return `${day}-${month}-${year} ${hours}:${minutes}`;
 }
+
+export function formatScheduledTime(date: string | Date | null): string | null {
+  if (!date) return null;
+  const d = new Date(date);
+  return d.toISOString().slice(0, -1); // Format: 2025-10-09T10:51:31.129
+}
