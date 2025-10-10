@@ -699,58 +699,6 @@ export default function CallLogDetails() {
         </Card>
       </div>
 
-      {/* Rejection & Hiring Reasons */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-600">
-              <XCircle className="h-5 w-5" />
-              Rejection Reason
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-900">
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                {callLog.Reason_to_reject || 'No rejection reason recorded'}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-600">
-              <ThumbsUp className="h-5 w-5" />
-              Hired Reason
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-900">
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                {callLog.Reason_to_Hire || 'No hiring reason recorded'}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Qualifications */}
-      {callLog?.qualifications && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Qualifications
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="p-4 bg-secondary/50 rounded-lg border">
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">{callLog.qualifications}</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Communication Skills */}
       {(callLog?.comm_summary || callLog?.comm_score) && (
         <Card className="overflow-hidden animate-fade-in">
@@ -813,6 +761,58 @@ export default function CallLogDetails() {
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Rejection & Hiring Reasons */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-red-600">
+              <XCircle className="h-5 w-5" />
+              Rejection Reason
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-900">
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                {callLog.Reason_to_reject || 'No rejection reason recorded'}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-green-600">
+              <ThumbsUp className="h-5 w-5" />
+              Hired Reason
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-900">
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                {callLog.Reason_to_Hire || 'No hiring reason recorded'}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Qualifications */}
+      {callLog?.qualifications && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Qualifications
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="p-4 bg-secondary/50 rounded-lg border">
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">{callLog.qualifications}</p>
             </div>
           </CardContent>
         </Card>
