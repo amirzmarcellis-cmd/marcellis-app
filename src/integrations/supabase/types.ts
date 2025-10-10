@@ -308,6 +308,7 @@ export type Database = {
           linkedin_score: number | null
           linkedin_score_reason: string | null
           longlisted_at: string | null
+          nationality: string | null
           notes: string | null
           notes_updated_at: string | null
           notes_updated_by: string | null
@@ -351,6 +352,7 @@ export type Database = {
           linkedin_score?: number | null
           linkedin_score_reason?: string | null
           longlisted_at?: string | null
+          nationality?: string | null
           notes?: string | null
           notes_updated_at?: string | null
           notes_updated_by?: string | null
@@ -394,6 +396,7 @@ export type Database = {
           linkedin_score?: number | null
           linkedin_score_reason?: string | null
           longlisted_at?: string | null
+          nationality?: string | null
           notes?: string | null
           notes_updated_at?: string | null
           notes_updated_by?: string | null
