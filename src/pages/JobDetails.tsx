@@ -1180,7 +1180,7 @@ export default function JobDetails() {
     } = rejectCandidateData;
     try {
       // Find the candidate data from the candidates array
-      const candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
+      const candidate = candidates.find(c => c["Candidate_ID"] === candidateId || c["user_id"] === candidateId);
       if (!candidate) {
         toast({
           title: "Error",
