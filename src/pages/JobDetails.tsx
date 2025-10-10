@@ -1533,11 +1533,32 @@ export default function JobDetails() {
     setInterviewLink('');
     console.log('Dialog should now be open. interviewDialogOpen state set to true');
   };
-  const handleCVSubmitted = async (candidateId: string) => {
-    // Open hire reason dialog first, before updating status
-    const candidateContact = candidates.find(c => c["Candidate_ID"] === candidateId);
+  const handleCVSubmitted = async (candidateId: string, callid?: number) => {
+    // Find candidate by either user_id or Candidate_ID
+    const candidateContact = candidates.find(c => 
+      c["user_id"] === candidateId || c["Candidate_ID"] === candidateId
+    );
+    
     if (candidateContact) {
-      openHireDialog(id!, candidateId, candidateContact.callid);
+      // Use provided callid or fall back to candidate's callid
+      const finalCallId = callid || candidateContact.callid;
+      
+      if (!finalCallId) {
+        toast({
+          title: "Error",
+          description: "Cannot submit CV: No call record found for this candidate",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      openHireDialog(id!, candidateId, finalCallId);
+    } else {
+      toast({
+        title: "Error", 
+        description: "Candidate not found",
+        variant: "destructive"
+      });
     }
   };
   
@@ -2030,7 +2051,13 @@ export default function JobDetails() {
                 {mainCandidate["Contacted"] === "Submitted" ? <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-blue-500 text-blue-600 cursor-default" disabled>
                     <FileCheck className="w-3 h-3 mr-1" />
                     CV Submitted
-                  </Button> : <Button variant="outline" size="sm" onClick={() => handleCVSubmitted(candidateId)} className="flex-1 min-w-[100px] bg-transparent border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-500 dark:hover:text-green-300 transition-all duration-200">
+                  </Button> : <Button variant="outline" size="sm" onClick={() => {
+                    const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
+                    const latestContact = contactsWithCalls.length > 0 
+                      ? contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest)
+                      : null;
+                    handleCVSubmitted(candidateId, latestContact?.callid);
+                  }} className="flex-1 min-w-[100px] bg-transparent border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-500 dark:hover:text-green-300 transition-all duration-200">
                     <FileCheck className="w-3 h-3 mr-1" />
                     Submit CV
                   </Button>}
