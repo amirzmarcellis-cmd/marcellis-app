@@ -2176,17 +2176,19 @@ export default function JobDetails() {
     });
   };
 
-  // Filter candidates into budget categories with applied filters
-  const withinBudgetCandidates = filterShortListCandidates(shortListCandidates.filter(candidate => {
-    const expectedSalary = parseSalary(candidate["Salary Expectations"]);
-    return expectedSalary === 0 || expectedSalary <= budgetThreshold;
-  }));
-  const aboveBudgetCandidates = filterShortListCandidates(shortListCandidates.filter(candidate => {
-    const expectedSalary = parseSalary(candidate["Salary Expectations"]);
-    return expectedSalary > 0 && expectedSalary > budgetThreshold;
-  }));
-  
-  // Filter candidates with nationality mismatch
+  // First, separate candidates by nationality match
+  const candidatesMatchingNationality = shortListCandidates.filter(candidate => {
+    const candidateNationality = candidate["nationality"];
+    const preferredNationality = job?.prefered_nationality;
+    
+    // If no preferred nationality is set, include all candidates in budget sections
+    if (!preferredNationality || !candidateNationality) return true;
+    
+    // Include only if nationalities match (case-insensitive)
+    return candidateNationality.toLowerCase().trim() === preferredNationality.toLowerCase().trim();
+  });
+
+  // Filter candidates with nationality mismatch - these will NOT appear in budget sections
   const notInPreferredNationalityCandidates = filterShortListCandidates(shortListCandidates.filter(candidate => {
     const candidateNationality = candidate["nationality"];
     const preferredNationality = job?.prefered_nationality;
@@ -2195,6 +2197,16 @@ export default function JobDetails() {
     if (!candidateNationality || !preferredNationality) return false;
     
     return candidateNationality.toLowerCase().trim() !== preferredNationality.toLowerCase().trim();
+  }));
+
+  // Filter candidates into budget categories with applied filters (only from matching nationality)
+  const withinBudgetCandidates = filterShortListCandidates(candidatesMatchingNationality.filter(candidate => {
+    const expectedSalary = parseSalary(candidate["Salary Expectations"]);
+    return expectedSalary === 0 || expectedSalary <= budgetThreshold;
+  }));
+  const aboveBudgetCandidates = filterShortListCandidates(candidatesMatchingNationality.filter(candidate => {
+    const expectedSalary = parseSalary(candidate["Salary Expectations"]);
+    return expectedSalary > 0 && expectedSalary > budgetThreshold;
   }));
   return <div className={cn("space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden", isShaking && "animate-shake")}>
         {/* Header */}
