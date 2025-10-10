@@ -2185,6 +2185,17 @@ export default function JobDetails() {
     const expectedSalary = parseSalary(candidate["Salary Expectations"]);
     return expectedSalary > 0 && expectedSalary > budgetThreshold;
   }));
+  
+  // Filter candidates with nationality mismatch
+  const notInPreferredNationalityCandidates = filterShortListCandidates(shortListCandidates.filter(candidate => {
+    const candidateNationality = candidate["nationality"];
+    const preferredNationality = job?.prefered_nationality;
+    
+    // Only include if both nationalities exist and don't match (case-insensitive)
+    if (!candidateNationality || !preferredNationality) return false;
+    
+    return candidateNationality.toLowerCase().trim() !== preferredNationality.toLowerCase().trim();
+  }));
   return <div className={cn("space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden", isShaking && "animate-shake")}>
         {/* Header */}
         <div className="flex flex-col gap-4">
@@ -3288,6 +3299,93 @@ export default function JobDetails() {
                       return overallScoreB - overallScoreA; // Sort in descending order (highest Overall Score first)
                     });
                     return sortedAboveBudgetEntries.map(([candidateId, candidateContacts]: [string, any[]]) => {
+                      const mainCandidate = candidateContacts[0];
+                      return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
+                    });
+                  })()}
+                      </div>
+                    </ScrollArea>}
+                </CardContent>
+              </Card>
+
+              {/* Not in Preferred Nationality Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <AlertTriangle className="w-5 h-5 mr-2" />
+                    Not in Preferred Nationality ({notInPreferredNationalityCandidates.length} candidates)
+                  </CardTitle>
+                  <CardDescription>
+                    High-scoring candidates whose nationality doesn't match the preferred nationality: {job?.prefered_nationality || "N/A"}
+                  </CardDescription>
+                  
+                  {/* AI Short List Filters */}
+                  <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center">
+                    <div className="relative min-w-0 flex-1">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                      <Input placeholder="Name..." value={shortListNameFilter} onChange={e => setShortListNameFilter(e.target.value)} className="pl-10 h-9 text-sm" />
+                    </div>
+                    <Input placeholder="Email..." value={shortListEmailFilter} onChange={e => setShortListEmailFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
+                    <Input placeholder="Phone..." value={shortListPhoneFilter} onChange={e => setShortListPhoneFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
+                    <Input placeholder="User ID..." value={shortListUserIdFilter} onChange={e => setShortListUserIdFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
+                    <Input placeholder="Source..." value={shortListSourceFilter} onChange={e => setShortListSourceFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
+                    <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
+                      <SelectTrigger className="h-9 text-sm w-32">
+                        <SelectValue placeholder="Source" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Sources</SelectItem>
+                        <SelectItem value="Itris">Itris</SelectItem>
+                        <SelectItem value="Linkedin">LinkedIn</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
+                      <SelectTrigger className="h-9 text-sm w-32">
+                        <SelectValue placeholder="Score" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Scores</SelectItem>
+                        <SelectItem value="90+">90+</SelectItem>
+                        <SelectItem value="85+">85+</SelectItem>
+                        <SelectItem value="80+">80+</SelectItem>
+                        <SelectItem value="75+">75+</SelectItem>
+                        <SelectItem value="70+">70+</SelectItem>
+                        <SelectItem value="high">High (85+)</SelectItem>
+                        <SelectItem value="medium">Medium (70-84)</SelectItem>
+                        <SelectItem value="low">Low (&lt;70)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {notInPreferredNationalityCandidates.length === 0 ? <div className="text-center py-8">
+                      <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">No nationality mismatch candidates</h3>
+                      <p className="text-muted-foreground">Candidates not matching preferred nationality will appear here</p>
+                    </div> : <ScrollArea className="h-[600px] w-full">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
+                        {(() => {
+                    // Group nationality mismatch candidates by user_id and sort by Overall Score
+                    const groupedNationalityMismatch = notInPreferredNationalityCandidates.reduce((acc, candidate) => {
+                      const candidateId = candidate["user_id"] || candidate["Candidate_ID"];
+                      if (!acc[candidateId]) {
+                        acc[candidateId] = [];
+                      }
+                      acc[candidateId].push(candidate);
+                      return acc;
+                    }, {} as Record<string, any[]>);
+
+                    // Sort by Overall Score descending (highest first)
+                    const sortedNationalityMismatchEntries = Object.entries(groupedNationalityMismatch).sort(([, candidateContactsA], [, candidateContactsB]) => {
+                      const candidateA = candidateContactsA[0];
+                      const candidateB = candidateContactsB[0];
+
+                      // Use the calculateOverallScore function for consistent scoring
+                      const overallScoreA = calculateOverallScore(candidateA);
+                      const overallScoreB = calculateOverallScore(candidateB);
+                      return overallScoreB - overallScoreA; // Sort in descending order (highest Overall Score first)
+                    });
+                    return sortedNationalityMismatchEntries.map(([candidateId, candidateContacts]: [string, any[]]) => {
                       const mainCandidate = candidateContacts[0];
                       return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
                     });
