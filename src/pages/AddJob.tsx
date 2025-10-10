@@ -751,7 +751,7 @@ export default function AddJob() {
                     {(formData.nationalityToInclude || []).map((country) => (
                       <span
                         key={country}
-                        className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs bg-primary/10 text-primary border border-primary/20"
                       >
                         {country}
                         <button
@@ -761,7 +761,8 @@ export default function AddJob() {
                             const updated = currentInclude.filter((n) => n !== country);
                             handleInputChange("nationalityToInclude", updated);
                           }}
-                          className="ml-1 text-primary/60 hover:text-primary"
+                          className="ml-1 hover:bg-primary/20 rounded-full w-4 h-4 flex items-center justify-center text-primary font-bold transition-colors"
+                          aria-label={`Remove ${country}`}
                         >
                           ×
                         </button>
@@ -810,7 +811,7 @@ export default function AddJob() {
                     {(formData.nationalityToExclude || []).map((country) => (
                       <span
                         key={country}
-                        className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-destructive/10 text-destructive"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs bg-destructive/10 text-destructive border border-destructive/20"
                       >
                         {country}
                         <button
@@ -820,7 +821,8 @@ export default function AddJob() {
                             const updated = currentExclude.filter((n) => n !== country);
                             handleInputChange("nationalityToExclude", updated);
                           }}
-                          className="ml-1 text-destructive/60 hover:text-destructive"
+                          className="ml-1 hover:bg-destructive/20 rounded-full w-4 h-4 flex items-center justify-center text-destructive font-bold transition-colors"
+                          aria-label={`Remove ${country}`}
                         >
                           ×
                         </button>
@@ -869,7 +871,7 @@ export default function AddJob() {
                   {(formData.preferedNationality || []).map((country) => (
                     <span
                       key={country}
-                      className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-500/20 text-green-700 dark:text-green-300"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs bg-green-500/20 text-green-700 dark:text-green-300 border border-green-500/30"
                     >
                       {country}
                       <button
@@ -879,7 +881,8 @@ export default function AddJob() {
                           const updated = currentPrefered.filter((n) => n !== country);
                           handleInputChange("preferedNationality", updated);
                         }}
-                        className="ml-1 text-green-600/70 hover:text-green-700 dark:text-green-300/70 dark:hover:text-green-300"
+                        className="ml-1 hover:bg-green-500/30 rounded-full w-4 h-4 flex items-center justify-center text-green-700 dark:text-green-300 font-bold transition-colors"
+                        aria-label={`Remove ${country}`}
                       >
                         ×
                       </button>
