@@ -764,4 +764,3 @@ const JobGrid = memo(function JobGrid({
     </div>;
 });
 
-export { JobManagementPanel };
