@@ -710,7 +710,7 @@ export default function AddJob() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Countries to Include</Label>
+                <Label>Locations to include</Label>
                 <Select onValueChange={(value) => {
                   const currentInclude = formData.nationalityToInclude || [];
                   if (value === "European Countries") {
