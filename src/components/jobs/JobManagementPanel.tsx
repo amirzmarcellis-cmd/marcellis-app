@@ -602,9 +602,9 @@ const JobGrid = memo(function JobGrid({
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <CardTitle className="line-clamp-2 mb-2 font-semibold text-xl">
+                <h4 className="line-clamp-2 mb-2 font-semibold text-xl">
                   {job.job_title || "Untitled Position"}
-                </CardTitle>
+                </h4>
                 <div className="flex items-center space-x-2 mb-2">
                   {getStatusBadge(job.Processed)}
                   <Badge variant="outline" className="text-xs">
