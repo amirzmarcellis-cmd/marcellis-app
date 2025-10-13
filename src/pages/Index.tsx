@@ -628,7 +628,7 @@ export default function Index() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
         {/* Left Side - Job Control Panels - 30% width */}
         <div className="space-y-4 lg:col-span-1">
-          <h2 className="text-lg font-bold font-work text-cyan-300 mb-4 flex items-center">
+          <h2 className="text-lg font-bold text-cyan-300 mb-4 flex items-center">
             <Target className="h-5 w-5 mr-2" />
             Active Jobs Funnel
           </h2>
@@ -783,13 +783,13 @@ export default function Index() {
 
           {/* Action Center */}
           <Card className="bg-card border-border dark:bg-gradient-to-br dark:from-white/5 dark:via-white/3 dark:to-white/5 dark:backdrop-blur-lg dark:border-white/20 shadow-xl shadow-purple-500/20">
-            <CardHeader>
+            <CardHeader className="font-light">
               <CardTitle className="text-lg text-purple-300">My Next Moves</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-400/30 cursor-pointer hover:bg-purple-500/20 hover:border-purple-400/50 transition-all duration-300 hover:scale-[1.02]" onClick={() => navigate('/jobs')}>
-                  <h4 className="font-semibold font-work text-purple-300 mb-2">Candidates Needing Review</h4>
+                <div onClick={() => navigate('/jobs')} className="bg-purple-500/10 rounded-lg p-4 border border-purple-400/30 cursor-pointer hover:bg-purple-500/20 hover:border-purple-400/50 transition-all duration-300 hover:scale-[1.02] font-light">
+                  <h4 className="font-semibold text-purple-300 mb-2">Candidates Needing Review</h4>
                   <div className="text-2xl font-bold text-purple-400">{highScoreActiveCount || 0}</div>
                   <p className="text-sm text-purple-200">Score &gt; 74</p>
                 </div>
