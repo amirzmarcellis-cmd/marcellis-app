@@ -369,6 +369,8 @@ export function JobManagementPanel() {
       allJobs: applyFilters(jobs)
     };
   }, [jobs, selectedGroupFilter, selectedRecruiterFilter, dateRange]);
+  
+  return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -543,7 +545,8 @@ export function JobManagementPanel() {
       setIsDialogOpen(false);
       setSelectedJob(null);
     }} />
-    </div>;
+    </div>
+  );
 }
 interface JobGridProps {
   jobs: Job[];
