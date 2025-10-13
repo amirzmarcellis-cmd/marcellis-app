@@ -91,11 +91,11 @@ export function DashboardSidebar() {
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
-  return <Sidebar className="border-r border-border" collapsible={isMobile ? "offcanvas" : "icon"}>
-      <SidebarContent className="bg-sidebar-background">
+  return <Sidebar className="border-r border-border/50 bg-card/50 backdrop-blur-xl" collapsible={isMobile ? "offcanvas" : "icon"}>
+      <SidebarContent className="bg-transparent">
         {/* Header */}
-        <div className="py-6 px-0 border-b border-border">
-          <div className="space-y-4">
+        <div className="py-12 px-0 border-b border-border/50">
+          <div className="space-y-6">
             <div className="flex items-center justify-center">
               <div className={`${isMini ? 'w-full h-16' : 'w-full h-20'} flex items-center justify-center transition-all duration-200`}>
                 {(() => {
@@ -105,14 +105,14 @@ export function DashboardSidebar() {
               </div>
             </div>
             {!isMini && profile && (
-              <div className="px-3 py-2 bg-muted/50 rounded-lg mx-4">
+              <div className="px-3 py-3 bg-card/30 backdrop-blur-xl border border-border/50 rounded-2xl mx-4">
                 <div className="flex items-center gap-2">
                   <User className="w-4 h-4 text-primary" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">
+                    <p className="text-sm font-light text-foreground truncate">
                       {profile.name || 'User'}
                     </p>
-                    <p className="text-xs text-muted-foreground truncate">
+                    <p className="text-xs font-light text-muted-foreground truncate">
                       {profile.email}
                     </p>
                   </div>
@@ -126,11 +126,11 @@ export function DashboardSidebar() {
         </div>
 
         <SidebarGroup className="flex-1">
-          <SidebarGroupLabel className={isMini ? "sr-only" : ""}>
+          <SidebarGroupLabel className={isMini ? "sr-only" : "font-light text-muted-foreground"}>
             Navigation
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-1">
+            <SidebarMenu className="space-y-2">
               {navigationItems.filter(item => {
               // Filter out Analytics and Reports for recruiters
               if ((item.title === 'Analytics' || item.title === 'Reports') && !canAccessAnalytics) {
@@ -140,12 +140,12 @@ export function DashboardSidebar() {
             }).map(item => <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <Link to={item.url} className={`
-                        flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200
-                          ${isActive(item.url) ? "bg-muted text-foreground shadow-medium dark:bg-primary dark:text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"}
+                        flex items-center space-x-3 px-4 py-3 rounded-full transition-all duration-300 font-light
+                          ${isActive(item.url) ? "bg-card/80 backdrop-blur-xl text-foreground border border-border/50" : "text-muted-foreground hover:text-foreground hover:bg-card/30 hover:backdrop-blur-xl"}
                         ${isMini ? "justify-center" : ""}
                       `}>
                       <item.icon className={`w-5 h-5 ${isMini ? "" : "mr-3"}`} />
-                      {!isMini && <span className="font-medium">{item.title}</span>}
+                      {!isMini && <span>{item.title}</span>}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>)}
@@ -154,20 +154,20 @@ export function DashboardSidebar() {
         </SidebarGroup>
 
         {/* Status indicator and sign out */}
-        <div className="p-4 border-t border-border space-y-3">
+        <div className="p-4 border-t border-border/50 space-y-3">
           {!isMini && <>
-              <div className="flex items-center space-x-2 text-sm">
+              <div className="flex items-center space-x-2 text-sm font-light">
                 <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
                 <span className="text-muted-foreground">System Online</span>
               </div>
               
               {/* Theme Toggle */}
-              <Button onClick={toggleTheme} variant="ghost" className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-muted/50">
+              <Button onClick={toggleTheme} variant="ghost" className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-card/30 font-light rounded-full">
                 {theme === 'dark' ? <Sun className="w-4 h-4 mr-3" /> : <Moon className="w-4 h-4 mr-3" />}
                 {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
               </Button>
               
-              <Button onClick={signOut} variant="ghost" className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-muted/50">
+              <Button onClick={signOut} variant="ghost" className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-card/30 font-light rounded-full">
                 <LogOut className="w-4 h-4 mr-3" />
                 Sign Out
               </Button>
@@ -176,11 +176,11 @@ export function DashboardSidebar() {
               <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
               
               {/* Theme Toggle - Collapsed */}
-              <Button onClick={toggleTheme} variant="ghost" size="sm" className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted/50">
+              <Button onClick={toggleTheme} variant="ghost" size="sm" className="p-2 text-muted-foreground hover:text-foreground hover:bg-card/30 rounded-full">
                 {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </Button>
               
-              <Button onClick={signOut} variant="ghost" size="sm" className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted/50">
+              <Button onClick={signOut} variant="ghost" size="sm" className="p-2 text-muted-foreground hover:text-foreground hover:bg-card/30 rounded-full">
                 <LogOut className="w-4 h-4" />
               </Button>
             </div>}

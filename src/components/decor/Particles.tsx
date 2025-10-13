@@ -6,24 +6,24 @@ interface ParticlesProps {
   className?: string
 }
 
-export function Particles({ count = 48, className }: ParticlesProps) {
+export function Particles({ count = 24, className }: ParticlesProps) {
   const particles = useMemo(
     () =>
       Array.from({ length: count }).map((_, i) => ({
         left: Math.random() * 100,
         top: Math.random() * 100,
         delay: Math.floor(Math.random() * 2000),
-        size: Math.random() * 2 + 1,
+        size: Math.random() * 1.5 + 0.5,
       })),
     [count]
   )
 
   return (
-    <div className={cn("pointer-events-none absolute inset-0", className)} aria-hidden="true">
+    <div className={cn("pointer-events-none absolute inset-0 opacity-10", className)} aria-hidden="true">
       {particles.map((p, i) => (
         <span
           key={i}
-          className="absolute rounded-full bg-primary/40 animate-pulse"
+          className="absolute rounded-full bg-primary/20 animate-pulse"
           style={{
             left: `${p.left}%`,
             top: `${p.top}%`,

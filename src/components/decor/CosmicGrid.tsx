@@ -6,7 +6,7 @@ interface CosmicGridProps { className?: string }
 export function CosmicGrid({ className }: CosmicGridProps) {
   return (
     <div
-      className={cn("cosmic-grid cosmic-grid--animated pointer-events-none", className)}
+      className={cn("cosmic-grid pointer-events-none opacity-10", className)}
       aria-hidden="true"
     />
   )

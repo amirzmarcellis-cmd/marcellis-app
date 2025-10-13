@@ -12,12 +12,12 @@ export function HeroHeader({
   actions,
   className
 }: HeroHeaderProps) {
-  return <header className={cn("mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between", className)}>
+  return <header className={cn("mb-12 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between", className)}>
       <div>
-        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight bg-gradient-primary bg-clip-text text-transparent">
+        <h1 className="text-5xl sm:text-6xl font-light tracking-tight text-foreground">
           {title}
         </h1>
-        {subtitle && <p className="text-sm text-muted-foreground mt-1 font-bold">{subtitle}</p>}
+        {subtitle && <p className="text-lg font-light text-muted-foreground mt-4">{subtitle}</p>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </header>;

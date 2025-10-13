@@ -53,73 +53,76 @@
   }
 
   .dark {
-    /* Dark theme - Mission Control */
-    --background: 220 25% 8%;
-    --foreground: 210 40% 98%;
-    --muted: 217 32% 15%;
-    --muted-foreground: 215 20% 65%;
-    --popover: 220 25% 8%;
-    --popover-foreground: 210 40% 98%;
-    --border: 217 32% 20%;
-    --input: 217 32% 15%;
-    --card: 220 25% 10%;
-    --card-foreground: 210 40% 98%;
+    /* Cinematic Dark Theme - Minimalist */
+    --background: 0 0% 6%;
+    --foreground: 0 0% 95%;
+    --muted: 0 0% 60%;
+    --muted-foreground: 0 0% 60%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 95%;
+    --border: 0 0% 18%;
+    --input: 0 0% 8%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 95%;
     
-    /* Mission control primary - Cyan */
-    --primary: 180 100% 50%;
-    --primary-foreground: 220 25% 8%;
-    --primary-glow: 180 100% 70%;
+    /* Muted blue-gray primary */
+    --primary: 200 15% 65%;
+    --primary-foreground: 0 0% 6%;
+    --primary-glow: 200 15% 75%;
     
     /* Secondary */
-    --secondary: 217 32% 15%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 0 0% 95%;
     
-    /* Accent colors for mission control */
-    --accent: 180 100% 50%;
-    --accent-foreground: 220 25% 8%;
-    --cyan: 180 100% 50%;
-    --blue: 200 98% 39%;
-    --purple: 270 95% 60%;
-    --orange: 25 95% 53%;
-    --green: 142 76% 36%;
+    /* Subtle warm accent */
+    --accent: 40 20% 55%;
+    --accent-foreground: 0 0% 6%;
     
-    /* Status colors */
-    --status-active: 142 76% 36%;
-    --status-pending: 43 96% 56%;
-    --status-inactive: 0 72% 51%;
-    --status-success: 142 76% 36%;
-    --success: 142 76% 36%;
-    --success-foreground: 355.7 100% 97.3%;
-    --warning: 43 96% 56%;
-    --warning-foreground: 220 25% 8%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 210 40% 98%;
+    /* Neutralized mission control colors */
+    --cyan: 200 15% 65%;
+    --blue: 200 15% 65%;
+    --purple: 200 15% 65%;
+    --orange: 40 20% 55%;
+    --green: 142 40% 45%;
     
-    --ring: 180 100% 50%;
+    /* Muted status colors */
+    --status-active: 142 40% 45%;
+    --status-pending: 40 20% 55%;
+    --status-inactive: 0 40% 50%;
+    --status-success: 142 40% 45%;
+    --success: 142 40% 45%;
+    --success-foreground: 0 0% 95%;
+    --warning: 40 20% 55%;
+    --warning-foreground: 0 0% 6%;
+    --destructive: 0 40% 50%;
+    --destructive-foreground: 0 0% 95%;
+    
+    --ring: 200 15% 65%;
 
-    /* Mission control gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(180 100% 50%), hsl(200 98% 39%));
-    --gradient-secondary: linear-gradient(135deg, hsl(217 32% 15%), hsl(220 25% 12%));
-    --gradient-accent: linear-gradient(135deg, hsl(180 100% 50%), hsl(270 95% 60%));
-    --gradient-card: linear-gradient(135deg, hsl(220 25% 10% / 0.9), hsl(217 32% 15% / 0.6));
-    --gradient-hero: linear-gradient(135deg, hsl(220 25% 8%), hsl(217 32% 12%));
-    --gradient-panel: linear-gradient(135deg, hsl(220 25% 10% / 0.95), hsl(217 32% 15% / 0.8));
+    /* Subtle gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 10%));
+    --gradient-secondary: linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 9%));
+    --gradient-accent: linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 10%));
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 8% / 0.3), hsl(0 0% 10% / 0.2));
+    --gradient-hero: linear-gradient(to bottom, hsl(0 0% 6%), hsl(0 0% 8% / 0.1));
+    --gradient-panel: linear-gradient(135deg, hsl(0 0% 8% / 0.95), hsl(0 0% 10% / 0.8));
+    --gradient-glow: radial-gradient(circle at center, hsl(200 15% 65% / 0.1), transparent 70%);
     
     /* Glassmorphism effects */
-    --glass-primary: hsla(180, 100%, 50%, 0.15);
-    --glass-secondary: hsla(217, 32%, 15%, 0.9);
-    --glass-border: hsla(210, 40%, 98%, 0.15);
-    --glass-bg: hsla(220, 25%, 8%, 0.95);
+    --glass-primary: hsla(200, 15%, 65%, 0.1);
+    --glass-secondary: hsla(0, 0%, 8%, 0.95);
+    --glass-border: hsla(0, 0%, 95%, 0.1);
+    --glass-bg: hsla(0, 0%, 6%, 0.95);
     
-    /* Enhanced shadows with glow */
-    --shadow-soft: 0 2px 8px -2px hsl(220 25% 4% / 0.3);
-    --shadow-medium: 0 8px 16px -4px hsl(220 25% 4% / 0.4);
-    --shadow-strong: 0 16px 32px -8px hsl(220 25% 4% / 0.5);
-    --shadow-glow: 0 0 40px hsl(180 100% 50% / 0.25);
-    --shadow-glow-blue: 0 0 32px hsl(200 98% 39% / 0.3);
-    --shadow-glow-purple: 0 0 28px hsl(270 95% 60% / 0.25);
-    --shadow-card: 0 8px 24px hsl(220 25% 4% / 0.4);
-    --shadow-elevated: 0 12px 40px hsl(220 25% 4% / 0.5);
+    /* Subtle shadows */
+    --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.2);
+    --shadow-medium: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --shadow-strong: 0 16px 48px rgba(0, 0, 0, 0.4);
+    --shadow-glow: 0 0 60px hsl(200 15% 65% / 0.15);
+    --shadow-glow-blue: 0 0 60px hsl(200 15% 65% / 0.15);
+    --shadow-glow-purple: 0 0 60px hsl(200 15% 65% / 0.15);
+    --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.4);
+    --shadow-elevated: 0 30px 80px rgba(0, 0, 0, 0.5);
     
     /* 3D AI Longlist Button - Sleek Modern Design */
     --ai-button-gradient: linear-gradient(145deg, hsl(220 8% 88%), hsl(220 6% 92%), hsl(220 10% 85%));
@@ -214,169 +217,169 @@
     @apply transition-all duration-200 hover:shadow-glow-blue active:scale-95;
   }
   
-  /* AI Longlist 3D Button - Sleek Modern Circular - Amber */
+    /* AI Longlist 3D Button - Muted Warm */
   .ai-longlist-button {
     @apply relative inline-flex flex-col items-center justify-center;
-    @apply rounded-full font-bold text-sm;
+    @apply rounded-full font-light text-sm;
     @apply text-white border-4;
     @apply hover:scale-110 active:scale-95;
     @apply focus:outline-none focus:ring-4;
     @apply cursor-pointer select-none;
     width: 120px;
     height: 120px;
-    background: linear-gradient(145deg, hsl(45 96% 53%), hsl(43 96% 56%), hsl(38 92% 50%));
-    border-color: hsl(45 90% 45% / 0.8);
-    box-shadow: 0 8px 24px -6px hsl(45 90% 45% / 0.3), 
-                0 4px 12px -3px hsl(43 96% 56% / 0.25),
+    background: linear-gradient(145deg, hsl(40 20% 55%), hsl(40 20% 58%), hsl(40 18% 50%));
+    border-color: hsl(40 18% 45% / 0.6);
+    box-shadow: 0 8px 24px -6px hsl(40 18% 35% / 0.2), 
+                0 4px 12px -3px hsl(40 20% 45% / 0.15),
                 inset 0 2px 8px rgba(255, 255, 255, 0.3),
                 inset 0 -2px 8px rgba(0, 0, 0, 0.1),
                 0 0 0 6px hsl(var(--background)), 
-                0 0 0 10px hsl(45 90% 45% / 0.4),
-                0 0 0 14px hsl(45 90% 45% / 0.2);
-    outline: 3px solid hsl(45 90% 45% / 0.25);
+                0 0 0 10px hsl(40 18% 45% / 0.3),
+                0 0 0 14px hsl(40 18% 45% / 0.15);
+    outline: 3px solid hsl(40 18% 45% / 0.2);
     outline-offset: 6px;
     transform-style: preserve-3d;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .ai-longlist-button:hover {
-    border-color: hsl(45 96% 50% / 0.9);
-    box-shadow: 0 12px 32px -6px hsl(45 90% 45% / 0.4), 
-                0 6px 16px -3px hsl(43 96% 56% / 0.35),
+    border-color: hsl(40 20% 50% / 0.7);
+    box-shadow: 0 12px 32px -6px hsl(40 18% 35% / 0.3), 
+                0 6px 16px -3px hsl(40 20% 45% / 0.25),
                 inset 0 2px 12px rgba(255, 255, 255, 0.4),
                 inset 0 -2px 12px rgba(0, 0, 0, 0.15),
                 0 0 0 6px hsl(var(--background)), 
-                0 0 0 12px hsl(45 90% 45% / 0.6),
-                0 0 0 18px hsl(45 90% 45% / 0.4),
-                0 0 0 24px hsl(45 90% 45% / 0.2);
-    outline: 5px solid hsl(45 90% 45% / 0.5);
+                0 0 0 12px hsl(40 18% 45% / 0.4),
+                0 0 0 18px hsl(40 18% 45% / 0.3),
+                0 0 0 24px hsl(40 18% 45% / 0.15);
+    outline: 5px solid hsl(40 18% 45% / 0.4);
     outline-offset: 10px;
     transform: translateY(-3px) scale(1.15);
-    background: linear-gradient(145deg, hsl(43 96% 60%), hsl(45 96% 58%), hsl(38 92% 55%));
+    background: linear-gradient(145deg, hsl(40 20% 60%), hsl(40 20% 58%), hsl(40 18% 55%));
   }
   
   .ai-longlist-button:active {
-    border-color: hsl(45 90% 40% / 0.95);
+    border-color: hsl(40 18% 40% / 0.8);
     transform: translateY(2px) scale(0.98);
-    box-shadow: 0 4px 16px -6px hsl(45 90% 45% / 0.4), 
-                0 2px 8px -3px hsl(43 96% 56% / 0.3),
+    box-shadow: 0 4px 16px -6px hsl(40 18% 35% / 0.3), 
+                0 2px 8px -3px hsl(40 20% 45% / 0.2),
                 inset 0 1px 6px rgba(255, 255, 255, 0.2),
                 inset 0 -1px 6px rgba(0, 0, 0, 0.2),
                 0 0 0 6px hsl(var(--background)), 
-                0 0 0 10px hsl(45 90% 45% / 0.3);
-    outline: 2px solid hsl(45 90% 45% / 0.3);
+                0 0 0 10px hsl(40 18% 45% / 0.25);
+    outline: 2px solid hsl(40 18% 45% / 0.25);
     outline-offset: 4px;
-    background: linear-gradient(145deg, hsl(45 90% 48%), hsl(43 96% 50%), hsl(38 92% 45%));
+    background: linear-gradient(145deg, hsl(40 18% 48%), hsl(40 20% 50%), hsl(40 16% 45%));
   }
   
-  /* Call Button - Green */
+  /* Call Button - Muted Green */
   .call-button {
     @apply relative inline-flex flex-col items-center justify-center;
-    @apply rounded-full font-bold text-sm;
+    @apply rounded-full font-light text-sm;
     @apply text-white border-4;
     @apply hover:scale-110 active:scale-95;
     @apply focus:outline-none focus:ring-4;
     @apply cursor-pointer select-none;
     width: 120px;
     height: 120px;
-    background: linear-gradient(145deg, hsl(142 76% 36%), hsl(142 71% 45%), hsl(142 69% 58%));
-    border-color: hsl(142 76% 30% / 0.8);
-    box-shadow: 0 8px 24px -6px hsl(142 76% 30% / 0.3), 
-                0 4px 12px -3px hsl(142 71% 45% / 0.25),
+    background: linear-gradient(145deg, hsl(142 40% 45%), hsl(142 40% 48%), hsl(142 38% 42%));
+    border-color: hsl(142 40% 35% / 0.6);
+    box-shadow: 0 8px 24px -6px hsl(142 40% 30% / 0.2), 
+                0 4px 12px -3px hsl(142 40% 40% / 0.15),
                 inset 0 2px 8px rgba(255, 255, 255, 0.3),
                 inset 0 -2px 8px rgba(0, 0, 0, 0.1),
                 0 0 0 6px hsl(var(--background)), 
-                0 0 0 10px hsl(142 76% 36% / 0.4),
-                0 0 0 14px hsl(142 76% 36% / 0.2);
-    outline: 3px solid hsl(142 76% 36% / 0.25);
+                0 0 0 10px hsl(142 40% 40% / 0.3),
+                0 0 0 14px hsl(142 40% 40% / 0.15);
+    outline: 3px solid hsl(142 40% 40% / 0.2);
     outline-offset: 6px;
     transform-style: preserve-3d;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .call-button:hover {
-    border-color: hsl(142 76% 35% / 0.9);
-    box-shadow: 0 12px 32px -6px hsl(142 76% 30% / 0.4), 
-                0 6px 16px -3px hsl(142 71% 45% / 0.35),
+    border-color: hsl(142 40% 40% / 0.7);
+    box-shadow: 0 12px 32px -6px hsl(142 40% 30% / 0.3), 
+                0 6px 16px -3px hsl(142 40% 40% / 0.25),
                 inset 0 2px 12px rgba(255, 255, 255, 0.4),
                 inset 0 -2px 12px rgba(0, 0, 0, 0.15),
                 0 0 0 6px hsl(var(--background)), 
-                0 0 0 12px hsl(142 76% 36% / 0.6),
-                0 0 0 18px hsl(142 76% 36% / 0.4),
-                0 0 0 24px hsl(142 76% 36% / 0.2);
-    outline: 5px solid hsl(142 76% 36% / 0.5);
+                0 0 0 12px hsl(142 40% 40% / 0.4),
+                0 0 0 18px hsl(142 40% 40% / 0.3),
+                0 0 0 24px hsl(142 40% 40% / 0.15);
+    outline: 5px solid hsl(142 40% 40% / 0.4);
     outline-offset: 10px;
     transform: translateY(-3px) scale(1.15);
-    background: linear-gradient(145deg, hsl(142 71% 45%), hsl(142 76% 40%), hsl(142 69% 58%));
+    background: linear-gradient(145deg, hsl(142 40% 50%), hsl(142 40% 48%), hsl(142 38% 45%));
   }
   
   .call-button:active {
-    border-color: hsl(142 76% 28% / 0.95);
+    border-color: hsl(142 40% 32% / 0.8);
     transform: translateY(2px) scale(0.98);
-    box-shadow: 0 4px 16px -6px hsl(142 76% 30% / 0.4), 
-                0 2px 8px -3px hsl(142 71% 45% / 0.3),
+    box-shadow: 0 4px 16px -6px hsl(142 40% 30% / 0.3), 
+                0 2px 8px -3px hsl(142 40% 40% / 0.2),
                 inset 0 1px 6px rgba(255, 255, 255, 0.2),
                 inset 0 -1px 6px rgba(0, 0, 0, 0.2),
                 0 0 0 6px hsl(var(--background)), 
-                0 0 0 10px hsl(142 76% 36% / 0.3);
-    outline: 2px solid hsl(142 76% 36% / 0.3);
+                0 0 0 10px hsl(142 40% 40% / 0.25);
+    outline: 2px solid hsl(142 40% 40% / 0.25);
     outline-offset: 4px;
-    background: linear-gradient(145deg, hsl(142 76% 32%), hsl(142 71% 40%), hsl(142 69% 50%));
+    background: linear-gradient(145deg, hsl(142 40% 40%), hsl(142 40% 42%), hsl(142 38% 38%));
   }
   
-  /* Stop Button - Red */
+  /* Stop Button - Muted Red */
   .stop-button {
     @apply relative inline-flex flex-col items-center justify-center;
-    @apply rounded-full font-bold text-sm;
+    @apply rounded-full font-light text-sm;
     @apply text-white border-4;
     @apply hover:scale-110 active:scale-95;
     @apply focus:outline-none focus:ring-4;
     @apply cursor-pointer select-none;
     width: 120px;
     height: 120px;
-    background: linear-gradient(145deg, hsl(0 72% 51%), hsl(0 84% 60%), hsl(0 65% 45%));
-    border-color: hsl(0 70% 45% / 0.8);
-    box-shadow: 0 8px 24px -6px hsl(0 70% 50% / 0.3), 
-                0 4px 12px -3px hsl(0 75% 45% / 0.25),
+    background: linear-gradient(145deg, hsl(0 40% 50%), hsl(0 40% 53%), hsl(0 38% 47%));
+    border-color: hsl(0 40% 40% / 0.6);
+    box-shadow: 0 8px 24px -6px hsl(0 40% 40% / 0.2), 
+                0 4px 12px -3px hsl(0 40% 45% / 0.15),
                 inset 0 2px 8px rgba(255, 255, 255, 0.3),
                 inset 0 -2px 8px rgba(0, 0, 0, 0.1),
                 0 0 0 6px hsl(var(--background)), 
-                0 0 0 10px hsl(0 70% 60% / 0.4),
-                0 0 0 14px hsl(0 70% 60% / 0.2);
-    outline: 3px solid hsl(0 70% 60% / 0.25);
+                0 0 0 10px hsl(0 40% 45% / 0.3),
+                0 0 0 14px hsl(0 40% 45% / 0.15);
+    outline: 3px solid hsl(0 40% 45% / 0.2);
     outline-offset: 6px;
     transform-style: preserve-3d;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .stop-button:hover {
-    border-color: hsl(0 75% 50% / 0.9);
-    box-shadow: 0 12px 32px -6px hsl(0 70% 50% / 0.4), 
-                0 6px 16px -3px hsl(0 75% 45% / 0.35),
+    border-color: hsl(0 40% 45% / 0.7);
+    box-shadow: 0 12px 32px -6px hsl(0 40% 40% / 0.3), 
+                0 6px 16px -3px hsl(0 40% 45% / 0.25),
                 inset 0 2px 12px rgba(255, 255, 255, 0.4),
                 inset 0 -2px 12px rgba(0, 0, 0, 0.15),
                 0 0 0 6px hsl(var(--background)), 
-                0 0 0 12px hsl(0 70% 60% / 0.6),
-                0 0 0 18px hsl(0 70% 60% / 0.4),
-                0 0 0 24px hsl(0 70% 60% / 0.2);
-    outline: 5px solid hsl(0 70% 60% / 0.5);
+                0 0 0 12px hsl(0 40% 45% / 0.4),
+                0 0 0 18px hsl(0 40% 45% / 0.3),
+                0 0 0 24px hsl(0 40% 45% / 0.15);
+    outline: 5px solid hsl(0 40% 45% / 0.4);
     outline-offset: 10px;
     transform: translateY(-3px) scale(1.15);
-    background: linear-gradient(145deg, hsl(0 85% 70%), hsl(0 80% 75%), hsl(0 90% 65%));
+    background: linear-gradient(145deg, hsl(0 40% 55%), hsl(0 40% 53%), hsl(0 38% 50%));
   }
   
   .stop-button:active {
-    border-color: hsl(0 80% 45% / 0.95);
+    border-color: hsl(0 40% 38% / 0.8);
     transform: translateY(2px) scale(0.98);
-    box-shadow: 0 4px 16px -6px hsl(0 70% 50% / 0.4), 
-                0 2px 8px -3px hsl(0 75% 45% / 0.3),
+    box-shadow: 0 4px 16px -6px hsl(0 40% 40% / 0.3), 
+                0 2px 8px -3px hsl(0 40% 45% / 0.2),
                 inset 0 1px 6px rgba(255, 255, 255, 0.2),
                 inset 0 -1px 6px rgba(0, 0, 0, 0.2),
                 0 0 0 6px hsl(var(--background)), 
-                0 0 0 10px hsl(0 70% 60% / 0.3);
-    outline: 2px solid hsl(0 70% 60% / 0.3);
+                0 0 0 10px hsl(0 40% 45% / 0.25);
+    outline: 2px solid hsl(0 40% 45% / 0.25);
     outline-offset: 4px;
-    background: linear-gradient(145deg, hsl(0 75% 60%), hsl(0 70% 65%), hsl(0 80% 55%));
+    background: linear-gradient(145deg, hsl(0 40% 45%), hsl(0 40% 48%), hsl(0 38% 43%));
   }
   
   .ai-longlist-button:disabled {
@@ -386,9 +389,9 @@
   }
   
   .ai-longlist-text {
-    @apply relative z-10 font-bold text-xs tracking-wide drop-shadow-sm mt-1;
-    color: hsl(220 15% 15%);
-    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5), 0 1px 2px rgba(0, 0, 0, 0.2);
+    @apply relative z-10 font-light text-xs tracking-wide drop-shadow-sm mt-1;
+    color: hsl(0 0% 95%);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
     letter-spacing: 0.5px;
     line-height: 1.1;
   }

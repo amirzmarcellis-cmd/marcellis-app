@@ -29,17 +29,17 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   }
   return (
     <SidebarProvider defaultOpen={!isMobile}>
-      <div className="min-h-screen flex w-full bg-background overflow-x-auto">
+      <div className="min-h-screen flex w-full bg-gradient-hero overflow-x-auto">
         <DashboardSidebar />
         <SidebarInset className="flex-1 relative">
           <MissionBackground>
             {/* Header */}
-            <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-              <div className="flex h-16 items-center gap-4 px-4 sm:px-6">
-                <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
+            <header className="sticky top-0 z-40 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl">
+              <div className="flex h-16 items-center gap-4 px-6">
+                <SidebarTrigger className="text-muted-foreground hover:text-foreground transition-colors" />
                 <div className="flex-1" />
                 <div className="flex items-center space-x-4">
-                  <div className="hidden sm:flex items-center space-x-2 text-sm text-muted-foreground">
+                  <div className="hidden sm:flex items-center space-x-2 text-sm font-light text-muted-foreground">
                     <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
                     <span>Live Dashboard</span>
                   </div>
@@ -48,7 +48,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </header>
 
             {/* Main Content */}
-            <main className="flex-1 p-4 sm:p-6">
+            <main className="flex-1 p-8 sm:p-12">
               {children}
             </main>
           </MissionBackground>

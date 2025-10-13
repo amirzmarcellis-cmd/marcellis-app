@@ -8,7 +8,7 @@ export function GlassCard({ className, children, ...props }: GlassCardProps) {
   return (
     <Card
       className={cn(
-        "relative overflow-hidden border border-border/50 bg-gradient-card backdrop-blur-lg shadow-card transition-transform duration-300 will-change-transform hover:shadow-medium hover:scale-[1.02]",
+        "relative overflow-hidden border border-border/50 bg-card/30 backdrop-blur-xl shadow-card transition-all duration-500 will-change-transform hover:shadow-elevated hover:scale-[1.01] hover:border-primary/30 rounded-2xl",
         className
       )}
       {...props}

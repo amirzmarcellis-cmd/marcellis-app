@@ -9,12 +9,11 @@ interface MissionBackgroundProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function MissionBackground({ className, children, ...props }: MissionBackgroundProps) {
   return (
-    <div className={cn("relative min-h-screen bg-background text-foreground overflow-hidden", className)} {...props}>
-      {/* Cinematic background layers */}
+    <div className={cn("relative min-h-screen bg-gradient-hero text-foreground overflow-hidden", className)} {...props}>
+      {/* Subtle background layers */}
       <AuroraBackground />
       <CosmicGrid />
-      <Particles />
-      <SpotlightCursor />
+      <Particles count={16} />
 
       {/* Foreground content */}
       <div className="relative z-20">{children}</div>
