@@ -3520,7 +3520,7 @@ export default function JobDetails() {
                                       className="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
                                     />
                                     <div className="min-w-0 flex-1">
-                                      <h4 className="font-semibold text-sm md:text-base truncate">
+                                      <h4 className="font-semibold text-sm md:text-base font-work truncate">
                                         {mainCandidate["Candidate Name"] &&
                                         !/undefined/i.test(String(mainCandidate["Candidate Name"]))
                                           ? mainCandidate["Candidate Name"]
@@ -3534,7 +3534,7 @@ export default function JobDetails() {
                                           mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
                                           mainCandidate["Contacted"]?.toLowerCase() === "tasked") &&
                                           mainCandidate["lastcalltime"] && (
-                                            <div className="text-xs text-muted-foreground flex items-center">
+                                            <div className="text-xs font-work text-muted-foreground flex items-center">
                                               <Clock className="w-3 h-3 mr-1" />
                                               {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
                                               <span className="ml-2">
@@ -3553,11 +3553,11 @@ export default function JobDetails() {
                                           mainCandidate["Contacted"]?.toLowerCase() === "tasked") &&
                                           mainCandidate["qualifications"] && (
                                             <div className="mt-2 p-2 bg-muted/30 rounded-sm border-l-2 border-primary/30">
-                                              <div className="text-xs font-medium text-foreground mb-1 flex items-center">
+                                              <div className="text-xs font-work font-medium text-foreground mb-1 flex items-center">
                                                 <FileText className="w-3 h-3 mr-1" />
                                                 Qualifications
                                               </div>
-                                              <p className="text-xs text-muted-foreground line-clamp-3">
+                                              <p className="text-xs font-work text-muted-foreground line-clamp-3">
                                                 {mainCandidate["qualifications"]}
                                               </p>
                                             </div>
@@ -3578,7 +3578,7 @@ export default function JobDetails() {
                                   </Button>
                                 </div>
 
-                                <div className="space-y-2 text-xs md:text-sm">
+                                <div className="space-y-2 text-xs md:text-sm font-work">
                                   {mainCandidate["Candidate Email"] && (
                                     <div className="flex items-center text-muted-foreground min-w-0">
                                       <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
@@ -3610,7 +3610,7 @@ export default function JobDetails() {
 
                                 {/* CV Score and Reason Section */}
                                 <div className="space-y-2 pt-2 border-t">
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-work">
                                     <div className="space-y-1">
                                       {
                                         <div className="flex items-center justify-between">
@@ -3659,16 +3659,16 @@ export default function JobDetails() {
                                   mainCandidate["Source"].toLowerCase().includes("linkedin") &&
                                   mainCandidate["linkedin_score_reason"] ? (
                                     <div className="pt-1">
-                                      <span className="text-muted-foreground text-xs">Reason:</span>
-                                      <p className="text-xs text-muted-foreground mt-1 line-clamp-3">
+                                      <span className="text-muted-foreground text-xs font-work">Reason:</span>
+                                      <p className="text-xs font-work text-muted-foreground mt-1 line-clamp-3">
                                         {mainCandidate["linkedin_score_reason"]}
                                       </p>
                                     </div>
                                   ) : (
                                     mainCandidate["cv_score_reason"] && (
                                       <div className="pt-1">
-                                        <span className="text-muted-foreground text-xs">CV Reason:</span>
-                                        <p className="text-xs text-muted-foreground mt-1 line-clamp-3">
+                                        <span className="text-muted-foreground text-xs font-work">CV Reason:</span>
+                                        <p className="text-xs font-work text-muted-foreground mt-1 line-clamp-3">
                                           {mainCandidate["cv_score_reason"]}
                                         </p>
                                       </div>
