@@ -25,7 +25,6 @@ import { HeroHeader } from '@/components/dashboard/HeroHeader';
 import { BentoKpis } from '@/components/dashboard/BentoKpis';
 import { TiltCard } from '@/components/effects/TiltCard';
 import { ActivityTicker } from '@/components/dashboard/ActivityTicker';
-
 interface DashboardData {
   totalCandidates: number;
   totalJobs: number;
@@ -36,7 +35,6 @@ interface DashboardData {
   recentCandidates: any[];
   activeJobs: any[];
 }
-
 interface Interview {
   intid: string;
   candidate_id: string;
@@ -53,8 +51,16 @@ interface Interview {
   updated_at: string;
 }
 export default function Index() {
-  const { profile, loading: profileLoading } = useProfile();
-  const { isAdmin, isManager, isTeamLeader, loading: rolesLoading } = useUserRole();
+  const {
+    profile,
+    loading: profileLoading
+  } = useProfile();
+  const {
+    isAdmin,
+    isManager,
+    isTeamLeader,
+    loading: rolesLoading
+  } = useUserRole();
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -66,12 +72,25 @@ export default function Index() {
   const [jobStats, setJobStats] = useState<Record<string, any>>({});
   const [highScoreActiveCount, setHighScoreActiveCount] = useState(0);
   const [interviewDialogOpen, setInterviewDialogOpen] = useState(false);
-  const [selectedCandidate, setSelectedCandidate] = useState<{candidateId: string, jobId: string, callid: number, intid?: string} | null>(null);
-  const [interviewSlots, setInterviewSlots] = useState<{date: Date | undefined, time: string}[]>([
-    { date: undefined, time: '' },
-    { date: undefined, time: '' },
-    { date: undefined, time: '' }
-  ]);
+  const [selectedCandidate, setSelectedCandidate] = useState<{
+    candidateId: string;
+    jobId: string;
+    callid: number;
+    intid?: string;
+  } | null>(null);
+  const [interviewSlots, setInterviewSlots] = useState<{
+    date: Date | undefined;
+    time: string;
+  }[]>([{
+    date: undefined,
+    time: ''
+  }, {
+    date: undefined,
+    time: ''
+  }, {
+    date: undefined,
+    time: ''
+  }]);
   const [interviewType, setInterviewType] = useState<string>('Phone');
   const [interviewLink, setInterviewLink] = useState<string>('');
   const [interviews, setInterviews] = useState<Interview[]>([]);
@@ -90,14 +109,13 @@ export default function Index() {
     // Fetch initial data with timeout fallback
     fetchDashboardData();
     fetchInterviews();
-    
+
     // Fallback timeout to prevent infinite loading
     const timeout = setTimeout(() => {
       console.warn('Dashboard loading timeout reached');
       setLoading(false);
     }, 5000);
-    
-  return () => clearTimeout(timeout);
+    return () => clearTimeout(timeout);
   }, []);
 
   // Fetch when auth roles and profile are ready
@@ -113,26 +131,70 @@ export default function Index() {
     }
     try {
       console.log('Starting dashboard data fetch...');
-      console.log('User roles:', { isAdmin, isManager, isTeamLeader });
-      console.log('User profile:', { email: profile?.email, name: profile?.name });
-      
-    // Optimize: Fetch jobs first, then only related candidates (avoid missing column and large payload)
-    let jobsQuery = supabase
-      .from('Jobs')
-      .select('job_id, job_title, job_location, status, Timestamp, jd_summary, recruiter_id, assignment')
-      .eq('Processed', 'Yes');
-    
-    // Filter jobs based on user role
-    const canViewAllJobs = isAdmin || isManager || isTeamLeader;
-    console.log('Can view all jobs:', canViewAllJobs);
-    if (!canViewAllJobs) {
-      if (profileLoading) {
-        return; // wait until profile is loaded to decide access
+      console.log('User roles:', {
+        isAdmin,
+        isManager,
+        isTeamLeader
+      });
+      console.log('User profile:', {
+        email: profile?.email,
+        name: profile?.name
+      });
+
+      // Optimize: Fetch jobs first, then only related candidates (avoid missing column and large payload)
+      let jobsQuery = supabase.from('Jobs').select('job_id, job_title, job_location, status, Timestamp, jd_summary, recruiter_id, assignment').eq('Processed', 'Yes');
+
+      // Filter jobs based on user role
+      const canViewAllJobs = isAdmin || isManager || isTeamLeader;
+      console.log('Can view all jobs:', canViewAllJobs);
+      if (!canViewAllJobs) {
+        if (profileLoading) {
+          return; // wait until profile is loaded to decide access
+        }
+        const userId = profile?.user_id;
+        const email = profile?.email;
+        if (!userId && !email) {
+          // No identifier to filter by — ensure empty dashboard for team members
+          setData({
+            totalCandidates: 0,
+            totalJobs: 0,
+            candidatesAwaitingReview: 0,
+            tasksToday: 0,
+            interviewsThisWeek: 0,
+            averageTimeToHire: 0,
+            recentCandidates: [],
+            activeJobs: []
+          });
+          setJobs([]);
+          setCandidates([]);
+          setCvData([]);
+          setJobStats({});
+          setLoading(false);
+          return;
+        }
+        // Regular employees only see jobs assigned to them (support both new and legacy fields)
+        if (userId && email) {
+          jobsQuery = jobsQuery.or(`recruiter_id.eq.${userId},assignment.eq.${email}`);
+        } else if (userId) {
+          jobsQuery = jobsQuery.eq('recruiter_id', userId);
+        } else if (email) {
+          jobsQuery = jobsQuery.eq('assignment', email);
+        }
       }
-      const userId = profile?.user_id;
-      const email = profile?.email;
-      if (!userId && !email) {
-        // No identifier to filter by — ensure empty dashboard for team members
+      const {
+        data: jobsData,
+        error: jobsError
+      } = await jobsQuery;
+      console.log('Jobs query result:', {
+        count: jobsData?.length || 0,
+        canViewAllJobs,
+        hasJobsData: !!jobsData,
+        error: jobsError
+      });
+
+      // If employee has no assigned jobs, set empty state and return early
+      if (!canViewAllJobs && (!jobsData || jobsData.length === 0)) {
+        console.log('Employee with no assigned jobs - setting empty state');
         setData({
           totalCandidates: 0,
           totalJobs: 0,
@@ -150,80 +212,33 @@ export default function Index() {
         setLoading(false);
         return;
       }
-      // Regular employees only see jobs assigned to them (support both new and legacy fields)
-      if (userId && email) {
-        jobsQuery = jobsQuery.or(`recruiter_id.eq.${userId},assignment.eq.${email}`);
-      } else if (userId) {
-        jobsQuery = jobsQuery.eq('recruiter_id', userId);
-      } else if (email) {
-        jobsQuery = jobsQuery.eq('assignment', email);
+      let jobsCvsData: any[] | null = [];
+      let jobsCvsError: any = null;
+      const jobIds = (jobsData || []).map((j: any) => j.job_id).filter(Boolean);
+      console.log('Fetching Jobs_CVs for job IDs:', jobIds);
+      if (jobIds.length > 0) {
+        const {
+          data,
+          error
+        } = await supabase.from('Jobs_CVs').select('job_id, recordid, cv_score, after_call_score, shortlisted_at, contacted, candidate_name, candidate_email, candidate_phone_number, call_summary, after_call_reason, lastcalltime, user_id, source').in('job_id', jobIds);
+        jobsCvsData = data || [];
+        jobsCvsError = error;
       }
-    }
-
-    const { data: jobsData, error: jobsError } = await jobsQuery;
-
-    console.log('Jobs query result:', { 
-      count: jobsData?.length || 0, 
-      canViewAllJobs,
-      hasJobsData: !!jobsData,
-      error: jobsError 
-    });
-
-    // If employee has no assigned jobs, set empty state and return early
-    if (!canViewAllJobs && (!jobsData || jobsData.length === 0)) {
-      console.log('Employee with no assigned jobs - setting empty state');
-      setData({
-        totalCandidates: 0,
-        totalJobs: 0,
-        candidatesAwaitingReview: 0,
-        tasksToday: 0,
-        interviewsThisWeek: 0,
-        averageTimeToHire: 0,
-        recentCandidates: [],
-        activeJobs: []
-      });
-      setJobs([]);
-      setCandidates([]);
-      setCvData([]);
-      setJobStats({});
-      setLoading(false);
-      return;
-    }
-
-    let jobsCvsData: any[] | null = [];
-    let jobsCvsError: any = null;
-
-    const jobIds = (jobsData || []).map((j: any) => j.job_id).filter(Boolean);
-    console.log('Fetching Jobs_CVs for job IDs:', jobIds);
-    if (jobIds.length > 0) {
-      const { data, error } = await supabase
-        .from('Jobs_CVs')
-        .select('job_id, recordid, cv_score, after_call_score, shortlisted_at, contacted, candidate_name, candidate_email, candidate_phone_number, call_summary, after_call_reason, lastcalltime, user_id, source')
-        .in('job_id', jobIds);
-      jobsCvsData = data || [];
-      jobsCvsError = error;
-    }
-
-    console.log('Jobs fetched:', jobsData?.length || 0);
-    console.log('Jobs_CVs fetched:', jobsCvsData?.length || 0);
-
-    console.log('Query results received');
-
-    if (jobsError || jobsCvsError) {
+      console.log('Jobs fetched:', jobsData?.length || 0);
+      console.log('Jobs_CVs fetched:', jobsCvsData?.length || 0);
+      console.log('Query results received');
+      if (jobsError || jobsCvsError) {
         console.error('Error fetching data:', jobsError || jobsCvsError);
         toast.error('Failed to load dashboard data');
         // Still set loading to false even on error
         setLoading(false);
         return;
       }
-
       console.log('Fetched jobs:', jobsData?.length || 0);
       console.log('Fetched jobs_cvs:', jobsCvsData?.length || 0);
-
       const activeJobs = jobsData || [];
       const links = jobsCvsData || [];
       const activeJobIds = new Set(activeJobs.map((j: any) => j.job_id));
-
       console.log('Active jobs:', activeJobs.length);
       console.log('Active job IDs:', Array.from(activeJobIds));
 
@@ -231,26 +246,22 @@ export default function Index() {
 
       // Mock data for candidates - will be replaced with real candidate data later
       const cvs: any[] = [];
-      
+
       // Metrics
       const shortlistedCandidates = links.filter((c: any) => c.shortlisted_at !== null);
       const interviewCandidates = links.filter((c: any) => c.contacted === 'Interview Scheduled');
       const taskedCandidates = links.filter((c: any) => c.contacted === 'Tasked');
 
       // Recent candidates from Jobs_CVs data - only Call Done candidates
-      const callDoneActiveCandidates = links.filter((c: any) => 
-        activeJobIds.has(c.job_id) && c.contacted === 'Call Done'
-      );
-      
-      const recentCandidates = callDoneActiveCandidates
-        .sort((a: any, b: any) => {
-          const scoreA = parseFloat(a.cv_score) || 0;
-          const scoreB = parseFloat(b.cv_score) || 0;
-          return scoreB - scoreA; // Highest score first
-        })
-        .slice(0, 10)
-        .map((c: any) => ({ ...c, callid: c.recordid }));
-      
+      const callDoneActiveCandidates = links.filter((c: any) => activeJobIds.has(c.job_id) && c.contacted === 'Call Done');
+      const recentCandidates = callDoneActiveCandidates.sort((a: any, b: any) => {
+        const scoreA = parseFloat(a.cv_score) || 0;
+        const scoreB = parseFloat(b.cv_score) || 0;
+        return scoreB - scoreA; // Highest score first
+      }).slice(0, 10).map((c: any) => ({
+        ...c,
+        callid: c.recordid
+      }));
       setCandidates(recentCandidates);
       setJobs(activeJobs);
       setCvData(cvs);
@@ -294,7 +305,6 @@ export default function Index() {
       setLoading(false);
     }
   };
-
   const fetchInterviews = async () => {
     try {
       // Mock data for interviews since table doesn't exist
@@ -303,15 +313,12 @@ export default function Index() {
       console.error('Error fetching interviews:', error);
     }
   };
-
   const getCandidate = (candidateId: string) => {
     return cvData.find(c => c.candidate_id === candidateId);
   };
-
   const getJob = (jobId: string) => {
     return jobs.find(j => j.job_id === jobId);
   };
-
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -326,11 +333,9 @@ export default function Index() {
         return 'bg-gray-500/20 text-gray-400 border-gray-400/40';
     }
   };
-
   const getTypeIcon = (type: string) => {
     return type === 'Phone' ? <Phone className="w-4 h-4" /> : <Video className="w-4 h-4" />;
   };
-
   const handleTaskCountChange = (count: number) => {
     // This function is no longer needed for task count since we're tracking tasked candidates
     // But keeping it for potential future use
@@ -348,7 +353,7 @@ export default function Index() {
     try {
       // Mock rejection since tables don't exist
       console.log('Rejecting candidate:', candidateId, 'for job:', jobId);
-      
+
       // Mock webhook call
       const candidate = candidates.find(c => c.Candidate_ID === candidateId);
       if (candidate) {
@@ -387,26 +392,29 @@ export default function Index() {
       });
       setInterviewDialogOpen(true);
       // Reset slots and type
-      setInterviewSlots([
-        { date: undefined, time: '' },
-        { date: undefined, time: '' },
-        { date: undefined, time: '' }
-      ]);
+      setInterviewSlots([{
+        date: undefined,
+        time: ''
+      }, {
+        date: undefined,
+        time: ''
+      }, {
+        date: undefined,
+        time: ''
+      }]);
       setInterviewType('Phone');
       setInterviewLink('');
     }
   };
-
   const handleCVSubmitted = async (candidateId: string, jobId: string) => {
     try {
-      const { error } = await supabase
-        .from('Jobs_CVs')
-        .update({ 'contacted': 'Submitted' })
-        .eq('recordid', parseInt(candidateId)) // Convert to number since recordid is bigint
-        .eq('job_id', jobId);
-
+      const {
+        error
+      } = await supabase.from('Jobs_CVs').update({
+        'contacted': 'Submitted'
+      }).eq('recordid', parseInt(candidateId)) // Convert to number since recordid is bigint
+      .eq('job_id', jobId);
       if (error) throw error;
-
       toast.success("Candidate's CV has been marked as submitted");
       // Reload the page to refresh data
       window.location.reload();
@@ -415,7 +423,6 @@ export default function Index() {
       toast.error("Failed to submit CV. Please try again.");
     }
   };
-
   const handleScheduleInterview = async () => {
     if (!selectedCandidate) return;
 
@@ -430,7 +437,6 @@ export default function Index() {
     const now = new Date();
     const currentDate = format(now, 'yyyy-MM-dd');
     const currentTime = format(now, 'HH:mm');
-    
     for (const slot of validSlots) {
       const slotDate = format(slot.date!, 'yyyy-MM-dd');
       if (slotDate === currentDate && slot.time <= currentTime) {
@@ -444,11 +450,10 @@ export default function Index() {
       alert('Please provide an interview link for online meetings');
       return;
     }
-
     try {
       // Mock status update since CVs table doesn't exist
       console.log('Updating candidate status to Interview:', selectedCandidate.candidateId);
-      
+
       // Format appointments for webhook
       const appointments = interviewSlots.map(slot => {
         if (slot.date && slot.time) {
@@ -500,19 +505,23 @@ export default function Index() {
       alert('Error scheduling interview. Please try again.');
     }
   };
-
   const updateInterviewSlot = (index: number, field: 'date' | 'time', value: Date | string) => {
     setInterviewSlots(prev => {
       const newSlots = [...prev];
       if (field === 'date') {
-        newSlots[index] = { ...newSlots[index], date: value as Date };
+        newSlots[index] = {
+          ...newSlots[index],
+          date: value as Date
+        };
       } else {
-        newSlots[index] = { ...newSlots[index], time: value as string };
+        newSlots[index] = {
+          ...newSlots[index],
+          time: value as string
+        };
       }
       return newSlots;
     });
   };
-
   const timeOptions = ['00', '15', '30', '45'];
   const getScoreColor = (score: number) => {
     if (score >= 90) return 'text-emerald-400';
@@ -527,13 +536,9 @@ export default function Index() {
 
   // Check if candidate has pending or scheduled interview
   const getCandidateInterviewStatus = (candidateId: string) => {
-    const candidateInterviews = interviews.filter(interview => 
-      interview.candidate_id === candidateId && 
-      (interview.intstatus === 'Scheduled' || interview.intstatus === 'Pending')
-    );
+    const candidateInterviews = interviews.filter(interview => interview.candidate_id === candidateId && (interview.intstatus === 'Scheduled' || interview.intstatus === 'Pending'));
     return candidateInterviews.length > 0 ? candidateInterviews[0].intstatus : null;
   };
-
   const handleHireCandidate = async (candidateId: string, jobId: string) => {
     try {
       // Mock hiring since CVs table doesn't exist
@@ -560,7 +565,8 @@ export default function Index() {
     const job = jobs.find(j => j.job_id === candidate.job_id);
     return {
       ...candidate,
-      Candidate_ID: candidate.recordid, // Map recordid to Candidate_ID for compatibility
+      Candidate_ID: candidate.recordid,
+      // Map recordid to Candidate_ID for compatibility
       job_title: job?.job_title || 'Unknown Position',
       success_score: candidate.cv_score || candidate.after_call_score || 0
     };
@@ -576,28 +582,16 @@ export default function Index() {
 
   // Admin interface for amir.z@marc-ellis.com
   if (false && profile?.is_admin) {
-    return (
-      <div className="space-y-6">
+    return <div className="space-y-6">
         <div className="flex items-center gap-3">
           <Building2 className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-bold">Admin Dashboard</h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <MetricCardPro
-            title="Total Users"
-            value="1"
-            icon={Users}
-            trend={[0, 0, 0, 0, 0]}
-          />
-          <MetricCardPro
-            title="System Health"
-            value="100%"
-            icon={Activity}
-            trend={[100, 100, 100, 100, 100]}
-          />
+          <MetricCardPro title="Total Users" value="1" icon={Users} trend={[0, 0, 0, 0, 0]} />
+          <MetricCardPro title="System Health" value="100%" icon={Activity} trend={[100, 100, 100, 100, 100]} />
         </div>
-      </div>
-    );
+      </div>;
   }
   return <div className="min-h-screen bg-background text-foreground p-4 sm:p-6 relative overflow-hidden mx-auto max-w-screen-2xl">
       
@@ -694,7 +688,7 @@ export default function Index() {
           <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xl text-cyan-300 flex items-center">
+                <CardTitle className="text-cyan-300 flex items-center text-xl">
                   <Activity className="h-5 w-5 mr-2 animate-pulse text-cyan-400" />
                   Live Candidate Feed
                   <Badge className="ml-3 bg-background/40 text-primary border-2 border-primary/60 glow-cyan animate-pulse">
@@ -747,16 +741,16 @@ export default function Index() {
                             </div>
                             <div className="flex flex-col space-y-2">
                               <Button size="xs" variant="outline" onClick={e => {
-                                e.stopPropagation();
-                                handleRejectCandidate(candidate.Candidate_ID, candidate.job_id);
-                              }} className="bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200 text-xs">
+                            e.stopPropagation();
+                            handleRejectCandidate(candidate.Candidate_ID, candidate.job_id);
+                          }} className="bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200 text-xs">
                                 <XCircle className="w-3 h-3 mr-1" />
                                 Reject Candidate
                               </Button>
                               <Button size="xs" variant="outline" onClick={e => {
-                                e.stopPropagation();
-                                handleCVSubmitted(candidate.Candidate_ID, candidate.job_id);
-                              }} className="bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200 text-xs">
+                            e.stopPropagation();
+                            handleCVSubmitted(candidate.Candidate_ID, candidate.job_id);
+                          }} className="bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200 text-xs">
                                 <CheckCircle className="w-3 h-3 mr-1" />
                                 Submit CV
                               </Button>
@@ -837,21 +831,12 @@ export default function Index() {
             </div>
             
             {/* Conditional Interview Link Input */}
-            {interviewType === 'Online Meeting' && (
-              <div className="space-y-2">
+            {interviewType === 'Online Meeting' && <div className="space-y-2">
                 <label className="text-sm font-medium">Interview Link</label>
-                <Input
-                  type="url"
-                  placeholder="https://zoom.us/j/... or https://meet.google.com/..."
-                  value={interviewLink}
-                  onChange={(e) => setInterviewLink(e.target.value)}
-                  className="w-full"
-                />
-              </div>
-            )}
+                <Input type="url" placeholder="https://zoom.us/j/... or https://meet.google.com/..." value={interviewLink} onChange={e => setInterviewLink(e.target.value)} className="w-full" />
+              </div>}
             
-            {interviewSlots.map((slot, index) => (
-              <div key={index} className="space-y-4 p-4 border rounded-lg">
+            {interviewSlots.map((slot, index) => <div key={index} className="space-y-4 p-4 border rounded-lg">
                 <h4 className="font-medium">Slot {index + 1}</h4>
                 
                 <div className="grid grid-cols-2 gap-4">
@@ -860,30 +845,17 @@ export default function Index() {
                     <label className="text-sm font-medium">Date</label>
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !slot.date && "text-muted-foreground"
-                          )}
-                        >
+                        <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !slot.date && "text-muted-foreground")}>
                           <Calendar className="mr-2 h-4 w-4" />
                           {slot.date ? format(slot.date, "PPP") : <span>Pick a date</span>}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
-                        <CalendarComponent
-                          mode="single"
-                          selected={slot.date}
-                          onSelect={(date) => updateInterviewSlot(index, 'date', date!)}
-                          disabled={(date) => {
-                            const today = new Date();
-                            today.setHours(0, 0, 0, 0);
-                            return date < today;
-                          }}
-                          initialFocus
-                          className="p-3 pointer-events-auto"
-                        />
+                        <CalendarComponent mode="single" selected={slot.date} onSelect={date => updateInterviewSlot(index, 'date', date!)} disabled={date => {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      return date < today;
+                    }} initialFocus className="p-3 pointer-events-auto" />
                       </PopoverContent>
                     </Popover>
                   </div>
@@ -893,79 +865,66 @@ export default function Index() {
                     <label className="text-sm font-medium">Time</label>
                     <div className="grid grid-cols-2 gap-2">
                       {/* Hours */}
-                      <Select
-                        value={slot.time.split(':')[0] || ''}
-                        onValueChange={(hour) => {
-                          const minute = slot.time.split(':')[1] || '00';
-                          const newTime = `${hour}:${minute}`;
-                          
-                          // Validate time is not in the past for today
-                          if (slot.date) {
-                            const today = new Date();
-                            const slotDate = format(slot.date, 'yyyy-MM-dd');
-                            const currentDate = format(today, 'yyyy-MM-dd');
-                            const currentTime = format(today, 'HH:mm');
-                            
-                            if (slotDate === currentDate && newTime <= currentTime) {
-                              alert('Cannot select a time in the past for today');
-                              return;
-                            }
-                          }
-                          
-                          updateInterviewSlot(index, 'time', newTime);
-                        }}
-                      >
+                      <Select value={slot.time.split(':')[0] || ''} onValueChange={hour => {
+                    const minute = slot.time.split(':')[1] || '00';
+                    const newTime = `${hour}:${minute}`;
+
+                    // Validate time is not in the past for today
+                    if (slot.date) {
+                      const today = new Date();
+                      const slotDate = format(slot.date, 'yyyy-MM-dd');
+                      const currentDate = format(today, 'yyyy-MM-dd');
+                      const currentTime = format(today, 'HH:mm');
+                      if (slotDate === currentDate && newTime <= currentTime) {
+                        alert('Cannot select a time in the past for today');
+                        return;
+                      }
+                    }
+                    updateInterviewSlot(index, 'time', newTime);
+                  }}>
                         <SelectTrigger>
                           <SelectValue placeholder="Hour" />
                         </SelectTrigger>
                         <SelectContent>
-                          {Array.from({ length: 24 }, (_, i) => (
-                            <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                          {Array.from({
+                        length: 24
+                      }, (_, i) => <SelectItem key={i} value={i.toString().padStart(2, '0')}>
                               {i.toString().padStart(2, '0')}
-                            </SelectItem>
-                          ))}
+                            </SelectItem>)}
                         </SelectContent>
                       </Select>
 
                       {/* Minutes */}
-                      <Select
-                        value={slot.time.split(':')[1] || ''}
-                        onValueChange={(minute) => {
-                          const hour = slot.time.split(':')[0] || '09';
-                          const newTime = `${hour}:${minute}`;
-                          
-                          // Validate time is not in the past for today
-                          if (slot.date) {
-                            const today = new Date();
-                            const slotDate = format(slot.date, 'yyyy-MM-dd');
-                            const currentDate = format(today, 'yyyy-MM-dd');
-                            const currentTime = format(today, 'HH:mm');
-                            
-                            if (slotDate === currentDate && newTime <= currentTime) {
-                              alert('Cannot select a time in the past for today');
-                              return;
-                            }
-                          }
-                          
-                          updateInterviewSlot(index, 'time', newTime);
-                        }}
-                      >
+                      <Select value={slot.time.split(':')[1] || ''} onValueChange={minute => {
+                    const hour = slot.time.split(':')[0] || '09';
+                    const newTime = `${hour}:${minute}`;
+
+                    // Validate time is not in the past for today
+                    if (slot.date) {
+                      const today = new Date();
+                      const slotDate = format(slot.date, 'yyyy-MM-dd');
+                      const currentDate = format(today, 'yyyy-MM-dd');
+                      const currentTime = format(today, 'HH:mm');
+                      if (slotDate === currentDate && newTime <= currentTime) {
+                        alert('Cannot select a time in the past for today');
+                        return;
+                      }
+                    }
+                    updateInterviewSlot(index, 'time', newTime);
+                  }}>
                         <SelectTrigger>
                           <SelectValue placeholder="Min" />
                         </SelectTrigger>
                         <SelectContent>
-                          {timeOptions.map((minute) => (
-                            <SelectItem key={minute} value={minute}>
+                          {timeOptions.map(minute => <SelectItem key={minute} value={minute}>
                               {minute}
-                            </SelectItem>
-                          ))}
+                            </SelectItem>)}
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              </div>)}
 
             <div className="flex justify-end space-x-2 pt-4 sticky bottom-0 bg-background border-t">
               <Button variant="outline" onClick={() => setInterviewDialogOpen(false)}>
