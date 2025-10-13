@@ -40,15 +40,15 @@ export function MetricCard({
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <p className="text-2xl font-bold text-foreground">{value}</p>
+            <p className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">{title}</p>
+            <p className="text-4xl font-light font-work text-foreground">{value}</p>
             {change && (
-              <p className={cn("text-xs font-medium", getChangeColor())}>
+              <p className={cn("text-xs font-light font-inter", getChangeColor())}>
                 {change}
               </p>
             )}
             {description && (
-              <p className="text-xs text-muted-foreground">{description}</p>
+              <p className="text-xs font-light font-inter text-muted-foreground">{description}</p>
             )}
           </div>
           <div className="flex-shrink-0">

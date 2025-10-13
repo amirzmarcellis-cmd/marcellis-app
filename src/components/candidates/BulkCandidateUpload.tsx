@@ -264,11 +264,11 @@ export function BulkCandidateUpload({ open, onOpenChange, onSuccess }: BulkCandi
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto glass-card">
         <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2 text-xl">
+          <DialogTitle className="flex items-center space-x-2 text-3xl font-light font-work tracking-tight">
             <Users className="h-5 w-5 text-primary" />
             <span>Add Multiple Candidates</span>
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="font-light font-inter">
             Upload multiple CV files at once to quickly add candidates to your pipeline.
             Each CV will create a new candidate record with a unique ID.
           </DialogDescription>
@@ -276,16 +276,16 @@ export function BulkCandidateUpload({ open, onOpenChange, onSuccess }: BulkCandi
 
         <div className="space-y-6 py-4">
           {/* File Selection */}
-          <Card className="mission-card">
+            <Card className="mission-card">
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
+              <CardTitle className="text-2xl font-light font-work flex items-center gap-2">
                 <Upload className="w-5 h-5" />
                 Select CV Files
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="bulkUpload">Upload CV Files</Label>
+                <Label htmlFor="bulkUpload" className="font-light font-inter">Upload CV Files</Label>
                 <Input
                   id="bulkUpload"
                   type="file"
@@ -295,7 +295,7 @@ export function BulkCandidateUpload({ open, onOpenChange, onSuccess }: BulkCandi
                   className="bg-background/50"
                   disabled={uploading}
                 />
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm font-light font-inter text-muted-foreground">
                   Select multiple PDF or document files (max 10MB each). 
                   Files will be uploaded to public storage and candidate records will be created automatically.
                 </p>
@@ -327,13 +327,13 @@ export function BulkCandidateUpload({ open, onOpenChange, onSuccess }: BulkCandi
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         {getStatusIcon(file.status)}
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium truncate">{file.file.name}</p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-sm font-light font-work truncate">{file.file.name}</p>
+                          <p className="text-xs font-light font-inter text-muted-foreground">
                             {(file.file.size / 1024 / 1024).toFixed(2)} MB
                             {file.candidateId && ` • ID: ${file.candidateId}`}
                           </p>
                           {file.error && (
-                            <p className="text-xs text-red-500 mt-1">{file.error}</p>
+                            <p className="text-xs text-red-500 mt-1 font-light font-inter">{file.error}</p>
                           )}
                         </div>
                       </div>

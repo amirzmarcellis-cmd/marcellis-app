@@ -377,7 +377,7 @@ export default function CallLogDetails() {
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </Button>
-        <h1 className="text-2xl sm:text-3xl font-bold">Call Details</h1>
+        <h1 className="text-5xl sm:text-6xl font-light font-work tracking-tight">Call Details</h1>
       </div>
 
       {/* Candidate Header */}
@@ -385,14 +385,14 @@ export default function CallLogDetails() {
         <CardContent className="p-6">
           <div className="flex items-center space-x-6">
             <Avatar className="w-20 h-20">
-              <AvatarFallback className="bg-gradient-primary text-white text-xl">
+              <AvatarFallback className="bg-gradient-primary text-white text-xl font-light font-work">
                 {callLog.candidate_name?.charAt(0) || 'C'}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h2 className="text-2xl font-bold">{callLog.candidate_name}</h2>
-              <p className="text-muted-foreground">{callLog.candidate_email}</p>
-              <p className="text-sm">{callLog.job_title}</p>
+              <h2 className="text-4xl font-light font-work tracking-tight">{callLog.candidate_name}</h2>
+              <p className="text-base font-light font-inter text-muted-foreground">{callLog.candidate_email}</p>
+              <p className="text-sm font-light font-inter">{callLog.job_title}</p>
               <div className="flex flex-wrap gap-2 mt-2">
                 <Badge variant="outline" className="text-xs">
                   User ID: {callLog.user_id}

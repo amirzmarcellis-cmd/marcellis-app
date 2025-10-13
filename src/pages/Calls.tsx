@@ -136,8 +136,8 @@ export default function Calls() {
   return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">Call Center</h1>
-          <p className="text-muted-foreground">Monitor active calls and review call history</p>
+          <h1 className="text-6xl font-light font-work tracking-tight text-foreground">Call Center</h1>
+          <p className="text-base font-light font-inter text-muted-foreground">Monitor active calls and review call history</p>
         </div>
 
         <div className="space-y-4">
@@ -192,7 +192,7 @@ export default function Calls() {
             {/* Call History Table */}
             <Card className="bg-gradient-card backdrop-blur-glass border-glass-border shadow-card">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-3xl font-light font-work tracking-tight">
                   <Clock className="w-5 h-5" />
                   Call History ({filteredCalls.length})
                 </CardTitle>
@@ -217,25 +217,25 @@ export default function Calls() {
                           <div className="flex items-center space-x-3">
                             <Avatar className="w-8 h-8">
                               <AvatarImage src={call.avatar} />
-                              <AvatarFallback className="bg-gradient-primary text-white text-xs">
+                              <AvatarFallback className="bg-gradient-primary text-white text-xs font-light font-work">
                                 {call.candidateName.split(' ').map(n => n[0]).join('')}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="font-medium">{call.candidateName}</span>
+                            <span className="font-light font-work">{call.candidateName}</span>
                           </div>
                         </TableCell>
-                        <TableCell>{call.position}</TableCell>
+                        <TableCell className="font-light font-inter">{call.position}</TableCell>
                         <TableCell>
                           <div>
-                            <div className="flex items-center space-x-1">
+                            <div className="flex items-center space-x-1 font-light font-inter">
                               <Calendar className="w-4 h-4 text-muted-foreground" />
                               <span>{call.date}</span>
                             </div>
-                            <div className="text-sm text-muted-foreground">{call.time}</div>
+                            <div className="text-sm font-light font-inter text-muted-foreground">{call.time}</div>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center space-x-1">
+                          <div className="flex items-center space-x-1 font-light font-inter">
                             <Clock className="w-4 h-4 text-muted-foreground" />
                             <span className="font-mono text-sm">{call.duration}</span>
                           </div>
@@ -251,7 +251,7 @@ export default function Calls() {
                           </Badge>
                         </TableCell>
                         <TableCell className="max-w-[200px]">
-                          <p className="text-sm text-muted-foreground truncate">{call.notes}</p>
+                          <p className="text-sm font-light font-inter text-muted-foreground truncate">{call.notes}</p>
                         </TableCell>
                       </TableRow>
                     ))}

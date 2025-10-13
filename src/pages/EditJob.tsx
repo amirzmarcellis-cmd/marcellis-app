@@ -365,16 +365,16 @@ export default function EditJob() {
             <span>Back to Jobs</span>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-glow">Edit Job</h1>
-            <p className="text-muted-foreground">Update job posting details</p>
+            <h1 className="text-6xl font-light font-work tracking-tight">Edit Job</h1>
+            <p className="text-base font-light font-inter text-muted-foreground">Update job posting details</p>
           </div>
         </div>
       </div>
 
       <Card className="mission-card">
         <CardHeader>
-          <CardTitle>Edit Job Posting</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-3xl font-light font-work tracking-tight">Edit Job Posting</CardTitle>
+          <CardDescription className="font-light font-inter">
             Update the job details and requirements
           </CardDescription>
         </CardHeader>
@@ -391,7 +391,7 @@ export default function EditJob() {
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="job_title">Job Title *</Label>
+                      <Label htmlFor="job_title" className="font-light font-inter">Job Title *</Label>
                       <Input
                         id="job_title"
                         name="job_title"
@@ -402,7 +402,7 @@ export default function EditJob() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="itris_job_id">Itris ID</Label>
+                      <Label htmlFor="itris_job_id" className="font-light font-inter">Itris ID</Label>
                       <Input
                         id="itris_job_id"
                         name="itris_job_id"

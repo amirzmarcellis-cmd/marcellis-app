@@ -16,9 +16,9 @@ const NotFound = () => {
     <MissionBackground>
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">404</h1>
-          <p className="text-xl text-muted-foreground mb-4">Oops! Page not found</p>
-          <a href="/" className="text-primary underline">
+          <h1 className="text-9xl font-light font-work tracking-tight">404</h1>
+          <p className="text-2xl font-light font-inter text-muted-foreground mb-4">Oops! Page not found</p>
+          <a href="/" className="text-primary underline font-light font-inter">
             Return to Home
           </a>
         </div>

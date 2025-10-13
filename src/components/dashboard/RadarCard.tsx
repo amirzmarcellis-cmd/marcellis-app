@@ -21,8 +21,8 @@ export function RadarCard({ title = "Ops Radar", stats }: RadarCardProps) {
     <Card className="bg-gradient-card border border-border/50">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
-          <div className="flex gap-3 text-xs text-muted-foreground">
+          <h3 className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">{title}</h3>
+          <div className="flex gap-3 text-xs font-light font-inter text-muted-foreground">
             <span>Longlist {stats.longlist}</span>
             <span>Shortlist {stats.shortlist}</span>
             <span>Tasked {stats.tasked}</span>

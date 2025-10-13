@@ -225,8 +225,8 @@ export default function CallLog() {
   return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">Call Log</h1>
-          <p className="text-muted-foreground">Track all recruitment calls and outcomes</p>
+          <h1 className="text-6xl font-light font-work tracking-tight text-foreground">Call Log</h1>
+          <p className="text-base font-light font-inter text-muted-foreground">Track all recruitment calls and outcomes</p>
         </div>
 
         {/* Filters */}
@@ -288,7 +288,7 @@ export default function CallLog() {
         {/* Call Log Table */}
         <Card className="bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass shadow-card">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-3xl font-light font-work tracking-tight">
               <Phone className="w-5 h-5" />
               Call History ({filteredCallLogs.length})
             </CardTitle>
@@ -330,23 +330,23 @@ export default function CallLog() {
                     
                       return (
                         <TableRow key={index} className="border-border hover:bg-glass-primary transition-colors">
-                          <TableCell className="max-w-[200px]">
+                           <TableCell className="max-w-[200px]">
                             <div className="flex items-center space-x-3">
                               <Avatar className="w-8 h-8 flex-shrink-0">
-                                <AvatarFallback className="bg-gradient-primary text-white text-sm">
+                                <AvatarFallback className="bg-gradient-primary text-white text-sm font-light font-work">
                                   {initials}
                                 </AvatarFallback>
                               </Avatar>
                               <div className="min-w-0 flex-1">
-                                <div className="font-medium truncate">{log.candidate_name || "N/A"}</div>
-                                <div className="text-sm text-muted-foreground truncate">{log.candidate_email || "N/A"}</div>
+                                <div className="font-light font-work truncate">{log.candidate_name || "N/A"}</div>
+                                <div className="text-sm font-light font-inter text-muted-foreground truncate">{log.candidate_email || "N/A"}</div>
                               </div>
                             </div>
                           </TableCell>
                           <TableCell className="max-w-[150px]">
                             <div className="min-w-0">
-                              <div className="font-medium truncate">{log.job_title || "N/A"}</div>
-                              <Badge variant="outline" className="font-mono text-xs mt-1">
+                              <div className="font-light font-work truncate">{log.job_title || "N/A"}</div>
+                              <Badge variant="outline" className="font-mono text-xs font-light font-inter mt-1">
                                 {(log.job_id || "N/A").substring(0, 8)}...
                               </Badge>
                             </div>

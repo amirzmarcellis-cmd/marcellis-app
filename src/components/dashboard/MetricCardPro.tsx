@@ -36,9 +36,9 @@ export function MetricCardPro({
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">{title}</p>
+            <p className="text-xs font-light font-inter uppercase tracking-wide text-muted-foreground">{title}</p>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-semibold text-foreground">{value}</span>
+              <span className="text-5xl font-light font-work text-foreground">{value}</span>
             </div>
           </div>
           <div className={cn("relative flex-shrink-0 text-primary", accentMap[accent])}>

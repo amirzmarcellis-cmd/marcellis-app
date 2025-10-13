@@ -50,30 +50,30 @@ export default function Performance() {
   return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Performance</h1>
-          <p className="text-muted-foreground">AI caller performance metrics and insights</p>
+          <h1 className="text-6xl font-light font-work tracking-tight text-foreground">Performance</h1>
+          <p className="text-base font-light font-inter text-muted-foreground">AI caller performance metrics and insights</p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {performanceMetrics.map((metric, index) => (
             <Card key={index}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{metric.metric}</CardTitle>
+                <CardTitle className="text-sm font-light font-inter uppercase tracking-wide">{metric.metric}</CardTitle>
                 <metric.icon className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
+                <div className="text-4xl font-light font-work">
                   {metric.metric === "Call Quality Score" ? `${metric.value}/5` : `${metric.value}%`}
                 </div>
-                <div className="space-y-2">
-                  <Progress value={metric.percentage} className="w-full" />
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">vs last month</span>
-                    <Badge variant="secondary" className="text-success">
-                      {metric.trend}
-                    </Badge>
+                  <div className="space-y-2">
+                    <Progress value={metric.percentage} className="w-full" />
+                    <div className="flex items-center justify-between text-xs font-light font-inter">
+                      <span className="text-muted-foreground">vs last month</span>
+                      <Badge variant="secondary" className="text-success font-light font-inter">
+                        {metric.trend}
+                      </Badge>
+                    </div>
                   </div>
-                </div>
               </CardContent>
             </Card>
           ))}
@@ -82,8 +82,8 @@ export default function Performance() {
         <div className="grid gap-6 lg:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Top Performing AI Callers</CardTitle>
-              <CardDescription>Ranked by overall performance score</CardDescription>
+              <CardTitle className="text-3xl font-light font-work tracking-tight">Top Performing AI Callers</CardTitle>
+              <CardDescription className="font-light font-inter">Ranked by overall performance score</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -98,8 +98,8 @@ export default function Performance() {
                         {index + 1}
                       </div>
                       <div>
-                        <p className="font-medium">{performer.name}</p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="font-light font-work">{performer.name}</p>
+                        <p className="text-sm font-light font-inter text-muted-foreground">
                           {performer.calls} calls • {performer.success}% success
                         </p>
                       </div>
@@ -113,16 +113,16 @@ export default function Performance() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Performance Insights</CardTitle>
-              <CardDescription>Key findings and recommendations</CardDescription>
+              <CardTitle className="text-3xl font-light font-work tracking-tight">Performance Insights</CardTitle>
+              <CardDescription className="font-light font-inter">Key findings and recommendations</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="p-4 rounded-lg border border-success/20 bg-success/5">
                 <div className="flex items-start space-x-3">
                   <TrendingUp className="w-5 h-5 text-success mt-0.5" />
                   <div>
-                    <h4 className="font-medium text-success">Strong Performance</h4>
-                    <p className="text-sm text-muted-foreground">
+                    <h4 className="font-light font-work text-success">Strong Performance</h4>
+                    <p className="text-sm font-light font-inter text-muted-foreground">
                       Call quality scores have improved by 8% this month, indicating better conversation quality.
                     </p>
                   </div>

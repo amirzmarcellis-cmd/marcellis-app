@@ -369,61 +369,61 @@ export function JobManagementPanel() {
       allJobs: applyFilters(jobs)
     };
   }, [jobs, selectedGroupFilter, selectedRecruiterFilter, dateRange]);
-  return <div className="space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-glow">Job Management</h2>
-          <p className="text-muted-foreground">Manage job postings and recruitment campaigns</p>
+          <h2 className="text-5xl font-light font-work tracking-tight">Job Management</h2>
+          <p className="text-base font-light font-inter text-muted-foreground">Manage job postings and recruitment campaigns</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button onClick={() => navigate("/groups")} variant="outline" className="flex items-center gap-2">
+          <Button onClick={() => navigate("/groups")} variant="outline" className="flex items-center gap-2 font-light font-inter">
             <Building2 className="h-4 w-4" />
             Manage Groups
           </Button>
-          <Button onClick={() => navigate("/jobs/add")} className="action-button bg-gradient-primary hover:shadow-glow">
+          <Button onClick={() => navigate("/jobs/add")} className="action-button bg-gradient-primary hover:shadow-glow font-light font-inter">
             <Plus className="h-4 w-4 mr-2" />
             Create Job
           </Button>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-4">
-        {/* Group Filter */}
-        <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">Filter by Group:</label>
-          <select value={selectedGroupFilter} onChange={e => setSelectedGroupFilter(e.target.value)} className="px-3 py-1 rounded-md border border-border bg-background text-sm">
-            <option value="">All Groups</option>
-            <option value="ungrouped">Ungrouped</option>
-            {groups.map(group => <option key={group.id} value={group.id}>
-                {group.name}
-              </option>)}
-          </select>
-        </div>
-        {selectedGroupFilter && <Button variant="ghost" size="sm" onClick={() => setSelectedGroupFilter("")} className="text-xs">
+        {/* Filters */}
+        <div className="flex flex-wrap items-center gap-4">
+          {/* Group Filter */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-light font-inter">Filter by Group:</label>
+            <select value={selectedGroupFilter} onChange={e => setSelectedGroupFilter(e.target.value)} className="px-3 py-1 rounded-md border border-border bg-background text-sm font-light font-inter">
+              <option value="">All Groups</option>
+              <option value="ungrouped">Ungrouped</option>
+              {groups.map(group => <option key={group.id} value={group.id}>
+                  {group.name}
+                </option>)}
+            </select>
+          </div>
+        {selectedGroupFilter && <Button variant="ghost" size="sm" onClick={() => setSelectedGroupFilter("")} className="text-xs font-light font-inter">
             Clear Filter
           </Button>}
 
         {/* Recruiter Filter */}
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">Filter by Recruiter:</label>
-          <select value={selectedRecruiterFilter} onChange={e => setSelectedRecruiterFilter(e.target.value)} className="px-3 py-1 rounded-md border border-border bg-background text-sm">
+          <label className="text-sm font-light font-inter">Filter by Recruiter:</label>
+          <select value={selectedRecruiterFilter} onChange={e => setSelectedRecruiterFilter(e.target.value)} className="px-3 py-1 rounded-md border border-border bg-background text-sm font-light font-inter">
             <option value="">All Recruiters</option>
             {recruiters.map(recruiter => <option key={recruiter.id} value={recruiter.id}>
                 {recruiter.name}
               </option>)}
           </select>
         </div>
-        {selectedRecruiterFilter && <Button variant="ghost" size="sm" onClick={() => setSelectedRecruiterFilter("")} className="text-xs">
+        {selectedRecruiterFilter && <Button variant="ghost" size="sm" onClick={() => setSelectedRecruiterFilter("")} className="text-xs font-light font-inter">
             Clear Filter
           </Button>}
 
         {/* Date Range Filter */}
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">Filter by Date:</label>
+          <label className="text-sm font-light font-inter">Filter by Date:</label>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className={cn("w-[280px] justify-start text-left font-normal", !dateRange.from && !dateRange.to && "text-muted-foreground")}>
+              <Button variant="outline" className={cn("w-[280px] justify-start text-left font-light font-inter", !dateRange.from && !dateRange.to && "text-muted-foreground")}>
                 <Calendar className="mr-2 h-4 w-4" />
                 {dateRange.from ? dateRange.to ? <>
                       {format(dateRange.from, "MMM dd, yyyy")} - {format(dateRange.to, "MMM dd, yyyy")}

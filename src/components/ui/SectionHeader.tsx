@@ -12,11 +12,11 @@ export function SectionHeader({ title, subtitle, actions, className }: SectionHe
   return (
     <header className={cn("mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between", className)}>
       <div>
-        <h1 className="text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">
+        <h1 className="text-4xl sm:text-5xl font-light font-work tracking-tight text-foreground">
           {title}
         </h1>
         {subtitle && (
-          <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+          <p className="text-sm font-light font-inter text-muted-foreground mt-1">{subtitle}</p>
         )}
       </div>
       {actions && (

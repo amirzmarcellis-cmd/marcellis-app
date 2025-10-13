@@ -156,7 +156,7 @@ export function StatusDropdown({
     return (
       <Badge 
         variant={getStatusVariant(currentStatus)} 
-        className={`${getStatusColor(currentStatus)} capitalize font-medium`}
+        className={`${getStatusColor(currentStatus)} capitalize font-light font-inter`}
       >
         {currentStatus || defaultStatus}
       </Badge>
@@ -173,7 +173,7 @@ export function StatusDropdown({
         <SelectValue>
           <Badge 
             variant={getStatusVariant(currentStatus || defaultStatus)} 
-            className={`${getStatusColor(currentStatus || defaultStatus)} capitalize font-medium text-xs`}
+            className={`${getStatusColor(currentStatus || defaultStatus)} capitalize font-light font-inter text-xs`}
           >
             {currentStatus || defaultStatus || 'Select status'}
           </Badge>
@@ -188,7 +188,7 @@ export function StatusDropdown({
           >
             <Badge 
               variant={getStatusVariant(status)} 
-              className={`${getStatusColor(status)} capitalize font-medium text-xs`}
+              className={`${getStatusColor(status)} capitalize font-light font-inter text-xs`}
             >
               {status}
             </Badge>

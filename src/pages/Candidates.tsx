@@ -173,11 +173,11 @@ export default function Candidates() {
           subtitle="View and manage all uploaded CVs"
           actions={
             <div className="flex gap-2">
-              <Button onClick={() => setBulkUploadOpen(true)} variant="outline" className="gap-2">
+              <Button onClick={() => setBulkUploadOpen(true)} variant="outline" className="gap-2 font-light font-inter">
                 <Upload className="w-4 h-4" />
                 Add Multiple CVs
               </Button>
-              <Button onClick={handleAddCandidate} className="gap-2">
+              <Button onClick={handleAddCandidate} className="gap-2 font-light font-inter">
                 <UserPlus className="w-4 h-4" />
                 Add CV
               </Button>
@@ -203,7 +203,7 @@ export default function Candidates() {
         {/* CVs Table */}
         <Card className="bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass shadow-card">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-3xl font-light font-work tracking-tight">
               <User className="w-5 h-5" />
               CVs ({filteredCVs.length})
             </CardTitle>
@@ -247,26 +247,26 @@ export default function Candidates() {
                               {cv.user_id}
                             </Badge>
                           </TableCell>
-                          <TableCell className="max-w-[200px]">
+                           <TableCell className="max-w-[200px]">
                             <div className="flex items-center space-x-3">
                               <Avatar className="w-8 h-8 flex-shrink-0">
-                                <AvatarFallback className="bg-gradient-primary text-white text-sm">
+                                <AvatarFallback className="bg-gradient-primary text-white text-sm font-light font-work">
                                   {initials}
                                 </AvatarFallback>
                               </Avatar>
                               <div className="min-w-0 flex-1">
-                                <div className="font-medium truncate">{fullName || "N/A"}</div>
+                                <div className="font-light font-work truncate">{fullName || "N/A"}</div>
                               </div>
                             </div>
                           </TableCell>
                           <TableCell className="max-w-[200px]">
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-2 font-light font-inter">
                               <Mail className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                               <span className="truncate">{cv.email || "N/A"}</span>
                             </div>
                           </TableCell>
                           <TableCell className="max-w-[150px]">
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-2 font-light font-inter">
                               <Phone className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                               <span className="truncate">{cv.phone_number || "N/A"}</span>
                             </div>
@@ -277,16 +277,16 @@ export default function Candidates() {
                                 href={cv.cv_link} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="text-primary hover:underline text-sm"
+                                className="text-primary hover:underline text-sm font-light font-inter"
                               >
                                 View CV
                               </a>
                             ) : (
-                              <span className="text-muted-foreground text-sm">No CV</span>
+                              <span className="text-muted-foreground text-sm font-light font-inter">No CV</span>
                             )}
                           </TableCell>
                           <TableCell className="max-w-[200px]">
-                            <div className="text-sm text-muted-foreground truncate max-w-[200px]">
+                            <div className="text-sm font-light font-inter text-muted-foreground truncate max-w-[200px]">
                               {cv.cv_text ? cv.cv_text.substring(0, 100) + "..." : "No CV text"}
                             </div>
                           </TableCell>

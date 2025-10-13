@@ -201,16 +201,16 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{candidate ? 'Edit Candidate' : 'Add New Candidate'}</DialogTitle>
+          <DialogTitle className="text-3xl font-light font-work tracking-tight">{candidate ? 'Edit Candidate' : 'Add New Candidate'}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Candidate Information</h3>
+            <h3 className="text-2xl font-light font-work tracking-tight">Candidate Information</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="user_id">User ID</Label>
+                <Label htmlFor="user_id" className="font-light font-inter">User ID</Label>
                 <Input
                   id="user_id"
                   value={formData.user_id}
@@ -220,7 +220,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name *</Label>
+                <Label htmlFor="name" className="font-light font-inter">Full Name *</Label>
                 <Input
                   id="name"
                   value={formData.name}
@@ -273,7 +273,7 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">CV Upload</h3>
+            <h3 className="text-2xl font-light font-work tracking-tight">CV Upload</h3>
             
             <FileUpload
               onFileUploaded={handleFileUpload}
@@ -283,12 +283,12 @@ export function CandidateDialog({ candidate, open, onOpenChange, onSave, jobs }:
             
             {(cvUrl || formData.cv_link) && (
               <div className="p-4 bg-secondary rounded-lg">
-                <p className="text-sm text-muted-foreground mb-2">Uploaded CV:</p>
+                <p className="text-sm font-light font-inter text-muted-foreground mb-2">Uploaded CV:</p>
                 <a 
                   href={cvUrl || formData.cv_link} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline"
+                  className="text-primary hover:underline font-light font-inter"
                 >
                   View CV Document
                 </a>

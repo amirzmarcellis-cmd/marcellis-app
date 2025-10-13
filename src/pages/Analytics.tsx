@@ -316,12 +316,12 @@ export default function Analytics() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">Analytics Dashboard</h1>
-            <p className="text-muted-foreground">Comprehensive recruitment performance insights</p>
+            <h1 className="text-6xl font-light font-work tracking-tight text-foreground mb-2">Analytics Dashboard</h1>
+            <p className="text-base font-light font-inter text-muted-foreground">Comprehensive recruitment performance insights</p>
           </div>
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-green-400 font-medium">Live Dashboard</span>
+            <span className="text-green-400 font-light font-inter">Live Dashboard</span>
           </div>
         </div>
       </div>
@@ -332,9 +332,9 @@ export default function Analytics() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-200 text-sm font-medium">Total Candidates</p>
-                <p className="text-4xl font-bold text-foreground mt-2">{data?.totalCandidates || 0}</p>
-                <p className="text-xs text-blue-300 mt-1">Active candidates in pipeline</p>
+                <p className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">Total Candidates</p>
+                <p className="text-5xl font-light font-work text-foreground mt-2">{data?.totalCandidates || 0}</p>
+                <p className="text-xs font-light font-inter text-muted-foreground mt-1">Active candidates in pipeline</p>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
                 <Users className="w-8 h-8 text-white" />

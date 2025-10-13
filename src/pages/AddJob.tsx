@@ -457,23 +457,23 @@ export default function AddJob() {
         <Button
           variant="ghost"
           onClick={() => navigate("/jobs")}
-          className="mb-4"
+          className="mb-4 font-light font-inter"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Jobs
         </Button>
-        <h1 className="text-3xl font-bold">Add New Job</h1>
+        <h1 className="text-6xl font-light font-work tracking-tight">Add New Job</h1>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Job Information</CardTitle>
+          <CardTitle className="text-3xl font-light font-work tracking-tight">Job Information</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="jobTitle">Job Title *</Label>
+                <Label htmlFor="jobTitle" className="font-light font-inter">Job Title *</Label>
                 <Input
                   id="jobTitle"
                   value={formData.jobTitle}
@@ -483,7 +483,7 @@ export default function AddJob() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="itrisId">Itris ID</Label>
+                <Label htmlFor="itrisId" className="font-light font-inter">Itris ID</Label>
                 <Input
                   id="itrisId"
                   value={formData.itrisId}

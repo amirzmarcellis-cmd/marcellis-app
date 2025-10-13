@@ -90,7 +90,7 @@ export function RecentCallsTable() {
   return (
     <Card className="bg-gradient-card backdrop-blur-sm border-border/50 animate-fade-in">
       <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
+        <CardTitle className="flex items-center space-x-2 text-3xl font-light font-work tracking-tight">
           <Phone className="w-5 h-5 text-primary" />
           <span>Recent Calls</span>
         </CardTitle>
@@ -106,10 +106,10 @@ export function RecentCallsTable() {
                 {getStatusIcon(call.status)}
                 <div>
                   <div className="flex items-center space-x-2">
-                    <p className="font-medium text-foreground">{call.candidateName}</p>
+                    <p className="font-light font-work text-base text-foreground">{call.candidateName}</p>
                     {getOutcomeBadge(call.outcome)}
                   </div>
-                  <p className="text-sm text-muted-foreground">{call.position}</p>
+                  <p className="text-sm font-light font-inter text-muted-foreground">{call.position}</p>
                 </div>
               </div>
               <div className="text-right text-sm text-muted-foreground">

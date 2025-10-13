@@ -103,15 +103,15 @@ export function CandidateManagementPanel() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-glow">Candidate Management</h2>
-          <p className="text-muted-foreground">Track and manage candidate pipeline</p>
+          <h2 className="text-5xl font-light font-work tracking-tight">Candidate Management</h2>
+          <p className="text-base font-light font-inter text-muted-foreground">Track and manage candidate pipeline</p>
         </div>
         <Button 
           onClick={() => {
             setSelectedCandidate(null);
             setIsDialogOpen(true);
           }}
-          className="action-button bg-gradient-primary hover:shadow-glow"
+          className="action-button bg-gradient-primary hover:shadow-glow font-light font-inter"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Candidate
@@ -183,10 +183,10 @@ export function CandidateManagementPanel() {
                 </Avatar>
                 
                 <div className="flex-1">
-                  <CardTitle className="text-lg font-semibold line-clamp-1">
+                  <CardTitle className="text-2xl font-light font-work line-clamp-1">
                     {candidate["First Name"]} {candidate["Last Name"]}
                   </CardTitle>
-                  <p className="text-sm text-muted-foreground line-clamp-1">
+                  <p className="text-sm font-light font-inter text-muted-foreground line-clamp-1">
                     {candidate.Title || "No title specified"}
                   </p>
                   <div className="flex items-center space-x-2 mt-2">
@@ -197,7 +197,7 @@ export function CandidateManagementPanel() {
             </CardHeader>
             
             <CardContent className="space-y-4">
-              <div className="space-y-2 text-sm">
+              <div className="space-y-2 text-sm font-light font-inter">
                 {candidate.Email && (
                   <div className="flex items-center text-muted-foreground">
                     <Mail className="h-4 w-4 mr-2 text-cyan" />

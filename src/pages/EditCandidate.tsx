@@ -137,14 +137,12 @@ export default function EditCandidate() {
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                Edit Candidate
-              </h1>
-              <p className="text-muted-foreground">
-                {candidate.first_name} {candidate.last_name}
-              </p>
-            </div>
+          <div>
+            <h1 className="text-6xl font-light font-work tracking-tight">Edit Candidate</h1>
+            <p className="text-base font-light font-inter text-muted-foreground">
+              {candidate.first_name} {candidate.last_name}
+            </p>
+          </div>
           </div>
           <Button onClick={handleSave} disabled={saving} className="bg-gradient-primary hover:bg-gradient-primary/90">
             <Save className="w-4 h-4 mr-2" />
@@ -156,7 +154,7 @@ export default function EditCandidate() {
           {/* Personal Information */}
           <Card className="bg-gradient-card backdrop-blur-glass border-glass-border">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-3xl font-light font-work tracking-tight">
                 <User className="w-5 h-5" />
                 Personal Information
               </CardTitle>
@@ -164,7 +162,7 @@ export default function EditCandidate() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="firstName" className="font-light font-inter">First Name</Label>
                   <Input
                     id="firstName"
                     value={candidate.first_name || ""}
@@ -173,7 +171,7 @@ export default function EditCandidate() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="lastName">Last Name</Label>
+                  <Label htmlFor="lastName" className="font-light font-inter">Last Name</Label>
                   <Input
                     id="lastName"
                     value={candidate.last_name || ""}

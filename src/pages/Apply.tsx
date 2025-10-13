@@ -432,13 +432,13 @@ export default function Apply() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <DialogTitle className="text-2xl font-bold text-center">Thank You!</DialogTitle>
-                <DialogDescription className="text-center text-lg">
+                <DialogTitle className="text-5xl font-light font-work tracking-tight text-center">Thank You!</DialogTitle>
+                <DialogDescription className="text-center text-base font-light font-inter">
                   Your application has been submitted successfully. We will review it and get back to you soon.
                 </DialogDescription>
               </DialogHeader>
               <div className="mt-6 text-center">
-                <p className="text-muted-foreground">
+                <p className="text-base font-light font-inter text-muted-foreground">
                   We appreciate your interest in joining our team.
                 </p>
               </div>
@@ -455,8 +455,8 @@ export default function Apply() {
       <div className="max-w-2xl mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl text-center">Job Application</CardTitle>
-            <CardDescription className="text-center">
+            <CardTitle className="text-4xl font-light font-work tracking-tight text-center">Job Application</CardTitle>
+            <CardDescription className="text-center font-light font-inter">
               Please fill out the form below to apply for a position with us.
             </CardDescription>
           </CardHeader>

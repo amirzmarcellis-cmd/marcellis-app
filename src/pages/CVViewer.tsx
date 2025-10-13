@@ -161,8 +161,8 @@ export default function CVViewer() {
       <GlassCard className="p-0 overflow-hidden">
         <div className="bg-gradient-to-br from-primary/5 via-background to-accent/5 p-8 border-b border-border/50">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold text-foreground mb-2">Curriculum Vitae</h2>
-            <p className="text-muted-foreground">Professional Profile</p>
+            <h2 className="text-5xl font-light font-work tracking-tight text-foreground mb-2">Curriculum Vitae</h2>
+            <p className="text-base font-light font-inter text-muted-foreground">Professional Profile</p>
           </div>
         </div>
         
@@ -189,7 +189,7 @@ export default function CVViewer() {
               
               if (isHeader) {
                 return (
-                  <h2 key={index} className="text-xl font-bold text-primary mt-8 mb-4 pb-2 border-b-2 border-primary/20 uppercase tracking-wide">
+                  <h2 key={index} className="text-3xl font-light font-work text-primary mt-8 mb-4 pb-2 border-b-2 border-primary/20 uppercase tracking-wide">
                     {cleanLine}
                   </h2>
                 );
@@ -197,7 +197,7 @@ export default function CVViewer() {
               
               if (isSubHeader) {
                 return (
-                  <h3 key={index} className="text-lg font-semibold text-foreground mt-6 mb-3">
+                  <h3 key={index} className="text-2xl font-light font-work text-foreground mt-6 mb-3">
                     {cleanLine}
                   </h3>
                 );
@@ -205,7 +205,7 @@ export default function CVViewer() {
               
               if (cleanLine.startsWith('•') || cleanLine.startsWith('-') || cleanLine.startsWith('*')) {
                 return (
-                  <div key={index} className="flex gap-3 ml-6 mb-2 text-muted-foreground">
+                  <div key={index} className="flex gap-3 ml-6 mb-2 text-muted-foreground font-light font-inter">
                     <span className="text-primary font-bold mt-1.5 text-sm">●</span>
                     <span className="flex-1 leading-relaxed">{cleanLine.replace(/^[•\-*]\s*/, '')}</span>
                   </div>
@@ -213,7 +213,7 @@ export default function CVViewer() {
               }
               
               return (
-                <p key={index} className="text-foreground leading-relaxed mb-3">
+                <p key={index} className="text-foreground leading-relaxed mb-3 font-light font-inter">
                   {cleanLine}
                 </p>
               );

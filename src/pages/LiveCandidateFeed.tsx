@@ -250,19 +250,19 @@ export default function LiveCandidateFeed() {
               </div>
             </div>
             <div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                LIVE CANDIDATE FEED
-              </h1>
-              <p className="text-purple-200 text-lg">Call Done Candidates - Ready for Action</p>
+            <h3 className="text-6xl sm:text-7xl font-light font-work tracking-tight">
+              LIVE CANDIDATE FEED
+            </h3>
+            <p className="text-base font-light font-inter text-muted-foreground">Call Done Candidates - Ready for Action</p>
             </div>
           </div>
           
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2 bg-background/30 px-4 py-2 rounded-full border-2 border-primary/60">
               <div className="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
-              <span className="text-primary font-medium">LIVE</span>
+              <span className="text-primary font-light font-inter">LIVE</span>
             </div>
-            <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-400/40 px-4 py-2 text-lg">
+            <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-400/40 px-4 py-2 text-lg font-light font-inter">
               {filteredCandidates.length} Active
             </Badge>
           </div>
@@ -272,7 +272,7 @@ export default function LiveCandidateFeed() {
       {/* Filters */}
       <Card className="mb-8 bg-card border-border dark:bg-gradient-to-r dark:from-white/10 dark:to-white/5 dark:backdrop-blur-xl dark:border-white/20 shadow-2xl shadow-purple-500/10">
         <CardHeader>
-          <CardTitle className="text-foreground flex items-center">
+          <CardTitle className="text-3xl font-light font-work tracking-tight text-foreground flex items-center">
             <Filter className="w-5 h-5 mr-2 text-cyan-400" />
             Advanced Filtering System
           </CardTitle>
@@ -280,20 +280,20 @@ export default function LiveCandidateFeed() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-purple-300">Search Candidates</label>
+              <label className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">Search Candidates</label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 w-4 h-4" />
                 <Input 
                   placeholder="Name or position..." 
                   value={searchTerm} 
                   onChange={e => setSearchTerm(e.target.value)} 
-                  className="pl-10 bg-black/20 border-cyan-400/30 text-foreground placeholder-muted-foreground focus:border-cyan-400 focus:ring-cyan-400/20" 
+                  className="pl-10 bg-black/20 border-cyan-400/30 text-foreground placeholder-muted-foreground focus:border-cyan-400 focus:ring-cyan-400/20 font-light font-inter" 
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-purple-300">Active Job</label>
+              <label className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">Active Job</label>
               <Select value={selectedJob} onValueChange={setSelectedJob}>
                 <SelectTrigger className="bg-black/20 border-purple-400/30 text-foreground focus:border-purple-400">
                   <SelectValue placeholder="All Jobs" />
@@ -316,16 +316,16 @@ export default function LiveCandidateFeed() {
       <Card className="bg-card border-border dark:bg-gradient-to-br dark:from-white/10 dark:to-white/5 dark:backdrop-blur-xl dark:border-white/20 shadow-2xl">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-2xl text-foreground flex items-center">
+            <CardTitle className="text-3xl font-light font-work tracking-tight text-foreground flex items-center">
               <Users className="w-6 h-6 mr-3 text-cyan-400" />
               Call Done Candidates
-              <Badge className="ml-4 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 text-cyan-300 border-cyan-400/40">
+              <Badge className="ml-4 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 text-cyan-300 border-cyan-400/40 font-light font-inter">
                 {filteredCandidates.length} Candidates
               </Badge>
             </CardTitle>
             <div className="flex items-center space-x-2">
               <Zap className="w-5 h-5 text-yellow-400 animate-pulse" />
-              <span className="text-yellow-400 text-sm font-medium">Real-time Updates</span>
+              <span className="text-yellow-400 text-sm font-light font-inter">Real-time Updates</span>
             </div>
           </div>
         </CardHeader>
@@ -362,23 +362,23 @@ export default function LiveCandidateFeed() {
                       
                       <div className="flex-1">
                         <div className="mb-3">
-                          <h3 className="text-xl font-bold text-foreground">{candidate.candidate_name}</h3>
+                          <h3 className="text-3xl font-light font-work tracking-tight text-foreground">{candidate.candidate_name}</h3>
                         </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                          <div className="flex items-center text-purple-300">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm font-light font-inter">
+                          <div className="flex items-center text-muted-foreground">
                             <Zap className="w-4 h-4 mr-2 text-yellow-400" />
-                            <span className="font-medium">{candidate['Job Title']}</span>
+                            <span>{candidate['Job Title']}</span>
                           </div>
-                          <div className="flex items-center text-purple-300">
+                          <div className="flex items-center text-muted-foreground">
                             <Mail className="w-4 h-4 mr-2 text-cyan-400" />
                             <span>{candidate.candidate_email}</span>
                           </div>
-                          <div className="flex items-center text-purple-300">
+                          <div className="flex items-center text-muted-foreground">
                             <Phone className="w-4 h-4 mr-2 text-green-400" />
                             <span>{candidate.candidate_phone_number}</span>
                           </div>
-                          <div className="flex items-center text-purple-300">
+                          <div className="flex items-center text-muted-foreground">
                             <Briefcase className="w-4 h-4 mr-2 text-orange-400" />
                             <span>💰 {candidate['Salary Expectations'] || 'Negotiable'}</span>
                           </div>

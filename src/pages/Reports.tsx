@@ -53,10 +53,10 @@ export default function Reports() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Reports</h1>
-            <p className="text-muted-foreground">Generate and download performance reports</p>
+            <h1 className="text-6xl font-light font-work tracking-tight text-foreground">Reports</h1>
+            <p className="text-base font-light font-inter text-muted-foreground">Generate and download performance reports</p>
           </div>
-          <Button>
+          <Button className="font-light font-inter">
             <FileText className="w-4 h-4 mr-2" />
             Generate New Report
           </Button>
@@ -85,10 +85,10 @@ export default function Reports() {
                         {report.type === "Operations" && <FileText className="w-5 h-5 text-primary" />}
                         {report.type === "Financial" && <FileText className="w-5 h-5 text-primary" />}
                       </div>
-                      <div>
-                        <CardTitle className="text-lg">{report.title}</CardTitle>
-                        <CardDescription>{report.description}</CardDescription>
-                      </div>
+                  <div>
+                    <CardTitle className="text-2xl font-light font-work">{report.title}</CardTitle>
+                    <CardDescription className="font-light font-inter">{report.description}</CardDescription>
+                  </div>
                     </div>
                     <Badge variant={report.status === "ready" ? "default" : "secondary"}>
                       {report.status}

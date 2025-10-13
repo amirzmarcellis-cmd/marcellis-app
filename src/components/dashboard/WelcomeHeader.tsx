@@ -41,15 +41,15 @@ export function WelcomeHeader() {
           </Avatar>
           
           <div>
-            <h1 className="text-3xl font-bold mb-1">
-              <span className="text-glow">Welcome back, </span>
-              <span className="bg-gradient-primary bg-clip-text text-transparent">
+            <h1 className="text-6xl font-light font-work tracking-tight mb-1">
+              <span className="text-foreground">Welcome back, </span>
+              <span className="text-primary">
                 {profile?.name || 'Recruiter'}
               </span>
             </h1>
-            <p className="text-muted-foreground text-lg mb-2">{currentDate}</p>
+            <p className="text-base font-light font-inter text-muted-foreground mb-2">{currentDate}</p>
             <div className="flex items-center space-x-3">
-              <Badge className="bg-primary text-primary-foreground">
+              <Badge className="bg-primary text-primary-foreground font-light font-inter">
                 User
               </Badge>
             </div>
@@ -57,12 +57,12 @@ export function WelcomeHeader() {
         </div>
 
         <div className="text-right">
-          <div className="flex items-center justify-end space-x-2 text-primary text-xl font-mono mb-2">
+          <div className="flex items-center justify-end space-x-2 text-primary text-xl font-light font-work mb-2">
             <Clock className="h-5 w-5" />
-            <span className="text-glow">{currentTime}</span>
+            <span>{currentTime}</span>
           </div>
           
-          <div className="flex items-center justify-end space-x-4 text-sm text-muted-foreground">
+          <div className="flex items-center justify-end space-x-4 text-sm font-light font-inter text-muted-foreground">
             <div className="flex items-center space-x-1">
               <div className="status-indicator status-active" />
               <span>Mission Control Online</span>
@@ -78,8 +78,8 @@ export function WelcomeHeader() {
             <Activity className="h-5 w-5 text-cyan" />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Active Today</p>
-            <p className="text-xl font-semibold text-cyan">24 calls</p>
+            <p className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">Active Today</p>
+            <p className="text-4xl font-light font-work text-cyan">24</p>
           </div>
         </div>
         
@@ -88,8 +88,8 @@ export function WelcomeHeader() {
             <Users className="h-5 w-5 text-blue" />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">New Candidates</p>
-            <p className="text-xl font-semibold text-blue">12 today</p>
+            <p className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">New Candidates</p>
+            <p className="text-4xl font-light font-work text-blue">12</p>
           </div>
         </div>
         
@@ -98,8 +98,8 @@ export function WelcomeHeader() {
             <Briefcase className="h-5 w-5 text-purple" />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Open Positions</p>
-            <p className="text-xl font-semibold text-purple">8 active</p>
+            <p className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">Open Positions</p>
+            <p className="text-4xl font-light font-work text-purple">8</p>
           </div>
         </div>
       </div>

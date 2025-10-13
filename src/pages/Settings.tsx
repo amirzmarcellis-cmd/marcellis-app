@@ -62,13 +62,13 @@ export default function Settings() {
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <SettingsIcon className="h-6 w-6 text-primary" />
-        <h1 className="text-2xl font-bold">Settings</h1>
+        <h1 className="text-6xl font-light font-work tracking-tight">Settings</h1>
       </div>
 
       {/* Profile Settings */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-3xl font-light font-work tracking-tight">
             <User className="h-5 w-5" />
             Profile Settings
           </CardTitle>
@@ -76,7 +76,7 @@ export default function Settings() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="name">Display Name</Label>
+              <Label htmlFor="name" className="font-light font-inter">Display Name</Label>
               <Input
                 id="name"
                 value={formData.name}
@@ -85,7 +85,7 @@ export default function Settings() {
               />
             </div>
             <div>
-              <Label htmlFor="email">Email Address</Label>
+              <Label htmlFor="email" className="font-light font-inter">Email Address</Label>
               <Input
                 id="email"
                 type="email"
