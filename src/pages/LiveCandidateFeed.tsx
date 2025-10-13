@@ -236,7 +236,7 @@ export default function LiveCandidateFeed() {
 
 
   return (
-    <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900 dark:to-blue-900 p-4 sm:p-6 overflow-x-auto">
+    <div className="min-h-screen bg-background text-foreground p-4 sm:p-6 overflow-x-auto">
       {/* Header */}
       <div className="mb-8">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
