@@ -1255,19 +1255,25 @@ export default function JobDetails() {
     if (!hireCandidateData) return;
     try {
       // Use callid to update the correct record (recordid in Jobs_CVs equals the callid)
-      const {
-        error
-      } = await supabase.from('Jobs_CVs').update({
-        Reason_to_Hire: hireReason,
-        contacted: 'Submitted'
-      }).eq('recordid', hireCandidateData.callid).eq('job_id', hireCandidateData.jobId);
+      const { error } = await supabase
+        .from('Jobs_CVs')
+        .update({
+          Reason_to_Hire: hireReason,
+          contacted: 'Submitted'
+        })
+        .eq('recordid', hireCandidateData.callid)
+        .eq('job_id', hireCandidateData.jobId);
+
       if (error) throw error;
 
       // Update local state using both user_id and Candidate_ID
-      setCandidates(prev => prev.map(c => c["user_id"] === hireCandidateData.candidateId || c["Candidate_ID"] === hireCandidateData.candidateId ? {
-        ...c,
-        Contacted: 'Submitted'
-      } : c));
+      setCandidates(prev => prev.map(c => 
+        (c["user_id"] === hireCandidateData.candidateId || 
+         c["Candidate_ID"] === hireCandidateData.candidateId) 
+          ? { ...c, Contacted: 'Submitted' }
+          : c
+      ));
+
       toast({
         title: "CV Submitted",
         description: "Candidate's CV has been submitted with hiring reason"
@@ -1278,6 +1284,7 @@ export default function JobDetails() {
         fetchCandidates(id);
         fetchLonglistedCandidates(id);
       }
+      
       setShowHireDialog(false);
       setHireReason("");
       setHireCandidateData(null);
@@ -1536,10 +1543,14 @@ export default function JobDetails() {
   };
   const handleCVSubmitted = async (candidateId: string, callid?: number) => {
     // Find candidate by either user_id or Candidate_ID
-    const candidateContact = candidates.find(c => c["user_id"] === candidateId || c["Candidate_ID"] === candidateId);
+    const candidateContact = candidates.find(c => 
+      c["user_id"] === candidateId || c["Candidate_ID"] === candidateId
+    );
+    
     if (candidateContact) {
       // Use provided callid or fall back to candidate's callid
       const finalCallId = callid || candidateContact.callid;
+      
       if (!finalCallId) {
         toast({
           title: "Error",
@@ -1548,42 +1559,50 @@ export default function JobDetails() {
         });
         return;
       }
+      
       openHireDialog(id!, candidateId, finalCallId);
     } else {
       toast({
-        title: "Error",
+        title: "Error", 
         description: "Candidate not found",
         variant: "destructive"
       });
     }
   };
+  
   const handleClientStatusChange = async (candidateId: string, newStatus: string) => {
     try {
-      const {
-        error
-      } = await supabase.from("Jobs_CVs").update({
-        client_status: newStatus
-      }).eq("user_id", candidateId).eq("job_id", id!);
+      const { error } = await supabase
+        .from("Jobs_CVs")
+        .update({ client_status: newStatus })
+        .eq("user_id", candidateId)
+        .eq("job_id", id!);
+
       if (error) throw error;
 
       // Update local state
-      setCandidates(prev => prev.map(c => c["user_id"] === candidateId || c["Candidate_ID"] === candidateId ? {
-        ...c,
-        client_status: newStatus
-      } : c));
+      setCandidates(prev =>
+        prev.map(c =>
+          (c["user_id"] === candidateId || c["Candidate_ID"] === candidateId)
+            ? { ...c, client_status: newStatus }
+            : c
+        )
+      );
+
       toast({
         title: "Client Status Updated",
-        description: `Client status changed to ${newStatus}`
+        description: `Client status changed to ${newStatus}`,
       });
     } catch (error) {
       console.error("Error updating client status:", error);
       toast({
         title: "Error",
         description: "Failed to update client status",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
+  
   const handleScheduleInterview = async () => {
     if (!selectedCandidate) return;
 
@@ -2041,10 +2060,12 @@ export default function JobDetails() {
                     <FileCheck className="w-3 h-3 mr-1" />
                     CV Submitted
                   </Button> : <Button variant="outline" size="sm" onClick={() => {
-                const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
-                const latestContact = contactsWithCalls.length > 0 ? contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest) : null;
-                handleCVSubmitted(candidateId, latestContact?.callid);
-              }} className="flex-1 min-w-[100px] bg-transparent border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-500 dark:hover:text-green-300 transition-all duration-200">
+                    const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
+                    const latestContact = contactsWithCalls.length > 0 
+                      ? contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest)
+                      : null;
+                    handleCVSubmitted(candidateId, latestContact?.callid);
+                  }} className="flex-1 min-w-[100px] bg-transparent border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-500 dark:hover:text-green-300 transition-all duration-200">
                     <FileCheck className="w-3 h-3 mr-1" />
                     Submit CV
                   </Button>}
@@ -2058,10 +2079,14 @@ export default function JobDetails() {
               </div>
               
               {/* Client Status Dropdown - Shows when CV is Submitted */}
-              {mainCandidate["Contacted"] === "Submitted" && <div className="pt-2 border-t">
+              {mainCandidate["Contacted"] === "Submitted" && (
+                <div className="pt-2 border-t">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">Client Status:</span>
-                    <Select value={mainCandidate["client_status"] || "Interview Requested"} onValueChange={value => handleClientStatusChange(candidateId, value)}>
+                    <Select
+                      value={mainCandidate["client_status"] || "Interview Requested"}
+                      onValueChange={(value) => handleClientStatusChange(candidateId, value)}
+                    >
                       <SelectTrigger className="h-9 flex-1">
                         <SelectValue />
                       </SelectTrigger>
@@ -2072,7 +2097,8 @@ export default function JobDetails() {
                       </SelectContent>
                     </Select>
                   </div>
-                </div>}
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
@@ -2154,10 +2180,10 @@ export default function JobDetails() {
   const candidatesMatchingNationality = shortListCandidates.filter(candidate => {
     const candidateNationality = candidate["nationality"];
     const preferredNationality = job?.prefered_nationality;
-
+    
     // If no preferred nationality is set, include all candidates in budget sections
     if (!preferredNationality || !candidateNationality) return true;
-
+    
     // Include only if nationalities match (case-insensitive)
     return candidateNationality.toLowerCase().trim() === preferredNationality.toLowerCase().trim();
   });
@@ -2166,9 +2192,10 @@ export default function JobDetails() {
   const notInPreferredNationalityCandidates = filterShortListCandidates(shortListCandidates.filter(candidate => {
     const candidateNationality = candidate["nationality"];
     const preferredNationality = job?.prefered_nationality;
-
+    
     // Only include if both nationalities exist and don't match (case-insensitive)
     if (!candidateNationality || !preferredNationality) return false;
+    
     return candidateNationality.toLowerCase().trim() !== preferredNationality.toLowerCase().trim();
   }));
 
@@ -2259,7 +2286,7 @@ export default function JobDetails() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <div className="w-full overflow-x-auto">
             <TabsList className="w-full grid grid-cols-7 h-auto p-1">
-              <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2 font-bold">Overview</TabsTrigger>
+              <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">Overview</TabsTrigger>
               <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2">Description</TabsTrigger>
               <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">AI Requirements</TabsTrigger>
               <TabsTrigger value="applications" className="text-xs md:text-sm px-2 py-2 relative" onClick={handleApplicationsTabClick}>
@@ -2336,10 +2363,22 @@ export default function JobDetails() {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Headhunting Companies:</span>
                     <div className="flex flex-col gap-1 items-end">
-                      {job.headhunting_companies ? job.headhunting_companies.split(",").map((url: string, index: number) => <a key={index} href={url.trim()} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
+                      {job.headhunting_companies ? (
+                        job.headhunting_companies.split(",").map((url: string, index: number) => (
+                          <a
+                            key={index}
+                            href={url.trim()}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline flex items-center gap-1"
+                          >
                             {url.trim()}
                             <ExternalLink className="w-3 h-3" />
-                          </a>) : <span>N/A</span>}
+                          </a>
+                        ))
+                      ) : (
+                        <span>N/A</span>
+                      )}
                     </div>
                   </div>
                   <div className="flex justify-between items-center">
