@@ -628,7 +628,7 @@ export default function Index() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
         {/* Left Side - Job Control Panels - 30% width */}
         <div className="space-y-4 lg:col-span-1">
-          <h2 className="text-lg font-bold text-cyan-300 mb-4 flex items-center">
+          <h2 className="text-lg font-bold font-work text-cyan-300 mb-4 flex items-center">
             <Target className="h-5 w-5 mr-2" />
             Active Jobs Funnel
           </h2>
@@ -637,12 +637,12 @@ export default function Index() {
               {data?.activeJobs?.map(job => <Card key={job.job_id} className="bg-card border-border dark:bg-gradient-to-br dark:from-white/5 dark:via-white/3 dark:to-white/5 dark:backdrop-blur-lg dark:border-white/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 hover:scale-[1.02]">
                   <CardContent className="p-4">
                     <div className="flex items-center mb-3">
-                      <h3 className="font-semibold text-sm truncate">{job.job_title}</h3>
+                      <h3 className="font-semibold font-work text-sm truncate">{job.job_title}</h3>
                     </div>
-                    <p className="text-xs text-gray-400 mb-3">{job.job_location}</p>
+                    <p className="text-xs font-work text-gray-400 mb-3">{job.job_location}</p>
                     <div className="space-y-2 mb-3">
                       {/* First Row: Longlist, Shortlist, Contacted */}
-                      <div className="grid grid-cols-3 gap-1 text-xs">
+                      <div className="grid grid-cols-3 gap-1 text-xs font-work">
                         <div className="text-center">
                           <div className="text-cyan-300 font-bold">{jobStats[job.job_id]?.longlist || 0}</div>
                           <div className="text-gray-500">Longlist</div>
@@ -657,7 +657,7 @@ export default function Index() {
                         </div>
                       </div>
                       {/* Second Row: Low Scored, Submitted, Rejected */}
-                      <div className="grid grid-cols-3 gap-1 text-xs">
+                      <div className="grid grid-cols-3 gap-1 text-xs font-work">
                         <div className="text-center">
                           <div className="text-red-300 font-bold">{jobStats[job.job_id]?.lowScored || 0}</div>
                           <div className="text-gray-500">Low Scored</div>
@@ -672,7 +672,7 @@ export default function Index() {
                         </div>
                       </div>
                     </div>
-                    <Button size="sm" variant="ghost" onClick={() => navigate(`/job/${job.job_id}`)} className="w-full mt-2 text-xs text-cyan-400 hover:bg-cyan-400/10">
+                    <Button size="sm" variant="ghost" onClick={() => navigate(`/job/${job.job_id}`)} className="w-full mt-2 text-xs font-work text-cyan-400 hover:bg-cyan-400/10">
                       Open Job
                     </Button>
                   </CardContent>
@@ -688,19 +688,19 @@ export default function Index() {
           <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xl text-cyan-300 flex items-center">
+                <CardTitle className="text-xl font-work text-cyan-300 flex items-center">
                   <Activity className="h-5 w-5 mr-2 animate-pulse text-cyan-400" />
                   Live Candidate Feed
-                  <Badge className="ml-3 bg-background/40 text-primary border-2 border-primary/60 glow-cyan animate-pulse">
+                  <Badge className="ml-3 font-work bg-background/40 text-primary border-2 border-primary/60 glow-cyan animate-pulse">
                     LIVE
                   </Badge>
                 </CardTitle>
                 <div className="flex items-center space-x-3">
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm text-emerald-300 font-medium">Active</span>
+                    <span className="text-sm font-work text-emerald-300 font-medium">Active</span>
                   </div>
-                  <Button size="sm" className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white border border-cyan-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" onClick={() => window.location.href = '/live-feed'}>
+                  <Button size="sm" className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white font-work border border-cyan-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" onClick={() => window.location.href = '/live-feed'}>
                     <Activity className="w-4 h-4 mr-2" />
                     Open Live Feed
                   </Button>
@@ -723,55 +723,55 @@ export default function Index() {
                               <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border-2 border-white animate-pulse"></div>
                             </div>
                              <div>
-                               <h4 className="font-semibold text-foreground text-lg group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors">{candidate.candidate_name}</h4>
-                               <p className="text-sm text-purple-300 font-medium">{jobTitle}</p>
+                               <h4 className="font-semibold font-work text-foreground text-lg group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors">{candidate.candidate_name}</h4>
+                               <p className="text-sm font-work text-purple-300 font-medium">{jobTitle}</p>
                                <div className="flex flex-wrap gap-2 mt-1">
-                                 <Badge variant="outline" className="text-xs border-cyan-400/50 text-cyan-400 bg-cyan-400/10">
+                                 <Badge variant="outline" className="text-xs font-work border-cyan-400/50 text-cyan-400 bg-cyan-400/10">
                                    User ID: {candidate.user_id}
                                  </Badge>
-                                 <Badge variant="outline" className="text-xs border-purple-400/50 text-purple-400 bg-purple-400/10">
+                                 <Badge variant="outline" className="text-xs font-work border-purple-400/50 text-purple-400 bg-purple-400/10">
                                    Job ID: {candidate.job_id}
                                  </Badge>
                                </div>
                              </div>
                           </div>
                           <div className="text-right">
-                            <div className={`text-2xl font-bold mb-2 ${getScoreColor(score)}`}>
+                            <div className={`text-2xl font-work font-bold mb-2 ${getScoreColor(score)}`}>
                               {score}
                             </div>
                             <div className="flex flex-col space-y-2">
                               <Button size="xs" variant="outline" onClick={e => {
                             e.stopPropagation();
                             handleRejectCandidate(candidate.Candidate_ID, candidate.job_id);
-                          }} className="bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200 text-xs">
+                          }} className="bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200 text-xs font-work">
                                 <XCircle className="w-3 h-3 mr-1" />
                                 Reject Candidate
                               </Button>
                               <Button size="xs" variant="outline" onClick={e => {
                             e.stopPropagation();
                             handleCVSubmitted(candidate.Candidate_ID, candidate.job_id);
-                          }} className="bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200 text-xs">
+                          }} className="bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200 text-xs font-work">
                                 <CheckCircle className="w-3 h-3 mr-1" />
                                 Submit CV
                               </Button>
                             </div>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-300 mb-4 leading-relaxed bg-black/20 p-3 rounded-lg">
+                        <p className="text-sm font-work text-gray-300 mb-4 leading-relaxed bg-black/20 p-3 rounded-lg">
                           {candidate.after_call_reason ? candidate.after_call_reason.slice(0, 200) + "..." : "No after call reason available"}
                         </p>
                          <div className="flex items-center justify-between">
-                          <div className="text-sm text-gray-400">
+                          <div className="text-sm font-work text-gray-400">
                             Updated: {new Date(candidate.lastcalltime || Date.now()).toLocaleDateString()}
                           </div>
-                           <Badge className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 border-blue-400/40 animate-pulse">
+                           <Badge className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 font-work border-blue-400/40 animate-pulse">
                              📞 Call Done
                            </Badge>
                         </div>
                       </div>;
                 })}
                   {enrichedCandidates.length > 5 && <div className="text-center pt-4">
-                      <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border border-purple-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" onClick={() => window.location.href = '/live-feed'}>
+                      <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-work border border-purple-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" onClick={() => window.location.href = '/live-feed'}>
                         View All {enrichedCandidates.length} Candidates
                         <Activity className="w-4 h-4 ml-2" />
                       </Button>
