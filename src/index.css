@@ -53,16 +53,16 @@
   }
 
   .dark {
-    /* Cinematic Dark Theme - Minimalist */
-    --background: 0 0% 6%;
+    /* Cinematic Dark Theme - Pure Black */
+    --background: 0 0% 0%;
     --foreground: 0 0% 95%;
     --muted: 0 0% 60%;
     --muted-foreground: 0 0% 60%;
-    --popover: 0 0% 8%;
+    --popover: 0 0% 0%;
     --popover-foreground: 0 0% 95%;
     --border: 0 0% 18%;
-    --input: 0 0% 8%;
-    --card: 0 0% 8%;
+    --input: 0 0% 0%;
+    --card: 0 0% 0%;
     --card-foreground: 0 0% 95%;
     
     /* Muted blue-gray primary */
@@ -99,20 +99,20 @@
     
     --ring: 200 15% 65%;
 
-    /* Subtle gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 10%));
-    --gradient-secondary: linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 9%));
-    --gradient-accent: linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 10%));
-    --gradient-card: linear-gradient(135deg, hsl(0 0% 8% / 0.3), hsl(0 0% 10% / 0.2));
-    --gradient-hero: linear-gradient(to bottom, hsl(0 0% 6%), hsl(0 0% 8% / 0.1));
-    --gradient-panel: linear-gradient(135deg, hsl(0 0% 8% / 0.95), hsl(0 0% 10% / 0.8));
+    /* Pure black gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(0 0% 0%), hsl(0 0% 2%));
+    --gradient-secondary: linear-gradient(135deg, hsl(0 0% 0%), hsl(0 0% 1%));
+    --gradient-accent: linear-gradient(135deg, hsl(0 0% 0%), hsl(0 0% 2%));
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 0% / 0.3), hsl(0 0% 2% / 0.2));
+    --gradient-hero: linear-gradient(to bottom, hsl(0 0% 0%), hsl(0 0% 0% / 0.1));
+    --gradient-panel: linear-gradient(135deg, hsl(0 0% 0% / 0.95), hsl(0 0% 2% / 0.8));
     --gradient-glow: radial-gradient(circle at center, hsl(200 15% 65% / 0.1), transparent 70%);
     
     /* Glassmorphism effects */
-    --glass-primary: hsla(200, 15%, 65%, 0.1);
-    --glass-secondary: hsla(0, 0%, 8%, 0.95);
+    --glass-primary: hsla(0, 0%, 20%, 0.1);
+    --glass-secondary: hsla(0, 0%, 0%, 0.95);
     --glass-border: hsla(0, 0%, 95%, 0.1);
-    --glass-bg: hsla(0, 0%, 6%, 0.95);
+    --glass-bg: hsla(0, 0%, 0%, 0.95);
     
     /* Subtle shadows */
     --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.2);
@@ -132,14 +132,14 @@
     --ai-button-inner-shadow: inset 0 3px 6px hsl(220 5% 96% / 0.9), inset 0 -3px 6px hsl(220 15% 65% / 0.5), inset 0 1px 2px hsl(220 2% 98% / 0.8);
 
     /* Sidebar dark theme */
-    --sidebar-background: 220 25% 8%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 180 100% 50%;
-    --sidebar-primary-foreground: 220 25% 8%;
-    --sidebar-accent: 217 32% 15%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 32% 20%;
-    --sidebar-ring: 180 100% 50%;
+    --sidebar-background: 0 0% 0%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 0 0% 50%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 0 0% 50%;
   }
 }
 
