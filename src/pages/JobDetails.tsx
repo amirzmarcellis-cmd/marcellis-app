@@ -8,7 +8,14 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -16,7 +23,35 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, MapPin, Calendar, Banknote, Users, FileText, Clock, Target, Phone, Mail, Star, Search, Filter, Upload, Zap, X, UserCheck, ExternalLink, CheckCircle, AlertCircle, AlertTriangle, Hourglass, User, FileCheck, Building, Pause, Play } from "lucide-react";
+import {
+  ArrowLeft,
+  MapPin,
+  Calendar,
+  Banknote,
+  Users,
+  FileText,
+  Clock,
+  Target,
+  Phone,
+  Mail,
+  Star,
+  Search,
+  Filter,
+  Upload,
+  Zap,
+  X,
+  UserCheck,
+  ExternalLink,
+  CheckCircle,
+  AlertCircle,
+  AlertTriangle,
+  Hourglass,
+  User,
+  FileCheck,
+  Building,
+  Pause,
+  Play,
+} from "lucide-react";
 import { FuturisticActionButton } from "@/components/ui/FuturisticActionButton";
 import { ActionButton } from "@/components/ui/ActionButton";
 import { Switch } from "@/components/ui/switch";
@@ -27,25 +62,28 @@ import { StatusDropdown } from "@/components/candidates/StatusDropdown";
 import { useToast } from "@/components/ui/use-toast";
 import { formatDate } from "@/lib/utils";
 import { useProfile } from "@/hooks/useProfile";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 
 // Using any type to avoid TypeScript complexity with quoted property names
 
 export default function JobDetails() {
-  const {
-    id
-  } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState("overview");
   const [isShaking, setIsShaking] = useState(false);
-  const {
-    profile
-  } = useProfile();
-  const {
-    toast
-  } = useToast();
+  const { profile } = useProfile();
+  const { toast } = useToast();
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [automaticDialSaving, setAutomaticDialSaving] = useState(false);
@@ -76,7 +114,7 @@ export default function JobDetails() {
   const [shortListScoreFilter, setShortListScoreFilter] = useState("all");
   const [shortListSourceFilter, setShortListSourceFilter] = useState("all");
 
-  // AI Long List filters  
+  // AI Long List filters
   const [longListSourceFilter, setLongListSourceFilter] = useState("all");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -103,83 +141,90 @@ export default function JobDetails() {
   } | null>(null);
 
   // Function to fetch LinkedIn ID and redirect to profile
-  const handleViewLinkedInProfile = async (candidateId: string, candidateName: string, jobId: string, source: string) => {
-    if (!source || !source.toLowerCase().includes('linkedin')) return;
+  const handleViewLinkedInProfile = async (
+    candidateId: string,
+    candidateName: string,
+    jobId: string,
+    source: string,
+  ) => {
+    if (!source || !source.toLowerCase().includes("linkedin")) return;
 
     // Open a blank tab immediately on user click to avoid iframe/X-Frame-Options issues and popup blockers
-    const preOpened = window.open('', '_blank');
+    const preOpened = window.open("", "_blank");
     try {
       preOpened?.document.write('<p style="font-family:sans-serif; color:#444;">Opening LinkedIn…</p>');
       preOpened?.document.close();
     } catch {}
     try {
-      console.log('Searching for LinkedIn profile:', {
+      console.log("Searching for LinkedIn profile:", {
         candidateId,
         candidateName,
-        jobId
+        jobId,
       });
 
       // Try searching by user_id first (Jobs_CVs.user_id like "Lin-319")
-      let {
+      let { data, error } = await supabase
+        .from("linkedin_boolean_search")
+        .select("linkedin_id, user_id")
+        .eq("user_id", candidateId)
+        .maybeSingle();
+      console.log("LinkedIn search by user_id result:", {
         data,
-        error
-      } = await supabase.from('linkedin_boolean_search').select('linkedin_id, user_id').eq('user_id', candidateId).maybeSingle();
-      console.log('LinkedIn search by user_id result:', {
-        data,
-        error
+        error,
       });
 
       // If not found by user_id, try searching by job_id
       if (!data && jobId) {
-        const {
-          data: allProfiles,
-          error: jobError
-        } = await supabase.from('linkedin_boolean_search').select('linkedin_id, user_id').eq('job_id', jobId);
-        console.log('LinkedIn profiles for job:', {
+        const { data: allProfiles, error: jobError } = await supabase
+          .from("linkedin_boolean_search")
+          .select("linkedin_id, user_id")
+          .eq("job_id", jobId);
+        console.log("LinkedIn profiles for job:", {
           allProfiles,
-          jobError
+          jobError,
         });
         if (allProfiles && allProfiles.length > 0) {
           data = allProfiles[0];
         }
       }
-      if (error && (error as any).code !== 'PGRST116') {
-        console.error('Error fetching LinkedIn ID:', error);
+      if (error && (error as any).code !== "PGRST116") {
+        console.error("Error fetching LinkedIn ID:", error);
         preOpened?.close();
         toast({
-          title: 'Error',
-          description: 'Could not fetch LinkedIn profile: ' + (error as any).message,
-          variant: 'destructive'
+          title: "Error",
+          description: "Could not fetch LinkedIn profile: " + (error as any).message,
+          variant: "destructive",
         });
         return;
       }
       if (data && data.linkedin_id) {
         const linkedInUrl = `https://www.linkedin.com/in/${data.linkedin_id}/`;
-        console.log('Opening LinkedIn URL:', linkedInUrl);
+        console.log("Opening LinkedIn URL:", linkedInUrl);
         if (preOpened) {
           preOpened.location.href = linkedInUrl;
         } else {
-          window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
+          window.open(linkedInUrl, "_blank", "noopener,noreferrer");
         }
       } else {
-        console.log('No LinkedIn ID found for candidate:', {
+        console.log("No LinkedIn ID found for candidate:", {
           candidateId,
-          candidateName
+          candidateName,
         });
         preOpened?.close();
         toast({
-          title: 'Not Found',
-          description: 'LinkedIn profile ID not found. The candidate may not have been sourced from LinkedIn boolean search.',
-          variant: 'destructive'
+          title: "Not Found",
+          description:
+            "LinkedIn profile ID not found. The candidate may not have been sourced from LinkedIn boolean search.",
+          variant: "destructive",
         });
       }
     } catch (err) {
-      console.error('Error:', err);
+      console.error("Error:", err);
       preOpened?.close();
       toast({
-        title: 'Error',
-        description: 'An error occurred while fetching the profile',
-        variant: 'destructive'
+        title: "Error",
+        description: "An error occurred while fetching the profile",
+        variant: "destructive",
       });
     }
   };
@@ -189,25 +234,32 @@ export default function JobDetails() {
     const fields: {
       v: any;
       treatAsId: boolean;
-    }[] = [{
-      v: c.linkedin_id ?? c["linkedin_id"],
-      treatAsId: true
-    }, {
-      v: c["LinkedIn ID"],
-      treatAsId: true
-    }, {
-      v: c.linkedin_url ?? c["linkedin_url"],
-      treatAsId: false
-    }, {
-      v: c["LinkedIn URL"],
-      treatAsId: false
-    }, {
-      v: c["Source URL"],
-      treatAsId: false
-    }, {
-      v: c["Source"],
-      treatAsId: false
-    }];
+    }[] = [
+      {
+        v: c.linkedin_id ?? c["linkedin_id"],
+        treatAsId: true,
+      },
+      {
+        v: c["LinkedIn ID"],
+        treatAsId: true,
+      },
+      {
+        v: c.linkedin_url ?? c["linkedin_url"],
+        treatAsId: false,
+      },
+      {
+        v: c["LinkedIn URL"],
+        treatAsId: false,
+      },
+      {
+        v: c["Source URL"],
+        treatAsId: false,
+      },
+      {
+        v: c["Source"],
+        treatAsId: false,
+      },
+    ];
     for (const f of fields) {
       const raw = f.v;
       if (!raw) continue;
@@ -218,10 +270,10 @@ export default function JobDetails() {
         continue;
       }
       if (!f.treatAsId) {
-        if (/linkedin\.com/i.test(s)) return `https://${s.replace(/^\/+/, '')}`;
+        if (/linkedin\.com/i.test(s)) return `https://${s.replace(/^\/+/, "")}`;
         continue;
       }
-      return `https://www.linkedin.com/in/${s.replace(/^\/+/, '').replace(/\/+$/, '')}/`;
+      return `https://www.linkedin.com/in/${s.replace(/^\/+/, "").replace(/\/+$/, "")}/`;
     }
     return null;
   };
@@ -241,21 +293,27 @@ export default function JobDetails() {
     jobId: string;
     callid: number;
   } | null>(null);
-  const [interviewSlots, setInterviewSlots] = useState<{
-    date: Date | undefined;
-    time: string;
-  }[]>([{
-    date: undefined,
-    time: ''
-  }, {
-    date: undefined,
-    time: ''
-  }, {
-    date: undefined,
-    time: ''
-  }]);
-  const [interviewType, setInterviewType] = useState<'Phone' | 'Online Meeting'>('Phone');
-  const [interviewLink, setInterviewLink] = useState('');
+  const [interviewSlots, setInterviewSlots] = useState<
+    {
+      date: Date | undefined;
+      time: string;
+    }[]
+  >([
+    {
+      date: undefined,
+      time: "",
+    },
+    {
+      date: undefined,
+      time: "",
+    },
+    {
+      date: undefined,
+      time: "",
+    },
+  ]);
+  const [interviewType, setInterviewType] = useState<"Phone" | "Online Meeting">("Phone");
+  const [interviewLink, setInterviewLink] = useState("");
   useEffect(() => {
     if (id) {
       // Load job data first to show page immediately
@@ -271,9 +329,7 @@ export default function JobDetails() {
       const storageKey = `shortlist_${id}_disabled`;
       const storedData = localStorage.getItem(storageKey);
       if (storedData) {
-        const {
-          disabledUntil
-        } = JSON.parse(storedData);
+        const { disabledUntil } = JSON.parse(storedData);
         const now = Date.now();
         if (disabledUntil > now) {
           setShortListButtonDisabled(true);
@@ -300,7 +356,7 @@ export default function JobDetails() {
     } else {
       // Check for tab in URL hash
       const hash = window.location.hash;
-      if (hash.startsWith('#tab=')) {
+      if (hash.startsWith("#tab=")) {
         const tab = hash.substring(5);
         setActiveTab(tab);
       }
@@ -321,25 +377,26 @@ export default function JobDetails() {
         const hoursPassed = (now.getTime() - enabledAt.getTime()) / (1000 * 60 * 60);
         if (hoursPassed >= 48) {
           // Auto dial has been on for 48+ hours, turn it off
-          const {
-            error
-          } = await supabase.from('Jobs').update({
-            automatic_dial: false,
-            auto_dial_enabled_at: null
-          }).eq('job_id', job.job_id);
+          const { error } = await supabase
+            .from("Jobs")
+            .update({
+              automatic_dial: false,
+              auto_dial_enabled_at: null,
+            })
+            .eq("job_id", job.job_id);
           if (error) throw error;
-          setJob(prev => ({
+          setJob((prev) => ({
             ...prev,
             automatic_dial: false,
-            auto_dial_enabled_at: null
+            auto_dial_enabled_at: null,
           }));
           toast({
             title: "Auto Dial Disabled",
-            description: "Auto dial has been automatically disabled after 48 hours"
+            description: "Auto dial has been automatically disabled after 48 hours",
           });
         }
       } catch (error) {
-        console.error('Error checking/disabling auto dial:', error);
+        console.error("Error checking/disabling auto dial:", error);
       }
     };
     if (job) {
@@ -350,16 +407,16 @@ export default function JobDetails() {
   // Scroll to focused candidate when returning from profile
   useEffect(() => {
     const focusId = location.state?.focusCandidateId;
-    if ((activeTab === 'boolean-search' || activeTab === 'shortlist') && focusId) {
+    if ((activeTab === "boolean-search" || activeTab === "shortlist") && focusId) {
       const el = document.getElementById(`candidate-card-${focusId}`);
       if (el) {
         el.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center'
+          behavior: "smooth",
+          block: "center",
         });
-        el.classList.add('ring-2', 'ring-primary', 'animate-pulse');
+        el.classList.add("ring-2", "ring-primary", "animate-pulse");
         setTimeout(() => {
-          el.classList.remove('animate-pulse', 'ring-2', 'ring-primary');
+          el.classList.remove("animate-pulse", "ring-2", "ring-primary");
           // Clear the focus state after highlighting
           window.history.replaceState({}, document.title);
         }, 1500);
@@ -370,7 +427,7 @@ export default function JobDetails() {
     let interval: NodeJS.Timeout;
     if (shortListButtonDisabled && shortListTimeRemaining > 0) {
       interval = setInterval(() => {
-        setShortListTimeRemaining(prev => {
+        setShortListTimeRemaining((prev) => {
           if (prev <= 1) {
             setShortListButtonDisabled(false);
             const storageKey = `shortlist_${id}_disabled`;
@@ -388,7 +445,7 @@ export default function JobDetails() {
   useEffect(() => {
     if (applications.length > 0 && lastViewedApplications) {
       const lastViewedTimestamp = new Date(lastViewedApplications);
-      const newApps = applications.filter(app => {
+      const newApps = applications.filter((app) => {
         const appTimestamp = new Date(app.Timestamp);
         return appTimestamp > lastViewedTimestamp;
       });
@@ -418,10 +475,7 @@ export default function JobDetails() {
   const fetchJob = async (jobId: string) => {
     try {
       setLoading(true);
-      const {
-        data,
-        error
-      } = await supabase.from('Jobs').select('*').eq('job_id', jobId).maybeSingle();
+      const { data, error } = await supabase.from("Jobs").select("*").eq("job_id", jobId).maybeSingle();
       if (error) {
         console.error("Error fetching job:", error);
         setJob(null);
@@ -436,9 +490,11 @@ export default function JobDetails() {
 
       // Fetch recruiter name if recruiter_id exists
       if (data.recruiter_id) {
-        const {
-          data: recruiterData
-        } = await supabase.from('profiles').select('name').eq('user_id', data.recruiter_id).maybeSingle();
+        const { data: recruiterData } = await supabase
+          .from("profiles")
+          .select("name")
+          .eq("user_id", data.recruiter_id)
+          .maybeSingle();
         if (recruiterData?.name) {
           setRecruiterName(recruiterData.name);
         }
@@ -454,35 +510,36 @@ export default function JobDetails() {
     if (!job?.job_id) return;
 
     // Optimistic update for immediate feedback
-    setJob(prev => ({
+    setJob((prev) => ({
       ...prev,
       automatic_dial: checked,
-      auto_dial_enabled_at: checked ? new Date().toISOString() : null
+      auto_dial_enabled_at: checked ? new Date().toISOString() : null,
     }));
     setAutomaticDialSaving(true);
     try {
-      const {
-        error
-      } = await supabase.from('Jobs').update({
-        automatic_dial: checked,
-        auto_dial_enabled_at: checked ? new Date().toISOString() : null
-      }).eq('job_id', job.job_id);
+      const { error } = await supabase
+        .from("Jobs")
+        .update({
+          automatic_dial: checked,
+          auto_dial_enabled_at: checked ? new Date().toISOString() : null,
+        })
+        .eq("job_id", job.job_id);
       if (error) throw error;
       toast({
         title: "Success",
-        description: `Automatic dial ${checked ? 'enabled' : 'disabled'} for this job`
+        description: `Automatic dial ${checked ? "enabled" : "disabled"} for this job`,
       });
     } catch (error) {
-      console.error('Error updating automatic dial:', error);
+      console.error("Error updating automatic dial:", error);
       // Revert on error
-      setJob(prev => ({
+      setJob((prev) => ({
         ...prev,
-        automatic_dial: !checked
+        automatic_dial: !checked,
       }));
       toast({
         title: "Error",
         description: "Failed to update automatic dial setting",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setAutomaticDialSaving(false);
@@ -493,33 +550,34 @@ export default function JobDetails() {
     const isCurrentlyActive = job?.Processed === "Yes";
 
     // Optimistic update for immediate feedback
-    setJob(prev => ({
+    setJob((prev) => ({
       ...prev,
       automatic_dial: isCurrentlyActive ? false : prev?.automatic_dial,
-      Processed: isCurrentlyActive ? "No" : "Yes"
+      Processed: isCurrentlyActive ? "No" : "Yes",
     }));
     setAutomaticDialSaving(true);
     try {
-      const {
-        error
-      } = await supabase.from('Jobs').update({
-        automatic_dial: isCurrentlyActive ? false : job?.automatic_dial,
-        Processed: isCurrentlyActive ? "No" : "Yes",
-        status: isCurrentlyActive ? "paused" : "active"
-      }).eq('job_id', job.job_id);
+      const { error } = await supabase
+        .from("Jobs")
+        .update({
+          automatic_dial: isCurrentlyActive ? false : job?.automatic_dial,
+          Processed: isCurrentlyActive ? "No" : "Yes",
+          status: isCurrentlyActive ? "paused" : "active",
+        })
+        .eq("job_id", job.job_id);
       if (error) throw error;
       toast({
         title: "Success",
-        description: isCurrentlyActive ? "Job paused successfully" : "Job activated successfully"
+        description: isCurrentlyActive ? "Job paused successfully" : "Job activated successfully",
       });
       // Navigate back to jobs page to see it in the correct section
-      setTimeout(() => navigate('/jobs'), 1000);
+      setTimeout(() => navigate("/jobs"), 1000);
     } catch (error) {
-      console.error('Error toggling job status:', error);
+      console.error("Error toggling job status:", error);
       toast({
         title: "Error",
         description: "Failed to update job status",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setAutomaticDialSaving(false);
@@ -527,10 +585,7 @@ export default function JobDetails() {
   };
   const fetchJobGroup = async (groupId: string) => {
     try {
-      const {
-        data,
-        error
-      } = await supabase.from('groups').select('*').eq('id', groupId).maybeSingle();
+      const { data, error } = await supabase.from("groups").select("*").eq("id", groupId).maybeSingle();
       if (error) {
         console.error("Error fetching group:", error);
         return;
@@ -545,100 +600,121 @@ export default function JobDetails() {
     try {
       setCandidatesLoading(true);
       // Optimize: Fetch both candidates and LinkedIn data in parallel
-      const [candidatesResult, linkedinResult] = await Promise.all([supabase.from('Jobs_CVs').select('*').eq('job_id', jobId).order('cv_score', {
-        ascending: false,
-        nullsFirst: false
-      }), supabase.from('linkedin_boolean_search').select('user_id, linkedin_id, linkedin_score, linkedin_score_reason').eq('job_id', jobId)]);
+      const [candidatesResult, linkedinResult] = await Promise.all([
+        supabase.from("Jobs_CVs").select("*").eq("job_id", jobId).order("cv_score", {
+          ascending: false,
+          nullsFirst: false,
+        }),
+        supabase
+          .from("linkedin_boolean_search")
+          .select("user_id, linkedin_id, linkedin_score, linkedin_score_reason")
+          .eq("job_id", jobId),
+      ]);
       const candidatesData = candidatesResult.data;
       const candidatesError = candidatesResult.error;
       const linkedinData = linkedinResult.data;
       const linkedinError = linkedinResult.error;
       if (candidatesError) throw candidatesError;
-      if (linkedinError) console.warn('Error fetching LinkedIn data:', linkedinError);
+      if (linkedinError) console.warn("Error fetching LinkedIn data:", linkedinError);
 
       // Create a map of LinkedIn data by user_id for quick lookup
       const linkedinMap = new Map();
-      (linkedinData || []).forEach(item => {
+      (linkedinData || []).forEach((item) => {
         if (item.user_id) {
           linkedinMap.set(item.user_id, {
             linkedin_id: item.linkedin_id,
             linkedin_score: item.linkedin_score,
-            linkedin_score_reason: item.linkedin_score_reason
+            linkedin_score_reason: item.linkedin_score_reason,
           });
         }
       });
       const mapped = (candidatesData || []).map((row: any) => {
         // Determine effective CV score (prioritize LinkedIn score for LinkedIn-sourced candidates)
-        const sourceLower = (row.source || '').toLowerCase();
-        const effectiveCvScore = sourceLower.includes('linkedin') ? row.linkedin_score ?? row.cv_score ?? null : row.cv_score ?? row.linkedin_score ?? null;
+        const sourceLower = (row.source || "").toLowerCase();
+        const effectiveCvScore = sourceLower.includes("linkedin")
+          ? (row.linkedin_score ?? row.cv_score ?? null)
+          : (row.cv_score ?? row.linkedin_score ?? null);
 
         // Get LinkedIn data for this candidate by user_id (if available from map)
         const linkedinInfo = linkedinMap.get(row.user_id) || {};
-        const linkedinId = linkedinInfo.linkedin_id ?? row.linkedin_id ?? '';
+        const linkedinId = linkedinInfo.linkedin_id ?? row.linkedin_id ?? "";
         const linkedinScore = linkedinInfo.linkedin_score ?? row.linkedin_score ?? null;
-        const linkedinReason = linkedinInfo.linkedin_score_reason ?? row.linkedin_score_reason ?? '';
+        const linkedinReason = linkedinInfo.linkedin_score_reason ?? row.linkedin_score_reason ?? "";
         return {
           ...row,
           "Job ID": jobId,
-          "Candidate_ID": row.recordid?.toString() || '',
-          "Contacted": row.contacted ?? '',
-          "Transcript": row.transcript ?? '',
-          "Summary": row.cv_score_reason ?? '',
-          "Success Score": row.after_call_score?.toString() ?? '',
-          "Score and Reason": row.cv_score_reason ?? '',
-          "Candidate Name": row.candidate_name ?? '',
-          "Candidate Email": row.candidate_email ?? '',
-          "Candidate Phone Number": row.candidate_phone_number ?? '',
-          "Source": row.source ?? '',
+          Candidate_ID: row.recordid?.toString() || "",
+          Contacted: row.contacted ?? "",
+          Transcript: row.transcript ?? "",
+          Summary: row.cv_score_reason ?? "",
+          "Success Score": row.after_call_score?.toString() ?? "",
+          "Score and Reason": row.cv_score_reason ?? "",
+          "Candidate Name": row.candidate_name ?? "",
+          "Candidate Email": row.candidate_email ?? "",
+          "Candidate Phone Number": row.candidate_phone_number ?? "",
+          Source: row.source ?? "",
           // Keep LinkedIn fields for UI/debug
-          "linkedin_id": linkedinId ?? '',
-          "linkedin_score": linkedinScore ?? '',
-          "linkedin_score_reason": linkedinReason ?? '',
-          "pros": row.after_call_pros,
-          "cons": row.after_call_cons,
-          "Notice Period": row.notice_period ?? '',
-          "Salary Expectations": row.salary_expectations ?? '',
-          "current_salary": row.current_salary ?? '',
-          "Notes": row.notes ?? '',
-          "callid": row.recordid ?? Math.random() * 1000000,
-          "duration": row.duration,
-          "recording": row.recording,
-          "first_name": row.candidate_name?.split(' ')[0] || '',
-          "last_name": row.candidate_name?.split(' ').slice(1).join(' ') || '',
+          linkedin_id: linkedinId ?? "",
+          linkedin_score: linkedinScore ?? "",
+          linkedin_score_reason: linkedinReason ?? "",
+          pros: row.after_call_pros,
+          cons: row.after_call_cons,
+          "Notice Period": row.notice_period ?? "",
+          "Salary Expectations": row.salary_expectations ?? "",
+          current_salary: row.current_salary ?? "",
+          Notes: row.notes ?? "",
+          callid: row.recordid ?? Math.random() * 1000000,
+          duration: row.duration,
+          recording: row.recording,
+          first_name: row.candidate_name?.split(" ")[0] || "",
+          last_name: row.candidate_name?.split(" ").slice(1).join(" ") || "",
           // Normalize CV score fields so the UI picks them up everywhere
           cv_score: effectiveCvScore ?? 0,
-          "CV Score": effectiveCvScore != null ? String(effectiveCvScore) : '',
+          "CV Score": effectiveCvScore != null ? String(effectiveCvScore) : "",
           // Keep legacy "Score" alias used elsewhere for sorting/analytics
-          "Score": effectiveCvScore != null ? String(effectiveCvScore) : '0',
-          "lastcalltime": row.lastcalltime
+          Score: effectiveCvScore != null ? String(effectiveCvScore) : "0",
+          lastcalltime: row.lastcalltime,
         };
       });
       setCandidates(mapped);
-      console.log('Total candidates from Jobs_CVs:', mapped?.length || 0);
+      console.log("Total candidates from Jobs_CVs:", mapped?.length || 0);
 
       // Calculate candidate scores for analytics
-      const allScores = mapped?.map(c => parseFloat(c.Score) || 0).filter(score => !isNaN(score)) || [];
-      console.log('All candidate scores:', allScores);
+      const allScores = mapped?.map((c) => parseFloat(c.Score) || 0).filter((score) => !isNaN(score)) || [];
+      console.log("All candidate scores:", allScores);
 
       // Debug LinkedIn data visibility
-      const linkedinCandidates = mapped.filter(c => typeof c["Source"] === 'string' && c["Source"].toLowerCase().includes('linkedin'));
-      console.log('LinkedIn source candidates:', linkedinCandidates.length, 'Sample:', linkedinCandidates.slice(0, 3).map(c => ({
-        name: c["Candidate Name"],
-        overall: c["linkedin_score"],
-        reason: c["linkedin_score_reason"]
-      })));
+      const linkedinCandidates = mapped.filter(
+        (c) => typeof c["Source"] === "string" && c["Source"].toLowerCase().includes("linkedin"),
+      );
+      console.log(
+        "LinkedIn source candidates:",
+        linkedinCandidates.length,
+        "Sample:",
+        linkedinCandidates.slice(0, 3).map((c) => ({
+          name: c["Candidate Name"],
+          overall: c["linkedin_score"],
+          reason: c["linkedin_score_reason"],
+        })),
+      );
 
       // Calculate low scored candidates (score < 70)
-      const lowScoredCandidates = mapped?.filter(c => {
-        const score = parseFloat(c.Score) || 0;
-        return !isNaN(score) && score < 70;
-      }) || [];
-      console.log('Low scored candidates:', lowScoredCandidates.length, 'Sample:', lowScoredCandidates.slice(0, 3).map(c => ({
-        name: c.candidate_name,
-        score: c.Score
-      })));
+      const lowScoredCandidates =
+        mapped?.filter((c) => {
+          const score = parseFloat(c.Score) || 0;
+          return !isNaN(score) && score < 70;
+        }) || [];
+      console.log(
+        "Low scored candidates:",
+        lowScoredCandidates.length,
+        "Sample:",
+        lowScoredCandidates.slice(0, 3).map((c) => ({
+          name: c.candidate_name,
+          score: c.Score,
+        })),
+      );
     } catch (error) {
-      console.error('Error fetching candidates from Jobs_CVs:', error);
+      console.error("Error fetching candidates from Jobs_CVs:", error);
       setCandidates([]);
     } finally {
       setCandidatesLoading(false);
@@ -649,33 +725,44 @@ export default function JobDetails() {
       setLonglistedLoading(true);
 
       // Fetch all Itris and LinkedIn candidates from Jobs_CVs
-      const {
-        data: longlistedData,
-        error: longlistedError
-      } = await supabase.from('Jobs_CVs').select('*').eq('job_id', jobId).limit(10000).order('cv_score', {
-        ascending: false,
-        nullsLast: true
-      });
+      const { data: longlistedData, error: longlistedError } = await supabase
+        .from("Jobs_CVs")
+        .select("*")
+        .eq("job_id", jobId)
+        .limit(10000)
+        .order("cv_score", {
+          ascending: false,
+          nullsLast: true,
+        });
       if (longlistedError) throw longlistedError;
 
       // Fetch any existing scores for this job (regardless of longlisted status)
-      const {
-        data: scoreRows,
-        error: scoreErr
-      } = await supabase.from('Jobs_CVs').select('user_id, candidate_email, candidate_phone_number, cv_score, cv_score_reason').eq('job_id', jobId);
-      if (scoreErr) console.warn('Error fetching score map:', scoreErr);
-      const scoreMap = new Map<string, {
-        score: number | null;
-        reason: string | null;
-      }>();
-      const emailScoreMap = new Map<string, {
-        score: number | null;
-        reason: string | null;
-      }>();
-      const phoneScoreMap = new Map<string, {
-        score: number | null;
-        reason: string | null;
-      }>();
+      const { data: scoreRows, error: scoreErr } = await supabase
+        .from("Jobs_CVs")
+        .select("user_id, candidate_email, candidate_phone_number, cv_score, cv_score_reason")
+        .eq("job_id", jobId);
+      if (scoreErr) console.warn("Error fetching score map:", scoreErr);
+      const scoreMap = new Map<
+        string,
+        {
+          score: number | null;
+          reason: string | null;
+        }
+      >();
+      const emailScoreMap = new Map<
+        string,
+        {
+          score: number | null;
+          reason: string | null;
+        }
+      >();
+      const phoneScoreMap = new Map<
+        string,
+        {
+          score: number | null;
+          reason: string | null;
+        }
+      >();
       (scoreRows || []).forEach((r: any) => {
         const nextScore = r?.cv_score ?? null;
         const nextReason = r?.cv_score_reason ?? null;
@@ -683,107 +770,130 @@ export default function JobDetails() {
         // by user_id
         if (r?.user_id) {
           const prev = scoreMap.get(String(r.user_id));
-          if (!prev) scoreMap.set(String(r.user_id), {
-            score: nextScore,
-            reason: nextReason
-          });else scoreMap.set(String(r.user_id), {
-            score: prev.score ?? nextScore,
-            reason: prev.reason ?? nextReason
-          });
+          if (!prev)
+            scoreMap.set(String(r.user_id), {
+              score: nextScore,
+              reason: nextReason,
+            });
+          else
+            scoreMap.set(String(r.user_id), {
+              score: prev.score ?? nextScore,
+              reason: prev.reason ?? nextReason,
+            });
         }
 
         // by email
-        const email = (r?.candidate_email || '').toString().trim().toLowerCase();
+        const email = (r?.candidate_email || "").toString().trim().toLowerCase();
         if (email) {
           const prevE = emailScoreMap.get(email);
-          if (!prevE) emailScoreMap.set(email, {
-            score: nextScore,
-            reason: nextReason
-          });else emailScoreMap.set(email, {
-            score: prevE.score ?? nextScore,
-            reason: prevE.reason ?? nextReason
-          });
+          if (!prevE)
+            emailScoreMap.set(email, {
+              score: nextScore,
+              reason: nextReason,
+            });
+          else
+            emailScoreMap.set(email, {
+              score: prevE.score ?? nextScore,
+              reason: prevE.reason ?? nextReason,
+            });
         }
 
         // by phone (digits only)
-        const phone = (r?.candidate_phone_number || '').toString().replace(/[^0-9]/g, '');
+        const phone = (r?.candidate_phone_number || "").toString().replace(/[^0-9]/g, "");
         if (phone) {
           const prevP = phoneScoreMap.get(phone);
-          if (!prevP) phoneScoreMap.set(phone, {
-            score: nextScore,
-            reason: nextReason
-          });else phoneScoreMap.set(phone, {
-            score: prevP.score ?? nextScore,
-            reason: prevP.reason ?? nextReason
-          });
+          if (!prevP)
+            phoneScoreMap.set(phone, {
+              score: nextScore,
+              reason: nextReason,
+            });
+          else
+            phoneScoreMap.set(phone, {
+              score: prevP.score ?? nextScore,
+              reason: prevP.reason ?? nextReason,
+            });
         }
       });
       // Also fetch LinkedIn profile IDs for this job to enrich candidates
-      const {
-        data: liRows,
-        error: liErr
-      } = await supabase.from('linkedin_boolean_search').select('user_id, linkedin_id').eq('job_id', jobId);
-      if (liErr) console.warn('Error fetching LinkedIn IDs:', liErr);
-      const liMap = new Map<string, {
-        linkedin_id: string | null;
-      }>();
+      const { data: liRows, error: liErr } = await supabase
+        .from("linkedin_boolean_search")
+        .select("user_id, linkedin_id")
+        .eq("job_id", jobId);
+      if (liErr) console.warn("Error fetching LinkedIn IDs:", liErr);
+      const liMap = new Map<
+        string,
+        {
+          linkedin_id: string | null;
+        }
+      >();
       (liRows || []).forEach((r: any) => {
-        if (r?.user_id) liMap.set(String(r.user_id), {
-          linkedin_id: r.linkedin_id ?? null
-        });
+        if (r?.user_id)
+          liMap.set(String(r.user_id), {
+            linkedin_id: r.linkedin_id ?? null,
+          });
       });
       const mappedLonglisted = (longlistedData || []).map((row: any) => {
-        const sourceLower = (row.source || '').toLowerCase();
-        const hasLinkedIn = sourceLower.includes('linkedin');
+        const sourceLower = (row.source || "").toLowerCase();
+        const hasLinkedIn = sourceLower.includes("linkedin");
 
         // Prefer stored cv_score on the row; if missing, fall back to any score we have for the same user_id/email/phone in this job
         const fromUser = scoreMap.get(String(row.user_id));
-        const emailKey = (row.candidate_email || '').toString().trim().toLowerCase();
-        const phoneKey = (row.candidate_phone_number || '').toString().replace(/[^0-9]/g, '');
+        const emailKey = (row.candidate_email || "").toString().trim().toLowerCase();
+        const phoneKey = (row.candidate_phone_number || "").toString().replace(/[^0-9]/g, "");
         const fromEmail = emailKey ? emailScoreMap.get(emailKey) : undefined;
         const fromPhone = phoneKey ? phoneScoreMap.get(phoneKey) : undefined;
-        const mergedScore = row.cv_score ?? fromUser?.score ?? fromEmail?.score ?? fromPhone?.score ?? (hasLinkedIn ? row.linkedin_score ?? null : null);
-        const mergedReason = row.cv_score_reason ?? fromUser?.reason ?? fromEmail?.reason ?? fromPhone?.reason ?? (hasLinkedIn ? row.linkedin_score_reason ?? '' : '');
+        const mergedScore =
+          row.cv_score ??
+          fromUser?.score ??
+          fromEmail?.score ??
+          fromPhone?.score ??
+          (hasLinkedIn ? (row.linkedin_score ?? null) : null);
+        const mergedReason =
+          row.cv_score_reason ??
+          fromUser?.reason ??
+          fromEmail?.reason ??
+          fromPhone?.reason ??
+          (hasLinkedIn ? (row.linkedin_score_reason ?? "") : "");
 
         // Prefer linkedin_id from Jobs_CVs row, else fall back to linkedin_boolean_search mapping
-        const mappedLinkedInId = row.linkedin_id ?? liMap.get(String(row.user_id))?.linkedin_id ?? '';
+        const mappedLinkedInId = row.linkedin_id ?? liMap.get(String(row.user_id))?.linkedin_id ?? "";
         return {
           ...row,
           "Job ID": jobId,
-          "Candidate_ID": row.recordid?.toString() || '',
-          "Contacted": row.contacted ?? '',
-          "Transcript": row.transcript ?? '',
-          "Summary": mergedReason || '',
-          "Success Score": row.after_call_score?.toString() ?? '',
-          "Score and Reason": mergedReason || '',
-          "Candidate Name": row.candidate_name ?? '',
-          "Candidate Email": row.candidate_email ?? '',
-          "Candidate Phone Number": row.candidate_phone_number ?? '',
-          "Source": row.source ?? '',
-          "linkedin_score": row.linkedin_score ?? '',
-          "linkedin_score_reason": row.linkedin_score_reason ?? '',
-          "pros": row.after_call_pros,
-          "cons": row.after_call_cons,
-          "Notice Period": row.notice_period ?? '',
-          "Salary Expectations": row.salary_expectations ?? '',
-          "current_salary": row.current_salary ?? '',
-          "Notes": row.notes ?? '',
-          "callid": row.recordid ?? Math.random() * 1000000,
-          "duration": row.duration,
-          "recording": row.recording,
-          "first_name": row.candidate_name?.split(' ')[0] || '',
-          "last_name": row.candidate_name?.split(' ').slice(1).join(' ') || '',
+          Candidate_ID: row.recordid?.toString() || "",
+          Contacted: row.contacted ?? "",
+          Transcript: row.transcript ?? "",
+          Summary: mergedReason || "",
+          "Success Score": row.after_call_score?.toString() ?? "",
+          "Score and Reason": mergedReason || "",
+          "Candidate Name": row.candidate_name ?? "",
+          "Candidate Email": row.candidate_email ?? "",
+          "Candidate Phone Number": row.candidate_phone_number ?? "",
+          Source: row.source ?? "",
+          linkedin_score: row.linkedin_score ?? "",
+          linkedin_score_reason: row.linkedin_score_reason ?? "",
+          pros: row.after_call_pros,
+          cons: row.after_call_cons,
+          "Notice Period": row.notice_period ?? "",
+          "Salary Expectations": row.salary_expectations ?? "",
+          current_salary: row.current_salary ?? "",
+          Notes: row.notes ?? "",
+          callid: row.recordid ?? Math.random() * 1000000,
+          duration: row.duration,
+          recording: row.recording,
+          first_name: row.candidate_name?.split(" ")[0] || "",
+          last_name: row.candidate_name?.split(" ").slice(1).join(" ") || "",
           cv_score: mergedScore ?? 0,
-          "CV Score": mergedScore != null ? String(mergedScore) : '',
-          "success_score": row.after_call_score ?? 0,
-          "linkedin_id": mappedLinkedInId,
-          "longlisted_at": row.longlisted_at,
-          cv_score_reason: mergedReason || ''
+          "CV Score": mergedScore != null ? String(mergedScore) : "",
+          success_score: row.after_call_score ?? 0,
+          linkedin_id: mappedLinkedInId,
+          longlisted_at: row.longlisted_at,
+          cv_score_reason: mergedReason || "",
         };
       });
       setLonglistedCandidates(mappedLonglisted);
     } catch (error) {
-      console.error('Error fetching longlisted candidates:', error);
+      console.error("Error fetching longlisted candidates:", error);
       setLonglistedCandidates([]);
     } finally {
       setLonglistedLoading(false);
@@ -792,45 +902,39 @@ export default function JobDetails() {
   const fetchCvData = async () => {
     if (!profile?.slug) return;
     try {
-      const {
-        data,
-        error
-      } = await supabase.from('CVs').select('*');
+      const { data, error } = await supabase.from("CVs").select("*");
       if (error) throw error;
       setCvData(data || []);
     } catch (error) {
-      console.error('Error fetching CV data:', error);
+      console.error("Error fetching CV data:", error);
       setCvData([]);
     }
   };
   const fetchApplications = async (jobId: string) => {
     setApplicationsLoading(true);
     try {
-      const {
-        data,
-        error
-      } = await supabase.from('CVs').select('*').eq('job_id', jobId).order('updated_time', {
-        ascending: false
+      const { data, error } = await supabase.from("CVs").select("*").eq("job_id", jobId).order("updated_time", {
+        ascending: false,
       });
       if (error) throw error;
 
       // Map the data to match the expected structure in the UI
-      const mappedApplications = (data || []).map(cv => ({
+      const mappedApplications = (data || []).map((cv) => ({
         candidate_id: cv.user_id,
         first_name: cv.Firstname,
         last_name: cv.Lastname,
         Email: cv.email,
         phone_number: cv.phone_number,
         CV_Link: cv.cv_link,
-        cv_summary: cv.cv_text ? cv.cv_text.substring(0, 200) + '...' : '',
-        Timestamp: cv.updated_time
+        cv_summary: cv.cv_text ? cv.cv_text.substring(0, 200) + "..." : "",
+        Timestamp: cv.updated_time,
       }));
       setApplications(mappedApplications);
 
       // Fetch longlisted status for all candidates
       await fetchLonglistedStatus(jobId);
     } catch (error) {
-      console.error('Error fetching applications:', error);
+      console.error("Error fetching applications:", error);
       setApplications([]);
     } finally {
       setApplicationsLoading(false);
@@ -838,63 +942,72 @@ export default function JobDetails() {
   };
   const fetchLonglistedStatus = async (jobId: string) => {
     try {
-      const {
-        data,
-        error
-      } = await supabase.from('Jobs_CVs').select('user_id').eq('job_id', jobId).not('longlisted_at', 'is', null);
+      const { data, error } = await supabase
+        .from("Jobs_CVs")
+        .select("user_id")
+        .eq("job_id", jobId)
+        .not("longlisted_at", "is", null);
       if (error) throw error;
-      const longlistedIds = new Set(data?.map(item => item.user_id) || []);
+      const longlistedIds = new Set(data?.map((item) => item.user_id) || []);
       setAddedToLongList(longlistedIds);
     } catch (error) {
-      console.error('Error fetching longlisted status:', error);
+      console.error("Error fetching longlisted status:", error);
     }
   };
   const fetchTaskCandidates = async (jobId: string) => {
     if (!profile?.slug) return;
     try {
       // For now, we'll use the same CVs table data since task_candidates table doesn't exist
-      const {
-        data,
-        error
-      } = await supabase.from('CVs').select('*').filter('applied_for', 'cs', `{${jobId}}`).not('CandidateStatus', 'is', null);
+      const { data, error } = await supabase
+        .from("CVs")
+        .select("*")
+        .filter("applied_for", "cs", `{${jobId}}`)
+        .not("CandidateStatus", "is", null);
       if (error) throw error;
       setTaskCandidates(data || []);
-      const taskedCandidates = data?.filter(c => c.CandidateStatus === 'Tasked') || [];
-      console.log('Tasked calculation:', {
+      const taskedCandidates = data?.filter((c) => c.CandidateStatus === "Tasked") || [];
+      console.log("Tasked calculation:", {
         tasked: taskedCandidates.length,
         total: data?.length || 0,
-        taskedCandidates: taskedCandidates.slice(0, 3).map(c => ({
+        taskedCandidates: taskedCandidates.slice(0, 3).map((c) => ({
           name: c.first_name,
-          status: c.CandidateStatus
-        }))
+          status: c.CandidateStatus,
+        })),
       });
     } catch (error) {
-      console.error('Error fetching task candidates:', error);
+      console.error("Error fetching task candidates:", error);
       setTaskCandidates([]);
     }
   };
-  const updateTaskStatus = async (taskId: number, newStatus: 'Pending' | 'Received' | 'Reviewed') => {
+  const updateTaskStatus = async (taskId: number, newStatus: "Pending" | "Received" | "Reviewed") => {
     try {
-      const {
-        error
-      } = await supabase.from('task_candidates').update({
-        status: newStatus
-      }).eq('taskid', taskId);
+      const { error } = await supabase
+        .from("task_candidates")
+        .update({
+          status: newStatus,
+        })
+        .eq("taskid", taskId);
       if (error) throw error;
-      setTaskCandidates(prev => prev.map(task => task.taskid === taskId ? {
-        ...task,
-        status: newStatus
-      } : task));
+      setTaskCandidates((prev) =>
+        prev.map((task) =>
+          task.taskid === taskId
+            ? {
+                ...task,
+                status: newStatus,
+              }
+            : task,
+        ),
+      );
       toast({
         title: "Success",
-        description: "Task status updated successfully"
+        description: "Task status updated successfully",
       });
     } catch (error) {
-      console.error('Error updating task status:', error);
+      console.error("Error updating task status:", error);
       toast({
         title: "Error",
         description: "Failed to update task status",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -903,7 +1016,7 @@ export default function JobDetails() {
       toast({
         title: "Error",
         description: "Please select candidates to call",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -911,14 +1024,14 @@ export default function JobDetails() {
       toast({
         title: "Error",
         description: "Job ID not found",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
     setIsGeneratingShortList(true);
     try {
       // Get selected candidate data
-      const selectedCandidateData = candidates.filter(candidate => selectedCandidates.has(candidate["Candidate_ID"]));
+      const selectedCandidateData = candidates.filter((candidate) => selectedCandidates.has(candidate["Candidate_ID"]));
 
       // Process each selected candidate with their recordid
       for (const candidate of selectedCandidateData) {
@@ -926,16 +1039,16 @@ export default function JobDetails() {
           user_id: candidate.user_id,
           jobID: job.job_id,
           job_itris_id: job.itris_job_id,
-          recordid: candidate.recordid
+          recordid: candidate.recordid,
         };
 
         // Make HTTP request to the webhook for each candidate
-        const response = await fetch('https://hook.eu2.make.com/o9mt66urjw5a6sxfog71945s3ubghukw', {
-          method: 'POST',
+        const response = await fetch("https://hook.eu2.make.com/o9mt66urjw5a6sxfog71945s3ubghukw", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
         });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -943,17 +1056,17 @@ export default function JobDetails() {
       }
       toast({
         title: "Success",
-        description: `Calling ${selectedCandidates.size} selected candidates initiated successfully`
+        description: `Calling ${selectedCandidates.size} selected candidates initiated successfully`,
       });
 
       // Clear selection after successful call
       setSelectedCandidates(new Set());
     } catch (error) {
-      console.error('Error calling selected candidates:', error);
+      console.error("Error calling selected candidates:", error);
       toast({
         title: "Error",
         description: "Failed to call selected candidates",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsGeneratingShortList(false);
@@ -964,7 +1077,7 @@ export default function JobDetails() {
       toast({
         title: "Error",
         description: "Please select candidates to remove",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -972,12 +1085,12 @@ export default function JobDetails() {
       toast({
         title: "Error",
         description: "Missing job ID",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
     try {
-      console.log('=== BULK REMOVE START ===');
+      console.log("=== BULK REMOVE START ===");
       const selectedIds = Array.from(selectedCandidates);
       const selectedSet = new Set(selectedIds);
 
@@ -987,7 +1100,7 @@ export default function JobDetails() {
         for (const c of list) {
           const cid = c["Candidate_ID"] ? String(c["Candidate_ID"]) : "";
           const uid = c.user_id ? String(c.user_id) : "";
-          if (cid && selectedSet.has(cid) || uid && selectedSet.has(uid)) {
+          if ((cid && selectedSet.has(cid)) || (uid && selectedSet.has(uid))) {
             if (c.recordid !== undefined && c.recordid !== null) {
               recordIdsToDelete.add(c.recordid);
             }
@@ -997,59 +1110,65 @@ export default function JobDetails() {
       collectFrom(candidates);
       collectFrom(longlistedCandidates);
       if (recordIdsToDelete.size === 0) {
-        console.warn('No recordids found for selected candidates');
+        console.warn("No recordids found for selected candidates");
         toast({
           title: "Nothing to delete",
-          description: "Selected candidates have no associated records"
+          description: "Selected candidates have no associated records",
         });
         return;
       }
-      console.log('Deleting from Jobs_CVs for job:', id, 'recordids:', Array.from(recordIdsToDelete));
-      const {
-        data,
-        error
-      } = await supabase.from('Jobs_CVs').delete().in('recordid', Array.from(recordIdsToDelete)).eq('job_id', id).select();
-      console.log('Bulk delete response:', {
+      console.log("Deleting from Jobs_CVs for job:", id, "recordids:", Array.from(recordIdsToDelete));
+      const { data, error } = await supabase
+        .from("Jobs_CVs")
+        .delete()
+        .in("recordid", Array.from(recordIdsToDelete))
+        .eq("job_id", id)
+        .select();
+      console.log("Bulk delete response:", {
         success: !error,
         deletedRows: data?.length || 0,
         data,
-        error
+        error,
       });
       if (error) throw error;
       if (!data || data.length === 0) {
-        console.warn('No rows deleted in bulk remove - they may have been already removed');
+        console.warn("No rows deleted in bulk remove - they may have been already removed");
       }
 
       // Update UI state: remove all selected candidates from both lists
-      setCandidates(prev => prev.filter(c => {
-        const cid = c["Candidate_ID"] ? String(c["Candidate_ID"]) : "";
-        const uid = c.user_id ? String(c.user_id) : "";
-        return !(cid && selectedSet.has(cid)) && !(uid && selectedSet.has(uid));
-      }));
-      setLonglistedCandidates(prev => prev.filter(c => {
-        const cid = c["Candidate_ID"] ? String(c["Candidate_ID"]) : "";
-        const uid = c.user_id ? String(c.user_id) : "";
-        return !(cid && selectedSet.has(cid)) && !(uid && selectedSet.has(uid));
-      }));
+      setCandidates((prev) =>
+        prev.filter((c) => {
+          const cid = c["Candidate_ID"] ? String(c["Candidate_ID"]) : "";
+          const uid = c.user_id ? String(c.user_id) : "";
+          return !(cid && selectedSet.has(cid)) && !(uid && selectedSet.has(uid));
+        }),
+      );
+      setLonglistedCandidates((prev) =>
+        prev.filter((c) => {
+          const cid = c["Candidate_ID"] ? String(c["Candidate_ID"]) : "";
+          const uid = c.user_id ? String(c.user_id) : "";
+          return !(cid && selectedSet.has(cid)) && !(uid && selectedSet.has(uid));
+        }),
+      );
 
       // Clear selection
       setSelectedCandidates(new Set());
       toast({
         title: "Removed",
-        description: `${selectedIds.length} candidate${selectedIds.length > 1 ? 's' : ''} removed from long list`
+        description: `${selectedIds.length} candidate${selectedIds.length > 1 ? "s" : ""} removed from long list`,
       });
-      console.log('=== BULK REMOVE SUCCESS ===');
+      console.log("=== BULK REMOVE SUCCESS ===");
     } catch (error) {
-      console.error('=== BULK REMOVE ERROR ===', error);
+      console.error("=== BULK REMOVE ERROR ===", error);
       toast({
         title: "Error",
         description: "Failed to remove selected candidates",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
   const toggleCandidateSelection = (candidateId: string) => {
-    setSelectedCandidates(prev => {
+    setSelectedCandidates((prev) => {
       const newSelection = new Set(prev);
       if (newSelection.has(candidateId)) {
         newSelection.delete(candidateId);
@@ -1060,10 +1179,17 @@ export default function JobDetails() {
     });
   };
   const selectAllCandidates = () => {
-    const allCandidateIds = new Set(Object.keys(filteredCandidates.reduce((acc, candidate) => {
-      acc[candidate["Candidate_ID"]] = true;
-      return acc;
-    }, {} as Record<string, boolean>)));
+    const allCandidateIds = new Set(
+      Object.keys(
+        filteredCandidates.reduce(
+          (acc, candidate) => {
+            acc[candidate["Candidate_ID"]] = true;
+            return acc;
+          },
+          {} as Record<string, boolean>,
+        ),
+      ),
+    );
     setSelectedCandidates(allCandidateIds);
   };
   const clearAllSelection = () => {
@@ -1079,143 +1205,145 @@ export default function JobDetails() {
   const handleSearchMoreCandidates = async () => {
     try {
       // Get user_ids from AI Boolean Search candidates (filteredCandidates) as comma-separated string
-      const booleanSearchUserIds = filteredCandidates.map(candidate => candidate.user_id).filter(Boolean).join(',');
+      const booleanSearchUserIds = filteredCandidates
+        .map((candidate) => candidate.user_id)
+        .filter(Boolean)
+        .join(",");
       const payload = {
-        job_id: job?.job_id || '',
-        itris_job_id: job?.itris_job_id || '',
+        job_id: job?.job_id || "",
+        itris_job_id: job?.itris_job_id || "",
         user_ids: booleanSearchUserIds,
-        profile_id: profile?.user_id || ''
+        profile_id: profile?.user_id || "",
       };
-      const response = await fetch('https://hook.eu2.make.com/w10612c8i0lg2em4p305sbhhnkj73auj', {
-        method: 'POST',
+      const response = await fetch("https://hook.eu2.make.com/w10612c8i0lg2em4p305sbhhnkj73auj", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       toast({
         title: "Success",
-        description: "AI is searching for more candidates"
+        description: "AI is searching for more candidates",
       });
     } catch (error) {
-      console.error('Error searching for more candidates:', error);
+      console.error("Error searching for more candidates:", error);
       toast({
         title: "Error",
         description: "Failed to search for more candidates",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
   const handleGenerateLongList = async () => {
     try {
-      console.log('Starting Generate Long List process...');
-      console.log('Current job:', job);
-      console.log('Current profile:', profile);
+      console.log("Starting Generate Long List process...");
+      console.log("Current job:", job);
+      console.log("Current profile:", profile);
 
       // First, increment the longlist count in the database
-      const {
-        error: updateError
-      } = await supabase.from('Jobs').update({
-        longlist: (job?.longlist || 0) + 1
-      }).eq('job_id', job?.job_id);
+      const { error: updateError } = await supabase
+        .from("Jobs")
+        .update({
+          longlist: (job?.longlist || 0) + 1,
+        })
+        .eq("job_id", job?.job_id);
       if (updateError) {
-        console.error('Database update error:', updateError);
+        console.error("Database update error:", updateError);
         throw updateError;
       }
 
       // Update local state
-      setJob(prev => ({
+      setJob((prev) => ({
         ...prev,
-        longlist: (prev?.longlist || 0) + 1
+        longlist: (prev?.longlist || 0) + 1,
       }));
 
       // Prepare payload for webhook
       const payload = {
-        job_id: job?.job_id || '',
-        itris_job_id: job?.itris_job_id || '',
-        profile_id: profile?.user_id || ''
+        job_id: job?.job_id || "",
+        itris_job_id: job?.itris_job_id || "",
+        profile_id: profile?.user_id || "",
       };
-      console.log('Webhook payload:', payload);
+      console.log("Webhook payload:", payload);
 
       // Call the automation endpoint
-      console.log('Calling webhook at:', 'https://hook.eu2.make.com/yiz4ustkcgxgji2sv6fwcs99jdr3674m');
-      const response = await fetch('https://hook.eu2.make.com/yiz4ustkcgxgji2sv6fwcs99jdr3674m', {
-        method: 'POST',
+      console.log("Calling webhook at:", "https://hook.eu2.make.com/yiz4ustkcgxgji2sv6fwcs99jdr3674m");
+      const response = await fetch("https://hook.eu2.make.com/yiz4ustkcgxgji2sv6fwcs99jdr3674m", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
-      console.log('Webhook response status:', response.status);
-      console.log('Webhook response ok:', response.ok);
+      console.log("Webhook response status:", response.status);
+      console.log("Webhook response ok:", response.ok);
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Webhook error response:', errorText);
+        console.error("Webhook error response:", errorText);
         throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
       }
       const responseData = await response.text();
-      console.log('Webhook success response:', responseData);
+      console.log("Webhook success response:", responseData);
       toast({
         title: "Success",
-        description: job?.longlist && job.longlist > 0 ? "Long list regenerated successfully" : "Long list generated successfully"
+        description:
+          job?.longlist && job.longlist > 0 ? "Long list regenerated successfully" : "Long list generated successfully",
       });
     } catch (error) {
-      console.error('Error generating long list:', error);
+      console.error("Error generating long list:", error);
       toast({
         title: "Error",
         description: `Failed to generate long list: ${error.message}`,
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
   const handleRejectCandidate = async (reason: string) => {
     if (!rejectCandidateData) return;
-    const {
-      jobId,
-      candidateId,
-      callid
-    } = rejectCandidateData;
+    const { jobId, candidateId, callid } = rejectCandidateData;
     try {
       // Find the candidate data from the candidates array
-      const candidate = candidates.find(c => c["Candidate_ID"] === candidateId || c["user_id"] === candidateId);
+      const candidate = candidates.find((c) => c["Candidate_ID"] === candidateId || c["user_id"] === candidateId);
       if (!candidate) {
         toast({
           title: "Error",
           description: "Candidate data not found",
-          variant: "destructive"
+          variant: "destructive",
         });
         return;
       }
 
       // Update the database with the rejection reason
-      const {
-        error: updateError
-      } = await supabase.from('Jobs_CVs').update({
-        contacted: 'Rejected',
-        Reason_to_reject: reason
-      }).eq('recordid', candidate.recordid);
+      const { error: updateError } = await supabase
+        .from("Jobs_CVs")
+        .update({
+          contacted: "Rejected",
+          Reason_to_reject: reason,
+        })
+        .eq("recordid", candidate.recordid);
       if (updateError) {
         throw updateError;
       }
-      const response = await fetch('https://hook.eu2.make.com/mk46k4ibvs5n5nk1lto9csljygesv75f', {
-        method: 'POST',
+      const response = await fetch("https://hook.eu2.make.com/mk46k4ibvs5n5nk1lto9csljygesv75f", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           job_id: jobId,
           user_id: candidate.user_id?.toString() || "",
           recordid: candidate.recordid?.toString() || "",
-          itris_job_id: job?.itris_job_id || ""
-        })
+          itris_job_id: job?.itris_job_id || "",
+        }),
       });
       if (response.ok) {
         toast({
           title: "Candidate Rejected",
-          description: "The candidate has been successfully rejected."
+          description: "The candidate has been successfully rejected.",
         });
         setShowRejectDialog(false);
         setRejectReason("");
@@ -1223,14 +1351,14 @@ export default function JobDetails() {
         // Refresh data
         fetchCandidates();
       } else {
-        throw new Error('Failed to reject candidate');
+        throw new Error("Failed to reject candidate");
       }
     } catch (error) {
-      console.error('Error rejecting candidate:', error);
+      console.error("Error rejecting candidate:", error);
       toast({
         title: "Error",
         description: "Failed to reject candidate. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -1238,7 +1366,7 @@ export default function JobDetails() {
     setRejectCandidateData({
       jobId,
       candidateId,
-      callid
+      callid,
     });
     setShowRejectDialog(true);
   };
@@ -1246,7 +1374,7 @@ export default function JobDetails() {
     setHireCandidateData({
       jobId,
       candidateId,
-      callid
+      callid,
     });
     setHireReason("");
     setShowHireDialog(true);
@@ -1255,22 +1383,29 @@ export default function JobDetails() {
     if (!hireCandidateData) return;
     try {
       // Use callid to update the correct record (recordid in Jobs_CVs equals the callid)
-      const {
-        error
-      } = await supabase.from('Jobs_CVs').update({
-        Reason_to_Hire: hireReason,
-        contacted: 'Submitted'
-      }).eq('recordid', hireCandidateData.callid).eq('job_id', hireCandidateData.jobId);
+      const { error } = await supabase
+        .from("Jobs_CVs")
+        .update({
+          Reason_to_Hire: hireReason,
+          contacted: "Submitted",
+        })
+        .eq("recordid", hireCandidateData.callid)
+        .eq("job_id", hireCandidateData.jobId);
+
       if (error) throw error;
 
       // Update local state using both user_id and Candidate_ID
-      setCandidates(prev => prev.map(c => c["user_id"] === hireCandidateData.candidateId || c["Candidate_ID"] === hireCandidateData.candidateId ? {
-        ...c,
-        Contacted: 'Submitted'
-      } : c));
+      setCandidates((prev) =>
+        prev.map((c) =>
+          c["user_id"] === hireCandidateData.candidateId || c["Candidate_ID"] === hireCandidateData.candidateId
+            ? { ...c, Contacted: "Submitted" }
+            : c,
+        ),
+      );
+
       toast({
         title: "CV Submitted",
-        description: "Candidate's CV has been submitted with hiring reason"
+        description: "Candidate's CV has been submitted with hiring reason",
       });
 
       // Refresh candidates data
@@ -1278,15 +1413,16 @@ export default function JobDetails() {
         fetchCandidates(id);
         fetchLonglistedCandidates(id);
       }
+
       setShowHireDialog(false);
       setHireReason("");
       setHireCandidateData(null);
     } catch (error) {
-      console.error('Error saving hire reason:', error);
+      console.error("Error saving hire reason:", error);
       toast({
         title: "Error",
         description: "Failed to submit CV. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -1295,7 +1431,7 @@ export default function JobDetails() {
       toast({
         title: "Error",
         description: "No candidates available to process",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -1315,16 +1451,16 @@ export default function JobDetails() {
           user_id: candidate.user_id,
           jobID: job.job_id,
           job_itris_id: job.itris_job_id,
-          recordid: candidate.recordid
+          recordid: candidate.recordid,
         };
 
         // Make HTTP request to the webhook for each candidate
-        const response = await fetch('https://hook.eu2.make.com/o9mt66urjw5a6sxfog71945s3ubghukw', {
-          method: 'POST',
+        const response = await fetch("https://hook.eu2.make.com/o9mt66urjw5a6sxfog71945s3ubghukw", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
         });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -1332,14 +1468,14 @@ export default function JobDetails() {
       }
       toast({
         title: "Success",
-        description: "Short list generation initiated successfully"
+        description: "Short list generation initiated successfully",
       });
     } catch (error) {
-      console.error('Error generating short list:', error);
+      console.error("Error generating short list:", error);
       toast({
         title: "Error",
         description: "Failed to generate short list",
-        variant: "destructive"
+        variant: "destructive",
       });
       // Remove the disabled state if there was an error
       localStorage.removeItem(storageKey);
@@ -1351,116 +1487,124 @@ export default function JobDetails() {
   };
   const handleRemoveFromLongList = async (candidateId: string) => {
     try {
-      console.log('=== REMOVE CANDIDATE START ===');
-      console.log('Attempting to remove candidate:', candidateId);
-      console.log('Job ID:', id);
-      console.log('Available candidates:', candidates.map(c => ({
-        id: c["Candidate_ID"],
-        recordid: c.recordid,
-        user_id: c.user_id,
-        name: c["Candidate Name"]
-      })));
+      console.log("=== REMOVE CANDIDATE START ===");
+      console.log("Attempting to remove candidate:", candidateId);
+      console.log("Job ID:", id);
+      console.log(
+        "Available candidates:",
+        candidates.map((c) => ({
+          id: c["Candidate_ID"],
+          recordid: c.recordid,
+          user_id: c.user_id,
+          name: c["Candidate Name"],
+        })),
+      );
 
       // Find the candidate record - try multiple approaches
-      let candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
+      let candidate = candidates.find((c) => c["Candidate_ID"] === candidateId);
 
       // If not found by Candidate_ID, try by recordid directly
       if (!candidate) {
-        candidate = candidates.find(c => c.recordid?.toString() === candidateId);
+        candidate = candidates.find((c) => c.recordid?.toString() === candidateId);
       }
 
       // If still not found, try by user_id
       if (!candidate) {
-        candidate = candidates.find(c => c.user_id === candidateId);
+        candidate = candidates.find((c) => c.user_id === candidateId);
       }
       if (!candidate) {
-        console.error('Candidate not found. Searched for:', candidateId);
-        console.error('Available candidate IDs:', candidates.map(c => c["Candidate_ID"]));
-        throw new Error('Candidate not found in local data');
+        console.error("Candidate not found. Searched for:", candidateId);
+        console.error(
+          "Available candidate IDs:",
+          candidates.map((c) => c["Candidate_ID"]),
+        );
+        throw new Error("Candidate not found in local data");
       }
-      console.log('Found candidate to remove:', {
+      console.log("Found candidate to remove:", {
         recordid: candidate.recordid,
         user_id: candidate.user_id,
         name: candidate["Candidate Name"],
-        email: candidate["Candidate Email"]
+        email: candidate["Candidate Email"],
       });
 
       // Use the actual recordid from the database for deletion
       const recordIdToDelete = candidate.recordid;
       if (!recordIdToDelete) {
-        console.error('No recordid found for candidate:', candidate);
-        throw new Error('Cannot delete candidate: missing recordid');
+        console.error("No recordid found for candidate:", candidate);
+        throw new Error("Cannot delete candidate: missing recordid");
       }
-      console.log('Deleting from Jobs_CVs table...');
-      console.log('Parameters:', {
+      console.log("Deleting from Jobs_CVs table...");
+      console.log("Parameters:", {
         recordid: recordIdToDelete,
-        job_id: id
+        job_id: id,
       });
 
       // Delete the candidate from the Jobs_CVs table permanently
-      const {
-        data,
-        error
-      } = await supabase.from('Jobs_CVs').delete().eq('recordid', recordIdToDelete).eq('job_id', id).select();
-      console.log('Delete response:', {
+      const { data, error } = await supabase
+        .from("Jobs_CVs")
+        .delete()
+        .eq("recordid", recordIdToDelete)
+        .eq("job_id", id)
+        .select();
+      console.log("Delete response:", {
         success: !error,
         deletedRows: data?.length || 0,
         data,
-        error
+        error,
       });
       if (error) {
-        console.error('Supabase delete error:', error);
+        console.error("Supabase delete error:", error);
         throw error;
       }
       if (!data || data.length === 0) {
-        console.warn('No rows were deleted - candidate may not exist in database');
-        throw new Error('Candidate not found in database or already deleted');
+        console.warn("No rows were deleted - candidate may not exist in database");
+        throw new Error("Candidate not found in database or already deleted");
       }
-      console.log('Successfully deleted candidate from Jobs_CVs table');
-      console.log('Deleted record:', data[0]);
+      console.log("Successfully deleted candidate from Jobs_CVs table");
+      console.log("Deleted record:", data[0]);
 
       // Update the local state to remove the candidate
-      setCandidates(prev => {
-        const updated = prev.filter(c => {
+      setCandidates((prev) => {
+        const updated = prev.filter((c) => {
           const cid = c["Candidate_ID"] ? String(c["Candidate_ID"]) : "";
           const uid = c.user_id ? String(c.user_id) : "";
           return cid !== String(candidateId) && uid !== String(candidateId);
         });
-        console.log('Updated candidates count:', updated.length);
+        console.log("Updated candidates count:", updated.length);
         return updated;
       });
-      setLonglistedCandidates(prev => {
-        const updated = prev.filter(c => {
+      setLonglistedCandidates((prev) => {
+        const updated = prev.filter((c) => {
           const cid = c["Candidate_ID"] ? String(c["Candidate_ID"]) : "";
           const uid = c.user_id ? String(c.user_id) : "";
           return cid !== String(candidateId) && uid !== String(candidateId);
         });
-        console.log('Updated longlisted candidates count:', updated.length);
+        console.log("Updated longlisted candidates count:", updated.length);
         return updated;
       });
 
       // Refresh the data to ensure UI is in sync with database
-      console.log('Refreshing longlisted candidates...');
+      console.log("Refreshing longlisted candidates...");
       await fetchLonglistedCandidates(String(id));
-      console.log('=== REMOVE CANDIDATE SUCCESS ===');
+      console.log("=== REMOVE CANDIDATE SUCCESS ===");
       toast({
         title: "Success",
-        description: `Candidate "${candidate["Candidate Name"]}" has been permanently removed from the database`
+        description: `Candidate "${candidate["Candidate Name"]}" has been permanently removed from the database`,
       });
     } catch (error) {
-      console.error('=== REMOVE CANDIDATE ERROR ===');
-      console.error('Error details:', error);
+      console.error("=== REMOVE CANDIDATE ERROR ===");
+      console.error("Error details:", error);
       toast({
         title: "Error",
-        description: `Failed to remove candidate: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        variant: "destructive"
+        description: `Failed to remove candidate: ${error instanceof Error ? error.message : "Unknown error"}`,
+        variant: "destructive",
       });
     }
   };
   const showRemoveConfirmation = (candidateId: string, candidateName: string) => {
     setCandidateToRemove({
       id: candidateId,
-      name: candidateName
+      name: candidateName,
     });
   };
   const confirmRemoveFromLongList = async () => {
@@ -1474,36 +1618,36 @@ export default function JobDetails() {
       setCallingCandidateId(candidateId);
 
       // Find the candidate record to get required data
-      const candidate = candidates.find(c => c["Candidate_ID"] === candidateId);
+      const candidate = candidates.find((c) => c["Candidate_ID"] === candidateId);
       if (!candidate) {
-        throw new Error('Candidate not found');
+        throw new Error("Candidate not found");
       }
       const payload = {
         user_id: candidate.user_id,
         jobID: job.job_id,
         job_itris_id: job.itris_job_id,
-        recordid: candidate.recordid
+        recordid: candidate.recordid,
       };
-      const response = await fetch('https://hook.eu2.make.com/o9mt66urjw5a6sxfog71945s3ubghukw', {
-        method: 'POST',
+      const response = await fetch("https://hook.eu2.make.com/o9mt66urjw5a6sxfog71945s3ubghukw", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       toast({
-        title: 'Success',
-        description: 'Call initiated successfully'
+        title: "Success",
+        description: "Call initiated successfully",
       });
     } catch (error) {
-      console.error('Error calling candidate:', error);
+      console.error("Error calling candidate:", error);
       toast({
-        title: 'Error',
-        description: 'Failed to initiate call',
-        variant: 'destructive'
+        title: "Error",
+        description: "Failed to initiate call",
+        variant: "destructive",
       });
     } finally {
       setCallingCandidateId(null);
@@ -1511,142 +1655,160 @@ export default function JobDetails() {
   };
   const handleArrangeInterview = (candidateId: string) => {
     // Find the candidate object
-    const candidate = candidates.find(c => c["Candidate_ID"] === candidateId || c.candidate_id === candidateId || c.Candidate_ID === candidateId);
+    const candidate = candidates.find(
+      (c) => c["Candidate_ID"] === candidateId || c.candidate_id === candidateId || c.Candidate_ID === candidateId,
+    );
     setSelectedCandidate({
       candidateId: candidateId,
-      jobId: job?.job_id || id || '',
-      callid: candidate?.callid || candidate?.Callid || 0
+      jobId: job?.job_id || id || "",
+      callid: candidate?.callid || candidate?.Callid || 0,
     });
     setInterviewDialogOpen(true);
 
     // Reset slots and type
-    setInterviewSlots([{
-      date: undefined,
-      time: ''
-    }, {
-      date: undefined,
-      time: ''
-    }, {
-      date: undefined,
-      time: ''
-    }]);
-    setInterviewType('Phone');
-    setInterviewLink('');
-    console.log('Dialog should now be open. interviewDialogOpen state set to true');
+    setInterviewSlots([
+      {
+        date: undefined,
+        time: "",
+      },
+      {
+        date: undefined,
+        time: "",
+      },
+      {
+        date: undefined,
+        time: "",
+      },
+    ]);
+    setInterviewType("Phone");
+    setInterviewLink("");
+    console.log("Dialog should now be open. interviewDialogOpen state set to true");
   };
   const handleCVSubmitted = async (candidateId: string, callid?: number) => {
     // Find candidate by either user_id or Candidate_ID
-    const candidateContact = candidates.find(c => c["user_id"] === candidateId || c["Candidate_ID"] === candidateId);
+    const candidateContact = candidates.find((c) => c["user_id"] === candidateId || c["Candidate_ID"] === candidateId);
+
     if (candidateContact) {
       // Use provided callid or fall back to candidate's callid
       const finalCallId = callid || candidateContact.callid;
+
       if (!finalCallId) {
         toast({
           title: "Error",
           description: "Cannot submit CV: No call record found for this candidate",
-          variant: "destructive"
+          variant: "destructive",
         });
         return;
       }
+
       openHireDialog(id!, candidateId, finalCallId);
     } else {
       toast({
         title: "Error",
         description: "Candidate not found",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
+
   const handleClientStatusChange = async (candidateId: string, newStatus: string) => {
     try {
-      const {
-        error
-      } = await supabase.from("Jobs_CVs").update({
-        client_status: newStatus
-      }).eq("user_id", candidateId).eq("job_id", id!);
+      const { error } = await supabase
+        .from("Jobs_CVs")
+        .update({ client_status: newStatus })
+        .eq("user_id", candidateId)
+        .eq("job_id", id!);
+
       if (error) throw error;
 
       // Update local state
-      setCandidates(prev => prev.map(c => c["user_id"] === candidateId || c["Candidate_ID"] === candidateId ? {
-        ...c,
-        client_status: newStatus
-      } : c));
+      setCandidates((prev) =>
+        prev.map((c) =>
+          c["user_id"] === candidateId || c["Candidate_ID"] === candidateId ? { ...c, client_status: newStatus } : c,
+        ),
+      );
+
       toast({
         title: "Client Status Updated",
-        description: `Client status changed to ${newStatus}`
+        description: `Client status changed to ${newStatus}`,
       });
     } catch (error) {
       console.error("Error updating client status:", error);
       toast({
         title: "Error",
         description: "Failed to update client status",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
+
   const handleScheduleInterview = async () => {
     if (!selectedCandidate) return;
 
     // Validate that all slots are filled
-    const validSlots = interviewSlots.filter(slot => slot.date && slot.time);
+    const validSlots = interviewSlots.filter((slot) => slot.date && slot.time);
     if (validSlots.length !== 3) {
-      alert('Please fill in all 3 interview slots');
+      alert("Please fill in all 3 interview slots");
       return;
     }
 
     // Validate that times are not in the past for today's date
     const now = new Date();
-    const currentDate = format(now, 'yyyy-MM-dd');
-    const currentTime = format(now, 'HH:mm');
+    const currentDate = format(now, "yyyy-MM-dd");
+    const currentTime = format(now, "HH:mm");
     for (const slot of validSlots) {
-      const slotDate = format(slot.date!, 'yyyy-MM-dd');
+      const slotDate = format(slot.date!, "yyyy-MM-dd");
       if (slotDate === currentDate && slot.time <= currentTime) {
-        alert('Cannot schedule interview times in the past for today. Please select a future time.');
+        alert("Cannot schedule interview times in the past for today. Please select a future time.");
         return;
       }
     }
 
     // Validate interview link for online meetings
-    if (interviewType === 'Online Meeting' && !interviewLink.trim()) {
-      alert('Please provide an interview link for online meetings');
+    if (interviewType === "Online Meeting" && !interviewLink.trim()) {
+      alert("Please provide an interview link for online meetings");
       return;
     }
     try {
       // Update candidate status
-      await supabase.from('CVs').update({
-        CandidateStatus: 'Interview'
-      }).eq('candidate_id', selectedCandidate.candidateId);
+      await supabase
+        .from("CVs")
+        .update({
+          CandidateStatus: "Interview",
+        })
+        .eq("candidate_id", selectedCandidate.candidateId);
 
       // Format appointments for webhook (same as Dashboard)
-      const appointments = interviewSlots.map(slot => {
+      const appointments = interviewSlots.map((slot) => {
         if (slot.date && slot.time) {
-          return `${format(slot.date, 'yyyy-MM-dd')} ${slot.time}`;
+          return `${format(slot.date, "yyyy-MM-dd")} ${slot.time}`;
         }
-        return '';
+        return "";
       });
 
       // Save interview to database and get the generated intid (same as Dashboard)
-      const {
-        data: interviewData,
-        error: insertError
-      } = await supabase.from('interview').insert({
-        candidate_id: selectedCandidate.candidateId,
-        job_id: selectedCandidate.jobId,
-        callid: selectedCandidate.callid,
-        appoint1: appointments[0],
-        appoint2: appointments[1],
-        appoint3: appointments[2],
-        inttype: interviewType,
-        intlink: interviewType === 'Online Meeting' ? interviewLink : null,
-        company_id: null
-      }).select('intid').single();
+      const { data: interviewData, error: insertError } = await supabase
+        .from("interview")
+        .insert({
+          candidate_id: selectedCandidate.candidateId,
+          job_id: selectedCandidate.jobId,
+          callid: selectedCandidate.callid,
+          appoint1: appointments[0],
+          appoint2: appointments[1],
+          appoint3: appointments[2],
+          inttype: interviewType,
+          intlink: interviewType === "Online Meeting" ? interviewLink : null,
+          company_id: null,
+        })
+        .select("intid")
+        .single();
       if (insertError) throw insertError;
 
       // Send webhook to Make.com (exact same as Dashboard)
-      await fetch('https://hook.eu2.make.com/3t88lby79dnf6x6hgm1i828yhen75omb', {
-        method: 'POST',
+      await fetch("https://hook.eu2.make.com/3t88lby79dnf6x6hgm1i828yhen75omb", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           job_id: selectedCandidate.jobId,
@@ -1657,52 +1819,58 @@ export default function JobDetails() {
           appoint2: appointments[1],
           appoint3: appointments[2],
           inttype: interviewType,
-          intlink: interviewType === 'Online Meeting' ? interviewLink : null
-        })
+          intlink: interviewType === "Online Meeting" ? interviewLink : null,
+        }),
       });
 
       // Update local state
-      setCvData(prev => prev.map(cv => cv.candidate_id === selectedCandidate.candidateId ? {
-        ...cv,
-        CandidateStatus: 'Interview'
-      } : cv));
+      setCvData((prev) =>
+        prev.map((cv) =>
+          cv.candidate_id === selectedCandidate.candidateId
+            ? {
+                ...cv,
+                CandidateStatus: "Interview",
+              }
+            : cv,
+        ),
+      );
 
       // Close dialog and show success message
       setInterviewDialogOpen(false);
       setSelectedCandidate(null);
-      setInterviewType('Phone');
-      setInterviewLink('');
+      setInterviewType("Phone");
+      setInterviewLink("");
       toast({
         title: "Interview Scheduled",
-        description: "The candidate has been scheduled for an interview."
+        description: "The candidate has been scheduled for an interview.",
       });
     } catch (error) {
-      console.error('Error scheduling interview:', error);
+      console.error("Error scheduling interview:", error);
       toast({
         title: "Error",
         description: "Failed to schedule interview. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
-  const updateInterviewSlot = (index: number, field: 'date' | 'time', value: Date | string) => {
-    setInterviewSlots(prev => {
+  const updateInterviewSlot = (index: number, field: "date" | "time", value: Date | string) => {
+    setInterviewSlots((prev) => {
       const newSlots = [...prev];
-      if (field === 'date') {
+      if (field === "date") {
         newSlots[index] = {
           ...newSlots[index],
-          date: value as Date
+          date: value as Date,
         };
       } else {
         newSlots[index] = {
           ...newSlots[index],
-          time: value as string
+          time: value as string,
         };
       }
       return newSlots;
     });
   };
-  const timeOptions = ['00', '15', '30', '45'];
+  const timeOptions = ["00", "15", "30", "45"];
   const handleApplicationsTabClick = () => {
     // Reset notification count and update last viewed timestamp
     if (id) {
@@ -1713,29 +1881,33 @@ export default function JobDetails() {
     }
   };
   if (loading) {
-    return <div className="flex items-center justify-center h-64">
+    return (
+      <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>;
+      </div>
+    );
   }
   if (!job) {
-    return <div className="flex flex-col items-center justify-center h-64 space-y-4">
+    return (
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
         <h2 className="text-2xl font-bold text-muted-foreground">Job not found</h2>
-        <Button onClick={() => navigate('/jobs')}>
+        <Button onClick={() => navigate("/jobs")}>
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Jobs
         </Button>
-      </div>;
+      </div>
+    );
   }
   const getStatusVariant = (status: string) => {
     switch (status?.toLowerCase()) {
-      case 'active':
-        return 'default';
-      case 'closed':
-        return 'destructive';
-      case 'draft':
-        return 'secondary';
+      case "active":
+        return "default";
+      case "closed":
+        return "destructive";
+      case "draft":
+        return "secondary";
       default:
-        return 'outline';
+        return "outline";
     }
   };
   const getScoreBadge = (score: string | null) => {
@@ -1779,19 +1951,22 @@ export default function JobDetails() {
 
     // Determine source type for display
     let sourceType = "";
-    if (candidate["Source"] && typeof candidate["Source"] === 'string') {
-      if (candidate["Source"].toLowerCase().includes('linkedin')) {
+    if (candidate["Source"] && typeof candidate["Source"] === "string") {
+      if (candidate["Source"].toLowerCase().includes("linkedin")) {
         sourceType = " (linkedin)";
-      } else if (candidate["Source"].toLowerCase().includes('itris')) {
+      } else if (candidate["Source"].toLowerCase().includes("itris")) {
         sourceType = " (cv)";
       }
     }
-    return <div className="flex items-center gap-1">
+    return (
+      <div className="flex items-center gap-1">
         <Badge className={`${variant} flex items-center gap-1 font-semibold`}>
           {hasIcon && <Star className="w-3 h-3" />}
-          Overall: {overallScore}{sourceType}
+          Overall: {overallScore}
+          {sourceType}
         </Badge>
-      </div>;
+      </div>
+    );
   };
   const formatCurrency = (amountStr: string | null | undefined, currency?: string | null) => {
     const amount = parseFloat((amountStr || "").toString().replace(/[^0-9.]/g, ""));
@@ -1801,7 +1976,7 @@ export default function JobDetails() {
         style: "currency",
         currency,
         minimumFractionDigits: 0,
-        maximumFractionDigits: 0
+        maximumFractionDigits: 0,
       }).format(amount);
     } catch {
       return `${currency} ${isNaN(amount) ? amountStr : amount.toLocaleString()}`;
@@ -1809,64 +1984,82 @@ export default function JobDetails() {
   };
 
   // Filtered candidates based on all filters
-  const filteredCandidates = candidates.filter(candidate => {
-    const nameMatch = !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
-    const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
-    const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
-    const userIdMatch = !userIdFilter || (candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
-    const sourceMatch = !longListSourceFilter || longListSourceFilter === "all" || (candidate["Source"] || "").toLowerCase().includes(longListSourceFilter.toLowerCase());
-    let scoreMatch = true;
-    if (scoreFilter !== "all") {
-      // Try multiple possible field names for CV score
-      const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
-      switch (scoreFilter) {
-        case "high":
-          scoreMatch = score >= 75;
-          break;
-        case "moderate":
-          scoreMatch = score >= 50 && score < 75;
-          break;
-        case "poor":
-          scoreMatch = score > 0 && score < 50;
-          break;
-        case "none":
-          scoreMatch = score === 0 || !candidate["Success Score"] && !candidate["cv_score"] && !candidate["CV Score"];
-          break;
+  const filteredCandidates = candidates
+    .filter((candidate) => {
+      const nameMatch =
+        !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
+      const emailMatch =
+        !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
+      const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
+      const userIdMatch = !userIdFilter || (candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
+      const sourceMatch =
+        !longListSourceFilter ||
+        longListSourceFilter === "all" ||
+        (candidate["Source"] || "").toLowerCase().includes(longListSourceFilter.toLowerCase());
+      let scoreMatch = true;
+      if (scoreFilter !== "all") {
+        // Try multiple possible field names for CV score
+        const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
+        switch (scoreFilter) {
+          case "high":
+            scoreMatch = score >= 75;
+            break;
+          case "moderate":
+            scoreMatch = score >= 50 && score < 75;
+            break;
+          case "poor":
+            scoreMatch = score > 0 && score < 50;
+            break;
+          case "none":
+            scoreMatch =
+              score === 0 || (!candidate["Success Score"] && !candidate["cv_score"] && !candidate["CV Score"]);
+            break;
+        }
       }
-    }
-    let contactedMatch = true;
-    if (contactedFilter !== "all") {
-      const raw = (candidate["Contacted"] || "").toString().trim();
-      const norm = raw.toLowerCase();
-      if (contactedFilter === "Not Contacted") {
-        // Treat empty/undefined and case variations as "Not Contacted"
-        contactedMatch = raw === "" || norm === "not contacted";
-      } else if (contactedFilter === "Ready to Call") {
-        // For "Ready to Contact", match both "Ready to Contact" and "Ready to Contact contacted"
-        contactedMatch = norm.includes("ready to contact") || norm.includes("ready to call");
-      } else {
-        contactedMatch = norm === contactedFilter.toLowerCase();
+      let contactedMatch = true;
+      if (contactedFilter !== "all") {
+        const raw = (candidate["Contacted"] || "").toString().trim();
+        const norm = raw.toLowerCase();
+        if (contactedFilter === "Not Contacted") {
+          // Treat empty/undefined and case variations as "Not Contacted"
+          contactedMatch = raw === "" || norm === "not contacted";
+        } else if (contactedFilter === "Ready to Call") {
+          // For "Ready to Contact", match both "Ready to Contact" and "Ready to Contact contacted"
+          contactedMatch = norm.includes("ready to contact") || norm.includes("ready to call");
+        } else {
+          contactedMatch = norm === contactedFilter.toLowerCase();
+        }
       }
-    }
-    return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceMatch && scoreMatch && contactedMatch;
-  }).sort((a, b) => {
-    // Sort by highest score descending (CV Score or LinkedIn Score, whichever is higher)
-    const cvScoreA = parseFloat(a["cv_score"] || a["CV Score"] || "0");
-    const linkedinScoreA = parseFloat(a["linkedin_score"] || "0");
-    const maxScoreA = Math.max(cvScoreA, linkedinScoreA);
-    const cvScoreB = parseFloat(b["cv_score"] || b["CV Score"] || "0");
-    const linkedinScoreB = parseFloat(b["linkedin_score"] || "0");
-    const maxScoreB = Math.max(cvScoreB, linkedinScoreB);
-    return maxScoreB - maxScoreA;
-  });
+      return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceMatch && scoreMatch && contactedMatch;
+    })
+    .sort((a, b) => {
+      // Sort by highest score descending (CV Score or LinkedIn Score, whichever is higher)
+      const cvScoreA = parseFloat(a["cv_score"] || a["CV Score"] || "0");
+      const linkedinScoreA = parseFloat(a["linkedin_score"] || "0");
+      const maxScoreA = Math.max(cvScoreA, linkedinScoreA);
+      const cvScoreB = parseFloat(b["cv_score"] || b["CV Score"] || "0");
+      const linkedinScoreB = parseFloat(b["linkedin_score"] || "0");
+      const maxScoreB = Math.max(cvScoreB, linkedinScoreB);
+      return maxScoreB - maxScoreA;
+    });
   // Helper function to render candidate cards
-  const renderCandidateCard = (candidateId: string, candidateContacts: any[], mainCandidate: any, isTopCandidate: boolean = false) => {
-    const cardClassName = isTopCandidate ? "relative border-2 border-yellow-400 hover:border-yellow-500 transition-all duration-300 hover:shadow-2xl bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 dark:from-yellow-950/50 dark:via-amber-950/50 dark:to-orange-950/50 shadow-xl shadow-yellow-200/50 dark:shadow-yellow-900/30 ring-2 ring-yellow-300/60 dark:ring-yellow-600/40 before:absolute before:inset-0 before:bg-gradient-to-r before:from-yellow-300/10 before:via-amber-300/10 before:to-orange-300/10 before:rounded-lg before:animate-pulse" : "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20";
-    return <Card key={candidateId} id={`candidate-card-${candidateId}`} className={cardClassName}>
+  const renderCandidateCard = (
+    candidateId: string,
+    candidateContacts: any[],
+    mainCandidate: any,
+    isTopCandidate: boolean = false,
+  ) => {
+    const cardClassName = isTopCandidate
+      ? "relative border-2 border-yellow-400 hover:border-yellow-500 transition-all duration-300 hover:shadow-2xl bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 dark:from-yellow-950/50 dark:via-amber-950/50 dark:to-orange-950/50 shadow-xl shadow-yellow-200/50 dark:shadow-yellow-900/30 ring-2 ring-yellow-300/60 dark:ring-yellow-600/40 before:absolute before:inset-0 before:bg-gradient-to-r before:from-yellow-300/10 before:via-amber-300/10 before:to-orange-300/10 before:rounded-lg before:animate-pulse"
+      : "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20";
+    return (
+      <Card key={candidateId} id={`candidate-card-${candidateId}`} className={cardClassName}>
         <CardContent className="p-4 relative">
-          {isTopCandidate && <Badge className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-gradient-to-br from-amber-300 via-yellow-300 to-amber-400 hover:from-amber-400 hover:via-yellow-400 hover:to-amber-500 border-2 border-amber-200 shadow-lg hover:shadow-xl transition-all duration-200 w-8 h-8 rounded-full p-0 flex items-center justify-center group z-10">
+          {isTopCandidate && (
+            <Badge className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-gradient-to-br from-amber-300 via-yellow-300 to-amber-400 hover:from-amber-400 hover:via-yellow-400 hover:to-amber-500 border-2 border-amber-200 shadow-lg hover:shadow-xl transition-all duration-200 w-8 h-8 rounded-full p-0 flex items-center justify-center group z-10">
               <Star className="w-4 h-4 fill-amber-800 text-amber-800 group-hover:scale-110 transition-transform duration-200" />
-            </Badge>}
+            </Badge>
+          )}
           <div className="space-y-3">
             <div className="flex items-start justify-between">
               <div className="min-w-0 flex-1">
@@ -1875,71 +2068,127 @@ export default function JobDetails() {
                 </div>
                 <p className="text-sm text-muted-foreground">User ID: {mainCandidate["user_id"] || "N/A"}</p>
                 <div className="flex items-center gap-4 text-sm mt-1">
-                  <span className="text-muted-foreground">CV Score: {mainCandidate["cv_score"] || mainCandidate["CV Score"] || "N/A"}</span>
-                  {mainCandidate["after_call_score"] && <span className="text-muted-foreground">After Call Score: {mainCandidate["after_call_score"]}</span>}
-                  {mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score"] !== undefined && mainCandidate["linkedin_score"] !== null && mainCandidate["linkedin_score"] !== "" && !["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && <span className="text-muted-foreground">Overall: {mainCandidate["linkedin_score"]}</span>}
+                  <span className="text-muted-foreground">
+                    CV Score: {mainCandidate["cv_score"] || mainCandidate["CV Score"] || "N/A"}
+                  </span>
+                  {mainCandidate["after_call_score"] && (
+                    <span className="text-muted-foreground">After Call Score: {mainCandidate["after_call_score"]}</span>
+                  )}
+                  {mainCandidate["Source"] &&
+                    typeof mainCandidate["Source"] === "string" &&
+                    mainCandidate["Source"].toLowerCase().includes("linkedin") &&
+                    mainCandidate["linkedin_score"] !== undefined &&
+                    mainCandidate["linkedin_score"] !== null &&
+                    mainCandidate["linkedin_score"] !== "" &&
+                    ![
+                      "ready to contact",
+                      "not contacted",
+                      "1st no answer",
+                      "2nd no answer",
+                      "3rd no answer",
+                      "1st no anwser",
+                      "2nd no anwser",
+                      "3rd no anwser",
+                    ].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && (
+                      <span className="text-muted-foreground">Overall: {mainCandidate["linkedin_score"]}</span>
+                    )}
                 </div>
-                {mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score_reason"] !== undefined && mainCandidate["linkedin_score_reason"] !== null && mainCandidate["linkedin_score_reason"] !== ""}
-                {mainCandidate["Salary Expectations"] && <div className="flex items-center gap-2 text-sm mt-1">
+                {mainCandidate["Source"] &&
+                  typeof mainCandidate["Source"] === "string" &&
+                  mainCandidate["Source"].toLowerCase().includes("linkedin") &&
+                  mainCandidate["linkedin_score_reason"] !== undefined &&
+                  mainCandidate["linkedin_score_reason"] !== null &&
+                  mainCandidate["linkedin_score_reason"] !== ""}
+                {mainCandidate["Salary Expectations"] && (
+                  <div className="flex items-center gap-2 text-sm mt-1">
                     <Banknote className="w-3 h-3 text-muted-foreground" />
-                    <span className="text-muted-foreground">Expected: {formatCurrency(mainCandidate["Salary Expectations"], job?.Currency)}</span>
-                  </div>}
+                    <span className="text-muted-foreground">
+                      Expected: {formatCurrency(mainCandidate["Salary Expectations"], job?.Currency)}
+                    </span>
+                  </div>
+                )}
               </div>
-              {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || mainCandidate["Contacted"]?.toLowerCase() === "contacted" || mainCandidate["Contacted"]?.toLowerCase() === "low scored" || mainCandidate["Contacted"]?.toLowerCase() === "tasked") && mainCandidate["lastcalltime"] && <div className="text-xs text-muted-foreground text-right">
-                  <div className="flex items-center">
-                    <Clock className="w-3 h-3 mr-1" />
-                    {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
+              {(mainCandidate["Contacted"]?.toLowerCase() === "call done" ||
+                mainCandidate["Contacted"]?.toLowerCase() === "contacted" ||
+                mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
+                mainCandidate["Contacted"]?.toLowerCase() === "tasked") &&
+                mainCandidate["lastcalltime"] && (
+                  <div className="text-xs text-muted-foreground text-right">
+                    <div className="flex items-center">
+                      <Clock className="w-3 h-3 mr-1" />
+                      {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
+                    </div>
+                    <div className="text-xs">
+                      {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </div>
                   </div>
-                  <div className="text-xs">
-                    {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-                  </div>
-                </div>}
-            </div>
-            
-            <div className="space-y-2 text-sm">
-              {mainCandidate["Candidate Email"] && <div className="flex items-center text-muted-foreground">
-                  <Mail className="w-4 h-4 mr-2" />
-                  <span className="truncate">{mainCandidate["Candidate Email"]}</span>
-                </div>}
-              
-              {mainCandidate["Candidate Phone Number"] && <div className="flex items-center text-muted-foreground">
-                  <Phone className="w-4 h-4 mr-2" />
-                  <span>{mainCandidate["Candidate Phone Number"]}</span>
-                </div>}
-                
-              {mainCandidate["Source"] && <div className="flex items-center text-muted-foreground">
-                  <Building className="w-4 h-4 mr-2" />
-                  <span className="truncate">{mainCandidate["Source"]}</span>
-                </div>}
+                )}
             </div>
 
-            {mainCandidate["Summary"] && <p className="text-sm text-muted-foreground line-clamp-3">
-                {mainCandidate["Summary"]}
-              </p>}
+            <div className="space-y-2 text-sm">
+              {mainCandidate["Candidate Email"] && (
+                <div className="flex items-center text-muted-foreground">
+                  <Mail className="w-4 h-4 mr-2" />
+                  <span className="truncate">{mainCandidate["Candidate Email"]}</span>
+                </div>
+              )}
+
+              {mainCandidate["Candidate Phone Number"] && (
+                <div className="flex items-center text-muted-foreground">
+                  <Phone className="w-4 h-4 mr-2" />
+                  <span>{mainCandidate["Candidate Phone Number"]}</span>
+                </div>
+              )}
+
+              {mainCandidate["Source"] && (
+                <div className="flex items-center text-muted-foreground">
+                  <Building className="w-4 h-4 mr-2" />
+                  <span className="truncate">{mainCandidate["Source"]}</span>
+                </div>
+              )}
+            </div>
+
+            {mainCandidate["Summary"] && (
+              <p className="text-sm text-muted-foreground line-clamp-3">{mainCandidate["Summary"]}</p>
+            )}
 
             {/* Task Status and Links Section */}
             {(() => {
-            const candidateTasks = taskCandidates.filter(task => task.candidate_id === candidateId);
-            const candidateStatus = mainCandidate["Contacted"]?.toLowerCase();
+              const candidateTasks = taskCandidates.filter((task) => task.candidate_id === candidateId);
+              const candidateStatus = mainCandidate["Contacted"]?.toLowerCase();
 
-            // Only show tasks if candidate status is "tasked" and not "rejected"
-            if (candidateTasks.length === 0 || candidateStatus !== "tasked" || candidateStatus === "rejected") return null;
-            return <div className="space-y-2 pt-2 border-t">
+              // Only show tasks if candidate status is "tasked" and not "rejected"
+              if (candidateTasks.length === 0 || candidateStatus !== "tasked" || candidateStatus === "rejected")
+                return null;
+              return (
+                <div className="space-y-2 pt-2 border-t">
                   <h5 className="text-sm font-medium text-foreground flex items-center">
                     <CheckCircle className="w-4 h-4 mr-2" />
                     Tasks ({candidateTasks.length})
                   </h5>
                   <div className="space-y-2">
-                    {candidateTasks.map(task => <div key={task.taskid} className={cn("flex items-center justify-between p-2 rounded-md", task.status === 'Received' ? "bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700" : "bg-muted/50")}>
+                    {candidateTasks.map((task) => (
+                      <div
+                        key={task.taskid}
+                        className={cn(
+                          "flex items-center justify-between p-2 rounded-md",
+                          task.status === "Received"
+                            ? "bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700"
+                            : "bg-muted/50",
+                        )}
+                      >
                         <div className="flex items-center space-x-2">
                           <div className="flex items-center space-x-1">
-                            {task.status === 'Pending' && <Hourglass className="w-3 h-3 text-orange-500" />}
-                            {task.status === 'Received' && <AlertCircle className="w-3 h-3 text-blue-500" />}
-                            {task.status === 'Reviewed' && <CheckCircle className="w-3 h-3 text-green-500" />}
-                            <Select value={task.status} onValueChange={value => updateTaskStatus(task.taskid, value as any)}>
+                            {task.status === "Pending" && <Hourglass className="w-3 h-3 text-orange-500" />}
+                            {task.status === "Received" && <AlertCircle className="w-3 h-3 text-blue-500" />}
+                            {task.status === "Reviewed" && <CheckCircle className="w-3 h-3 text-green-500" />}
+                            <Select
+                              value={task.status}
+                              onValueChange={(value) => updateTaskStatus(task.taskid, value as any)}
+                            >
                               <SelectTrigger className="w-24 h-6 text-xs bg-background/50 border-border/50">
                                 <SelectValue />
                               </SelectTrigger>
@@ -1952,53 +2201,120 @@ export default function JobDetails() {
                           </div>
                         </div>
                         <div className="flex items-center space-x-1">
-                          {task.tasklink && (task.tasklink.includes(',') ?
-                    // Multiple links
-                    <div className="flex items-center space-x-1">
-                              {task.tasklink.split(',').map((link: string, index: number) => <Button key={index} variant="ghost" size="sm" onClick={() => window.open(link.trim(), '_blank')} className="p-1 h-6 w-6 hover:bg-primary/10" title={`Task Link ${index + 1}`}>
-                                  <ExternalLink className="h-3 w-3" />
-                                </Button>)}
-                              <span className="text-xs text-muted-foreground">
-                                ({task.tasklink.split(',').length} links)
-                              </span>
-                            </div> :
-                    // Single link
-                    <Button variant="ghost" size="sm" onClick={() => window.open(task.tasklink, '_blank')} className="p-1 h-6 w-6 hover:bg-primary/10" title="Task Link">
-                              <ExternalLink className="h-3 w-3" />
-                            </Button>)}
+                          {task.tasklink &&
+                            (task.tasklink.includes(",") ? (
+                              // Multiple links
+                              <div className="flex items-center space-x-1">
+                                {task.tasklink.split(",").map((link: string, index: number) => (
+                                  <Button
+                                    key={index}
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => window.open(link.trim(), "_blank")}
+                                    className="p-1 h-6 w-6 hover:bg-primary/10"
+                                    title={`Task Link ${index + 1}`}
+                                  >
+                                    <ExternalLink className="h-3 w-3" />
+                                  </Button>
+                                ))}
+                                <span className="text-xs text-muted-foreground">
+                                  ({task.tasklink.split(",").length} links)
+                                </span>
+                              </div>
+                            ) : (
+                              // Single link
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => window.open(task.tasklink, "_blank")}
+                                className="p-1 h-6 w-6 hover:bg-primary/10"
+                                title="Task Link"
+                              >
+                                <ExternalLink className="h-3 w-3" />
+                              </Button>
+                            ))}
                         </div>
-                      </div>)}
+                      </div>
+                    ))}
                   </div>
-                </div>;
-          })()}
+                </div>
+              );
+            })()}
 
             <div className="flex items-center justify-between pt-2 border-t">
               <div className="flex items-center space-x-2 flex-wrap gap-2">
-                <StatusDropdown currentStatus={mainCandidate["Contacted"]} candidateId={mainCandidate["Candidate_ID"]} jobId={id!} onStatusChange={newStatus => {
-                setCandidates(prev => prev.map(c => c["Candidate_ID"] === mainCandidate["Candidate_ID"] ? {
-                  ...c,
-                  Contacted: newStatus
-                } : c));
-              }} variant="badge" />
-                {getCandidateStatus(mainCandidate["Candidate_ID"]) && <StatusDropdown currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])} candidateId={mainCandidate["Candidate_ID"]} jobId={null} onStatusChange={newStatus => {
-                setCvData(prev => prev.map(cv => cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] ? {
-                  ...cv,
-                  CandidateStatus: newStatus
-                } : cv));
-              }} variant="badge" />}
+                <StatusDropdown
+                  currentStatus={mainCandidate["Contacted"]}
+                  candidateId={mainCandidate["Candidate_ID"]}
+                  jobId={id!}
+                  onStatusChange={(newStatus) => {
+                    setCandidates((prev) =>
+                      prev.map((c) =>
+                        c["Candidate_ID"] === mainCandidate["Candidate_ID"]
+                          ? {
+                              ...c,
+                              Contacted: newStatus,
+                            }
+                          : c,
+                      ),
+                    );
+                  }}
+                  variant="badge"
+                />
+                {getCandidateStatus(mainCandidate["Candidate_ID"]) && (
+                  <StatusDropdown
+                    currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
+                    candidateId={mainCandidate["Candidate_ID"]}
+                    jobId={null}
+                    onStatusChange={(newStatus) => {
+                      setCvData((prev) =>
+                        prev.map((cv) =>
+                          cv["Cadndidate_ID"] === mainCandidate["Candidate_ID"]
+                            ? {
+                                ...cv,
+                                CandidateStatus: newStatus,
+                              }
+                            : cv,
+                        ),
+                      );
+                    }}
+                    variant="badge"
+                  />
+                )}
                 {/* Qualification Status Badge */}
-                {mainCandidate["qualifications"] !== null && mainCandidate["qualifications"] !== undefined && mainCandidate["qualifications"] !== "" ? <Badge className="border-2 border-green-600 text-green-600 bg-green-100 shadow-md">
+                {mainCandidate["qualifications"] !== null &&
+                mainCandidate["qualifications"] !== undefined &&
+                mainCandidate["qualifications"] !== "" ? (
+                  <Badge className="border-2 border-green-600 text-green-600 bg-green-100 shadow-md">
                     <CheckCircle className="w-3 h-3 mr-1" />
                     Qualification Received
-                  </Badge> : <Badge variant="outline" className="border-2 border-amber-500 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50 transition-all duration-200">
+                  </Badge>
+                ) : (
+                  <Badge
+                    variant="outline"
+                    className="border-2 border-amber-500 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50 transition-all duration-200"
+                  >
                     <Clock className="w-3 h-3 mr-1" />
                     Qualification Sent
-                  </Badge>}
+                  </Badge>
+                )}
               </div>
               <div className="flex flex-col gap-1 items-end">
                 {/* Only show overall score when status is Call Done */}
                 {mainCandidate["Contacted"]?.toLowerCase() === "call done" && getOverallScoreBadge(mainCandidate)}
-                {!["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
+                {![
+                  "ready to contact",
+                  "not contacted",
+                  "1st no answer",
+                  "2nd no answer",
+                  "3rd no answer",
+                  "1st no anwser",
+                  "2nd no anwser",
+                  "3rd no anwser",
+                ].includes(mainCandidate["Contacted"]?.toLowerCase() || "") &&
+                  getScoreBadge(
+                    mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"],
+                  )}
               </div>
             </div>
 
@@ -2006,62 +2322,120 @@ export default function JobDetails() {
             <div className="space-y-2 pt-2 border-t">
               <div className="flex flex-wrap gap-2">
                 {(() => {
-                console.log('AI Short List - candidateContacts for candidate:', candidateId, candidateContacts);
-                const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
-                console.log('AI Short List - contactsWithCalls:', contactsWithCalls);
-                if (contactsWithCalls.length === 0) return null;
+                  console.log("AI Short List - candidateContacts for candidate:", candidateId, candidateContacts);
+                  const contactsWithCalls = candidateContacts.filter((contact) => contact.callcount > 0);
+                  console.log("AI Short List - contactsWithCalls:", contactsWithCalls);
+                  if (contactsWithCalls.length === 0) return null;
 
-                // Get the latest call log (highest callid)
-                const latestContact = contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest);
-                console.log('AI Short List - latestContact:', latestContact);
-                return <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-[100px]">
-                      <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}&fromTab=shortlist`}>
+                  // Get the latest call log (highest callid)
+                  const latestContact = contactsWithCalls.reduce((latest, current) =>
+                    current.callid > latest.callid ? current : latest,
+                  );
+                  console.log("AI Short List - latestContact:", latestContact);
+                  return (
+                    <Button
+                      key={latestContact.callid}
+                      variant="outline"
+                      size="sm"
+                      asChild
+                      className="flex-1 min-w-[100px]"
+                    >
+                      <Link
+                        to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}&fromTab=shortlist`}
+                      >
                         <FileText className="w-3 h-3 mr-1" />
                         Call Log
                       </Link>
-                    </Button>;
-              })()}
+                    </Button>
+                  );
+                })()}
                 <Button variant="ghost" size="sm" asChild className="flex-1 min-w-[100px]">
-                  {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && getLinkedInUrl(mainCandidate) ? <a href={getLinkedInUrl(mainCandidate)!} target="_blank" rel="noopener noreferrer">
+                  {typeof mainCandidate["Source"] === "string" &&
+                  mainCandidate["Source"].toLowerCase().includes("linkedin") &&
+                  getLinkedInUrl(mainCandidate) ? (
+                    <a href={getLinkedInUrl(mainCandidate)!} target="_blank" rel="noopener noreferrer">
                       <Users className="w-3 h-3 mr-1" />
                       View Profile
-                    </a> : <Link to={`/candidate/${mainCandidate["user_id"] || candidateId}`} state={{
-                  fromJob: id,
-                  tab: 'shortlist',
-                  focusCandidateId: mainCandidate["user_id"] || candidateId
-                }}>
+                    </a>
+                  ) : (
+                    <Link
+                      to={`/candidate/${mainCandidate["user_id"] || candidateId}`}
+                      state={{
+                        fromJob: id,
+                        tab: "shortlist",
+                        focusCandidateId: mainCandidate["user_id"] || candidateId,
+                      }}
+                    >
                       <Users className="w-3 h-3 mr-1" />
                       View Profile
-                    </Link>}
+                    </Link>
+                  )}
                 </Button>
               </div>
               {/* Action Buttons - CV Submitted and Reject */}
               <div className="flex gap-2">
-                {mainCandidate["Contacted"] === "Submitted" ? <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-blue-500 text-blue-600 cursor-default" disabled>
+                {mainCandidate["Contacted"] === "Submitted" ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 min-w-[100px] bg-transparent border-2 border-blue-500 text-blue-600 cursor-default"
+                    disabled
+                  >
                     <FileCheck className="w-3 h-3 mr-1" />
                     CV Submitted
-                  </Button> : <Button variant="outline" size="sm" onClick={() => {
-                const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
-                const latestContact = contactsWithCalls.length > 0 ? contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest) : null;
-                handleCVSubmitted(candidateId, latestContact?.callid);
-              }} className="flex-1 min-w-[100px] bg-transparent border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-500 dark:hover:text-green-300 transition-all duration-200">
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const contactsWithCalls = candidateContacts.filter((contact) => contact.callcount > 0);
+                      const latestContact =
+                        contactsWithCalls.length > 0
+                          ? contactsWithCalls.reduce((latest, current) =>
+                              current.callid > latest.callid ? current : latest,
+                            )
+                          : null;
+                      handleCVSubmitted(candidateId, latestContact?.callid);
+                    }}
+                    className="flex-1 min-w-[100px] bg-transparent border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-500 dark:hover:text-green-300 transition-all duration-200"
+                  >
                     <FileCheck className="w-3 h-3 mr-1" />
                     Submit CV
-                  </Button>}
-                {mainCandidate["Contacted"] === "Rejected" ? <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed" disabled>
+                  </Button>
+                )}
+                {mainCandidate["Contacted"] === "Rejected" ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 min-w-[100px] bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed"
+                    disabled
+                  >
                     <X className="w-3 h-3 mr-1" />
                     Rejected
-                  </Button> : <Button variant="outline" size="sm" className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200" onClick={() => openRejectDialog(id!, candidateId, candidateContacts[0].callid)}>
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200"
+                    onClick={() => openRejectDialog(id!, candidateId, candidateContacts[0].callid)}
+                  >
                     <X className="w-3 h-3 mr-1" />
                     Reject Candidate
-                  </Button>}
+                  </Button>
+                )}
               </div>
-              
+
               {/* Client Status Dropdown - Shows when CV is Submitted */}
-              {mainCandidate["Contacted"] === "Submitted" && <div className="pt-2 border-t">
+              {mainCandidate["Contacted"] === "Submitted" && (
+                <div className="pt-2 border-t">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">Client Status:</span>
-                    <Select value={mainCandidate["client_status"] || "Interview Requested"} onValueChange={value => handleClientStatusChange(candidateId, value)}>
+                    <Select
+                      value={mainCandidate["client_status"] || "Interview Requested"}
+                      onValueChange={(value) => handleClientStatusChange(candidateId, value)}
+                    >
                       <SelectTrigger className="h-9 flex-1">
                         <SelectValue />
                       </SelectTrigger>
@@ -2072,28 +2446,32 @@ export default function JobDetails() {
                       </SelectContent>
                     </Select>
                   </div>
-                </div>}
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
-      </Card>;
+      </Card>
+    );
   };
 
   // Get CV status for a candidate
   const getCandidateStatus = (candidateId: string) => {
-    const cvRecord = cvData.find(cv => cv['candidate_id'] === candidateId);
-    return cvRecord?.['CandidateStatus'] || null;
+    const cvRecord = cvData.find((cv) => cv["candidate_id"] === candidateId);
+    return cvRecord?.["CandidateStatus"] || null;
   };
 
   // Short list candidates (after_call_score > 74) sorted by Overall Score descending
-  const shortListCandidates = candidates.filter(candidate => {
-    const score = parseFloat(candidate.after_call_score || "0");
-    return score > 74;
-  }).sort((a, b) => {
-    const overallScoreA = calculateOverallScore(a);
-    const overallScoreB = calculateOverallScore(b);
-    return overallScoreB - overallScoreA; // Sort highest score first
-  });
+  const shortListCandidates = candidates
+    .filter((candidate) => {
+      const score = parseFloat(candidate.after_call_score || "0");
+      return score > 74;
+    })
+    .sort((a, b) => {
+      const overallScoreA = calculateOverallScore(a);
+      const overallScoreB = calculateOverallScore(b);
+      return overallScoreB - overallScoreA; // Sort highest score first
+    });
 
   // Helper function to parse salary as number
   const parseSalary = (salary: string | null | undefined): number => {
@@ -2108,12 +2486,22 @@ export default function JobDetails() {
 
   // Function to filter short list candidates
   const filterShortListCandidates = (candidates: any[]) => {
-    return candidates.filter(candidate => {
-      const nameMatch = !shortListNameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(shortListNameFilter.toLowerCase());
-      const emailMatch = !shortListEmailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(shortListEmailFilter.toLowerCase());
-      const phoneMatch = !shortListPhoneFilter || (candidate["Candidate Phone Number"] || "").includes(shortListPhoneFilter);
-      const userIdMatch = !shortListUserIdFilter || (candidate.user_id || candidate["user_id"] || "").toString().includes(shortListUserIdFilter);
-      const sourceMatch = !shortListSourceFilter || shortListSourceFilter === "all" || (candidate["Source"] || "").toLowerCase().includes(shortListSourceFilter.toLowerCase());
+    return candidates.filter((candidate) => {
+      const nameMatch =
+        !shortListNameFilter ||
+        (candidate["Candidate Name"] || "").toLowerCase().includes(shortListNameFilter.toLowerCase());
+      const emailMatch =
+        !shortListEmailFilter ||
+        (candidate["Candidate Email"] || "").toLowerCase().includes(shortListEmailFilter.toLowerCase());
+      const phoneMatch =
+        !shortListPhoneFilter || (candidate["Candidate Phone Number"] || "").includes(shortListPhoneFilter);
+      const userIdMatch =
+        !shortListUserIdFilter ||
+        (candidate.user_id || candidate["user_id"] || "").toString().includes(shortListUserIdFilter);
+      const sourceMatch =
+        !shortListSourceFilter ||
+        shortListSourceFilter === "all" ||
+        (candidate["Source"] || "").toLowerCase().includes(shortListSourceFilter.toLowerCase());
       let scoreMatch = true;
       if (shortListScoreFilter !== "all") {
         const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
@@ -2151,7 +2539,7 @@ export default function JobDetails() {
   };
 
   // First, separate candidates by nationality match
-  const candidatesMatchingNationality = shortListCandidates.filter(candidate => {
+  const candidatesMatchingNationality = shortListCandidates.filter((candidate) => {
     const candidateNationality = candidate["nationality"];
     const preferredNationality = job?.prefered_nationality;
 
@@ -2163,1451 +2551,2027 @@ export default function JobDetails() {
   });
 
   // Filter candidates with nationality mismatch - these will NOT appear in budget sections
-  const notInPreferredNationalityCandidates = filterShortListCandidates(shortListCandidates.filter(candidate => {
-    const candidateNationality = candidate["nationality"];
-    const preferredNationality = job?.prefered_nationality;
+  const notInPreferredNationalityCandidates = filterShortListCandidates(
+    shortListCandidates.filter((candidate) => {
+      const candidateNationality = candidate["nationality"];
+      const preferredNationality = job?.prefered_nationality;
 
-    // Only include if both nationalities exist and don't match (case-insensitive)
-    if (!candidateNationality || !preferredNationality) return false;
-    return candidateNationality.toLowerCase().trim() !== preferredNationality.toLowerCase().trim();
-  }));
+      // Only include if both nationalities exist and don't match (case-insensitive)
+      if (!candidateNationality || !preferredNationality) return false;
+
+      return candidateNationality.toLowerCase().trim() !== preferredNationality.toLowerCase().trim();
+    }),
+  );
 
   // Filter candidates into budget categories with applied filters (only from matching nationality)
-  const withinBudgetCandidates = filterShortListCandidates(candidatesMatchingNationality.filter(candidate => {
-    const expectedSalary = parseSalary(candidate["Salary Expectations"]);
-    return expectedSalary === 0 || expectedSalary <= budgetThreshold;
-  }));
-  const aboveBudgetCandidates = filterShortListCandidates(candidatesMatchingNationality.filter(candidate => {
-    const expectedSalary = parseSalary(candidate["Salary Expectations"]);
-    return expectedSalary > 0 && expectedSalary > budgetThreshold;
-  }));
-  return <div className={cn("space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden", isShaking && "animate-shake")}>
-        {/* Header */}
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 items-start">
-            <div className="flex items-center space-x-2 md:space-x-4">
-              <Button variant="ghost" size="sm" onClick={() => navigate('/jobs')}>
-                <ArrowLeft className="w-4 h-4 mr-1 md:mr-2" />
-                <span className="hidden sm:inline">Back to Jobs</span>
-                <span className="sm:hidden">Back</span>
-              </Button>
-              <div className="h-6 w-px bg-border hidden sm:block" />
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-light font-work tracking-tight truncate">Job Details</h1>
-            </div>
-            {/* Futuristic 3D Action Menu */}
-            <FuturisticActionButton isExpanded={isActionMenuExpanded} onToggle={() => setIsActionMenuExpanded(!isActionMenuExpanded)}>
-              <ActionButton onClick={handlePauseJob} disabled={automaticDialSaving} icon={job?.Processed === "Yes" ? Pause : Play} label={job?.Processed === "Yes" ? "Pause Job" : "Run Job"} variant="danger" />
-            </FuturisticActionButton>
+  const withinBudgetCandidates = filterShortListCandidates(
+    candidatesMatchingNationality.filter((candidate) => {
+      const expectedSalary = parseSalary(candidate["Salary Expectations"]);
+      return expectedSalary === 0 || expectedSalary <= budgetThreshold;
+    }),
+  );
+  const aboveBudgetCandidates = filterShortListCandidates(
+    candidatesMatchingNationality.filter((candidate) => {
+      const expectedSalary = parseSalary(candidate["Salary Expectations"]);
+      return expectedSalary > 0 && expectedSalary > budgetThreshold;
+    }),
+  );
+  return (
+    <div className={cn("space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden", isShaking && "animate-shake")}>
+      {/* Header */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 items-start">
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/jobs")}>
+              <ArrowLeft className="w-4 h-4 mr-1 md:mr-2" />
+              <span className="hidden sm:inline">Back to Jobs</span>
+              <span className="sm:hidden">Back</span>
+            </Button>
+            <div className="h-6 w-px bg-border hidden sm:block" />
+            <h3 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h3>
+          </div>
+          {/* Futuristic 3D Action Menu */}
+          <FuturisticActionButton
+            isExpanded={isActionMenuExpanded}
+            onToggle={() => setIsActionMenuExpanded(!isActionMenuExpanded)}
+          >
+            <ActionButton
+              onClick={handlePauseJob}
+              disabled={automaticDialSaving}
+              icon={job?.Processed === "Yes" ? Pause : Play}
+              label={job?.Processed === "Yes" ? "Pause Job" : "Run Job"}
+              variant="danger"
+            />
+          </FuturisticActionButton>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 items-center justify-center lg:justify-end">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-light">Auto Dial</span>
-                <ToggleSwitch checked={job?.automatic_dial || false} onChange={handleAutomaticDialToggle} disabled={automaticDialSaving} size="sm" onLabel="ON" offLabel="OFF" />
-              </div>
-              <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto">
-                <FileText className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Edit Job</span>
-                <span className="sm:hidden">Edit</span>
-              </Button>
-              <Button variant="outline" asChild size="sm" className="w-full sm:w-auto">
-                <Link to={`/job/${job.job_id}/apply`}>
-                  <span className="hidden sm:inline">Apply Link</span>
-                  <span className="sm:hidden">Apply</span>
-                </Link>
-              </Button>
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 items-center justify-center lg:justify-end">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">Auto Dial</span>
+              <ToggleSwitch
+                checked={job?.automatic_dial || false}
+                onChange={handleAutomaticDialToggle}
+                disabled={automaticDialSaving}
+                size="sm"
+                onLabel="ON"
+                offLabel="OFF"
+              />
             </div>
+            <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto">
+              <FileText className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Edit Job</span>
+              <span className="sm:hidden">Edit</span>
+            </Button>
+            <Button variant="outline" asChild size="sm" className="w-full sm:w-auto">
+              <Link to={`/job/${job.job_id}/apply`}>
+                <span className="hidden sm:inline">Apply Link</span>
+                <span className="sm:hidden">Apply</span>
+              </Link>
+            </Button>
           </div>
         </div>
+      </div>
 
-        {/* Job Header Card */}
-        <Card>
-          <CardContent className="p-4 md:p-6">
-            <div className="space-y-4">
-              <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                <div className="space-y-2 flex-1 min-w-0">
-                  <h4 className="text-6xl md:text-7xl lg:text-8xl font-light font-work tracking-tight break-words">{job.job_title}</h4>
-                  <p className="text-sm md:text-base font-light text-muted-foreground break-words">{job.client_description || "Client Description"}</p>
-                </div>
-                <Badge variant={job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "default" : "destructive"} className={`text-xs md:text-sm px-2 md:px-3 py-1 whitespace-nowrap ${job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "bg-green-600 text-white border-0" : "bg-red-600 text-white border-0"}`}>
-                  {job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "Active" : "Not Active"}
-                </Badge>
+      {/* Job Header Card */}
+      <Card>
+        <CardContent className="p-4 md:p-6">
+          <div className="space-y-4">
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+              <div className="space-y-2 flex-1 min-w-0">
+                <h2 className="text-xl md:text-2xl font-bold break-words">{job.job_title}</h2>
+                <p className="text-base md:text-lg text-muted-foreground break-words">
+                  {job.client_description || "Client Description"}
+                </p>
               </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 pt-4 border-t">
-                <div className="flex items-center space-x-2 text-sm font-light min-w-0">
-                  <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                  <span className="truncate">{job.job_location}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm font-light min-w-0">
-                  <Banknote className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                  <span className="truncate">{formatCurrency(job.job_salary_range?.toString(), job.Currency)}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm font-light min-w-0 sm:col-span-2 lg:col-span-1">
-                  <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                  <span className="truncate">Posted: {formatDate(job.Timestamp)}</span>
-                </div>
+              <Badge
+                variant={
+                  job.Processed === true || job.Processed === "true" || job.Processed === "Yes"
+                    ? "default"
+                    : "destructive"
+                }
+                className={`text-xs md:text-sm px-2 md:px-3 py-1 whitespace-nowrap ${job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "bg-green-600 text-white border-0" : "bg-red-600 text-white border-0"}`}
+              >
+                {job.Processed === true || job.Processed === "true" || job.Processed === "Yes"
+                  ? "Active"
+                  : "Not Active"}
+              </Badge>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 pt-4 border-t">
+              <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0">
+                <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">{job.job_location}</span>
+              </div>
+              <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0">
+                <Banknote className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">{formatCurrency(job.job_salary_range?.toString(), job.Currency)}</span>
+              </div>
+              <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0 sm:col-span-2 lg:col-span-1">
+                <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">Posted: {formatDate(job.Timestamp)}</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Job Funnel */}
-        <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
-
-        {/* Detailed Information Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <div className="w-full overflow-x-auto">
-            <TabsList className="w-full grid grid-cols-7 h-auto p-1">
-              <TabsTrigger value="overview" className="text-sm font-light px-2 py-2">Overview</TabsTrigger>
-              <TabsTrigger value="description" className="text-sm font-light px-2 py-2">Description</TabsTrigger>
-              <TabsTrigger value="requirements" className="text-sm font-light px-2 py-2">AI Requirements</TabsTrigger>
-              <TabsTrigger value="applications" className="text-sm font-light px-2 py-2 relative" onClick={handleApplicationsTabClick}>
-                Applications
-                {newApplicationsCount > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-light rounded-full h-5 w-5 flex items-center justify-center min-w-[20px] z-10">
-                    {newApplicationsCount > 99 ? '99+' : newApplicationsCount}
-                  </span>}
-              </TabsTrigger>
-              <TabsTrigger value="boolean-search" className="text-sm font-light px-2 py-2">AI Longlist</TabsTrigger>
-              <TabsTrigger value="shortlist" className="text-sm font-light px-2 py-2">AI Short List</TabsTrigger>
-            </TabsList>
           </div>
+        </CardContent>
+      </Card>
 
-          <TabsContent value="overview" className="space-y-4 pb-32">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-4xl md:text-5xl font-light font-work tracking-tight">Job Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-sm font-light text-muted-foreground">Job ID:</span>
-                    <span className="font-mono text-sm font-light">{job.job_id}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-light text-muted-foreground">Itris ID:</span>
-                    <span className="font-mono text-sm font-light">{job.itris_job_id || "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-light text-muted-foreground">Client Name:</span>
-                    <span className="text-sm font-light">{job.client_name || "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-light text-muted-foreground">Client Description:</span>
-                    <span className="text-sm font-light">{job.client_description || "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-light text-muted-foreground">Location:</span>
-                    <span className="text-sm font-light">{job.job_location || "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-light text-muted-foreground">Salary Range:</span>
-                    <span className="text-sm font-light">
-                      {formatCurrency(job.job_salary_range?.toString(), job.Currency)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-light text-muted-foreground">Assigned Recruiter:</span>
-                    <span className="text-sm font-light">{recruiterName || job.recruiter_id || "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-light text-muted-foreground">Notice Period:</span>
-                    <span className="text-sm font-light">{job.notice_period || "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-light text-muted-foreground">Preferred Nationality:</span>
-                    <span className="text-sm font-light">{job.prefered_nationality || "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Group:</span>
-                    <span className="flex items-center gap-2">
-                      {jobGroup ? <>
-                          <div className="w-3 h-3 rounded-full" style={{
-                      backgroundColor: jobGroup.color
-                    }} />
-                          {jobGroup.name}
-                        </> : "No Group"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Industry:</span>
-                    <span>{job.industry || "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Headhunting Companies:</span>
-                    <div className="flex flex-col gap-1 items-end">
-                      {job.headhunting_companies ? job.headhunting_companies.split(",").map((url: string, index: number) => <a key={index} href={url.trim()} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
-                            {url.trim()}
-                            <ExternalLink className="w-3 h-3" />
-                          </a>) : <span>N/A</span>}
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Automatic Dial:</span>
-                    <div className="flex items-center gap-2">
-                      <Switch checked={job.automatic_dial || false} onCheckedChange={handleAutomaticDialToggle} disabled={automaticDialSaving} />
-                      <span className="text-sm text-muted-foreground">
-                        {job.automatic_dial ? 'ON' : 'OFF'}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+      {/* Job Funnel */}
+      <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-4xl md:text-5xl font-light font-work tracking-tight">Job Requirements & Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Nationality to Include:</span>
-                    <span>{job.nationality_to_include || "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Nationality to Exclude:</span>
-                    <span>{job.nationality_to_exclude || "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Job Type:</span>
-                    <span>
-                      {job["Type"] || "N/A"}
-                      {job["Contract Length"] && job["Type"] === "Contract" && ` (${job["Contract Length"]})`}
-                    </span>
-                  </div>
-                  {job["assignment"] && <div className="flex justify-between">
-                      <span className="text-muted-foreground">Assignment Link:</span>
-                      <a href={job["assignment"]} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">
-                        View Assignment
-                      </a>
-                    </div>}
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Posted Date:</span>
-                    <span>{job.Timestamp ? formatDate(job.Timestamp) : "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">JD Summary:</span>
-                    <span>{job.jd_summary || "N/A"}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
+      {/* Detailed Information Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <div className="w-full overflow-x-auto">
+          <TabsList className="w-full grid grid-cols-7 h-auto p-1">
+            <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2">
+              Description
+            </TabsTrigger>
+            <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">
+              AI Requirements
+            </TabsTrigger>
+            <TabsTrigger
+              value="applications"
+              className="text-xs md:text-sm px-2 py-2 relative"
+              onClick={handleApplicationsTabClick}
+            >
+              Applications
+              {newApplicationsCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-[20px] z-10">
+                  {newApplicationsCount > 99 ? "99+" : newApplicationsCount}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="boolean-search" className="text-xs md:text-sm px-2 py-2">
+              AI Longlist
+            </TabsTrigger>
+            <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">
+              AI Short List
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-          <TabsContent value="description" className="space-y-4 pb-32">
+        <TabsContent value="overview" className="space-y-4 pb-32">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center text-4xl md:text-5xl font-light font-work tracking-tight">
-                      <FileText className="w-5 h-5 mr-2" />
-                      Job Description
-                    </CardTitle>
-                    <CardDescription className="text-sm font-light">
-                      Detailed overview of the role and responsibilities
-                    </CardDescription>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm">
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload File
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job.job_id}`)}>
-                      <FileText className="w-4 h-4 mr-2" />
-                      Edit Job
-                    </Button>
+                <CardTitle>Job Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Job ID:</span>
+                  <span className="font-mono text-sm">{job.job_id}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Itris ID:</span>
+                  <span className="font-mono text-sm">{job.itris_job_id || "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Client Name:</span>
+                  <span>{job.client_name || "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Client Description:</span>
+                  <span>{job.client_description || "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Location:</span>
+                  <span>{job.job_location || "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Salary Range:</span>
+                  <span className="font-medium">{formatCurrency(job.job_salary_range?.toString(), job.Currency)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Assigned Recruiter:</span>
+                  <span>{recruiterName || job.recruiter_id || "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Notice Period:</span>
+                  <span>{job.notice_period || "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Preferred Nationality:</span>
+                  <span>{job.prefered_nationality || "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Group:</span>
+                  <span className="flex items-center gap-2">
+                    {jobGroup ? (
+                      <>
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{
+                            backgroundColor: jobGroup.color,
+                          }}
+                        />
+                        {jobGroup.name}
+                      </>
+                    ) : (
+                      "No Group"
+                    )}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Industry:</span>
+                  <span>{job.industry || "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Headhunting Companies:</span>
+                  <div className="flex flex-col gap-1 items-end">
+                    {job.headhunting_companies ? (
+                      job.headhunting_companies.split(",").map((url: string, index: number) => (
+                        <a
+                          key={index}
+                          href={url.trim()}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline flex items-center gap-1"
+                        >
+                          {url.trim()}
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      ))
+                    ) : (
+                      <span>N/A</span>
+                    )}
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="prose prose-sm max-w-none">
-                  <p className="leading-relaxed whitespace-pre-wrap text-sm font-light">
-                    {job.job_description || "No description available for this position."}
-                  </p>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Automatic Dial:</span>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={job.automatic_dial || false}
+                      onCheckedChange={handleAutomaticDialToggle}
+                      disabled={automaticDialSaving}
+                    />
+                    <span className="text-sm text-muted-foreground">{job.automatic_dial ? "ON" : "OFF"}</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Job Documents Section */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center text-4xl md:text-5xl font-light font-work tracking-tight">
-                  <FileText className="w-5 h-5 mr-2" />
-                  Job Documents
-                </CardTitle>
-                <CardDescription className="text-sm font-light">
-                  Uploaded job description files and related documents
-                </CardDescription>
+                <CardTitle>Job Requirements & Details</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-2xl md:text-3xl font-light font-work tracking-tight mb-2">No documents uploaded</h3>
-                  <p className="text-sm font-light text-muted-foreground">Upload job description files when creating or editing this job</p>
-                  <Button variant="outline" className="mt-4" onClick={() => setIsEditDialogOpen(true)}>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Nationality to Include:</span>
+                  <span>{job.nationality_to_include || "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Nationality to Exclude:</span>
+                  <span>{job.nationality_to_exclude || "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Job Type:</span>
+                  <span>
+                    {job["Type"] || "N/A"}
+                    {job["Contract Length"] && job["Type"] === "Contract" && ` (${job["Contract Length"]})`}
+                  </span>
+                </div>
+                {job["assignment"] && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Assignment Link:</span>
+                    <a
+                      href={job["assignment"]}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline break-all"
+                    >
+                      View Assignment
+                    </a>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Posted Date:</span>
+                  <span>{job.Timestamp ? formatDate(job.Timestamp) : "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">JD Summary:</span>
+                  <span>{job.jd_summary || "N/A"}</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="description" className="space-y-4 pb-32">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center">
+                    <FileText className="w-5 h-5 mr-2" />
+                    Job Description
+                  </CardTitle>
+                  <CardDescription>Detailed overview of the role and responsibilities</CardDescription>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button variant="outline" size="sm">
                     <Upload className="w-4 h-4 mr-2" />
-                    Upload Documents
+                    Upload File
                   </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="requirements" className="space-y-4 pb-32">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center text-4xl md:text-5xl font-light font-work tracking-tight">
-                      <Target className="w-5 h-5 mr-2" />
-                      AI Requirements
-                    </CardTitle>
-                    <CardDescription className="text-sm font-light">
-                      Skills, experience, and qualifications needed for this role
-                    </CardDescription>
-                  </div>
                   <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job.job_id}`)}>
                     <FileText className="w-4 h-4 mr-2" />
-                    Amend
+                    Edit Job
                   </Button>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="prose prose-sm max-w-none space-y-4">
-                  <div>
-                    <h4 className="text-2xl md:text-3xl font-light font-work tracking-tight mb-2">Things to look for:</h4>
-                    <p className="leading-relaxed whitespace-pre-wrap text-sm font-light">
-                      {job.things_to_look_for || "No specific criteria listed."}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="text-2xl md:text-3xl font-light font-work tracking-tight mb-2">Must have:</h4>
-                    <p className="leading-relaxed whitespace-pre-wrap text-sm font-light">
-                      {job.musttohave || "No must-have requirements specified."}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="text-2xl md:text-3xl font-light font-work tracking-tight mb-2">Nice to Have:</h4>
-                    <p className="leading-relaxed whitespace-pre-wrap text-sm font-light">
-                      {job.nicetohave || "No nice-to-have requirements specified."}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="prose prose-sm max-w-none">
+                <p className="leading-relaxed whitespace-pre-wrap">
+                  {job.job_description || "No description available for this position."}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="applications" className="space-y-4 pb-32">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center text-4xl md:text-5xl font-light font-work tracking-tight">
-                      <FileText className="w-5 h-5 mr-2" />
-                      Applications ({applications.length})
-                    </CardTitle>
-                    <CardDescription className="text-sm font-light">
-                      Candidates who have applied for this position
-                    </CardDescription>
-                  </div>
+          {/* Job Documents Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <FileText className="w-5 h-5 mr-2" />
+                Job Documents
+              </CardTitle>
+              <CardDescription>Uploaded job description files and related documents</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No documents uploaded</h3>
+                <p className="text-muted-foreground">Upload job description files when creating or editing this job</p>
+                <Button variant="outline" className="mt-4" onClick={() => setIsEditDialogOpen(true)}>
+                  <Upload className="w-4 h-4 mr-2" />
+                  Upload Documents
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="requirements" className="space-y-4 pb-32">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center">
+                    <Target className="w-5 h-5 mr-2" />
+                    AI Requirements
+                  </CardTitle>
+                  <CardDescription>Skills, experience, and qualifications needed for this role</CardDescription>
                 </div>
-              </CardHeader>
-              <CardContent>
-                {/* Application Filters */}
-                <Card className="mb-4">
-                  <CardContent className="pt-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-light">Name</label>
-                        <Input placeholder="Filter by name..." value={appNameFilter} onChange={e => setAppNameFilter(e.target.value)} className="h-9 font-light" />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-light">Email</label>
-                        <Input placeholder="Filter by email..." value={appEmailFilter} onChange={e => setAppEmailFilter(e.target.value)} className="h-9 font-light" />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-light">Phone</label>
-                        <Input placeholder="Filter by phone..." value={appPhoneFilter} onChange={e => setAppPhoneFilter(e.target.value)} className="h-9 font-light" />
-                      </div>
+                <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job.job_id}`)}>
+                  <FileText className="w-4 h-4 mr-2" />
+                  Amend
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="prose prose-sm max-w-none space-y-4">
+                <div>
+                  <h4 className="font-semibold mb-2">Things to look for:</h4>
+                  <p className="leading-relaxed whitespace-pre-wrap">
+                    {job.things_to_look_for || "No specific criteria listed."}
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-2">Must have:</h4>
+                  <p className="leading-relaxed whitespace-pre-wrap">
+                    {job.musttohave || "No must-have requirements specified."}
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-2">Nice to Have:</h4>
+                  <p className="leading-relaxed whitespace-pre-wrap">
+                    {job.nicetohave || "No nice-to-have requirements specified."}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="applications" className="space-y-4 pb-32">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center">
+                    <FileText className="w-5 h-5 mr-2" />
+                    Applications ({applications.length})
+                  </CardTitle>
+                  <CardDescription>Candidates who have applied for this position</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {/* Application Filters */}
+              <Card className="mb-4">
+                <CardContent className="pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Name</label>
+                      <Input
+                        placeholder="Filter by name..."
+                        value={appNameFilter}
+                        onChange={(e) => setAppNameFilter(e.target.value)}
+                        className="h-9"
+                      />
                     </div>
-                  </CardContent>
-                </Card>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Email</label>
+                      <Input
+                        placeholder="Filter by email..."
+                        value={appEmailFilter}
+                        onChange={(e) => setAppEmailFilter(e.target.value)}
+                        className="h-9"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Phone</label>
+                      <Input
+                        placeholder="Filter by phone..."
+                        value={appPhoneFilter}
+                        onChange={(e) => setAppPhoneFilter(e.target.value)}
+                        className="h-9"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-                {applicationsLoading ? <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  </div> : applications.length === 0 ? <div className="text-center py-8 text-muted-foreground">
-                    No applications found for this job.
-                  </div> : (() => {
-              // Filter applications based on name, email, and phone
-              const filteredApplications = applications.filter(application => {
-                const fullName = application.first_name && application.last_name ? `${application.first_name} ${application.last_name}` : application.first_name || application.last_name || "";
-                const email = application.Email || "";
-                const phone = application.phone_number || "";
-                const nameMatch = !appNameFilter || fullName.toLowerCase().includes(appNameFilter.toLowerCase());
-                const emailMatch = !appEmailFilter || email.toLowerCase().includes(appEmailFilter.toLowerCase());
-                const phoneMatch = !appPhoneFilter || phone.includes(appPhoneFilter);
-                return nameMatch && emailMatch && phoneMatch;
-              });
-              return <div>
-                        <div className="mb-4 text-sm text-muted-foreground">
-                          Showing {filteredApplications.length} of {applications.length} applications
-                        </div>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                          {filteredApplications.map(application => <Card key={application.candidate_id} className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg">
-                              <CardContent className="p-3 md:p-4">
-                                <div className="space-y-3">
-                                  <div className="flex items-start justify-between">
-                                    <div className="min-w-0 flex-1">
-                                      <h4 className="font-semibold text-sm md:text-base truncate">
-                                        {application.first_name && application.last_name ? `${application.first_name} ${application.last_name}` : application.first_name || application.last_name || "Unknown"}
-                                      </h4>
-                                      <p className="text-xs md:text-sm text-muted-foreground truncate">{application.candidate_id}</p>
-                                    </div>
-                                  </div>
-                                  
-                                  <div className="space-y-2 text-xs md:text-sm">
-                                    {application.Email && <div className="flex items-center text-muted-foreground min-w-0">
-                                        <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
-                                        <span className="truncate">{application.Email}</span>
-                                      </div>}
-                                    
-                                    {application.phone_number && <div className="flex items-center text-muted-foreground min-w-0">
-                                        <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
-                                        <span className="truncate">{application.phone_number}</span>
-                                      </div>}
-                                  </div>
-
-                                  {application.cv_summary && <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
-                                      {application.cv_summary}
-                                    </p>}
-
-                                   <div className="flex items-center justify-between pt-2 border-t gap-2">
-                                     <div className="flex items-center gap-2">
-                                       {application.CV_Link && <Button variant="outline" size="sm" asChild>
-                                           <a href={application.CV_Link} target="_blank" rel="noopener noreferrer">
-                                             <FileText className="w-4 h-4 mr-1" />
-                                             CV
-                                           </a>
-                                         </Button>}
-                    <Button variant="outline" size="sm" asChild>
-                      <Link to={`/candidate/${application.candidate_id}`} state={{
-                                fromJob: id,
-                                tab: 'applications',
-                                focusCandidateId: application.candidate_id
-                              }}>
-                        View Profile
-                      </Link>
-                    </Button>
-                                     </div>
-                                      {!addedToLongList.has(application.candidate_id) && <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={async () => {
-                            try {
-                              const webhookUrl = "https://hook.eu2.make.com/tv58ofd5rftm64t677f65phmbwrnq24e";
-                              const payload = {
-                                "user_id": String(application.candidate_id),
-                                "job_id": String(job?.job_id || id || '')
-                              };
-                              console.log('Triggering webhook with payload:', JSON.stringify(payload, null, 2));
-
-                              // Optimistically disable the button immediately
-                              setAddedToLongList(prev => new Set([...prev, application.candidate_id]));
-                              const response = await fetch(webhookUrl, {
-                                method: "POST",
-                                headers: {
-                                  "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify(payload)
-                              });
-                              if (response.ok) {
-                                try {
-                                  const responseText = await response.text();
-                                  console.log('Webhook response:', responseText);
-
-                                  // Try to parse as JSON if possible, otherwise use as text
-                                  let responseData;
-                                  try {
-                                    responseData = JSON.parse(responseText);
-                                  } catch {
-                                    responseData = responseText;
-                                  }
-                                  console.log('Processed webhook response:', responseData);
-                                } catch (error) {
-                                  console.error('Error processing webhook response:', error);
-                                }
-                              }
-
-                              // Try to reuse any existing CV score/reason for this candidate on this job by user_id/email/phone
-                              const email = (application.Email || application.email || '').toString().trim().toLowerCase();
-                              const phone = (application.phone_number || '').toString().replace(/[^0-9]/g, '');
-                              const orFilters = [`user_id.eq.${String(application.candidate_id)}`, email ? `candidate_email.eq.${email}` : null, phone ? `candidate_phone_number.eq.${phone}` : null].filter(Boolean).join(',');
-                              const {
-                                data: existingScore
-                              } = await supabase.from('Jobs_CVs').select('cv_score, cv_score_reason').eq('job_id', String(job?.job_id || id || '')).or(orFilters).order('cv_score', {
-                                ascending: false
-                              }).limit(1).maybeSingle();
-
-                              // Update database to mark as longlisted and carry over existing score/reason if present
-                              const {
-                                error: updateError
-                              } = await supabase.from('Jobs_CVs').upsert({
-                                job_id: String(job?.job_id || id || ''),
-                                user_id: String(application.candidate_id),
-                                longlisted_at: new Date().toISOString(),
-                                candidate_name: (() => {
-                                  const fn = application.first_name || application.Firstname || '';
-                                  const ln = application.last_name || application.Lastname || '';
-                                  const combined = `${fn} ${ln}`.trim();
-                                  if (combined && combined.toLowerCase() !== 'undefined undefined') return combined;
-                                  if (application.name) return application.name;
-                                  if (application.candidate_name) return application.candidate_name;
-                                  if (application.Email) return String(application.Email).split('@')[0];
-                                  if (application.email) return String(application.email).split('@')[0];
-                                  return `Candidate ${application.candidate_id}`;
-                                })(),
-                                candidate_email: application.Email || application.email || application.candidate_email || null,
-                                candidate_phone_number: application.phone_number || application.candidate_phone_number || null,
-                                cv_score: existingScore?.cv_score ?? undefined,
-                                cv_score_reason: existingScore?.cv_score_reason ?? undefined,
-                                contacted: 'Ready to Contact'
-                              });
-                              if (updateError) {
-                                console.error('Error updating longlisted status:', updateError);
-                              }
-
-                              // Refresh longlisted candidates to show the new addition
-                              await fetchLonglistedCandidates(String(job?.job_id || id || ''));
-                              console.log('Webhook triggered successfully');
-                            } catch (error) {
-                              console.error('Error triggering webhook:', error);
-                            }
-                          }}>
-                                          Add to Long List
-                                        </Button>}
-                                   </div>
-                                </div>
-                              </CardContent>
-                            </Card>)}
-                        </div>
-                      </div>;
-            })()}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="boolean-search" className="space-y-4 pb-32">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
+              {applicationsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : applications.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">No applications found for this job.</div>
+              ) : (
+                (() => {
+                  // Filter applications based on name, email, and phone
+                  const filteredApplications = applications.filter((application) => {
+                    const fullName =
+                      application.first_name && application.last_name
+                        ? `${application.first_name} ${application.last_name}`
+                        : application.first_name || application.last_name || "";
+                    const email = application.Email || "";
+                    const phone = application.phone_number || "";
+                    const nameMatch = !appNameFilter || fullName.toLowerCase().includes(appNameFilter.toLowerCase());
+                    const emailMatch = !appEmailFilter || email.toLowerCase().includes(appEmailFilter.toLowerCase());
+                    const phoneMatch = !appPhoneFilter || phone.includes(appPhoneFilter);
+                    return nameMatch && emailMatch && phoneMatch;
+                  });
+                  return (
                     <div>
-                      <CardTitle className="flex items-center text-4xl md:text-5xl font-light font-work tracking-tight">
-                        <Users className="w-5 h-5 mr-2" />
-                        AI Longlist ({longlistedCandidates.filter(c => {
-                      const source = (c["Source"] || c.source || "").toLowerCase();
-                      return source.includes("itris") || source.includes("linkedin");
-                    }).length} candidates)
-                      </CardTitle>
-                      <CardDescription className="text-sm font-light">
-                        Candidates added to the longlist for this position
-                      </CardDescription>
-                    </div>
-                    {job?.longlist && job.longlist > 0 ? <Button onClick={handleSearchMoreCandidates} size="sm" variant="outline">
-                        <Search className="w-4 h-4 mr-2" />
-                        Regenerate AI
-                      </Button> : <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} size="sm">
-                        <Zap className="w-4 h-4 mr-2" />
-                        Generate AI
-                      </Button>}
-                  </div>
-                </div>
-              </CardHeader>
-               <CardContent>
-                 {(() => {
-              const readyToContactCount = longlistedCandidates.filter(candidate => candidate["Contacted"] === "Ready to Contact").length;
-              if (readyToContactCount > 0) {
-                return <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                         <div className="flex items-center">
-                           <Target className="w-4 h-4 mr-2 text-amber-600 dark:text-amber-400" />
-                           <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                             {readyToContactCount} {readyToContactCount === 1 ? 'candidate' : 'candidates'} ready to be contacted
-                           </span>
-                         </div>
-                       </div>;
-              }
-              return null;
-            })()}
-                 {longlistedLoading ? <div className="flex items-center justify-center py-8">
-                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                   </div> : longlistedCandidates.length === 0 ? <div className="text-center py-8">
-                     <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                     <h3 className="text-lg font-semibold mb-2">No candidates in longlist yet</h3>
-                     <p className="text-muted-foreground">Add candidates to the longlist from the Applications tab</p>
-                   </div> : <>
-                    {/* Bulk Actions */}
-                    {selectedCandidates.size > 0 && <Card className="p-3 md:p-4 mb-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-light">
-                              {selectedCandidates.size} candidate{selectedCandidates.size > 1 ? 's' : ''} selected
-                            </span>
-                            <Button variant="ghost" size="sm" onClick={clearAllSelection} className="h-6 text-xs px-2">
-                              Clear
-                            </Button>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" onClick={handleRemoveSelectedCandidates} className="text-destructive hover:text-destructive border-destructive/50 hover:border-destructive">
-                              <X className="w-4 h-4 mr-1" />
-                              Remove Selected
-                            </Button>
-                            <Button variant="default" size="sm" onClick={handleCallSelectedCandidates} disabled={isGeneratingShortList} className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600">
-                              <Phone className="w-4 h-4 mr-1" />
-                              {isGeneratingShortList ? "Calling..." : "Call Selected"}
-                            </Button>
-                          </div>
-                        </div>
-                      </Card>}
+                      <div className="mb-4 text-sm text-muted-foreground">
+                        Showing {filteredApplications.length} of {applications.length} applications
+                      </div>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {filteredApplications.map((application) => (
+                          <Card
+                            key={application.candidate_id}
+                            className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg"
+                          >
+                            <CardContent className="p-3 md:p-4">
+                              <div className="space-y-3">
+                                <div className="flex items-start justify-between">
+                                  <div className="min-w-0 flex-1">
+                                    <h4 className="font-semibold text-sm md:text-base truncate">
+                                      {application.first_name && application.last_name
+                                        ? `${application.first_name} ${application.last_name}`
+                                        : application.first_name || application.last_name || "Unknown"}
+                                    </h4>
+                                    <p className="text-xs md:text-sm text-muted-foreground truncate">
+                                      {application.candidate_id}
+                                    </p>
+                                  </div>
+                                </div>
 
-                    {/* Filters */}
-                    <Card className="p-3 md:p-4 mb-4 bg-muted/50">
-                      <div className="flex items-center justify-between mb-3">
+                                <div className="space-y-2 text-xs md:text-sm">
+                                  {application.Email && (
+                                    <div className="flex items-center text-muted-foreground min-w-0">
+                                      <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+                                      <span className="truncate">{application.Email}</span>
+                                    </div>
+                                  )}
+
+                                  {application.phone_number && (
+                                    <div className="flex items-center text-muted-foreground min-w-0">
+                                      <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
+                                      <span className="truncate">{application.phone_number}</span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {application.cv_summary && (
+                                  <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
+                                    {application.cv_summary}
+                                  </p>
+                                )}
+
+                                <div className="flex items-center justify-between pt-2 border-t gap-2">
+                                  <div className="flex items-center gap-2">
+                                    {application.CV_Link && (
+                                      <Button variant="outline" size="sm" asChild>
+                                        <a href={application.CV_Link} target="_blank" rel="noopener noreferrer">
+                                          <FileText className="w-4 h-4 mr-1" />
+                                          CV
+                                        </a>
+                                      </Button>
+                                    )}
+                                    <Button variant="outline" size="sm" asChild>
+                                      <Link
+                                        to={`/candidate/${application.candidate_id}`}
+                                        state={{
+                                          fromJob: id,
+                                          tab: "applications",
+                                          focusCandidateId: application.candidate_id,
+                                        }}
+                                      >
+                                        View Profile
+                                      </Link>
+                                    </Button>
+                                  </div>
+                                  {!addedToLongList.has(application.candidate_id) && (
+                                    <Button
+                                      size="sm"
+                                      className="bg-primary text-primary-foreground hover:bg-primary/90"
+                                      onClick={async () => {
+                                        try {
+                                          const webhookUrl =
+                                            "https://hook.eu2.make.com/tv58ofd5rftm64t677f65phmbwrnq24e";
+                                          const payload = {
+                                            user_id: String(application.candidate_id),
+                                            job_id: String(job?.job_id || id || ""),
+                                          };
+                                          console.log(
+                                            "Triggering webhook with payload:",
+                                            JSON.stringify(payload, null, 2),
+                                          );
+
+                                          // Optimistically disable the button immediately
+                                          setAddedToLongList((prev) => new Set([...prev, application.candidate_id]));
+                                          const response = await fetch(webhookUrl, {
+                                            method: "POST",
+                                            headers: {
+                                              "Content-Type": "application/json",
+                                            },
+                                            body: JSON.stringify(payload),
+                                          });
+                                          if (response.ok) {
+                                            try {
+                                              const responseText = await response.text();
+                                              console.log("Webhook response:", responseText);
+
+                                              // Try to parse as JSON if possible, otherwise use as text
+                                              let responseData;
+                                              try {
+                                                responseData = JSON.parse(responseText);
+                                              } catch {
+                                                responseData = responseText;
+                                              }
+                                              console.log("Processed webhook response:", responseData);
+                                            } catch (error) {
+                                              console.error("Error processing webhook response:", error);
+                                            }
+                                          }
+
+                                          // Try to reuse any existing CV score/reason for this candidate on this job by user_id/email/phone
+                                          const email = (application.Email || application.email || "")
+                                            .toString()
+                                            .trim()
+                                            .toLowerCase();
+                                          const phone = (application.phone_number || "")
+                                            .toString()
+                                            .replace(/[^0-9]/g, "");
+                                          const orFilters = [
+                                            `user_id.eq.${String(application.candidate_id)}`,
+                                            email ? `candidate_email.eq.${email}` : null,
+                                            phone ? `candidate_phone_number.eq.${phone}` : null,
+                                          ]
+                                            .filter(Boolean)
+                                            .join(",");
+                                          const { data: existingScore } = await supabase
+                                            .from("Jobs_CVs")
+                                            .select("cv_score, cv_score_reason")
+                                            .eq("job_id", String(job?.job_id || id || ""))
+                                            .or(orFilters)
+                                            .order("cv_score", {
+                                              ascending: false,
+                                            })
+                                            .limit(1)
+                                            .maybeSingle();
+
+                                          // Update database to mark as longlisted and carry over existing score/reason if present
+                                          const { error: updateError } = await supabase.from("Jobs_CVs").upsert({
+                                            job_id: String(job?.job_id || id || ""),
+                                            user_id: String(application.candidate_id),
+                                            longlisted_at: new Date().toISOString(),
+                                            candidate_name: (() => {
+                                              const fn = application.first_name || application.Firstname || "";
+                                              const ln = application.last_name || application.Lastname || "";
+                                              const combined = `${fn} ${ln}`.trim();
+                                              if (combined && combined.toLowerCase() !== "undefined undefined")
+                                                return combined;
+                                              if (application.name) return application.name;
+                                              if (application.candidate_name) return application.candidate_name;
+                                              if (application.Email) return String(application.Email).split("@")[0];
+                                              if (application.email) return String(application.email).split("@")[0];
+                                              return `Candidate ${application.candidate_id}`;
+                                            })(),
+                                            candidate_email:
+                                              application.Email ||
+                                              application.email ||
+                                              application.candidate_email ||
+                                              null,
+                                            candidate_phone_number:
+                                              application.phone_number || application.candidate_phone_number || null,
+                                            cv_score: existingScore?.cv_score ?? undefined,
+                                            cv_score_reason: existingScore?.cv_score_reason ?? undefined,
+                                            contacted: "Ready to Contact",
+                                          });
+                                          if (updateError) {
+                                            console.error("Error updating longlisted status:", updateError);
+                                          }
+
+                                          // Refresh longlisted candidates to show the new addition
+                                          await fetchLonglistedCandidates(String(job?.job_id || id || ""));
+                                          console.log("Webhook triggered successfully");
+                                        } catch (error) {
+                                          console.error("Error triggering webhook:", error);
+                                        }
+                                      }}
+                                    >
+                                      Add to Long List
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="boolean-search" className="space-y-4 pb-32">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div>
+                    <CardTitle className="flex items-center">
+                      <Users className="w-5 h-5 mr-2" />
+                      AI Longlist (
+                      {
+                        longlistedCandidates.filter((c) => {
+                          const source = (c["Source"] || c.source || "").toLowerCase();
+                          return source.includes("itris") || source.includes("linkedin");
+                        }).length
+                      }{" "}
+                      candidates)
+                    </CardTitle>
+                    <CardDescription>Candidates added to the longlist for this position</CardDescription>
+                  </div>
+                  {job?.longlist && job.longlist > 0 ? (
+                    <Button onClick={handleSearchMoreCandidates} size="sm" variant="outline">
+                      <Search className="w-4 h-4 mr-2" />
+                      Regenerate AI
+                    </Button>
+                  ) : (
+                    <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} size="sm">
+                      <Zap className="w-4 h-4 mr-2" />
+                      Generate AI
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {(() => {
+                const readyToContactCount = longlistedCandidates.filter(
+                  (candidate) => candidate["Contacted"] === "Ready to Contact",
+                ).length;
+                if (readyToContactCount > 0) {
+                  return (
+                    <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                      <div className="flex items-center">
+                        <Target className="w-4 h-4 mr-2 text-amber-600 dark:text-amber-400" />
+                        <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                          {readyToContactCount} {readyToContactCount === 1 ? "candidate" : "candidates"} ready to be
+                          contacted
+                        </span>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+              {longlistedLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : longlistedCandidates.length === 0 ? (
+                <div className="text-center py-8">
+                  <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No candidates in longlist yet</h3>
+                  <p className="text-muted-foreground">Add candidates to the longlist from the Applications tab</p>
+                </div>
+              ) : (
+                <>
+                  {/* Bulk Actions */}
+                  {selectedCandidates.size > 0 && (
+                    <Card className="p-3 md:p-4 mb-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+                      <div className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-2">
-                          <Filter className="w-4 h-4" />
-                          <h4 className="text-lg md:text-xl font-light font-work tracking-tight">Filters</h4>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm" onClick={selectAllCandidates} className="h-6 text-xs px-2">
-                            Select All
+                          <span className="text-sm font-medium">
+                            {selectedCandidates.size} candidate{selectedCandidates.size > 1 ? "s" : ""} selected
+                          </span>
+                          <Button variant="ghost" size="sm" onClick={clearAllSelection} className="h-6 text-xs px-2">
+                            Clear
                           </Button>
                         </div>
-                      </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-3">
-                          <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                            <Input placeholder="Name..." value={nameFilter} onChange={e => setNameFilter(e.target.value)} className="pl-10 h-9 text-sm" />
-                          </div>
-                          <Input placeholder="Email..." value={emailFilter} onChange={e => setEmailFilter(e.target.value)} className="h-9 text-sm" />
-                          <Input placeholder="Phone..." value={phoneFilter} onChange={e => setPhoneFilter(e.target.value)} className="h-9 text-sm" />
-                          <Input placeholder="User ID..." value={userIdFilter} onChange={e => setUserIdFilter(e.target.value)} className="h-9 text-sm" />
-                          <Select value={longListSourceFilter} onValueChange={setLongListSourceFilter}>
-                            <SelectTrigger className="h-9 text-sm">
-                              <SelectValue placeholder="Source" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">All Sources</SelectItem>
-                              <SelectItem value="Itris">Itris</SelectItem>
-                              <SelectItem value="Linkedin">LinkedIn</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <Select value={scoreFilter} onValueChange={setScoreFilter}>
-                          <SelectTrigger className="h-9 text-sm">
-                            <SelectValue placeholder="Score" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Scores</SelectItem>
-                            <SelectItem value="high">High (75+)</SelectItem>
-                            <SelectItem value="moderate">Moderate (50-74)</SelectItem>
-                            <SelectItem value="poor">Poor (1-49)</SelectItem>
-                            <SelectItem value="none">No Score</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Select value={contactedFilter} onValueChange={setContactedFilter}>
-                          <SelectTrigger className="h-9 text-sm">
-                            <SelectValue placeholder="Status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Status</SelectItem>
-                            <SelectItem value="Not Contacted">Not Contacted</SelectItem>
-                            <SelectItem value="Ready to Call">Ready to Contact</SelectItem>
-                            <SelectItem value="Contacted">Contacted</SelectItem>
-                            <SelectItem value="Call Done">Call Done</SelectItem>
-                            <SelectItem value="1st No Answer">1st No Answer</SelectItem>
-                            <SelectItem value="2nd No Answer">2nd No Answer</SelectItem>
-                            <SelectItem value="3rd No Answer">3rd No Answer</SelectItem>
-                            <SelectItem value="Low Scored">Low Scored</SelectItem>
-                            <SelectItem value="Tasked">Tasked</SelectItem>
-                            <SelectItem value="Rejected">Rejected</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleRemoveSelectedCandidates}
+                            className="text-destructive hover:text-destructive border-destructive/50 hover:border-destructive"
+                          >
+                            <X className="w-4 h-4 mr-1" />
+                            Remove Selected
+                          </Button>
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={handleCallSelectedCandidates}
+                            disabled={isGeneratingShortList}
+                            className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600"
+                          >
+                            <Phone className="w-4 h-4 mr-1" />
+                            {isGeneratingShortList ? "Calling..." : "Call Selected"}
+                          </Button>
+                        </div>
                       </div>
                     </Card>
+                  )}
 
-                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                       {(() => {
-                  // Filter longlisted candidates based on filters (show all candidates in Jobs_CVs)
-                  const filteredLonglistedCandidates = longlistedCandidates.filter(candidate => {
-                    const nameMatch = !nameFilter || (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
-                    const emailMatch = !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
-                    const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
-                    const userIdMatch = !userIdFilter || (candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
-                    const source = (candidate["Source"] || candidate.source || "").toLowerCase();
-                    const sourceFilterMatch = !longListSourceFilter || longListSourceFilter === "all" || source.includes(longListSourceFilter.toLowerCase());
-                    let scoreMatch = true;
-                    if (scoreFilter !== "all") {
-                      const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
-                      switch (scoreFilter) {
-                        case "high":
-                          scoreMatch = score >= 75;
-                          break;
-                        case "moderate":
-                          scoreMatch = score >= 50 && score < 75;
-                          break;
-                        case "poor":
-                          scoreMatch = score >= 1 && score < 50;
-                          break;
-                        case "none":
-                          scoreMatch = score === 0 || isNaN(score);
-                          break;
-                      }
-                    }
-                    let contactedMatch = true;
-                    if (contactedFilter !== "all") {
-                      const contacted = candidate["Contacted"] || "";
-                      contactedMatch = contacted === contactedFilter || contactedFilter === "Ready to Call" && contacted === "Ready to Contact";
-                    }
-                    return nameMatch && emailMatch && phoneMatch && userIdMatch && sourceFilterMatch && scoreMatch && contactedMatch;
-                  });
+                  {/* Filters */}
+                  <Card className="p-3 md:p-4 mb-4 bg-muted/50">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <Filter className="w-4 h-4" />
+                        <h4 className="font-medium text-sm md:text-base">Filters</h4>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="sm" onClick={selectAllCandidates} className="h-6 text-xs px-2">
+                          Select All
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-3">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                        <Input
+                          placeholder="Name..."
+                          value={nameFilter}
+                          onChange={(e) => setNameFilter(e.target.value)}
+                          className="pl-10 h-9 text-sm"
+                        />
+                      </div>
+                      <Input
+                        placeholder="Email..."
+                        value={emailFilter}
+                        onChange={(e) => setEmailFilter(e.target.value)}
+                        className="h-9 text-sm"
+                      />
+                      <Input
+                        placeholder="Phone..."
+                        value={phoneFilter}
+                        onChange={(e) => setPhoneFilter(e.target.value)}
+                        className="h-9 text-sm"
+                      />
+                      <Input
+                        placeholder="User ID..."
+                        value={userIdFilter}
+                        onChange={(e) => setUserIdFilter(e.target.value)}
+                        className="h-9 text-sm"
+                      />
+                      <Select value={longListSourceFilter} onValueChange={setLongListSourceFilter}>
+                        <SelectTrigger className="h-9 text-sm">
+                          <SelectValue placeholder="Source" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Sources</SelectItem>
+                          <SelectItem value="Itris">Itris</SelectItem>
+                          <SelectItem value="Linkedin">LinkedIn</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={scoreFilter} onValueChange={setScoreFilter}>
+                        <SelectTrigger className="h-9 text-sm">
+                          <SelectValue placeholder="Score" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Scores</SelectItem>
+                          <SelectItem value="high">High (75+)</SelectItem>
+                          <SelectItem value="moderate">Moderate (50-74)</SelectItem>
+                          <SelectItem value="poor">Poor (1-49)</SelectItem>
+                          <SelectItem value="none">No Score</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={contactedFilter} onValueChange={setContactedFilter}>
+                        <SelectTrigger className="h-9 text-sm">
+                          <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Status</SelectItem>
+                          <SelectItem value="Not Contacted">Not Contacted</SelectItem>
+                          <SelectItem value="Ready to Call">Ready to Contact</SelectItem>
+                          <SelectItem value="Contacted">Contacted</SelectItem>
+                          <SelectItem value="Call Done">Call Done</SelectItem>
+                          <SelectItem value="1st No Answer">1st No Answer</SelectItem>
+                          <SelectItem value="2nd No Answer">2nd No Answer</SelectItem>
+                          <SelectItem value="3rd No Answer">3rd No Answer</SelectItem>
+                          <SelectItem value="Low Scored">Low Scored</SelectItem>
+                          <SelectItem value="Tasked">Tasked</SelectItem>
+                          <SelectItem value="Rejected">Rejected</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </Card>
 
-                  // Group candidates by user_id (for LinkedIn) or Candidate_ID (for others) to handle multiple contacts
-                  const groupedCandidates = filteredLonglistedCandidates.reduce((acc, candidate) => {
-                    // Use user_id for grouping as it's unique for each candidate
-                    const candidateId = candidate["user_id"] || candidate["Candidate_ID"];
-                    if (!acc[candidateId]) {
-                      acc[candidateId] = [];
-                    }
-                    acc[candidateId].push(candidate);
-                    return acc;
-                  }, {} as Record<string, any[]>);
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {(() => {
+                      // Filter longlisted candidates based on filters (show all candidates in Jobs_CVs)
+                      const filteredLonglistedCandidates = longlistedCandidates.filter((candidate) => {
+                        const nameMatch =
+                          !nameFilter ||
+                          (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
+                        const emailMatch =
+                          !emailFilter ||
+                          (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
+                        const phoneMatch =
+                          !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
+                        const userIdMatch =
+                          !userIdFilter || (candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
+                        const source = (candidate["Source"] || candidate.source || "").toLowerCase();
+                        const sourceFilterMatch =
+                          !longListSourceFilter ||
+                          longListSourceFilter === "all" ||
+                          source.includes(longListSourceFilter.toLowerCase());
+                        let scoreMatch = true;
+                        if (scoreFilter !== "all") {
+                          const score = parseInt(
+                            candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0",
+                          );
+                          switch (scoreFilter) {
+                            case "high":
+                              scoreMatch = score >= 75;
+                              break;
+                            case "moderate":
+                              scoreMatch = score >= 50 && score < 75;
+                              break;
+                            case "poor":
+                              scoreMatch = score >= 1 && score < 50;
+                              break;
+                            case "none":
+                              scoreMatch = score === 0 || isNaN(score);
+                              break;
+                          }
+                        }
+                        let contactedMatch = true;
+                        if (contactedFilter !== "all") {
+                          const contacted = candidate["Contacted"] || "";
+                          contactedMatch =
+                            contacted === contactedFilter ||
+                            (contactedFilter === "Ready to Call" && contacted === "Ready to Contact");
+                        }
+                        return (
+                          nameMatch &&
+                          emailMatch &&
+                          phoneMatch &&
+                          userIdMatch &&
+                          sourceFilterMatch &&
+                          scoreMatch &&
+                          contactedMatch
+                        );
+                      });
 
-                  // Sort grouped candidates by highest score (CV or LinkedIn) first
-                  const sortedGroupedCandidates = Object.entries(groupedCandidates).sort(([, contactsA], [, contactsB]) => {
-                    // Get max score from any contact in the group
-                    const getMaxScore = (contacts: any[]) => {
-                      return Math.max(...contacts.map(c => Math.max(parseInt(c["cv_score"] || c["CV Score"] || "0"), parseInt(c["linkedin_score"] || c["LinkedIn Score"] || "0"))));
-                    };
-                    return getMaxScore(contactsB) - getMaxScore(contactsA); // Descending order (highest first)
-                  });
-                  return sortedGroupedCandidates.map(([candidateId, candidateContacts]: [string, any[]]) => {
-                    // Use the first contact for display info
-                    const mainCandidate = candidateContacts[0];
-                    return <Card key={candidateId} id={`candidate-card-${candidateId}`} className={cn("border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg", selectedCandidates.has(candidateId) && "border-primary bg-primary/5")}>
-                              <CardContent className="p-3 md:p-4">
-                                 <div className="space-y-3">
-                                   <div className="flex items-start justify-between">
-                                     <div className="flex items-start gap-3 min-w-0 flex-1">
-                                       <input type="checkbox" checked={selectedCandidates.has(candidateId)} onChange={() => toggleCandidateSelection(candidateId)} className="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" />
-                                       <div className="min-w-0 flex-1">
-                                         <h4 className="font-semibold text-sm md:text-base truncate">{mainCandidate["Candidate Name"] && !/undefined/i.test(String(mainCandidate["Candidate Name"])) ? mainCandidate["Candidate Name"] : mainCandidate["Candidate Email"] ? String(mainCandidate["Candidate Email"]).split('@')[0] : `Candidate ${candidateId}`}</h4>
-                                          <div className="space-y-1">
-                                            
-                                            {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || mainCandidate["Contacted"]?.toLowerCase() === "contacted" || mainCandidate["Contacted"]?.toLowerCase() === "low scored" || mainCandidate["Contacted"]?.toLowerCase() === "tasked") && mainCandidate["lastcalltime"] && <div className="text-xs text-muted-foreground flex items-center">
-                                                 <Clock className="w-3 h-3 mr-1" />
-                                                 {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
-                                                 <span className="ml-2">
-                                                   {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], {
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                      })}
-                                                 </span>
-                                               </div>}
-                                            
-                                            {/* Qualifications Section - only show when call log is available and qualifications exist */}
-                                            {(mainCandidate["Contacted"]?.toLowerCase() === "call done" || mainCandidate["Contacted"]?.toLowerCase() === "contacted" || mainCandidate["Contacted"]?.toLowerCase() === "low scored" || mainCandidate["Contacted"]?.toLowerCase() === "tasked") && mainCandidate["qualifications"] && <div className="mt-2 p-2 bg-muted/30 rounded-sm border-l-2 border-primary/30">
-                                                <div className="text-xs font-medium text-foreground mb-1 flex items-center">
-                                                  <FileText className="w-3 h-3 mr-1" />
-                                                  Qualifications
-                                                </div>
-                                                <p className="text-xs text-muted-foreground line-clamp-3">
-                                                  {mainCandidate["qualifications"]}
-                                                </p>
-                                              </div>}
-                                          </div>
-                                       </div>
-                                     </div>
-                                     <Button variant="ghost" size="sm" onClick={() => showRemoveConfirmation(candidateId, mainCandidate["Candidate Name"] || "Unknown")} className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive" title="Remove from Long List">
-                                       <X className="h-3 w-3" />
-                                     </Button>
-                                   </div>
-                                  
-                                  <div className="space-y-2 text-xs md:text-sm">
-                                    {mainCandidate["Candidate Email"] && <div className="flex items-center text-muted-foreground min-w-0">
-                                        <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
-                                        <span className="truncate">{mainCandidate["Candidate Email"]}</span>
-                                      </div>}
-                                    
-                                     {mainCandidate["Candidate Phone Number"] && <div className="flex items-center text-muted-foreground min-w-0">
-                                        <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
-                                        <span className="truncate">{mainCandidate["Candidate Phone Number"]}</span>
-                                      </div>}
-                                      
-                                      {mainCandidate["Job ID"] && <div className="flex items-center text-muted-foreground min-w-0">
-                                        <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
-                                        <span className="truncate">{mainCandidate["Job ID"]}</span>
-                                      </div>}
-                                      
-                                      {mainCandidate["Source"] && <div className="flex items-center text-muted-foreground min-w-0">
-                                        <Building className="w-4 h-4 mr-2 flex-shrink-0" />
-                                        <span className="truncate">{mainCandidate["Source"]}</span>
-                                      </div>}
-                                  </div>
+                      // Group candidates by user_id (for LinkedIn) or Candidate_ID (for others) to handle multiple contacts
+                      const groupedCandidates = filteredLonglistedCandidates.reduce(
+                        (acc, candidate) => {
+                          // Use user_id for grouping as it's unique for each candidate
+                          const candidateId = candidate["user_id"] || candidate["Candidate_ID"];
+                          if (!acc[candidateId]) {
+                            acc[candidateId] = [];
+                          }
+                          acc[candidateId].push(candidate);
+                          return acc;
+                        },
+                        {} as Record<string, any[]>,
+                      );
 
-                                   {/* CV Score and Reason Section */}
-                                   <div className="space-y-2 pt-2 border-t">
-                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                                        <div className="space-y-1">
-                                           {<div className="flex items-center justify-between">
-                                                <span className="text-muted-foreground">{typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? 'LinkedIn Score:' : 'CV Score:'}</span>
-                                                {(() => {
-                                    const score = typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "N/A" : mainCandidate["cv_score"] || "N/A";
-                                    const numScore = parseInt(score);
-                                    let scoreClass = "font-medium";
-                                    if (!isNaN(numScore)) {
-                                      if (numScore < 50) {
-                                        scoreClass = "font-bold text-red-600 dark:text-red-400";
-                                      } else if (numScore < 75) {
-                                        scoreClass = "font-medium text-amber-600 dark:text-amber-400";
-                                      } else {
-                                        scoreClass = "font-medium text-green-600 dark:text-green-400";
-                                      }
-                                    }
-                                    return <span className={scoreClass}>{score}</span>;
-                                  })()}
-                                              </div>}
-                                           {mainCandidate["after_call_score"] && mainCandidate["after_call_score"] !== 0 && <div className="flex items-center justify-between">
-                                             <span className="text-muted-foreground">After Call Score:</span>
-                                             <span className="font-medium">{mainCandidate["after_call_score"]}</span>
-                                           </div>}
-                                           <div className="flex items-center justify-between">
-                                             <span className="text-muted-foreground">User ID:</span>
-                                             <span className="font-mono text-xs">{mainCandidate["user_id"] || "N/A"}</span>
-                                           </div>
-                                        </div>
+                      // Sort grouped candidates by highest score (CV or LinkedIn) first
+                      const sortedGroupedCandidates = Object.entries(groupedCandidates).sort(
+                        ([, contactsA], [, contactsB]) => {
+                          // Get max score from any contact in the group
+                          const getMaxScore = (contacts: any[]) => {
+                            return Math.max(
+                              ...contacts.map((c) =>
+                                Math.max(
+                                  parseInt(c["cv_score"] || c["CV Score"] || "0"),
+                                  parseInt(c["linkedin_score"] || c["LinkedIn Score"] || "0"),
+                                ),
+                              ),
+                            );
+                          };
+                          return getMaxScore(contactsB) - getMaxScore(contactsA); // Descending order (highest first)
+                        },
+                      );
+                      return sortedGroupedCandidates.map(([candidateId, candidateContacts]: [string, any[]]) => {
+                        // Use the first contact for display info
+                        const mainCandidate = candidateContacts[0];
+                        return (
+                          <Card
+                            key={candidateId}
+                            id={`candidate-card-${candidateId}`}
+                            className={cn(
+                              "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg",
+                              selectedCandidates.has(candidateId) && "border-primary bg-primary/5",
+                            )}
+                          >
+                            <CardContent className="p-3 md:p-4">
+                              <div className="space-y-3">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex items-start gap-3 min-w-0 flex-1">
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedCandidates.has(candidateId)}
+                                      onChange={() => toggleCandidateSelection(candidateId)}
+                                      className="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                                    />
+                                    <div className="min-w-0 flex-1">
+                                      <h4 className="font-semibold text-sm md:text-base truncate">
+                                        {mainCandidate["Candidate Name"] &&
+                                        !/undefined/i.test(String(mainCandidate["Candidate Name"]))
+                                          ? mainCandidate["Candidate Name"]
+                                          : mainCandidate["Candidate Email"]
+                                            ? String(mainCandidate["Candidate Email"]).split("@")[0]
+                                            : `Candidate ${candidateId}`}
+                                      </h4>
                                       <div className="space-y-1">
-                                        
+                                        {(mainCandidate["Contacted"]?.toLowerCase() === "call done" ||
+                                          mainCandidate["Contacted"]?.toLowerCase() === "contacted" ||
+                                          mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
+                                          mainCandidate["Contacted"]?.toLowerCase() === "tasked") &&
+                                          mainCandidate["lastcalltime"] && (
+                                            <div className="text-xs text-muted-foreground flex items-center">
+                                              <Clock className="w-3 h-3 mr-1" />
+                                              {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
+                                              <span className="ml-2">
+                                                {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], {
+                                                  hour: "2-digit",
+                                                  minute: "2-digit",
+                                                })}
+                                              </span>
+                                            </div>
+                                          )}
+
+                                        {/* Qualifications Section - only show when call log is available and qualifications exist */}
+                                        {(mainCandidate["Contacted"]?.toLowerCase() === "call done" ||
+                                          mainCandidate["Contacted"]?.toLowerCase() === "contacted" ||
+                                          mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
+                                          mainCandidate["Contacted"]?.toLowerCase() === "tasked") &&
+                                          mainCandidate["qualifications"] && (
+                                            <div className="mt-2 p-2 bg-muted/30 rounded-sm border-l-2 border-primary/30">
+                                              <div className="text-xs font-medium text-foreground mb-1 flex items-center">
+                                                <FileText className="w-3 h-3 mr-1" />
+                                                Qualifications
+                                              </div>
+                                              <p className="text-xs text-muted-foreground line-clamp-3">
+                                                {mainCandidate["qualifications"]}
+                                              </p>
+                                            </div>
+                                          )}
                                       </div>
                                     </div>
-                                     {mainCandidate["Source"] && typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes("linkedin") && mainCandidate["linkedin_score_reason"] ? <div className="pt-1">
-                                         <span className="text-muted-foreground text-xs">Reason:</span>
-                                         <p className="text-xs text-muted-foreground mt-1 line-clamp-3">
-                                           {mainCandidate["linkedin_score_reason"]}
-                                         </p>
-                                       </div> : mainCandidate["cv_score_reason"] && <div className="pt-1">
-                                           <span className="text-muted-foreground text-xs">CV Reason:</span>
-                                           <p className="text-xs text-muted-foreground mt-1 line-clamp-3">
-                                             {mainCandidate["cv_score_reason"]}
-                                           </p>
-                                         </div>}
-                                     
-                                     {/* Highlight Low Scores */}
-                                     {(() => {
-                              const score = typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') ? parseInt(mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "0") : parseInt(mainCandidate["cv_score"] || "0");
-                              if (score > 0 && score < 50) {
-                                return <div className="pt-2">
-                                           <Badge className="bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400 border border-red-200 dark:border-red-800">
-                                             ⚠️ Low Score: {score}
-                                           </Badge>
-                                         </div>;
-                              }
-                              return null;
-                            })()}
                                   </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      showRemoveConfirmation(candidateId, mainCandidate["Candidate Name"] || "Unknown")
+                                    }
+                                    className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
+                                    title="Remove from Long List"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </Button>
+                                </div>
 
-                                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t gap-2">
-                                     <div className="flex flex-wrap items-center gap-1">
-                                       <StatusDropdown currentStatus={mainCandidate["Contacted"]} candidateId={mainCandidate["Candidate_ID"]} jobId={id!} onStatusChange={newStatus => {
-                                setCandidates(prev => prev.map(c => c["Candidate_ID"] === mainCandidate["Candidate_ID"] ? {
-                                  ...c,
-                                  Contacted: newStatus
-                                } : c));
-                              }} variant="badge" />
-                                       {getCandidateStatus(mainCandidate["Candidate_ID"]) && <StatusDropdown currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])} candidateId={mainCandidate["Candidate_ID"]} jobId={null} onStatusChange={newStatus => {
-                                setCvData(prev => prev.map(cv => cv['Cadndidate_ID'] === mainCandidate["Candidate_ID"] ? {
-                                  ...cv,
-                                  CandidateStatus: newStatus
-                                } : cv));
-                              }} variant="badge" />}
-                                     </div>
-                                      <div className="flex flex-col gap-1 items-end">
-                                        {/* Only show overall score when status is Call Done */}
-                                        {mainCandidate["Contacted"]?.toLowerCase() === "call done" && getOverallScoreBadge(mainCandidate)}
-                                        {!["ready to contact", "not contacted", "1st no answer", "2nd no answer", "3rd no answer", "1st no anwser", "2nd no anwser", "3rd no anwser"].includes(mainCandidate["Contacted"]?.toLowerCase() || "") && getScoreBadge(mainCandidate["Success Score"] || mainCandidate["cv_score"] || mainCandidate["CV Score"])}
+                                <div className="space-y-2 text-xs md:text-sm">
+                                  {mainCandidate["Candidate Email"] && (
+                                    <div className="flex items-center text-muted-foreground min-w-0">
+                                      <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+                                      <span className="truncate">{mainCandidate["Candidate Email"]}</span>
+                                    </div>
+                                  )}
+
+                                  {mainCandidate["Candidate Phone Number"] && (
+                                    <div className="flex items-center text-muted-foreground min-w-0">
+                                      <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
+                                      <span className="truncate">{mainCandidate["Candidate Phone Number"]}</span>
+                                    </div>
+                                  )}
+
+                                  {mainCandidate["Job ID"] && (
+                                    <div className="flex items-center text-muted-foreground min-w-0">
+                                      <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
+                                      <span className="truncate">{mainCandidate["Job ID"]}</span>
+                                    </div>
+                                  )}
+
+                                  {mainCandidate["Source"] && (
+                                    <div className="flex items-center text-muted-foreground min-w-0">
+                                      <Building className="w-4 h-4 mr-2 flex-shrink-0" />
+                                      <span className="truncate">{mainCandidate["Source"]}</span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* CV Score and Reason Section */}
+                                <div className="space-y-2 pt-2 border-t">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                    <div className="space-y-1">
+                                      {
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-muted-foreground">
+                                            {typeof mainCandidate["Source"] === "string" &&
+                                            mainCandidate["Source"].toLowerCase().includes("linkedin")
+                                              ? "LinkedIn Score:"
+                                              : "CV Score:"}
+                                          </span>
+                                          {(() => {
+                                            const score =
+                                              typeof mainCandidate["Source"] === "string" &&
+                                              mainCandidate["Source"].toLowerCase().includes("linkedin")
+                                                ? mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "N/A"
+                                                : mainCandidate["cv_score"] || "N/A";
+                                            const numScore = parseInt(score);
+                                            let scoreClass = "font-medium";
+                                            if (!isNaN(numScore)) {
+                                              if (numScore < 50) {
+                                                scoreClass = "font-bold text-red-600 dark:text-red-400";
+                                              } else if (numScore < 75) {
+                                                scoreClass = "font-medium text-amber-600 dark:text-amber-400";
+                                              } else {
+                                                scoreClass = "font-medium text-green-600 dark:text-green-400";
+                                              }
+                                            }
+                                            return <span className={scoreClass}>{score}</span>;
+                                          })()}
+                                        </div>
+                                      }
+                                      {mainCandidate["after_call_score"] && mainCandidate["after_call_score"] !== 0 && (
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-muted-foreground">After Call Score:</span>
+                                          <span className="font-medium">{mainCandidate["after_call_score"]}</span>
+                                        </div>
+                                      )}
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-muted-foreground">User ID:</span>
+                                        <span className="font-mono text-xs">{mainCandidate["user_id"] || "N/A"}</span>
                                       </div>
-                                   </div>
-
-                                  {/* Call Log Buttons */}
-                                  <div className="space-y-2 pt-2 border-t">
-                                    <div className="flex flex-col sm:flex-row gap-2">
-                                      <Button variant="default" size="sm" onClick={() => handleCallCandidate(mainCandidate["Candidate_ID"], id!, mainCandidate["callid"])} disabled={callingCandidateId === candidateId} className="w-full sm:flex-1 bg-foreground hover:bg-foreground/90 text-background disabled:opacity-50 text-xs md:text-sm">
-                                        <Phone className="w-3 h-3 mr-1" />
-                                        {callingCandidateId === candidateId ? 'Calling...' : 'Call Candidate'}
-                                      </Button>
-                                      {(() => {
-                                const isLinkedInCandidate = typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin');
-                                const contactsWithCalls = candidateContacts.filter(contact => contact.callcount > 0);
-
-                                // For LinkedIn candidates, always show Call Log button
-                                if (isLinkedInCandidate) {
-                                  const latestContact = contactsWithCalls.length > 0 ? contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest) : mainCandidate;
-                                  return <Button variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
-                                            <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid || latestContact.recordid || candidateId}&longListSourceFilter=${encodeURIComponent(longListSourceFilter)}&fromTab=boolean-search`} className="truncate">
-                                              <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
-                                              <span className="truncate">Call Log</span>
-                                            </Link>
-                                          </Button>;
-                                }
-
-                                // For non-LinkedIn candidates, only show if they have call logs
-                                if (contactsWithCalls.length === 0) return null;
-
-                                // Get the latest call log (highest callid)
-                                const latestContact = contactsWithCalls.reduce((latest, current) => current.callid > latest.callid ? current : latest);
-                                return <Button key={latestContact.callid} variant="outline" size="sm" asChild className="flex-1 min-w-0 text-xs md:text-sm">
-                                             <Link to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}&longListSourceFilter=${encodeURIComponent(longListSourceFilter)}&fromTab=boolean-search`} className="truncate">
-                                              <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
-                                              <span className="truncate">Call Log</span>
-                                            </Link>
-                                          </Button>;
-                              })()}
                                     </div>
-                                    
-                                    {/* Show All Record Info Button */}
-                                    <div className="flex gap-2">
-                                      {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('linkedin') && getLinkedInUrl(mainCandidate) ? <Button variant="ghost" size="sm" asChild className="flex-1 text-xs md:text-sm">
-                                          <a href={getLinkedInUrl(mainCandidate)!} target="_blank" rel="noopener noreferrer">
-                                            <Users className="w-3 h-3 mr-1" />
-                                            View Profile
-                                          </a>
-                                        </Button> : <Button variant="ghost" size="sm" asChild className="flex-1 text-xs md:text-sm">
-                                          <Link to={`/candidate/${candidateId}`} state={{
-                                  fromJob: id,
-                                  tab: 'boolean-search',
-                                  focusCandidateId: candidateId,
-                                  longListSourceFilter
-                                }}>
-                                            <Users className="w-3 h-3 mr-1" />
-                                            View Profile
-                                          </Link>
-                                        </Button>}
-                                      {typeof mainCandidate["Source"] === 'string' && mainCandidate["Source"].toLowerCase().includes('itris') && <Button variant="outline" size="sm" className="flex-1 text-xs md:text-sm" onClick={() => {
-                                navigate(`/cv-viewer/${candidateId}/${id}`);
-                              }}>
-                                          <FileText className="w-3 h-3 mr-1" />
-                                          View CV
-                                        </Button>}
+                                    <div className="space-y-1"></div>
+                                  </div>
+                                  {mainCandidate["Source"] &&
+                                  typeof mainCandidate["Source"] === "string" &&
+                                  mainCandidate["Source"].toLowerCase().includes("linkedin") &&
+                                  mainCandidate["linkedin_score_reason"] ? (
+                                    <div className="pt-1">
+                                      <span className="text-muted-foreground text-xs">Reason:</span>
+                                      <p className="text-xs text-muted-foreground mt-1 line-clamp-3">
+                                        {mainCandidate["linkedin_score_reason"]}
+                                      </p>
                                     </div>
+                                  ) : (
+                                    mainCandidate["cv_score_reason"] && (
+                                      <div className="pt-1">
+                                        <span className="text-muted-foreground text-xs">CV Reason:</span>
+                                        <p className="text-xs text-muted-foreground mt-1 line-clamp-3">
+                                          {mainCandidate["cv_score_reason"]}
+                                        </p>
+                                      </div>
+                                    )
+                                  )}
+
+                                  {/* Highlight Low Scores */}
+                                  {(() => {
+                                    const score =
+                                      typeof mainCandidate["Source"] === "string" &&
+                                      mainCandidate["Source"].toLowerCase().includes("linkedin")
+                                        ? parseInt(mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "0")
+                                        : parseInt(mainCandidate["cv_score"] || "0");
+                                    if (score > 0 && score < 50) {
+                                      return (
+                                        <div className="pt-2">
+                                          <Badge className="bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400 border border-red-200 dark:border-red-800">
+                                            ⚠️ Low Score: {score}
+                                          </Badge>
+                                        </div>
+                                      );
+                                    }
+                                    return null;
+                                  })()}
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t gap-2">
+                                  <div className="flex flex-wrap items-center gap-1">
+                                    <StatusDropdown
+                                      currentStatus={mainCandidate["Contacted"]}
+                                      candidateId={mainCandidate["Candidate_ID"]}
+                                      jobId={id!}
+                                      onStatusChange={(newStatus) => {
+                                        setCandidates((prev) =>
+                                          prev.map((c) =>
+                                            c["Candidate_ID"] === mainCandidate["Candidate_ID"]
+                                              ? {
+                                                  ...c,
+                                                  Contacted: newStatus,
+                                                }
+                                              : c,
+                                          ),
+                                        );
+                                      }}
+                                      variant="badge"
+                                    />
+                                    {getCandidateStatus(mainCandidate["Candidate_ID"]) && (
+                                      <StatusDropdown
+                                        currentStatus={getCandidateStatus(mainCandidate["Candidate_ID"])}
+                                        candidateId={mainCandidate["Candidate_ID"]}
+                                        jobId={null}
+                                        onStatusChange={(newStatus) => {
+                                          setCvData((prev) =>
+                                            prev.map((cv) =>
+                                              cv["Cadndidate_ID"] === mainCandidate["Candidate_ID"]
+                                                ? {
+                                                    ...cv,
+                                                    CandidateStatus: newStatus,
+                                                  }
+                                                : cv,
+                                            ),
+                                          );
+                                        }}
+                                        variant="badge"
+                                      />
+                                    )}
+                                  </div>
+                                  <div className="flex flex-col gap-1 items-end">
+                                    {/* Only show overall score when status is Call Done */}
+                                    {mainCandidate["Contacted"]?.toLowerCase() === "call done" &&
+                                      getOverallScoreBadge(mainCandidate)}
+                                    {![
+                                      "ready to contact",
+                                      "not contacted",
+                                      "1st no answer",
+                                      "2nd no answer",
+                                      "3rd no answer",
+                                      "1st no anwser",
+                                      "2nd no anwser",
+                                      "3rd no anwser",
+                                    ].includes(mainCandidate["Contacted"]?.toLowerCase() || "") &&
+                                      getScoreBadge(
+                                        mainCandidate["Success Score"] ||
+                                          mainCandidate["cv_score"] ||
+                                          mainCandidate["CV Score"],
+                                      )}
                                   </div>
                                 </div>
-                              </CardContent>
-                            </Card>;
-                  });
-                })()}
+
+                                {/* Call Log Buttons */}
+                                <div className="space-y-2 pt-2 border-t">
+                                  <div className="flex flex-col sm:flex-row gap-2">
+                                    <Button
+                                      variant="default"
+                                      size="sm"
+                                      onClick={() =>
+                                        handleCallCandidate(mainCandidate["Candidate_ID"], id!, mainCandidate["callid"])
+                                      }
+                                      disabled={callingCandidateId === candidateId}
+                                      className="w-full sm:flex-1 bg-foreground hover:bg-foreground/90 text-background disabled:opacity-50 text-xs md:text-sm"
+                                    >
+                                      <Phone className="w-3 h-3 mr-1" />
+                                      {callingCandidateId === candidateId ? "Calling..." : "Call Candidate"}
+                                    </Button>
+                                    {(() => {
+                                      const isLinkedInCandidate =
+                                        typeof mainCandidate["Source"] === "string" &&
+                                        mainCandidate["Source"].toLowerCase().includes("linkedin");
+                                      const contactsWithCalls = candidateContacts.filter(
+                                        (contact) => contact.callcount > 0,
+                                      );
+
+                                      // For LinkedIn candidates, always show Call Log button
+                                      if (isLinkedInCandidate) {
+                                        const latestContact =
+                                          contactsWithCalls.length > 0
+                                            ? contactsWithCalls.reduce((latest, current) =>
+                                                current.callid > latest.callid ? current : latest,
+                                              )
+                                            : mainCandidate;
+                                        return (
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            asChild
+                                            className="flex-1 min-w-0 text-xs md:text-sm"
+                                          >
+                                            <Link
+                                              to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid || latestContact.recordid || candidateId}&longListSourceFilter=${encodeURIComponent(longListSourceFilter)}&fromTab=boolean-search`}
+                                              className="truncate"
+                                            >
+                                              <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
+                                              <span className="truncate">Call Log</span>
+                                            </Link>
+                                          </Button>
+                                        );
+                                      }
+
+                                      // For non-LinkedIn candidates, only show if they have call logs
+                                      if (contactsWithCalls.length === 0) return null;
+
+                                      // Get the latest call log (highest callid)
+                                      const latestContact = contactsWithCalls.reduce((latest, current) =>
+                                        current.callid > latest.callid ? current : latest,
+                                      );
+                                      return (
+                                        <Button
+                                          key={latestContact.callid}
+                                          variant="outline"
+                                          size="sm"
+                                          asChild
+                                          className="flex-1 min-w-0 text-xs md:text-sm"
+                                        >
+                                          <Link
+                                            to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}&longListSourceFilter=${encodeURIComponent(longListSourceFilter)}&fromTab=boolean-search`}
+                                            className="truncate"
+                                          >
+                                            <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
+                                            <span className="truncate">Call Log</span>
+                                          </Link>
+                                        </Button>
+                                      );
+                                    })()}
+                                  </div>
+
+                                  {/* Show All Record Info Button */}
+                                  <div className="flex gap-2">
+                                    {typeof mainCandidate["Source"] === "string" &&
+                                    mainCandidate["Source"].toLowerCase().includes("linkedin") &&
+                                    getLinkedInUrl(mainCandidate) ? (
+                                      <Button variant="ghost" size="sm" asChild className="flex-1 text-xs md:text-sm">
+                                        <a
+                                          href={getLinkedInUrl(mainCandidate)!}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                        >
+                                          <Users className="w-3 h-3 mr-1" />
+                                          View Profile
+                                        </a>
+                                      </Button>
+                                    ) : (
+                                      <Button variant="ghost" size="sm" asChild className="flex-1 text-xs md:text-sm">
+                                        <Link
+                                          to={`/candidate/${candidateId}`}
+                                          state={{
+                                            fromJob: id,
+                                            tab: "boolean-search",
+                                            focusCandidateId: candidateId,
+                                            longListSourceFilter,
+                                          }}
+                                        >
+                                          <Users className="w-3 h-3 mr-1" />
+                                          View Profile
+                                        </Link>
+                                      </Button>
+                                    )}
+                                    {typeof mainCandidate["Source"] === "string" &&
+                                      mainCandidate["Source"].toLowerCase().includes("itris") && (
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          className="flex-1 text-xs md:text-sm"
+                                          onClick={() => {
+                                            navigate(`/cv-viewer/${candidateId}/${id}`);
+                                          }}
+                                        >
+                                          <FileText className="w-3 h-3 mr-1" />
+                                          View CV
+                                        </Button>
+                                      )}
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      });
+                    })()}
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="shortlist" className="space-y-4 pb-32">
+          <div className="space-y-6">
+            {/* Within Budget Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Star className="w-5 h-5 mr-2" />
+                  Within Budget ({withinBudgetCandidates.length} candidates)
+                </CardTitle>
+                <CardDescription>
+                  High-scoring candidates with salary expectations within 20% of budget (
+                  {formatCurrency(jobBudget.toString(), job?.Currency)} + 20%)
+                </CardDescription>
+
+                {/* AI Short List Filters - Single Line */}
+                <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center">
+                  <div className="relative min-w-0 flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    <Input
+                      placeholder="Name..."
+                      value={shortListNameFilter}
+                      onChange={(e) => setShortListNameFilter(e.target.value)}
+                      className="pl-10 h-9 text-sm"
+                    />
+                  </div>
+                  <Input
+                    placeholder="Email..."
+                    value={shortListEmailFilter}
+                    onChange={(e) => setShortListEmailFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Input
+                    placeholder="Phone..."
+                    value={shortListPhoneFilter}
+                    onChange={(e) => setShortListPhoneFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Input
+                    placeholder="User ID..."
+                    value={shortListUserIdFilter}
+                    onChange={(e) => setShortListUserIdFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Input
+                    placeholder="Source..."
+                    value={shortListSourceFilter}
+                    onChange={(e) => setShortListSourceFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
+                    <SelectTrigger className="h-9 text-sm w-32">
+                      <SelectValue placeholder="Source" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Sources</SelectItem>
+                      <SelectItem value="Itris">Itris</SelectItem>
+                      <SelectItem value="Linkedin">LinkedIn</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
+                    <SelectTrigger className="h-9 text-sm w-32">
+                      <SelectValue placeholder="Score" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Scores</SelectItem>
+                      <SelectItem value="90+">90+</SelectItem>
+                      <SelectItem value="85+">85+</SelectItem>
+                      <SelectItem value="80+">80+</SelectItem>
+                      <SelectItem value="75+">75+</SelectItem>
+                      <SelectItem value="70+">70+</SelectItem>
+                      <SelectItem value="high">High (85+)</SelectItem>
+                      <SelectItem value="medium">Medium (70-84)</SelectItem>
+                      <SelectItem value="low">Low (&lt;70)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {withinBudgetCandidates.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No within-budget candidates yet</h3>
+                    <p className="text-muted-foreground">High-scoring candidates within budget will appear here</p>
+                  </div>
+                ) : (
+                  <ScrollArea className="h-[600px] w-full">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
+                      {(() => {
+                        // Group within budget candidates by user_id and sort by score
+                        const groupedWithinBudget = withinBudgetCandidates.reduce(
+                          (acc, candidate) => {
+                            const candidateId = candidate["user_id"] || candidate["Candidate_ID"];
+                            if (!acc[candidateId]) {
+                              acc[candidateId] = [];
+                            }
+                            acc[candidateId].push(candidate);
+                            return acc;
+                          },
+                          {} as Record<string, any[]>,
+                        );
+
+                        // Convert to array and sort by highest Overall Score first
+                        const sortedCandidateEntries = Object.entries(groupedWithinBudget).sort(
+                          ([, candidateContactsA], [, candidateContactsB]) => {
+                            const candidateA = candidateContactsA[0];
+                            const candidateB = candidateContactsB[0];
+
+                            // Use the calculateOverallScore function for consistent scoring
+                            const overallScoreA = calculateOverallScore(candidateA);
+                            const overallScoreB = calculateOverallScore(candidateB);
+                            return overallScoreB - overallScoreA; // Sort in descending order (highest Overall Score first)
+                          },
+                        );
+                        return sortedCandidateEntries.map(
+                          ([candidateId, candidateContacts]: [string, any[]], index: number) => {
+                            const mainCandidate = candidateContacts[0];
+                            const isTopCandidate = index < 3; // Top 3 candidates get golden effect
+                            return renderCandidateCard(candidateId, candidateContacts, mainCandidate, isTopCandidate);
+                          },
+                        );
+                      })()}
                     </div>
-                  </>}
+                  </ScrollArea>
+                )}
               </CardContent>
             </Card>
-          </TabsContent>
 
-          <TabsContent value="shortlist" className="space-y-4 pb-32">
-            <div className="space-y-6">
-              {/* Within Budget Section */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center text-4xl md:text-5xl font-light font-work tracking-tight">
-                    <Star className="w-5 h-5 mr-2" />
-                    Within Budget ({withinBudgetCandidates.length} candidates)
-                  </CardTitle>
-                  <CardDescription className="text-sm font-light">
-                    High-scoring candidates with salary expectations within 20% of budget ({formatCurrency(jobBudget.toString(), job?.Currency)} + 20%)
-                  </CardDescription>
-                  
-                  {/* AI Short List Filters - Single Line */}
-                  <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center">
-                    <div className="relative min-w-0 flex-1">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                      <Input placeholder="Name..." value={shortListNameFilter} onChange={e => setShortListNameFilter(e.target.value)} className="pl-10 h-9 text-sm" />
-                    </div>
-                    <Input placeholder="Email..." value={shortListEmailFilter} onChange={e => setShortListEmailFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
-                    <Input placeholder="Phone..." value={shortListPhoneFilter} onChange={e => setShortListPhoneFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
-                    <Input placeholder="User ID..." value={shortListUserIdFilter} onChange={e => setShortListUserIdFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
-                    <Input placeholder="Source..." value={shortListSourceFilter} onChange={e => setShortListSourceFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
-                    <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
-                      <SelectTrigger className="h-9 text-sm w-32">
-                        <SelectValue placeholder="Source" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Sources</SelectItem>
-                        <SelectItem value="Itris">Itris</SelectItem>
-                        <SelectItem value="Linkedin">LinkedIn</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
-                      <SelectTrigger className="h-9 text-sm w-32">
-                        <SelectValue placeholder="Score" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Scores</SelectItem>
-                        <SelectItem value="90+">90+</SelectItem>
-                        <SelectItem value="85+">85+</SelectItem>
-                        <SelectItem value="80+">80+</SelectItem>
-                        <SelectItem value="75+">75+</SelectItem>
-                        <SelectItem value="70+">70+</SelectItem>
-                        <SelectItem value="high">High (85+)</SelectItem>
-                        <SelectItem value="medium">Medium (70-84)</SelectItem>
-                        <SelectItem value="low">Low (&lt;70)</SelectItem>
-                      </SelectContent>
-                    </Select>
+            {/* Above Budget Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <AlertTriangle className="w-5 h-5 mr-2" />
+                  Above Budget ({aboveBudgetCandidates.length} candidates)
+                </CardTitle>
+                <CardDescription>
+                  High-scoring candidates with salary expectations more than 20% above budget (
+                  {formatCurrency(budgetThreshold.toString(), job?.Currency)}+)
+                </CardDescription>
+
+                {/* AI Short List Filters - Single Line */}
+                <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center">
+                  <div className="relative min-w-0 flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    <Input
+                      placeholder="Name..."
+                      value={shortListNameFilter}
+                      onChange={(e) => setShortListNameFilter(e.target.value)}
+                      className="pl-10 h-9 text-sm"
+                    />
                   </div>
-                </CardHeader>
-                <CardContent>
-                  {withinBudgetCandidates.length === 0 ? <div className="text-center py-8">
-                      <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">No within-budget candidates yet</h3>
-                      <p className="text-muted-foreground">High-scoring candidates within budget will appear here</p>
-                    </div> : <ScrollArea className="h-[600px] w-full">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
-                        {(() => {
-                    // Group within budget candidates by user_id and sort by score
-                    const groupedWithinBudget = withinBudgetCandidates.reduce((acc, candidate) => {
-                      const candidateId = candidate["user_id"] || candidate["Candidate_ID"];
-                      if (!acc[candidateId]) {
-                        acc[candidateId] = [];
-                      }
-                      acc[candidateId].push(candidate);
-                      return acc;
-                    }, {} as Record<string, any[]>);
-
-                    // Convert to array and sort by highest Overall Score first
-                    const sortedCandidateEntries = Object.entries(groupedWithinBudget).sort(([, candidateContactsA], [, candidateContactsB]) => {
-                      const candidateA = candidateContactsA[0];
-                      const candidateB = candidateContactsB[0];
-
-                      // Use the calculateOverallScore function for consistent scoring
-                      const overallScoreA = calculateOverallScore(candidateA);
-                      const overallScoreB = calculateOverallScore(candidateB);
-                      return overallScoreB - overallScoreA; // Sort in descending order (highest Overall Score first)
-                    });
-                    return sortedCandidateEntries.map(([candidateId, candidateContacts]: [string, any[]], index: number) => {
-                      const mainCandidate = candidateContacts[0];
-                      const isTopCandidate = index < 3; // Top 3 candidates get golden effect
-                      return renderCandidateCard(candidateId, candidateContacts, mainCandidate, isTopCandidate);
-                    });
-                  })()}
-                      </div>
-                    </ScrollArea>}
-                </CardContent>
-              </Card>
-
-              {/* Above Budget Section */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center text-4xl md:text-5xl font-light font-work tracking-tight">
-                    <AlertTriangle className="w-5 h-5 mr-2" />
-                    Above Budget ({aboveBudgetCandidates.length} candidates)
-                  </CardTitle>
-                  <CardDescription className="text-sm font-light">
-                    High-scoring candidates with salary expectations more than 20% above budget ({formatCurrency(budgetThreshold.toString(), job?.Currency)}+)
-                  </CardDescription>
-                  
-                  {/* AI Short List Filters - Single Line */}
-                  <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center">
-                    <div className="relative min-w-0 flex-1">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                      <Input placeholder="Name..." value={shortListNameFilter} onChange={e => setShortListNameFilter(e.target.value)} className="pl-10 h-9 text-sm" />
-                    </div>
-                    <Input placeholder="Email..." value={shortListEmailFilter} onChange={e => setShortListEmailFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
-                    <Input placeholder="Phone..." value={shortListPhoneFilter} onChange={e => setShortListPhoneFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
-                    <Input placeholder="User ID..." value={shortListUserIdFilter} onChange={e => setShortListUserIdFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
-                    <Input placeholder="Source..." value={shortListSourceFilter} onChange={e => setShortListSourceFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
-                    <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
-                      <SelectTrigger className="h-9 text-sm w-32">
-                        <SelectValue placeholder="Source" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Sources</SelectItem>
-                        <SelectItem value="Itris">Itris</SelectItem>
-                        <SelectItem value="Linkedin">LinkedIn</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
-                      <SelectTrigger className="h-9 text-sm w-32">
-                        <SelectValue placeholder="Score" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Scores</SelectItem>
-                        <SelectItem value="90+">90+</SelectItem>
-                        <SelectItem value="85+">85+</SelectItem>
-                        <SelectItem value="80+">80+</SelectItem>
-                        <SelectItem value="75+">75+</SelectItem>
-                        <SelectItem value="70+">70+</SelectItem>
-                        <SelectItem value="high">High (85+)</SelectItem>
-                        <SelectItem value="medium">Medium (70-84)</SelectItem>
-                        <SelectItem value="low">Low (&lt;70)</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <Input
+                    placeholder="Email..."
+                    value={shortListEmailFilter}
+                    onChange={(e) => setShortListEmailFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Input
+                    placeholder="Phone..."
+                    value={shortListPhoneFilter}
+                    onChange={(e) => setShortListPhoneFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Input
+                    placeholder="User ID..."
+                    value={shortListUserIdFilter}
+                    onChange={(e) => setShortListUserIdFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Input
+                    placeholder="Source..."
+                    value={shortListSourceFilter}
+                    onChange={(e) => setShortListSourceFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
+                    <SelectTrigger className="h-9 text-sm w-32">
+                      <SelectValue placeholder="Source" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Sources</SelectItem>
+                      <SelectItem value="Itris">Itris</SelectItem>
+                      <SelectItem value="Linkedin">LinkedIn</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
+                    <SelectTrigger className="h-9 text-sm w-32">
+                      <SelectValue placeholder="Score" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Scores</SelectItem>
+                      <SelectItem value="90+">90+</SelectItem>
+                      <SelectItem value="85+">85+</SelectItem>
+                      <SelectItem value="80+">80+</SelectItem>
+                      <SelectItem value="75+">75+</SelectItem>
+                      <SelectItem value="70+">70+</SelectItem>
+                      <SelectItem value="high">High (85+)</SelectItem>
+                      <SelectItem value="medium">Medium (70-84)</SelectItem>
+                      <SelectItem value="low">Low (&lt;70)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {aboveBudgetCandidates.length === 0 ? (
+                  <div className="text-center py-8">
+                    <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No above-budget candidates</h3>
+                    <p className="text-muted-foreground">High-scoring candidates above budget will appear here</p>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  {aboveBudgetCandidates.length === 0 ? <div className="text-center py-8">
-                      <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">No above-budget candidates</h3>
-                      <p className="text-muted-foreground">High-scoring candidates above budget will appear here</p>
-                    </div> : <ScrollArea className="h-[600px] w-full">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
-                        {(() => {
-                    // Group above budget candidates by user_id and sort by Overall Score
-                    const groupedAboveBudget = aboveBudgetCandidates.reduce((acc, candidate) => {
-                      const candidateId = candidate["user_id"] || candidate["Candidate_ID"];
-                      if (!acc[candidateId]) {
-                        acc[candidateId] = [];
-                      }
-                      acc[candidateId].push(candidate);
-                      return acc;
-                    }, {} as Record<string, any[]>);
+                ) : (
+                  <ScrollArea className="h-[600px] w-full">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
+                      {(() => {
+                        // Group above budget candidates by user_id and sort by Overall Score
+                        const groupedAboveBudget = aboveBudgetCandidates.reduce(
+                          (acc, candidate) => {
+                            const candidateId = candidate["user_id"] || candidate["Candidate_ID"];
+                            if (!acc[candidateId]) {
+                              acc[candidateId] = [];
+                            }
+                            acc[candidateId].push(candidate);
+                            return acc;
+                          },
+                          {} as Record<string, any[]>,
+                        );
 
-                    // Sort by Overall Score descending (highest first)
-                    const sortedAboveBudgetEntries = Object.entries(groupedAboveBudget).sort(([, candidateContactsA], [, candidateContactsB]) => {
-                      const candidateA = candidateContactsA[0];
-                      const candidateB = candidateContactsB[0];
+                        // Sort by Overall Score descending (highest first)
+                        const sortedAboveBudgetEntries = Object.entries(groupedAboveBudget).sort(
+                          ([, candidateContactsA], [, candidateContactsB]) => {
+                            const candidateA = candidateContactsA[0];
+                            const candidateB = candidateContactsB[0];
 
-                      // Use the calculateOverallScore function for consistent scoring
-                      const overallScoreA = calculateOverallScore(candidateA);
-                      const overallScoreB = calculateOverallScore(candidateB);
-                      return overallScoreB - overallScoreA; // Sort in descending order (highest Overall Score first)
-                    });
-                    return sortedAboveBudgetEntries.map(([candidateId, candidateContacts]: [string, any[]]) => {
-                      const mainCandidate = candidateContacts[0];
-                      return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
-                    });
-                  })()}
-                      </div>
-                    </ScrollArea>}
-                </CardContent>
-              </Card>
-
-              {/* Not in Preferred Nationality Section */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center text-4xl md:text-5xl font-light font-work tracking-tight">
-                    <AlertTriangle className="w-5 h-5 mr-2" />
-                    Not in Preferred Nationality ({notInPreferredNationalityCandidates.length} candidates)
-                  </CardTitle>
-                  <CardDescription className="text-sm font-light">
-                    High-scoring candidates whose nationality doesn't match the preferred nationality: {job?.prefered_nationality || "N/A"}
-                  </CardDescription>
-                  
-                  {/* AI Short List Filters */}
-                  <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center">
-                    <div className="relative min-w-0 flex-1">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                      <Input placeholder="Name..." value={shortListNameFilter} onChange={e => setShortListNameFilter(e.target.value)} className="pl-10 h-9 text-sm" />
+                            // Use the calculateOverallScore function for consistent scoring
+                            const overallScoreA = calculateOverallScore(candidateA);
+                            const overallScoreB = calculateOverallScore(candidateB);
+                            return overallScoreB - overallScoreA; // Sort in descending order (highest Overall Score first)
+                          },
+                        );
+                        return sortedAboveBudgetEntries.map(([candidateId, candidateContacts]: [string, any[]]) => {
+                          const mainCandidate = candidateContacts[0];
+                          return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
+                        });
+                      })()}
                     </div>
-                    <Input placeholder="Email..." value={shortListEmailFilter} onChange={e => setShortListEmailFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
-                    <Input placeholder="Phone..." value={shortListPhoneFilter} onChange={e => setShortListPhoneFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
-                    <Input placeholder="User ID..." value={shortListUserIdFilter} onChange={e => setShortListUserIdFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
-                    <Input placeholder="Source..." value={shortListSourceFilter} onChange={e => setShortListSourceFilter(e.target.value)} className="h-9 text-sm min-w-0 flex-1" />
-                    <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
-                      <SelectTrigger className="h-9 text-sm w-32">
-                        <SelectValue placeholder="Source" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Sources</SelectItem>
-                        <SelectItem value="Itris">Itris</SelectItem>
-                        <SelectItem value="Linkedin">LinkedIn</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
-                      <SelectTrigger className="h-9 text-sm w-32">
-                        <SelectValue placeholder="Score" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Scores</SelectItem>
-                        <SelectItem value="90+">90+</SelectItem>
-                        <SelectItem value="85+">85+</SelectItem>
-                        <SelectItem value="80+">80+</SelectItem>
-                        <SelectItem value="75+">75+</SelectItem>
-                        <SelectItem value="70+">70+</SelectItem>
-                        <SelectItem value="high">High (85+)</SelectItem>
-                        <SelectItem value="medium">Medium (70-84)</SelectItem>
-                        <SelectItem value="low">Low (&lt;70)</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  </ScrollArea>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Not in Preferred Nationality Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <AlertTriangle className="w-5 h-5 mr-2" />
+                  Not in Preferred Nationality ({notInPreferredNationalityCandidates.length} candidates)
+                </CardTitle>
+                <CardDescription>
+                  High-scoring candidates whose nationality doesn't match the preferred nationality:{" "}
+                  {job?.prefered_nationality || "N/A"}
+                </CardDescription>
+
+                {/* AI Short List Filters */}
+                <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center">
+                  <div className="relative min-w-0 flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    <Input
+                      placeholder="Name..."
+                      value={shortListNameFilter}
+                      onChange={(e) => setShortListNameFilter(e.target.value)}
+                      className="pl-10 h-9 text-sm"
+                    />
                   </div>
-                </CardHeader>
-                <CardContent>
-                  {notInPreferredNationalityCandidates.length === 0 ? <div className="text-center py-8">
-                      <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">No nationality mismatch candidates</h3>
-                      <p className="text-muted-foreground">Candidates not matching preferred nationality will appear here</p>
-                    </div> : <ScrollArea className="h-[600px] w-full">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
-                        {(() => {
-                    // Group nationality mismatch candidates by user_id and sort by Overall Score
-                    const groupedNationalityMismatch = notInPreferredNationalityCandidates.reduce((acc, candidate) => {
-                      const candidateId = candidate["user_id"] || candidate["Candidate_ID"];
-                      if (!acc[candidateId]) {
-                        acc[candidateId] = [];
-                      }
-                      acc[candidateId].push(candidate);
-                      return acc;
-                    }, {} as Record<string, any[]>);
+                  <Input
+                    placeholder="Email..."
+                    value={shortListEmailFilter}
+                    onChange={(e) => setShortListEmailFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Input
+                    placeholder="Phone..."
+                    value={shortListPhoneFilter}
+                    onChange={(e) => setShortListPhoneFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Input
+                    placeholder="User ID..."
+                    value={shortListUserIdFilter}
+                    onChange={(e) => setShortListUserIdFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Input
+                    placeholder="Source..."
+                    value={shortListSourceFilter}
+                    onChange={(e) => setShortListSourceFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
+                    <SelectTrigger className="h-9 text-sm w-32">
+                      <SelectValue placeholder="Source" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Sources</SelectItem>
+                      <SelectItem value="Itris">Itris</SelectItem>
+                      <SelectItem value="Linkedin">LinkedIn</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
+                    <SelectTrigger className="h-9 text-sm w-32">
+                      <SelectValue placeholder="Score" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Scores</SelectItem>
+                      <SelectItem value="90+">90+</SelectItem>
+                      <SelectItem value="85+">85+</SelectItem>
+                      <SelectItem value="80+">80+</SelectItem>
+                      <SelectItem value="75+">75+</SelectItem>
+                      <SelectItem value="70+">70+</SelectItem>
+                      <SelectItem value="high">High (85+)</SelectItem>
+                      <SelectItem value="medium">Medium (70-84)</SelectItem>
+                      <SelectItem value="low">Low (&lt;70)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {notInPreferredNationalityCandidates.length === 0 ? (
+                  <div className="text-center py-8">
+                    <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No nationality mismatch candidates</h3>
+                    <p className="text-muted-foreground">
+                      Candidates not matching preferred nationality will appear here
+                    </p>
+                  </div>
+                ) : (
+                  <ScrollArea className="h-[600px] w-full">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
+                      {(() => {
+                        // Group nationality mismatch candidates by user_id and sort by Overall Score
+                        const groupedNationalityMismatch = notInPreferredNationalityCandidates.reduce(
+                          (acc, candidate) => {
+                            const candidateId = candidate["user_id"] || candidate["Candidate_ID"];
+                            if (!acc[candidateId]) {
+                              acc[candidateId] = [];
+                            }
+                            acc[candidateId].push(candidate);
+                            return acc;
+                          },
+                          {} as Record<string, any[]>,
+                        );
 
-                    // Sort by Overall Score descending (highest first)
-                    const sortedNationalityMismatchEntries = Object.entries(groupedNationalityMismatch).sort(([, candidateContactsA], [, candidateContactsB]) => {
-                      const candidateA = candidateContactsA[0];
-                      const candidateB = candidateContactsB[0];
+                        // Sort by Overall Score descending (highest first)
+                        const sortedNationalityMismatchEntries = Object.entries(groupedNationalityMismatch).sort(
+                          ([, candidateContactsA], [, candidateContactsB]) => {
+                            const candidateA = candidateContactsA[0];
+                            const candidateB = candidateContactsB[0];
 
-                      // Use the calculateOverallScore function for consistent scoring
-                      const overallScoreA = calculateOverallScore(candidateA);
-                      const overallScoreB = calculateOverallScore(candidateB);
-                      return overallScoreB - overallScoreA; // Sort in descending order (highest Overall Score first)
-                    });
-                    return sortedNationalityMismatchEntries.map(([candidateId, candidateContacts]: [string, any[]]) => {
-                      const mainCandidate = candidateContacts[0];
-                      return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
-                    });
-                  })()}
-                      </div>
-                    </ScrollArea>}
-                </CardContent>
-              </Card>
+                            // Use the calculateOverallScore function for consistent scoring
+                            const overallScoreA = calculateOverallScore(candidateA);
+                            const overallScoreB = calculateOverallScore(candidateB);
+                            return overallScoreB - overallScoreA; // Sort in descending order (highest Overall Score first)
+                          },
+                        );
+                        return sortedNationalityMismatchEntries.map(
+                          ([candidateId, candidateContacts]: [string, any[]]) => {
+                            const mainCandidate = candidateContacts[0];
+                            return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
+                          },
+                        );
+                      })()}
+                    </div>
+                  </ScrollArea>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      <JobDialog
+        job={job}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onSave={() => {
+          fetchJob(id!);
+          setIsEditDialogOpen(false);
+        }}
+      />
+
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Regenerate Long List</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to regenerate Long List?</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowConfirmDialog(false);
+                handleGenerateLongList();
+              }}
+            >
+              Yes, Regenerate
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Interview Scheduling Dialog */}
+      <Dialog open={interviewDialogOpen} onOpenChange={setInterviewDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Schedule Interview Slots</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 overflow-y-auto max-h-[70vh] px-1">
+            <p className="text-sm text-muted-foreground">
+              Please select 3 preferred interview slots and interview type. Only future dates are allowed, and times
+              must be in 15-minute intervals.
+            </p>
+
+            {/* Interview Type Selection */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Interview Type</label>
+              <Select value={interviewType} onValueChange={setInterviewType}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select interview type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Phone">Phone</SelectItem>
+                  <SelectItem value="Online Meeting">Online Meeting</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          </TabsContent>
-        </Tabs>
-        
-        <JobDialog job={job} open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen} onSave={() => {
-      fetchJob(id!);
-      setIsEditDialogOpen(false);
-    }} />
 
-        <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Regenerate Long List</AlertDialogTitle>
-              <AlertDialogDescription>
-                Are you sure you want to regenerate Long List?
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => {
-            setShowConfirmDialog(false);
-            handleGenerateLongList();
-          }}>
-                Yes, Regenerate
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-
-        {/* Interview Scheduling Dialog */}
-        <Dialog open={interviewDialogOpen} onOpenChange={setInterviewDialogOpen}>
-          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Schedule Interview Slots</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-6 overflow-y-auto max-h-[70vh] px-1">
-              <p className="text-sm text-muted-foreground">
-                Please select 3 preferred interview slots and interview type. Only future dates are allowed, and times must be in 15-minute intervals.
-              </p>
-              
-              {/* Interview Type Selection */}
+            {/* Conditional Interview Link Input */}
+            {interviewType === "Online Meeting" && (
               <div className="space-y-2">
-                <label className="text-sm font-medium">Interview Type</label>
-                <Select value={interviewType} onValueChange={setInterviewType}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select interview type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Phone">Phone</SelectItem>
-                    <SelectItem value="Online Meeting">Online Meeting</SelectItem>
-                  </SelectContent>
-                </Select>
+                <label className="text-sm font-medium">Interview Link</label>
+                <Input
+                  type="url"
+                  placeholder="https://zoom.us/j/... or https://meet.google.com/..."
+                  value={interviewLink}
+                  onChange={(e) => setInterviewLink(e.target.value)}
+                  className="w-full"
+                />
               </div>
-              
-              {/* Conditional Interview Link Input */}
-              {interviewType === 'Online Meeting' && <div className="space-y-2">
-                  <label className="text-sm font-medium">Interview Link</label>
-                  <Input type="url" placeholder="https://zoom.us/j/... or https://meet.google.com/..." value={interviewLink} onChange={e => setInterviewLink(e.target.value)} className="w-full" />
-                </div>}
-              
-              {interviewSlots.map((slot, index) => <div key={index} className="space-y-4 p-4 border rounded-lg">
-                  <h4 className="font-medium">Slot {index + 1}</h4>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    {/* Date Picker */}
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Date</label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !slot.date && "text-muted-foreground")}>
-                            <Calendar className="mr-2 h-4 w-4" />
-                            {slot.date ? format(slot.date, "PPP") : <span>Pick a date</span>}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <CalendarComponent mode="single" selected={slot.date} onSelect={date => updateInterviewSlot(index, 'date', date!)} disabled={date => {
-                      const today = new Date();
-                      today.setHours(0, 0, 0, 0);
-                      return date < today;
-                    }} initialFocus className="p-3 pointer-events-auto" />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
+            )}
 
-                    {/* Time Picker */}
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Time</label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {/* Hours */}
-                        <Select value={slot.time.split(':')[0] || ''} onValueChange={hour => {
-                    const minute = slot.time.split(':')[1] || '00';
-                    const newTime = `${hour}:${minute}`;
+            {interviewSlots.map((slot, index) => (
+              <div key={index} className="space-y-4 p-4 border rounded-lg">
+                <h4 className="font-medium">Slot {index + 1}</h4>
 
-                    // Validate time is not in the past for today
-                    if (slot.date) {
-                      const today = new Date();
-                      const slotDate = format(slot.date, 'yyyy-MM-dd');
-                      const currentDate = format(today, 'yyyy-MM-dd');
-                      const currentTime = format(today, 'HH:mm');
-                      if (slotDate === currentDate && newTime <= currentTime) {
-                        alert('Cannot select a time in the past for today');
-                        return;
-                      }
-                    }
-                    updateInterviewSlot(index, 'time', newTime);
-                  }}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Hour" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Array.from({
-                        length: 24
-                      }, (_, i) => <SelectItem key={i} value={i.toString().padStart(2, '0')}>
-                                {i.toString().padStart(2, '0')}
-                              </SelectItem>)}
-                          </SelectContent>
-                        </Select>
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Date Picker */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Date</label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !slot.date && "text-muted-foreground",
+                          )}
+                        >
+                          <Calendar className="mr-2 h-4 w-4" />
+                          {slot.date ? format(slot.date, "PPP") : <span>Pick a date</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <CalendarComponent
+                          mode="single"
+                          selected={slot.date}
+                          onSelect={(date) => updateInterviewSlot(index, "date", date!)}
+                          disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            return date < today;
+                          }}
+                          initialFocus
+                          className="p-3 pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
 
-                        {/* Minutes */}
-                        <Select value={slot.time.split(':')[1] || ''} onValueChange={minute => {
-                    const hour = slot.time.split(':')[0] || '09';
-                    const newTime = `${hour}:${minute}`;
+                  {/* Time Picker */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Time</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {/* Hours */}
+                      <Select
+                        value={slot.time.split(":")[0] || ""}
+                        onValueChange={(hour) => {
+                          const minute = slot.time.split(":")[1] || "00";
+                          const newTime = `${hour}:${minute}`;
 
-                    // Validate time is not in the past for today
-                    if (slot.date) {
-                      const today = new Date();
-                      const slotDate = format(slot.date, 'yyyy-MM-dd');
-                      const currentDate = format(today, 'yyyy-MM-dd');
-                      const currentTime = format(today, 'HH:mm');
-                      if (slotDate === currentDate && newTime <= currentTime) {
-                        alert('Cannot select a time in the past for today');
-                        return;
-                      }
-                    }
-                    updateInterviewSlot(index, 'time', newTime);
-                  }}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Min" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {timeOptions.map(minute => <SelectItem key={minute} value={minute}>
-                                {minute}
-                              </SelectItem>)}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                          // Validate time is not in the past for today
+                          if (slot.date) {
+                            const today = new Date();
+                            const slotDate = format(slot.date, "yyyy-MM-dd");
+                            const currentDate = format(today, "yyyy-MM-dd");
+                            const currentTime = format(today, "HH:mm");
+                            if (slotDate === currentDate && newTime <= currentTime) {
+                              alert("Cannot select a time in the past for today");
+                              return;
+                            }
+                          }
+                          updateInterviewSlot(index, "time", newTime);
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Hour" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from(
+                            {
+                              length: 24,
+                            },
+                            (_, i) => (
+                              <SelectItem key={i} value={i.toString().padStart(2, "0")}>
+                                {i.toString().padStart(2, "0")}
+                              </SelectItem>
+                            ),
+                          )}
+                        </SelectContent>
+                      </Select>
+
+                      {/* Minutes */}
+                      <Select
+                        value={slot.time.split(":")[1] || ""}
+                        onValueChange={(minute) => {
+                          const hour = slot.time.split(":")[0] || "09";
+                          const newTime = `${hour}:${minute}`;
+
+                          // Validate time is not in the past for today
+                          if (slot.date) {
+                            const today = new Date();
+                            const slotDate = format(slot.date, "yyyy-MM-dd");
+                            const currentDate = format(today, "yyyy-MM-dd");
+                            const currentTime = format(today, "HH:mm");
+                            if (slotDate === currentDate && newTime <= currentTime) {
+                              alert("Cannot select a time in the past for today");
+                              return;
+                            }
+                          }
+                          updateInterviewSlot(index, "time", newTime);
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Min" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {timeOptions.map((minute) => (
+                            <SelectItem key={minute} value={minute}>
+                              {minute}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
-                </div>)}
-
-              <div className="flex justify-end space-x-2 pt-4 sticky bottom-0 bg-background border-t">
-                <Button variant="outline" onClick={() => setInterviewDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={handleScheduleInterview} className="bg-emerald-600 hover:bg-emerald-700">
-                  Schedule Interview
-                </Button>
+                </div>
               </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+            ))}
 
-        {/* Remove Candidate Confirmation Dialog */}
-        <AlertDialog open={!!candidateToRemove} onOpenChange={() => setCandidateToRemove(null)}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Remove Candidate</AlertDialogTitle>
-              <AlertDialogDescription>
-                Are you sure you want to remove {candidateToRemove?.name}?
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={confirmRemoveFromLongList}>
-                Remove
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-
-        {/* Reject Candidate Dialog */}
-        <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Reject Candidate</DialogTitle>
-              <DialogDescription>
-                Please provide a reason for rejecting this candidate.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <Textarea placeholder="Enter rejection reason..." value={rejectReason} onChange={e => setRejectReason(e.target.value)} className="min-h-[100px]" />
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => {
-            setShowRejectDialog(false);
-            setRejectReason("");
-            setRejectCandidateData(null);
-          }}>
+            <div className="flex justify-end space-x-2 pt-4 sticky bottom-0 bg-background border-t">
+              <Button variant="outline" onClick={() => setInterviewDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button variant="destructive" onClick={() => handleRejectCandidate(rejectReason)} disabled={!rejectReason.trim()}>
-                Reject
+              <Button onClick={handleScheduleInterview} className="bg-emerald-600 hover:bg-emerald-700">
+                Schedule Interview
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Hire Candidate Dialog */}
-        <Dialog open={showHireDialog} onOpenChange={open => {
-      if (!open) {
-        // If closing, reset state
-        setShowHireDialog(false);
-        setHireReason("");
-        setHireCandidateData(null);
-      }
-    }}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Submit CV - Hiring Reason Required</DialogTitle>
-              <DialogDescription>
-                Please provide a reason for hiring this candidate. The CV will be marked as "Submitted" once you save this reason.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <Textarea placeholder="Enter hire reason (required)..." value={hireReason} onChange={e => setHireReason(e.target.value)} className="min-h-[100px]" />
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => {
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Remove Candidate Confirmation Dialog */}
+      <AlertDialog open={!!candidateToRemove} onOpenChange={() => setCandidateToRemove(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Candidate</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to remove {candidateToRemove?.name}?</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRemoveFromLongList}>Remove</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reject Candidate Dialog */}
+      <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Candidate</DialogTitle>
+            <DialogDescription>Please provide a reason for rejecting this candidate.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <Textarea
+              placeholder="Enter rejection reason..."
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              className="min-h-[100px]"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowRejectDialog(false);
+                setRejectReason("");
+                setRejectCandidateData(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => handleRejectCandidate(rejectReason)}
+              disabled={!rejectReason.trim()}
+            >
+              Reject
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Hire Candidate Dialog */}
+      <Dialog
+        open={showHireDialog}
+        onOpenChange={(open) => {
+          if (!open) {
+            // If closing, reset state
             setShowHireDialog(false);
             setHireReason("");
             setHireCandidateData(null);
-          }}>
-                Cancel
-              </Button>
-              <Button onClick={handleHireCandidate} disabled={!hireReason.trim()} className="bg-emerald-600 hover:bg-emerald-700">
-                Save & Submit CV
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-
-      </div>;
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Submit CV - Hiring Reason Required</DialogTitle>
+            <DialogDescription>
+              Please provide a reason for hiring this candidate. The CV will be marked as "Submitted" once you save this
+              reason.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <Textarea
+              placeholder="Enter hire reason (required)..."
+              value={hireReason}
+              onChange={(e) => setHireReason(e.target.value)}
+              className="min-h-[100px]"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowHireDialog(false);
+                setHireReason("");
+                setHireCandidateData(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleHireCandidate}
+              disabled={!hireReason.trim()}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
+              Save & Submit CV
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 }
