@@ -51,7 +51,10 @@ export function JobManagementPanel() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedGroupFilter, setSelectedGroupFilter] = useState<string>("");
   const [selectedRecruiterFilter, setSelectedRecruiterFilter] = useState<string>("");
-  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
+  const [dateRange, setDateRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
     from: undefined,
     to: undefined
   });
@@ -68,9 +71,15 @@ export function JobManagementPanel() {
   const {
     toast
   } = useToast();
-  const { profile, loading: profileLoading } = useProfile();
-  const { isAdmin, isManager, isTeamLeader } = useUserRole();
-
+  const {
+    profile,
+    loading: profileLoading
+  } = useProfile();
+  const {
+    isAdmin,
+    isManager,
+    isTeamLeader
+  } = useUserRole();
   useEffect(() => {
     if (profile?.user_id) {
       fetchJobs();
@@ -85,11 +94,10 @@ export function JobManagementPanel() {
       setLoading(false);
       return;
     }
-    
     try {
       console.log('JobManagementPanel: Starting fetch for user:', profile.user_id);
       const startTime = performance.now();
-      
+
       // Optimize: Build query with proper conditions
       let query = supabase.from('Jobs').select(`
           job_id, job_title, job_location, job_salary_range, Currency, Processed, status, Timestamp, group_id, automatic_dial, jd_summary, recruiter_id,
@@ -98,7 +106,6 @@ export function JobManagementPanel() {
 
       // Admins, Managers, and Team Leaders can view all jobs
       const canViewAllJobs = isAdmin || isManager || isTeamLeader;
-      
       if (!canViewAllJobs) {
         // Regular employees only see jobs assigned to them (support both new and legacy fields)
         const userId = profile.user_id;
@@ -111,24 +118,18 @@ export function JobManagementPanel() {
           query = query.eq('assignment', email);
         }
       }
-
-      const jobsResult = await query.order('Timestamp', { ascending: false });
-
+      const jobsResult = await query.order('Timestamp', {
+        ascending: false
+      });
       if (jobsResult.error) throw jobsResult.error;
       const initialJobs = jobsResult.data || [];
-      
+
       // Fetch candidates only for the jobs we have access to
       const jobIds = initialJobs.map(j => j.job_id).filter(Boolean);
       // Fetch candidates per job to avoid PostgREST max-rows cap on multi-job queries
       const candidatesByJob = new Map<string, any[]>();
       if (jobIds.length > 0) {
-        const perJobPromises = jobIds.map(jid =>
-          supabase
-            .from('Jobs_CVs')
-            .select('job_id, source, contacted, shortlisted_at, longlisted_at, after_call_score')
-            .eq('job_id', jid)
-            .limit(10000)
-        );
+        const perJobPromises = jobIds.map(jid => supabase.from('Jobs_CVs').select('job_id, source, contacted, shortlisted_at, longlisted_at, after_call_score').eq('job_id', jid).limit(10000));
         const perJobResults = await Promise.all(perJobPromises);
         perJobResults.forEach((res, idx) => {
           if (res.error) {
@@ -139,20 +140,17 @@ export function JobManagementPanel() {
           candidatesByJob.set(jobIds[idx], rows);
         });
       }
-
       console.log('JobManagementPanel: Jobs fetched:', initialJobs.length);
       console.log('JobManagementPanel: candidatesByJob built for jobs:', candidatesByJob.size);
 
       // Fetch recruiter names only if needed
       const recruiterIds = [...new Set(initialJobs.map(j => j.recruiter_id).filter(Boolean))];
       const recruiterNamesMap = new Map<string, string>();
-      
       if (recruiterIds.length > 0) {
-        const { data: profiles, error: profilesError } = await supabase
-          .from('profiles')
-          .select('user_id, linkedin_id, name')
-          .or(`user_id.in.(${recruiterIds.join(',')}),linkedin_id.in.(${recruiterIds.join(',')})`);
-        
+        const {
+          data: profiles,
+          error: profilesError
+        } = await supabase.from('profiles').select('user_id, linkedin_id, name').or(`user_id.in.(${recruiterIds.join(',')}),linkedin_id.in.(${recruiterIds.join(',')})`);
         if (!profilesError && profiles) {
           profiles.forEach(p => {
             if (p.user_id && p.name) {
@@ -168,39 +166,38 @@ export function JobManagementPanel() {
       // Calculate counts for all jobs before setting state
       const jobsWithCounts = initialJobs.map(job => {
         const candidates = candidatesByJob.get(job.job_id) || [];
-        
+
         // Debug logging for the specific job
         if (job.job_id === 'me-j-0023') {
           console.log(`JobManagementPanel: Job "${job.job_title}" (${job.job_id}) has ${candidates.length} total candidates from Jobs_CVs`);
         }
-        
+
         // Longlisted: all candidates in Jobs_CVs (AI Long List)
         const longlisted_count = candidates.length;
         const longlistedCandidates = candidates;
-        
+
         // Debug logging for the specific job
         if (job.job_id === 'me-j-0023') {
           console.log(`JobManagementPanel: Job "${job.job_title}" longlisted count: ${longlisted_count}`);
         }
-        
+
         // Shortlisted: only longlisted candidates with score >= 74 (matches JobFunnel exactly)
         const shortlisted_count = longlistedCandidates.filter(c => {
           const score = parseInt(c.after_call_score || "0");
           return score >= 74;
         }).length;
-        
+
         // Rejected: longlisted candidates with contacted status = 'Rejected'
         const rejected_count = longlistedCandidates.filter(c => {
           const contacted = (c.contacted || "").trim();
           return contacted === 'Rejected';
         }).length;
-        
+
         // Submitted: only longlisted candidates with contacted status = 'Submitted' (matches JobFunnel)
         const submitted_count = longlistedCandidates.filter(c => {
           const contacted = (c.contacted || "").trim();
           return contacted === 'Submitted';
         }).length;
-
         return {
           ...job,
           longlisted_count,
@@ -210,20 +207,15 @@ export function JobManagementPanel() {
           recruiter_name: job.recruiter_id ? recruiterNamesMap.get(job.recruiter_id) || null : null
         };
       });
-
       const endTime = performance.now();
       console.log(`JobManagementPanel: Fetch completed in ${(endTime - startTime).toFixed(2)}ms`);
       console.log('JobManagementPanel: Jobs with counts:', jobsWithCounts.length);
 
       // Extract unique recruiters
-      const uniqueRecruiters = Array.from(
-        new Map(
-          jobsWithCounts
-            .filter(job => job.recruiter_id && job.recruiter_name)
-            .map(job => [job.recruiter_id, { id: job.recruiter_id!, name: job.recruiter_name! }])
-        ).values()
-      ).sort((a, b) => a.name.localeCompare(b.name));
-      
+      const uniqueRecruiters = Array.from(new Map(jobsWithCounts.filter(job => job.recruiter_id && job.recruiter_name).map(job => [job.recruiter_id, {
+        id: job.recruiter_id!,
+        name: job.recruiter_name!
+      }])).values()).sort((a, b) => a.name.localeCompare(b.name));
       setRecruiters(uniqueRecruiters);
       setJobs(jobsWithCounts);
       setLoading(false);
@@ -272,7 +264,6 @@ export function JobManagementPanel() {
       });
     }
   };
-
   const handleAutomaticDialToggle = async (jobId: string, currentValue: boolean | null) => {
     const newValue = !currentValue;
     try {
@@ -335,14 +326,11 @@ export function JobManagementPanel() {
       }
       return jobList.filter(job => job.group_id === selectedGroupFilter);
     };
-
     const filterJobsByDate = (jobList: Job[]) => {
       if (!dateRange.from && !dateRange.to) return jobList;
-      
       return jobList.filter(job => {
         if (!job.Timestamp) return false;
         const jobDate = new Date(job.Timestamp);
-        
         if (dateRange.from && dateRange.to) {
           const fromDate = new Date(dateRange.from);
           fromDate.setHours(0, 0, 0, 0);
@@ -350,38 +338,31 @@ export function JobManagementPanel() {
           toDate.setHours(23, 59, 59, 999);
           return jobDate >= fromDate && jobDate <= toDate;
         }
-        
         if (dateRange.from) {
           const fromDate = new Date(dateRange.from);
           fromDate.setHours(0, 0, 0, 0);
           return jobDate >= fromDate;
         }
-        
         if (dateRange.to) {
           const toDate = new Date(dateRange.to);
           toDate.setHours(23, 59, 59, 999);
           return jobDate <= toDate;
         }
-        
         return true;
       });
     };
-
     const filterJobsByRecruiter = (jobList: Job[]) => {
       if (!selectedRecruiterFilter) return jobList;
       return jobList.filter(job => job.recruiter_id === selectedRecruiterFilter);
     };
-
     const applyFilters = (jobList: Job[]) => {
       let filtered = filterJobsByGroup(jobList);
       filtered = filterJobsByDate(filtered);
       filtered = filterJobsByRecruiter(filtered);
       return filtered;
     };
-
     const activeJobs = jobs.filter(job => job.Processed === "Yes");
     const pausedJobs = jobs.filter(job => job.Processed !== "Yes");
-
     return {
       activeJobs: applyFilters(activeJobs),
       pausedJobs: applyFilters(pausedJobs),
@@ -442,25 +423,11 @@ export function JobManagementPanel() {
           <label className="text-sm font-medium">Filter by Date:</label>
           <Popover>
             <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-[280px] justify-start text-left font-normal",
-                  !dateRange.from && !dateRange.to && "text-muted-foreground"
-                )}
-              >
+              <Button variant="outline" className={cn("w-[280px] justify-start text-left font-normal", !dateRange.from && !dateRange.to && "text-muted-foreground")}>
                 <Calendar className="mr-2 h-4 w-4" />
-                {dateRange.from ? (
-                  dateRange.to ? (
-                    <>
+                {dateRange.from ? dateRange.to ? <>
                       {format(dateRange.from, "MMM dd, yyyy")} - {format(dateRange.to, "MMM dd, yyyy")}
-                    </>
-                  ) : (
-                    format(dateRange.from, "MMM dd, yyyy")
-                  )
-                ) : (
-                  <span>Pick a date range</span>
-                )}
+                    </> : format(dateRange.from, "MMM dd, yyyy") : <span>Pick a date range</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -468,50 +435,42 @@ export function JobManagementPanel() {
                 <div className="space-y-2">
                   <div>
                     <label className="text-xs font-medium mb-1 block">From:</label>
-                    <input
-                      type="date"
-                      value={dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : ''}
-                      onChange={(e) => {
-                        const newDate = e.target.value ? new Date(e.target.value) : undefined;
-                        setDateRange(prev => ({ ...prev, from: newDate }));
-                      }}
-                      className="w-full px-2 py-1 text-sm border border-border rounded-md bg-background"
-                    />
+                    <input type="date" value={dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : ''} onChange={e => {
+                    const newDate = e.target.value ? new Date(e.target.value) : undefined;
+                    setDateRange(prev => ({
+                      ...prev,
+                      from: newDate
+                    }));
+                  }} className="w-full px-2 py-1 text-sm border border-border rounded-md bg-background" />
                   </div>
                   <div>
                     <label className="text-xs font-medium mb-1 block">To:</label>
-                    <input
-                      type="date"
-                      value={dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : ''}
-                      onChange={(e) => {
-                        const newDate = e.target.value ? new Date(e.target.value) : undefined;
-                        setDateRange(prev => ({ ...prev, to: newDate }));
-                      }}
-                      className="w-full px-2 py-1 text-sm border border-border rounded-md bg-background"
-                    />
+                    <input type="date" value={dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : ''} onChange={e => {
+                    const newDate = e.target.value ? new Date(e.target.value) : undefined;
+                    setDateRange(prev => ({
+                      ...prev,
+                      to: newDate
+                    }));
+                  }} className="w-full px-2 py-1 text-sm border border-border rounded-md bg-background" />
                   </div>
                 </div>
               </div>
             </PopoverContent>
           </Popover>
           
-          {(dateRange.from || dateRange.to) && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setDateRange({ from: undefined, to: undefined })}
-              className="h-8 px-2"
-            >
+          {(dateRange.from || dateRange.to) && <Button variant="ghost" size="sm" onClick={() => setDateRange({
+          from: undefined,
+          to: undefined
+        })} className="h-8 px-2">
               <X className="h-4 w-4" />
-            </Button>
-          )}
+            </Button>}
         </div>
       </div>
 
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i} className="mission-card">
+      {loading ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({
+        length: 6
+      }).map((_, i) => <Card key={i} className="mission-card">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -538,11 +497,8 @@ export function JobManagementPanel() {
                   <div className="h-8 w-20 bg-muted rounded animate-pulse" />
                 </div>
               </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <Tabs defaultValue="active" className="space-y-6">
+            </Card>)}
+        </div> : <Tabs defaultValue="active" className="space-y-6">
           <TabsList className="glass-card flex-nowrap whitespace-nowrap overflow-x-auto">
             <TabsTrigger value="active" className="data-[state=active]:bg-status-active data-[state=active]:text-white flex-shrink-0">
               Active Jobs ({filteredJobs.activeJobs.length})
@@ -557,26 +513,25 @@ export function JobManagementPanel() {
 
           <TabsContent value="active">
             <JobGrid jobs={filteredJobs.activeJobs} loading={false} onEdit={job => {
-            setSelectedJob(job);
-            setIsDialogOpen(true);
-          }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} onAutomaticDialToggle={handleAutomaticDialToggle} navigate={navigate} />
+          setSelectedJob(job);
+          setIsDialogOpen(true);
+        }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} onAutomaticDialToggle={handleAutomaticDialToggle} navigate={navigate} />
           </TabsContent>
           
           <TabsContent value="paused">
             <JobGrid jobs={filteredJobs.pausedJobs} loading={false} onEdit={job => {
-            setSelectedJob(job);
-            setIsDialogOpen(true);
-          }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} onAutomaticDialToggle={handleAutomaticDialToggle} navigate={navigate} />
+          setSelectedJob(job);
+          setIsDialogOpen(true);
+        }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} onAutomaticDialToggle={handleAutomaticDialToggle} navigate={navigate} />
           </TabsContent>
           
           <TabsContent value="all">
             <JobGrid jobs={filteredJobs.allJobs} loading={false} onEdit={job => {
-            setSelectedJob(job);
-            setIsDialogOpen(true);
-          }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} onAutomaticDialToggle={handleAutomaticDialToggle} navigate={navigate} />
+          setSelectedJob(job);
+          setIsDialogOpen(true);
+        }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} onAutomaticDialToggle={handleAutomaticDialToggle} navigate={navigate} />
           </TabsContent>
-        </Tabs>
-      )}
+        </Tabs>}
 
       <JobDialog job={selectedJob} open={isDialogOpen} onOpenChange={open => {
       setIsDialogOpen(open);
@@ -647,7 +602,7 @@ const JobGrid = memo(function JobGrid({
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <CardTitle className="text-lg font-semibold line-clamp-2 mb-2">
+                <CardTitle className="font-semibold line-clamp-2 mb-2 text-lg">
                   {job.job_title || "Untitled Position"}
                 </CardTitle>
                 <div className="flex items-center space-x-2 mb-2">
@@ -727,18 +682,10 @@ const JobGrid = memo(function JobGrid({
             {/* Automatic Dial Toggle */}
             <div className="flex items-center justify-between py-2 border-t border-border/30">
               <div className="flex items-center gap-2 text-sm">
-                {job.automatic_dial ? (
-                  <Phone className="h-4 w-4 text-green" />
-                ) : (
-                  <PhoneOff className="h-4 w-4 text-muted-foreground" />
-                )}
+                {job.automatic_dial ? <Phone className="h-4 w-4 text-green" /> : <PhoneOff className="h-4 w-4 text-muted-foreground" />}
                 <span className="text-muted-foreground">Automatic Dial</span>
               </div>
-              <Switch
-                checked={job.automatic_dial || false}
-                onCheckedChange={() => onAutomaticDialToggle(job.job_id, job.automatic_dial)}
-                className="data-[state=checked]:bg-green data-[state=unchecked]:bg-muted"
-              />
+              <Switch checked={job.automatic_dial || false} onCheckedChange={() => onAutomaticDialToggle(job.job_id, job.automatic_dial)} className="data-[state=checked]:bg-green data-[state=unchecked]:bg-muted" />
             </div>
 
             <div className="flex items-center justify-between pt-2">
@@ -763,4 +710,3 @@ const JobGrid = memo(function JobGrid({
         </Card>)}
     </div>;
 });
-
