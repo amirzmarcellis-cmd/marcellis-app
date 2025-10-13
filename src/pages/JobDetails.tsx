@@ -2226,7 +2226,7 @@ export default function JobDetails() {
             <div className="space-y-4">
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                 <div className="space-y-2 flex-1 min-w-0">
-                  <h2 className="text-xl md:text-2xl font-bold break-words">{job.job_title}</h2>
+                  <h2 className="text-xl md:text-2xl font-bold font-work break-words">{job.job_title}</h2>
                   <p className="text-base md:text-lg text-muted-foreground break-words">{job.client_description || "Client Description"}</p>
                 </div>
                 <Badge variant={job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "default" : "destructive"} className={`text-xs md:text-sm px-2 md:px-3 py-1 whitespace-nowrap ${job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "bg-green-600 text-white border-0" : "bg-red-600 text-white border-0"}`}>
