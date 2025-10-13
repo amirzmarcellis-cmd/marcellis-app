@@ -2192,7 +2192,7 @@ export default function JobDetails() {
                 <span className="sm:hidden">Back</span>
               </Button>
               <div className="h-6 w-px bg-border hidden sm:block" />
-              <h1 className="text-xl md:text-2xl font-bold font-work truncate lg:text-2xl">Job Details</h1>
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-light font-work tracking-tight truncate">Job Details</h1>
             </div>
             {/* Futuristic 3D Action Menu */}
             <FuturisticActionButton isExpanded={isActionMenuExpanded} onToggle={() => setIsActionMenuExpanded(!isActionMenuExpanded)}>
@@ -2202,7 +2202,7 @@ export default function JobDetails() {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 items-center justify-center lg:justify-end">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Auto Dial</span>
+                <span className="text-sm font-light">Auto Dial</span>
                 <ToggleSwitch checked={job?.automatic_dial || false} onChange={handleAutomaticDialToggle} disabled={automaticDialSaving} size="sm" onLabel="ON" offLabel="OFF" />
               </div>
               <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto">
@@ -2226,8 +2226,8 @@ export default function JobDetails() {
             <div className="space-y-4">
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                 <div className="space-y-2 flex-1 min-w-0">
-                  <h2 className="text-xl md:text-2xl font-bold font-work break-words">{job.job_title}</h2>
-                  <p className="text-base md:text-lg text-muted-foreground break-words">{job.client_description || "Client Description"}</p>
+                  <h2 className="text-6xl md:text-7xl lg:text-8xl font-light font-work tracking-tight break-words">{job.job_title}</h2>
+                  <p className="text-sm md:text-base font-light text-muted-foreground break-words">{job.client_description || "Client Description"}</p>
                 </div>
                 <Badge variant={job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "default" : "destructive"} className={`text-xs md:text-sm px-2 md:px-3 py-1 whitespace-nowrap ${job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "bg-green-600 text-white border-0" : "bg-red-600 text-white border-0"}`}>
                   {job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "Active" : "Not Active"}
@@ -2235,15 +2235,15 @@ export default function JobDetails() {
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 pt-4 border-t">
-                <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0">
+                <div className="flex items-center space-x-2 text-sm font-light min-w-0">
                   <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                   <span className="truncate">{job.job_location}</span>
                 </div>
-                <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0">
+                <div className="flex items-center space-x-2 text-sm font-light min-w-0">
                   <Banknote className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                   <span className="truncate">{formatCurrency(job.job_salary_range?.toString(), job.Currency)}</span>
                 </div>
-                <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0 sm:col-span-2 lg:col-span-1">
+                <div className="flex items-center space-x-2 text-sm font-light min-w-0 sm:col-span-2 lg:col-span-1">
                   <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                   <span className="truncate">Posted: {formatDate(job.Timestamp)}</span>
                 </div>
@@ -2259,17 +2259,17 @@ export default function JobDetails() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <div className="w-full overflow-x-auto">
             <TabsList className="w-full grid grid-cols-7 h-auto p-1">
-              <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">Overview</TabsTrigger>
-              <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2">Description</TabsTrigger>
-              <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">AI Requirements</TabsTrigger>
-              <TabsTrigger value="applications" className="text-xs md:text-sm px-2 py-2 relative" onClick={handleApplicationsTabClick}>
+              <TabsTrigger value="overview" className="text-sm font-light px-2 py-2">Overview</TabsTrigger>
+              <TabsTrigger value="description" className="text-sm font-light px-2 py-2">Description</TabsTrigger>
+              <TabsTrigger value="requirements" className="text-sm font-light px-2 py-2">AI Requirements</TabsTrigger>
+              <TabsTrigger value="applications" className="text-sm font-light px-2 py-2 relative" onClick={handleApplicationsTabClick}>
                 Applications
-                {newApplicationsCount > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-[20px] z-10">
+                {newApplicationsCount > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-light rounded-full h-5 w-5 flex items-center justify-center min-w-[20px] z-10">
                     {newApplicationsCount > 99 ? '99+' : newApplicationsCount}
                   </span>}
               </TabsTrigger>
-              <TabsTrigger value="boolean-search" className="text-xs md:text-sm px-2 py-2">AI Longlist</TabsTrigger>
-              <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">AI Short List</TabsTrigger>
+              <TabsTrigger value="boolean-search" className="text-sm font-light px-2 py-2">AI Longlist</TabsTrigger>
+              <TabsTrigger value="shortlist" className="text-sm font-light px-2 py-2">AI Short List</TabsTrigger>
             </TabsList>
           </div>
 
@@ -2277,46 +2277,46 @@ export default function JobDetails() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Job Information</CardTitle>
+                  <CardTitle className="text-4xl md:text-5xl font-light font-work tracking-tight">Job Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Job ID:</span>
-                    <span className="font-mono text-sm">{job.job_id}</span>
+                    <span className="text-sm font-light text-muted-foreground">Job ID:</span>
+                    <span className="font-mono text-sm font-light">{job.job_id}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Itris ID:</span>
-                    <span className="font-mono text-sm">{job.itris_job_id || "N/A"}</span>
+                    <span className="text-sm font-light text-muted-foreground">Itris ID:</span>
+                    <span className="font-mono text-sm font-light">{job.itris_job_id || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Client Name:</span>
-                    <span>{job.client_name || "N/A"}</span>
+                    <span className="text-sm font-light text-muted-foreground">Client Name:</span>
+                    <span className="text-sm font-light">{job.client_name || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Client Description:</span>
-                    <span>{job.client_description || "N/A"}</span>
+                    <span className="text-sm font-light text-muted-foreground">Client Description:</span>
+                    <span className="text-sm font-light">{job.client_description || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Location:</span>
-                    <span>{job.job_location || "N/A"}</span>
+                    <span className="text-sm font-light text-muted-foreground">Location:</span>
+                    <span className="text-sm font-light">{job.job_location || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Salary Range:</span>
-                    <span className="font-medium">
+                    <span className="text-sm font-light text-muted-foreground">Salary Range:</span>
+                    <span className="text-sm font-light">
                       {formatCurrency(job.job_salary_range?.toString(), job.Currency)}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Assigned Recruiter:</span>
-                    <span>{recruiterName || job.recruiter_id || "N/A"}</span>
+                    <span className="text-sm font-light text-muted-foreground">Assigned Recruiter:</span>
+                    <span className="text-sm font-light">{recruiterName || job.recruiter_id || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Notice Period:</span>
-                    <span>{job.notice_period || "N/A"}</span>
+                    <span className="text-sm font-light text-muted-foreground">Notice Period:</span>
+                    <span className="text-sm font-light">{job.notice_period || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Preferred Nationality:</span>
-                    <span>{job.prefered_nationality || "N/A"}</span>
+                    <span className="text-sm font-light text-muted-foreground">Preferred Nationality:</span>
+                    <span className="text-sm font-light">{job.prefered_nationality || "N/A"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Group:</span>
@@ -2356,7 +2356,7 @@ export default function JobDetails() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Job Requirements & Details</CardTitle>
+                  <CardTitle className="text-4xl md:text-5xl font-light font-work tracking-tight">Job Requirements & Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex justify-between">
@@ -2398,11 +2398,11 @@ export default function JobDetails() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="flex items-center">
+                    <CardTitle className="flex items-center text-4xl md:text-5xl font-light font-work tracking-tight">
                       <FileText className="w-5 h-5 mr-2" />
                       Job Description
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-sm font-light">
                       Detailed overview of the role and responsibilities
                     </CardDescription>
                   </div>
@@ -2420,7 +2420,7 @@ export default function JobDetails() {
               </CardHeader>
               <CardContent>
                 <div className="prose prose-sm max-w-none">
-                  <p className="leading-relaxed whitespace-pre-wrap">
+                  <p className="leading-relaxed whitespace-pre-wrap text-sm font-light">
                     {job.job_description || "No description available for this position."}
                   </p>
                 </div>
@@ -2430,19 +2430,19 @@ export default function JobDetails() {
             {/* Job Documents Section */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-4xl md:text-5xl font-light font-work tracking-tight">
                   <FileText className="w-5 h-5 mr-2" />
                   Job Documents
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm font-light">
                   Uploaded job description files and related documents
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-8">
                   <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No documents uploaded</h3>
-                  <p className="text-muted-foreground">Upload job description files when creating or editing this job</p>
+                  <h3 className="text-2xl md:text-3xl font-light font-work tracking-tight mb-2">No documents uploaded</h3>
+                  <p className="text-sm font-light text-muted-foreground">Upload job description files when creating or editing this job</p>
                   <Button variant="outline" className="mt-4" onClick={() => setIsEditDialogOpen(true)}>
                     <Upload className="w-4 h-4 mr-2" />
                     Upload Documents
@@ -2457,11 +2457,11 @@ export default function JobDetails() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="flex items-center">
+                    <CardTitle className="flex items-center text-4xl md:text-5xl font-light font-work tracking-tight">
                       <Target className="w-5 h-5 mr-2" />
                       AI Requirements
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-sm font-light">
                       Skills, experience, and qualifications needed for this role
                     </CardDescription>
                   </div>
@@ -2474,20 +2474,20 @@ export default function JobDetails() {
               <CardContent>
                 <div className="prose prose-sm max-w-none space-y-4">
                   <div>
-                    <h4 className="font-semibold mb-2">Things to look for:</h4>
-                    <p className="leading-relaxed whitespace-pre-wrap">
+                    <h4 className="text-2xl md:text-3xl font-light font-work tracking-tight mb-2">Things to look for:</h4>
+                    <p className="leading-relaxed whitespace-pre-wrap text-sm font-light">
                       {job.things_to_look_for || "No specific criteria listed."}
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-2">Must have:</h4>
-                    <p className="leading-relaxed whitespace-pre-wrap">
+                    <h4 className="text-2xl md:text-3xl font-light font-work tracking-tight mb-2">Must have:</h4>
+                    <p className="leading-relaxed whitespace-pre-wrap text-sm font-light">
                       {job.musttohave || "No must-have requirements specified."}
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-2">Nice to Have:</h4>
-                    <p className="leading-relaxed whitespace-pre-wrap">
+                    <h4 className="text-2xl md:text-3xl font-light font-work tracking-tight mb-2">Nice to Have:</h4>
+                    <p className="leading-relaxed whitespace-pre-wrap text-sm font-light">
                       {job.nicetohave || "No nice-to-have requirements specified."}
                     </p>
                   </div>
@@ -2501,11 +2501,11 @@ export default function JobDetails() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="flex items-center">
+                    <CardTitle className="flex items-center text-4xl md:text-5xl font-light font-work tracking-tight">
                       <FileText className="w-5 h-5 mr-2" />
                       Applications ({applications.length})
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-sm font-light">
                       Candidates who have applied for this position
                     </CardDescription>
                   </div>
@@ -2517,16 +2517,16 @@ export default function JobDetails() {
                   <CardContent className="pt-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Name</label>
-                        <Input placeholder="Filter by name..." value={appNameFilter} onChange={e => setAppNameFilter(e.target.value)} className="h-9" />
+                        <label className="text-sm font-light">Name</label>
+                        <Input placeholder="Filter by name..." value={appNameFilter} onChange={e => setAppNameFilter(e.target.value)} className="h-9 font-light" />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Email</label>
-                        <Input placeholder="Filter by email..." value={appEmailFilter} onChange={e => setAppEmailFilter(e.target.value)} className="h-9" />
+                        <label className="text-sm font-light">Email</label>
+                        <Input placeholder="Filter by email..." value={appEmailFilter} onChange={e => setAppEmailFilter(e.target.value)} className="h-9 font-light" />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Phone</label>
-                        <Input placeholder="Filter by phone..." value={appPhoneFilter} onChange={e => setAppPhoneFilter(e.target.value)} className="h-9" />
+                        <label className="text-sm font-light">Phone</label>
+                        <Input placeholder="Filter by phone..." value={appPhoneFilter} onChange={e => setAppPhoneFilter(e.target.value)} className="h-9 font-light" />
                       </div>
                     </div>
                   </CardContent>
@@ -2698,14 +2698,14 @@ export default function JobDetails() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div>
-                      <CardTitle className="flex items-center">
+                      <CardTitle className="flex items-center text-4xl md:text-5xl font-light font-work tracking-tight">
                         <Users className="w-5 h-5 mr-2" />
                         AI Longlist ({longlistedCandidates.filter(c => {
                       const source = (c["Source"] || c.source || "").toLowerCase();
                       return source.includes("itris") || source.includes("linkedin");
                     }).length} candidates)
                       </CardTitle>
-                      <CardDescription>
+                      <CardDescription className="text-sm font-light">
                         Candidates added to the longlist for this position
                       </CardDescription>
                     </div>
@@ -2745,7 +2745,7 @@ export default function JobDetails() {
                     {selectedCandidates.size > 0 && <Card className="p-3 md:p-4 mb-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
                         <div className="flex items-center justify-between gap-4">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium">
+                            <span className="text-sm font-light">
                               {selectedCandidates.size} candidate{selectedCandidates.size > 1 ? 's' : ''} selected
                             </span>
                             <Button variant="ghost" size="sm" onClick={clearAllSelection} className="h-6 text-xs px-2">
@@ -2770,7 +2770,7 @@ export default function JobDetails() {
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <Filter className="w-4 h-4" />
-                          <h4 className="font-medium text-sm md:text-base">Filters</h4>
+                          <h4 className="text-lg md:text-xl font-light font-work tracking-tight">Filters</h4>
                         </div>
                         <div className="flex items-center gap-2">
                           <Button variant="ghost" size="sm" onClick={selectAllCandidates} className="h-6 text-xs px-2">
@@ -3109,11 +3109,11 @@ export default function JobDetails() {
               {/* Within Budget Section */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center">
+                  <CardTitle className="flex items-center text-4xl md:text-5xl font-light font-work tracking-tight">
                     <Star className="w-5 h-5 mr-2" />
                     Within Budget ({withinBudgetCandidates.length} candidates)
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-sm font-light">
                     High-scoring candidates with salary expectations within 20% of budget ({formatCurrency(jobBudget.toString(), job?.Currency)} + 20%)
                   </CardDescription>
                   
@@ -3197,11 +3197,11 @@ export default function JobDetails() {
               {/* Above Budget Section */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center">
+                  <CardTitle className="flex items-center text-4xl md:text-5xl font-light font-work tracking-tight">
                     <AlertTriangle className="w-5 h-5 mr-2" />
                     Above Budget ({aboveBudgetCandidates.length} candidates)
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-sm font-light">
                     High-scoring candidates with salary expectations more than 20% above budget ({formatCurrency(budgetThreshold.toString(), job?.Currency)}+)
                   </CardDescription>
                   
@@ -3284,11 +3284,11 @@ export default function JobDetails() {
               {/* Not in Preferred Nationality Section */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center">
+                  <CardTitle className="flex items-center text-4xl md:text-5xl font-light font-work tracking-tight">
                     <AlertTriangle className="w-5 h-5 mr-2" />
                     Not in Preferred Nationality ({notInPreferredNationalityCandidates.length} candidates)
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-sm font-light">
                     High-scoring candidates whose nationality doesn't match the preferred nationality: {job?.prefered_nationality || "N/A"}
                   </CardDescription>
                   
