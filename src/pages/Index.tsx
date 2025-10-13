@@ -575,7 +575,7 @@ export default function Index() {
     return <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
         <div className="flex items-center space-x-3">
           <Activity className="h-8 w-8 animate-spin text-cyan-400" />
-          <span className="text-xl text-foreground">Loading Mission Control...</span>
+          <span className="text-xl font-light font-inter text-foreground">Loading Mission Control...</span>
         </div>
       </div>;
   }
@@ -585,7 +585,7 @@ export default function Index() {
     return <div className="space-y-6">
         <div className="flex items-center gap-3">
           <Building2 className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+          <h1 className="text-6xl md:text-7xl font-light font-work tracking-tight">Admin Dashboard</h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <MetricCardPro title="Total Users" value="1" icon={Users} trend={[0, 0, 0, 0, 0]} />
@@ -637,42 +637,42 @@ export default function Index() {
               {data?.activeJobs?.map(job => <Card key={job.job_id} className="bg-card border-border dark:bg-gradient-to-br dark:from-white/5 dark:via-white/3 dark:to-white/5 dark:backdrop-blur-lg dark:border-white/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 hover:scale-[1.02]">
                   <CardContent className="p-4">
                     <div className="flex items-center mb-3">
-                      <h3 className="font-semibold text-sm truncate">{job.job_title}</h3>
+                      <h3 className="font-light font-work text-sm truncate">{job.job_title}</h3>
                     </div>
-                    <p className="text-xs text-gray-400 mb-3">{job.job_location}</p>
+                    <p className="text-xs font-light font-inter text-gray-400 mb-3">{job.job_location}</p>
                     <div className="space-y-2 mb-3">
                       {/* First Row: Longlist, Shortlist, Contacted */}
-                      <div className="grid grid-cols-3 gap-1 text-xs">
+                      <div className="grid grid-cols-3 gap-1 text-xs font-light font-inter">
                         <div className="text-center">
-                          <div className="text-cyan-300 font-bold">{jobStats[job.job_id]?.longlist || 0}</div>
+                          <div className="text-cyan-300 font-light">{jobStats[job.job_id]?.longlist || 0}</div>
                           <div className="text-gray-500">Longlist</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-purple-300 font-bold">{jobStats[job.job_id]?.shortlist || 0}</div>
+                          <div className="text-purple-300 font-light">{jobStats[job.job_id]?.shortlist || 0}</div>
                           <div className="text-gray-500">Shortlist</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-orange-300 font-bold">{jobStats[job.job_id]?.contacted || 0}</div>
+                          <div className="text-orange-300 font-light">{jobStats[job.job_id]?.contacted || 0}</div>
                           <div className="text-gray-500">Contacted</div>
                         </div>
                       </div>
                       {/* Second Row: Low Scored, Submitted, Rejected */}
-                      <div className="grid grid-cols-3 gap-1 text-xs">
+                      <div className="grid grid-cols-3 gap-1 text-xs font-light font-inter">
                         <div className="text-center">
-                          <div className="text-red-300 font-bold">{jobStats[job.job_id]?.lowScored || 0}</div>
+                          <div className="text-red-300 font-light">{jobStats[job.job_id]?.lowScored || 0}</div>
                           <div className="text-gray-500">Low Scored</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-emerald-300 font-bold">{jobStats[job.job_id]?.submittedCv || 0}</div>
+                          <div className="text-emerald-300 font-light">{jobStats[job.job_id]?.submittedCv || 0}</div>
                           <div className="text-gray-500">Submitted</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-gray-300 font-bold">{jobStats[job.job_id]?.rejected || 0}</div>
+                          <div className="text-gray-300 font-light">{jobStats[job.job_id]?.rejected || 0}</div>
                           <div className="text-gray-500">Rejected</div>
                         </div>
                       </div>
                     </div>
-                    <Button size="sm" variant="ghost" onClick={() => navigate(`/job/${job.job_id}`)} className="w-full mt-2 text-xs text-cyan-400 hover:bg-cyan-400/10">
+                    <Button size="sm" variant="ghost" onClick={() => navigate(`/job/${job.job_id}`)} className="w-full mt-2 text-xs font-light font-inter text-cyan-400 hover:bg-cyan-400/10">
                       Open Job
                     </Button>
                   </CardContent>
@@ -688,19 +688,19 @@ export default function Index() {
           <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-cyan-300 flex items-center text-xl">
+                <CardTitle className="text-cyan-300 flex items-center text-4xl md:text-5xl font-light font-work tracking-tight">
                   <Activity className="h-5 w-5 mr-2 animate-pulse text-cyan-400" />
                   Live Candidate Feed
-                  <Badge className="ml-3 bg-background/40 text-primary border-2 border-primary/60 glow-cyan animate-pulse">
+                  <Badge className="ml-3 bg-background/40 text-primary border-2 border-primary/60 glow-cyan animate-pulse text-sm font-light font-inter">
                     LIVE
                   </Badge>
                 </CardTitle>
                 <div className="flex items-center space-x-3">
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm text-emerald-300 font-medium">Active</span>
+                    <span className="text-sm text-emerald-300 font-light font-inter">Active</span>
                   </div>
-                  <Button size="sm" className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white border border-cyan-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" onClick={() => window.location.href = '/live-feed'}>
+                  <Button size="sm" className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white border border-cyan-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-light font-inter" onClick={() => window.location.href = '/live-feed'}>
                     <Activity className="w-4 h-4 mr-2" />
                     Open Live Feed
                   </Button>
@@ -723,55 +723,55 @@ export default function Index() {
                               <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border-2 border-white animate-pulse"></div>
                             </div>
                              <div>
-                               <h4 className="font-semibold text-foreground text-lg group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors">{candidate.candidate_name}</h4>
-                               <p className="text-sm text-purple-300 font-medium">{jobTitle}</p>
+                               <h4 className="font-light font-work text-foreground text-lg group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors">{candidate.candidate_name}</h4>
+                               <p className="text-sm text-purple-300 font-light font-inter">{jobTitle}</p>
                                <div className="flex flex-wrap gap-2 mt-1">
-                                 <Badge variant="outline" className="text-xs border-cyan-400/50 text-cyan-400 bg-cyan-400/10">
+                                 <Badge variant="outline" className="text-xs font-light font-inter border-cyan-400/50 text-cyan-400 bg-cyan-400/10">
                                    User ID: {candidate.user_id}
                                  </Badge>
-                                 <Badge variant="outline" className="text-xs border-purple-400/50 text-purple-400 bg-purple-400/10">
+                                 <Badge variant="outline" className="text-xs font-light font-inter border-purple-400/50 text-purple-400 bg-purple-400/10">
                                    Job ID: {candidate.job_id}
                                  </Badge>
                                </div>
                              </div>
                           </div>
                           <div className="text-right">
-                            <div className={`text-2xl font-bold mb-2 ${getScoreColor(score)}`}>
+                            <div className={`text-2xl font-light font-work mb-2 ${getScoreColor(score)}`}>
                               {score}
                             </div>
                             <div className="flex flex-col space-y-2">
                               <Button size="xs" variant="outline" onClick={e => {
                             e.stopPropagation();
                             handleRejectCandidate(candidate.Candidate_ID, candidate.job_id);
-                          }} className="bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200 text-xs">
+                          }} className="bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200 text-xs font-light font-inter">
                                 <XCircle className="w-3 h-3 mr-1" />
                                 Reject Candidate
                               </Button>
                               <Button size="xs" variant="outline" onClick={e => {
                             e.stopPropagation();
                             handleCVSubmitted(candidate.Candidate_ID, candidate.job_id);
-                          }} className="bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200 text-xs">
+                          }} className="bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200 text-xs font-light font-inter">
                                 <CheckCircle className="w-3 h-3 mr-1" />
                                 Submit CV
                               </Button>
                             </div>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-300 mb-4 leading-relaxed bg-black/20 p-3 rounded-lg">
+                        <p className="text-sm font-light font-inter text-gray-300 mb-4 leading-relaxed bg-black/20 p-3 rounded-lg">
                           {candidate.after_call_reason ? candidate.after_call_reason.slice(0, 200) + "..." : "No after call reason available"}
                         </p>
                          <div className="flex items-center justify-between">
-                          <div className="text-sm text-gray-400">
+                          <div className="text-sm font-light font-inter text-gray-400">
                             Updated: {new Date(candidate.lastcalltime || Date.now()).toLocaleDateString()}
                           </div>
-                           <Badge className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 border-blue-400/40 animate-pulse">
+                           <Badge className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 border-blue-400/40 animate-pulse text-sm font-light font-inter">
                              📞 Call Done
                            </Badge>
                         </div>
                       </div>;
                 })}
                   {enrichedCandidates.length > 5 && <div className="text-center pt-4">
-                      <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border border-purple-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" onClick={() => window.location.href = '/live-feed'}>
+                      <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border border-purple-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-light font-inter" onClick={() => window.location.href = '/live-feed'}>
                         View All {enrichedCandidates.length} Candidates
                         <Activity className="w-4 h-4 ml-2" />
                       </Button>
@@ -784,19 +784,19 @@ export default function Index() {
           {/* Action Center */}
           <Card className="bg-card border-border dark:bg-gradient-to-br dark:from-white/5 dark:via-white/3 dark:to-white/5 dark:backdrop-blur-lg dark:border-white/20 shadow-xl shadow-purple-500/20">
             <CardHeader>
-              <CardTitle className="text-lg text-purple-300">My Next Moves</CardTitle>
+              <CardTitle className="text-4xl md:text-5xl font-light font-work tracking-tight text-purple-300">My Next Moves</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-400/30 cursor-pointer hover:bg-purple-500/20 hover:border-purple-400/50 transition-all duration-300 hover:scale-[1.02]" onClick={() => navigate('/jobs')}>
-                  <h4 className="font-semibold text-purple-300 mb-2">Candidates Needing Review</h4>
-                  <div className="text-2xl font-bold text-purple-400">{highScoreActiveCount || 0}</div>
-                  <p className="text-sm text-purple-200">Score &gt; 74</p>
+                  <h4 className="font-light font-work text-purple-300 mb-2">Candidates Needing Review</h4>
+                  <div className="text-2xl font-light font-work text-purple-400">{highScoreActiveCount || 0}</div>
+                  <p className="text-sm font-light font-inter text-purple-200">Score &gt; 74</p>
                 </div>
                 <div className="bg-cyan-500/10 rounded-lg p-4 border border-cyan-400/30 cursor-pointer hover:bg-cyan-500/20 hover:border-cyan-400/50 transition-all duration-300 hover:scale-[1.02]" onClick={() => navigate('/jobs')}>
-                  <h4 className="font-semibold text-cyan-300 mb-2">Upcoming Interviews</h4>
-                  <div className="text-2xl font-bold text-cyan-400">{data?.interviewsThisWeek || 0}</div>
-                  <p className="text-sm text-cyan-200">This week</p>
+                  <h4 className="font-light font-work text-cyan-300 mb-2">Upcoming Interviews</h4>
+                  <div className="text-2xl font-light font-work text-cyan-400">{data?.interviewsThisWeek || 0}</div>
+                  <p className="text-sm font-light font-inter text-cyan-200">This week</p>
                 </div>
               </div>
             </CardContent>
@@ -809,16 +809,16 @@ export default function Index() {
       <Dialog open={interviewDialogOpen} onOpenChange={setInterviewDialogOpen}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Schedule Interview Slots</DialogTitle>
+            <DialogTitle className="text-3xl md:text-4xl font-light font-work tracking-tight">Schedule Interview Slots</DialogTitle>
           </DialogHeader>
           <div className="space-y-6 overflow-y-auto max-h-[70vh] px-1">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm font-light font-inter text-muted-foreground">
               Please select 3 preferred interview slots and interview type. Only future dates are allowed, and times must be in 15-minute intervals.
             </p>
             
             {/* Interview Type Selection */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Interview Type</label>
+              <label className="text-sm font-light font-inter">Interview Type</label>
               <Select value={interviewType} onValueChange={setInterviewType}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select interview type" />
@@ -832,17 +832,17 @@ export default function Index() {
             
             {/* Conditional Interview Link Input */}
             {interviewType === 'Online Meeting' && <div className="space-y-2">
-                <label className="text-sm font-medium">Interview Link</label>
+                <label className="text-sm font-light font-inter">Interview Link</label>
                 <Input type="url" placeholder="https://zoom.us/j/... or https://meet.google.com/..." value={interviewLink} onChange={e => setInterviewLink(e.target.value)} className="w-full" />
               </div>}
             
             {interviewSlots.map((slot, index) => <div key={index} className="space-y-4 p-4 border rounded-lg">
-                <h4 className="font-medium">Slot {index + 1}</h4>
+                <h4 className="font-light font-work">Slot {index + 1}</h4>
                 
                 <div className="grid grid-cols-2 gap-4">
                   {/* Date Picker */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Date</label>
+                    <label className="text-sm font-light font-inter">Date</label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !slot.date && "text-muted-foreground")}>
@@ -862,7 +862,7 @@ export default function Index() {
 
                   {/* Time Picker */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Time</label>
+                    <label className="text-sm font-light font-inter">Time</label>
                     <div className="grid grid-cols-2 gap-2">
                       {/* Hours */}
                       <Select value={slot.time.split(':')[0] || ''} onValueChange={hour => {
@@ -927,10 +927,10 @@ export default function Index() {
               </div>)}
 
             <div className="flex justify-end space-x-2 pt-4 sticky bottom-0 bg-background border-t">
-              <Button variant="outline" onClick={() => setInterviewDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setInterviewDialogOpen(false)} className="font-light font-inter">
                 Cancel
               </Button>
-              <Button onClick={handleScheduleInterview} className="bg-emerald-600 hover:bg-emerald-700">
+              <Button onClick={handleScheduleInterview} className="bg-emerald-600 hover:bg-emerald-700 font-light font-inter">
                 Schedule Interview
               </Button>
             </div>
