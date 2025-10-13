@@ -2219,7 +2219,7 @@ export default function JobDetails() {
                 <span className="sm:hidden">Back</span>
               </Button>
               <div className="h-6 w-px bg-border hidden sm:block" />
-              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h1>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-light font-work tracking-tight truncate">Job Details</h1>
             </div>
             {/* Futuristic 3D Action Menu */}
             <FuturisticActionButton isExpanded={isActionMenuExpanded} onToggle={() => setIsActionMenuExpanded(!isActionMenuExpanded)}>
