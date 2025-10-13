@@ -602,7 +602,7 @@ const JobGrid = memo(function JobGrid({
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <CardTitle className="font-semibold line-clamp-2 mb-2 text-lg">
+                <CardTitle className="line-clamp-2 mb-2 font-semibold text-xl">
                   {job.job_title || "Untitled Position"}
                 </CardTitle>
                 <div className="flex items-center space-x-2 mb-2">
