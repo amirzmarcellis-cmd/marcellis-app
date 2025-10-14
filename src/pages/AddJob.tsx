@@ -19,6 +19,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { ApiMultiSelect } from "@/components/ui/api-multi-select";
 
 
 const europeanCountries = [
@@ -614,129 +615,34 @@ export default function AddJob() {
 
             <div className="space-y-2">
               <Label>Industry</Label>
-              <Popover open={industryPopoverOpen} onOpenChange={setIndustryPopoverOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={industryPopoverOpen}
-                    className="w-full justify-between"
-                  >
-                    Select industries...
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0" align="start">
-                  <Command>
-                    <CommandInput placeholder="Search industry..." />
-                    <CommandList>
-                      <CommandEmpty>No industry found.</CommandEmpty>
-                      <CommandGroup>
-                        {industries.filter(industry => 
-                          !(formData.industries || []).includes(industry)
-                        ).map((industry) => (
-                          <CommandItem
-                            key={industry}
-                            value={industry}
-                            onSelect={() => {
-                              const currentIndustries = formData.industries || [];
-                              handleInputChange("industries", [...currentIndustries, industry]);
-                              setIndustryPopoverOpen(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                "opacity-0"
-                              )}
-                            />
-                            {industry}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              {(formData.industries || []).length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {(formData.industries || []).map((industry) => (
-                    <span
-                      key={industry}
-                      className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
-                    >
-                      {industry}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const currentIndustries = formData.industries || [];
-                          const updated = currentIndustries.filter((i) => i !== industry);
-                          handleInputChange("industries", updated);
-                        }}
-                        className="ml-1 text-primary/60 hover:text-primary"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
+              <ApiMultiSelect
+                value={formData.industries}
+                onChange={(value) => handleInputChange("industries", value)}
+                apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords="
+                apiHeaders={{
+                  "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
+                  "Accept": "application/json"
+                }}
+                placeholder="Select industries..."
+                searchPlaceholder="Type to search industries..."
+                emptyText="Type to search for industries"
+              />
             </div>
 
             <div className="space-y-2">
-              <Label>Headhunting Company URLs</Label>
-              <div className="flex gap-2">
-                <Input
-                  value={newHeadhuntingUrl}
-                  onChange={(e) => setNewHeadhuntingUrl(e.target.value)}
-                  placeholder="Enter headhunting company URL"
-                  type="url"
-                />
-                <Button
-                  type="button"
-                  onClick={() => {
-                    if (newHeadhuntingUrl.trim()) {
-                      handleInputChange("headhuntingCompanies", [
-                        ...formData.headhuntingCompanies,
-                        newHeadhuntingUrl.trim()
-                      ]);
-                      setNewHeadhuntingUrl("");
-                    }
-                  }}
-                  variant="secondary"
-                >
-                  Add
-                </Button>
-              </div>
-              {formData.headhuntingCompanies.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {formData.headhuntingCompanies.map((url, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-secondary/10 text-foreground"
-                    >
-                      <a
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:underline max-w-[200px] truncate"
-                      >
-                        {url}
-                      </a>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const updated = formData.headhuntingCompanies.filter((_, i) => i !== index);
-                          handleInputChange("headhuntingCompanies", updated);
-                        }}
-                        className="ml-1 text-foreground/60 hover:text-foreground"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
+              <Label>Headhunting Companies</Label>
+              <ApiMultiSelect
+                value={formData.headhuntingCompanies}
+                onChange={(value) => handleInputChange("headhuntingCompanies", value)}
+                apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords=&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
+                apiHeaders={{
+                  "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
+                  "Accept": "application/json"
+                }}
+                placeholder="Select headhunting companies..."
+                searchPlaceholder="Type to search companies..."
+                emptyText="Type to search for companies"
+              />
             </div>
 
             <div className="space-y-2">
