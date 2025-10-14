@@ -71,6 +71,8 @@ export default function Index() {
   const [openTasksCount, setOpenTasksCount] = useState(0);
   const [jobStats, setJobStats] = useState<Record<string, any>>({});
   const [highScoreActiveCount, setHighScoreActiveCount] = useState(0);
+  const [totalShortlistedCount, setTotalShortlistedCount] = useState(0);
+  const [totalSubmittedCount, setTotalSubmittedCount] = useState(0);
   const [interviewDialogOpen, setInterviewDialogOpen] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<{
     candidateId: string;
@@ -282,6 +284,12 @@ export default function Index() {
         };
       });
       setJobStats(stats);
+
+      // Calculate total shortlisted and submitted counts
+      const totalShortlisted = links.filter((jc: any) => jc.shortlisted_at !== null).length;
+      const totalSubmitted = links.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase() === 'submitted').length;
+      setTotalShortlistedCount(totalShortlisted);
+      setTotalSubmittedCount(totalSubmitted);
 
       // Candidates needing review: Shortlisted candidates count
       const highScoreActiveCountVal = callDoneActiveCandidates.length;
@@ -607,13 +615,17 @@ export default function Index() {
             </TiltCard>
             <TiltCard>
               <div onClick={() => navigate('/live-feed')} className="cursor-pointer">
-                <MetricCardPro title="Awaiting Review" value={highScoreActiveCount || 0} delta="-12%" icon={ClipboardList} accent="purple" trend={[12, 10, 11, 9, 8, 7, 8, 6]} progress={Math.min(100, highScoreActiveCount || 0)} className="border-2 border-primary/60 glow-cyan" />
+                <MetricCardPro title="Interview Review" value={highScoreActiveCount || 0} delta="-12%" icon={ClipboardList} accent="purple" trend={[12, 10, 11, 9, 8, 7, 8, 6]} progress={Math.min(100, highScoreActiveCount || 0)} className="border-2 border-primary/60 glow-cyan" />
               </div>
             </TiltCard>
-            
             <TiltCard>
-              <div onClick={() => navigate('/interviews')} className="cursor-pointer">
-                <MetricCardPro title="Interviews" value={data?.interviewsThisWeek ?? 0} delta="+8%" icon={Video} accent="cyan" trend={[2, 3, 3, 4, 5, 6, 6, 7]} progress={Math.min(100, (data?.interviewsThisWeek ?? 0) * 15)} />
+              <div onClick={() => navigate('/candidates')} className="cursor-pointer">
+                <MetricCardPro title="Shortlisted" value={totalShortlistedCount || 0} delta="+5%" icon={Users} accent="cyan" trend={[4, 5, 6, 7, 8, 9, 10, 11]} progress={Math.min(100, (totalShortlistedCount || 0) * 10)} />
+              </div>
+            </TiltCard>
+            <TiltCard>
+              <div onClick={() => navigate('/candidates')} className="cursor-pointer">
+                <MetricCardPro title="Submitted" value={totalSubmittedCount || 0} delta="+2%" icon={CheckCircle} accent="emerald" trend={[2, 3, 4, 5, 6, 7, 8, 9]} progress={Math.min(100, (totalSubmittedCount || 0) * 8)} />
               </div>
             </TiltCard>
           </BentoKpis>
