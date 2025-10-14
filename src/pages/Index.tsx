@@ -723,7 +723,7 @@ export default function Index() {
                               <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border-2 border-white animate-pulse"></div>
                             </div>
                              <div>
-                               <h4 className="font-semibold font-work text-foreground group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors text-lg">{candidate.candidate_name}</h4>
+                               <h4 className="font-work text-foreground group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors text-lg font-normal">{candidate.candidate_name}</h4>
                                <p className="text-sm text-purple-300 font-medium">{jobTitle}</p>
                                <div className="flex flex-wrap gap-2 mt-1">
                                  <Badge variant="outline" className="text-xs border-cyan-400/50 text-cyan-400 bg-cyan-400/10">
