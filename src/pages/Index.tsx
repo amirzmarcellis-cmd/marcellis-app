@@ -610,11 +610,7 @@ export default function Index() {
                 <MetricCardPro title="Awaiting Review" value={highScoreActiveCount || 0} delta="-12%" icon={ClipboardList} accent="purple" trend={[12, 10, 11, 9, 8, 7, 8, 6]} progress={Math.min(100, highScoreActiveCount || 0)} className="border-2 border-primary/60 glow-cyan" />
               </div>
             </TiltCard>
-            <TiltCard>
-              <div onClick={() => navigate('/jobs')} className="cursor-pointer">
-                <MetricCardPro title="Tasked" value={data?.tasksToday ?? 0} delta={data?.tasksToday ? `${data.tasksToday > 0 ? '+' : ''}${data.tasksToday}` : undefined} icon={Target} accent="emerald" trend={[1, 2, 1, 3, 2, 4, 3, 5]} progress={Math.min(100, (data?.tasksToday ?? 0) * 10)} />
-              </div>
-            </TiltCard>
+            
             <TiltCard>
               <div onClick={() => navigate('/interviews')} className="cursor-pointer">
                 <MetricCardPro title="Interviews" value={data?.interviewsThisWeek ?? 0} delta="+8%" icon={Video} accent="cyan" trend={[2, 3, 3, 4, 5, 6, 6, 7]} progress={Math.min(100, (data?.interviewsThisWeek ?? 0) * 15)} />
@@ -641,26 +637,34 @@ export default function Index() {
                     </div>
                     <p className="text-xs font-work text-gray-400 mb-3">{job.job_location}</p>
                     <div className="space-y-2 mb-3">
-                      {/* First Row: Active Jobs, Interview Review */}
-                      <div className="grid grid-cols-2 gap-2 text-xs">
+                      {/* First Row: Longlist, Shortlist, Contacted */}
+                      <div className="grid grid-cols-3 gap-1 text-xs">
                         <div className="text-center">
                           <div className="text-cyan-300 font-bold">{jobStats[job.job_id]?.longlist || 0}</div>
-                          <div className="text-gray-500">Active Jobs</div>
+                          <div className="text-gray-500">Longlist</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-purple-300 font-bold">{jobStats[job.job_id]?.shortlist || 0}</div>
+                          <div className="text-gray-500">Shortlist</div>
                         </div>
                         <div className="text-center">
                           <div className="text-orange-300 font-bold">{jobStats[job.job_id]?.contacted || 0}</div>
-                          <div className="text-gray-500">Interview Review</div>
+                          <div className="text-gray-500">Contacted</div>
                         </div>
                       </div>
-                      {/* Second Row: Shortlisted, Submitted */}
-                      <div className="grid grid-cols-2 gap-2 text-xs">
+                      {/* Second Row: Low Scored, Submitted, Rejected */}
+                      <div className="grid grid-cols-3 gap-1 text-xs">
                         <div className="text-center">
-                          <div className="text-purple-300 font-bold">{jobStats[job.job_id]?.shortlist || 0}</div>
-                          <div className="text-gray-500">Shortlisted</div>
+                          <div className="text-red-300 font-bold">{jobStats[job.job_id]?.lowScored || 0}</div>
+                          <div className="text-gray-500">Low Scored</div>
                         </div>
                         <div className="text-center">
                           <div className="text-emerald-300 font-bold">{jobStats[job.job_id]?.submittedCv || 0}</div>
                           <div className="text-gray-500">Submitted</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-gray-300 font-bold">{jobStats[job.job_id]?.rejected || 0}</div>
+                          <div className="text-gray-500">Rejected</div>
                         </div>
                       </div>
                     </div>
