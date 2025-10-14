@@ -641,18 +641,21 @@ export default function Index() {
                     </div>
                     <p className="text-xs font-work text-gray-400 mb-3">{job.job_location}</p>
                     <div className="space-y-2 mb-3">
-                      {/* Mission Control Cards - 2x2 Grid */}
+                      {/* First Row: Active Jobs, Interview Review */}
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="text-center">
                           <div className="text-cyan-300 font-bold">{jobStats[job.job_id]?.longlist || 0}</div>
                           <div className="text-gray-500">Active Jobs</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-purple-300 font-bold">{jobStats[job.job_id]?.shortlist || 0}</div>
+                          <div className="text-orange-300 font-bold">{jobStats[job.job_id]?.contacted || 0}</div>
                           <div className="text-gray-500">Interview Review</div>
                         </div>
+                      </div>
+                      {/* Second Row: Shortlisted, Submitted */}
+                      <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="text-center">
-                          <div className="text-orange-300 font-bold">{jobStats[job.job_id]?.shortlist || 0}</div>
+                          <div className="text-purple-300 font-bold">{jobStats[job.job_id]?.shortlist || 0}</div>
                           <div className="text-gray-500">Shortlisted</div>
                         </div>
                         <div className="text-center">
