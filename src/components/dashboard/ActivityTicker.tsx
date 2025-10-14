@@ -11,9 +11,9 @@ export function ActivityTicker({ items, className }: ActivityTickerProps) {
   const line = items.join(" • ")
   return (
     <div className={cn("rounded-lg border border-border/40 bg-gradient-card backdrop-blur-lg p-2", className)}>
-      <div className="flex items-center gap-2 text-xs font-light font-inter text-muted-foreground">
+      <div className="flex items-center gap-2 text-xs font-light font-work text-muted-foreground">
         <span className="inline-flex h-2 w-2 rounded-full bg-success animate-pulse" aria-hidden="true" />
-        <span className="font-light font-inter text-foreground">LIVE</span>
+        <span className="font-light font-work text-foreground">LIVE</span>
         <div className="marquee-row flex-1" aria-live="polite" role="marquee">
           <div className="marquee-inner">
             <span className="px-4">{line}</span>
