@@ -474,7 +474,7 @@ export default function EditJob() {
                     <ApiMultiSelect
                       value={industries}
                       onChange={setIndustries}
-                      apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?type=INDUSTRY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
+                      apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=INDUSTRY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
                       apiHeaders={{
                         "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
                         "Accept": "application/json"
@@ -490,7 +490,7 @@ export default function EditJob() {
                     <ApiMultiSelect
                       value={headhuntingCompanies}
                       onChange={setHeadhuntingCompanies}
-                      apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
+                      apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
                       apiHeaders={{
                         "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
                         "Accept": "application/json"
@@ -511,14 +511,16 @@ export default function EditJob() {
                           client_name: values[values.length - 1] || ""
                         }));
                       }}
-                      apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
+                      apiEndpoint="https://sofrxfgjptargppbepbi.supabase.run/rest/v1/clients?select=id,name&name=ilike.*{keywords}*&order=name.asc&limit=50"
                       apiHeaders={{
-                        "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
+                        "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvZnJ4ZmdqcHRhcmdwcGJlcGJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMDMxNzYsImV4cCI6MjA2OTg3OTE3Nn0._xVCMGu8VY2_JSs38wOdL7nG7EKpl3996heMiu33j9A",
                         "Accept": "application/json"
                       }}
                       placeholder="Select client..."
-                      searchPlaceholder="Search companies..."
-                      emptyText="No companies found"
+                      searchPlaceholder="Search clients..."
+                      emptyText="No clients found"
+                      labelField="name"
+                      isDatabase={true}
                     />
                   </div>
 

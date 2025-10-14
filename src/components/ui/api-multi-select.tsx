@@ -19,6 +19,8 @@ interface ApiMultiSelectProps {
   placeholder?: string;
   searchPlaceholder?: string;
   emptyText?: string;
+  labelField?: string; // Field name to use as the display label (default: "title")
+  isDatabase?: boolean; // If true, expects direct array response instead of {items: [...]}
 }
 
 export function ApiMultiSelect({
@@ -28,7 +30,9 @@ export function ApiMultiSelect({
   apiHeaders,
   placeholder = "Select items...",
   searchPlaceholder = "Search...",
-  emptyText = "No results found."
+  emptyText = "No results found.",
+  labelField = "title",
+  isDatabase = false
 }: ApiMultiSelectProps) {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<ApiOption[]>([]);
@@ -57,14 +61,20 @@ export function ApiMultiSelect({
 
       const data = await response.json();
       
-      if (data.items && Array.isArray(data.items)) {
-        setOptions(data.items.map((item: any) => ({
-          id: item.id || item.title,
-          title: item.title
-        })));
-      } else {
-        setOptions([]);
+      // Handle different response formats
+      let items: any[] = [];
+      if (isDatabase && Array.isArray(data)) {
+        // Direct array response from database
+        items = data;
+      } else if (data.items && Array.isArray(data.items)) {
+        // Wrapped response from API
+        items = data.items;
       }
+      
+      setOptions(items.map((item: any) => ({
+        id: item.id || item[labelField],
+        title: item[labelField]
+      })));
     } catch (error) {
       console.error('Error fetching options:', error);
       setOptions([]);
