@@ -628,7 +628,7 @@ export default function Index() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
         {/* Left Side - Job Control Panels - 30% width */}
         <div className="space-y-4 lg:col-span-1">
-          <h2 className="text-lg font-bold text-cyan-300 mb-4 flex items-center">
+          <h2 className="text-lg font-bold font-work text-cyan-300 mb-4 flex items-center">
             <Target className="h-5 w-5 mr-2" />
             Active Jobs Funnel
           </h2>
