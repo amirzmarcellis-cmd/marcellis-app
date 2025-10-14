@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { toast } from "sonner";
 import FileUpload from "@/components/upload/FileUpload";
+import { ApiMultiSelect } from "@/components/ui/api-multi-select";
 
 const europeanCountries = [
   "Albania", "Andorra", "Austria", "Azerbaijan", "Belgium", "Bosnia and Herzegovina", 
@@ -155,7 +156,6 @@ export default function EditJob() {
   const [currentTab, setCurrentTab] = useState("details");
   const [industries, setIndustries] = useState<string[]>([]);
   const [headhuntingCompanies, setHeadhuntingCompanies] = useState<string[]>([]);
-  const [newHeadhuntingUrl, setNewHeadhuntingUrl] = useState("");
   const [formData, setFormData] = useState<JobData>({
     job_id: "",
     job_title: "",
@@ -471,105 +471,54 @@ export default function EditJob() {
 
                   <div className="space-y-2">
                     <Label>Industry</Label>
-                    <Select onValueChange={(value) => {
-                      if (!industries.includes(value)) {
-                        setIndustries([...industries, value]);
-                      }
-                    }}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select industries..." />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-60">
-                        {industriesList.filter(industry => !industries.includes(industry)).map((industry) => (
-                          <SelectItem key={industry} value={industry}>
-                            {industry}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {industries.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {industries.map((industry, index) => (
-                          <span
-                            key={index}
-                            className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
-                          >
-                            {industry}
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setIndustries(industries.filter((_, i) => i !== index));
-                              }}
-                              className="ml-1 text-primary/60 hover:text-primary"
-                            >
-                              ×
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    <ApiMultiSelect
+                      value={industries}
+                      onChange={setIndustries}
+                      apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?type=INDUSTRY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
+                      apiHeaders={{
+                        "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
+                        "Accept": "application/json"
+                      }}
+                      placeholder="Select industries..."
+                      searchPlaceholder="Search industries..."
+                      emptyText="No industries found"
+                    />
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Headhunting Company URLs</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        value={newHeadhuntingUrl}
-                        onChange={(e) => setNewHeadhuntingUrl(e.target.value)}
-                        placeholder="Enter headhunting company URL"
-                        type="url"
-                      />
-                      <Button
-                        type="button"
-                        onClick={() => {
-                          if (newHeadhuntingUrl.trim()) {
-                            setHeadhuntingCompanies([...headhuntingCompanies, newHeadhuntingUrl.trim()]);
-                            setNewHeadhuntingUrl("");
-                          }
-                        }}
-                        variant="secondary"
-                      >
-                        Add
-                      </Button>
-                    </div>
-                    {headhuntingCompanies.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {headhuntingCompanies.map((url, index) => (
-                          <span
-                            key={index}
-                            className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-secondary/10 text-foreground"
-                          >
-                            <a
-                              href={url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="hover:underline max-w-[200px] truncate"
-                            >
-                              {url}
-                            </a>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setHeadhuntingCompanies(headhuntingCompanies.filter((_, i) => i !== index));
-                              }}
-                              className="ml-1 text-foreground/60 hover:text-foreground"
-                            >
-                              ×
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    <Label>Headhunting Companies</Label>
+                    <ApiMultiSelect
+                      value={headhuntingCompanies}
+                      onChange={setHeadhuntingCompanies}
+                      apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
+                      apiHeaders={{
+                        "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
+                        "Accept": "application/json"
+                      }}
+                      placeholder="Select companies..."
+                      searchPlaceholder="Search companies..."
+                      emptyText="No companies found"
+                    />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="client_name">Client Name</Label>
-                    <Input
-                      id="client_name"
-                      name="client_name"
-                      value={formData.client_name}
-                      onChange={handleInputChange}
-                      placeholder="Enter client name"
+                    <Label>Client Name</Label>
+                    <ApiMultiSelect
+                      value={formData.client_name ? [formData.client_name] : []}
+                      onChange={(values) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          client_name: values[values.length - 1] || ""
+                        }));
+                      }}
+                      apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
+                      apiHeaders={{
+                        "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
+                        "Accept": "application/json"
+                      }}
+                      placeholder="Select client..."
+                      searchPlaceholder="Search companies..."
+                      emptyText="No companies found"
                     />
                   </div>
 
