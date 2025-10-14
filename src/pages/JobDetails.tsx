@@ -2538,6 +2538,61 @@ export default function JobDetails() {
     });
   };
 
+  // Helper function to check if candidate nationality matches any preferred nationality
+  const matchesPreferredNationality = (candidateNationality: string, preferredNationalities: string): boolean => {
+    // Mapping between country names and nationality adjectives
+    const nationalityMap: Record<string, string[]> = {
+      'egypt': ['egyptian', 'egypt'],
+      'saudi arabia': ['saudi', 'saudi arabian', 'saudi arabia'],
+      'united arab emirates': ['emirati', 'uae', 'united arab emirates'],
+      'jordan': ['jordanian', 'jordan'],
+      'lebanon': ['lebanese', 'lebanon'],
+      'syria': ['syrian', 'syria'],
+      'iraq': ['iraqi', 'iraq'],
+      'kuwait': ['kuwaiti', 'kuwait'],
+      'bahrain': ['bahraini', 'bahrain'],
+      'oman': ['omani', 'oman'],
+      'qatar': ['qatari', 'qatar'],
+      'yemen': ['yemeni', 'yemen'],
+      'palestine': ['palestinian', 'palestine'],
+      'morocco': ['moroccan', 'morocco'],
+      'tunisia': ['tunisian', 'tunisia'],
+      'algeria': ['algerian', 'algeria'],
+      'libya': ['libyan', 'libya'],
+      'sudan': ['sudanese', 'sudan'],
+      'pakistan': ['pakistani', 'pakistan'],
+      'india': ['indian', 'india'],
+      'bangladesh': ['bangladeshi', 'bangladesh'],
+      'philippines': ['filipino', 'philippine', 'philippines'],
+      'indonesia': ['indonesian', 'indonesia'],
+      'malaysia': ['malaysian', 'malaysia'],
+      'singapore': ['singaporean', 'singapore'],
+      'united kingdom': ['british', 'uk', 'united kingdom'],
+      'united states': ['american', 'us', 'usa', 'united states'],
+      'canada': ['canadian', 'canada'],
+      'australia': ['australian', 'australia'],
+      'new zealand': ['new zealander', 'kiwi', 'new zealand'],
+      'south africa': ['south african', 'south africa'],
+    };
+
+    const candidateNat = candidateNationality.toLowerCase().trim();
+    const preferredList = preferredNationalities.split(',').map(n => n.toLowerCase().trim());
+
+    return preferredList.some(preferred => {
+      // Direct match
+      if (candidateNat === preferred) return true;
+
+      // Check if either matches through mapping
+      for (const [country, variations] of Object.entries(nationalityMap)) {
+        if (variations.includes(preferred) && variations.includes(candidateNat)) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+  };
+
   // First, separate candidates by nationality match
   const candidatesMatchingNationality = shortListCandidates.filter((candidate) => {
     const candidateNationality = candidate["nationality"];
@@ -2546,8 +2601,8 @@ export default function JobDetails() {
     // If no preferred nationality is set, include all candidates in budget sections
     if (!preferredNationality || !candidateNationality) return true;
 
-    // Include only if nationalities match (case-insensitive)
-    return candidateNationality.toLowerCase().trim() === preferredNationality.toLowerCase().trim();
+    // Include only if nationalities match (with mapping support)
+    return matchesPreferredNationality(candidateNationality, preferredNationality);
   });
 
   // Filter candidates with nationality mismatch - these will NOT appear in budget sections
@@ -2556,10 +2611,10 @@ export default function JobDetails() {
       const candidateNationality = candidate["nationality"];
       const preferredNationality = job?.prefered_nationality;
 
-      // Only include if both nationalities exist and don't match (case-insensitive)
+      // Only include if both nationalities exist and don't match
       if (!candidateNationality || !preferredNationality) return false;
 
-      return candidateNationality.toLowerCase().trim() !== preferredNationality.toLowerCase().trim();
+      return !matchesPreferredNationality(candidateNationality, preferredNationality);
     }),
   );
 
