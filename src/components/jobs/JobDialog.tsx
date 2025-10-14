@@ -16,6 +16,9 @@ interface JobRecord {
   "Job ID": string;
   "Job Title": string | null;
   "Job Description": string | null;
+  industry?: string | null;
+  headhunting_companies?: string | null;
+  client_name?: string | null;
   "Client Description": string | null;
   "Job Location": string | null;
   "Job Salary Range (ex: 15000 AED)": string | null;
@@ -25,6 +28,13 @@ interface JobRecord {
   musttohave?: string | null;
   nicetohave?: string | null;
   Timestamp: string | null;
+  job_title?: string | null;
+  job_description?: string | null;
+  client_description?: string | null;
+  job_location?: string | null;
+  job_salary_range?: string | null;
+  things_to_look_for?: string | null;
+  jd_summary?: string | null;
 }
 
 interface JobDialogProps {
@@ -34,10 +44,48 @@ interface JobDialogProps {
   onSave: () => void;
 }
 
+const industriesList = [
+  "Accounting", "Airlines / Aviation", "Alternative Dispute Resolution", "Alternative Medicine",
+  "Animation", "Apparel & Fashion", "Architecture & Planning", "Arts & Crafts", "Automotive",
+  "Aviation & Aerospace", "Banking", "Biotechnology", "Broadcast Media", "Building Materials",
+  "Business Supplies & Equipment", "Capital Markets", "Chemicals", "Civic & Social Organization",
+  "Civil Engineering", "Commercial Real Estate", "Computer & Network Security", "Computer Games",
+  "Computer Hardware", "Computer Networking", "Computer Software", "Construction",
+  "Consumer Electronics", "Consumer Goods", "Consumer Services", "Cosmetics", "Dairy",
+  "Defense & Space", "Design", "E-Learning", "Education Management",
+  "Electrical/Electronic Manufacturing", "Entertainment", "Environmental Services",
+  "Events Services", "Executive Office", "Facilities Services", "Farming", "Financial Services",
+  "Fine Art", "Fishery", "Food & Beverages", "Food Production", "Fund‐Raising", "Furniture",
+  "Gambling & Casinos", "Glass, Ceramics & Concrete", "Government Administration",
+  "Government Relations", "Graphic Design", "Health, Wellness and Fitness", "Higher Education",
+  "Hospital & Health Care", "Hospitality", "Human Resources", "Import and Export",
+  "Individual & Family Services", "Industrial Automation", "Information Services",
+  "Information Technology & Services", "Insurance", "International Affairs",
+  "International Trade & Development", "Internet", "Investment Banking", "Investment Management",
+  "Judiciary", "Law Enforcement", "Law Practice", "Legal Services", "Legislative Office",
+  "Leisure, Travel & Tourism", "Libraries", "Logistics & Supply Chain", "Luxury Goods & Jewelry",
+  "Machinery", "Management Consulting", "Maritime", "Market Research", "Marketing & Advertising",
+  "Mechanical or Industrial Engineering", "Media Production", "Medical Devices", "Medical Practice",
+  "Mental Health Care", "Military", "Mining & Metals", "Motion Pictures & Film",
+  "Museums & Institutions", "Music", "Nanotechnology", "Newspapers",
+  "Nonprofit Organization Management", "Oil & Energy", "Online Media", "Outsourcing / Offshoring",
+  "Package / Freight Delivery", "Packaging & Containers", "Paper & Forest Products",
+  "Performing Arts", "Pharmaceuticals", "Photography", "Plastics", "Political Organization",
+  "Primary / Secondary Education", "Printing", "Professional Training & Coaching",
+  "Program Development", "Public Policy", "Public Relations & Communications", "Public Safety",
+  "Publishing", "Real Estate", "Recreational Facilities & Services", "Religious Institutions",
+  "Renewables & Environment", "Research", "Restaurants", "Retail", "Security & Investigations",
+  "Semiconductors", "Shipbuilding", "Sporting Goods", "Sports", "Staffing & Recruiting",
+  "Supermarkets", "Telecommunications", "Textiles", "Transportation / Trucking / Railroad",
+  "Utilities", "Venture Capital & Private Equity", "Veterinary", "Warehousing", "Wholesale",
+  "Wine & Spirits", "Wireless", "Writing & Editing"
+];
+
 export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
+    clientName: "",
     clientDescription: "",
     location: "",
     salaryRange: "",
@@ -49,6 +97,9 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
   });
   const [loading, setLoading] = useState(false);
   const [jdFile, setJdFile] = useState<File | null>(null);
+  const [industries, setIndustries] = useState<string[]>([]);
+  const [headhuntingCompanies, setHeadhuntingCompanies] = useState<string[]>([]);
+  const [newHeadhuntingUrl, setNewHeadhuntingUrl] = useState("");
   const { toast } = useToast();
   
 
@@ -57,6 +108,7 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
       setFormData({
         title: job.job_title || "",
         description: job.job_description || "",
+        clientName: job.client_name || "",
         clientDescription: job.client_description || "",
         location: job.job_location || "",
         salaryRange: job.job_salary_range || "",
@@ -66,10 +118,23 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
         nicetohave: job.nicetohave || "",
         status: job["Processed"] || "No",
       });
+      
+      // Parse industries and headhunting companies
+      if (job.industry) {
+        setIndustries(job.industry.split(", ").filter(Boolean));
+      } else {
+        setIndustries([]);
+      }
+      if (job.headhunting_companies) {
+        setHeadhuntingCompanies(job.headhunting_companies.split(", ").filter(Boolean));
+      } else {
+        setHeadhuntingCompanies([]);
+      }
     } else {
       setFormData({
         title: "",
         description: "",
+        clientName: "",
         clientDescription: "",
         location: "",
         salaryRange: "",
@@ -79,8 +144,11 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
         nicetohave: "",
         status: "No",
       });
+      setIndustries([]);
+      setHeadhuntingCompanies([]);
     }
     setJdFile(null);
+    setNewHeadhuntingUrl("");
   }, [job, open]);
 
   const generateJobId = () => {
@@ -118,6 +186,9 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
         job_id: (job as any)?.job_id || generateJobId(),
         job_title: formData.title,
         job_description: formData.description,
+        industry: industries.join(", "),
+        headhunting_companies: headhuntingCompanies.join(", "),
+        client_name: formData.clientName,
         client_description: formData.clientDescription,
         job_location: formData.location,
         job_salary_range: formData.salaryRange,
@@ -219,6 +290,111 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
                   value={formData.salaryRange}
                   onChange={(e) => setFormData(prev => ({ ...prev, salaryRange: e.target.value }))}
                   placeholder="e.g., 15000-20000 AED"
+                  className="bg-background/50"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Industry</Label>
+                <Select onValueChange={(value) => {
+                  if (!industries.includes(value)) {
+                    setIndustries([...industries, value]);
+                  }
+                }}>
+                  <SelectTrigger className="bg-background/50">
+                    <SelectValue placeholder="Select industries..." />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    {industriesList.filter(industry => !industries.includes(industry)).map((industry) => (
+                      <SelectItem key={industry} value={industry}>
+                        {industry}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {industries.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {industries.map((industry, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
+                      >
+                        {industry}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIndustries(industries.filter((_, i) => i !== index));
+                          }}
+                          className="ml-1 text-primary/60 hover:text-primary"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label>Headhunting Company URLs</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newHeadhuntingUrl}
+                    onChange={(e) => setNewHeadhuntingUrl(e.target.value)}
+                    placeholder="Enter headhunting company URL"
+                    type="url"
+                    className="bg-background/50"
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      if (newHeadhuntingUrl.trim()) {
+                        setHeadhuntingCompanies([...headhuntingCompanies, newHeadhuntingUrl.trim()]);
+                        setNewHeadhuntingUrl("");
+                      }
+                    }}
+                    variant="secondary"
+                  >
+                    Add
+                  </Button>
+                </div>
+                {headhuntingCompanies.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {headhuntingCompanies.map((url, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-secondary/10 text-foreground"
+                      >
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:underline max-w-[200px] truncate"
+                        >
+                          {url}
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setHeadhuntingCompanies(headhuntingCompanies.filter((_, i) => i !== index));
+                          }}
+                          className="ml-1 text-foreground/60 hover:text-foreground"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="clientName">Client Name</Label>
+                <Input
+                  id="clientName"
+                  value={formData.clientName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, clientName: e.target.value }))}
+                  placeholder="Enter client name"
                   className="bg-background/50"
                 />
               </div>
