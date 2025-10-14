@@ -51,6 +51,7 @@ interface CallLogDetail {
   qualifications: string | null
   comm_summary: string | null
   comm_score: string | null
+  nationality: string | null
 }
 
 export default function CallLogDetails() {
@@ -212,7 +213,8 @@ export default function CallLogDetails() {
         Reason_to_reject: data.Reason_to_reject,
         Reason_to_Hire: data.Reason_to_Hire,
         comm_summary: data.comm_summary,
-        comm_score: data.comm_score?.toString()
+        comm_score: data.comm_score?.toString(),
+        nationality: data.nationality
       }
 
       console.log('Enriched data:', enrichedData);
@@ -393,6 +395,9 @@ export default function CallLogDetails() {
               <h2 className="text-4xl font-light font-work tracking-tight">{callLog.candidate_name}</h2>
               <p className="text-base font-light font-inter text-muted-foreground">{callLog.candidate_email}</p>
               <p className="text-sm font-light font-inter">{callLog.job_title}</p>
+              {callLog.nationality && (
+                <p className="text-sm font-light font-inter text-muted-foreground">Nationality: {callLog.nationality}</p>
+              )}
               <div className="flex flex-wrap gap-2 mt-2">
                 <Badge variant="outline" className="text-xs">
                   User ID: {callLog.user_id}
