@@ -618,7 +618,7 @@ export default function AddJob() {
               <ApiMultiSelect
                 value={formData.industries}
                 onChange={(value) => handleInputChange("industries", value)}
-                apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords="
+                apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=INDUSTRY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
                 apiHeaders={{
                   "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
                   "Accept": "application/json"
@@ -634,7 +634,7 @@ export default function AddJob() {
               <ApiMultiSelect
                 value={formData.headhuntingCompanies}
                 onChange={(value) => handleInputChange("headhuntingCompanies", value)}
-                apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords=&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
+                apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
                 apiHeaders={{
                   "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
                   "Accept": "application/json"

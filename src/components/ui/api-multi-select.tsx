@@ -44,7 +44,8 @@ export function ApiMultiSelect({
 
     setLoading(true);
     try {
-      const url = `${apiEndpoint}${encodeURIComponent(keywords)}`;
+      // Replace {keywords} placeholder with actual search term
+      const url = apiEndpoint.replace('{keywords}', encodeURIComponent(keywords));
       const response = await fetch(url, {
         method: 'GET',
         headers: apiHeaders
@@ -79,7 +80,7 @@ export function ApiMultiSelect({
 
     debounceTimerRef.current = setTimeout(() => {
       fetchOptions(searchTerm);
-    }, 500);
+    }, 300); // Reduced debounce for faster response
 
     return () => {
       if (debounceTimerRef.current) {
