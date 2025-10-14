@@ -73,6 +73,7 @@ export default function Index() {
   const [highScoreActiveCount, setHighScoreActiveCount] = useState(0);
   const [totalShortlistedCount, setTotalShortlistedCount] = useState(0);
   const [totalSubmittedCount, setTotalSubmittedCount] = useState(0);
+  const [totalRejectedCount, setTotalRejectedCount] = useState(0);
   const [interviewDialogOpen, setInterviewDialogOpen] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<{
     candidateId: string;
@@ -285,11 +286,13 @@ export default function Index() {
       });
       setJobStats(stats);
 
-      // Calculate total shortlisted and submitted counts
+      // Calculate total shortlisted, submitted, and rejected counts
       const totalShortlisted = links.filter((jc: any) => jc.shortlisted_at !== null).length;
       const totalSubmitted = links.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase() === 'submitted').length;
+      const totalRejected = links.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase() === 'rejected').length;
       setTotalShortlistedCount(totalShortlisted);
       setTotalSubmittedCount(totalSubmitted);
+      setTotalRejectedCount(totalRejected);
 
       // Candidates needing review: Shortlisted candidates count
       const highScoreActiveCountVal = callDoneActiveCandidates.length;
@@ -615,7 +618,7 @@ export default function Index() {
             </TiltCard>
             <TiltCard>
               <div onClick={() => navigate('/live-feed')} className="cursor-pointer">
-                <MetricCardPro title="Interview Review" value={highScoreActiveCount || 0} delta="-12%" icon={ClipboardList} accent="purple" trend={[12, 10, 11, 9, 8, 7, 8, 6]} progress={Math.min(100, highScoreActiveCount || 0)} className="border-2 border-primary/60 glow-cyan" />
+                <MetricCardPro title="Waiting Review" value={highScoreActiveCount || 0} delta="-12%" icon={ClipboardList} accent="purple" trend={[12, 10, 11, 9, 8, 7, 8, 6]} progress={Math.min(100, highScoreActiveCount || 0)} className="border-2 border-primary/60 glow-cyan" />
               </div>
             </TiltCard>
             <TiltCard>
@@ -625,12 +628,12 @@ export default function Index() {
             </TiltCard>
             <TiltCard>
               <div onClick={() => navigate('/candidates')} className="cursor-pointer">
-                <MetricCardPro title="Submitted" value={totalSubmittedCount || 0} delta="+2%" icon={CheckCircle} accent="emerald" trend={[2, 3, 4, 5, 6, 7, 8, 9]} progress={Math.min(100, (totalSubmittedCount || 0) * 8)} />
+                <MetricCardPro title="Rejected" value={totalRejectedCount || 0} delta="-3%" icon={UserX} accent="red" trend={[15, 14, 13, 12, 11, 10, 9, 8]} progress={Math.min(100, (totalRejectedCount || 0) * 5)} />
               </div>
             </TiltCard>
             <TiltCard>
               <div onClick={() => navigate('/candidates')} className="cursor-pointer">
-                <MetricCardPro title="Rejected" value={0} delta="-3%" icon={UserX} accent="red" trend={[15, 14, 13, 12, 11, 10, 9, 8]} progress={0} />
+                <MetricCardPro title="Submitted" value={totalSubmittedCount || 0} delta="+2%" icon={CheckCircle} accent="emerald" trend={[2, 3, 4, 5, 6, 7, 8, 9]} progress={Math.min(100, (totalSubmittedCount || 0) * 8)} />
               </div>
             </TiltCard>
           </BentoKpis>
