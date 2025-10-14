@@ -728,26 +728,37 @@ export default function AddJob() {
             </div>
 
             <div className="space-y-2">
-              <Label>Client</Label>
+              <Label className="text-sm font-medium">Client</Label>
               <Popover open={clientPopoverOpen} onOpenChange={setClientPopoverOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     role="combobox"
                     aria-expanded={clientPopoverOpen}
-                    className="w-full justify-between font-light"
+                    className="w-full justify-between h-12 px-4 bg-background hover:bg-accent/5 border-border/50 rounded-xl transition-all duration-200"
                   >
-                    {formData.clientId 
-                      ? clients.find((c) => c.id === formData.clientId)?.name 
-                      : "Select client..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    {formData.clientId ? (
+                      <div className="flex flex-col items-start text-left flex-1 min-w-0">
+                        <span className="font-medium text-foreground truncate w-full">
+                          {clients.find((c) => c.id === formData.clientId)?.name}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground font-normal">Select client...</span>
+                    )}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 text-muted-foreground" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0" align="start">
-                  <Command>
-                    <CommandInput placeholder="Search client..." />
-                    <CommandList>
-                      <CommandEmpty>No client found.</CommandEmpty>
+                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-popover/95 backdrop-blur-xl border-border/50 shadow-lg" align="start">
+                  <Command className="bg-transparent">
+                    <CommandInput 
+                      placeholder="Search clients..." 
+                      className="h-12 border-b border-border/50 text-sm"
+                    />
+                    <CommandList className="max-h-[300px]">
+                      <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">
+                        No client found.
+                      </CommandEmpty>
                       <CommandGroup>
                         <CommandItem
                           value="__add_new__"
@@ -755,10 +766,10 @@ export default function AddJob() {
                             setAddClientDialogOpen(true);
                             setClientPopoverOpen(false);
                           }}
-                          className="border-b"
+                          className="border-b border-border/30 py-3 cursor-pointer data-[selected=true]:bg-accent/50"
                         >
-                          <Plus className="mr-2 h-4 w-4" />
-                          Add Client
+                          <Plus className="mr-3 h-4 w-4 text-primary" />
+                          <span className="font-medium">Add New Client</span>
                         </CommandItem>
                         {clients.map((client) => (
                           <CommandItem
@@ -770,17 +781,18 @@ export default function AddJob() {
                               handleInputChange("clientDescription", client.description || "");
                               setClientPopoverOpen(false);
                             }}
+                            className="py-3 cursor-pointer data-[selected=true]:bg-accent/50 border-b border-border/10 last:border-0"
                           >
                             <Check
                               className={cn(
-                                "mr-2 h-4 w-4",
+                                "mr-3 h-4 w-4 text-primary",
                                 formData.clientId === client.id ? "opacity-100" : "opacity-0"
                               )}
                             />
-                            <div>
-                              <div className="font-medium">{client.name}</div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-foreground truncate">{client.name}</div>
                               {client.description && (
-                                <div className="text-xs text-muted-foreground line-clamp-1">
+                                <div className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
                                   {client.description}
                                 </div>
                               )}
@@ -792,11 +804,11 @@ export default function AddJob() {
                   </Command>
                 </PopoverContent>
               </Popover>
-              {formData.clientId && (
-                <div className="text-sm text-muted-foreground mt-1">
-                  {formData.clientDescription && (
-                    <p className="line-clamp-2">{formData.clientDescription}</p>
-                  )}
+              {formData.clientId && formData.clientDescription && (
+                <div className="px-3 py-2 rounded-lg bg-accent/20 border border-border/30">
+                  <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                    {formData.clientDescription}
+                  </p>
                 </div>
               )}
             </div>
