@@ -214,7 +214,7 @@ export default function Clients() {
         </Card> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filteredClients.map(client => <Card 
               key={client.id} 
-              className="group relative h-[200px] flex flex-col transition-all duration-200 hover:shadow-lg hover:border-primary/30 hover:-translate-y-0.5"
+              className="group relative min-h-[200px] flex flex-col transition-all duration-200 hover:shadow-lg hover:border-primary/30 hover:-translate-y-0.5"
             >
               <CardHeader className="pb-3 flex-shrink-0">
                 <div className="flex items-start justify-between gap-3">
@@ -223,7 +223,7 @@ export default function Clients() {
                       <Building2 className="h-5 w-5 text-primary" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-base leading-tight line-clamp-1">
+                      <h3 className="font-semibold text-base leading-tight">
                         {client.name}
                       </h3>
                     </div>
