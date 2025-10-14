@@ -75,6 +75,7 @@ export default function Auth() {
                       : (settings.logoDark || settings.logo || defaultLogo)} 
                     alt="Company Logo" 
                     className="w-full h-full object-contain rounded-lg"
+                    fetchPriority="high"
                   />
                 </div>
               </div>

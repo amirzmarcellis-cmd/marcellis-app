@@ -104,7 +104,7 @@ export function DashboardSidebar() {
               <div className={`${isMini ? 'w-full h-16' : 'w-full h-20'} flex items-center justify-center transition-all duration-200`}>
                 {(() => {
                 const displayLogo = theme === 'dark' ? settings.logoLight || settings.logo || settings.primaryColor : settings.logoDark || settings.logo || settings.primaryColor;
-                return displayLogo ? <img src={displayLogo as string} alt="Company Logo" className="w-full h-full object-contain rounded-lg" /> : <Phone className={`${isMini ? 'w-10 h-10' : 'w-16 h-16'} text-primary`} />;
+                return displayLogo ? <img src={displayLogo as string} alt="Company Logo" className="w-full h-full object-contain rounded-lg" fetchPriority="high" /> : <Phone className={`${isMini ? 'w-10 h-10' : 'w-16 h-16'} text-primary`} />;
               })()}
               </div>
             </div>
