@@ -369,9 +369,7 @@ export function JobManagementPanel() {
       allJobs: applyFilters(jobs)
     };
   }, [jobs, selectedGroupFilter, selectedRecruiterFilter, dateRange]);
-  
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-5xl font-light font-work tracking-tight">Job Management</h2>
@@ -545,8 +543,7 @@ export function JobManagementPanel() {
       setIsDialogOpen(false);
       setSelectedJob(null);
     }} />
-    </div>
-  );
+    </div>;
 }
 interface JobGridProps {
   jobs: Job[];
@@ -605,7 +602,7 @@ const JobGrid = memo(function JobGrid({
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <h4 className="line-clamp-2 mb-2 font-semibold text-xl font-work">
+                <h4 className="line-clamp-2 mb-2 text-xl font-normal">
                   {job.job_title || "Untitled Position"}
                 </h4>
                 <div className="flex items-center space-x-2 mb-2">
