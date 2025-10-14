@@ -288,8 +288,17 @@ export default function Index() {
 
       // Calculate total shortlisted, submitted, and rejected counts
       const totalShortlisted = links.filter((jc: any) => jc.shortlisted_at !== null).length;
-      const totalSubmitted = links.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase() === 'submitted').length;
-      const totalRejected = links.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase() === 'rejected').length;
+      const totalSubmitted = links.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase().trim() === 'submitted').length;
+      const totalRejected = links.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase().trim() === 'rejected').length;
+      
+      console.log('Dashboard Metrics Debug:', {
+        totalShortlisted,
+        totalSubmitted,
+        totalRejected,
+        highScoreActive: callDoneActiveCandidates.length,
+        sampleContactedStatuses: links.slice(0, 10).map((jc: any) => jc.contacted)
+      });
+      
       setTotalShortlistedCount(totalShortlisted);
       setTotalSubmittedCount(totalSubmitted);
       setTotalRejectedCount(totalRejected);
