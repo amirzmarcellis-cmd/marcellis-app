@@ -136,33 +136,34 @@ export default function Clients() {
       setEditingClient(null);
     }
   };
-  return <div className="container mx-auto p-6 space-y-8">
+  return <div className="min-h-screen bg-background">
+      <div className="max-w-5xl mx-auto px-6 py-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-semibold tracking-tight">Clients</h1>
-          <p className="text-muted-foreground mt-1.5 text-sm">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Clients</h1>
+          <p className="text-muted-foreground mt-1 text-sm">
             Manage your client database
           </p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={handleDialogOpenChange}>
           <DialogTrigger asChild>
-            <Button className="font-light">
+            <Button className="shadow-sm">
               <Plus className="h-4 w-4 mr-2" />
               Add Client
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle className="font-work">
+              <DialogTitle className="text-xl font-semibold">
                 {editingClient ? "Edit Client" : "Add New Client"}
               </DialogTitle>
-              <DialogDescription className="font-light">
+              <DialogDescription>
                 {editingClient ? "Update client information" : "Add a new client to your database"}
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="font-light">
+                <Label htmlFor="name">
                   Client Name *
                 </Label>
                 <Input id="name" value={formData.name} onChange={e => setFormData({
@@ -171,7 +172,7 @@ export default function Clients() {
               })} placeholder="Enter client name" required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="description" className="font-light">
+                <Label htmlFor="description">
                   Description
                 </Label>
                 <Textarea id="description" value={formData.description} onChange={e => setFormData({
@@ -180,10 +181,10 @@ export default function Clients() {
               })} placeholder="Enter client description" rows={4} />
               </div>
               <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => handleDialogOpenChange(false)} className="font-light">
+                <Button type="button" variant="outline" onClick={() => handleDialogOpenChange(false)}>
                   Cancel
                 </Button>
-                <Button type="submit" className="font-light">
+                <Button type="submit">
                   {editingClient ? "Update" : "Add"} Client
                 </Button>
               </div>
@@ -192,88 +193,96 @@ export default function Clients() {
         </Dialog>
       </div>
 
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input 
           placeholder="Search clients…" 
           value={searchQuery} 
           onChange={e => setSearchQuery(e.target.value)} 
-          className="pl-10 h-11 border-border/60 bg-background/50 backdrop-blur-sm focus-visible:ring-primary/20" 
+          className="pl-11 h-12 rounded-xl border-border/60 bg-card shadow-sm focus-visible:ring-2 focus-visible:ring-primary/20" 
         />
       </div>
 
-      {isLoading ? <div className="flex items-center justify-center py-16">
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div> : filteredClients.length === 0 ? <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-16">
+        </div>
+      ) : filteredClients.length === 0 ? (
+        <div className="bg-card rounded-xl border border-border/60 shadow-sm">
+          <div className="flex flex-col items-center justify-center py-20">
             <Building2 className="h-12 w-12 text-muted-foreground/40 mb-3" />
             <p className="text-muted-foreground text-sm">
               {searchQuery ? "No clients found" : "No clients yet"}
             </p>
-          </CardContent>
-        </Card> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {filteredClients.map(client => <Card 
-              key={client.id} 
-              className="group relative min-h-[200px] flex flex-col transition-all duration-200 hover:shadow-lg hover:border-primary/30 hover:-translate-y-0.5"
+          </div>
+        </div>
+      ) : (
+        <div className="bg-card rounded-xl border border-border/60 shadow-sm overflow-hidden">
+          {filteredClients.map((client, index) => (
+            <div 
+              key={client.id}
+              className={`
+                group flex items-center justify-between gap-4 px-5 py-4
+                transition-colors duration-150
+                hover:bg-accent/50
+                ${index !== filteredClients.length - 1 ? 'border-b border-border/40' : ''}
+              `}
             >
-              <CardHeader className="pb-3 flex-shrink-0">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-3 min-w-0 flex-1">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Building2 className="h-5 w-5 text-primary" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-base leading-tight">
-                        {client.name}
-                      </h3>
-                    </div>
-                  </div>
-                  <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
-                      onClick={() => handleEdit(client)}
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
-                      onClick={() => handleDeleteClick(client)}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
+              <div className="flex items-center gap-4 min-w-0 flex-1">
+                <div className="flex-shrink-0 w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Building2 className="h-5 w-5 text-primary" />
                 </div>
-              </CardHeader>
-              <CardContent className="pt-0 flex-1 overflow-hidden">
-                {client.description ? (
-                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-                    {client.description}
-                  </p>
-                ) : (
-                  <p className="text-sm text-muted-foreground/50 italic">
-                    No description provided
-                  </p>
-                )}
-              </CardContent>
-            </Card>)}
-        </div>}
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold text-base text-foreground mb-0.5">
+                    {client.name}
+                  </h3>
+                  {client.description ? (
+                    <p className="text-sm text-muted-foreground leading-snug line-clamp-2">
+                      {client.description}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground/50 italic">
+                      No description
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="h-9 w-9 hover:bg-accent hover:text-foreground"
+                  onClick={() => handleEdit(client)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="h-9 w-9 hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => handleDeleteClick(client)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-work">Delete Client</AlertDialogTitle>
-            <AlertDialogDescription className="font-light">
+            <AlertDialogTitle>Delete Client</AlertDialogTitle>
+            <AlertDialogDescription>
               Are you sure you want to delete "{clientToDelete?.name}"? This action
               cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="font-light">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive hover:bg-destructive/90 font-light">
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive hover:bg-destructive/90">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
