@@ -70,7 +70,7 @@ export default function LiveCandidateFeed() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            candidate_id: candidateId,
+            user_id: candidateId,
             Job_Title: candidate['Job Title'],
             Name: candidate['Candidate Name'],
             company_id: 'your_company_id_here'
