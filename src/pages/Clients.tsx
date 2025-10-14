@@ -136,11 +136,11 @@ export default function Clients() {
       setEditingClient(null);
     }
   };
-  return <div className="container mx-auto p-6 space-y-6">
+  return <div className="container mx-auto p-6 space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-6xl font-light font-work tracking-tight">Clients</h1>
-          <p className="text-muted-foreground mt-2 font-light">
+          <h1 className="text-4xl font-semibold tracking-tight">Clients</h1>
+          <p className="text-muted-foreground mt-1.5 text-sm">
             Manage your client database
           </p>
         </div>
@@ -192,43 +192,73 @@ export default function Clients() {
         </Dialog>
       </div>
 
-      <div className="relative">
+      <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Search clients..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 font-light" />
+        <Input 
+          placeholder="Search clients…" 
+          value={searchQuery} 
+          onChange={e => setSearchQuery(e.target.value)} 
+          className="pl-10 h-11 border-border/60 bg-background/50 backdrop-blur-sm focus-visible:ring-primary/20" 
+        />
       </div>
 
-      {isLoading ? <div className="flex items-center justify-center py-12">
+      {isLoading ? <div className="flex items-center justify-center py-16">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div> : filteredClients.length === 0 ? <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Building2 className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground font-light">
+        </div> : filteredClients.length === 0 ? <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <Building2 className="h-12 w-12 text-muted-foreground/40 mb-3" />
+            <p className="text-muted-foreground text-sm">
               {searchQuery ? "No clients found" : "No clients yet"}
             </p>
           </CardContent>
-        </Card> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredClients.map(client => <Card key={client.id} className="hover:border-primary/50 transition-colors">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5 text-primary" />
-                    <CardTitle className="font-work text-lg">{client.name}</CardTitle>
+        </Card> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {filteredClients.map(client => <Card 
+              key={client.id} 
+              className="group relative h-[200px] flex flex-col transition-all duration-200 hover:shadow-lg hover:border-primary/30 hover:-translate-y-0.5"
+            >
+              <CardHeader className="pb-3 flex-shrink-0">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3 min-w-0 flex-1">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Building2 className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-semibold text-base leading-tight line-clamp-1">
+                        {client.name}
+                      </h3>
+                    </div>
                   </div>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" onClick={() => handleEdit(client)}>
-                      <Pencil className="h-4 w-4" />
+                  <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
+                      onClick={() => handleEdit(client)}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDeleteClick(client)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => handleDeleteClick(client)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
                 </div>
               </CardHeader>
-              {client.description && <CardContent>
-                  <p className="text-sm text-muted-foreground font-light line-clamp-3">
+              <CardContent className="pt-0 flex-1 overflow-hidden">
+                {client.description ? (
+                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
                     {client.description}
                   </p>
-                </CardContent>}
+                ) : (
+                  <p className="text-sm text-muted-foreground/50 italic">
+                    No description provided
+                  </p>
+                )}
+              </CardContent>
             </Card>)}
         </div>}
 
