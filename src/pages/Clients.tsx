@@ -50,8 +50,20 @@ export default function Clients() {
         error
       } = await supabase.from("clients").select("*").order("name");
       if (error) throw error;
-      setClients(data || []);
-      setFilteredClients(data || []);
+      
+      // Deduplicate clients by name (case-insensitive)
+      const uniqueClients = (data || []).reduce((acc: Client[], current) => {
+        const duplicate = acc.find(
+          client => client.name.toLowerCase().trim() === current.name.toLowerCase().trim()
+        );
+        if (!duplicate) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+      
+      setClients(uniqueClients);
+      setFilteredClients(uniqueClients);
     } catch (error) {
       console.error("Error fetching clients:", error);
       toast.error("Failed to fetch clients");
@@ -65,13 +77,26 @@ export default function Clients() {
       toast.error("Client name is required");
       return;
     }
+    
+    // Check for duplicate client names (case-insensitive)
+    const duplicateClient = clients.find(
+      client => 
+        client.name.toLowerCase().trim() === formData.name.toLowerCase().trim() &&
+        client.id !== editingClient?.id
+    );
+    
+    if (duplicateClient) {
+      toast.error("A client with this name already exists");
+      return;
+    }
+    
     try {
       if (editingClient) {
         const {
           error
         } = await supabase.from("clients").update({
-          name: formData.name,
-          description: formData.description || null
+          name: formData.name.trim(),
+          description: formData.description?.trim() || null
         }).eq("id", editingClient.id);
         if (error) throw error;
         toast.success("Client updated successfully");
@@ -79,8 +104,8 @@ export default function Clients() {
         const {
           error
         } = await supabase.from("clients").insert({
-          name: formData.name,
-          description: formData.description || null
+          name: formData.name.trim(),
+          description: formData.description?.trim() || null
         });
         if (error) throw error;
         toast.success("Client added successfully");
