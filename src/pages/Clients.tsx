@@ -274,7 +274,7 @@ export default function Clients() {
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
                     <Building2 className="h-5 w-5 text-primary" />
-                    <CardTitle className="text-xl font-work">{client.name}</CardTitle>
+                    <CardTitle className="text-lg font-work">{client.name}</CardTitle>
                   </div>
                   <div className="flex gap-1">
                     <Button
