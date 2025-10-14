@@ -45,7 +45,25 @@ interface CallLog {
   shortlisted_at: string | null
   notes_updated_by: string | null
   notes_updated_at: string | null
+  nationality: string | null
 }
+
+// Normalize nationality to handle variations
+const normalizeNationality = (nationality: string | null): string => {
+  if (!nationality) return "";
+  const normalized = nationality.toLowerCase().trim();
+  
+  // Map common variations to standard forms
+  const mappings: { [key: string]: string } = {
+    "egyptian": "egypt",
+    "british": "uk",
+    "american": "usa",
+    "emirati": "uae",
+    // Add more mappings as needed
+  };
+  
+  return mappings[normalized] || normalized;
+};
 
 const formatPhoneNumber = (phone: string | null) => {
   if (!phone) return "N/A"
@@ -82,8 +100,10 @@ export default function CallLog() {
   const [contactedFilter, setContactedFilter] = useState("all")
   const [scoreFilter, setScoreFilter] = useState("all")
   const [jobFilter, setJobFilter] = useState("all")
+  const [nationalityFilter, setNationalityFilter] = useState("all")
   const [callLogs, setCallLogs] = useState<CallLog[]>([])
   const [jobs, setJobs] = useState<any[]>([])
+  const [nationalities, setNationalities] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [editingNotes, setEditingNotes] = useState<{[key: string]: string}>({})
   const [savingNotes, setSavingNotes] = useState<{[key: string]: boolean}>({})
@@ -122,11 +142,22 @@ export default function CallLog() {
         console.error('Error fetching jobs:', jobsError);
       }
 
+      // Extract unique nationalities
+      const uniqueNationalities = Array.from(
+        new Set(
+          (callLogsData || [])
+            .map(log => log.nationality)
+            .filter(Boolean)
+        )
+      ).sort();
+
       console.log('Fetched call logs:', callLogsData);
       console.log('Fetched jobs:', jobsData);
+      console.log('Unique nationalities:', uniqueNationalities);
 
       setCallLogs(callLogsData || []);
       setJobs(jobsData || []);
+      setNationalities(uniqueNationalities);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -215,11 +246,15 @@ export default function CallLog() {
                         (scoreFilter === "low" && score >= 1 && score <= 49)
     const matchesJob = jobFilter === "all" || log.job_id === jobFilter
     
+    // Nationality filter with normalization
+    const matchesNationality = nationalityFilter === "all" || 
+                               normalizeNationality(log.nationality) === normalizeNationality(nationalityFilter)
+    
     // URL parameter filtering
     const matchesCandidate = !candidateParam || log.user_id?.toString() === candidateParam
     const matchesJobParam = !jobParam || log.job_id === jobParam
     
-    return matchesSearch && matchesContacted && matchesScore && matchesJob && matchesCandidate && matchesJobParam
+    return matchesSearch && matchesContacted && matchesScore && matchesJob && matchesNationality && matchesCandidate && matchesJobParam
   })
 
   return (
@@ -282,6 +317,19 @@ export default function CallLog() {
                 <SelectItem value="low">1-49</SelectItem>
               </SelectContent>
             </Select>
+            <Select value={nationalityFilter} onValueChange={setNationalityFilter}>
+              <SelectTrigger className="w-[150px] bg-background/50 border-border">
+                <SelectValue placeholder="Nationality" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border-border z-50">
+                <SelectItem value="all">All Nationalities</SelectItem>
+                {nationalities.map((nationality) => (
+                  <SelectItem key={nationality} value={nationality}>
+                    {nationality}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </Card>
 
@@ -302,6 +350,7 @@ export default function CallLog() {
                     <TableHead className="w-[150px]">Job</TableHead>
                     <TableHead className="w-[120px]">Contacted</TableHead>
                     <TableHead className="w-[100px]">Score</TableHead>
+                    <TableHead className="w-[120px]">Nationality</TableHead>
                     <TableHead className="w-[120px]">Notice Period</TableHead>
                     <TableHead className="w-[140px]">Salary Expectations</TableHead>
                     <TableHead className="w-[200px] text-right">Actions</TableHead>
@@ -310,13 +359,13 @@ export default function CallLog() {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8">
+                    <TableCell colSpan={8} className="text-center py-8">
                       Loading call logs...
                     </TableCell>
                   </TableRow>
                 ) : filteredCallLogs.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8">
+                    <TableCell colSpan={8} className="text-center py-8">
                       No call logs found
                     </TableCell>
                   </TableRow>
@@ -375,6 +424,11 @@ export default function CallLog() {
                                 </Badge>
                               );
                             })()}
+                          </TableCell>
+                          <TableCell className="max-w-[120px]">
+                            <Badge variant="outline" className="whitespace-nowrap">
+                              {log.nationality || "N/A"}
+                            </Badge>
                           </TableCell>
                           <TableCell className="max-w-[120px]">
                             <div className="flex items-center space-x-2">
