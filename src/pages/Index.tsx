@@ -639,7 +639,7 @@ export default function Index() {
                     <div className="flex items-center mb-3">
                       <h3 className="font-semibold font-work text-sm truncate">{job.job_title}</h3>
                     </div>
-                    <p className="text-xs text-gray-400 mb-3">{job.job_location}</p>
+                    <p className="text-xs font-work text-gray-400 mb-3">{job.job_location}</p>
                     <div className="space-y-2 mb-3">
                       {/* First Row: Longlist, Shortlist, Contacted */}
                       <div className="grid grid-cols-3 gap-1 text-xs">
