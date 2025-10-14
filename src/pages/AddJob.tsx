@@ -312,7 +312,19 @@ export default function AddJob() {
         .order('name');
 
       if (error) throw error;
-      setClients(data || []);
+      
+      // Deduplicate clients by name (case-insensitive)
+      const uniqueClients = (data || []).reduce((acc: Array<{id: string, name: string, description: string | null}>, current) => {
+        const duplicate = acc.find(
+          client => client.name.toLowerCase().trim() === current.name.toLowerCase().trim()
+        );
+        if (!duplicate) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+      
+      setClients(uniqueClients);
     } catch (error) {
       console.error('Error fetching clients:', error);
     }
