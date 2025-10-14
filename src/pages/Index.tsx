@@ -637,7 +637,7 @@ export default function Index() {
               {data?.activeJobs?.map(job => <Card key={job.job_id} className="bg-card border-border dark:bg-gradient-to-br dark:from-white/5 dark:via-white/3 dark:to-white/5 dark:backdrop-blur-lg dark:border-white/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 hover:scale-[1.02]">
                   <CardContent className="p-4">
                     <div className="flex items-center mb-3">
-                      <h3 className="font-semibold font-work text-sm truncate">{job.job_title}</h3>
+                      <h3 className="font-work truncate text-sm font-medium">{job.job_title}</h3>
                     </div>
                     <p className="text-xs font-work text-gray-400 mb-3">{job.job_location}</p>
                     <div className="space-y-2 mb-3">
