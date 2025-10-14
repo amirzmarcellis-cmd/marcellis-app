@@ -16,7 +16,7 @@ import { StatusDropdown } from '@/components/candidates/StatusDropdown';
 import { useProfile } from '@/hooks/useProfile';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Play, Pause, Search, FileText, Upload, Users, Briefcase, Clock, Star, TrendingUp, Calendar, CheckCircle, XCircle, ClipboardList, Video, Target, Activity, Timer, Phone, UserCheck, Building2 } from 'lucide-react';
+import { Plus, Play, Pause, Search, FileText, Upload, Users, Briefcase, Clock, Star, TrendingUp, Calendar, CheckCircle, XCircle, ClipboardList, Video, Target, Activity, Timer, Phone, UserCheck, Building2, UserX } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 import { MetricCardPro } from '@/components/dashboard/MetricCardPro';
@@ -626,6 +626,11 @@ export default function Index() {
             <TiltCard>
               <div onClick={() => navigate('/candidates')} className="cursor-pointer">
                 <MetricCardPro title="Submitted" value={totalSubmittedCount || 0} delta="+2%" icon={CheckCircle} accent="emerald" trend={[2, 3, 4, 5, 6, 7, 8, 9]} progress={Math.min(100, (totalSubmittedCount || 0) * 8)} />
+              </div>
+            </TiltCard>
+            <TiltCard>
+              <div onClick={() => navigate('/candidates')} className="cursor-pointer">
+                <MetricCardPro title="Rejected" value={0} delta="-3%" icon={UserX} accent="red" trend={[15, 14, 13, 12, 11, 10, 9, 8]} progress={0} />
               </div>
             </TiltCard>
           </BentoKpis>

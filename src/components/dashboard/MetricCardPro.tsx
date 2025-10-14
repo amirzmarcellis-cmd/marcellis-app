@@ -9,7 +9,7 @@ interface MetricCardProProps {
   delta?: string;
   icon: LucideIcon;
   trend?: number[];
-  accent?: "primary" | "purple" | "cyan" | "emerald";
+  accent?: "primary" | "purple" | "cyan" | "emerald" | "red";
   progress?: number;
   glow?: boolean;
   className?: string;
@@ -18,7 +18,8 @@ const accentMap: Record<NonNullable<MetricCardProProps["accent"]>, string> = {
   primary: "text-primary",
   purple: "text-purple",
   cyan: "text-cyan",
-  emerald: "text-success"
+  emerald: "text-success",
+  red: "text-destructive"
 };
 export function MetricCardPro({
   title,
