@@ -58,6 +58,10 @@ export function DashboardSidebar() {
     url: "/groups", 
     icon: FolderOpen
   }, {
+    title: "Clients",
+    url: "/clients",
+    icon: Building2
+  }, {
     title: "Candidates",
     url: "/candidates",
     icon: Users

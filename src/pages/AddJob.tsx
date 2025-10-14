@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { ArrowLeft, Check, ChevronsUpDown } from "lucide-react";
+import { ArrowLeft, Check, ChevronsUpDown, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useProfile } from "@/hooks/useProfile";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 
@@ -230,6 +231,7 @@ export default function AddJob() {
     jobDescription: "",
     industries: [] as string[],
     headhuntingCompanies: [] as string[],
+    clientId: "",
     clientName: "",
     clientDescription: "",
     jobLocation: "",
@@ -250,8 +252,12 @@ export default function AddJob() {
   const [newHeadhuntingUrl, setNewHeadhuntingUrl] = useState("");
   const [groups, setGroups] = useState<Array<{id: string, name: string, color: string | null}>>([]);
   const [recruiters, setRecruiters] = useState<Array<{user_id: string, name: string, email: string}>>([]);
+  const [clients, setClients] = useState<Array<{id: string, name: string, description: string | null}>>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [industryPopoverOpen, setIndustryPopoverOpen] = useState(false);
+  const [clientPopoverOpen, setClientPopoverOpen] = useState(false);
+  const [addClientDialogOpen, setAddClientDialogOpen] = useState(false);
+  const [newClientData, setNewClientData] = useState({ name: "", description: "" });
   const [currentJobId, setCurrentJobId] = useState<string | null>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -266,6 +272,7 @@ export default function AddJob() {
   useEffect(() => {
     fetchGroups();
     fetchRecruiters();
+    fetchClients();
   }, [profile?.user_id]);
 
   const fetchGroups = async () => {
@@ -294,6 +301,50 @@ export default function AddJob() {
       setRecruiters(data || []);
     } catch (error) {
       console.error('Error fetching recruiters:', error);
+    }
+  };
+
+  const fetchClients = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('clients')
+        .select('id, name, description')
+        .order('name');
+
+      if (error) throw error;
+      setClients(data || []);
+    } catch (error) {
+      console.error('Error fetching clients:', error);
+    }
+  };
+
+  const handleAddClient = async () => {
+    if (!newClientData.name.trim()) {
+      toast.error("Client name is required");
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('clients')
+        .insert({
+          name: newClientData.name,
+          description: newClientData.description || null,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast.success("Client added successfully");
+      setClients([...clients, data]);
+      setFormData({ ...formData, clientId: data.id, clientName: data.name, clientDescription: data.description || "" });
+      setNewClientData({ name: "", description: "" });
+      setAddClientDialogOpen(false);
+      setClientPopoverOpen(false);
+    } catch (error) {
+      console.error('Error adding client:', error);
+      toast.error("Failed to add client");
     }
   };
 
@@ -414,6 +465,7 @@ export default function AddJob() {
           job_description: formData.jobDescription,
           industry: formData.industries.join(", "),
           headhunting_companies: formData.headhuntingCompanies.join(", "),
+          client_id: formData.clientId || null,
           client_name: formData.clientName,
           client_description: formData.clientDescription,
           job_location: formData.jobLocation,
@@ -676,25 +728,130 @@ export default function AddJob() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="clientName">Client Name</Label>
-              <Input
-                id="clientName"
-                value={formData.clientName}
-                onChange={(e) => handleInputChange("clientName", e.target.value)}
-                placeholder="Enter client name"
-              />
+              <Label>Client</Label>
+              <Popover open={clientPopoverOpen} onOpenChange={setClientPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={clientPopoverOpen}
+                    className="w-full justify-between font-light"
+                  >
+                    {formData.clientId 
+                      ? clients.find((c) => c.id === formData.clientId)?.name 
+                      : "Select client..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search client..." />
+                    <CommandList>
+                      <CommandEmpty>No client found.</CommandEmpty>
+                      <CommandGroup>
+                        <CommandItem
+                          value="__add_new__"
+                          onSelect={() => {
+                            setAddClientDialogOpen(true);
+                            setClientPopoverOpen(false);
+                          }}
+                          className="border-b"
+                        >
+                          <Plus className="mr-2 h-4 w-4" />
+                          Add Client
+                        </CommandItem>
+                        {clients.map((client) => (
+                          <CommandItem
+                            key={client.id}
+                            value={client.name}
+                            onSelect={() => {
+                              handleInputChange("clientId", client.id);
+                              handleInputChange("clientName", client.name);
+                              handleInputChange("clientDescription", client.description || "");
+                              setClientPopoverOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                formData.clientId === client.id ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            <div>
+                              <div className="font-medium">{client.name}</div>
+                              {client.description && (
+                                <div className="text-xs text-muted-foreground line-clamp-1">
+                                  {client.description}
+                                </div>
+                              )}
+                            </div>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              {formData.clientId && (
+                <div className="text-sm text-muted-foreground mt-1">
+                  {formData.clientDescription && (
+                    <p className="line-clamp-2">{formData.clientDescription}</p>
+                  )}
+                </div>
+              )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="clientDescription">Client Description</Label>
-              <Textarea
-                id="clientDescription"
-                value={formData.clientDescription}
-                onChange={(e) => handleInputChange("clientDescription", e.target.value)}
-                placeholder="Enter client description"
-                rows={4}
-              />
-            </div>
+            <Dialog open={addClientDialogOpen} onOpenChange={setAddClientDialogOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="font-work">Add New Client</DialogTitle>
+                  <DialogDescription className="font-light">
+                    Add a new client to your database
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="newClientName" className="font-light">Client Name *</Label>
+                    <Input
+                      id="newClientName"
+                      value={newClientData.name}
+                      onChange={(e) => setNewClientData({ ...newClientData, name: e.target.value })}
+                      placeholder="Enter client name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="newClientDescription" className="font-light">Description</Label>
+                    <Textarea
+                      id="newClientDescription"
+                      value={newClientData.description}
+                      onChange={(e) => setNewClientData({ ...newClientData, description: e.target.value })}
+                      placeholder="Enter client description"
+                      rows={4}
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setAddClientDialogOpen(false);
+                        setNewClientData({ name: "", description: "" });
+                      }}
+                      className="font-light"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={handleAddClient}
+                      className="font-light"
+                    >
+                      Add Client
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">

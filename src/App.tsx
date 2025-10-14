@@ -14,6 +14,7 @@ const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Jobs = lazy(() => import("./pages/Jobs"));
 const Groups = lazy(() => import("./pages/Groups"));
+const Clients = lazy(() => import("./pages/Clients"));
 const AddJob = lazy(() => import("./pages/AddJob"));
 const EditJob = lazy(() => import("./pages/EditJob"));
 const JobDetails = lazy(() => import("./pages/JobDetails"));
@@ -67,6 +68,7 @@ const App = () => (
                   <Route path="/tasks" element={<DashboardLayout><Tasks /></DashboardLayout>} />
                   <Route path="/jobs" element={<DashboardLayout><Jobs /></DashboardLayout>} />
                   <Route path="/groups" element={<DashboardLayout><Groups /></DashboardLayout>} />
+                  <Route path="/clients" element={<DashboardLayout><Clients /></DashboardLayout>} />
                   <Route path="/jobs/add" element={<DashboardLayout><AddJob /></DashboardLayout>} />
                   <Route path="/jobs/edit/:id" element={<DashboardLayout><EditJob /></DashboardLayout>} />
                   <Route path="/job/:id" element={<DashboardLayout><JobDetails /></DashboardLayout>} />

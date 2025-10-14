@@ -68,6 +68,30 @@ export type Database = {
         }
         Relationships: []
       }
+      clients: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       CVs: {
         Row: {
           cv_link: string | null
@@ -179,6 +203,7 @@ export type Database = {
           auto_dial_enabled_at: string | null
           automatic_dial: boolean | null
           client_description: string | null
+          client_id: string | null
           client_name: string | null
           contract_length: string | null
           Currency: string | null
@@ -212,6 +237,7 @@ export type Database = {
           auto_dial_enabled_at?: string | null
           automatic_dial?: boolean | null
           client_description?: string | null
+          client_id?: string | null
           client_name?: string | null
           contract_length?: string | null
           Currency?: string | null
@@ -245,6 +271,7 @@ export type Database = {
           auto_dial_enabled_at?: string | null
           automatic_dial?: boolean | null
           client_description?: string | null
+          client_id?: string | null
           client_name?: string | null
           contract_length?: string | null
           Currency?: string | null
@@ -274,6 +301,13 @@ export type Database = {
           Type?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "Jobs_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "Jobs_group_id_fkey"
             columns: ["group_id"]
