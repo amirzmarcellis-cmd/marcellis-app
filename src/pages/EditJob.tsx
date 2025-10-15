@@ -511,7 +511,7 @@ export default function EditJob() {
                           client_name: values[values.length - 1] || ""
                         }));
                       }}
-                      apiEndpoint="https://sofrxfgjptargppbepbi.supabase.run/rest/v1/clients?select=id,name&name=ilike.*{keywords}*&order=name.asc&limit=50"
+                      apiEndpoint="https://sofrxfgjptargppbepbi.supabase.co/rest/v1/clients?select=id,name&name=ilike.*{keywords}*&order=name.asc&limit=50"
                       apiHeaders={{
                         "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvZnJ4ZmdqcHRhcmdwcGJlcGJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMDMxNzYsImV4cCI6MjA2OTg3OTE3Nn0._xVCMGu8VY2_JSs38wOdL7nG7EKpl3996heMiu33j9A",
                         "Accept": "application/json"
