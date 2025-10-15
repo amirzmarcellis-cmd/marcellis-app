@@ -55,7 +55,7 @@ export function ProgressiveStatusBar({ status, className }: ProgressiveStatusBar
                   className={cn(
                     "w-1 h-full rounded-full transition-all duration-700",
                     isPassed && "bg-white shadow-[0_0_15px_3px_rgba(255,255,255,0.4)]",
-                    isCurrent && "bg-primary shadow-[0_0_20px_4px_hsl(var(--primary)/0.6)] scale-150 h-16",
+                    isCurrent && "bg-white shadow-[0_0_20px_4px_rgba(255,255,255,0.6)] scale-150 h-16",
                     isNotReached && "bg-muted-foreground/30"
                   )}
                 />
