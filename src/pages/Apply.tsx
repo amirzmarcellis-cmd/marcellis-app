@@ -172,42 +172,62 @@ export default function Apply() {
     setIsSubmitting(true);
     
     try {
+      // Check if files are still uploading
+      const stillUploading = uploadedFiles.some(file => file.isUploading);
+      if (stillUploading) {
+        toast({
+          title: "Files Still Uploading",
+          description: "Please wait for all files to finish uploading before submitting.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       // Get job_id from URL params
       const path = window.location.pathname;
       const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
       const jobIdFromUrl = pathMatch?.[1] || "";
 
-      // Only insert to database if no files were uploaded (files are handled separately)
-      if (uploadedFiles.length === 0) {
-        // Function to clean text data and remove null characters
-        const cleanText = (text: string) => {
-          if (!text) return "";
-          return text.replace(/\u0000/g, "").trim();
-        };
+      // Function to clean text data and remove null characters
+      const cleanText = (text: string) => {
+        if (!text) return "";
+        return text.replace(/\u0000/g, "").trim();
+      };
 
-        // Insert into CVs table with correct field mapping
-        const { error: insertError } = await supabase
-          .from("CVs")
-          .insert([{
-            user_id: cleanText(data.user_id),
-            Firstname: cleanText(data.firstName),
-            Lastname: cleanText(data.lastName),
-            name: cleanText(`${data.firstName} ${data.lastName}`),
-            email: cleanText(data.email),
-            phone_number: cleanText(data.phoneNumber),
-            notes: "",
-            job_id: cleanText(jobIdFromUrl),
-            cv_text: "",
-            cv_link: ""
-          }]);
+      // Get valid uploaded files (only those with Supabase URLs)
+      const validFiles = uploadedFiles.filter(file => 
+        file.url && file.url.startsWith('https://') && file.url.includes('supabase') && !file.isUploading
+      );
 
-        if (insertError) {
-          console.error("Insert failed:", insertError);
-          throw insertError;
-        }
+      // Prepare webhook payload with all data
+      const webhookPayload = {
+        type: "INSERT",
+        table: "CVs",
+        record: {
+          name: cleanText(`${data.firstName} ${data.lastName}`),
+          email: cleanText(data.email),
+          cv_link: validFiles.length > 0 ? validFiles.map(f => f.url).join(', ') : "",
+          cv_text: validFiles.length > 0 ? validFiles.map(f => f.text || '').join('\n') : "",
+          user_id: cleanText(data.user_id),
+          Lastname: cleanText(data.lastName),
+          Firstname: cleanText(data.firstName),
+          phone_number: cleanText(data.phoneNumber),
+          notes: "",
+          job_id: cleanText(jobIdFromUrl)
+        },
+        schema: "public",
+        old_record: null
+      };
 
-        setIsSubmitted(true);
-      } else {
+      // Trigger webhook
+      const success = await triggerWebhook(webhookPayload);
+
+      if (success) {
+        toast({
+          title: "Application Submitted Successfully",
+          description: `Your application has been submitted with User ID: ${data.user_id}`,
+        });
         setIsSubmitted(true);
       }
     } catch (error) {
@@ -347,77 +367,12 @@ export default function Apply() {
   };
 
   const handleSubmitFiles = async () => {
-    // One-click lock and one-time trigger guard
-    if (hasTriggeredWebhookRef.current || isSubmittingFiles) return;
-    
-    // Temporarily lock to avoid rapid double clicks; we'll release if we can't send yet
-    hasTriggeredWebhookRef.current = true;
-    setIsSubmittingFiles(true);
-
-    try {
-      // Do not proceed while files are still uploading
-      const stillUploading = uploadedFiles.some(file => file.isUploading);
-      if (stillUploading) {
-        // Release lock so user can try again once uploads finish
-        hasTriggeredWebhookRef.current = false;
-        setIsSubmittingFiles(false);
-        return;
-      }
-
-      const path = window.location.pathname;
-      const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
-      const resolvedJobId = pathMatch?.[1] || "general";
-
-      const formUserId = form.getValues("user_id");
-
-      const validFiles = uploadedFiles.filter(file => 
-        file.url && file.url.startsWith('https://') && file.url.includes('supabase') && !file.isUploading
-      );
-
-      if (validFiles.length === 0) {
-        // Release lock (nothing to send yet)
-        hasTriggeredWebhookRef.current = false;
-        setIsSubmittingFiles(false);
-        return;
-      }
-
-      const webhookPayload = {
-        type: "INSERT",
-        table: "CVs",
-        record: {
-          name: `${form.getValues("firstName")} ${form.getValues("lastName")}`,
-          email: form.getValues("email"),
-          cv_link: validFiles.map(f => f.url).join(', '),
-          cv_text: validFiles.map(f => f.text || '').join('\n'),
-          user_id: formUserId,
-          Lastname: form.getValues("lastName"),
-          Firstname: form.getValues("firstName"),
-          phone_number: form.getValues("phoneNumber"),
-          notes: "",
-          job_id: resolvedJobId
-        },
-        schema: "public",
-        old_record: null
-      };
-
-      const success = await triggerWebhook(webhookPayload);
-
-      if (success) {
-        toast({
-          title: "Files Submitted Successfully",
-          description: `Your CV files have been submitted with User ID: ${formUserId}. Webhook triggered to external system.`,
-        });
-      }
-
-      // Keep the one-time flag set after a send attempt (even with no-cors opaque response)
-      setIsDialogOpen(false);
-    } catch (e) {
-      console.error("Submit files failed:", e);
-      // On unexpected error, allow retry
-      hasTriggeredWebhookRef.current = false;
-    } finally {
-      setIsSubmittingFiles(false);
-    }
+    // Simply close the dialog - webhook will be triggered when Submit Application is clicked
+    setIsDialogOpen(false);
+    toast({
+      title: "Files Ready",
+      description: "Your files are ready. Click 'Submit Application' to complete your submission.",
+    });
   };
 
   if (isSubmitted) {
@@ -590,9 +545,9 @@ export default function Apply() {
                                 type="button"
                                 onClick={handleSubmitFiles}
                                 className="w-full"
-                                disabled={uploadedFiles.length === 0 || isSubmittingFiles || hasTriggeredWebhookRef.current || uploadedFiles.some(f => f.isUploading)}
+                                disabled={uploadedFiles.length === 0 || uploadedFiles.some(f => f.isUploading)}
                               >
-                                {isSubmittingFiles ? "Submitting..." : "Submit Files"}
+                                {uploadedFiles.some(f => f.isUploading) ? "Processing..." : "Done"}
                               </Button>
                             </div>
                           </DialogContent>
