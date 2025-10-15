@@ -604,7 +604,11 @@ export default function CallLogDetails() {
                 <RulerScore value={(() => {
                   const afterCallScore = parseInt(callLog.after_call_score || "0")
                   const cvScore = parseInt(callLog.cv_score || "0")
-                  return Math.round((afterCallScore + cvScore) / 2)
+                  const linkedInScore = parseInt(callLog.linkedin_score || "0")
+                  const source = callLog.source?.toLowerCase() || ""
+                  const isLinkedInSource = source.includes('linkedin')
+                  const secondScore = isLinkedInSource ? linkedInScore : cvScore
+                  return Math.round((afterCallScore + secondScore) / 2)
                 })()} />
               </div>
             )}
