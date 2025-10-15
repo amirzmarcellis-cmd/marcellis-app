@@ -494,6 +494,8 @@ export default function AddJob() {
           itris_job_id: formData.itrisId,
           group_id: formData.groupId || null,
           recruiter_id: recruiterIdToSave || null,
+          status: 'Active',
+          Processed: 'Yes',
           Timestamp: new Date().toISOString()
         });
 

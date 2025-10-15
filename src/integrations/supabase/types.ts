@@ -94,6 +94,7 @@ export type Database = {
       }
       CVs: {
         Row: {
+          applied_for: string[] | null
           cv_link: string | null
           cv_text: string | null
           done_questions: string | null
@@ -109,6 +110,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          applied_for?: string[] | null
           cv_link?: string | null
           cv_text?: string | null
           done_questions?: string | null
@@ -124,6 +126,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          applied_for?: string[] | null
           cv_link?: string | null
           cv_text?: string | null
           done_questions?: string | null
@@ -456,7 +459,9 @@ export type Database = {
         Row: {
           apollo_id: string | null
           chat_id: string | null
+          connection_request_time: string | null
           id: number
+          invitation_id: string | null
           job_id: string | null
           linkedin_id: string | null
           recruiter_id: string | null
@@ -468,7 +473,9 @@ export type Database = {
         Insert: {
           apollo_id?: string | null
           chat_id?: string | null
+          connection_request_time?: string | null
           id?: number
+          invitation_id?: string | null
           job_id?: string | null
           linkedin_id?: string | null
           recruiter_id?: string | null
@@ -480,7 +487,9 @@ export type Database = {
         Update: {
           apollo_id?: string | null
           chat_id?: string | null
+          connection_request_time?: string | null
           id?: number
+          invitation_id?: string | null
           job_id?: string | null
           linkedin_id?: string | null
           recruiter_id?: string | null

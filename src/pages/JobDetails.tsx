@@ -73,6 +73,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
+import { ProcessingAnimation } from "@/components/jobs/ProcessingAnimation";
 
 // Using any type to avoid TypeScript complexity with quoted property names
 
@@ -499,6 +500,18 @@ export default function JobDetails() {
           setRecruiterName(recruiterData.name);
         }
       }
+
+      // Fetch group data if group_id exists
+      if (data.group_id) {
+        const { data: groupData } = await supabase
+          .from("groups")
+          .select("*")
+          .eq("id", data.group_id)
+          .maybeSingle();
+        if (groupData) {
+          setJobGroup(groupData);
+        }
+      }
     } catch (error) {
       console.error("Error fetching job:", error);
       setJob(null);
@@ -506,6 +519,73 @@ export default function JobDetails() {
       setLoading(false);
     }
   };
+
+  // Monitor AI requirements and update status from Active to Processing
+  useEffect(() => {
+    if (!job || !job.job_id) return;
+    
+    const hasAIRequirements = job.things_to_look_for || job.musttohave || job.nicetohave;
+    
+    if (hasAIRequirements && job.status === 'Active' && job.Processed === 'Yes') {
+      // Automatically transition to Processing
+      const updateStatus = async () => {
+        try {
+          const { error } = await supabase
+            .from('Jobs')
+            .update({ status: 'Processing' })
+            .eq('job_id', job.job_id);
+          
+          if (!error) {
+            setJob({ ...job, status: 'Processing' });
+          }
+        } catch (error) {
+          console.error('Error updating job status:', error);
+        }
+      };
+      updateStatus();
+    }
+  }, [job?.things_to_look_for, job?.musttohave, job?.nicetohave, job?.status, job?.job_id, job?.Processed]);
+
+  // Monitor for first candidate added and update status from Processing to Recruiting
+  useEffect(() => {
+    if (!job || !job.job_id) return;
+    
+    const channel = supabase
+      .channel('job-candidates-monitor')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'Jobs_CVs',
+        filter: `job_id=eq.${job.job_id}`
+      }, async (payload) => {
+        console.log('New candidate detected:', payload);
+        
+        // First candidate added, transition to Recruiting if Processing
+        if (job.status === 'Processing' && job.Processed === 'Yes') {
+          try {
+            const { error } = await supabase
+              .from('Jobs')
+              .update({ status: 'Recruiting' })
+              .eq('job_id', job.job_id);
+            
+            if (!error) {
+              setJob({ ...job, status: 'Recruiting' });
+              toast({
+                title: "Status Updated",
+                description: "Job is now actively recruiting candidates",
+              });
+            }
+          } catch (error) {
+            console.error('Error updating job status:', error);
+          }
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [job?.job_id, job?.status, job?.Processed]);
   const handleAutomaticDialToggle = async (checked: boolean) => {
     if (!job?.job_id) return;
 
@@ -2633,6 +2713,9 @@ export default function JobDetails() {
   );
   return (
     <div className={cn("space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden", isShaking && "animate-shake")}>
+      {/* Processing Animation Overlay */}
+      {job?.status === 'Processing' && job?.Processed === 'Yes' && <ProcessingAnimation />}
+      
       {/* Header */}
       <div className="flex flex-col gap-4">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 items-start">

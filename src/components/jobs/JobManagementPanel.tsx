@@ -241,19 +241,57 @@ export function JobManagementPanel() {
       console.error('Error fetching groups:', error);
     }
   }, []);
-  const handleStatusToggle = async (jobId: string, currentStatus: string | null) => {
-    const newStatus = currentStatus === "Yes" ? "No" : "Yes";
+  const handleStatusToggle = async (jobId: string, currentProcessed: string | null) => {
+    const newProcessed = currentProcessed === "Yes" ? "No" : "Yes";
+    
     try {
-      const {
-        error
-      } = await supabase.from('Jobs').update({
-        Processed: newStatus
-      }).eq('job_id', jobId);
+      let newStatus = null;
+      
+      if (newProcessed === "No") {
+        // User is pausing - always set to Completed
+        newStatus = 'Completed';
+      } else {
+        // User is resuming - check if job has candidates
+        const { data: candidatesData } = await supabase
+          .from('Jobs_CVs')
+          .select('recordid')
+          .eq('job_id', jobId)
+          .limit(1);
+        
+        const hasCandidates = candidatesData && candidatesData.length > 0;
+        
+        if (hasCandidates) {
+          newStatus = 'Recruiting';
+        } else {
+          // Check if AI requirements exist
+          const { data: jobData } = await supabase
+            .from('Jobs')
+            .select('things_to_look_for, musttohave, nicetohave')
+            .eq('job_id', jobId)
+            .single();
+          
+          const hasAI = jobData?.things_to_look_for || jobData?.musttohave || jobData?.nicetohave;
+          newStatus = hasAI ? 'Processing' : 'Active';
+        }
+      }
+      
+      const updateData: any = { Processed: newProcessed };
+      if (newStatus) {
+        updateData.status = newStatus;
+      }
+      
+      const { error } = await supabase
+        .from('Jobs')
+        .update(updateData)
+        .eq('job_id', jobId);
+      
       if (error) throw error;
+      
       await fetchJobs();
+      
       toast({
         title: "Success",
-        description: `Job ${newStatus === "Yes" ? "activated" : "paused"}`
+        description: newProcessed === "Yes" ? "Job reactivated" : "Job marked as completed"
       });
     } catch (error) {
       console.error('Error updating job status:', error);
@@ -308,14 +346,24 @@ export function JobManagementPanel() {
       });
     }
   };
-  const getStatusBadge = (status: string | null) => {
-    return status === "Yes" ? <Badge className="bg-status-active text-white">
-        <Play className="h-3 w-3 mr-1" />
-        Active
-      </Badge> : <Badge variant="secondary">
-        <Pause className="h-3 w-3 mr-1" />
-        Paused
-      </Badge>;
+  const getStatusBadge = (status: string | null, processed: string | null) => {
+    const displayStatus = status || (processed === "Yes" ? "Active" : "Completed");
+    
+    const badgeConfig: Record<string, { color: string; icon: string }> = {
+      'Active': { color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: '🔵' },
+      'Processing': { color: 'bg-purple-500/20 text-purple-400 border-purple-500/30 animate-pulse', icon: '🟣' },
+      'Recruiting': { color: 'bg-green-500/20 text-green-400 border-green-500/30', icon: '🟢' },
+      'Completed': { color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30', icon: '🟡' },
+    };
+    
+    const config = badgeConfig[displayStatus] || badgeConfig['Active'];
+    
+    return (
+      <Badge className={`${config.color} font-light border`}>
+        <span className="mr-1">{config.icon}</span>
+        {displayStatus}
+      </Badge>
+    );
   };
   // Memoize expensive filtering operations
   const filteredJobs = useMemo(() => {
@@ -577,14 +625,24 @@ const JobGrid = memo(function JobGrid({
       return `${currency} ${isNaN(amount) ? amountStr : amount.toLocaleString()}`;
     }
   };
-  const getStatusBadge = (status: string | null) => {
-    return status === "Yes" ? <Badge className="bg-status-active text-white">
-        <Play className="h-3 w-3 mr-1" />
-        Active
-      </Badge> : <Badge variant="secondary">
-        <Pause className="h-3 w-3 mr-1" />
-        Paused
-      </Badge>;
+  const getStatusBadge = (status: string | null, processed: string | null) => {
+    const displayStatus = status || (processed === "Yes" ? "Active" : "Completed");
+    
+    const badgeConfig: Record<string, { color: string; icon: string }> = {
+      'Active': { color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: '🔵' },
+      'Processing': { color: 'bg-purple-500/20 text-purple-400 border-purple-500/30 animate-pulse', icon: '🟣' },
+      'Recruiting': { color: 'bg-green-500/20 text-green-400 border-green-500/30', icon: '🟢' },
+      'Completed': { color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30', icon: '🟡' },
+    };
+    
+    const config = badgeConfig[displayStatus] || badgeConfig['Active'];
+    
+    return (
+      <Badge className={`${config.color} font-light border`}>
+        <span className="mr-1">{config.icon}</span>
+        {displayStatus}
+      </Badge>
+    );
   };
   if (!loading && jobs.length === 0) {
     return <Card className="mission-card">
@@ -606,7 +664,7 @@ const JobGrid = memo(function JobGrid({
                   {job.job_title || "Untitled Position"}
                 </h4>
                 <div className="flex items-center space-x-2 mb-2">
-                  {getStatusBadge(job.Processed)}
+                  {getStatusBadge(job.status, job.Processed)}
                   <Badge variant="outline" className="text-xs">
                     ID: {job.job_id}
                   </Badge>
