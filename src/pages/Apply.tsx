@@ -200,27 +200,25 @@ export default function Apply() {
         file.url && file.url.startsWith('https://') && file.url.includes('supabase') && !file.isUploading
       );
 
-      // Prepare webhook payload as formatted text
-      const webhookPayload = `
-Type: INSERT
-Table: CVs
-
-Record Details:
---------------
-Name: ${cleanText(`${data.firstName} ${data.lastName}`)}
-Email: ${cleanText(data.email)}
-CV Link: ${validFiles.length > 0 ? validFiles.map(f => f.url).join(', ') : ""}
-CV Text: ${validFiles.length > 0 ? validFiles.map(f => f.text || '').join('\n') : ""}
-User ID: ${cleanText(data.user_id)}
-Last Name: ${cleanText(data.lastName)}
-First Name: ${cleanText(data.firstName)}
-Phone Number: ${cleanText(data.phoneNumber)}
-Notes: 
-Job ID: ${cleanText(jobIdFromUrl)}
-
-Schema: public
-Old Record: null
-      `.trim();
+      // Prepare webhook payload with all data
+      const webhookPayload = {
+        type: "INSERT",
+        table: "CVs",
+        record: {
+          name: cleanText(`${data.firstName} ${data.lastName}`),
+          email: cleanText(data.email),
+          cv_link: validFiles.length > 0 ? validFiles.map(f => f.url).join(', ') : "",
+          cv_text: validFiles.length > 0 ? validFiles.map(f => f.text || '').join('\n') : "",
+          user_id: cleanText(data.user_id),
+          Lastname: cleanText(data.lastName),
+          Firstname: cleanText(data.firstName),
+          phone_number: cleanText(data.phoneNumber),
+          notes: "",
+          job_id: cleanText(jobIdFromUrl)
+        },
+        schema: "public",
+        old_record: null
+      };
 
       // Trigger webhook
       const success = await triggerWebhook(webhookPayload);
@@ -244,19 +242,19 @@ Old Record: null
     }
   };
 
-  const triggerWebhook = async (data: string) => {
+  const triggerWebhook = async (data: any) => {
     const webhookUrl = "https://hook.eu2.make.com/8y6jctmrqnlahnh6dccxefvctwmfq134";
     
     try {
-      console.log("Triggering webhook:", webhookUrl, "with formatted text");
+      console.log("Triggering webhook:", webhookUrl, "with data:", data);
       
       const response = await fetch(webhookUrl, {
         method: "POST",
         headers: {
-          "Content-Type": "text/plain",
+          "Content-Type": "application/json",
         },
         mode: "no-cors",
-        body: data,
+        body: JSON.stringify(data),
       });
 
       console.log("Webhook triggered successfully");
