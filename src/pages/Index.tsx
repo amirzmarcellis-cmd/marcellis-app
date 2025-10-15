@@ -223,25 +223,9 @@ export default function Index() {
         const {
           data,
           error
-        } = await supabase.from('Jobs_CVs').select('job_id, recordid, cv_score, after_call_score, shortlisted_at, contacted, candidate_name, candidate_email, candidate_phone_number, call_summary, after_call_reason, lastcalltime, user_id, source').in('job_id', jobIds);
+        } = await supabase.from('Jobs_CVs').select('job_id, recordid, cv_score, after_call_score, shortlisted_at, contacted, candidate_name, candidate_email, candidate_phone_number, call_summary, after_call_reason, lastcalltime, user_id, source').in('job_id', jobIds).limit(5000);
         jobsCvsData = data || [];
         jobsCvsError = error;
-        
-        // DEBUG: Log raw submitted data
-        const rawSubmitted = (data || []).filter((jc: any) => 
-          jc.contacted && jc.contacted.toLowerCase().trim() === 'submitted'
-        );
-        console.log('Raw Jobs_CVs submitted data:', {
-          totalRecords: data?.length || 0,
-          submittedCount: rawSubmitted.length,
-          submittedRecordids: rawSubmitted.map((r: any) => r.recordid),
-          submittedDetails: rawSubmitted.map((r: any) => ({
-            recordid: r.recordid,
-            job_id: r.job_id,
-            candidate_name: r.candidate_name,
-            contacted: r.contacted
-          }))
-        });
       }
       console.log('Jobs fetched:', jobsData?.length || 0);
       console.log('Jobs_CVs fetched:', jobsCvsData?.length || 0);
@@ -304,34 +288,8 @@ export default function Index() {
 
       // Calculate total shortlisted, submitted, and rejected counts
       const totalShortlisted = links.filter((jc: any) => jc.shortlisted_at !== null).length;
-      
-      // DEBUG: Detailed submitted records logging
-      const submittedRecords = links.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase().trim() === 'submitted');
-      console.log('Submitted Records in Links Array:', {
-        count: submittedRecords.length,
-        recordids: submittedRecords.map((r: any) => r.recordid),
-        byJob: submittedRecords.reduce((acc: any, r: any) => {
-          acc[r.job_id] = (acc[r.job_id] || 0) + 1;
-          return acc;
-        }, {}),
-        fullDetails: submittedRecords.map((r: any) => ({
-          recordid: r.recordid,
-          job_id: r.job_id,
-          candidate_name: r.candidate_name,
-          user_id: r.user_id
-        }))
-      });
-      
-      const totalSubmitted = submittedRecords.length;
+      const totalSubmitted = links.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase().trim() === 'submitted').length;
       const totalRejected = links.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase().trim() === 'rejected').length;
-      
-      console.log('Dashboard Metrics Debug:', {
-        totalShortlisted,
-        totalSubmitted,
-        totalRejected,
-        highScoreActive: callDoneActiveCandidates.length,
-        sampleContactedStatuses: links.slice(0, 10).map((jc: any) => jc.contacted)
-      });
       
       setTotalShortlistedCount(totalShortlisted);
       setTotalSubmittedCount(totalSubmitted);
