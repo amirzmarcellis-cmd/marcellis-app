@@ -49,12 +49,24 @@ export function ProgressiveStatusBar({ status, className }: ProgressiveStatusBar
               key={stage}
               className="flex flex-col items-center gap-3 transition-all duration-700"
             >
+              {/* Stage indicator - vertical line */}
+              <div className="relative flex items-center justify-center h-12">
+                <div
+                  className={cn(
+                    "w-1 h-full rounded-full transition-all duration-700",
+                    isPassed && "bg-white shadow-[0_0_15px_3px_rgba(255,255,255,0.4)]",
+                    isCurrent && "bg-primary shadow-[0_0_20px_4px_hsl(var(--primary)/0.6)] scale-150 h-16",
+                    isNotReached && "bg-muted-foreground/30"
+                  )}
+                />
+              </div>
+              
               {/* Stage label */}
               <span
                 className={cn(
                   "text-xs font-semibold transition-all duration-700 text-center",
                   isPassed && "text-white",
-                  isCurrent && "text-primary scale-110",
+                  isCurrent && "text-primary",
                   isNotReached && "text-muted-foreground/50"
                 )}
               >
