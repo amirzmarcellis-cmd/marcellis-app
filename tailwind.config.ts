@@ -179,6 +179,14 @@ export default {
 					'0%, 100%': { transform: 'translateX(0)' },
 					'10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-2px)' },
 					'20%, 40%, 60%, 80%': { transform: 'translateX(2px)' }
+				},
+				'shimmer': {
+					'0%': { transform: 'translateX(-100%)' },
+					'100%': { transform: 'translateX(200%)' }
+				},
+				'pulse-subtle': {
+					'0%, 100%': { opacity: '1', transform: 'scale(1)' },
+					'50%': { opacity: '0.9', transform: 'scale(1.05)' }
 				}
 			},
 			animation: {
@@ -196,7 +204,9 @@ export default {
 				'marquee': 'marquee 24s linear infinite',
 				'parallax-pan': 'parallax-pan 60s linear infinite',
 				'spotlight-fade': 'spotlight-fade 0.6s ease-out',
-				'shake': 'shake 0.6s ease-in-out'
+				'shake': 'shake 0.6s ease-in-out',
+				'shimmer': 'shimmer 2s ease-in-out infinite',
+				'pulse-subtle': 'pulse-subtle 2s ease-in-out infinite'
 			}
 		}
 	},

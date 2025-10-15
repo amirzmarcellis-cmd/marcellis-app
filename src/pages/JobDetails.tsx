@@ -75,6 +75,7 @@ import {
 import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { ProcessingAnimation } from "@/components/jobs/ProcessingAnimation";
 import { AppleLoadingBar } from "@/components/ui/AppleLoadingBar";
+import { ProgressiveStatusBar } from "@/components/ui/ProgressiveStatusBar";
 
 // Using any type to avoid TypeScript complexity with quoted property names
 
@@ -2797,6 +2798,11 @@ export default function JobDetails() {
                   ? "Active"
                   : "Not Active"}
               </Badge>
+            </div>
+
+            {/* Progressive Status Bar */}
+            <div className="pt-6 pb-2">
+              <ProgressiveStatusBar status={job.status || "Active"} />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 pt-4 border-t">
