@@ -246,7 +246,7 @@ export default function Apply() {
     const webhookUrl = "https://hook.eu2.make.com/8y6jctmrqnlahnh6dccxefvctwmfq134";
     
     try {
-      console.log("Triggering webhook:", webhookUrl, "with data:", data);
+      console.log("Triggering webhook:", webhookUrl, "with data:", [data]);
       
       const response = await fetch(webhookUrl, {
         method: "POST",
@@ -254,7 +254,7 @@ export default function Apply() {
           "Content-Type": "application/json",
         },
         mode: "no-cors",
-        body: JSON.stringify(data),
+        body: JSON.stringify([data]),
       });
 
       console.log("Webhook triggered successfully");
