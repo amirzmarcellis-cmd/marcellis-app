@@ -574,12 +574,18 @@ export default function CallLogDetails() {
                   <span className="text-sm font-medium">Overall Score</span>
                   <span className={`text-xl font-semibold ${scoreColorClass}`}>
                     {(() => {
-                      // Calculate overall score as average of after call score and CV score
+                      // Calculate overall score based on source
                       const afterCallScore = parseInt(callLog.after_call_score || "0")
                       const cvScore = parseInt(callLog.cv_score || "0")
+                      const linkedInScore = parseInt(callLog.linkedin_score || "0")
                       
-                      // Calculate average of after call and CV scores
-                      const overallScore = Math.round((afterCallScore + cvScore) / 2)
+                      // Use LinkedIn score for LinkedIn sources, CV score for others
+                      const source = callLog.source?.toLowerCase() || ""
+                      const isLinkedInSource = source.includes('linkedin')
+                      const secondScore = isLinkedInSource ? linkedInScore : cvScore
+                      
+                      // Calculate average of after call and second score
+                      const overallScore = Math.round((afterCallScore + secondScore) / 2)
                       
                       // Determine source type for display
                       let sourceType = ""

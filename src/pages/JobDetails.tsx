@@ -2005,14 +2005,22 @@ export default function JobDetails() {
     return null;
   };
   const calculateOverallScore = (candidate: any) => {
-    const cvScore = parseFloat(candidate.cv_score) || 0;
     const afterCallScore = parseFloat(candidate.after_call_score) || 0;
-    if (cvScore > 0 && afterCallScore > 0) {
-      return Math.round((cvScore + afterCallScore) / 2);
-    } else if (cvScore > 0) {
-      return cvScore; // Return CV score if only it's available
+    const cvScore = parseFloat(candidate.cv_score) || 0;
+    const linkedInScore = parseFloat(candidate.linkedin_score) || 0;
+    
+    // Determine which score to use based on source
+    const source = (candidate.source || candidate.Source || "").toLowerCase();
+    const isLinkedInSource = source.includes('linkedin');
+    
+    const secondScore = isLinkedInSource ? linkedInScore : cvScore;
+    
+    if (afterCallScore > 0 && secondScore > 0) {
+      return Math.round((afterCallScore + secondScore) / 2);
+    } else if (secondScore > 0) {
+      return secondScore;
     } else if (afterCallScore > 0) {
-      return afterCallScore; // Return after call score if only it's available
+      return afterCallScore;
     }
     return 0;
   };

@@ -26,6 +26,8 @@ interface CallLog {
   cv_score: number | null
   cv_score_reason: string | null
   after_call_score: number | null
+  linkedin_score: number | null
+  source: string | null
   after_call_reason: string | null
   candidate_name: string | null
   candidate_email: string | null
@@ -299,7 +301,11 @@ export default function CallLog() {
           break
       }
     }
-    const score = log.after_call_score || log.cv_score || 0;
+    // Use LinkedIn score for LinkedIn sources, CV score for others
+    const source = (log.source || "").toLowerCase();
+    const isLinkedInSource = source.includes('linkedin');
+    const secondScore = isLinkedInSource ? (log.linkedin_score || 0) : (log.cv_score || 0);
+    const score = log.after_call_score ? Math.round((log.after_call_score + secondScore) / 2) : secondScore;
     const matchesScore = scoreFilter === "all" || 
                         (scoreFilter === "high" && score >= 75) ||
                         (scoreFilter === "medium" && score >= 50 && score <= 74) ||
@@ -477,7 +483,11 @@ export default function CallLog() {
                           </TableCell>
                           <TableCell className="max-w-[100px]">
                             {(() => {
-                              const score = log.after_call_score || log.cv_score;
+                              // Use LinkedIn score for LinkedIn sources, CV score for others
+                              const source = (log.source || "").toLowerCase();
+                              const isLinkedInSource = source.includes('linkedin');
+                              const secondScore = isLinkedInSource ? (log.linkedin_score || 0) : (log.cv_score || 0);
+                              const score = log.after_call_score ? Math.round((log.after_call_score + secondScore) / 2) : secondScore;
                               return (
                                 <Badge variant={getScoreBadgeVariant(score?.toString())} className="whitespace-nowrap">
                                   {score ? `${score}/100` : "N/A"}

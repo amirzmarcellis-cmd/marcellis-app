@@ -580,7 +580,12 @@ export default function Index() {
       Candidate_ID: candidate.recordid,
       // Map recordid to Candidate_ID for compatibility
       job_title: job?.job_title || 'Unknown Position',
-      success_score: candidate.cv_score || candidate.after_call_score || 0
+      success_score: (() => {
+        const source = (candidate.source || "").toLowerCase();
+        const isLinkedInSource = source.includes('linkedin');
+        const secondScore = isLinkedInSource ? (candidate.linkedin_score || 0) : (candidate.cv_score || 0);
+        return candidate.after_call_score ? Math.round((candidate.after_call_score + secondScore) / 2) : secondScore;
+      })()
     };
   });
   if (loading) {

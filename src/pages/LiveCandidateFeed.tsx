@@ -36,6 +36,10 @@ interface Candidate {
   after_call_reason?: string;
   callid?: number;
   recordid?: number;
+  after_call_score?: number;
+  cv_score?: number;
+  linkedin_score?: number;
+  source?: string;
 }
 
 interface Job {
@@ -150,7 +154,7 @@ export default function LiveCandidateFeed() {
       if (jobIds.length > 0) {
         const { data, error: jobsCvsError } = await supabase
           .from('Jobs_CVs')
-          .select('recordid, candidate_name, candidate_email, candidate_phone_number, job_id, after_call_score, cv_score, after_call_reason, cv_score_reason, contacted, call_summary, after_call_pros, after_call_cons, notice_period, salary_expectations')
+          .select('recordid, candidate_name, candidate_email, candidate_phone_number, job_id, after_call_score, cv_score, linkedin_score, source, after_call_reason, cv_score_reason, contacted, call_summary, after_call_pros, after_call_cons, notice_period, salary_expectations')
           .eq('contacted', 'Call Done')
           .in('job_id', jobIds);
         
@@ -193,7 +197,11 @@ export default function LiveCandidateFeed() {
         success_score: candidate.after_call_score?.toString() || candidate.cv_score?.toString() || '0',
         after_call_reason: candidate.after_call_reason || '',
         callid: candidate.recordid || 0,
-        recordid: candidate.recordid || 0
+        recordid: candidate.recordid || 0,
+        after_call_score: candidate.after_call_score || 0,
+        cv_score: candidate.cv_score || 0,
+        linkedin_score: candidate.linkedin_score || 0,
+        source: candidate.source || ''
       })) || [];
       
       console.log('LiveFeed: Final candidates count:', callDoneCandidates.length);
@@ -214,10 +222,17 @@ export default function LiveCandidateFeed() {
     return matchesSearch && matchesJob;
   });
 
+  const calculateOverallScore = (candidate: Candidate) => {
+    const source = (candidate.source || "").toLowerCase();
+    const isLinkedInSource = source.includes('linkedin');
+    const secondScore = isLinkedInSource ? (candidate.linkedin_score || 0) : (candidate.cv_score || 0);
+    return candidate.after_call_score ? Math.round((candidate.after_call_score + secondScore) / 2) : secondScore;
+  };
+
   const sortedCandidates = [...filteredCandidates].sort((a, b) => {
-    const sa = parseFloat(a.success_score || '0') || 0;
-    const sb = parseFloat(b.success_score || '0') || 0;
-    return sb - sa;
+    const scoreA = calculateOverallScore(a);
+    const scoreB = calculateOverallScore(b);
+    return scoreB - scoreA;
   });
 
   const getScoreColor = (score: number) => {
@@ -333,7 +348,7 @@ export default function LiveCandidateFeed() {
           <ScrollArea className="h-[600px] pr-4">
             <div className="space-y-4">
               {sortedCandidates.map((candidate, index) => {
-                const score = parseFloat(candidate.success_score || '0') || 0;
+                const score = calculateOverallScore(candidate);
                 return (
                   <div 
                     key={index} 
