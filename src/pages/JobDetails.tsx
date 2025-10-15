@@ -74,6 +74,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { ProcessingAnimation } from "@/components/jobs/ProcessingAnimation";
+import { AppleLoadingBar } from "@/components/ui/AppleLoadingBar";
 
 // Using any type to avoid TypeScript complexity with quoted property names
 
@@ -2715,6 +2716,9 @@ export default function JobDetails() {
     <div className={cn("space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden", isShaking && "animate-shake")}>
       {/* Processing Animation Overlay */}
       {job?.status === 'Processing' && job?.Processed === 'Yes' && <ProcessingAnimation />}
+      
+      {/* Apple Loading Bar */}
+      <AppleLoadingBar isLoading={loading} className="absolute top-0 left-0 right-0 z-50" />
       
       {/* Header */}
       <div className="flex flex-col gap-4">

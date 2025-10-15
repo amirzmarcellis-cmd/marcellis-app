@@ -118,6 +118,27 @@ export default {
 				'bounce': 'var(--transition-bounce)'
 			},
 			keyframes: {
+				'apple-loading': {
+					'0%': {
+						transform: 'translateX(-100%)',
+						opacity: '0',
+					},
+					'50%': {
+						opacity: '1',
+					},
+					'100%': {
+						transform: 'translateX(250%)',
+						opacity: '0',
+					},
+				},
+				'apple-loading-out': {
+					'0%': {
+						opacity: '1',
+					},
+					'100%': {
+						opacity: '0',
+					},
+				},
 				'accordion-down': {
 					from: {
 						height: '0'
@@ -161,6 +182,8 @@ export default {
 				}
 			},
 			animation: {
+				'apple-loading': 'apple-loading 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite',
+				'apple-loading-out': 'apple-loading-out 0.5s ease-out forwards',
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.5s ease-out',
