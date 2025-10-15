@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils"
-import { Check } from "lucide-react"
 
 interface ProgressiveStatusBarProps {
   status: string
@@ -24,19 +23,22 @@ export function ProgressiveStatusBar({ status, className }: ProgressiveStatusBar
   return (
     <div className={cn("w-full", className)}>
       {/* Progress bar container */}
-      <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted/30 backdrop-blur-sm">
+      <div className="relative h-1 w-full overflow-hidden rounded-full bg-muted/20 backdrop-blur-sm">
         {/* Animated progress fill */}
         <div
-          className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-primary via-primary/90 to-primary transition-all duration-1000 ease-smooth shadow-[0_0_20px_2px_hsl(var(--primary)/0.4)]"
+          className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-primary via-primary to-primary/80 transition-all duration-1000 ease-smooth shadow-[0_0_30px_4px_hsl(var(--primary)/0.6)]"
           style={{ width: `${progressPercentage}%` }}
         >
           {/* Shimmer effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+          
+          {/* Glowing edge */}
+          <div className="absolute right-0 top-0 bottom-0 w-2 bg-gradient-to-l from-white/40 to-transparent animate-pulse-subtle" />
         </div>
       </div>
 
       {/* Status stages */}
-      <div className="mt-4 flex items-center justify-between">
+      <div className="mt-6 flex items-start justify-between">
         {STATUS_STAGES.map((stage, index) => {
           const isActive = index <= activeIndex
           const isCurrent = index === activeIndex
@@ -44,32 +46,39 @@ export function ProgressiveStatusBar({ status, className }: ProgressiveStatusBar
           return (
             <div
               key={stage}
-              className="flex flex-col items-center gap-2 transition-all duration-500"
+              className="flex flex-col items-center gap-3 transition-all duration-700"
             >
-              {/* Stage indicator */}
-              <div
-                className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all duration-500",
-                  isActive
-                    ? "border-primary bg-primary text-primary-foreground shadow-[0_0_12px_2px_hsl(var(--primary)/0.3)]"
-                    : "border-muted-foreground/30 bg-muted/20 text-muted-foreground",
-                  isCurrent && "scale-110 animate-pulse-subtle"
-                )}
-              >
-                {isActive && index < activeIndex ? (
-                  <Check className="h-4 w-4" />
-                ) : (
-                  <span className="text-xs font-semibold">{index + 1}</span>
-                )}
+              {/* Stage indicator - vertical line */}
+              <div className="relative flex items-center justify-center h-12">
+                <div
+                  className={cn(
+                    "w-1 h-full rounded-full transition-all duration-700 relative",
+                    isActive
+                      ? "bg-gradient-to-b from-primary via-primary to-primary/70 shadow-[0_0_20px_4px_hsl(var(--primary)/0.5)]"
+                      : "bg-muted-foreground/20",
+                    isCurrent && "animate-pulse-glow scale-110"
+                  )}
+                >
+                  {/* Glowing top edge for active states */}
+                  {isActive && (
+                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-primary shadow-[0_0_15px_3px_hsl(var(--primary)/0.8)] animate-pulse-subtle" />
+                  )}
+                  
+                  {/* Glowing bottom edge for current state */}
+                  {isCurrent && (
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-primary shadow-[0_0_15px_3px_hsl(var(--primary)/0.8)] animate-pulse-subtle" />
+                  )}
+                </div>
               </div>
               
               {/* Stage label */}
               <span
                 className={cn(
-                  "text-xs font-medium transition-all duration-500",
+                  "text-xs font-semibold transition-all duration-700 text-center",
                   isActive
                     ? "text-foreground"
-                    : "text-muted-foreground/60"
+                    : "text-muted-foreground/50",
+                  isCurrent && "text-primary animate-pulse-subtle"
                 )}
               >
                 {stage}
