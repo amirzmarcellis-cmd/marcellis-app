@@ -198,8 +198,7 @@ export default function Apply() {
             notes: "",
             job_id: cleanText(jobIdFromUrl),
             cv_text: "",
-            cv_link: "",
-            applied_for: jobIdFromUrl ? [cleanText(jobIdFromUrl)] : []
+            cv_link: ""
           }]);
 
         if (insertError) {
@@ -395,8 +394,7 @@ export default function Apply() {
           Firstname: form.getValues("firstName"),
           phone_number: form.getValues("phoneNumber"),
           notes: "",
-          job_id: resolvedJobId,
-          applied_for: resolvedJobId ? [resolvedJobId] : []
+          job_id: resolvedJobId
         },
         schema: "public",
         old_record: null
