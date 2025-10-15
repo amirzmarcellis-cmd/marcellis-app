@@ -40,8 +40,9 @@ export function ProgressiveStatusBar({ status, className }: ProgressiveStatusBar
       {/* Status stages */}
       <div className="mt-6 flex items-start justify-between">
         {STATUS_STAGES.map((stage, index) => {
-          const isActive = index <= activeIndex
+          const isPassed = index < activeIndex
           const isCurrent = index === activeIndex
+          const isNotReached = index > activeIndex
           
           return (
             <div
@@ -52,33 +53,21 @@ export function ProgressiveStatusBar({ status, className }: ProgressiveStatusBar
               <div className="relative flex items-center justify-center h-12">
                 <div
                   className={cn(
-                    "w-1 h-full rounded-full transition-all duration-700 relative",
-                    isActive
-                      ? "bg-gradient-to-b from-primary via-primary to-primary/70 shadow-[0_0_20px_4px_hsl(var(--primary)/0.5)]"
-                      : "bg-muted-foreground/20",
-                    isCurrent && "animate-pulse-glow scale-110"
+                    "w-1 h-full rounded-full transition-all duration-700",
+                    isPassed && "bg-white shadow-[0_0_15px_3px_rgba(255,255,255,0.4)]",
+                    isCurrent && "bg-primary shadow-[0_0_20px_4px_hsl(var(--primary)/0.6)] scale-150 h-16",
+                    isNotReached && "bg-muted-foreground/30"
                   )}
-                >
-                  {/* Glowing top edge for active states */}
-                  {isActive && (
-                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-primary shadow-[0_0_15px_3px_hsl(var(--primary)/0.8)] animate-pulse-subtle" />
-                  )}
-                  
-                  {/* Glowing bottom edge for current state */}
-                  {isCurrent && (
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-primary shadow-[0_0_15px_3px_hsl(var(--primary)/0.8)] animate-pulse-subtle" />
-                  )}
-                </div>
+                />
               </div>
               
               {/* Stage label */}
               <span
                 className={cn(
                   "text-xs font-semibold transition-all duration-700 text-center",
-                  isActive
-                    ? "text-foreground"
-                    : "text-muted-foreground/50",
-                  isCurrent && "text-primary animate-pulse-subtle"
+                  isPassed && "text-white",
+                  isCurrent && "text-primary",
+                  isNotReached && "text-muted-foreground/50"
                 )}
               >
                 {stage}
