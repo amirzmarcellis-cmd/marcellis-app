@@ -2259,6 +2259,23 @@ mainCandidate["linkedin_score_reason"] ? (
               <p className="text-sm text-muted-foreground line-clamp-3">{mainCandidate["Summary"]}</p>
             )}
 
+            {/* Qualifications Section - only show when call log is available and qualifications exist */}
+            {(mainCandidate["Contacted"]?.toLowerCase() === "call done" ||
+              mainCandidate["Contacted"]?.toLowerCase() === "contacted" ||
+              mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
+              mainCandidate["Contacted"]?.toLowerCase() === "tasked") &&
+              mainCandidate["qualifications"] && (
+                <div className="mt-2 p-2 bg-muted/30 rounded-sm border-l-2 border-primary/30">
+                  <div className="text-xs font-work font-medium text-foreground mb-1 flex items-center">
+                    <FileText className="w-3 h-3 mr-1" />
+                    Qualifications
+                  </div>
+                  <p className="text-xs font-work text-muted-foreground line-clamp-3">
+                    {mainCandidate["qualifications"]}
+                  </p>
+                </div>
+              )}
+
             {/* Task Status and Links Section */}
             {(() => {
               const candidateTasks = taskCandidates.filter((task) => task.candidate_id === candidateId);
