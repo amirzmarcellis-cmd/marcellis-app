@@ -2183,20 +2183,34 @@ export default function JobDetails() {
                       <span className="text-muted-foreground">Overall: {mainCandidate["linkedin_score"]}</span>
                     )}
                 </div>
-                {mainCandidate["Source"] &&
-                  typeof mainCandidate["Source"] === "string" &&
-                  mainCandidate["Source"].toLowerCase().includes("linkedin") &&
-                  mainCandidate["linkedin_score_reason"] !== undefined &&
-                  mainCandidate["linkedin_score_reason"] !== null &&
-                  mainCandidate["linkedin_score_reason"] !== ""}
-                {mainCandidate["Salary Expectations"] && (
-                  <div className="flex items-center gap-2 text-sm mt-1">
-                    <Banknote className="w-3 h-3 text-muted-foreground" />
-                    <span className="text-muted-foreground">
-                      Expected: {formatCurrency(mainCandidate["Salary Expectations"], job?.Currency)}
-                    </span>
-                  </div>
-                )}
+{mainCandidate["Source"] &&
+typeof mainCandidate["Source"] === "string" &&
+mainCandidate["Source"].toLowerCase().includes("linkedin") &&
+mainCandidate["linkedin_score_reason"] ? (
+  <div className="pt-1">
+    <span className="text-muted-foreground text-xs font-work">Reason:</span>
+    <p className="text-xs font-work text-muted-foreground mt-1 line-clamp-3">
+      {mainCandidate["linkedin_score_reason"]}
+    </p>
+  </div>
+) : (
+  mainCandidate["cv_score_reason"] && (
+    <div className="pt-1">
+      <span className="text-muted-foreground text-xs font-work">CV Reason:</span>
+      <p className="text-xs font-work text-muted-foreground mt-1 line-clamp-3">
+        {mainCandidate["cv_score_reason"]}
+      </p>
+    </div>
+  )
+)}
+{mainCandidate["Salary Expectations"] && (
+  <div className="flex items-center gap-2 text-sm mt-1">
+    <Banknote className="w-3 h-3 text-muted-foreground" />
+    <span className="text-muted-foreground">
+      Expected: {formatCurrency(mainCandidate["Salary Expectations"], job?.Currency)}
+    </span>
+  </div>
+)}
               </div>
               {(mainCandidate["Contacted"]?.toLowerCase() === "call done" ||
                 mainCandidate["Contacted"]?.toLowerCase() === "contacted" ||
