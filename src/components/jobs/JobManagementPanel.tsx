@@ -248,8 +248,8 @@ export function JobManagementPanel() {
       let newStatus = null;
       
       if (newProcessed === "No") {
-        // User is pausing - always set to Completed
-        newStatus = 'Completed';
+        // User is pausing - always set to Complete
+        newStatus = 'Complete';
       } else {
         // User is resuming - check if job has candidates
         const { data: candidatesData } = await supabase
@@ -626,13 +626,17 @@ const JobGrid = memo(function JobGrid({
     }
   };
   const getStatusBadge = (status: string | null, processed: string | null) => {
-    const displayStatus = status || (processed === "Yes" ? "Active" : "Completed");
+    // If Processed is "No", always show Complete regardless of status field
+    const displayStatus = processed === "No" 
+      ? "Complete" 
+      : (status || "Active");
     
     const badgeConfig: Record<string, { color: string; icon: string }> = {
       'Active': { color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: '🔵' },
-      'Processing': { color: 'bg-purple-500/20 text-purple-400 border-purple-500/30 animate-pulse', icon: '🟣' },
+      'Sourcing': { color: 'bg-purple-500/20 text-purple-400 border-purple-500/30', icon: '🟣' },
       'Recruiting': { color: 'bg-green-500/20 text-green-400 border-green-500/30', icon: '🟢' },
-      'Completed': { color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30', icon: '🟡' },
+      'Complete': { color: 'bg-purple-500/20 text-purple-400 border-purple-500/30', icon: '🟣' },
+      'Completed': { color: 'bg-purple-500/20 text-purple-400 border-purple-500/30', icon: '🟣' },
     };
     
     const config = badgeConfig[displayStatus] || badgeConfig['Active'];
