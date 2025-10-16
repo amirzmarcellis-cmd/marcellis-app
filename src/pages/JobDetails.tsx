@@ -2412,16 +2412,43 @@ export default function JobDetails() {
             <div className="space-y-2 pt-2 border-t">
               <div className="flex flex-wrap gap-2">
                 {(() => {
-                  console.log("AI Short List - candidateContacts for candidate:", candidateId, candidateContacts);
+                  const isLinkedInCandidate =
+                    typeof mainCandidate["Source"] === "string" &&
+                    mainCandidate["Source"].toLowerCase().includes("linkedin");
                   const contactsWithCalls = candidateContacts.filter((contact) => contact.callcount > 0);
-                  console.log("AI Short List - contactsWithCalls:", contactsWithCalls);
+
+                  // For LinkedIn candidates, always show Call Log button
+                  if (isLinkedInCandidate) {
+                    const latestContact =
+                      contactsWithCalls.length > 0
+                        ? contactsWithCalls.reduce((latest, current) =>
+                            current.callid > latest.callid ? current : latest,
+                          )
+                        : mainCandidate;
+                    return (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        asChild
+                        className="flex-1 min-w-[100px]"
+                      >
+                        <Link
+                          to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid || latestContact.recordid || candidateId}&fromTab=shortlist`}
+                        >
+                          <FileText className="w-3 h-3 mr-1" />
+                          Call Log
+                        </Link>
+                      </Button>
+                    );
+                  }
+
+                  // For non-LinkedIn candidates, only show if they have call logs
                   if (contactsWithCalls.length === 0) return null;
 
                   // Get the latest call log (highest callid)
                   const latestContact = contactsWithCalls.reduce((latest, current) =>
                     current.callid > latest.callid ? current : latest,
                   );
-                  console.log("AI Short List - latestContact:", latestContact);
                   return (
                     <Button
                       key={latestContact.callid}
