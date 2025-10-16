@@ -2854,22 +2854,34 @@ mainCandidate["linkedin_score_reason"] ? (
               </div>
               <Badge
                 variant={
-                  job.Processed === true || job.Processed === "true" || job.Processed === "Yes"
+                  job.status === "paused" || job.Processed === "No"
+                    ? "secondary"
+                    : job.Processed === true || job.Processed === "true" || job.Processed === "Yes"
                     ? "default"
                     : "destructive"
                 }
-                className={`text-xs md:text-sm px-2 md:px-3 py-1 whitespace-nowrap ${job.Processed === true || job.Processed === "true" || job.Processed === "Yes" ? "bg-green-600 text-white border-0" : "bg-red-600 text-white border-0"}`}
+                className={`text-xs md:text-sm px-2 md:px-3 py-1 whitespace-nowrap ${
+                  job.status === "paused" || job.Processed === "No"
+                    ? "bg-yellow-600 text-white border-0"
+                    : job.Processed === true || job.Processed === "true" || job.Processed === "Yes"
+                    ? "bg-green-600 text-white border-0"
+                    : "bg-red-600 text-white border-0"
+                }`}
               >
-                {job.Processed === true || job.Processed === "true" || job.Processed === "Yes"
+                {job.status === "paused" || job.Processed === "No"
+                  ? "Paused"
+                  : job.Processed === true || job.Processed === "true" || job.Processed === "Yes"
                   ? "Active"
                   : "Not Active"}
               </Badge>
             </div>
 
             {/* Progressive Status Bar */}
-            <div className="pt-6 pb-2">
-              <ProgressiveStatusBar status={job.status || "Active"} />
-            </div>
+            {job.status !== "paused" && job.Processed !== "No" && (
+              <div className="pt-6 pb-2">
+                <ProgressiveStatusBar status={job.status || "Active"} />
+              </div>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 pt-4 border-t">
               <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0">
