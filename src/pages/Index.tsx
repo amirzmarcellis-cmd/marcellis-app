@@ -580,6 +580,7 @@ export default function Index() {
       Candidate_ID: candidate.recordid,
       // Map recordid to Candidate_ID for compatibility
       job_title: job?.job_title || 'Unknown Position',
+      recruiter: job?.assignment || 'Unassigned',
       success_score: (() => {
         const source = (candidate.source || "").toLowerCase();
         const isLinkedInSource = source.includes('linkedin');
@@ -746,7 +747,7 @@ export default function Index() {
                             </div>
                              <div>
                                <h4 className="font-work text-foreground group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors text-lg font-normal">{candidate.candidate_name}</h4>
-                               <p className="text-purple-300 text-sm font-normal">{jobTitle}</p>
+                               <p className="text-purple-300 text-sm font-normal">{jobTitle} - ({candidate.recruiter})</p>
                                <div className="flex flex-wrap gap-2 mt-1">
                                  <Badge variant="outline" className="text-xs border-cyan-400/50 text-cyan-400 bg-cyan-400/10">
                                    User ID: {candidate.user_id}
