@@ -78,24 +78,41 @@ export function JobManagementPanel() {
   const {
     isAdmin,
     isManager,
-    isTeamLeader
+    isTeamLeader,
+    loading: rolesLoading
   } = useUserRole();
+  
   useEffect(() => {
+    // Wait for both profile and roles to be fully loaded before fetching
+    if (profileLoading || rolesLoading) {
+      return; // Keep loading state true while data is being fetched
+    }
+    
     if (profile?.user_id) {
       fetchJobs();
       fetchGroups();
-    } else if (!profileLoading) {
-      // No profile available (not logged in or failed to load) -> don't block UI
+    } else {
+      // Profile loading complete but no user - set loading false
       setLoading(false);
     }
-  }, [profile?.user_id, isAdmin, isManager, isTeamLeader, profileLoading]);
+  }, [profile?.user_id, isAdmin, isManager, isTeamLeader, profileLoading, rolesLoading]);
   const fetchJobs = useCallback(async () => {
+    // Guard: Ensure we have all necessary data before fetching
     if (!profile?.user_id) {
+      console.log('JobManagementPanel: No user_id, skipping fetch');
       setLoading(false);
       return;
     }
+    
+    // Don't fetch if roles haven't loaded yet
+    if (rolesLoading) {
+      console.log('JobManagementPanel: Roles still loading, skipping fetch');
+      return;
+    }
+    
     try {
-      console.log('JobManagementPanel: Starting fetch for user:', profile.user_id);
+      console.log('JobManagementPanel: Starting fetch for user:', profile.user_id, 
+                  'Roles:', { isAdmin, isManager, isTeamLeader });
       const startTime = performance.now();
 
       // Optimize: Build query with proper conditions
@@ -217,18 +234,20 @@ export function JobManagementPanel() {
         name: job.recruiter_name!
       }])).values()).sort((a, b) => a.name.localeCompare(b.name));
       setRecruiters(uniqueRecruiters);
+      console.log('JobManagementPanel: Fetch complete. Jobs count:', jobsWithCounts.length);
       setJobs(jobsWithCounts);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching jobs:', error);
+      console.error('JobManagementPanel: Error fetching jobs:', error);
       toast({
         title: "Error",
         description: "Failed to load jobs",
         variant: "destructive"
       });
+      setJobs([]); // Set empty array on error to prevent stale data
       setLoading(false);
     }
-  }, [profile?.user_id, isAdmin, isManager, isTeamLeader, toast]);
+  }, [profile?.user_id, isAdmin, isManager, isTeamLeader, rolesLoading, toast]);
   const fetchGroups = useCallback(async () => {
     try {
       const {
