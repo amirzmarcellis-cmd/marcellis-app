@@ -3044,7 +3044,7 @@ mainCandidate["linkedin_score_reason"] ? (
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Nationality to Include:</span>
+                  <span className="text-muted-foreground">Countries to include:</span>
                   <span>{job.nationality_to_include || "N/A"}</span>
                 </div>
                 <div className="flex justify-between">
