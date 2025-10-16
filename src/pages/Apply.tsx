@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -47,6 +47,7 @@ export default function Apply() {
   const { toast } = useToast();
   const { id: jobId } = useParams();
   const [isSubmittingFiles, setIsSubmittingFiles] = useState(false);
+  const hasTriggeredWebhookRef = useRef(false);
 
   const form = useForm<ApplicationForm>({
     resolver: zodResolver(applicationSchema),
@@ -59,6 +60,13 @@ export default function Apply() {
       jobApplied: "",
     },
   });
+
+  // Re-enable Submit Files when the file list changes
+  useEffect(() => {
+    if (!isSubmittingFiles) {
+      hasTriggeredWebhookRef.current = false;
+    }
+  }, [uploadedFiles, isSubmittingFiles]);
 
 
   // Generate next user ID and fetch job details
@@ -158,6 +166,34 @@ export default function Apply() {
     } catch (error) {
       console.error("Error in fetchJobName:", error);
       return "";
+    }
+  };
+
+  const triggerWebhook = async (data: any) => {
+    const webhookUrl = "https://hook.eu2.make.com/8y6jctmrqnlahnh6dccxefvctwmfq134";
+    
+    try {
+      console.log("Triggering webhook:", webhookUrl, "with data:", data);
+      
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        mode: "no-cors",
+        body: JSON.stringify(data),
+      });
+
+      console.log("Webhook triggered successfully");
+      return true;
+    } catch (error) {
+      console.error("Error triggering webhook:", error);
+      toast({
+        title: "Webhook Error",
+        description: "Failed to trigger webhook. Please check the URL and try again.",
+        variant: "destructive",
+      });
+      return false;
     }
   };
 
@@ -313,51 +349,70 @@ export default function Apply() {
   };
 
   const handleSubmitFiles = async () => {
-    if (isSubmittingFiles) return;
+    // One-click lock and one-time trigger guard
+    if (hasTriggeredWebhookRef.current || isSubmittingFiles) return;
     
+    // Temporarily lock to avoid rapid double clicks
+    hasTriggeredWebhookRef.current = true;
     setIsSubmittingFiles(true);
 
     try {
       // Do not proceed while files are still uploading
       const stillUploading = uploadedFiles.some(file => file.isUploading);
       if (stillUploading) {
+        hasTriggeredWebhookRef.current = false;
         setIsSubmittingFiles(false);
-        toast({
-          title: "Please Wait",
-          description: "Files are still uploading. Please wait for them to complete.",
-          variant: "destructive",
-        });
         return;
       }
+
+      const path = window.location.pathname;
+      const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
+      const resolvedJobId = pathMatch?.[1] || "general";
+
+      const formUserId = form.getValues("user_id");
 
       const validFiles = uploadedFiles.filter(file => 
         file.url && file.url.startsWith('https://') && file.url.includes('supabase') && !file.isUploading
       );
 
       if (validFiles.length === 0) {
+        hasTriggeredWebhookRef.current = false;
         setIsSubmittingFiles(false);
-        toast({
-          title: "No Files",
-          description: "Please upload at least one file before submitting.",
-          variant: "destructive",
-        });
         return;
       }
 
-      // Simply close dialog and show success - no webhook triggered
-      toast({
-        title: "Files Ready",
-        description: "Your files have been uploaded successfully.",
-      });
+      const webhookPayload = {
+        type: "INSERT",
+        table: "CVs",
+        record: {
+          name: `${form.getValues("firstName")} ${form.getValues("lastName")}`,
+          email: form.getValues("email"),
+          cv_link: validFiles.map(f => f.url).join(', '),
+          cv_text: validFiles.map(f => f.text || '').join('\n'),
+          user_id: formUserId,
+          Lastname: form.getValues("lastName"),
+          Firstname: form.getValues("firstName"),
+          phone_number: form.getValues("phoneNumber"),
+          notes: "",
+          job_id: resolvedJobId
+        },
+        schema: "public",
+        old_record: null
+      };
+
+      const success = await triggerWebhook(webhookPayload);
+
+      if (success) {
+        toast({
+          title: "Files Submitted Successfully",
+          description: `Your CV files have been submitted with User ID: ${formUserId}. Webhook triggered to external system.`,
+        });
+      }
 
       setIsDialogOpen(false);
     } catch (e) {
       console.error("Submit files failed:", e);
-      toast({
-        title: "Error",
-        description: "An error occurred. Please try again.",
-        variant: "destructive",
-      });
+      hasTriggeredWebhookRef.current = false;
     } finally {
       setIsSubmittingFiles(false);
     }
@@ -533,7 +588,7 @@ export default function Apply() {
                                 type="button"
                                 onClick={handleSubmitFiles}
                                 className="w-full"
-                                disabled={uploadedFiles.length === 0 || isSubmittingFiles || uploadedFiles.some(f => f.isUploading)}
+                                disabled={uploadedFiles.length === 0 || isSubmittingFiles || hasTriggeredWebhookRef.current || uploadedFiles.some(f => f.isUploading)}
                               >
                                 {isSubmittingFiles ? "Submitting..." : "Submit Files"}
                               </Button>
