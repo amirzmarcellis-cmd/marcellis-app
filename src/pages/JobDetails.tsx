@@ -3048,7 +3048,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   <span>{job.nationality_to_include || "N/A"}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Nationality to Exclude:</span>
+                  <span className="text-muted-foreground">Countries to exclude:</span>
                   <span>{job.nationality_to_exclude || "N/A"}</span>
                 </div>
                 <div className="flex justify-between">
