@@ -195,7 +195,12 @@ export default function Apply() {
       // Function to clean text data and remove null characters
       const cleanText = (text: string) => {
         if (!text) return "";
-        return text.replace(/\u0000/g, "").trim();
+        // Remove null bytes and most control characters that Postgres text cannot store
+        return text
+          .replace(/\u0000/g, "")
+          .replace(/[\u0001-\u0008\u000B-\u001F\u007F-\u009F]/g, "")
+          .normalize("NFC")
+          .trim();
       };
 
       // Get all valid files (uploaded and processed)
@@ -215,7 +220,7 @@ export default function Apply() {
           phone_number: cleanText(data.phoneNumber),
           notes: "",
           job_id: cleanText(jobIdFromUrl),
-          cv_text: validFiles.map(f => f.text || '').join('\n'),
+          cv_text: cleanText(validFiles.map(f => f.text || '').join('\n')),
           cv_link: validFiles.map(f => f.url).join(', ')
         }]);
 
