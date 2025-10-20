@@ -1030,7 +1030,7 @@ export default function JobDetails() {
     try {
       // Fetch both CVs and profiles in parallel
       const [cvsResult, profilesResult] = await Promise.all([
-        supabase.from("CVs").select("*").eq("job_id", jobId).order("updated_time", {
+        supabase.from("CVs").select("*").eq("job_id", jobId).like("user_id", "App%").order("updated_time", {
           ascending: false,
         }),
         supabase.from("profiles").select("user_id, name"),
