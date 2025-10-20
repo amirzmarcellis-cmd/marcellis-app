@@ -6,7 +6,7 @@ interface ProgressiveStatusBarProps {
 }
 
 // Status stages in order
-const STATUS_STAGES = ["Active", "Sourcing", "Recruiting", "Complete"]
+const STATUS_STAGES = ["Active", "Sourcing", "Making Calls", "Complete"]
 
 export function ProgressiveStatusBar({ status, className }: ProgressiveStatusBarProps) {
   // Find the current stage index
