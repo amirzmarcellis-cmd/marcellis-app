@@ -19,10 +19,10 @@ import { Upload, X, FileText } from "lucide-react";
 
 const applicationSchema = z.object({
   user_id: z.string().min(1, "User ID is required"),
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
-  phoneNumber: z.string().min(10, "Please enter a valid phone number"),
-  email: z.string().email("Please enter a valid email address"),
+  firstName: z.string().min(1, "First name is required").min(2, "First name must be at least 2 characters"),
+  lastName: z.string().min(1, "Last name is required").min(2, "Last name must be at least 2 characters"),
+  phoneNumber: z.string().min(1, "Phone number is required").min(10, "Please enter a valid phone number"),
+  email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
   jobApplied: z.string().min(1, "Job applied is required"),
 });
 
@@ -198,6 +198,27 @@ export default function Apply() {
   };
 
   const onSubmit = async (data: ApplicationForm) => {
+    // Validate that at least one CV file is uploaded
+    if (uploadedFiles.length === 0) {
+      toast({
+        title: "CV Required",
+        description: "Please upload at least one CV file to submit your application.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if any files are still uploading
+    const stillUploading = uploadedFiles.some(file => file.isUploading);
+    if (stillUploading) {
+      toast({
+        title: "Upload in Progress",
+        description: "Please wait for all files to finish uploading before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -206,7 +227,7 @@ export default function Apply() {
       const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
       const jobIdFromUrl = pathMatch?.[1] || "";
 
-      // Only insert to database if no files were uploaded (files are handled separately)
+      // Since files are mandatory, we always have files to process
       if (uploadedFiles.length === 0) {
         // Function to clean text data and remove null characters
         const cleanText = (text: string) => {
@@ -468,9 +489,9 @@ export default function Apply() {
                   name="firstName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>First Name</FormLabel>
+                      <FormLabel>First Name *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your first name" {...field} />
+                        <Input placeholder="Enter your first name" {...field} required />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -482,9 +503,9 @@ export default function Apply() {
                   name="lastName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Last Name</FormLabel>
+                      <FormLabel>Last Name *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your last name" {...field} />
+                        <Input placeholder="Enter your last name" {...field} required />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -496,9 +517,9 @@ export default function Apply() {
                   name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel>Phone Number *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your phone number" {...field} />
+                        <Input placeholder="Enter your phone number" {...field} required />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -510,9 +531,9 @@ export default function Apply() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Address</FormLabel>
+                      <FormLabel>Email Address *</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="your.email@example.com" {...field} />
+                        <Input type="email" placeholder="your.email@example.com" {...field} required />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -520,7 +541,8 @@ export default function Apply() {
                 />
 
                 <div>
-                  <Label className="text-sm font-medium">Upload your CV</Label>
+                  <Label className="text-sm font-medium">Upload your CV *</Label>
+                  <p className="text-xs text-muted-foreground mt-1">At least one CV file is required to submit your application</p>
                   <div className="mt-2">
                     {uploadedFiles.length > 0 ? (
                       <div className="space-y-2">
@@ -629,9 +651,9 @@ export default function Apply() {
                 <Button 
                   type="submit" 
                   className="w-full" 
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || uploadedFiles.length === 0}
                 >
-                  {isSubmitting ? "Submitting..." : "Submit Application"}
+                  {isSubmitting ? "Submitting..." : uploadedFiles.length === 0 ? "Please Upload CV First" : "Submit Application"}
                 </Button>
               </form>
             </Form>
