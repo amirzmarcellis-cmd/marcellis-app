@@ -1030,22 +1030,57 @@ export default function JobDetails() {
   const fetchApplications = async (jobId: string) => {
     setApplicationsLoading(true);
     try {
-      const { data, error } = await supabase.from("CVs").select("*").eq("job_id", jobId).order("updated_time", {
-        ascending: false,
+      // Fetch both CVs and profiles in parallel
+      const [cvsResult, profilesResult] = await Promise.all([
+        supabase.from("CVs").select("*").eq("job_id", jobId).order("updated_time", {
+          ascending: false,
+        }),
+        supabase.from("profiles").select("user_id, name"),
+      ]);
+
+      if (cvsResult.error) throw cvsResult.error;
+
+      // Create a map of profiles by user_id
+      const profilesMap = new Map();
+      (profilesResult.data || []).forEach((profile) => {
+        if (profile.user_id && profile.name) {
+          profilesMap.set(profile.user_id, profile.name);
+        }
       });
-      if (error) throw error;
 
       // Map the data to match the expected structure in the UI
-      const mappedApplications = (data || []).map((cv) => ({
-        candidate_id: cv.user_id,
-        first_name: cv.Firstname,
-        last_name: cv.Lastname,
-        Email: cv.email,
-        phone_number: cv.phone_number,
-        CV_Link: cv.cv_link,
-        cv_summary: cv.cv_text ? cv.cv_text.substring(0, 200) + "..." : "",
-        Timestamp: cv.updated_time,
-      }));
+      const mappedApplications = (cvsResult.data || []).map((cv) => {
+        // Get name with priority: CVs.name -> Firstname + Lastname -> profiles.name
+        let firstName = cv.Firstname || "";
+        let lastName = cv.Lastname || "";
+        
+        // If we have a name field in CVs, use that
+        if (cv.name && cv.name.trim()) {
+          const nameParts = cv.name.trim().split(" ");
+          firstName = nameParts[0] || "";
+          lastName = nameParts.slice(1).join(" ") || "";
+        }
+        // If still no name, check profiles
+        else if (!firstName && !lastName) {
+          const profileName = profilesMap.get(cv.user_id);
+          if (profileName) {
+            const nameParts = profileName.trim().split(" ");
+            firstName = nameParts[0] || "";
+            lastName = nameParts.slice(1).join(" ") || "";
+          }
+        }
+
+        return {
+          candidate_id: cv.user_id,
+          first_name: firstName,
+          last_name: lastName,
+          Email: cv.email,
+          phone_number: cv.phone_number,
+          CV_Link: cv.cv_link,
+          cv_summary: cv.cv_text ? cv.cv_text.substring(0, 200) + "..." : "",
+          Timestamp: cv.updated_time,
+        };
+      });
       setApplications(mappedApplications);
 
       // Fetch longlisted status for all candidates
