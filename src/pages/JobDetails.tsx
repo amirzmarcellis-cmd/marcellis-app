@@ -2148,7 +2148,7 @@ export default function JobDetails() {
       const emailMatch =
         !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
       const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
-      const userIdMatch = !userIdFilter || (candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
+      const userIdMatch = !userIdFilter || (candidate.user_id || candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
       const sourceMatch =
         !longListSourceFilter ||
         longListSourceFilter === "all" ||
@@ -3662,7 +3662,7 @@ mainCandidate["linkedin_score_reason"] ? (
                         const phoneMatch =
                           !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
                         const userIdMatch =
-                          !userIdFilter || (candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
+                          !userIdFilter || (candidate.user_id || candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
                         const source = (candidate["Source"] || candidate.source || "").toLowerCase();
                         const sourceFilterMatch =
                           !longListSourceFilter ||
