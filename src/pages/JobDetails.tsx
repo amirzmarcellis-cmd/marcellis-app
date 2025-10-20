@@ -681,8 +681,8 @@ export default function JobDetails() {
   const fetchCandidates = async (jobId: string) => {
     try {
       setCandidatesLoading(true);
-      // Optimize: Fetch both candidates and LinkedIn data in parallel, plus CVs for name fallback
-      const [candidatesResult, linkedinResult, cvsResult] = await Promise.all([
+      // Optimize: Fetch candidates, LinkedIn data, CVs, and profiles in parallel for name fallback
+      const [candidatesResult, linkedinResult, cvsResult, profilesResult] = await Promise.all([
         supabase.from("Jobs_CVs").select("*").eq("job_id", jobId).order("cv_score", {
           ascending: false,
           nullsFirst: false,
@@ -692,6 +692,7 @@ export default function JobDetails() {
           .select("user_id, linkedin_id, linkedin_score, linkedin_score_reason")
           .eq("job_id", jobId),
         supabase.from("CVs").select("user_id, name, Firstname, Lastname"),
+        supabase.from("profiles").select("user_id, name"),
       ]);
       const candidatesData = candidatesResult.data;
       const candidatesError = candidatesResult.error;
@@ -699,10 +700,13 @@ export default function JobDetails() {
       const linkedinError = linkedinResult.error;
       const cvsData = cvsResult.data;
       const cvsError = cvsResult.error;
+      const profilesData = profilesResult.data;
+      const profilesError = profilesResult.error;
       
       if (candidatesError) throw candidatesError;
       if (linkedinError) console.warn("Error fetching LinkedIn data:", linkedinError);
       if (cvsError) console.warn("Error fetching CVs data:", cvsError);
+      if (profilesError) console.warn("Error fetching profiles data:", profilesError);
 
       // Create a map of LinkedIn data by user_id for quick lookup
       const linkedinMap = new Map();
@@ -716,7 +720,15 @@ export default function JobDetails() {
         }
       });
 
-      // Create a map of CVs data by user_id for name fallback
+      // Create a map of profiles data by user_id for name fallback (highest priority)
+      const profilesMap = new Map();
+      (profilesData || []).forEach((item) => {
+        if (item.user_id && item.name) {
+          profilesMap.set(item.user_id, item.name);
+        }
+      });
+
+      // Create a map of CVs data by user_id for name fallback (secondary priority)
       const cvsMap = new Map();
       (cvsData || []).forEach((item) => {
         if (item.user_id) {
@@ -739,8 +751,11 @@ export default function JobDetails() {
         const linkedinScore = linkedinInfo.linkedin_score ?? row.linkedin_score ?? null;
         const linkedinReason = linkedinInfo.linkedin_score_reason ?? row.linkedin_score_reason ?? "";
         
-        // Get candidate name with fallback from CVs table
-        const candidateName = row.candidate_name || cvsMap.get(row.user_id) || "";
+        // Get candidate name with fallback: Jobs_CVs -> profiles -> CVs
+        const candidateName = row.candidate_name || 
+                             profilesMap.get(row.user_id) || 
+                             cvsMap.get(row.user_id) || 
+                             "";
         
         return {
           ...row,
