@@ -3053,11 +3053,16 @@ mainCandidate["linkedin_score_reason"] ? (
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Job Type:</span>
-                  <span>
-                    {job["Type"] || "N/A"}
-                    {job["Contract Length"] && job["Type"] === "Contract" && ` (${job["Contract Length"]})`}
-                  </span>
+                  <span>{job["Type"] || "N/A"}</span>
                 </div>
+                {(job["Type"] === "Contract" || job["Type"]?.toLowerCase().includes("contract")) && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Contract Length:</span>
+                    <span className="font-medium">
+                      {job.contract_length || job["Contract Length"] || "Not specified"}
+                    </span>
+                  </div>
+                )}
                 {job["assignment"] && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Assignment Link:</span>
