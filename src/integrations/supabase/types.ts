@@ -123,7 +123,7 @@ export type Database = {
           notes?: string | null
           phone_number?: string | null
           updated_time?: string | null
-          user_id: string
+          user_id?: string
         }
         Update: {
           applied_for?: string[] | null
