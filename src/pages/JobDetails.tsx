@@ -2227,7 +2227,7 @@ export default function JobDetails() {
                 <p className="text-sm text-muted-foreground">User ID: {mainCandidate["user_id"] || "N/A"}</p>
                 <div className="flex items-center gap-4 text-sm mt-1">
                   <span className="text-muted-foreground">
-                    CV Score: {mainCandidate["cv_score"] || mainCandidate["CV Score"] || "N/A"}
+                    CV Score: {mainCandidate["cv_score"] !== null && mainCandidate["cv_score"] !== undefined ? mainCandidate["cv_score"] : (mainCandidate["CV Score"] || "N/A")}
                   </span>
                   {mainCandidate["after_call_score"] && (
                     <span className="text-muted-foreground">After Call Score: {mainCandidate["after_call_score"]}</span>
@@ -3923,8 +3923,8 @@ mainCandidate["linkedin_score_reason"] ? (
                                             const score =
                                               typeof mainCandidate["Source"] === "string" &&
                                               mainCandidate["Source"].toLowerCase().includes("linkedin")
-                                                ? mainCandidate["linkedin_score"] || mainCandidate["cv_score"] || "N/A"
-                                                : mainCandidate["cv_score"] || "N/A";
+                                                ? (mainCandidate["linkedin_score"] !== null && mainCandidate["linkedin_score"] !== undefined ? mainCandidate["linkedin_score"] : (mainCandidate["cv_score"] !== null && mainCandidate["cv_score"] !== undefined ? mainCandidate["cv_score"] : "N/A"))
+                                                : (mainCandidate["cv_score"] !== null && mainCandidate["cv_score"] !== undefined ? mainCandidate["cv_score"] : "N/A");
                                             const numScore = parseInt(score);
                                             let scoreClass = "font-medium";
                                             if (!isNaN(numScore)) {
