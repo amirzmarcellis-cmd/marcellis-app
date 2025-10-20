@@ -681,8 +681,8 @@ export default function JobDetails() {
   const fetchCandidates = async (jobId: string) => {
     try {
       setCandidatesLoading(true);
-      // Optimize: Fetch both candidates and LinkedIn data in parallel
-      const [candidatesResult, linkedinResult] = await Promise.all([
+      // Optimize: Fetch both candidates and LinkedIn data in parallel, plus CVs for name fallback
+      const [candidatesResult, linkedinResult, cvsResult] = await Promise.all([
         supabase.from("Jobs_CVs").select("*").eq("job_id", jobId).order("cv_score", {
           ascending: false,
           nullsFirst: false,
@@ -691,13 +691,18 @@ export default function JobDetails() {
           .from("linkedin_boolean_search")
           .select("user_id, linkedin_id, linkedin_score, linkedin_score_reason")
           .eq("job_id", jobId),
+        supabase.from("CVs").select("user_id, name, Firstname, Lastname"),
       ]);
       const candidatesData = candidatesResult.data;
       const candidatesError = candidatesResult.error;
       const linkedinData = linkedinResult.data;
       const linkedinError = linkedinResult.error;
+      const cvsData = cvsResult.data;
+      const cvsError = cvsResult.error;
+      
       if (candidatesError) throw candidatesError;
       if (linkedinError) console.warn("Error fetching LinkedIn data:", linkedinError);
+      if (cvsError) console.warn("Error fetching CVs data:", cvsError);
 
       // Create a map of LinkedIn data by user_id for quick lookup
       const linkedinMap = new Map();
@@ -708,6 +713,17 @@ export default function JobDetails() {
             linkedin_score: item.linkedin_score,
             linkedin_score_reason: item.linkedin_score_reason,
           });
+        }
+      });
+
+      // Create a map of CVs data by user_id for name fallback
+      const cvsMap = new Map();
+      (cvsData || []).forEach((item) => {
+        if (item.user_id) {
+          const fullName = item.name || 
+            (item.Firstname && item.Lastname ? `${item.Firstname} ${item.Lastname}` : 
+             item.Firstname || item.Lastname || "");
+          cvsMap.set(item.user_id, fullName);
         }
       });
       const mapped = (candidatesData || []).map((row: any) => {
@@ -722,6 +738,10 @@ export default function JobDetails() {
         const linkedinId = linkedinInfo.linkedin_id ?? row.linkedin_id ?? "";
         const linkedinScore = linkedinInfo.linkedin_score ?? row.linkedin_score ?? null;
         const linkedinReason = linkedinInfo.linkedin_score_reason ?? row.linkedin_score_reason ?? "";
+        
+        // Get candidate name with fallback from CVs table
+        const candidateName = row.candidate_name || cvsMap.get(row.user_id) || "";
+        
         return {
           ...row,
           "Job ID": jobId,
@@ -731,7 +751,7 @@ export default function JobDetails() {
           Summary: row.cv_score_reason ?? "",
           "Success Score": row.after_call_score?.toString() ?? "",
           "Score and Reason": row.cv_score_reason ?? "",
-          "Candidate Name": row.candidate_name ?? "",
+          "Candidate Name": candidateName,
           "Candidate Email": row.candidate_email ?? "",
           "Candidate Phone Number": row.candidate_phone_number ?? "",
           Source: row.source ?? "",
@@ -748,8 +768,8 @@ export default function JobDetails() {
           callid: row.recordid ?? Math.random() * 1000000,
           duration: row.duration,
           recording: row.recording,
-          first_name: row.candidate_name?.split(" ")[0] || "",
-          last_name: row.candidate_name?.split(" ").slice(1).join(" ") || "",
+          first_name: candidateName?.split(" ")[0] || "",
+          last_name: candidateName?.split(" ").slice(1).join(" ") || "",
           // Normalize CV score fields so the UI picks them up everywhere
           cv_score: effectiveCvScore ?? 0,
           "CV Score": effectiveCvScore != null ? String(effectiveCvScore) : "",
