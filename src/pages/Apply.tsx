@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -46,8 +46,6 @@ export default function Apply() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
   const { id: jobId } = useParams();
-  const [isSubmittingFiles, setIsSubmittingFiles] = useState(false);
-  const hasTriggeredWebhookRef = useRef(false);
 
   const form = useForm<ApplicationForm>({
     resolver: zodResolver(applicationSchema),
@@ -61,12 +59,6 @@ export default function Apply() {
     },
   });
 
-  // Re-enable Submit Files when the file list changes
-  useEffect(() => {
-    if (!isSubmittingFiles) {
-      hasTriggeredWebhookRef.current = false;
-    }
-  }, [uploadedFiles, isSubmittingFiles]);
 
 
   // Generate next user ID and fetch job details
@@ -169,33 +161,6 @@ export default function Apply() {
     }
   };
 
-  const triggerWebhook = async (data: any) => {
-    const webhookUrl = "https://hook.eu2.make.com/8y6jctmrqnlahnh6dccxefvctwmfq134";
-    
-    try {
-      console.log("Triggering webhook:", webhookUrl, "with data:", data);
-      
-      const response = await fetch(webhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        mode: "no-cors",
-        body: JSON.stringify(data),
-      });
-
-      console.log("Webhook triggered successfully");
-      return true;
-    } catch (error) {
-      console.error("Error triggering webhook:", error);
-      toast({
-        title: "Webhook Error",
-        description: "Failed to trigger webhook. Please check the URL and try again.",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
 
   const onSubmit = async (data: ApplicationForm) => {
     // Validate that at least one CV file is uploaded
@@ -227,39 +192,46 @@ export default function Apply() {
       const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
       const jobIdFromUrl = pathMatch?.[1] || "";
 
-      // Since files are mandatory, we always have files to process
-      if (uploadedFiles.length === 0) {
-        // Function to clean text data and remove null characters
-        const cleanText = (text: string) => {
-          if (!text) return "";
-          return text.replace(/\u0000/g, "").trim();
-        };
+      // Function to clean text data and remove null characters
+      const cleanText = (text: string) => {
+        if (!text) return "";
+        return text.replace(/\u0000/g, "").trim();
+      };
 
-        // Insert into CVs table with correct field mapping
-        const { error: insertError } = await supabase
-          .from("CVs")
-          .insert([{
-            user_id: cleanText(data.user_id),
-            Firstname: cleanText(data.firstName),
-            Lastname: cleanText(data.lastName),
-            name: cleanText(`${data.firstName} ${data.lastName}`),
-            email: cleanText(data.email),
-            phone_number: cleanText(data.phoneNumber),
-            notes: "",
-            job_id: cleanText(jobIdFromUrl),
-            cv_text: "",
-            cv_link: ""
-          }]);
+      // Get all valid files (uploaded and processed)
+      const validFiles = uploadedFiles.filter(file => 
+        file.url && file.url.startsWith('https://') && !file.isUploading
+      );
 
-        if (insertError) {
-          console.error("Insert failed:", insertError);
-          throw insertError;
-        }
+      // Insert into CVs table - this will automatically trigger the Supabase webhook
+      const { error: insertError } = await supabase
+        .from("CVs")
+        .insert([{
+          user_id: cleanText(data.user_id),
+          Firstname: cleanText(data.firstName),
+          Lastname: cleanText(data.lastName),
+          name: cleanText(`${data.firstName} ${data.lastName}`),
+          email: cleanText(data.email),
+          phone_number: cleanText(data.phoneNumber),
+          notes: "",
+          job_id: cleanText(jobIdFromUrl),
+          cv_text: validFiles.map(f => f.text || '').join('\n'),
+          cv_link: validFiles.map(f => f.url).join(', ')
+        }]);
 
-        setIsSubmitted(true);
-      } else {
-        setIsSubmitted(true);
+      if (insertError) {
+        console.error("Insert failed:", insertError);
+        throw insertError;
       }
+
+      console.log("Application submitted successfully - Supabase webhook will be triggered automatically");
+      
+      toast({
+        title: "Application Submitted",
+        description: `Your application has been submitted with User ID: ${data.user_id}`,
+      });
+
+      setIsSubmitted(true);
     } catch (error) {
       console.error("Error submitting application:", error);
       toast({
@@ -369,75 +341,6 @@ export default function Apply() {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmitFiles = async () => {
-    // One-click lock and one-time trigger guard
-    if (hasTriggeredWebhookRef.current || isSubmittingFiles) return;
-    
-    // Temporarily lock to avoid rapid double clicks
-    hasTriggeredWebhookRef.current = true;
-    setIsSubmittingFiles(true);
-
-    try {
-      // Do not proceed while files are still uploading
-      const stillUploading = uploadedFiles.some(file => file.isUploading);
-      if (stillUploading) {
-        hasTriggeredWebhookRef.current = false;
-        setIsSubmittingFiles(false);
-        return;
-      }
-
-      const path = window.location.pathname;
-      const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
-      const resolvedJobId = pathMatch?.[1] || "general";
-
-      const formUserId = form.getValues("user_id");
-
-      const validFiles = uploadedFiles.filter(file => 
-        file.url && file.url.startsWith('https://') && file.url.includes('supabase') && !file.isUploading
-      );
-
-      if (validFiles.length === 0) {
-        hasTriggeredWebhookRef.current = false;
-        setIsSubmittingFiles(false);
-        return;
-      }
-
-      const webhookPayload = {
-        type: "INSERT",
-        table: "CVs",
-        record: {
-          name: `${form.getValues("firstName")} ${form.getValues("lastName")}`,
-          email: form.getValues("email"),
-          cv_link: validFiles.map(f => f.url).join(', '),
-          cv_text: validFiles.map(f => f.text || '').join('\n'),
-          user_id: formUserId,
-          Lastname: form.getValues("lastName"),
-          Firstname: form.getValues("firstName"),
-          phone_number: form.getValues("phoneNumber"),
-          notes: "",
-          job_id: resolvedJobId
-        },
-        schema: "public",
-        old_record: null
-      };
-
-      const success = await triggerWebhook(webhookPayload);
-
-      if (success) {
-        toast({
-          title: "Files Submitted Successfully",
-          description: `Your CV files have been submitted with User ID: ${formUserId}. Webhook triggered to external system.`,
-        });
-      }
-
-      setIsDialogOpen(false);
-    } catch (e) {
-      console.error("Submit files failed:", e);
-      hasTriggeredWebhookRef.current = false;
-    } finally {
-      setIsSubmittingFiles(false);
-    }
-  };
 
   if (isSubmitted) {
     return (
@@ -605,15 +508,6 @@ export default function Apply() {
                                   maxSizeMB={10}
                                 />
                               </div>
-                              
-                              <Button 
-                                type="button"
-                                onClick={handleSubmitFiles}
-                                className="w-full"
-                                disabled={uploadedFiles.length === 0 || isSubmittingFiles || hasTriggeredWebhookRef.current || uploadedFiles.some(f => f.isUploading)}
-                              >
-                                {isSubmittingFiles ? "Submitting..." : "Submit Files"}
-                              </Button>
                             </div>
                           </DialogContent>
                         </Dialog>
