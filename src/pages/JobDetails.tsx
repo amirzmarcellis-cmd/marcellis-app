@@ -3401,6 +3401,9 @@ mainCandidate["linkedin_score_reason"] ? (
                                       className="bg-primary text-primary-foreground hover:bg-primary/90"
                                       onClick={async () => {
                                         try {
+                                          // Disable the button immediately
+                                          setAddedToLongList((prev) => new Set([...prev, application.candidate_id]));
+
                                           const webhookUrl =
                                             "https://hook.eu2.make.com/tv58ofd5rftm64t677f65phmbwrnq24e";
                                           const payload = {
@@ -3412,8 +3415,6 @@ mainCandidate["linkedin_score_reason"] ? (
                                             JSON.stringify(payload, null, 2),
                                           );
 
-                                          // Optimistically disable the button immediately
-                                          setAddedToLongList((prev) => new Set([...prev, application.candidate_id]));
                                           const response = await fetch(webhookUrl, {
                                             method: "POST",
                                             headers: {
@@ -3421,6 +3422,7 @@ mainCandidate["linkedin_score_reason"] ? (
                                             },
                                             body: JSON.stringify(payload),
                                           });
+                                          
                                           if (response.ok) {
                                             try {
                                               const responseText = await response.text();
@@ -3439,66 +3441,6 @@ mainCandidate["linkedin_score_reason"] ? (
                                             }
                                           }
 
-                                          // Try to reuse any existing CV score/reason for this candidate on this job by user_id/email/phone
-                                          const email = (application.Email || application.email || "")
-                                            .toString()
-                                            .trim()
-                                            .toLowerCase();
-                                          const phone = (application.phone_number || "")
-                                            .toString()
-                                            .replace(/[^0-9]/g, "");
-                                          const orFilters = [
-                                            `user_id.eq.${String(application.candidate_id)}`,
-                                            email ? `candidate_email.eq.${email}` : null,
-                                            phone ? `candidate_phone_number.eq.${phone}` : null,
-                                          ]
-                                            .filter(Boolean)
-                                            .join(",");
-                                          const { data: existingScore } = await supabase
-                                            .from("Jobs_CVs")
-                                            .select("cv_score, cv_score_reason")
-                                            .eq("job_id", String(job?.job_id || id || ""))
-                                            .or(orFilters)
-                                            .order("cv_score", {
-                                              ascending: false,
-                                            })
-                                            .limit(1)
-                                            .maybeSingle();
-
-                                          // Update database to mark as longlisted and carry over existing score/reason if present
-                                          const { error: updateError } = await supabase.from("Jobs_CVs").upsert({
-                                            job_id: String(job?.job_id || id || ""),
-                                            user_id: String(application.candidate_id),
-                                            longlisted_at: new Date().toISOString(),
-                                            candidate_name: (() => {
-                                              const fn = application.first_name || application.Firstname || "";
-                                              const ln = application.last_name || application.Lastname || "";
-                                              const combined = `${fn} ${ln}`.trim();
-                                              if (combined && combined.toLowerCase() !== "undefined undefined")
-                                                return combined;
-                                              if (application.name) return application.name;
-                                              if (application.candidate_name) return application.candidate_name;
-                                              if (application.Email) return String(application.Email).split("@")[0];
-                                              if (application.email) return String(application.email).split("@")[0];
-                                              return `Candidate ${application.candidate_id}`;
-                                            })(),
-                                            candidate_email:
-                                              application.Email ||
-                                              application.email ||
-                                              application.candidate_email ||
-                                              null,
-                                            candidate_phone_number:
-                                              application.phone_number || application.candidate_phone_number || null,
-                                            cv_score: existingScore?.cv_score ?? undefined,
-                                            cv_score_reason: existingScore?.cv_score_reason ?? undefined,
-                                            contacted: "Ready to Contact",
-                                          });
-                                          if (updateError) {
-                                            console.error("Error updating longlisted status:", updateError);
-                                          }
-
-                                          // Refresh longlisted candidates to show the new addition
-                                          await fetchLonglistedCandidates(String(job?.job_id || id || ""));
                                           console.log("Webhook triggered successfully");
                                         } catch (error) {
                                           console.error("Error triggering webhook:", error);
