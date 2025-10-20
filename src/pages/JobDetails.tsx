@@ -1095,8 +1095,7 @@ export default function JobDetails() {
       const { data, error } = await supabase
         .from("Jobs_CVs")
         .select("user_id")
-        .eq("job_id", jobId)
-        .not("longlisted_at", "is", null);
+        .eq("job_id", jobId);
       if (error) throw error;
       const longlistedIds = new Set(data?.map((item) => item.user_id) || []);
       setAddedToLongList(longlistedIds);
