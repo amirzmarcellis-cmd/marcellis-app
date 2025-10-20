@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Briefcase, Phone, PhoneOff, UserCircle, Calendar, X } from "lucide-react";
+import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Briefcase, Phone, PhoneOff, UserCircle, Calendar, Clock, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
@@ -32,6 +32,7 @@ interface Job {
   Timestamp: string | null;
   group_id?: string | null;
   automatic_dial?: boolean | null;
+  contract_length?: string | null;
   longlisted_count?: number;
   shortlisted_count?: number;
   rejected_count?: number;
@@ -117,7 +118,7 @@ export function JobManagementPanel() {
 
       // Optimize: Build query with proper conditions
       let query = supabase.from('Jobs').select(`
-          job_id, job_title, job_location, job_salary_range, Currency, Processed, status, Timestamp, group_id, automatic_dial, jd_summary, recruiter_id,
+          job_id, job_title, job_location, job_salary_range, Currency, Processed, status, Timestamp, group_id, automatic_dial, jd_summary, recruiter_id, contract_length,
           groups ( id, name, color )
         `);
 
@@ -716,6 +717,11 @@ const JobGrid = memo(function JobGrid({
               {job.job_salary_range && <div className="flex items-center text-muted-foreground">
                   <Banknote className="h-4 w-4 mr-2 text-green" />
                   {formatCurrency(job.job_salary_range, job["Currency"] as string | null)}
+                </div>}
+              
+              {job.contract_length && <div className="flex items-center text-muted-foreground">
+                  <Clock className="h-4 w-4 mr-2 text-primary" />
+                  {job.contract_length}
                 </div>}
               
               {job.Timestamp && <div className="flex items-center text-muted-foreground">
