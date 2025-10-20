@@ -689,7 +689,7 @@ export default function JobDetails() {
         }),
         supabase
           .from("linkedin_boolean_search")
-          .select("user_id, linkedin_id, linkedin_score, linkedin_score_reason")
+          .select("user_id, linkedin_id")
           .eq("job_id", jobId),
         supabase.from("CVs").select("user_id, name, Firstname, Lastname"),
         supabase.from("profiles").select("user_id, name"),
@@ -714,8 +714,6 @@ export default function JobDetails() {
         if (item.user_id) {
           linkedinMap.set(item.user_id, {
             linkedin_id: item.linkedin_id,
-            linkedin_score: item.linkedin_score,
-            linkedin_score_reason: item.linkedin_score_reason,
           });
         }
       });
@@ -748,8 +746,8 @@ export default function JobDetails() {
         // Get LinkedIn data for this candidate by user_id (if available from map)
         const linkedinInfo = linkedinMap.get(row.user_id) || {};
         const linkedinId = linkedinInfo.linkedin_id ?? row.linkedin_id ?? "";
-        const linkedinScore = linkedinInfo.linkedin_score ?? row.linkedin_score ?? null;
-        const linkedinReason = linkedinInfo.linkedin_score_reason ?? row.linkedin_score_reason ?? "";
+        const linkedinScore = row.linkedin_score ?? null;
+        const linkedinReason = row.linkedin_score_reason ?? "";
         
         // Get candidate name with fallback: Jobs_CVs -> profiles -> CVs
         const candidateName = row.candidate_name || 
