@@ -1364,6 +1364,9 @@ export default function JobDetails() {
         user_ids: booleanSearchUserIds,
         profile_id: job?.recruiter_id || "",
       };
+      console.log("Regenerate AI webhook payload:", payload);
+      console.log("Job recruiter_id:", job?.recruiter_id);
+      console.log("User profile ID:", profile?.user_id);
       const response = await fetch("https://hook.eu2.make.com/w10612c8i0lg2em4p305sbhhnkj73auj", {
         method: "POST",
         headers: {
