@@ -2949,7 +2949,15 @@ mainCandidate["linkedin_score_reason"] ? (
             {/* Progressive Status Bar */}
             <div className="pt-6 pb-2">
               <ProgressiveStatusBar 
-                status={job.Processed === "No" ? "Complete" : (job.status || "Active")} 
+                status={
+                  job.Processed === "No" 
+                    ? "Complete" 
+                    : job.status === "Processing" 
+                    ? "Sourcing"
+                    : job.status === "Recruiting"
+                    ? "Making Calls"
+                    : "Active"
+                } 
               />
             </div>
 
