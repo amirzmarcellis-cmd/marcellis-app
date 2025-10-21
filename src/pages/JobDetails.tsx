@@ -1362,7 +1362,7 @@ export default function JobDetails() {
         job_id: job?.job_id || "",
         itris_job_id: job?.itris_job_id || "",
         user_ids: booleanSearchUserIds,
-        profile_id: profile?.user_id || "",
+        profile_id: job?.recruiter_id || "",
       };
       const response = await fetch("https://hook.eu2.make.com/w10612c8i0lg2em4p305sbhhnkj73auj", {
         method: "POST",
@@ -1415,7 +1415,7 @@ export default function JobDetails() {
       const payload = {
         job_id: job?.job_id || "",
         itris_job_id: job?.itris_job_id || "",
-        profile_id: profile?.user_id || "",
+        profile_id: job?.recruiter_id || "",
       };
       console.log("Webhook payload:", payload);
 
