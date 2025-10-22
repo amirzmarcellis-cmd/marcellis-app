@@ -1052,8 +1052,13 @@ export default function JobDetails() {
         let firstName = cv.Firstname || "";
         let lastName = cv.Lastname || "";
         
+        // Treat "Not found" or "not found" as empty
+        if (lastName && lastName.toLowerCase() === "not found") {
+          lastName = "";
+        }
+        
         // If we have a name field in CVs, use that
-        if (cv.name && cv.name.trim()) {
+        if (cv.name && cv.name.trim() && !cv.name.toLowerCase().includes("not found")) {
           const nameParts = cv.name.trim().split(" ");
           firstName = nameParts[0] || "";
           lastName = nameParts.slice(1).join(" ") || "";

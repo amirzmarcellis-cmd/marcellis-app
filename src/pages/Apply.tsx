@@ -237,13 +237,17 @@ export default function Apply() {
       );
 
       // Insert into CVs table - this will automatically trigger the Supabase webhook
+      const firstName = cleanText(data.firstName);
+      const lastName = cleanText(data.lastName);
+      const fullName = lastName ? `${firstName} ${lastName}` : firstName;
+      
       const { error: insertError } = await supabase
         .from("CVs")
         .insert([{
           user_id: cleanText(data.user_id),
-          Firstname: cleanText(data.firstName),
-          Lastname: cleanText(data.lastName),
-          name: cleanText(`${data.firstName} ${data.lastName}`),
+          Firstname: firstName,
+          Lastname: lastName || null,
+          name: fullName,
           email: cleanText(data.email),
           phone_number: cleanText(data.phoneNumber),
           notes: "",
