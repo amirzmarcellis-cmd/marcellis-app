@@ -16,7 +16,7 @@ export default function Auth() {
   const { theme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -121,14 +121,6 @@ export default function Auth() {
               >
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isLogin ? 'Sign In' : 'Sign Up'}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setIsLogin(!isLogin)}
-                className="w-full text-muted-foreground hover:text-foreground"
-              >
-                {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
               </Button>
             </form>
           </CardContent>
