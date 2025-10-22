@@ -1367,8 +1367,8 @@ export default function JobDetails() {
       
       // Map search type to title
       const searchTitles = {
-        linkedin: "LinkedIn Only",
-        database: "Database Only",
+        linkedin: "LinkedIn",
+        database: "Database",
         both: "Search Both"
       };
       
