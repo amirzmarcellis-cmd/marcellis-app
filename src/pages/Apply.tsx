@@ -212,6 +212,21 @@ export default function Apply() {
       return;
     }
 
+    // Get all valid files (uploaded successfully with real Supabase URLs)
+    const validFiles = uploadedFiles.filter(file => 
+      file.url && file.url.startsWith('https://') && !file.isUploading
+    );
+
+    // Check if we have any valid files
+    if (validFiles.length === 0) {
+      toast({
+        title: "Upload Failed",
+        description: "No CVs were successfully uploaded. Please try uploading your files again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -235,6 +250,10 @@ export default function Apply() {
       const validFiles = uploadedFiles.filter(file => 
         file.url && file.url.startsWith('https://') && !file.isUploading
       );
+
+      if (validFiles.length === 0) {
+        throw new Error("No valid CV files found - all uploads failed");
+      }
 
       // Insert into CVs table - this will automatically trigger the Supabase webhook
       const firstName = cleanText(data.firstName);
@@ -360,15 +379,22 @@ export default function Apply() {
           ));
         } catch (error) {
           console.error('Error processing CV:', error);
-          // Update with error state but keep the file visible
+          // Update with error state - remove the blob URL to prevent submission
           setUploadedFiles(prev => prev.map((file, index) => 
             index === fileIndex ? {
               ...file,
-              text: 'Upload failed - using temporary file',
+              url: '', // Clear the blob URL so it won't pass validation
+              text: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
               isUploading: false,
               uploadProgress: 0
             } : file
           ));
+          
+          toast({
+            title: "Upload Failed",
+            description: `Failed to upload ${fileObj.file_name}. Please try again.`,
+            variant: "destructive",
+          });
         }
       }
     }
