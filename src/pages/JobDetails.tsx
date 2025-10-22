@@ -76,6 +76,7 @@ import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { ProcessingAnimation } from "@/components/jobs/ProcessingAnimation";
 import { AppleLoadingBar } from "@/components/ui/AppleLoadingBar";
 import { ProgressiveStatusBar } from "@/components/ui/ProgressiveStatusBar";
+import { ExpandableSearchButton } from "@/components/ui/ExpandableSearchButton";
 
 // Using any type to avoid TypeScript complexity with quoted property names
 
@@ -1356,7 +1357,7 @@ export default function JobDetails() {
       handleGenerateLongList();
     }
   };
-  const handleSearchMoreCandidates = async () => {
+  const handleSearchMoreCandidates = async (searchType: "linkedin" | "database" | "both" = "both") => {
     try {
       // Get user_ids from AI Boolean Search candidates (filteredCandidates) as comma-separated string
       const booleanSearchUserIds = filteredCandidates
@@ -1368,6 +1369,7 @@ export default function JobDetails() {
         itris_job_id: job?.itris_job_id || "",
         user_ids: booleanSearchUserIds,
         profile_id: job?.recruiter_id || "",
+        search_type: searchType,
       };
       console.log("Regenerate AI webhook payload:", payload);
       console.log("Job recruiter_id:", job?.recruiter_id);
@@ -3516,10 +3518,11 @@ mainCandidate["linkedin_score_reason"] ? (
                     <CardDescription>Candidates added to the longlist for this position</CardDescription>
                   </div>
                   {job?.longlist && job.longlist > 0 ? (
-                    <Button onClick={handleSearchMoreCandidates} size="sm" variant="outline">
-                      <Search className="w-4 h-4 mr-2" />
-                      Regenerate AI
-                    </Button>
+                    <ExpandableSearchButton
+                      onSearchLinkedIn={() => handleSearchMoreCandidates("linkedin")}
+                      onSearchDatabase={() => handleSearchMoreCandidates("database")}
+                      onSearchBoth={() => handleSearchMoreCandidates("both")}
+                    />
                   ) : (
                     <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} size="sm">
                       <Zap className="w-4 h-4 mr-2" />
