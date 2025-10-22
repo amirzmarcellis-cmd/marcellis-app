@@ -461,10 +461,44 @@ export default function AddJob() {
     e.preventDefault();
     
     // Validate all mandatory fields
-    if (!formData.jobTitle || !formData.recruiterId || !formData.jobDescription || 
-        !formData.clientId || !formData.jobLocation || !formData.noticePeriod || 
-        !formData.jobSalaryRange || !formData.currency || !formData.type) {
-      toast.error("Please fill in all mandatory fields");
+    if (!formData.jobTitle.trim()) {
+      toast.error("Job Title is required");
+      return;
+    }
+    if (!formData.recruiterId) {
+      toast.error("Assigned Recruiter is required");
+      return;
+    }
+    if (!formData.jobDescription.trim()) {
+      toast.error("Job Description is required");
+      return;
+    }
+    if (!formData.clientId) {
+      toast.error("Client is required");
+      return;
+    }
+    if (!formData.jobLocation.trim()) {
+      toast.error("Job Location is required");
+      return;
+    }
+    if (!formData.noticePeriod) {
+      toast.error("Notice Period is required");
+      return;
+    }
+    if (!formData.jobSalaryRange[0] || formData.jobSalaryRange[0] < 1000) {
+      toast.error("Valid Salary is required");
+      return;
+    }
+    if (!formData.currency) {
+      toast.error("Currency is required");
+      return;
+    }
+    if (!formData.type) {
+      toast.error("Job Type is required");
+      return;
+    }
+    if (formData.type === "Contract" && !formData.contractLength) {
+      toast.error("Contract Length is required for contract positions");
       return;
     }
 
@@ -481,27 +515,27 @@ export default function AddJob() {
         .from('Jobs')
         .insert({
           job_id: jobId,
-          job_title: formData.jobTitle,
-          job_description: formData.jobDescription,
-          industry: formData.industries.join(", "),
-          headhunting_companies: formData.headhuntingCompanies.join(", "),
+          job_title: formData.jobTitle.trim(),
+          job_description: formData.jobDescription.trim(),
+          industry: formData.industries.length > 0 ? formData.industries.join(", ") : null,
+          headhunting_companies: formData.headhuntingCompanies.length > 0 ? formData.headhuntingCompanies.join(", ") : null,
           companies_to_exclude: formData.companiesToExclude.length > 0 ? formData.companiesToExclude.join(", ") : null,
-          client_id: formData.clientId || null,
-          client_name: formData.clientName,
-          client_description: formData.clientDescription,
-          job_location: formData.jobLocation,
+          client_id: formData.clientId,
+          client_name: formData.clientName.trim() || null,
+          client_description: formData.clientDescription ? formData.clientDescription.trim() : null,
+          job_location: formData.jobLocation.trim(),
           job_salary_range: formData.jobSalaryRange[0],
-          assignment: formData.hasAssignment ? formData.assignmentLink : null,
+          assignment: formData.hasAssignment && formData.assignmentLink ? formData.assignmentLink.trim() : null,
           notice_period: formData.noticePeriod,
           nationality_to_include: formData.nationalityToInclude.length > 0 ? formData.nationalityToInclude.join(", ") : null,
           nationality_to_exclude: formData.nationalityToExclude.length > 0 ? formData.nationalityToExclude.join(", ") : null,
           prefered_nationality: formData.preferedNationality.length > 0 ? formData.preferedNationality.join(", ") : null,
           Type: formData.type,
-          contract_length: formData.type === "Contract" ? formData.contractLength : null,
+          contract_length: formData.type === "Contract" && formData.contractLength ? formData.contractLength : null,
           Currency: formData.currency,
-          itris_job_id: formData.itrisId,
+          itris_job_id: formData.itrisId ? formData.itrisId.trim() : null,
           group_id: formData.groupId || null,
-          recruiter_id: recruiterIdToSave || null,
+          recruiter_id: recruiterIdToSave,
           status: 'Active',
           Processed: 'Yes',
           Timestamp: new Date().toISOString()
@@ -509,7 +543,7 @@ export default function AddJob() {
 
       if (error) {
         console.error('Error creating job:', error);
-        toast.error("Failed to create job");
+        toast.error(`Failed to create job: ${error.message}`);
         return;
       }
       
