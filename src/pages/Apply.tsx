@@ -109,28 +109,56 @@ export default function Apply() {
 
   const generateNextUserId = async (): Promise<string> => {
     try {
+      // Get all existing App IDs to find the highest number
       const { data, error } = await supabase
         .from("CVs")
         .select("user_id")
         .like("user_id", "App%")
-        .order("user_id", { ascending: false })
-        .limit(1);
+        .order("user_id", { ascending: false });
 
       if (error) throw error;
 
+      let nextNumber = 1;
+      
       if (data && data.length > 0) {
-        const lastUserId = data[0].user_id;
-        const match = lastUserId.match(/App(\d+)/);
-        if (match) {
-          const nextNumber = parseInt(match[1]) + 1;
-          return `App${nextNumber.toString().padStart(4, '0')}`;
+        // Extract all numbers and find the maximum
+        const numbers = data
+          .map(item => {
+            const match = item.user_id.match(/App(\d+)/);
+            return match ? parseInt(match[1]) : 0;
+          })
+          .filter(num => num > 0);
+        
+        if (numbers.length > 0) {
+          nextNumber = Math.max(...numbers) + 1;
         }
       }
       
-      return "App0001";
+      // Keep incrementing until we find an available ID
+      let attempts = 0;
+      while (attempts < 100) {
+        const candidateId = `App${nextNumber.toString().padStart(4, '0')}`;
+        
+        // Check if this ID exists
+        const { data: existing } = await supabase
+          .from("CVs")
+          .select("user_id")
+          .eq("user_id", candidateId)
+          .maybeSingle();
+        
+        if (!existing) {
+          return candidateId;
+        }
+        
+        nextNumber++;
+        attempts++;
+      }
+      
+      // Fallback to timestamp-based ID if we can't find a free sequential one
+      return `App${Date.now().toString().slice(-4)}`;
     } catch (error) {
       console.error("Error generating user ID:", error);
-      return "App0001";
+      return `App${Date.now().toString().slice(-4)}`;
     }
   };
 
