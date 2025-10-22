@@ -1364,12 +1364,21 @@ export default function JobDetails() {
         .map((candidate) => candidate.user_id)
         .filter(Boolean)
         .join(",");
+      
+      // Map search type to title
+      const searchTitles = {
+        linkedin: "LinkedIn Only",
+        database: "Database Only",
+        both: "Search Both"
+      };
+      
       const payload = {
         job_id: job?.job_id || "",
         itris_job_id: job?.itris_job_id || "",
         user_ids: booleanSearchUserIds,
         profile_id: job?.recruiter_id || "",
         search_type: searchType,
+        title: searchTitles[searchType],
       };
       console.log("Regenerate AI webhook payload:", payload);
       console.log("Job recruiter_id:", job?.recruiter_id);
