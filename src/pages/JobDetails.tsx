@@ -3328,10 +3328,13 @@ mainCandidate["linkedin_score_reason"] ? (
                 (() => {
                   // Filter applications based on name, email, and phone
                   const filteredApplications = applications.filter((application) => {
-                    const fullName =
-                      application.first_name && application.last_name
-                        ? `${application.first_name} ${application.last_name}`
-                        : application.first_name || application.last_name || "";
+                    const first = application.first_name || "";
+                    const last = application.last_name || "";
+                    // Filter out "Not found" values
+                    const cleanFirst = first.toLowerCase() === "not found" ? "" : first;
+                    const cleanLast = last.toLowerCase() === "not found" ? "" : last;
+                    const fullName = [cleanFirst, cleanLast].filter(Boolean).join(" ");
+                    
                     const email = application.Email || "";
                     const phone = application.phone_number || "";
                     const nameMatch = !appNameFilter || fullName.toLowerCase().includes(appNameFilter.toLowerCase());
@@ -3352,12 +3355,26 @@ mainCandidate["linkedin_score_reason"] ? (
                           >
                             <CardContent className="p-3 md:p-4">
                               <div className="space-y-3">
-                                <div className="flex items-start justify-between">
+                                 <div className="flex items-start justify-between">
                                   <div className="min-w-0 flex-1">
                                     <h4 className="font-semibold text-sm md:text-base truncate">
-                                      {application.first_name && application.last_name
-                                        ? `${application.first_name} ${application.last_name}`
-                                        : application.first_name || application.last_name || "Unknown"}
+                                      {(() => {
+                                        const first = application.first_name || "";
+                                        const last = application.last_name || "";
+                                        // Filter out "Not found" values
+                                        const cleanFirst = first.toLowerCase() === "not found" ? "" : first;
+                                        const cleanLast = last.toLowerCase() === "not found" ? "" : last;
+                                        
+                                        if (cleanFirst && cleanLast) {
+                                          return `${cleanFirst} ${cleanLast}`;
+                                        } else if (cleanFirst) {
+                                          return cleanFirst;
+                                        } else if (cleanLast) {
+                                          return cleanLast;
+                                        } else {
+                                          return application.candidate_id || "Applicant";
+                                        }
+                                      })()}
                                     </h4>
                                     <p className="text-xs md:text-sm text-muted-foreground truncate">
                                       {application.candidate_id}
