@@ -232,7 +232,7 @@ export default function AddJob() {
     jobDescription: "",
     industries: [] as string[],
     headhuntingCompanies: [] as string[],
-    companyNotToInclude: "",
+    companiesToExclude: [] as string[],
     clientId: "",
     clientName: "",
     clientDescription: "",
@@ -479,6 +479,7 @@ export default function AddJob() {
           job_description: formData.jobDescription,
           industry: formData.industries.join(", "),
           headhunting_companies: formData.headhuntingCompanies.join(", "),
+          companies_to_exclude: formData.companiesToExclude.length > 0 ? formData.companiesToExclude.join(", ") : null,
           client_id: formData.clientId || null,
           client_name: formData.clientName,
           client_description: formData.clientDescription,
@@ -649,16 +650,16 @@ export default function AddJob() {
             </div>
 
             <div className="space-y-2">
-              <Label>Company not to include</Label>
+              <Label>Companies to Exclude</Label>
               <ApiMultiSelect
-                value={formData.companyNotToInclude ? [formData.companyNotToInclude] : []}
-                onChange={(value) => handleInputChange("companyNotToInclude", value.length > 0 ? value[value.length - 1] : "")}
+                value={formData.companiesToExclude}
+                onChange={(value) => handleInputChange("companiesToExclude", value)}
                 apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
                 apiHeaders={{
                   "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
                   "Accept": "application/json"
                 }}
-                placeholder="Select company to exclude..."
+                placeholder="Select companies to exclude..."
                 searchPlaceholder="Type to search companies..."
                 emptyText="Type to search for companies"
               />
