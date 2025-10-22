@@ -22,6 +22,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { cn } from "@/lib/utils";
 import { ApiMultiSelect } from "@/components/ui/api-multi-select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { LinkedInConnection } from "@/components/settings/LinkedInConnection";
 
 
 const europeanCountries = [
@@ -1278,6 +1279,18 @@ export default function AddJob() {
           </Button>
         </div>
       </form>
+
+      {/* LinkedIn Connection Section */}
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-2xl font-light font-work tracking-tight">
+            LinkedIn Connection
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <LinkedInConnection />
+        </CardContent>
+      </Card>
     </div>
   );
 }

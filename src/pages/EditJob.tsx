@@ -16,6 +16,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { toast } from "sonner";
 import FileUpload from "@/components/upload/FileUpload";
 import { ApiMultiSelect } from "@/components/ui/api-multi-select";
+import { LinkedInConnection } from "@/components/settings/LinkedInConnection";
 
 const europeanCountries = [
   "Albania", "Andorra", "Austria", "Azerbaijan", "Belgium", "Bosnia and Herzegovina", 
@@ -956,6 +957,21 @@ export default function EditJob() {
               </Button>
             </div>
           </form>
+        </CardContent>
+      </Card>
+
+      {/* LinkedIn Connection Section */}
+      <Card className="mission-card mt-6">
+        <CardHeader>
+          <CardTitle className="text-3xl font-light font-work tracking-tight">
+            LinkedIn Connection
+          </CardTitle>
+          <CardDescription className="font-light font-inter">
+            Manage your LinkedIn integration for this job
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <LinkedInConnection />
         </CardContent>
       </Card>
     </div>
