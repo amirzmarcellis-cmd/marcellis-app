@@ -1281,13 +1281,8 @@ export default function AddJob() {
       </form>
 
       {/* LinkedIn Connection Section */}
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle className="text-2xl font-light font-work tracking-tight">
-            LinkedIn Connection
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Card className="mt-4">
+        <CardContent className="pt-4">
           <LinkedInConnection />
         </CardContent>
       </Card>

@@ -961,16 +961,8 @@ export default function EditJob() {
       </Card>
 
       {/* LinkedIn Connection Section */}
-      <Card className="mission-card mt-6">
-        <CardHeader>
-          <CardTitle className="text-3xl font-light font-work tracking-tight">
-            LinkedIn Connection
-          </CardTitle>
-          <CardDescription className="font-light font-inter">
-            Manage your LinkedIn integration for this job
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <Card className="mission-card mt-4">
+        <CardContent className="pt-4">
           <LinkedInConnection />
         </CardContent>
       </Card>
