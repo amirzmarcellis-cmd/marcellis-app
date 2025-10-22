@@ -456,27 +456,12 @@ export default function AddJob() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate all mandatory fields
-    const mandatoryFields = {
-      'Job Title': formData.jobTitle,
-      'Assigned Recruiter': formData.recruiterId,
-      'Job Description': formData.jobDescription,
-      'Client': formData.clientId,
-      'Job Location': formData.jobLocation,
-      'Notice Period': formData.noticePeriod,
-      'Salary': formData.jobSalaryRange[0] > 0,
-      'Currency': formData.currency,
-      'Job Type': formData.type
-    };
-
-    const missingFields = Object.entries(mandatoryFields)
-      .filter(([_, value]) => !value)
-      .map(([field]) => field);
-
-    if (missingFields.length > 0) {
-      toast.error(`Please fill in all required fields: ${missingFields.join(', ')}`);
+    // Basic validation
+    if (!formData.jobTitle || !formData.jobDescription) {
+      toast.error("Please fill in all required fields");
       return;
     }
+
 
     setIsSubmitting(true);
     
@@ -551,87 +536,157 @@ export default function AddJob() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-3xl font-light font-work tracking-tight">Mandatory Information</CardTitle>
-          <p className="text-sm text-muted-foreground mt-2">All fields marked with * are required</p>
+          <CardTitle className="text-3xl font-light font-work tracking-tight">Job Information</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Mandatory Fields Section */}
-            <div className="space-y-6 p-6 rounded-lg border-2 border-primary/20 bg-primary/5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="jobTitle" className="font-light font-inter">
-                    Job Title <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="jobTitle"
-                    value={formData.jobTitle}
-                    onChange={(e) => handleInputChange("jobTitle", e.target.value)}
-                    placeholder="Enter job title"
-                    className="border-primary/30"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="recruiter">
-                    Assigned Recruiter <span className="text-destructive">*</span>
-                  </Label>
-                  <Select value={formData.recruiterId || "none"} onValueChange={(value) => handleInputChange("recruiterId", value === "none" ? "" : value)}>
-                    <SelectTrigger className="border-primary/30">
-                      <SelectValue placeholder="Select a recruiter" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">No Recruiter</SelectItem>
-                      {recruiters.map((recruiter) => (
-                        <SelectItem key={recruiter.user_id} value={recruiter.user_id}>
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-primary"/>
-                            {recruiter.name || recruiter.email}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="jobDescription">
-                  Job Description <span className="text-destructive">*</span>
-                </Label>
-                <Textarea
-                  id="jobDescription"
-                  value={formData.jobDescription}
-                  onChange={(e) => handleInputChange("jobDescription", e.target.value)}
-                  placeholder="Enter detailed job description"
-                  rows={6}
-                  className="border-primary/30"
+                <Label htmlFor="jobTitle" className="font-light font-inter">Job Title *</Label>
+                <Input
+                  id="jobTitle"
+                  value={formData.jobTitle}
+                  onChange={(e) => handleInputChange("jobTitle", e.target.value)}
+                  placeholder="Enter job title"
+                  required
                 />
               </div>
-
               <div className="space-y-2">
-                <Label className="text-sm font-medium">
-                  Client <span className="text-destructive">*</span>
-                </Label>
-                <Popover open={clientPopoverOpen} onOpenChange={setClientPopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={clientPopoverOpen}
-                      className="w-full justify-between h-12 px-4 bg-background hover:bg-accent/5 border-primary/30 rounded-xl transition-all duration-200"
-                    >
-                      {formData.clientId ? (
-                        <div className="flex flex-col items-start text-left flex-1 min-w-0">
-                          <span className="font-medium text-foreground truncate w-full">
-                            {clients.find((c) => c.id === formData.clientId)?.name}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground font-normal">Select client...</span>
-                      )}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 text-muted-foreground" />
-                    </Button>
-                  </PopoverTrigger>
+                <Label htmlFor="itrisId" className="font-light font-inter">Itris ID</Label>
+                <Input
+                  id="itrisId"
+                  value={formData.itrisId}
+                  onChange={(e) => handleInputChange("itrisId", e.target.value)}
+                  placeholder="Enter Itris ID"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="group">Group</Label>
+              <Select value={formData.groupId || "none"} onValueChange={(value) => handleInputChange("groupId", value === "none" ? "" : value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a group (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No Group</SelectItem>
+                  {groups.map((group) => (
+                    <SelectItem key={group.id} value={group.id}>
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: group.color || "#3B82F6" }}
+                        />
+                        {group.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="recruiter">Assigned Recruiter</Label>
+              <Select value={formData.recruiterId || "none"} onValueChange={(value) => handleInputChange("recruiterId", value === "none" ? "" : value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a recruiter (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No Recruiter</SelectItem>
+                  {recruiters.map((recruiter) => (
+                    <SelectItem key={recruiter.user_id} value={recruiter.user_id}>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-primary"/>
+                        {recruiter.name || recruiter.email}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="jobDescription">Job Description *</Label>
+              <Textarea
+                id="jobDescription"
+                value={formData.jobDescription}
+                onChange={(e) => handleInputChange("jobDescription", e.target.value)}
+                placeholder="Enter detailed job description"
+                rows={6}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Industry</Label>
+              <ApiMultiSelect
+                value={formData.industries}
+                onChange={(value) => handleInputChange("industries", value)}
+                apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=INDUSTRY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
+                apiHeaders={{
+                  "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
+                  "Accept": "application/json"
+                }}
+                placeholder="Select industries..."
+                searchPlaceholder="Type to search industries..."
+                emptyText="Type to search for industries"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Headhunting Companies</Label>
+              <ApiMultiSelect
+                value={formData.headhuntingCompanies}
+                onChange={(value) => handleInputChange("headhuntingCompanies", value)}
+                apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
+                apiHeaders={{
+                  "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
+                  "Accept": "application/json"
+                }}
+                placeholder="Select headhunting companies..."
+                searchPlaceholder="Type to search companies..."
+                emptyText="Type to search for companies"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Companies to Exclude</Label>
+              <ApiMultiSelect
+                value={formData.companiesToExclude}
+                onChange={(value) => handleInputChange("companiesToExclude", value)}
+                apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
+                apiHeaders={{
+                  "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
+                  "Accept": "application/json"
+                }}
+                placeholder="Select companies to exclude..."
+                searchPlaceholder="Type to search companies..."
+                emptyText="Type to search for companies"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Client</Label>
+              <Popover open={clientPopoverOpen} onOpenChange={setClientPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={clientPopoverOpen}
+                    className="w-full justify-between h-12 px-4 bg-background hover:bg-accent/5 border-border/50 rounded-xl transition-all duration-200"
+                  >
+                    {formData.clientId ? (
+                      <div className="flex flex-col items-start text-left flex-1 min-w-0">
+                        <span className="font-medium text-foreground truncate w-full">
+                          {clients.find((c) => c.id === formData.clientId)?.name}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground font-normal">Select client...</span>
+                    )}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 text-muted-foreground" />
+                  </Button>
+                </PopoverTrigger>
                 <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-popover/95 backdrop-blur-xl border-border/50 shadow-lg" align="start">
                   <Command className="bg-transparent">
                     <CommandInput 
@@ -685,410 +740,15 @@ export default function AddJob() {
                       </CommandGroup>
                     </CommandList>
                   </Command>
-                  </PopoverContent>
-                </Popover>
-                {formData.clientId && formData.clientDescription && (
-                  <div className="px-3 py-2 rounded-lg bg-accent/20 border border-border/30">
-                    <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                      {formData.clientDescription}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="jobLocation">
-                    Job Location <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="jobLocation"
-                    value={formData.jobLocation}
-                    onChange={(e) => handleInputChange("jobLocation", e.target.value)}
-                    placeholder="Enter job location"
-                    className="border-primary/30"
-                  />
+                </PopoverContent>
+              </Popover>
+              {formData.clientId && formData.clientDescription && (
+                <div className="px-3 py-2 rounded-lg bg-accent/20 border border-border/30">
+                  <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                    {formData.clientDescription}
+                  </p>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="noticePeriod">
-                    Notice Period <span className="text-destructive">*</span>
-                  </Label>
-                  <Select value={formData.noticePeriod} onValueChange={(value) => handleInputChange("noticePeriod", value)}>
-                    <SelectTrigger className="border-primary/30">
-                      <SelectValue placeholder="Select notice period" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {noticePeriods.map((period) => (
-                        <SelectItem key={period} value={period}>
-                          {period}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-4">
-                  <Label htmlFor="jobSalaryRange">
-                    Salary: {formData.jobSalaryRange[0].toLocaleString()} <span className="text-destructive">*</span>
-                  </Label>
-                  <Slider
-                    value={formData.jobSalaryRange}
-                    onValueChange={(value) => handleInputChange("jobSalaryRange", value)}
-                    max={100000}
-                    min={1000}
-                    step={500}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>1,000</span>
-                    <span>100,000</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="currency">
-                    Currency <span className="text-destructive">*</span>
-                  </Label>
-                  <Select value={formData.currency} onValueChange={(value) => handleInputChange("currency", value)}>
-                    <SelectTrigger className="border-primary/30">
-                      <SelectValue placeholder="Select currency" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="AED">AED</SelectItem>
-                      <SelectItem value="SAR">SAR</SelectItem>
-                      <SelectItem value="QAR">QAR</SelectItem>
-                      <SelectItem value="USD">USD</SelectItem>
-                      <SelectItem value="EUR">EUR</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="type">
-                    Job Type <span className="text-destructive">*</span>
-                  </Label>
-                  <Select value={formData.type} onValueChange={(value) => handleInputChange("type", value)}>
-                    <SelectTrigger className="border-primary/30">
-                      <SelectValue placeholder="Select job type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Permanent">Permanent</SelectItem>
-                      <SelectItem value="Contract">Contract</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                {formData.type === "Contract" && (
-                  <div className="space-y-2">
-                    <Label htmlFor="contractLength">Contract Length</Label>
-                    <Select value={formData.contractLength} onValueChange={(value) => handleInputChange("contractLength", value)}>
-                      <SelectTrigger className="border-primary/30">
-                        <SelectValue placeholder="Select contract length" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {contractLengths.map((length) => (
-                          <SelectItem key={length} value={length}>
-                            {length}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Optional Fields Section */}
-            <div className="space-y-6 p-6 rounded-lg border border-border/50 bg-muted/30">
-              <div className="mb-4">
-                <h3 className="text-xl font-light font-work tracking-tight">Optional Information</h3>
-                <p className="text-sm text-muted-foreground mt-1">These fields can be filled later if needed</p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="itrisId" className="font-light font-inter">Itris ID</Label>
-                <Input
-                  id="itrisId"
-                  value={formData.itrisId}
-                  onChange={(e) => handleInputChange("itrisId", e.target.value)}
-                  placeholder="Enter Itris ID"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="group">Group</Label>
-                <Select value={formData.groupId || "none"} onValueChange={(value) => handleInputChange("groupId", value === "none" ? "" : value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a group (optional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">No Group</SelectItem>
-                    {groups.map((group) => (
-                      <SelectItem key={group.id} value={group.id}>
-                        <div className="flex items-center gap-2">
-                          <div 
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: group.color || "#3B82F6" }}
-                          />
-                          {group.name}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Industry</Label>
-                <ApiMultiSelect
-                  value={formData.industries}
-                  onChange={(value) => handleInputChange("industries", value)}
-                  apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=INDUSTRY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
-                  apiHeaders={{
-                    "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
-                    "Accept": "application/json"
-                  }}
-                  placeholder="Select industries..."
-                  searchPlaceholder="Type to search industries..."
-                  emptyText="Type to search for industries"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Headhunting Companies</Label>
-                <ApiMultiSelect
-                  value={formData.headhuntingCompanies}
-                  onChange={(value) => handleInputChange("headhuntingCompanies", value)}
-                  apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
-                  apiHeaders={{
-                    "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
-                    "Accept": "application/json"
-                  }}
-                  placeholder="Select headhunting companies..."
-                  searchPlaceholder="Type to search companies..."
-                  emptyText="Type to search for companies"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Companies to Exclude</Label>
-                <ApiMultiSelect
-                  value={formData.companiesToExclude}
-                  onChange={(value) => handleInputChange("companiesToExclude", value)}
-                  apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
-                  apiHeaders={{
-                    "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
-                    "Accept": "application/json"
-                  }}
-                  placeholder="Select companies to exclude..."
-                  searchPlaceholder="Type to search companies..."
-                  emptyText="Type to search for companies"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Locations to include</Label>
-                  <Select onValueChange={(value) => {
-                    const currentInclude = formData.nationalityToInclude || [];
-                    if (value === "European Countries") {
-                      const newCountries = europeanCountries.filter(country => !currentInclude.includes(country));
-                      handleInputChange("nationalityToInclude", [...currentInclude, ...newCountries]);
-                    } else if (value === "Arabian Countries") {
-                      const newCountries = arabianCountries.filter(country => !currentInclude.includes(country));
-                      handleInputChange("nationalityToInclude", [...currentInclude, ...newCountries]);
-                    } else if (!currentInclude.includes(value)) {
-                      handleInputChange("nationalityToInclude", [...currentInclude, value]);
-                    }
-                  }}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select countries to include..." />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-60">
-                      <SelectItem value="European Countries" className="font-semibold text-primary">
-                        🇪🇺 European Countries (Select All)
-                      </SelectItem>
-                      <SelectItem value="Arabian Countries" className="font-semibold text-primary">
-                        🕌 Arabian Countries (Select All)
-                      </SelectItem>
-                      {countries.filter(country => 
-                        !(formData.nationalityToInclude || []).includes(country)
-                      ).map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {country}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {(formData.nationalityToInclude || []).length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {(formData.nationalityToInclude || []).map((country) => (
-                        <span
-                          key={country}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs bg-primary/10 text-primary border border-primary/20"
-                        >
-                          {country}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const currentInclude = formData.nationalityToInclude || [];
-                              const updated = currentInclude.filter((n) => n !== country);
-                              handleInputChange("nationalityToInclude", updated);
-                            }}
-                            className="ml-1 hover:bg-primary/20 rounded-full w-4 h-4 flex items-center justify-center text-primary font-bold transition-colors"
-                            aria-label={`Remove ${country}`}
-                          >
-                            ×
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label>Location to be Exclude</Label>
-                  <Select onValueChange={(value) => {
-                    const currentExclude = formData.nationalityToExclude || [];
-                    if (value === "European Countries") {
-                      const newCountries = europeanCountries.filter(country => !currentExclude.includes(country));
-                      handleInputChange("nationalityToExclude", [...currentExclude, ...newCountries]);
-                    } else if (value === "Arabian Countries") {
-                      const newCountries = arabianCountries.filter(country => !currentExclude.includes(country));
-                      handleInputChange("nationalityToExclude", [...currentExclude, ...newCountries]);
-                    } else if (!currentExclude.includes(value)) {
-                      handleInputChange("nationalityToExclude", [...currentExclude, value]);
-                    }
-                  }}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select countries to exclude..." />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-60">
-                      <SelectItem value="European Countries" className="font-semibold text-destructive">
-                        🇪🇺 European Countries (Select All)
-                      </SelectItem>
-                      <SelectItem value="Arabian Countries" className="font-semibold text-destructive">
-                        🕌 Arabian Countries (Select All)
-                      </SelectItem>
-                      {countries.filter(country => 
-                        !(formData.nationalityToExclude || []).includes(country)
-                      ).map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {country}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {(formData.nationalityToExclude || []).length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {(formData.nationalityToExclude || []).map((country) => (
-                        <span
-                          key={country}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs bg-destructive/10 text-destructive border border-destructive/20"
-                        >
-                          {country}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const currentExclude = formData.nationalityToExclude || [];
-                              const updated = currentExclude.filter((n) => n !== country);
-                              handleInputChange("nationalityToExclude", updated);
-                            }}
-                            className="ml-1 hover:bg-destructive/20 rounded-full w-4 h-4 flex items-center justify-center text-destructive font-bold transition-colors"
-                            aria-label={`Remove ${country}`}
-                          >
-                            ×
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Prefered Nationality</Label>
-                <Select onValueChange={(value) => {
-                  const currentPrefered = formData.preferedNationality || [];
-                  if (value === "European Countries") {
-                    const newCountries = europeanCountries.filter(country => !currentPrefered.includes(country));
-                    handleInputChange("preferedNationality", [...currentPrefered, ...newCountries]);
-                  } else if (value === "Arabian Countries") {
-                    const newCountries = arabianCountries.filter(country => !currentPrefered.includes(country));
-                    handleInputChange("preferedNationality", [...currentPrefered, ...newCountries]);
-                  } else if (!currentPrefered.includes(value)) {
-                    handleInputChange("preferedNationality", [...currentPrefered, value]);
-                  }
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select prefered nationalities..." />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-60">
-                    <SelectItem value="European Countries" className="font-semibold text-primary">
-                      🇪🇺 European Countries (Select All)
-                    </SelectItem>
-                    <SelectItem value="Arabian Countries" className="font-semibold text-primary">
-                      🕌 Arabian Countries (Select All)
-                    </SelectItem>
-                    {countries.filter(country => 
-                      !(formData.preferedNationality || []).includes(country)
-                    ).map((country) => (
-                      <SelectItem key={country} value={country}>
-                        {country}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {(formData.preferedNationality || []).length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {(formData.preferedNationality || []).map((country) => (
-                      <span
-                        key={country}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs bg-green-500/20 text-green-700 dark:text-green-300 border border-green-500/30"
-                      >
-                        {country}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const currentPrefered = formData.preferedNationality || [];
-                            const updated = currentPrefered.filter((n) => n !== country);
-                            handleInputChange("preferedNationality", updated);
-                          }}
-                          className="ml-1 hover:bg-green-500/30 rounded-full w-4 h-4 flex items-center justify-center text-green-700 dark:text-green-300 font-bold transition-colors"
-                          aria-label={`Remove ${country}`}
-                        >
-                          ×
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="hasAssignment"
-                    checked={formData.hasAssignment}
-                    onCheckedChange={(value) => handleInputChange("hasAssignment", value)}
-                  />
-                  <Label htmlFor="hasAssignment">Has Assignment?</Label>
-                </div>
-                
-                {formData.hasAssignment && (
-                  <div className="space-y-2">
-                    <Label htmlFor="assignmentLink">Assignment Link</Label>
-                    <Input
-                      id="assignmentLink"
-                      value={formData.assignmentLink}
-                      onChange={(e) => handleInputChange("assignmentLink", e.target.value)}
-                      placeholder="Enter assignment link"
-                    />
-                  </div>
-                )}
-              </div>
+              )}
             </div>
 
             <Dialog open={addClientDialogOpen} onOpenChange={setAddClientDialogOpen}>
@@ -1143,6 +803,304 @@ export default function AddJob() {
               </DialogContent>
             </Dialog>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="jobLocation">Job Location</Label>
+                <Input
+                  id="jobLocation"
+                  value={formData.jobLocation}
+                  onChange={(e) => handleInputChange("jobLocation", e.target.value)}
+                  placeholder="Enter job location"
+                />
+              </div>
+              <div className="space-y-4">
+                <Label htmlFor="jobSalaryRange">Salary: {formData.jobSalaryRange[0].toLocaleString()}</Label>
+                <Slider
+                  value={formData.jobSalaryRange}
+                  onValueChange={(value) => handleInputChange("jobSalaryRange", value)}
+                  max={100000}
+                  min={1000}
+                  step={500}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>1,000</span>
+                  <span>100,000</span>
+                </div>
+              </div>
+            </div>
+
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="noticePeriod">Notice Period</Label>
+                <Select value={formData.noticePeriod} onValueChange={(value) => handleInputChange("noticePeriod", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select notice period" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {noticePeriods.map((period) => (
+                      <SelectItem key={period} value={period}>
+                        {period}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="currency">Currency</Label>
+                <Select value={formData.currency} onValueChange={(value) => handleInputChange("currency", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="AED">AED</SelectItem>
+                    <SelectItem value="SAR">SAR</SelectItem>
+                    <SelectItem value="QAR">QAR</SelectItem>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="EUR">EUR</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Locations to include</Label>
+                <Select onValueChange={(value) => {
+                  const currentInclude = formData.nationalityToInclude || [];
+                  if (value === "European Countries") {
+                    // Add all European countries that aren't already included
+                    const newCountries = europeanCountries.filter(country => !currentInclude.includes(country));
+                    handleInputChange("nationalityToInclude", [...currentInclude, ...newCountries]);
+                  } else if (value === "Arabian Countries") {
+                    // Add all Arabian countries that aren't already included
+                    const newCountries = arabianCountries.filter(country => !currentInclude.includes(country));
+                    handleInputChange("nationalityToInclude", [...currentInclude, ...newCountries]);
+                  } else if (!currentInclude.includes(value)) {
+                    handleInputChange("nationalityToInclude", [...currentInclude, value]);
+                  }
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select countries to include..." />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    <SelectItem value="European Countries" className="font-semibold text-primary">
+                      🇪🇺 European Countries (Select All)
+                    </SelectItem>
+                    <SelectItem value="Arabian Countries" className="font-semibold text-primary">
+                      🕌 Arabian Countries (Select All)
+                    </SelectItem>
+                    {countries.filter(country => 
+                      !(formData.nationalityToInclude || []).includes(country)
+                    ).map((country) => (
+                      <SelectItem key={country} value={country}>
+                        {country}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {(formData.nationalityToInclude || []).length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {(formData.nationalityToInclude || []).map((country) => (
+                      <span
+                        key={country}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs bg-primary/10 text-primary border border-primary/20"
+                      >
+                        {country}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const currentInclude = formData.nationalityToInclude || [];
+                            const updated = currentInclude.filter((n) => n !== country);
+                            handleInputChange("nationalityToInclude", updated);
+                          }}
+                          className="ml-1 hover:bg-primary/20 rounded-full w-4 h-4 flex items-center justify-center text-primary font-bold transition-colors"
+                          aria-label={`Remove ${country}`}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label>Location to be Exclude</Label>
+                <Select onValueChange={(value) => {
+                  const currentExclude = formData.nationalityToExclude || [];
+                  if (value === "European Countries") {
+                    // Add all European countries that aren't already excluded
+                    const newCountries = europeanCountries.filter(country => !currentExclude.includes(country));
+                    handleInputChange("nationalityToExclude", [...currentExclude, ...newCountries]);
+                  } else if (value === "Arabian Countries") {
+                    // Add all Arabian countries that aren't already excluded
+                    const newCountries = arabianCountries.filter(country => !currentExclude.includes(country));
+                    handleInputChange("nationalityToExclude", [...currentExclude, ...newCountries]);
+                  } else if (!currentExclude.includes(value)) {
+                    handleInputChange("nationalityToExclude", [...currentExclude, value]);
+                  }
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select countries to exclude..." />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    <SelectItem value="European Countries" className="font-semibold text-destructive">
+                      🇪🇺 European Countries (Select All)
+                    </SelectItem>
+                    <SelectItem value="Arabian Countries" className="font-semibold text-destructive">
+                      🕌 Arabian Countries (Select All)
+                    </SelectItem>
+                    {countries.filter(country => 
+                      !(formData.nationalityToExclude || []).includes(country)
+                    ).map((country) => (
+                      <SelectItem key={country} value={country}>
+                        {country}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {(formData.nationalityToExclude || []).length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {(formData.nationalityToExclude || []).map((country) => (
+                      <span
+                        key={country}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs bg-destructive/10 text-destructive border border-destructive/20"
+                      >
+                        {country}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const currentExclude = formData.nationalityToExclude || [];
+                            const updated = currentExclude.filter((n) => n !== country);
+                            handleInputChange("nationalityToExclude", updated);
+                          }}
+                          className="ml-1 hover:bg-destructive/20 rounded-full w-4 h-4 flex items-center justify-center text-destructive font-bold transition-colors"
+                          aria-label={`Remove ${country}`}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Prefered Nationality</Label>
+              <Select onValueChange={(value) => {
+                const currentPrefered = formData.preferedNationality || [];
+                if (value === "European Countries") {
+                  const newCountries = europeanCountries.filter(country => !currentPrefered.includes(country));
+                  handleInputChange("preferedNationality", [...currentPrefered, ...newCountries]);
+                } else if (value === "Arabian Countries") {
+                  const newCountries = arabianCountries.filter(country => !currentPrefered.includes(country));
+                  handleInputChange("preferedNationality", [...currentPrefered, ...newCountries]);
+                } else if (!currentPrefered.includes(value)) {
+                  handleInputChange("preferedNationality", [...currentPrefered, value]);
+                }
+              }}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select prefered nationalities..." />
+                </SelectTrigger>
+                <SelectContent className="max-h-60">
+                  <SelectItem value="European Countries" className="font-semibold text-primary">
+                    🇪🇺 European Countries (Select All)
+                  </SelectItem>
+                  <SelectItem value="Arabian Countries" className="font-semibold text-primary">
+                    🕌 Arabian Countries (Select All)
+                  </SelectItem>
+                  {countries.filter(country => 
+                    !(formData.preferedNationality || []).includes(country)
+                  ).map((country) => (
+                    <SelectItem key={country} value={country}>
+                      {country}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {(formData.preferedNationality || []).length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {(formData.preferedNationality || []).map((country) => (
+                    <span
+                      key={country}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs bg-green-500/20 text-green-700 dark:text-green-300 border border-green-500/30"
+                    >
+                      {country}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentPrefered = formData.preferedNationality || [];
+                          const updated = currentPrefered.filter((n) => n !== country);
+                          handleInputChange("preferedNationality", updated);
+                        }}
+                        className="ml-1 hover:bg-green-500/30 rounded-full w-4 h-4 flex items-center justify-center text-green-700 dark:text-green-300 font-bold transition-colors"
+                        aria-label={`Remove ${country}`}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="type">Job Type</Label>
+                <Select value={formData.type} onValueChange={(value) => handleInputChange("type", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select job type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Permanent">Permanent</SelectItem>
+                    <SelectItem value="Contract">Contract</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {formData.type === "Contract" && (
+                <div className="space-y-2">
+                  <Label htmlFor="contractLength">Contract Length</Label>
+                  <Select value={formData.contractLength} onValueChange={(value) => handleInputChange("contractLength", value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select contract length" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {contractLengths.map((length) => (
+                        <SelectItem key={length} value={length}>
+                          {length}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="hasAssignment"
+                  checked={formData.hasAssignment}
+                  onCheckedChange={(value) => handleInputChange("hasAssignment", value)}
+                />
+                <Label htmlFor="hasAssignment">Has Assignment?</Label>
+              </div>
+              
+              {formData.hasAssignment && (
+                <div className="space-y-2">
+                  <Label htmlFor="assignmentLink">Assignment Link</Label>
+                  <Input
+                    id="assignmentLink"
+                    value={formData.assignmentLink}
+                    onChange={(e) => handleInputChange("assignmentLink", e.target.value)}
+                    placeholder="Enter assignment link"
+                  />
+                </div>
+              )}
+            </div>
 
             <div className="flex gap-4 pt-4">
               <Button type="submit" disabled={isSubmitting}>
