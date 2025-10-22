@@ -1377,7 +1377,6 @@ export default function JobDetails() {
         itris_job_id: job?.itris_job_id || "",
         user_ids: booleanSearchUserIds,
         profile_id: job?.recruiter_id || "",
-        search_type: searchType,
         title: searchTitles[searchType],
       };
       console.log("Regenerate AI webhook payload:", payload);
