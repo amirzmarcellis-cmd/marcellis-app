@@ -49,7 +49,10 @@ export function LinkedInConnection({ linkedinId, userName, onUpdate }: LinkedInC
       console.log('Initiating LinkedIn connection...');
 
       const { data, error } = await supabase.functions.invoke('linkedin-connect', {
-        body: { action: 'initiate' }
+        body: { action: 'initiate' },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
       });
 
       if (error) throw error;
@@ -101,10 +104,18 @@ export function LinkedInConnection({ linkedinId, userName, onUpdate }: LinkedInC
 
   const checkConnectionStatus = async () => {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Session expired. Please log in again.');
+      }
+
       // Poll for up to 15 seconds (30 attempts * 500ms)
       for (let i = 0; i < 30; i++) {
         const { data, error } = await supabase.functions.invoke('linkedin-connect', {
-          body: { action: 'check-status' }
+          body: { action: 'check-status' },
+          headers: {
+            Authorization: `Bearer ${session.access_token}`
+          }
         });
 
         if (error) throw error;
@@ -152,8 +163,16 @@ export function LinkedInConnection({ linkedinId, userName, onUpdate }: LinkedInC
 
     setIsDisconnecting(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Please log in to disconnect LinkedIn');
+      }
+
       const { error } = await supabase.functions.invoke('linkedin-connect', {
-        body: { action: 'disconnect' }
+        body: { action: 'disconnect' },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
       });
 
       if (error) throw error;
