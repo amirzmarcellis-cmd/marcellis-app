@@ -22,30 +22,45 @@ Deno.serve(async (req) => {
     const authHeader = req.headers.get('Authorization');
     console.log('Auth header present:', !!authHeader);
 
+    if (!authHeader) {
+      throw new Error('No authorization header provided');
+    }
+
+    // Extract JWT token from Bearer header
+    const jwt = authHeader.replace('Bearer ', '');
+    if (!jwt) {
+      throw new Error('No authorization token provided');
+    }
+
+    // Create Supabase client with service role key for admin operations
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       {
         global: {
-          headers: { Authorization: authHeader! },
+          headers: { Authorization: authHeader },
         },
       }
     );
 
+    // Verify JWT token explicitly
     const {
       data: { user },
       error: authError,
-    } = await supabaseClient.auth.getUser();
+    } = await supabaseClient.auth.getUser(jwt);
 
-    console.log('Auth check:', { 
+    console.log('Auth verification:', { 
       hasUser: !!user, 
       userId: user?.id, 
       error: authError?.message 
     });
 
     if (authError || !user) {
-      throw new Error('Not authenticated - please log in again. ' + (authError?.message || ''));
+      console.error('JWT verification failed:', authError);
+      throw new Error('Invalid or expired session. Please log in again.');
     }
+
+    console.log('User authenticated successfully:', user.id);
 
     const { action, code, state, targetUserId } = await req.json();
     const UNIPILE_API_KEY = Deno.env.get('UNIPILE_API_KEY');
