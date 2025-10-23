@@ -32,6 +32,7 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
   const [isConnecting, setIsConnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [showNamePrompt, setShowNamePrompt] = useState(false);
+  const [connectionName, setConnectionName] = useState<string | null>(null);
   const popupWindow = useRef<Window | null>(null);
   const popupCheckInterval = useRef<NodeJS.Timeout | null>(null);
 
@@ -63,6 +64,11 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
       }
 
       if (data?.url) {
+        console.log('LinkedIn initiate response:', data);
+
+        // Store connection name for status polling
+        setConnectionName(data.connectionName);
+
         // Open centered popup window
         const width = 600;
         const height = 700;
@@ -83,12 +89,16 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
         popupWindow.current = popup;
 
         // Poll to check if popup is closed
-        popupCheckInterval.current = setInterval(() => {
+        popupCheckInterval.current = setInterval(async () => {
           if (popup.closed) {
             if (popupCheckInterval.current) {
               clearInterval(popupCheckInterval.current);
             }
-            handleAuthComplete();
+            console.log('Popup closed, checking connection status...');
+            
+            // Check if connection was completed
+            await checkConnectionStatus(data.connectionName);
+            setIsConnecting(false);
           }
         }, 500);
       }
@@ -129,38 +139,49 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
     }
   };
 
-  const handleAuthComplete = async () => {
-    // Verify and save the LinkedIn connection
+  const checkConnectionStatus = async (connName: string) => {
     try {
-      const { data: verifyData, error: verifyError } = await supabase.functions.invoke('linkedin-connect', {
-        body: { action: 'verify' },
-      });
+      // Poll for up to 15 seconds (30 attempts * 500ms)
+      for (let i = 0; i < 30; i++) {
+        const { data, error } = await supabase.functions.invoke('linkedin-connect', {
+          body: { 
+            action: 'check-status',
+            connectionName: connName
+          }
+        });
 
-      if (verifyError) {
-        console.error('Verification error:', verifyError);
-        toast({
-          title: 'Connection failed',
-          description: 'Failed to verify LinkedIn connection. Please try again.',
-          variant: 'destructive',
-        });
-      } else if (verifyData?.success) {
-        toast({
-          title: 'Connected',
-          description: 'LinkedIn account connected successfully.',
-        });
+        if (error) throw error;
+
+        console.log('Connection status:', data.status);
+
+        if (data.status === 'completed') {
+          toast({
+            title: "LinkedIn Connected",
+            description: "Your LinkedIn account has been successfully connected.",
+          });
+          onUpdate?.();
+          return;
+        }
+
+        if (data.status === 'failed') {
+          throw new Error(data.error_message || 'Connection failed');
+        }
+
+        // Wait 500ms before next check
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
+
+      // Timeout after 15 seconds
+      throw new Error('Connection verification timed out. The connection may still complete in the background.');
+
     } catch (error) {
-      console.error('Verification error:', error);
+      console.error('Error checking connection status:', error);
       toast({
-        title: 'Connection failed',
-        description: error instanceof Error ? error.message : 'Failed to verify LinkedIn connection.',
-        variant: 'destructive',
+        title: "Verification Failed",
+        description: error instanceof Error ? error.message : 'Failed to verify connection',
+        variant: "destructive",
       });
     }
-    
-    // Refresh profile to check if connected
-    onUpdate();
-    setIsConnecting(false);
   };
 
   // Cleanup on unmount
