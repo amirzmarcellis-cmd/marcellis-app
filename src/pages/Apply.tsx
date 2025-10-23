@@ -109,56 +109,28 @@ export default function Apply() {
 
   const generateNextUserId = async (): Promise<string> => {
     try {
-      // Get all existing App IDs to find the highest number
       const { data, error } = await supabase
         .from("CVs")
         .select("user_id")
         .like("user_id", "App%")
-        .order("user_id", { ascending: false });
+        .order("user_id", { ascending: false })
+        .limit(1);
 
       if (error) throw error;
 
-      let nextNumber = 1;
-      
       if (data && data.length > 0) {
-        // Extract all numbers and find the maximum
-        const numbers = data
-          .map(item => {
-            const match = item.user_id.match(/App(\d+)/);
-            return match ? parseInt(match[1]) : 0;
-          })
-          .filter(num => num > 0);
-        
-        if (numbers.length > 0) {
-          nextNumber = Math.max(...numbers) + 1;
+        const lastUserId = data[0].user_id;
+        const match = lastUserId.match(/App(\d+)/);
+        if (match) {
+          const nextNumber = parseInt(match[1]) + 1;
+          return `App${nextNumber.toString().padStart(4, '0')}`;
         }
       }
       
-      // Keep incrementing until we find an available ID
-      let attempts = 0;
-      while (attempts < 100) {
-        const candidateId = `App${nextNumber.toString().padStart(4, '0')}`;
-        
-        // Check if this ID exists
-        const { data: existing } = await supabase
-          .from("CVs")
-          .select("user_id")
-          .eq("user_id", candidateId)
-          .maybeSingle();
-        
-        if (!existing) {
-          return candidateId;
-        }
-        
-        nextNumber++;
-        attempts++;
-      }
-      
-      // Fallback to timestamp-based ID if we can't find a free sequential one
-      return `App${Date.now().toString().slice(-4)}`;
+      return "App0001";
     } catch (error) {
       console.error("Error generating user ID:", error);
-      return `App${Date.now().toString().slice(-4)}`;
+      return "App0001";
     }
   };
 
@@ -212,21 +184,6 @@ export default function Apply() {
       return;
     }
 
-    // Get all valid files (uploaded successfully with real Supabase URLs)
-    const validFiles = uploadedFiles.filter(file => 
-      file.url && file.url.startsWith('https://') && !file.isUploading
-    );
-
-    // Check if we have any valid files
-    if (validFiles.length === 0) {
-      toast({
-        title: "Upload Failed",
-        description: "No CVs were successfully uploaded. Please try uploading your files again.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsSubmitting(true);
     
     try {
@@ -251,22 +208,14 @@ export default function Apply() {
         file.url && file.url.startsWith('https://') && !file.isUploading
       );
 
-      if (validFiles.length === 0) {
-        throw new Error("No valid CV files found - all uploads failed");
-      }
-
       // Insert into CVs table - this will automatically trigger the Supabase webhook
-      const firstName = cleanText(data.firstName);
-      const lastName = cleanText(data.lastName);
-      const fullName = lastName ? `${firstName} ${lastName}` : firstName;
-      
       const { error: insertError } = await supabase
         .from("CVs")
         .insert([{
           user_id: cleanText(data.user_id),
-          Firstname: firstName,
-          Lastname: lastName || null,
-          name: fullName,
+          Firstname: cleanText(data.firstName),
+          Lastname: cleanText(data.lastName),
+          name: cleanText(`${data.firstName} ${data.lastName}`),
           email: cleanText(data.email),
           phone_number: cleanText(data.phoneNumber),
           notes: "",
@@ -379,22 +328,15 @@ export default function Apply() {
           ));
         } catch (error) {
           console.error('Error processing CV:', error);
-          // Update with error state - remove the blob URL to prevent submission
+          // Update with error state but keep the file visible
           setUploadedFiles(prev => prev.map((file, index) => 
             index === fileIndex ? {
               ...file,
-              url: '', // Clear the blob URL so it won't pass validation
-              text: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+              text: 'Upload failed - using temporary file',
               isUploading: false,
               uploadProgress: 0
             } : file
           ));
-          
-          toast({
-            title: "Upload Failed",
-            description: `Failed to upload ${fileObj.file_name}. Please try again.`,
-            variant: "destructive",
-          });
         }
       }
     }

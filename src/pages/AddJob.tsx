@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { ArrowLeft, Check, ChevronsUpDown, Plus, ChevronDown } from "lucide-react";
+import { ArrowLeft, Check, ChevronsUpDown, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useProfile } from "@/hooks/useProfile";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -21,8 +20,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { ApiMultiSelect } from "@/components/ui/api-multi-select";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { LinkedInConnection } from "@/components/settings/LinkedInConnection";
 
 
 const europeanCountries = [
@@ -235,7 +232,7 @@ export default function AddJob() {
     jobDescription: "",
     industries: [] as string[],
     headhuntingCompanies: [] as string[],
-    companiesToExclude: [] as string[],
+    companyNotToInclude: "",
     clientId: "",
     clientName: "",
     clientDescription: "",
@@ -265,8 +262,6 @@ export default function AddJob() {
   const [newClientData, setNewClientData] = useState({ name: "", description: "" });
   const [currentJobId, setCurrentJobId] = useState<string | null>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const [optionalFieldsOpen, setOptionalFieldsOpen] = useState(false);
-  const [selectedOptionalFields, setSelectedOptionalFields] = useState<string[]>([]);
 
   useEffect(() => {
     // Auto-assign recruiter to current user for team members if not selected
@@ -461,45 +456,9 @@ export default function AddJob() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate all mandatory fields
-    if (!formData.jobTitle.trim()) {
-      toast.error("Job Title is required");
-      return;
-    }
-    if (!formData.recruiterId) {
-      toast.error("Assigned Recruiter is required");
-      return;
-    }
-    if (!formData.jobDescription.trim()) {
-      toast.error("Job Description is required");
-      return;
-    }
-    if (!formData.clientId) {
-      toast.error("Client is required");
-      return;
-    }
-    if (!formData.jobLocation.trim()) {
-      toast.error("Job Location is required");
-      return;
-    }
-    if (!formData.noticePeriod) {
-      toast.error("Notice Period is required");
-      return;
-    }
-    if (!formData.jobSalaryRange[0] || formData.jobSalaryRange[0] < 1000) {
-      toast.error("Valid Salary is required");
-      return;
-    }
-    if (!formData.currency) {
-      toast.error("Currency is required");
-      return;
-    }
-    if (!formData.type) {
-      toast.error("Job Type is required");
-      return;
-    }
-    if (formData.type === "Contract" && !formData.contractLength) {
-      toast.error("Contract Length is required for contract positions");
+    // Basic validation
+    if (!formData.jobTitle || !formData.jobDescription) {
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -516,27 +475,26 @@ export default function AddJob() {
         .from('Jobs')
         .insert({
           job_id: jobId,
-          job_title: formData.jobTitle.trim(),
-          job_description: formData.jobDescription.trim(),
-          industry: formData.industries.length > 0 ? formData.industries.join(", ") : null,
-          headhunting_companies: formData.headhuntingCompanies.length > 0 ? formData.headhuntingCompanies.join(", ") : null,
-          companies_to_exclude: formData.companiesToExclude.length > 0 ? formData.companiesToExclude.join(", ") : null,
-          client_id: formData.clientId,
-          client_name: formData.clientName.trim() || null,
-          client_description: formData.clientDescription ? formData.clientDescription.trim() : null,
-          job_location: formData.jobLocation.trim(),
+          job_title: formData.jobTitle,
+          job_description: formData.jobDescription,
+          industry: formData.industries.join(", "),
+          headhunting_companies: formData.headhuntingCompanies.join(", "),
+          client_id: formData.clientId || null,
+          client_name: formData.clientName,
+          client_description: formData.clientDescription,
+          job_location: formData.jobLocation,
           job_salary_range: formData.jobSalaryRange[0],
-          assignment: formData.hasAssignment && formData.assignmentLink ? formData.assignmentLink.trim() : null,
+          assignment: formData.hasAssignment ? formData.assignmentLink : null,
           notice_period: formData.noticePeriod,
           nationality_to_include: formData.nationalityToInclude.length > 0 ? formData.nationalityToInclude.join(", ") : null,
           nationality_to_exclude: formData.nationalityToExclude.length > 0 ? formData.nationalityToExclude.join(", ") : null,
           prefered_nationality: formData.preferedNationality.length > 0 ? formData.preferedNationality.join(", ") : null,
           Type: formData.type,
-          contract_length: formData.type === "Contract" && formData.contractLength ? formData.contractLength : null,
+          contract_length: formData.type === "Contract" ? formData.contractLength : null,
           Currency: formData.currency,
-          itris_job_id: formData.itrisId ? formData.itrisId.trim() : null,
+          itris_job_id: formData.itrisId,
           group_id: formData.groupId || null,
-          recruiter_id: recruiterIdToSave,
+          recruiter_id: recruiterIdToSave || null,
           status: 'Active',
           Processed: 'Yes',
           Timestamp: new Date().toISOString()
@@ -544,7 +502,7 @@ export default function AddJob() {
 
       if (error) {
         console.error('Error creating job:', error);
-        toast.error(`Failed to create job: ${error.message}`);
+        toast.error("Failed to create job");
         return;
       }
       
@@ -561,104 +519,76 @@ export default function AddJob() {
     }
   };
 
-  const optionalFieldOptions = [
-    { id: "industry", label: "Industry" },
-    { id: "headhunting", label: "Headhunting Companies" },
-    { id: "companies_exclude", label: "Companies to Exclude" },
-    { id: "locations_include", label: "Locations to Include" },
-    { id: "locations_exclude", label: "Locations to Exclude" },
-    { id: "preferred_nationality", label: "Preferred Nationality" },
-    { id: "assignment", label: "Assignment Link" },
-  ];
-
-  const toggleOptionalField = (fieldId: string) => {
-    setSelectedOptionalFields(prev => 
-      prev.includes(fieldId) 
-        ? prev.filter(id => id !== fieldId)
-        : [...prev, fieldId]
-    );
-  };
-
   return (
-    <div className="container mx-auto p-6 max-w-5xl">
-      <div className="mb-8">
+    <div className="container mx-auto p-6 max-w-4xl">
+      <div className="mb-6">
         <Button
           variant="ghost"
           onClick={() => navigate("/jobs")}
-          className="mb-4 font-light"
+          className="mb-4 font-light font-inter"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Jobs
         </Button>
-        <h1 className="text-5xl font-light font-work tracking-tight">Add New Job</h1>
+        <h1 className="text-6xl font-light font-work tracking-tight">Add New Job</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Mandatory Fields Section */}
-        <Card className="border-primary/20">
-          <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-primary/10">
-            <CardTitle className="text-2xl font-light font-work tracking-tight flex items-center gap-2">
-              <span className="text-primary">*</span> Mandatory Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-6 space-y-6">
-            {/* Row 1: Job Title, ITRIS ID, Group */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-3xl font-light font-work tracking-tight">Job Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="jobTitle" className="font-medium flex items-center gap-1">
-                  Job Title <span className="text-primary">*</span>
-                </Label>
+                <Label htmlFor="jobTitle" className="font-light font-inter">Job Title *</Label>
                 <Input
                   id="jobTitle"
                   value={formData.jobTitle}
                   onChange={(e) => handleInputChange("jobTitle", e.target.value)}
                   placeholder="Enter job title"
                   required
-                  className="h-11"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="itrisId" className="font-medium">Itris ID</Label>
+                <Label htmlFor="itrisId" className="font-light font-inter">Itris ID</Label>
                 <Input
                   id="itrisId"
                   value={formData.itrisId}
                   onChange={(e) => handleInputChange("itrisId", e.target.value)}
                   placeholder="Enter Itris ID"
-                  className="h-11"
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="group" className="font-medium">Group</Label>
-                <Select value={formData.groupId || "none"} onValueChange={(value) => handleInputChange("groupId", value === "none" ? "" : value)}>
-                  <SelectTrigger className="h-11">
-                    <SelectValue placeholder="Select group" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">No Group</SelectItem>
-                    {groups.map((group) => (
-                      <SelectItem key={group.id} value={group.id}>
-                        <div className="flex items-center gap-2">
-                          <div 
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: group.color || "#3B82F6" }}
-                          />
-                          {group.name}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
             </div>
 
-            {/* Row 2: Assigned Recruiter */}
             <div className="space-y-2">
-              <Label htmlFor="recruiter" className="font-medium flex items-center gap-1">
-                Assigned Recruiter <span className="text-primary">*</span>
-              </Label>
+              <Label htmlFor="group">Group</Label>
+              <Select value={formData.groupId || "none"} onValueChange={(value) => handleInputChange("groupId", value === "none" ? "" : value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a group (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No Group</SelectItem>
+                  {groups.map((group) => (
+                    <SelectItem key={group.id} value={group.id}>
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: group.color || "#3B82F6" }}
+                        />
+                        {group.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="recruiter">Assigned Recruiter</Label>
               <Select value={formData.recruiterId || "none"} onValueChange={(value) => handleInputChange("recruiterId", value === "none" ? "" : value)}>
-                <SelectTrigger className="h-11">
-                  <SelectValue placeholder="Select a recruiter" />
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a recruiter (optional)" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">No Recruiter</SelectItem>
@@ -674,39 +604,82 @@ export default function AddJob() {
               </Select>
             </div>
 
-            {/* Row 3: Job Description */}
             <div className="space-y-2">
-              <Label htmlFor="jobDescription" className="font-medium flex items-center gap-1">
-                Job Description <span className="text-primary">*</span>
-              </Label>
+              <Label htmlFor="jobDescription">Job Description *</Label>
               <Textarea
                 id="jobDescription"
                 value={formData.jobDescription}
                 onChange={(e) => handleInputChange("jobDescription", e.target.value)}
                 placeholder="Enter detailed job description"
-                rows={5}
+                rows={6}
                 required
-                className="resize-none"
               />
             </div>
 
-            {/* Row 4: Client */}
             <div className="space-y-2">
-              <Label className="font-medium flex items-center gap-1">
-                Client <span className="text-primary">*</span>
-              </Label>
+              <Label>Industry</Label>
+              <ApiMultiSelect
+                value={formData.industries}
+                onChange={(value) => handleInputChange("industries", value)}
+                apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=INDUSTRY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
+                apiHeaders={{
+                  "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
+                  "Accept": "application/json"
+                }}
+                placeholder="Select industries..."
+                searchPlaceholder="Type to search industries..."
+                emptyText="Type to search for industries"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Headhunting Companies</Label>
+              <ApiMultiSelect
+                value={formData.headhuntingCompanies}
+                onChange={(value) => handleInputChange("headhuntingCompanies", value)}
+                apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
+                apiHeaders={{
+                  "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
+                  "Accept": "application/json"
+                }}
+                placeholder="Select headhunting companies..."
+                searchPlaceholder="Type to search companies..."
+                emptyText="Type to search for companies"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Company not to include</Label>
+              <ApiMultiSelect
+                value={formData.companyNotToInclude ? [formData.companyNotToInclude] : []}
+                onChange={(value) => handleInputChange("companyNotToInclude", value.length > 0 ? value[value.length - 1] : "")}
+                apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
+                apiHeaders={{
+                  "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
+                  "Accept": "application/json"
+                }}
+                placeholder="Select company to exclude..."
+                searchPlaceholder="Type to search companies..."
+                emptyText="Type to search for companies"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Client</Label>
               <Popover open={clientPopoverOpen} onOpenChange={setClientPopoverOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     role="combobox"
                     aria-expanded={clientPopoverOpen}
-                    className="w-full justify-between h-11 px-4 bg-background hover:bg-accent/5 border-border/50 rounded-lg"
+                    className="w-full justify-between h-12 px-4 bg-background hover:bg-accent/5 border-border/50 rounded-xl transition-all duration-200"
                   >
                     {formData.clientId ? (
-                      <span className="font-medium truncate">
-                        {clients.find((c) => c.id === formData.clientId)?.name}
-                      </span>
+                      <div className="flex flex-col items-start text-left flex-1 min-w-0">
+                        <span className="font-medium text-foreground truncate w-full">
+                          {clients.find((c) => c.id === formData.clientId)?.name}
+                        </span>
+                      </div>
                     ) : (
                       <span className="text-muted-foreground font-normal">Select client...</span>
                     )}
@@ -777,48 +750,91 @@ export default function AddJob() {
               )}
             </div>
 
-            {/* Row 5: Job Location and Salary */}
+            <Dialog open={addClientDialogOpen} onOpenChange={setAddClientDialogOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="font-work">Add New Client</DialogTitle>
+                  <DialogDescription className="font-light">
+                    Add a new client to your database
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="newClientName" className="font-light">Client Name *</Label>
+                    <Input
+                      id="newClientName"
+                      value={newClientData.name}
+                      onChange={(e) => setNewClientData({ ...newClientData, name: e.target.value })}
+                      placeholder="Enter client name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="newClientDescription" className="font-light">Description</Label>
+                    <Textarea
+                      id="newClientDescription"
+                      value={newClientData.description}
+                      onChange={(e) => setNewClientData({ ...newClientData, description: e.target.value })}
+                      placeholder="Enter client description"
+                      rows={4}
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setAddClientDialogOpen(false);
+                        setNewClientData({ name: "", description: "" });
+                      }}
+                      className="font-light"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={handleAddClient}
+                      className="font-light"
+                    >
+                      Add Client
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="jobLocation" className="font-medium flex items-center gap-1">
-                  Job Location <span className="text-primary">*</span>
-                </Label>
+                <Label htmlFor="jobLocation">Job Location</Label>
                 <Input
                   id="jobLocation"
                   value={formData.jobLocation}
                   onChange={(e) => handleInputChange("jobLocation", e.target.value)}
                   placeholder="Enter job location"
-                  required
-                  className="h-11"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="jobSalaryRange" className="font-medium flex items-center gap-1">
-                  Salary: {formData.jobSalaryRange[0].toLocaleString()} <span className="text-primary">*</span>
-                </Label>
+              <div className="space-y-4">
+                <Label htmlFor="jobSalaryRange">Salary: {formData.jobSalaryRange[0].toLocaleString()}</Label>
                 <Slider
                   value={formData.jobSalaryRange}
                   onValueChange={(value) => handleInputChange("jobSalaryRange", value)}
                   max={100000}
                   min={1000}
                   step={500}
-                  className="w-full mt-4"
+                  className="w-full"
                 />
-                <div className="flex justify-between text-xs text-muted-foreground">
+                <div className="flex justify-between text-sm text-muted-foreground">
                   <span>1,000</span>
                   <span>100,000</span>
                 </div>
               </div>
             </div>
 
-            {/* Row 6: Notice Period, Currency, Job Type */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="noticePeriod" className="font-medium flex items-center gap-1">
-                  Notice Period <span className="text-primary">*</span>
-                </Label>
+                <Label htmlFor="noticePeriod">Notice Period</Label>
                 <Select value={formData.noticePeriod} onValueChange={(value) => handleInputChange("noticePeriod", value)}>
-                  <SelectTrigger className="h-11">
+                  <SelectTrigger>
                     <SelectValue placeholder="Select notice period" />
                   </SelectTrigger>
                   <SelectContent>
@@ -831,11 +847,9 @@ export default function AddJob() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="currency" className="font-medium flex items-center gap-1">
-                  Currency <span className="text-primary">*</span>
-                </Label>
+                <Label htmlFor="currency">Currency</Label>
                 <Select value={formData.currency} onValueChange={(value) => handleInputChange("currency", value)}>
-                  <SelectTrigger className="h-11">
+                  <SelectTrigger>
                     <SelectValue placeholder="Select currency" />
                   </SelectTrigger>
                   <SelectContent>
@@ -847,12 +861,195 @@ export default function AddJob() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="type" className="font-medium flex items-center gap-1">
-                  Job Type <span className="text-primary">*</span>
-                </Label>
+                <Label>Locations to include</Label>
+                <Select onValueChange={(value) => {
+                  const currentInclude = formData.nationalityToInclude || [];
+                  if (value === "European Countries") {
+                    // Add all European countries that aren't already included
+                    const newCountries = europeanCountries.filter(country => !currentInclude.includes(country));
+                    handleInputChange("nationalityToInclude", [...currentInclude, ...newCountries]);
+                  } else if (value === "Arabian Countries") {
+                    // Add all Arabian countries that aren't already included
+                    const newCountries = arabianCountries.filter(country => !currentInclude.includes(country));
+                    handleInputChange("nationalityToInclude", [...currentInclude, ...newCountries]);
+                  } else if (!currentInclude.includes(value)) {
+                    handleInputChange("nationalityToInclude", [...currentInclude, value]);
+                  }
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select countries to include..." />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    <SelectItem value="European Countries" className="font-semibold text-primary">
+                      🇪🇺 European Countries (Select All)
+                    </SelectItem>
+                    <SelectItem value="Arabian Countries" className="font-semibold text-primary">
+                      🕌 Arabian Countries (Select All)
+                    </SelectItem>
+                    {countries.filter(country => 
+                      !(formData.nationalityToInclude || []).includes(country)
+                    ).map((country) => (
+                      <SelectItem key={country} value={country}>
+                        {country}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {(formData.nationalityToInclude || []).length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {(formData.nationalityToInclude || []).map((country) => (
+                      <span
+                        key={country}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs bg-primary/10 text-primary border border-primary/20"
+                      >
+                        {country}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const currentInclude = formData.nationalityToInclude || [];
+                            const updated = currentInclude.filter((n) => n !== country);
+                            handleInputChange("nationalityToInclude", updated);
+                          }}
+                          className="ml-1 hover:bg-primary/20 rounded-full w-4 h-4 flex items-center justify-center text-primary font-bold transition-colors"
+                          aria-label={`Remove ${country}`}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label>Location to be Exclude</Label>
+                <Select onValueChange={(value) => {
+                  const currentExclude = formData.nationalityToExclude || [];
+                  if (value === "European Countries") {
+                    // Add all European countries that aren't already excluded
+                    const newCountries = europeanCountries.filter(country => !currentExclude.includes(country));
+                    handleInputChange("nationalityToExclude", [...currentExclude, ...newCountries]);
+                  } else if (value === "Arabian Countries") {
+                    // Add all Arabian countries that aren't already excluded
+                    const newCountries = arabianCountries.filter(country => !currentExclude.includes(country));
+                    handleInputChange("nationalityToExclude", [...currentExclude, ...newCountries]);
+                  } else if (!currentExclude.includes(value)) {
+                    handleInputChange("nationalityToExclude", [...currentExclude, value]);
+                  }
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select countries to exclude..." />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    <SelectItem value="European Countries" className="font-semibold text-destructive">
+                      🇪🇺 European Countries (Select All)
+                    </SelectItem>
+                    <SelectItem value="Arabian Countries" className="font-semibold text-destructive">
+                      🕌 Arabian Countries (Select All)
+                    </SelectItem>
+                    {countries.filter(country => 
+                      !(formData.nationalityToExclude || []).includes(country)
+                    ).map((country) => (
+                      <SelectItem key={country} value={country}>
+                        {country}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {(formData.nationalityToExclude || []).length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {(formData.nationalityToExclude || []).map((country) => (
+                      <span
+                        key={country}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs bg-destructive/10 text-destructive border border-destructive/20"
+                      >
+                        {country}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const currentExclude = formData.nationalityToExclude || [];
+                            const updated = currentExclude.filter((n) => n !== country);
+                            handleInputChange("nationalityToExclude", updated);
+                          }}
+                          className="ml-1 hover:bg-destructive/20 rounded-full w-4 h-4 flex items-center justify-center text-destructive font-bold transition-colors"
+                          aria-label={`Remove ${country}`}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Prefered Nationality</Label>
+              <Select onValueChange={(value) => {
+                const currentPrefered = formData.preferedNationality || [];
+                if (value === "European Countries") {
+                  const newCountries = europeanCountries.filter(country => !currentPrefered.includes(country));
+                  handleInputChange("preferedNationality", [...currentPrefered, ...newCountries]);
+                } else if (value === "Arabian Countries") {
+                  const newCountries = arabianCountries.filter(country => !currentPrefered.includes(country));
+                  handleInputChange("preferedNationality", [...currentPrefered, ...newCountries]);
+                } else if (!currentPrefered.includes(value)) {
+                  handleInputChange("preferedNationality", [...currentPrefered, value]);
+                }
+              }}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select prefered nationalities..." />
+                </SelectTrigger>
+                <SelectContent className="max-h-60">
+                  <SelectItem value="European Countries" className="font-semibold text-primary">
+                    🇪🇺 European Countries (Select All)
+                  </SelectItem>
+                  <SelectItem value="Arabian Countries" className="font-semibold text-primary">
+                    🕌 Arabian Countries (Select All)
+                  </SelectItem>
+                  {countries.filter(country => 
+                    !(formData.preferedNationality || []).includes(country)
+                  ).map((country) => (
+                    <SelectItem key={country} value={country}>
+                      {country}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {(formData.preferedNationality || []).length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {(formData.preferedNationality || []).map((country) => (
+                    <span
+                      key={country}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs bg-green-500/20 text-green-700 dark:text-green-300 border border-green-500/30"
+                    >
+                      {country}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentPrefered = formData.preferedNationality || [];
+                          const updated = currentPrefered.filter((n) => n !== country);
+                          handleInputChange("preferedNationality", updated);
+                        }}
+                        className="ml-1 hover:bg-green-500/30 rounded-full w-4 h-4 flex items-center justify-center text-green-700 dark:text-green-300 font-bold transition-colors"
+                        aria-label={`Remove ${country}`}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="type">Job Type</Label>
                 <Select value={formData.type} onValueChange={(value) => handleInputChange("type", value)}>
-                  <SelectTrigger className="h-11">
+                  <SelectTrigger>
                     <SelectValue placeholder="Select job type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -861,431 +1058,60 @@ export default function AddJob() {
                   </SelectContent>
                 </Select>
               </div>
+              
+              {formData.type === "Contract" && (
+                <div className="space-y-2">
+                  <Label htmlFor="contractLength">Contract Length</Label>
+                  <Select value={formData.contractLength} onValueChange={(value) => handleInputChange("contractLength", value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select contract length" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {contractLengths.map((length) => (
+                        <SelectItem key={length} value={length}>
+                          {length}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
 
-            {/* Contract Length (conditional) */}
-            {formData.type === "Contract" && (
-              <div className="space-y-2">
-                <Label htmlFor="contractLength" className="font-medium">Contract Length</Label>
-                <Select value={formData.contractLength} onValueChange={(value) => handleInputChange("contractLength", value)}>
-                  <SelectTrigger className="h-11">
-                    <SelectValue placeholder="Select contract length" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {contractLengths.map((length) => (
-                      <SelectItem key={length} value={length}>
-                        {length}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Optional Fields Section */}
-        <Card>
-          <CardHeader>
-            <Collapsible open={optionalFieldsOpen} onOpenChange={setOptionalFieldsOpen}>
-              <CollapsibleTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full justify-between p-0 hover:bg-transparent"
-                >
-                  <CardTitle className="text-2xl font-light font-work tracking-tight">
-                    Optional Fields
-                  </CardTitle>
-                  <ChevronDown className={cn(
-                    "h-5 w-5 transition-transform duration-200",
-                    optionalFieldsOpen && "rotate-180"
-                  )} />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="pt-4">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Select which optional fields you want to fill in:
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {optionalFieldOptions.map((option) => (
-                      <Button
-                        key={option.id}
-                        type="button"
-                        variant={selectedOptionalFields.includes(option.id) ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => toggleOptionalField(option.id)}
-                        className="rounded-full"
-                      >
-                        {option.label}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-          </CardHeader>
-          
-          {selectedOptionalFields.length > 0 && (
-            <CardContent className="space-y-6 pt-0">
-              {selectedOptionalFields.includes("industry") && (
-                <div className="space-y-2 p-4 border border-border/50 rounded-lg bg-accent/5">
-                  <Label className="font-medium">Industry</Label>
-                  <ApiMultiSelect
-                    value={formData.industries}
-                    onChange={(value) => handleInputChange("industries", value)}
-                    apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=INDUSTRY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
-                    apiHeaders={{
-                      "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
-                      "Accept": "application/json"
-                    }}
-                    placeholder="Select industries..."
-                    searchPlaceholder="Type to search industries..."
-                    emptyText="Type to search for industries"
-                  />
-                  <p className="text-xs text-muted-foreground italic mt-2">
-                    Note: This will affect the candidate longlist
-                  </p>
-                </div>
-              )}
-
-              {selectedOptionalFields.includes("headhunting") && (
-                <div className="space-y-2 p-4 border border-border/50 rounded-lg bg-accent/5">
-                  <Label className="font-medium">Headhunting Companies</Label>
-                  <ApiMultiSelect
-                    value={formData.headhuntingCompanies}
-                    onChange={(value) => handleInputChange("headhuntingCompanies", value)}
-                    apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
-                    apiHeaders={{
-                      "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
-                      "Accept": "application/json"
-                    }}
-                    placeholder="Select headhunting companies..."
-                    searchPlaceholder="Type to search companies..."
-                    emptyText="Type to search for companies"
-                  />
-                  <p className="text-xs text-muted-foreground italic mt-2">
-                    Note: This will affect the candidate longlist
-                  </p>
-                </div>
-              )}
-
-              {selectedOptionalFields.includes("companies_exclude") && (
-                <div className="space-y-2 p-4 border border-border/50 rounded-lg bg-accent/5">
-                  <Label className="font-medium">Companies to Exclude</Label>
-                  <ApiMultiSelect
-                    value={formData.companiesToExclude}
-                    onChange={(value) => handleInputChange("companiesToExclude", value)}
-                    apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
-                    apiHeaders={{
-                      "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
-                      "Accept": "application/json"
-                    }}
-                    placeholder="Select companies to exclude..."
-                    searchPlaceholder="Type to search companies..."
-                    emptyText="Type to search for companies"
-                  />
-                  <p className="text-xs text-muted-foreground italic mt-2">
-                    Note: This will affect the candidate longlist
-                  </p>
-                </div>
-              )}
-
-              {selectedOptionalFields.includes("locations_include") && (
-                <div className="space-y-2 p-4 border border-border/50 rounded-lg bg-accent/5">
-                  <Label className="font-medium">Locations to Include</Label>
-                  <Select onValueChange={(value) => {
-                    const currentInclude = formData.nationalityToInclude || [];
-                    if (value === "European Countries") {
-                      const newCountries = europeanCountries.filter(country => !currentInclude.includes(country));
-                      handleInputChange("nationalityToInclude", [...currentInclude, ...newCountries]);
-                    } else if (value === "Arabian Countries") {
-                      const newCountries = arabianCountries.filter(country => !currentInclude.includes(country));
-                      handleInputChange("nationalityToInclude", [...currentInclude, ...newCountries]);
-                    } else if (!currentInclude.includes(value)) {
-                      handleInputChange("nationalityToInclude", [...currentInclude, value]);
-                    }
-                  }}>
-                    <SelectTrigger className="h-11">
-                      <SelectValue placeholder="Select countries to include..." />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-60">
-                      <SelectItem value="European Countries" className="font-semibold text-primary">
-                        🇪🇺 European Countries (Select All)
-                      </SelectItem>
-                      <SelectItem value="Arabian Countries" className="font-semibold text-primary">
-                        🕌 Arabian Countries (Select All)
-                      </SelectItem>
-                      {countries.filter(country => 
-                        !(formData.nationalityToInclude || []).includes(country)
-                      ).map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {country}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {(formData.nationalityToInclude || []).length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {(formData.nationalityToInclude || []).map((country) => (
-                        <span
-                          key={country}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs bg-primary/10 text-primary border border-primary/20"
-                        >
-                          {country}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const currentInclude = formData.nationalityToInclude || [];
-                              const updated = currentInclude.filter((n) => n !== country);
-                              handleInputChange("nationalityToInclude", updated);
-                            }}
-                            className="ml-1 hover:bg-primary/20 rounded-full w-4 h-4 flex items-center justify-center text-primary font-bold transition-colors"
-                            aria-label={`Remove ${country}`}
-                          >
-                            ×
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <p className="text-xs text-muted-foreground italic mt-2">
-                    Note: This will affect the candidate longlist
-                  </p>
-                </div>
-              )}
-
-              {selectedOptionalFields.includes("locations_exclude") && (
-                <div className="space-y-2 p-4 border border-border/50 rounded-lg bg-accent/5">
-                  <Label className="font-medium">Locations to Exclude</Label>
-                  <Select onValueChange={(value) => {
-                    const currentExclude = formData.nationalityToExclude || [];
-                    if (value === "European Countries") {
-                      const newCountries = europeanCountries.filter(country => !currentExclude.includes(country));
-                      handleInputChange("nationalityToExclude", [...currentExclude, ...newCountries]);
-                    } else if (value === "Arabian Countries") {
-                      const newCountries = arabianCountries.filter(country => !currentExclude.includes(country));
-                      handleInputChange("nationalityToExclude", [...currentExclude, ...newCountries]);
-                    } else if (!currentExclude.includes(value)) {
-                      handleInputChange("nationalityToExclude", [...currentExclude, value]);
-                    }
-                  }}>
-                    <SelectTrigger className="h-11">
-                      <SelectValue placeholder="Select countries to exclude..." />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-60">
-                      <SelectItem value="European Countries" className="font-semibold text-destructive">
-                        🇪🇺 European Countries (Select All)
-                      </SelectItem>
-                      <SelectItem value="Arabian Countries" className="font-semibold text-destructive">
-                        🕌 Arabian Countries (Select All)
-                      </SelectItem>
-                      {countries.filter(country => 
-                        !(formData.nationalityToExclude || []).includes(country)
-                      ).map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {country}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {(formData.nationalityToExclude || []).length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {(formData.nationalityToExclude || []).map((country) => (
-                        <span
-                          key={country}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs bg-destructive/10 text-destructive border border-destructive/20"
-                        >
-                          {country}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const currentExclude = formData.nationalityToExclude || [];
-                              const updated = currentExclude.filter((n) => n !== country);
-                              handleInputChange("nationalityToExclude", updated);
-                            }}
-                            className="ml-1 hover:bg-destructive/20 rounded-full w-4 h-4 flex items-center justify-center text-destructive font-bold transition-colors"
-                            aria-label={`Remove ${country}`}
-                          >
-                            ×
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <p className="text-xs text-muted-foreground italic mt-2">
-                    Note: This will affect the candidate longlist
-                  </p>
-                </div>
-              )}
-
-              {selectedOptionalFields.includes("preferred_nationality") && (
-                <div className="space-y-2 p-4 border border-border/50 rounded-lg bg-accent/5">
-                  <Label className="font-medium">Preferred Nationality</Label>
-                  <Select onValueChange={(value) => {
-                    const currentPrefered = formData.preferedNationality || [];
-                    if (value === "European Countries") {
-                      const newCountries = europeanCountries.filter(country => !currentPrefered.includes(country));
-                      handleInputChange("preferedNationality", [...currentPrefered, ...newCountries]);
-                    } else if (value === "Arabian Countries") {
-                      const newCountries = arabianCountries.filter(country => !currentPrefered.includes(country));
-                      handleInputChange("preferedNationality", [...currentPrefered, ...newCountries]);
-                    } else if (!currentPrefered.includes(value)) {
-                      handleInputChange("preferedNationality", [...currentPrefered, value]);
-                    }
-                  }}>
-                    <SelectTrigger className="h-11">
-                      <SelectValue placeholder="Select preferred nationalities..." />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-60">
-                      <SelectItem value="European Countries" className="font-semibold text-primary">
-                        🇪🇺 European Countries (Select All)
-                      </SelectItem>
-                      <SelectItem value="Arabian Countries" className="font-semibold text-primary">
-                        🕌 Arabian Countries (Select All)
-                      </SelectItem>
-                      {countries.filter(country => 
-                        !(formData.preferedNationality || []).includes(country)
-                      ).map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {country}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {(formData.preferedNationality || []).length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {(formData.preferedNationality || []).map((country) => (
-                        <span
-                          key={country}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs bg-green-500/20 text-green-700 dark:text-green-300 border border-green-500/30"
-                        >
-                          {country}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const currentPrefered = formData.preferedNationality || [];
-                              const updated = currentPrefered.filter((n) => n !== country);
-                              handleInputChange("preferedNationality", updated);
-                            }}
-                            className="ml-1 hover:bg-green-500/30 rounded-full w-4 h-4 flex items-center justify-center text-green-700 dark:text-green-300 font-bold transition-colors"
-                            aria-label={`Remove ${country}`}
-                          >
-                            ×
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <p className="text-xs text-muted-foreground italic mt-2">
-                    Note: This will affect the candidate longlist
-                  </p>
-                </div>
-              )}
-
-              {selectedOptionalFields.includes("assignment") && (
-                <div className="space-y-2 p-4 border border-border/50 rounded-lg bg-accent/5">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Switch
-                      id="hasAssignment"
-                      checked={formData.hasAssignment}
-                      onCheckedChange={(value) => handleInputChange("hasAssignment", value)}
-                    />
-                    <Label htmlFor="hasAssignment" className="font-medium">Has Assignment?</Label>
-                  </div>
-                  
-                  {formData.hasAssignment && (
-                    <>
-                      <Label htmlFor="assignmentLink">Assignment Link</Label>
-                      <Input
-                        id="assignmentLink"
-                        value={formData.assignmentLink}
-                        onChange={(e) => handleInputChange("assignmentLink", e.target.value)}
-                        placeholder="Enter assignment link"
-                        className="h-11"
-                      />
-                      <p className="text-xs text-muted-foreground italic mt-2">
-                        Note: This will affect the candidate longlist
-                      </p>
-                    </>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          )}
-        </Card>
-
-        {/* Client Dialog */}
-        <Dialog open={addClientDialogOpen} onOpenChange={setAddClientDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="font-work">Add New Client</DialogTitle>
-              <DialogDescription className="font-light">
-                Add a new client to your database
-              </DialogDescription>
-            </DialogHeader>
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="newClientName" className="font-light">Client Name *</Label>
-                <Input
-                  id="newClientName"
-                  value={newClientData.name}
-                  onChange={(e) => setNewClientData({ ...newClientData, name: e.target.value })}
-                  placeholder="Enter client name"
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="hasAssignment"
+                  checked={formData.hasAssignment}
+                  onCheckedChange={(value) => handleInputChange("hasAssignment", value)}
                 />
+                <Label htmlFor="hasAssignment">Has Assignment?</Label>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="newClientDescription" className="font-light">Description</Label>
-                <Textarea
-                  id="newClientDescription"
-                  value={newClientData.description}
-                  onChange={(e) => setNewClientData({ ...newClientData, description: e.target.value })}
-                  placeholder="Enter client description"
-                  rows={4}
-                />
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setAddClientDialogOpen(false);
-                    setNewClientData({ name: "", description: "" });
-                  }}
-                  className="font-light"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="button"
-                  onClick={handleAddClient}
-                  className="font-light"
-                >
-                  Add Client
-                </Button>
-              </div>
+              
+              {formData.hasAssignment && (
+                <div className="space-y-2">
+                  <Label htmlFor="assignmentLink">Assignment Link</Label>
+                  <Input
+                    id="assignmentLink"
+                    value={formData.assignmentLink}
+                    onChange={(e) => handleInputChange("assignmentLink", e.target.value)}
+                    placeholder="Enter assignment link"
+                  />
+                </div>
+              )}
             </div>
-          </DialogContent>
-        </Dialog>
 
-        {/* LinkedIn Connection Section */}
-        <Card className="mb-6">
-          <CardContent className="pt-4">
-            <LinkedInConnection />
-          </CardContent>
-        </Card>
-
-        {/* Submit Buttons */}
-        <div className="flex gap-4 pb-6">
-          <Button type="submit" disabled={isSubmitting} size="lg" className="px-8">
-            {isSubmitting ? "Creating..." : "Create Job"}
-          </Button>
-          <Button type="button" variant="outline" onClick={() => navigate("/jobs")} size="lg" className="px-8">
-            Cancel
-          </Button>
-        </div>
-      </form>
+            <div className="flex gap-4 pt-4">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Creating..." : "Create Job"}
+              </Button>
+              <Button type="button" variant="outline" onClick={() => navigate("/jobs")}>
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

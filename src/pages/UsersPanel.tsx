@@ -14,7 +14,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import Teams from './Teams';
-import { LinkedInLogo } from '@/components/ui/LinkedInLogo';
 
 type UserRole = 'admin' | 'management' | 'team_member' | 'team_leader';
 
@@ -25,7 +24,6 @@ interface Profile {
   email: string;
   is_admin: boolean;
   role?: UserRole;
-  linkedin_id?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -342,39 +340,6 @@ export default function UsersPanel() {
       toast({
         title: "Error",
         description: error.message || "Failed to delete user",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleDisconnectLinkedIn = async (userId: string) => {
-    if (!confirm('Are you sure you want to disconnect this user\'s LinkedIn account?')) {
-      return;
-    }
-
-    try {
-      const { error } = await supabase.functions.invoke('linkedin-connect', {
-        body: {
-          action: 'disconnect',
-          targetUserId: userId
-        }
-      });
-
-      if (error) {
-        throw new Error(error.message || 'Failed to disconnect LinkedIn');
-      }
-
-      toast({
-        title: "Success",
-        description: "LinkedIn account disconnected successfully",
-      });
-
-      fetchUsers();
-    } catch (error: any) {
-      console.error('Error disconnecting LinkedIn:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to disconnect LinkedIn",
         variant: "destructive"
       });
     }
@@ -768,29 +733,6 @@ export default function UsersPanel() {
                     })}
                   </SelectContent>
                 </Select>
-              </div>
-            )}
-            {editingUser?.linkedin_id && (
-              <div className="space-y-2 pt-4 border-t">
-                <Label className="text-sm font-medium">LinkedIn Connection</Label>
-                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                  <div className="flex items-center gap-2">
-                    <LinkedInLogo size={16} />
-                    <span className="text-sm">LinkedIn Connected</span>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      handleDisconnectLinkedIn(editingUser.user_id);
-                      setIsEditUserOpen(false);
-                    }}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    Disconnect
-                  </Button>
-                </div>
               </div>
             )}
             <DialogFooter>

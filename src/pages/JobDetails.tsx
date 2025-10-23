@@ -76,7 +76,6 @@ import { ToggleSwitch } from "@/components/ui/ToggleSwitch";
 import { ProcessingAnimation } from "@/components/jobs/ProcessingAnimation";
 import { AppleLoadingBar } from "@/components/ui/AppleLoadingBar";
 import { ProgressiveStatusBar } from "@/components/ui/ProgressiveStatusBar";
-import { ExpandableSearchButton } from "@/components/ui/ExpandableSearchButton";
 
 // Using any type to avoid TypeScript complexity with quoted property names
 
@@ -1053,13 +1052,8 @@ export default function JobDetails() {
         let firstName = cv.Firstname || "";
         let lastName = cv.Lastname || "";
         
-        // Treat "Not found" or "not found" as empty
-        if (lastName && lastName.toLowerCase() === "not found") {
-          lastName = "";
-        }
-        
         // If we have a name field in CVs, use that
-        if (cv.name && cv.name.trim() && !cv.name.toLowerCase().includes("not found")) {
+        if (cv.name && cv.name.trim()) {
           const nameParts = cv.name.trim().split(" ");
           firstName = nameParts[0] || "";
           lastName = nameParts.slice(1).join(" ") || "";
@@ -1357,27 +1351,18 @@ export default function JobDetails() {
       handleGenerateLongList();
     }
   };
-  const handleSearchMoreCandidates = async (searchType: "linkedin" | "database" | "both" = "both") => {
+  const handleSearchMoreCandidates = async () => {
     try {
       // Get user_ids from AI Boolean Search candidates (filteredCandidates) as comma-separated string
       const booleanSearchUserIds = filteredCandidates
         .map((candidate) => candidate.user_id)
         .filter(Boolean)
         .join(",");
-      
-      // Map search type to title
-      const searchTitles = {
-        linkedin: "LinkedIn",
-        database: "Database",
-        both: "Search Both"
-      };
-      
       const payload = {
         job_id: job?.job_id || "",
         itris_job_id: job?.itris_job_id || "",
         user_ids: booleanSearchUserIds,
         profile_id: job?.recruiter_id || "",
-        title: searchTitles[searchType],
       };
       console.log("Regenerate AI webhook payload:", payload);
       console.log("Job recruiter_id:", job?.recruiter_id);
@@ -3338,13 +3323,10 @@ mainCandidate["linkedin_score_reason"] ? (
                 (() => {
                   // Filter applications based on name, email, and phone
                   const filteredApplications = applications.filter((application) => {
-                    const first = application.first_name || "";
-                    const last = application.last_name || "";
-                    // Filter out "Not found" values
-                    const cleanFirst = first.toLowerCase() === "not found" ? "" : first;
-                    const cleanLast = last.toLowerCase() === "not found" ? "" : last;
-                    const fullName = [cleanFirst, cleanLast].filter(Boolean).join(" ");
-                    
+                    const fullName =
+                      application.first_name && application.last_name
+                        ? `${application.first_name} ${application.last_name}`
+                        : application.first_name || application.last_name || "";
                     const email = application.Email || "";
                     const phone = application.phone_number || "";
                     const nameMatch = !appNameFilter || fullName.toLowerCase().includes(appNameFilter.toLowerCase());
@@ -3365,26 +3347,12 @@ mainCandidate["linkedin_score_reason"] ? (
                           >
                             <CardContent className="p-3 md:p-4">
                               <div className="space-y-3">
-                                 <div className="flex items-start justify-between">
+                                <div className="flex items-start justify-between">
                                   <div className="min-w-0 flex-1">
                                     <h4 className="font-semibold text-sm md:text-base truncate">
-                                      {(() => {
-                                        const first = application.first_name || "";
-                                        const last = application.last_name || "";
-                                        // Filter out "Not found" values
-                                        const cleanFirst = first.toLowerCase() === "not found" ? "" : first;
-                                        const cleanLast = last.toLowerCase() === "not found" ? "" : last;
-                                        
-                                        if (cleanFirst && cleanLast) {
-                                          return `${cleanFirst} ${cleanLast}`;
-                                        } else if (cleanFirst) {
-                                          return cleanFirst;
-                                        } else if (cleanLast) {
-                                          return cleanLast;
-                                        } else {
-                                          return application.candidate_id || "Applicant";
-                                        }
-                                      })()}
+                                      {application.first_name && application.last_name
+                                        ? `${application.first_name} ${application.last_name}`
+                                        : application.first_name || application.last_name || "Unknown"}
                                     </h4>
                                     <p className="text-xs md:text-sm text-muted-foreground truncate">
                                       {application.candidate_id}
@@ -3526,11 +3494,10 @@ mainCandidate["linkedin_score_reason"] ? (
                     <CardDescription>Candidates added to the longlist for this position</CardDescription>
                   </div>
                   {job?.longlist && job.longlist > 0 ? (
-                    <ExpandableSearchButton
-                      onSearchLinkedIn={() => handleSearchMoreCandidates("linkedin")}
-                      onSearchDatabase={() => handleSearchMoreCandidates("database")}
-                      onSearchBoth={() => handleSearchMoreCandidates("both")}
-                    />
+                    <Button onClick={handleSearchMoreCandidates} size="sm" variant="outline">
+                      <Search className="w-4 h-4 mr-2" />
+                      Regenerate AI
+                    </Button>
                   ) : (
                     <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} size="sm">
                       <Zap className="w-4 h-4 mr-2" />

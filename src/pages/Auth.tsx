@@ -38,12 +38,6 @@ export default function Auth() {
     setError(null);
 
     try {
-      // Validate email domain
-      const emailDomain = email.split('@')[1];
-      if (emailDomain !== 'marc-ellis.com') {
-        throw new Error('Only @marc-ellis.com email addresses are allowed to access this platform');
-      }
-
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
           email,

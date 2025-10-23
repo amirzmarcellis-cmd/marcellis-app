@@ -16,7 +16,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { toast } from "sonner";
 import FileUpload from "@/components/upload/FileUpload";
 import { ApiMultiSelect } from "@/components/ui/api-multi-select";
-import { LinkedInConnection } from "@/components/settings/LinkedInConnection";
 
 const europeanCountries = [
   "Albania", "Andorra", "Austria", "Azerbaijan", "Belgium", "Bosnia and Herzegovina", 
@@ -937,13 +936,6 @@ export default function EditJob() {
                 </div>
               </TabsContent>
             </Tabs>
-
-            {/* LinkedIn Connection Section */}
-            <Card className="mission-card mb-6">
-              <CardContent className="pt-4">
-                <LinkedInConnection />
-              </CardContent>
-            </Card>
 
             <div className="flex justify-end space-x-4 pt-6 border-t border-border/30">
               <Button 
