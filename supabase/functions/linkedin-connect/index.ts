@@ -19,22 +19,32 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const authHeader = req.headers.get('Authorization');
+    console.log('Auth header present:', !!authHeader);
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
+          headers: { Authorization: authHeader! },
         },
       }
     );
 
     const {
       data: { user },
+      error: authError,
     } = await supabaseClient.auth.getUser();
 
-    if (!user) {
-      throw new Error('Not authenticated');
+    console.log('Auth check:', { 
+      hasUser: !!user, 
+      userId: user?.id, 
+      error: authError?.message 
+    });
+
+    if (authError || !user) {
+      throw new Error('Not authenticated - please log in again. ' + (authError?.message || ''));
     }
 
     const { action, code, state, targetUserId } = await req.json();

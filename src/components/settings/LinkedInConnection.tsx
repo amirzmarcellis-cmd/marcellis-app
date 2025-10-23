@@ -23,11 +23,23 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
   const handleConnect = async () => {
     setIsConnecting(true);
     try {
+      // Check if user is authenticated
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        throw new Error('You must be logged in to connect LinkedIn. Please refresh the page and try again.');
+      }
+
+      console.log('Session check passed, initiating LinkedIn connection...');
+
       const { data, error } = await supabase.functions.invoke('linkedin-connect', {
         body: { action: 'initiate' },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Edge function error:', error);
+        throw error;
+      }
 
       if (data?.url) {
         // Open LinkedIn OAuth in a popup
