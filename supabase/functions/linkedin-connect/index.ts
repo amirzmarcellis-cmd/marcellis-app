@@ -59,10 +59,10 @@ serve(async (req) => {
       );
     }
 
-    // Get user profile for name
+    // Get user profile for name and linkedin_id
     const { data: profile, error: profileError } = await supabaseClient
       .from('profiles')
-      .select('name, email')
+      .select('name, email, linkedin_id')
       .eq('user_id', user.id)
       .single();
 
@@ -77,8 +77,61 @@ serve(async (req) => {
       );
     }
 
-    // Get the origin from the request body
-    const { origin } = await req.json();
+    // Get the request body
+    const body = await req.json();
+    const { origin, action } = body;
+
+    // Handle disconnect action
+    if (action === 'disconnect') {
+      console.log('Disconnecting LinkedIn account for user:', user.id);
+      
+      // Remove linkedin_id from profiles table
+      const { error: updateError } = await supabaseClient
+        .from('profiles')
+        .update({ linkedin_id: null })
+        .eq('user_id', user.id);
+
+      if (updateError) {
+        console.error('Failed to update profile:', updateError);
+        return new Response(
+          JSON.stringify({ error: 'Failed to disconnect LinkedIn account' }),
+          { 
+            status: 500, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+
+      // Optionally delete the account from Unipile if linkedin_id exists
+      if (profile.linkedin_id) {
+        try {
+          const unipileDsn = Deno.env.get('UNIPILE_DSN');
+          const deleteResponse = await fetch(`${unipileDsn}/api/v1/accounts/${profile.linkedin_id}`, {
+            method: 'DELETE',
+            headers: {
+              'X-API-KEY': unipileApiKey,
+            },
+          });
+          
+          if (!deleteResponse.ok) {
+            console.error('Failed to delete account from Unipile:', await deleteResponse.text());
+            // Continue anyway as we've already removed it from our database
+          } else {
+            console.log('Successfully deleted account from Unipile');
+          }
+        } catch (error) {
+          console.error('Error deleting from Unipile:', error);
+          // Continue anyway
+        }
+      }
+
+      return new Response(
+        JSON.stringify({ success: true }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
     
     if (!origin) {
       return new Response(
