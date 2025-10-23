@@ -1269,6 +1269,13 @@ export default function AddJob() {
           </DialogContent>
         </Dialog>
 
+        {/* LinkedIn Connection Section */}
+        <Card className="mb-6">
+          <CardContent className="pt-4">
+            <LinkedInConnection />
+          </CardContent>
+        </Card>
+
         {/* Submit Buttons */}
         <div className="flex gap-4 pb-6">
           <Button type="submit" disabled={isSubmitting} size="lg" className="px-8">
@@ -1279,13 +1286,6 @@ export default function AddJob() {
           </Button>
         </div>
       </form>
-
-      {/* LinkedIn Connection Section */}
-      <Card className="mt-4">
-        <CardContent className="pt-4">
-          <LinkedInConnection />
-        </CardContent>
-      </Card>
     </div>
   );
 }

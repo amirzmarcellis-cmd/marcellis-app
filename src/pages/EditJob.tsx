@@ -938,6 +938,13 @@ export default function EditJob() {
               </TabsContent>
             </Tabs>
 
+            {/* LinkedIn Connection Section */}
+            <Card className="mission-card mb-6">
+              <CardContent className="pt-4">
+                <LinkedInConnection />
+              </CardContent>
+            </Card>
+
             <div className="flex justify-end space-x-4 pt-6 border-t border-border/30">
               <Button 
                 type="button" 
@@ -957,13 +964,6 @@ export default function EditJob() {
               </Button>
             </div>
           </form>
-        </CardContent>
-      </Card>
-
-      {/* LinkedIn Connection Section */}
-      <Card className="mission-card mt-4">
-        <CardContent className="pt-4">
-          <LinkedInConnection />
         </CardContent>
       </Card>
     </div>
