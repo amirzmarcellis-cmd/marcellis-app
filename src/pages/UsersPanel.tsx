@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Plus, Mail, User, Shield, Trash2, Crown, Briefcase, DollarSign, Truck, UserCheck, Users2, AlertTriangle, Edit } from 'lucide-react';
+import { Users, Plus, Mail, User, Shield, Trash2, Crown, Briefcase, DollarSign, Truck, UserCheck, Users2, AlertTriangle, Edit, Linkedin } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,6 +24,7 @@ interface Profile {
   email: string;
   is_admin: boolean;
   role?: UserRole;
+  linkedin_id?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -345,6 +346,39 @@ export default function UsersPanel() {
     }
   };
 
+  const handleDisconnectLinkedIn = async (userId: string) => {
+    if (!confirm('Are you sure you want to disconnect this user\'s LinkedIn account?')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase.functions.invoke('linkedin-connect', {
+        body: {
+          action: 'disconnect',
+          targetUserId: userId
+        }
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Failed to disconnect LinkedIn');
+      }
+
+      toast({
+        title: "Success",
+        description: "LinkedIn account disconnected successfully",
+      });
+
+      fetchUsers();
+    } catch (error: any) {
+      console.error('Error disconnecting LinkedIn:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to disconnect LinkedIn",
+        variant: "destructive"
+      });
+    }
+  };
+
   const openEditUserDialog = (user: Profile) => {
     setEditingUser(user);
     const orgRole = userOrgRoles[user.user_id] || 'EMPLOYEE';
@@ -636,6 +670,17 @@ export default function UsersPanel() {
                          >
                            <Edit className="h-4 w-4" />
                          </Button>
+                         {user.linkedin_id && (
+                           <Button
+                             variant="outline"
+                             size="sm"
+                             onClick={() => handleDisconnectLinkedIn(user.user_id)}
+                             className="text-[#0A66C2] hover:text-[#0A66C2]"
+                             title="Disconnect LinkedIn"
+                           >
+                             <Linkedin className="h-4 w-4" />
+                           </Button>
+                         )}
                          <Button
                            variant="outline"
                            size="sm"

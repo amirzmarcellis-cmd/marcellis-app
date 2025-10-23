@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
       throw new Error('Not authenticated');
     }
 
-    const { action, code, state } = await req.json();
+    const { action, code, state, targetUserId } = await req.json();
     const UNIPILE_API_KEY = Deno.env.get('UNIPILE_API_KEY');
     const UNIPILE_DSN = Deno.env.get('UNIPILE_DSN');
 
@@ -47,10 +47,27 @@ Deno.serve(async (req) => {
 
     // Handle disconnect action
     if (action === 'disconnect') {
+      let userIdToDisconnect = user.id;
+      
+      // If targetUserId is provided, check if current user is admin
+      if (targetUserId && targetUserId !== user.id) {
+        const { data: userRole, error: roleError } = await supabaseClient
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (roleError || userRole?.role !== 'ADMIN') {
+          throw new Error('Only admins can disconnect other users');
+        }
+        
+        userIdToDisconnect = targetUserId;
+      }
+      
       await supabaseClient
         .from('profiles')
         .update({ linkedin_id: null })
-        .eq('user_id', user.id);
+        .eq('user_id', userIdToDisconnect);
 
       return new Response(
         JSON.stringify({ success: true, message: 'LinkedIn disconnected' }),
