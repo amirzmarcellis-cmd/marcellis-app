@@ -491,36 +491,48 @@ export default function EditJob() {
                     </Select>
                   </div>
 
-                  {/* LinkedIn Search Toggle */}
+                  {/* LinkedIn Search Toggle - Prominent Feature */}
                   {formData.recruiter_id && (
-                    <div className="space-y-2 p-4 border border-border/50 rounded-lg bg-accent/5">
+                    <div className="space-y-3 p-5 border-2 border-primary/30 rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 shadow-sm">
                       <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <Label className="font-medium">LinkedIn Search</Label>
-                          <p className="text-sm text-muted-foreground">
-                            Enable LinkedIn candidate search for this job
+                        <div className="space-y-1.5 flex-1">
+                          <div className="flex items-center gap-2">
+                            <Label className="font-semibold text-base">🔍 LinkedIn Search</Label>
+                            {linkedInSearchEnabled && (
+                              <span className="px-2 py-0.5 text-xs font-medium bg-green-500/20 text-green-700 dark:text-green-400 rounded-full border border-green-500/30">
+                                Active
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            Automatically search and find candidates on LinkedIn for this position
                           </p>
                         </div>
                         {recruiterLinkedInId ? (
                           <Switch
                             checked={linkedInSearchEnabled}
                             onCheckedChange={setLinkedInSearchEnabled}
+                            className="ml-4"
                           />
                         ) : (
                           <Button
                             type="button"
-                            variant="outline"
+                            variant="default"
                             size="sm"
                             onClick={() => navigate("/settings")}
+                            className="ml-4 font-medium"
                           >
                             Connect LinkedIn
                           </Button>
                         )}
                       </div>
                       {!recruiterLinkedInId && (
-                        <p className="text-xs text-amber-600 dark:text-amber-400">
-                          The assigned recruiter needs to connect their LinkedIn account to enable this feature.
-                        </p>
+                        <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+                          <span className="text-amber-600 dark:text-amber-400 text-sm">⚠️</span>
+                          <p className="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">
+                            The assigned recruiter needs to connect their LinkedIn account first. Click "Connect LinkedIn" to set it up.
+                          </p>
+                        </div>
                       )}
                     </div>
                   )}
