@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
   user: User | null;
@@ -15,6 +16,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Set up auth state listener
@@ -38,22 +40,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Error signing out:', error);
-        // Even if there's an error, clear local state
-        setSession(null);
-        setUser(null);
-      }
-      // Redirect to auth page after sign out
-      window.location.href = '/auth';
+      // Set flag to indicate sign-out is in progress
+      sessionStorage.setItem('signing_out', 'true');
+      
+      // Clear local state first
+      setSession(null);
+      setUser(null);
+      
+      // Sign out from Supabase
+      await supabase.auth.signOut();
+      
+      // Navigate to auth page
+      navigate('/auth');
     } catch (error) {
       console.error('Error signing out:', error);
       // Clear local state even if sign out fails
       setSession(null);
       setUser(null);
-      // Redirect to auth page even if sign out fails
-      window.location.href = '/auth';
+      // Navigate to auth page even if sign out fails
+      navigate('/auth');
     }
   };
 

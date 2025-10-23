@@ -24,6 +24,13 @@ export default function Auth() {
   useEffect(() => {
     // Check if user is already logged in
     const checkUser = async () => {
+      // Check if user just signed out
+      const signingOut = sessionStorage.getItem('signing_out');
+      if (signingOut) {
+        sessionStorage.removeItem('signing_out');
+        return; // Don't auto-redirect if user just signed out
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         navigate('/');
