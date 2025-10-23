@@ -670,17 +670,6 @@ export default function UsersPanel() {
                          >
                            <Edit className="h-4 w-4" />
                          </Button>
-                         {user.linkedin_id && (
-                           <Button
-                             variant="outline"
-                             size="sm"
-                             onClick={() => handleDisconnectLinkedIn(user.user_id)}
-                             className="text-[#0A66C2] hover:text-[#0A66C2]"
-                             title="Disconnect LinkedIn"
-                           >
-                             <Linkedin className="h-4 w-4" />
-                           </Button>
-                         )}
                          <Button
                            variant="outline"
                            size="sm"
@@ -778,6 +767,29 @@ export default function UsersPanel() {
                     })}
                   </SelectContent>
                 </Select>
+              </div>
+            )}
+            {editingUser?.linkedin_id && (
+              <div className="space-y-2 pt-4 border-t">
+                <Label className="text-sm font-medium">LinkedIn Connection</Label>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                  <div className="flex items-center gap-2">
+                    <Linkedin className="h-4 w-4 text-[#0A66C2]" />
+                    <span className="text-sm">LinkedIn Connected</span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      handleDisconnectLinkedIn(editingUser.user_id);
+                      setIsEditUserOpen(false);
+                    }}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    Disconnect
+                  </Button>
+                </div>
               </div>
             )}
             <DialogFooter>
