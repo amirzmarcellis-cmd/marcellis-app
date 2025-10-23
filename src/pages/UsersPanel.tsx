@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Plus, Mail, User, Shield, Trash2, Crown, Briefcase, DollarSign, Truck, UserCheck, Users2, AlertTriangle, Edit } from 'lucide-react';
+import { Users, Plus, Mail, User, Shield, Trash2, Crown, Briefcase, DollarSign, Truck, UserCheck, Users2, AlertTriangle, Edit, Linkedin } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -26,6 +26,7 @@ interface Profile {
   role?: UserRole;
   created_at: string;
   updated_at: string;
+  linkedin_id?: string | null;
 }
 
 interface NewUserData {
@@ -98,7 +99,7 @@ export default function UsersPanel() {
   });
   const { toast } = useToast();
   const { session } = useAuth();
-  const { canAccessUsersPanel, loading: roleLoading } = useUserRole();
+  const { canAccessUsersPanel, loading: roleLoading, isAdmin } = useUserRole();
 
   // Move all useEffect hooks to top level before any conditional returns
   useEffect(() => {
@@ -690,6 +691,24 @@ export default function UsersPanel() {
                 required
               />
             </div>
+            {isAdmin && editingUser && (
+              <div className="space-y-2">
+                <Label>LinkedIn Connection</Label>
+                <div className="flex items-center gap-2 p-3 rounded-md border bg-muted/50">
+                  <Linkedin className="h-4 w-4" />
+                  {editingUser.linkedin_id ? (
+                    <Badge variant="default" className="bg-blue-600">Connected</Badge>
+                  ) : (
+                    <Badge variant="secondary">Not Connected</Badge>
+                  )}
+                  {editingUser.linkedin_id && (
+                    <span className="text-xs text-muted-foreground ml-2">
+                      ID: {editingUser.linkedin_id}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="edit-role">Role</Label>
               <Select value={editUserData.role} onValueChange={(value: UserRole) => setEditUserData({ ...editUserData, role: value, team: undefined })}>
