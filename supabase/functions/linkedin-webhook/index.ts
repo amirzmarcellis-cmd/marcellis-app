@@ -17,28 +17,56 @@ Deno.serve(async (req) => {
     // Extract account_id from the webhook payload
     const accountId = payload.account_id || payload.id;
     const provider = payload.provider;
+    const accountName = payload.name;
+    
+    console.log('Processing webhook for account:', accountName, 'ID:', accountId, 'Provider:', provider);
     
     if (accountId && provider === 'LINKEDIN') {
-      // Update the user's profile with the LinkedIn account ID
       const supabaseClient = createClient(
         Deno.env.get('SUPABASE_URL') ?? '',
         Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       );
 
-      // Find profile by the name from the webhook and update with linkedin_id
-      const { data: updatedProfile, error } = await supabaseClient
+      // Find the connection attempt by name
+      const { data: attempt, error: attemptError } = await supabaseClient
+        .from('linkedin_connection_attempts')
+        .select('user_id, id')
+        .eq('connection_name', accountName)
+        .eq('status', 'pending')
+        .single();
+
+      if (attemptError || !attempt) {
+        console.error('Could not find connection attempt:', attemptError);
+        return new Response(
+          JSON.stringify({ success: false, error: 'Connection attempt not found' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Update the user's profile with the LinkedIn account ID
+      const { data: updatedProfile, error: profileError } = await supabaseClient
         .from('profiles')
         .update({ linkedin_id: accountId })
-        .is('linkedin_id', null)
-        .limit(1)
+        .eq('user_id', attempt.user_id)
         .select()
         .single();
 
-      if (error) {
-        console.error('Error updating profile:', error);
+      if (profileError) {
+        console.error('Error updating profile:', profileError);
       } else {
         console.log('Successfully updated profile with LinkedIn ID:', updatedProfile);
       }
+
+      // Update connection attempt status
+      await supabaseClient
+        .from('linkedin_connection_attempts')
+        .update({ 
+          status: profileError ? 'failed' : 'completed',
+          account_id: accountId,
+          completed_at: new Date().toISOString(),
+          error_message: profileError?.message
+        })
+        .eq('id', attempt.id);
     }
 
     return new Response(

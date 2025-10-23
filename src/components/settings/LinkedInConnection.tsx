@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Linkedin, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { LinkedInConnectionModal } from './LinkedInConnectionModal';
 
 interface LinkedInConnectionProps {
   linkedinId: string | null;
@@ -16,6 +17,8 @@ export function LinkedInConnection({ linkedinId, onUpdate }: LinkedInConnectionP
   const [isConnecting, setIsConnecting] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [connectionUrl, setConnectionUrl] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   const handleConnect = async () => {
     setIsConnecting(true);
@@ -34,8 +37,10 @@ export function LinkedInConnection({ linkedinId, onUpdate }: LinkedInConnectionP
       console.log('LinkedIn connect response:', data);
 
       if (data?.url) {
-        // Redirect to LinkedIn OAuth URL
-        window.location.href = data.url;
+        // Open URL in modal iframe instead of redirecting
+        setConnectionUrl(data.url);
+        setShowModal(true);
+        setIsConnecting(false);
       } else if (data?.error) {
         throw new Error(data.error);
       }
@@ -48,6 +53,19 @@ export function LinkedInConnection({ linkedinId, onUpdate }: LinkedInConnectionP
       });
       setIsConnecting(false);
     }
+  };
+
+  const handleConnectionSuccess = () => {
+    toast({
+      title: 'LinkedIn Connected',
+      description: 'Your LinkedIn account has been successfully connected.',
+    });
+    onUpdate();
+  };
+
+  const handleModalClose = () => {
+    setShowModal(false);
+    setConnectionUrl(null);
   };
 
   const handleDisconnect = async () => {
@@ -106,8 +124,16 @@ export function LinkedInConnection({ linkedinId, onUpdate }: LinkedInConnectionP
   const isConnected = !!linkedinId;
 
   return (
-    <Card>
-      <CardHeader>
+    <>
+      <LinkedInConnectionModal
+        url={connectionUrl || ''}
+        open={showModal}
+        onClose={handleModalClose}
+        onSuccess={handleConnectionSuccess}
+      />
+      
+      <Card>
+        <CardHeader>
         <CardTitle className="flex items-center gap-2 text-3xl font-light font-work tracking-tight">
           <Linkedin className="h-5 w-5 text-[#0A66C2]" />
           LinkedIn Integration
@@ -177,5 +203,6 @@ export function LinkedInConnection({ linkedinId, onUpdate }: LinkedInConnectionP
         )}
       </CardContent>
     </Card>
+    </>
   );
 }
