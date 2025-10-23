@@ -42,13 +42,41 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
       }
 
       if (data?.url) {
-        // Open LinkedIn OAuth in a popup
+        const accountId = data.account_id;
+        
+        // Open LinkedIn OAuth in a popup (hide the actual URL from user)
         const popup = window.open(data.url, 'LinkedIn Connection', 'width=600,height=700');
         
-        // Poll for popup closure or success
+        // Poll for popup closure
         const checkPopup = setInterval(async () => {
           if (popup?.closed) {
             clearInterval(checkPopup);
+            
+            // Verify and save the LinkedIn connection
+            if (accountId) {
+              try {
+                const { data: verifyData, error: verifyError } = await supabase.functions.invoke('linkedin-connect', {
+                  body: { action: 'verify', code: accountId },
+                });
+
+                if (verifyError) {
+                  console.error('Verification error:', verifyError);
+                  toast({
+                    title: 'Connection failed',
+                    description: 'Failed to verify LinkedIn connection. Please try again.',
+                    variant: 'destructive',
+                  });
+                } else if (verifyData?.success) {
+                  toast({
+                    title: 'Connected',
+                    description: 'LinkedIn account connected successfully.',
+                  });
+                }
+              } catch (error) {
+                console.error('Verification error:', error);
+              }
+            }
+            
             // Refresh profile to check if connected
             onUpdate();
             setIsConnecting(false);

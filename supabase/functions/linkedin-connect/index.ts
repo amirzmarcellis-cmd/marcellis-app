@@ -87,37 +87,47 @@ Deno.serve(async (req) => {
 
     // Handle initiate OAuth flow
     if (action === 'initiate') {
+      // Set expiration date to 1 year from now
+      const expiresOn = new Date();
+      expiresOn.setFullYear(expiresOn.getFullYear() + 1);
+
       const response = await fetch(`${UNIPILE_DSN}/api/v1/hosted/accounts/link`, {
         method: 'POST',
         headers: {
           'X-API-KEY': UNIPILE_API_KEY,
-          'Content-Type': 'application/json',
+          'accept': 'application/json',
+          'content-type': 'application/json',
         },
         body: JSON.stringify({
-          provider: 'linkedin',
-          success_redirect_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/linkedin-connect`,
-          failure_redirect_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/linkedin-connect`,
-          expirity: 600,
-          notify_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/linkedin-connect`,
-          state: JSON.stringify({ user_id: user.id }),
+          type: 'create',
+          providers: ['LINKEDIN'],
+          api_url: UNIPILE_DSN,
+          expiresOn: expiresOn.toISOString(),
         }),
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Unipile API error:', errorText);
         throw new Error('Failed to initiate LinkedIn OAuth');
       }
 
       const data = await response.json();
-      return new Response(JSON.stringify({ url: data.url }), {
+      console.log('Unipile response:', data);
+      
+      // Store the user_id in a temporary mapping or use the account_id for callback
+      // Return the hosted link URL for the popup
+      return new Response(JSON.stringify({ 
+        url: data.hosted_link || data.url,
+        account_id: data.account_id 
+      }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Handle OAuth callback
-    if (action === 'callback' && code && state) {
-      const stateData = JSON.parse(state);
-      
-      // Get account details from Unipile
+    // Handle OAuth callback/verification with account_id
+    if (action === 'verify' && code) {
+      // Get account details from Unipile using the account_id
       const response = await fetch(`${UNIPILE_DSN}/api/v1/accounts/${code}`, {
         headers: {
           'X-API-KEY': UNIPILE_API_KEY,
@@ -125,18 +135,26 @@ Deno.serve(async (req) => {
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Failed to verify account:', errorText);
         throw new Error('Failed to verify LinkedIn account');
       }
 
       const accountData: UnipileAccountResponse = await response.json();
+      console.log('Account verified:', accountData);
 
       // Update user profile with LinkedIn account ID
-      await supabaseClient
+      const { error: updateError } = await supabaseClient
         .from('profiles')
         .update({ 
           linkedin_id: accountData.account_id,
         })
-        .eq('user_id', stateData.user_id);
+        .eq('user_id', user.id);
+
+      if (updateError) {
+        console.error('Failed to update profile:', updateError);
+        throw new Error('Failed to update profile with LinkedIn ID');
+      }
 
       return new Response(
         JSON.stringify({ 
