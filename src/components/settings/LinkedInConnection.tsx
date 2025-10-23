@@ -17,7 +17,6 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
   const onUpdate = propOnUpdate ?? refetch;
   const { toast } = useToast();
   const [isConnecting, setIsConnecting] = useState(false);
-  const [isTesting, setIsTesting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
   const handleConnect = async () => {
@@ -80,40 +79,17 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
     }
   };
 
-  const handleTest = async () => {
-    setIsTesting(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('linkedin-test-connection');
-
-      if (error) throw error;
-
-      if (data?.success) {
-        toast({
-          title: 'Connection verified',
-          description: 'Your LinkedIn connection is working properly.',
-        });
-      } else {
-        throw new Error(data?.error || 'Connection test failed');
-      }
-    } catch (error) {
-      console.error('LinkedIn test error:', error);
-      toast({
-        title: 'Connection test failed',
-        description: 'Your LinkedIn connection may have expired. Please reconnect.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsTesting(false);
-    }
-  };
 
   const isConnected = !!linkedinId;
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Linkedin className="h-4 w-4 text-[#0A66C2]" />
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Linkedin className="h-5 w-5 text-[#0A66C2] drop-shadow-lg" />
+            <div className="absolute -inset-1 bg-[#0A66C2]/20 blur-md rounded-full -z-10" />
+          </div>
           <span className="text-sm font-medium">LinkedIn Integration</span>
         </div>
         {isConnected ? (
@@ -146,28 +122,16 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
           </Button>
         </div>
       ) : (
-        <div className="flex gap-2">
-          <Button
-            onClick={handleTest}
-            disabled={isTesting}
-            variant="outline"
-            size="sm"
-            className="gap-2 h-8"
-          >
-            {isTesting && <Loader2 className="h-3 w-3 animate-spin" />}
-            Test Connection
-          </Button>
-          <Button
-            onClick={handleDisconnect}
-            disabled={isDisconnecting}
-            variant="destructive"
-            size="sm"
-            className="gap-2 h-8"
-          >
-            {isDisconnecting && <Loader2 className="h-3 w-3 animate-spin" />}
-            Disconnect
-          </Button>
-        </div>
+        <Button
+          onClick={handleDisconnect}
+          disabled={isDisconnecting}
+          variant="destructive"
+          size="sm"
+          className="gap-2 h-8"
+        >
+          {isDisconnecting && <Loader2 className="h-3 w-3 animate-spin" />}
+          Disconnect
+        </Button>
       )}
     </div>
   );
