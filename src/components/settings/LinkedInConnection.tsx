@@ -1,7 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
@@ -20,9 +19,9 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
   const { toast } = useToast();
   const [isConnecting, setIsConnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
-  const [showIframe, setShowIframe] = useState(false);
-  const [iframeUrl, setIframeUrl] = useState('');
   const [accountId, setAccountId] = useState('');
+  const popupWindow = useRef<Window | null>(null);
+  const popupCheckInterval = useRef<NodeJS.Timeout | null>(null);
 
   const handleConnect = async () => {
     setIsConnecting(true);
@@ -47,14 +46,41 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
 
       if (data?.url) {
         setAccountId(data.account_id);
-        setIframeUrl(data.url);
-        setShowIframe(true);
+        
+        // Open centered popup window
+        const width = 600;
+        const height = 700;
+        const left = Math.round((window.screen.width - width) / 2);
+        const top = Math.round((window.screen.height - height) / 2);
+
+        const popup = window.open(
+          data.url,
+          'LinkedIn Authentication',
+          `width=${width},height=${height},left=${left},top=${top},` +
+          `toolbar=no,menubar=no,location=no,status=no,scrollbars=yes,resizable=yes`
+        );
+
+        if (!popup) {
+          throw new Error('Popup blocked. Please allow popups for this site.');
+        }
+
+        popupWindow.current = popup;
+
+        // Poll to check if popup is closed
+        popupCheckInterval.current = setInterval(() => {
+          if (popup.closed) {
+            if (popupCheckInterval.current) {
+              clearInterval(popupCheckInterval.current);
+            }
+            handleAuthComplete();
+          }
+        }, 500);
       }
     } catch (error) {
       console.error('LinkedIn connect error:', error);
       toast({
         title: 'Connection failed',
-        description: 'Failed to connect LinkedIn account. Please try again.',
+        description: error instanceof Error ? error.message : 'Failed to connect LinkedIn account. Please try again.',
         variant: 'destructive',
       });
       setIsConnecting(false);
@@ -87,9 +113,7 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
     }
   };
 
-  const handleIframeClose = async () => {
-    setShowIframe(false);
-    
+  const handleAuthComplete = async () => {
     // Verify and save the LinkedIn connection
     if (accountId) {
       try {
@@ -119,6 +143,18 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
     onUpdate();
     setIsConnecting(false);
   };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (popupCheckInterval.current) {
+        clearInterval(popupCheckInterval.current);
+      }
+      if (popupWindow.current && !popupWindow.current.closed) {
+        popupWindow.current.close();
+      }
+    };
+  }, []);
 
   const isConnected = !!linkedinId;
 
@@ -175,16 +211,6 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
           </Button>
         )}
       </div>
-
-      <Dialog open={showIframe} onOpenChange={(open) => !open && handleIframeClose()}>
-        <DialogContent className="max-w-2xl h-[80vh] p-0">
-          <iframe
-            src={iframeUrl}
-            className="w-full h-full rounded-lg"
-            title="LinkedIn Connection"
-          />
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
