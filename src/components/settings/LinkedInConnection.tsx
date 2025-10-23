@@ -20,6 +20,16 @@ export function LinkedInConnection({ linkedinId, onUpdate }: LinkedInConnectionP
   const handleConnect = async () => {
     setIsConnecting(true);
     try {
+      // Refresh the session to get a fresh JWT token
+      const { data: sessionData, error: sessionError } = await supabase.auth.refreshSession();
+      
+      if (sessionError || !sessionData.session) {
+        throw new Error('Session expired. Please log in again.');
+      }
+
+      console.log('Session refreshed, calling edge function...');
+
+      // Now call the edge function with the fresh token
       const { data, error } = await supabase.functions.invoke('linkedin-connect', {
         body: { action: 'initiate' },
       });
