@@ -14,14 +14,14 @@ Deno.serve(async (req) => {
     const payload = await req.json();
     console.log('Unipile webhook received:', JSON.stringify(payload, null, 2));
 
-    // Extract account_id from the webhook payload
+    // Extract data from the webhook payload
     const accountId = payload.account_id || payload.id;
-    const provider = payload.provider;
+    const status = payload.status;
     const accountName = payload.name;
     
-    console.log('Processing webhook for account:', accountName, 'ID:', accountId, 'Provider:', provider);
+    console.log('Processing webhook - Status:', status, 'Account:', accountName, 'ID:', accountId);
     
-    if (accountId && provider === 'LINKEDIN') {
+    if (accountId && status === 'CREATION_SUCCESS') {
       const supabaseClient = createClient(
         Deno.env.get('SUPABASE_URL') ?? '',
         Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',

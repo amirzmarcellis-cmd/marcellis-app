@@ -19,6 +19,7 @@ export function LinkedInConnection({ linkedinId, onUpdate }: LinkedInConnectionP
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [connectionUrl, setConnectionUrl] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [isPolling, setIsPolling] = useState(false);
 
   const handleConnect = async () => {
     setIsConnecting(true);
@@ -55,12 +56,51 @@ export function LinkedInConnection({ linkedinId, onUpdate }: LinkedInConnectionP
     }
   };
 
+  const pollForLinkedInId = async () => {
+    setIsPolling(true);
+    const maxAttempts = 10; // Poll for 10 seconds
+    let attempts = 0;
+
+    const poll = setInterval(async () => {
+      attempts++;
+      
+      // Refetch the profile
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        clearInterval(poll);
+        setIsPolling(false);
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('linkedin_id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profile?.linkedin_id) {
+        clearInterval(poll);
+        setIsPolling(false);
+        toast({
+          title: 'LinkedIn Connected',
+          description: `Account ID: ${profile.linkedin_id}`,
+        });
+        onUpdate(); // Refresh the UI
+      } else if (attempts >= maxAttempts) {
+        clearInterval(poll);
+        setIsPolling(false);
+        toast({
+          title: 'Connection in progress',
+          description: 'Your account is being connected. Please refresh the page in a moment.',
+        });
+      }
+    }, 1000); // Check every second
+  };
+
   const handleConnectionSuccess = () => {
-    toast({
-      title: 'LinkedIn Connected',
-      description: 'Your LinkedIn account has been successfully connected.',
-    });
-    onUpdate();
+    // Start polling for the LinkedIn ID
+    pollForLinkedInId();
+    setShowModal(false);
   };
 
   const handleModalClose = () => {

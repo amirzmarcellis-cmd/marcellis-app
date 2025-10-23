@@ -33,15 +33,18 @@ export function LinkedInConnectionModal({
     if (!open || !url) return;
 
     const handleMessage = (event: MessageEvent) => {
-      // Check if the message is from the Unipile iframe
-      if (event.origin === 'https://account.unipile.com') {
-        console.log('Received message from Unipile:', event.data);
+      console.log('Received message from iframe:', event.data);
+      
+      // Listen for our custom success message from the callback page
+      if (event.data?.type === 'linkedin-auth-success') {
+        const accountId = event.data.accountId;
+        console.log('LinkedIn authentication successful, account ID:', accountId);
         
-        // Check for success message
-        if (event.data?.type === 'success' || event.data?.status === 'success') {
+        // Small delay to let the user see the success message
+        setTimeout(() => {
           onSuccess();
           onClose();
-        }
+        }, 1500);
       }
     };
 

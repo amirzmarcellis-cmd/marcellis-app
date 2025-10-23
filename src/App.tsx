@@ -38,6 +38,7 @@ const TeamUsers = lazy(() => import("./pages/TeamUsers"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const CompanySettings = lazy(() => import("./pages/CompanySettings"));
 const PlatformAdmin = lazy(() => import("./pages/PlatformAdmin"));
+const LinkedInCallback = lazy(() => import("./pages/LinkedInCallback"));
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient({
@@ -61,6 +62,7 @@ const App = () => (
               <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
                 <Routes>
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/linkedin-callback" element={<LinkedInCallback />} />
                   <Route path="/apply" element={<Apply />} />
                   <Route path="/apply/:subdomain" element={<Apply />} />
                   <Route path="/" element={<DashboardLayout><Index /></DashboardLayout>} />
