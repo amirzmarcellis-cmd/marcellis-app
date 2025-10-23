@@ -208,9 +208,14 @@ export function LinkedInConnection({ linkedinId, userName, onUpdate }: LinkedInC
         <CardContent className="space-y-4">
           {isConnected ? (
             <>
-              <div className="rounded-lg bg-muted p-3">
-                <p className="text-sm font-medium">Account ID</p>
-                <p className="text-sm text-muted-foreground font-mono">{linkedinId}</p>
+              <div className="group relative overflow-hidden rounded-xl border border-border/50 bg-gradient-to-br from-primary/5 to-primary/10 p-4 transition-all hover:border-primary/30">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Connected Account</p>
+                    <p className="text-sm font-mono text-foreground break-all leading-relaxed">{linkedinId}</p>
+                  </div>
+                  <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 mt-1" />
+                </div>
               </div>
               <Button
                 variant="destructive"
