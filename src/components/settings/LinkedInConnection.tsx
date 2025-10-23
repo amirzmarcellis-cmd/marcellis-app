@@ -110,6 +110,36 @@ export function LinkedInConnection({ linkedinId, onUpdate }: LinkedInConnectionP
   const handleDisconnect = async () => {
     setIsDisconnecting(true);
     try {
+      // Get user profile data before disconnecting
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not found');
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('linkedin_id, name')
+        .eq('user_id', user.id)
+        .single();
+
+      // Send webhook notification before disconnecting
+      if (profile?.linkedin_id) {
+        try {
+          await fetch('https://hook.eu2.make.com/j3c6idm38oapvf8xrba2jdlzua6y7d9b', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify([{
+              linkedin_id: profile.linkedin_id,
+              name: profile.name || user.email || 'Unknown'
+            }])
+          });
+        } catch (webhookError) {
+          console.error('Webhook notification error:', webhookError);
+          // Continue with disconnect even if webhook fails
+        }
+      }
+
+      // Proceed with disconnect
       const { error } = await supabase.functions.invoke('linkedin-connect', {
         body: { action: 'disconnect' },
       });
