@@ -3,8 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Linkedin, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
+import { LinkedInLogo } from '@/components/ui/LinkedInLogo';
 
 interface LinkedInConnectionProps {
   linkedinId?: string | null;
@@ -87,7 +88,7 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Linkedin className="h-5 w-5 text-[#0A66C2] drop-shadow-lg" />
+            <LinkedInLogo size={20} className="drop-shadow-lg" />
             <div className="absolute -inset-1 bg-[#0A66C2]/20 blur-md rounded-full -z-10" />
           </div>
           <span className="text-sm font-medium">LinkedIn Integration</span>
@@ -117,7 +118,7 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
             className="gap-2 h-8"
           >
             {isConnecting && <Loader2 className="h-3 w-3 animate-spin" />}
-            <Linkedin className="h-3 w-3" />
+            <LinkedInLogo size={14} />
             Connect LinkedIn
           </Button>
         </div>

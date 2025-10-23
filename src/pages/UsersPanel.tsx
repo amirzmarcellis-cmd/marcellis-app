@@ -8,12 +8,13 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Plus, Mail, User, Shield, Trash2, Crown, Briefcase, DollarSign, Truck, UserCheck, Users2, AlertTriangle, Edit, Linkedin } from 'lucide-react';
+import { Users, Plus, Mail, User, Shield, Trash2, Crown, Briefcase, DollarSign, Truck, UserCheck, Users2, AlertTriangle, Edit } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import Teams from './Teams';
+import { LinkedInLogo } from '@/components/ui/LinkedInLogo';
 
 type UserRole = 'admin' | 'management' | 'team_member' | 'team_leader';
 
@@ -774,7 +775,7 @@ export default function UsersPanel() {
                 <Label className="text-sm font-medium">LinkedIn Connection</Label>
                 <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                   <div className="flex items-center gap-2">
-                    <Linkedin className="h-4 w-4 text-[#0A66C2]" />
+                    <LinkedInLogo size={16} />
                     <span className="text-sm">LinkedIn Connected</span>
                   </div>
                   <Button
