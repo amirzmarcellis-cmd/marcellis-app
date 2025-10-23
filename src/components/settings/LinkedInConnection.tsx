@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
@@ -19,6 +20,9 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
   const { toast } = useToast();
   const [isConnecting, setIsConnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [showIframe, setShowIframe] = useState(false);
+  const [iframeUrl, setIframeUrl] = useState('');
+  const [accountId, setAccountId] = useState('');
 
   const handleConnect = async () => {
     setIsConnecting(true);
@@ -42,46 +46,9 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
       }
 
       if (data?.url) {
-        const accountId = data.account_id;
-        
-        // Open LinkedIn OAuth in a popup (hide the actual URL from user)
-        const popup = window.open(data.url, 'LinkedIn Connection', 'width=600,height=700');
-        
-        // Poll for popup closure
-        const checkPopup = setInterval(async () => {
-          if (popup?.closed) {
-            clearInterval(checkPopup);
-            
-            // Verify and save the LinkedIn connection
-            if (accountId) {
-              try {
-                const { data: verifyData, error: verifyError } = await supabase.functions.invoke('linkedin-connect', {
-                  body: { action: 'verify', code: accountId },
-                });
-
-                if (verifyError) {
-                  console.error('Verification error:', verifyError);
-                  toast({
-                    title: 'Connection failed',
-                    description: 'Failed to verify LinkedIn connection. Please try again.',
-                    variant: 'destructive',
-                  });
-                } else if (verifyData?.success) {
-                  toast({
-                    title: 'Connected',
-                    description: 'LinkedIn account connected successfully.',
-                  });
-                }
-              } catch (error) {
-                console.error('Verification error:', error);
-              }
-            }
-            
-            // Refresh profile to check if connected
-            onUpdate();
-            setIsConnecting(false);
-          }
-        }, 1000);
+        setAccountId(data.account_id);
+        setIframeUrl(data.url);
+        setShowIframe(true);
       }
     } catch (error) {
       console.error('LinkedIn connect error:', error);
@@ -120,60 +87,104 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
     }
   };
 
+  const handleIframeClose = async () => {
+    setShowIframe(false);
+    
+    // Verify and save the LinkedIn connection
+    if (accountId) {
+      try {
+        const { data: verifyData, error: verifyError } = await supabase.functions.invoke('linkedin-connect', {
+          body: { action: 'verify', code: accountId },
+        });
+
+        if (verifyError) {
+          console.error('Verification error:', verifyError);
+          toast({
+            title: 'Connection failed',
+            description: 'Failed to verify LinkedIn connection. Please try again.',
+            variant: 'destructive',
+          });
+        } else if (verifyData?.success) {
+          toast({
+            title: 'Connected',
+            description: 'LinkedIn account connected successfully.',
+          });
+        }
+      } catch (error) {
+        console.error('Verification error:', error);
+      }
+    }
+    
+    // Refresh profile to check if connected
+    onUpdate();
+    setIsConnecting(false);
+  };
 
   const isConnected = !!linkedinId;
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <LinkedInLogo size={20} className="drop-shadow-lg" />
-            <div className="absolute -inset-1 bg-[#0A66C2]/20 blur-md rounded-full -z-10" />
+    <>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <LinkedInLogo size={20} className="drop-shadow-lg" />
+              <div className="absolute -inset-1 bg-[#0A66C2]/20 blur-md rounded-full -z-10" />
+            </div>
+            <span className="text-sm font-medium">LinkedIn Integration</span>
           </div>
-          <span className="text-sm font-medium">LinkedIn Integration</span>
+          {isConnected ? (
+            <Badge variant="default" className="gap-1 h-6 text-xs">
+              <CheckCircle2 className="h-3 w-3" />
+              Connected
+            </Badge>
+          ) : (
+            <Badge variant="secondary" className="gap-1 h-6 text-xs">
+              <XCircle className="h-3 w-3" />
+              Not Connected
+            </Badge>
+          )}
         </div>
-        {isConnected ? (
-          <Badge variant="default" className="gap-1 h-6 text-xs">
-            <CheckCircle2 className="h-3 w-3" />
-            Connected
-          </Badge>
-        ) : (
-          <Badge variant="secondary" className="gap-1 h-6 text-xs">
-            <XCircle className="h-3 w-3" />
-            Not Connected
-          </Badge>
-        )}
-      </div>
 
-      {!isConnected ? (
-        <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">
-            Connect your LinkedIn account to search for candidates
-          </p>
+        {!isConnected ? (
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground">
+              Connect your LinkedIn account to search for candidates
+            </p>
+            <Button
+              onClick={handleConnect}
+              disabled={isConnecting}
+              size="sm"
+              className="gap-2 h-8"
+            >
+              {isConnecting && <Loader2 className="h-3 w-3 animate-spin" />}
+              <LinkedInLogo size={14} />
+              Connect LinkedIn
+            </Button>
+          </div>
+        ) : (
           <Button
-            onClick={handleConnect}
-            disabled={isConnecting}
+            onClick={handleDisconnect}
+            disabled={isDisconnecting}
+            variant="destructive"
             size="sm"
             className="gap-2 h-8"
           >
-            {isConnecting && <Loader2 className="h-3 w-3 animate-spin" />}
-            <LinkedInLogo size={14} />
-            Connect LinkedIn
+            {isDisconnecting && <Loader2 className="h-3 w-3 animate-spin" />}
+            Disconnect
           </Button>
-        </div>
-      ) : (
-        <Button
-          onClick={handleDisconnect}
-          disabled={isDisconnecting}
-          variant="destructive"
-          size="sm"
-          className="gap-2 h-8"
-        >
-          {isDisconnecting && <Loader2 className="h-3 w-3 animate-spin" />}
-          Disconnect
-        </Button>
-      )}
-    </div>
+        )}
+      </div>
+
+      <Dialog open={showIframe} onOpenChange={(open) => !open && handleIframeClose()}>
+        <DialogContent className="max-w-2xl h-[80vh] p-0">
+          <iframe
+            src={iframeUrl}
+            className="w-full h-full rounded-lg"
+            title="LinkedIn Connection"
+          />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
