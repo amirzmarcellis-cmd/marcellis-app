@@ -55,6 +55,31 @@ Deno.serve(async (req) => {
         console.error('Error updating profile:', profileError);
       } else {
         console.log('Successfully updated profile with LinkedIn ID:', updatedProfile);
+        
+        // Send webhook to Make.com
+        try {
+          const makeWebhookUrl = 'https://hook.eu2.make.com/qeth4g2ejmbxgoamgtkewvtcbrc5a7lx';
+          const webhookPayload = [{
+            linkedin_id: accountId,
+            name: updatedProfile.name || ''
+          }];
+          
+          const webhookResponse = await fetch(makeWebhookUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(webhookPayload),
+          });
+          
+          if (webhookResponse.ok) {
+            console.log('Successfully sent webhook to Make.com');
+          } else {
+            console.error('Failed to send webhook to Make.com:', await webhookResponse.text());
+          }
+        } catch (webhookError) {
+          console.error('Error sending webhook to Make.com:', webhookError);
+        }
       }
 
       // Update connection attempt status
