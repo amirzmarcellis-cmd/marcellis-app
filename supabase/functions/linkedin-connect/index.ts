@@ -119,6 +119,7 @@ Deno.serve(async (req) => {
           expiresOn: expiresOn.toISOString(),
           notify_url: notifyUrl,
           name: connectionName,
+          success_redirect_url: 'https://marcellis.eezi.ai/settings'
         }),
       });
 
