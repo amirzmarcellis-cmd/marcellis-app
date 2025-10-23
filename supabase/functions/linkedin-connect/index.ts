@@ -70,6 +70,13 @@ Deno.serve(async (req) => {
       throw new Error('Unipile configuration missing');
     }
 
+    // Ensure UNIPILE_DSN has proper protocol
+    let unipileDsn = UNIPILE_DSN.trim();
+    if (!unipileDsn.startsWith('http://') && !unipileDsn.startsWith('https://')) {
+      unipileDsn = `https://${unipileDsn}`;
+    }
+    console.log('Using Unipile DSN:', unipileDsn);
+
     // Handle disconnect action
     if (action === 'disconnect') {
       let userIdToDisconnect = user.id;
@@ -106,7 +113,7 @@ Deno.serve(async (req) => {
       const expiresOn = new Date();
       expiresOn.setFullYear(expiresOn.getFullYear() + 1);
 
-      const response = await fetch(`${UNIPILE_DSN}/api/v1/hosted/accounts/link`, {
+      const response = await fetch(`${unipileDsn}/api/v1/hosted/accounts/link`, {
         method: 'POST',
         headers: {
           'X-API-KEY': UNIPILE_API_KEY,
@@ -116,7 +123,7 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           type: 'create',
           providers: ['LINKEDIN'],
-          api_url: UNIPILE_DSN,
+          api_url: unipileDsn,
           expiresOn: expiresOn.toISOString(),
         }),
       });
@@ -143,7 +150,7 @@ Deno.serve(async (req) => {
     // Handle OAuth callback/verification with account_id
     if (action === 'verify' && code) {
       // Get account details from Unipile using the account_id
-      const response = await fetch(`${UNIPILE_DSN}/api/v1/accounts/${code}`, {
+      const response = await fetch(`${unipileDsn}/api/v1/accounts/${code}`, {
         headers: {
           'X-API-KEY': UNIPILE_API_KEY,
         },
