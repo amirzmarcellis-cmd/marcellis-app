@@ -24,27 +24,24 @@ export function LinkedInConnection({ linkedinId, onUpdate }: LinkedInConnectionP
         body: { action: 'initiate' },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Edge function error:', error);
+        throw error;
+      }
+
+      console.log('LinkedIn connect response:', data);
 
       if (data?.url) {
-        // Open LinkedIn OAuth in a popup
-        const popup = window.open(data.url, 'LinkedIn Connection', 'width=600,height=700');
-        
-        // Poll for popup closure or success
-        const checkPopup = setInterval(async () => {
-          if (popup?.closed) {
-            clearInterval(checkPopup);
-            // Refresh profile to check if connected
-            onUpdate();
-            setIsConnecting(false);
-          }
-        }, 1000);
+        // Redirect to LinkedIn OAuth URL
+        window.location.href = data.url;
+      } else if (data?.error) {
+        throw new Error(data.error);
       }
     } catch (error) {
       console.error('LinkedIn connect error:', error);
       toast({
         title: 'Connection failed',
-        description: 'Failed to connect LinkedIn account. Please try again.',
+        description: error.message || 'Failed to connect LinkedIn account. Please try again.',
         variant: 'destructive',
       });
       setIsConnecting(false);

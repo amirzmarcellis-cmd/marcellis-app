@@ -60,6 +60,16 @@ Deno.serve(async (req) => {
 
     // Handle initiate OAuth flow
     if (action === 'initiate') {
+      // Fetch user profile to get their name
+      const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('name')
+        .eq('user_id', user.id)
+        .single();
+
+      const userName = profile?.name || 'User';
+
+      // Create Unipile hosted account link with correct format
       const response = await fetch(`${UNIPILE_DSN}/api/v1/hosted/accounts/link`, {
         method: 'POST',
         headers: {
@@ -67,20 +77,24 @@ Deno.serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          provider: 'linkedin',
-          success_redirect_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/linkedin-connect`,
-          failure_redirect_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/linkedin-connect`,
-          expirity: 600,
-          notify_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/linkedin-connect`,
-          state: JSON.stringify({ user_id: user.id }),
+          type: 'create',
+          providers: ['LINKEDIN'],
+          api_url: UNIPILE_DSN,
+          expiresOn: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+          name: userName,
+          notify_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/linkedin-webhook`,
+          success_redirect_url: 'https://marcellis.eezi.ai/settings',
         }),
       });
 
+      const responseText = await response.text();
+      console.log('Unipile API Response:', responseText);
+
       if (!response.ok) {
-        throw new Error('Failed to initiate LinkedIn OAuth');
+        throw new Error(`Failed to initiate LinkedIn OAuth: ${responseText}`);
       }
 
-      const data = await response.json();
+      const data = JSON.parse(responseText);
       return new Response(JSON.stringify({ url: data.url }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
