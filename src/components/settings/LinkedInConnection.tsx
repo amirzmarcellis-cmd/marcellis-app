@@ -6,6 +6,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
 import { LinkedInLogo } from '@/components/ui/LinkedInLogo';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useNavigate } from 'react-router-dom';
 
 interface LinkedInConnectionProps {
   linkedinId?: string | null;
@@ -17,12 +28,20 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
   const linkedinId = propLinkedinId ?? profile?.linkedin_id;
   const onUpdate = propOnUpdate ?? refetch;
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isConnecting, setIsConnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [showNamePrompt, setShowNamePrompt] = useState(false);
   const popupWindow = useRef<Window | null>(null);
   const popupCheckInterval = useRef<NodeJS.Timeout | null>(null);
 
   const handleConnect = async () => {
+    // Check if user has a name in their profile
+    if (!profile?.name || profile.name.trim() === '') {
+      setShowNamePrompt(true);
+      return;
+    }
+
     setIsConnecting(true);
     try {
       // Check if user is authenticated
@@ -160,6 +179,35 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
 
   return (
     <>
+      <AlertDialog open={showNamePrompt} onOpenChange={setShowNamePrompt}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Profile Name Required</AlertDialogTitle>
+            <AlertDialogDescription>
+              You need to add your name to your profile before connecting LinkedIn. 
+              This name will be used to identify your LinkedIn connection.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {
+              setShowNamePrompt(false);
+              // Scroll to the top of the page where the name input is
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              // Focus the name input after a short delay
+              setTimeout(() => {
+                const nameInput = document.getElementById('name');
+                if (nameInput) {
+                  nameInput.focus();
+                }
+              }, 300);
+            }}>
+              Update Profile
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
