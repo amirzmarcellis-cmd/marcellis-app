@@ -180,57 +180,58 @@ export function LinkedInConnection({ linkedinId, userName, onUpdate }: LinkedInC
 
   return (
     <>
-      <Card className="relative overflow-hidden border-border/30">
-        <CardHeader className="pb-4">
+      <Card className="relative overflow-hidden border-border/30 max-w-md">
+        <CardHeader className="pb-2 p-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0A66C2]">
-                <Linkedin className="h-5 w-5 text-white" />
+            <div className="flex items-center gap-2">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#0A66C2]">
+                <Linkedin className="h-3.5 w-3.5 text-white" />
               </div>
               <div>
-                <CardTitle className="text-2xl font-light">LinkedIn</CardTitle>
-                <CardDescription className="text-xs">
-                  Professional network integration
+                <CardTitle className="text-base font-medium">LinkedIn</CardTitle>
+                <CardDescription className="text-[10px]">
+                  Professional network
                 </CardDescription>
               </div>
             </div>
             <Badge 
               variant={isConnected ? "default" : "secondary"}
               className={isConnected 
-                ? "gap-1.5 bg-[#0A66C2]/10 text-[#0A66C2] hover:bg-[#0A66C2]/20 border-0" 
-                : "gap-1.5"
+                ? "gap-1 text-[10px] h-5 px-2 bg-[#0A66C2]/10 text-[#0A66C2] hover:bg-[#0A66C2]/20 border-0" 
+                : "gap-1 text-[10px] h-5 px-2"
               }
             >
               {isConnected ? (
-                <><CheckCircle className="h-3 w-3" /> Connected</>
+                <><CheckCircle className="h-2.5 w-2.5" /> Connected</>
               ) : (
-                <><XCircle className="h-3 w-3" /> Not Connected</>
+                <><XCircle className="h-2.5 w-2.5" /> Not Connected</>
               )}
             </Badge>
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-3 pt-0">
+        <CardContent className="space-y-2 pt-0 p-4">
           {isConnected ? (
             <>
-              <div className="rounded-lg border border-border/50 bg-muted/30 p-3.5">
-                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
+              <div className="rounded-md border border-border/50 bg-muted/30 p-2">
+                <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
                   Account ID
                 </p>
-                <p className="text-sm font-mono text-foreground break-all leading-relaxed">
+                <p className="text-xs font-mono text-foreground break-all">
                   {linkedinId}
                 </p>
               </div>
               
               <Button
                 variant="outline"
+                size="sm"
                 onClick={handleDisconnect}
                 disabled={isDisconnecting}
-                className="w-full border-destructive/30 text-destructive hover:bg-destructive/10 hover:border-destructive/50"
+                className="w-full h-7 text-xs border-destructive/30 text-destructive hover:bg-destructive/10 hover:border-destructive/50"
               >
                 {isDisconnecting ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />
                     Disconnecting...
                   </>
                 ) : (
@@ -240,22 +241,23 @@ export function LinkedInConnection({ linkedinId, userName, onUpdate }: LinkedInC
             </>
           ) : (
             <>
-              <p className="text-xs text-muted-foreground leading-relaxed pb-1">
-                Connect your LinkedIn account to sync your professional profile.
+              <p className="text-[10px] text-muted-foreground leading-relaxed">
+                Connect your LinkedIn to sync your profile.
               </p>
               <Button
                 onClick={handleConnect}
                 disabled={isConnecting}
-                className="w-full bg-[#0A66C2] hover:bg-[#004182] text-white"
+                size="sm"
+                className="w-full h-7 text-xs bg-[#0A66C2] hover:bg-[#004182] text-white"
               >
                 {isConnecting ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />
                     Connecting...
                   </>
                 ) : (
                   <>
-                    <Linkedin className="mr-2 h-4 w-4" />
+                    <Linkedin className="mr-1.5 h-3 w-3" />
                     Connect LinkedIn
                   </>
                 )}
