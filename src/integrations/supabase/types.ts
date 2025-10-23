@@ -249,6 +249,7 @@ export type Database = {
           job_location: string | null
           job_salary_range: number | null
           job_title: string | null
+          linkedin_search_enabled: boolean | null
           longlist: number | null
           musttohave: string | null
           nationality_to_exclude: string | null
@@ -284,6 +285,7 @@ export type Database = {
           job_location?: string | null
           job_salary_range?: number | null
           job_title?: string | null
+          linkedin_search_enabled?: boolean | null
           longlist?: number | null
           musttohave?: string | null
           nationality_to_exclude?: string | null
@@ -319,6 +321,7 @@ export type Database = {
           job_location?: string | null
           job_salary_range?: number | null
           job_title?: string | null
+          linkedin_search_enabled?: boolean | null
           longlist?: number | null
           musttohave?: string | null
           nationality_to_exclude?: string | null

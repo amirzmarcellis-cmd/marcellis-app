@@ -156,6 +156,8 @@ export default function EditJob() {
   const [currentTab, setCurrentTab] = useState("details");
   const [industries, setIndustries] = useState<string[]>([]);
   const [headhuntingCompanies, setHeadhuntingCompanies] = useState<string[]>([]);
+  const [linkedInSearchEnabled, setLinkedInSearchEnabled] = useState(false);
+  const [recruiterLinkedInId, setRecruiterLinkedInId] = useState<string | null>(null);
   const [formData, setFormData] = useState<JobData>({
     job_id: "",
     job_title: "",
@@ -190,6 +192,37 @@ export default function EditJob() {
     fetchGroups();
     fetchRecruiters();
   }, [id]);
+
+  // Fetch recruiter's LinkedIn ID when recruiter changes
+  useEffect(() => {
+    const fetchRecruiterLinkedInId = async () => {
+      if (!formData.recruiter_id) {
+        setRecruiterLinkedInId(null);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('linkedin_id')
+          .eq('user_id', formData.recruiter_id)
+          .single();
+
+        if (error) throw error;
+        setRecruiterLinkedInId(data?.linkedin_id || null);
+        
+        // Disable LinkedIn search if recruiter doesn't have LinkedIn ID
+        if (!data?.linkedin_id) {
+          setLinkedInSearchEnabled(false);
+        }
+      } catch (error) {
+        console.error('Error fetching recruiter LinkedIn ID:', error);
+        setRecruiterLinkedInId(null);
+      }
+    };
+
+    fetchRecruiterLinkedInId();
+  }, [formData.recruiter_id]);
 
   const fetchGroups = async () => {
     try {
@@ -241,6 +274,7 @@ export default function EditJob() {
       if (data) {
         setFormData(data);
         setHasAssignment(!!data.assignment);
+        setLinkedInSearchEnabled(data.linkedin_search_enabled || false);
         
         // Parse salary range
         const salaryStr = data.job_salary_range;
@@ -308,7 +342,8 @@ export default function EditJob() {
         headhunting_companies: headhuntingCompanies.join(", "),
         contract_length: formData.Type === "Contract" ? formData.contract_length : null,
         assignment: hasAssignment ? formData.assignment : null,
-        group_id: formData.group_id || null
+        group_id: formData.group_id || null,
+        linkedin_search_enabled: linkedInSearchEnabled
       };
 
       const { error } = await supabase
@@ -455,6 +490,40 @@ export default function EditJob() {
                       </SelectContent>
                     </Select>
                   </div>
+
+                  {/* LinkedIn Search Toggle */}
+                  {formData.recruiter_id && (
+                    <div className="space-y-2 p-4 border border-border/50 rounded-lg bg-accent/5">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <Label className="font-medium">LinkedIn Search</Label>
+                          <p className="text-sm text-muted-foreground">
+                            Enable LinkedIn candidate search for this job
+                          </p>
+                        </div>
+                        {recruiterLinkedInId ? (
+                          <Switch
+                            checked={linkedInSearchEnabled}
+                            onCheckedChange={setLinkedInSearchEnabled}
+                          />
+                        ) : (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate("/settings")}
+                          >
+                            Connect LinkedIn
+                          </Button>
+                        )}
+                      </div>
+                      {!recruiterLinkedInId && (
+                        <p className="text-xs text-amber-600 dark:text-amber-400">
+                          The assigned recruiter needs to connect their LinkedIn account to enable this feature.
+                        </p>
+                      )}
+                    </div>
+                  )}
 
                   <div className="space-y-2">
                     <Label htmlFor="job_description">Job Description *</Label>

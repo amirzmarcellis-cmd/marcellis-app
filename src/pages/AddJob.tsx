@@ -266,6 +266,8 @@ export default function AddJob() {
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [optionalFieldsOpen, setOptionalFieldsOpen] = useState(false);
   const [selectedOptionalFields, setSelectedOptionalFields] = useState<string[]>([]);
+  const [linkedInSearchEnabled, setLinkedInSearchEnabled] = useState(false);
+  const [recruiterLinkedInId, setRecruiterLinkedInId] = useState<string | null>(null);
 
   useEffect(() => {
     // Auto-assign recruiter to current user for team members if not selected
@@ -280,6 +282,39 @@ export default function AddJob() {
     fetchRecruiters();
     fetchClients();
   }, [profile?.user_id]);
+
+  // Fetch recruiter's LinkedIn ID when recruiter changes
+  useEffect(() => {
+    const fetchRecruiterLinkedInId = async () => {
+      if (!formData.recruiterId) {
+        setRecruiterLinkedInId(null);
+        setLinkedInSearchEnabled(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('linkedin_id')
+          .eq('user_id', formData.recruiterId)
+          .single();
+
+        if (error) throw error;
+        setRecruiterLinkedInId(data?.linkedin_id || null);
+        
+        // Disable LinkedIn search if recruiter doesn't have LinkedIn ID
+        if (!data?.linkedin_id) {
+          setLinkedInSearchEnabled(false);
+        }
+      } catch (error) {
+        console.error('Error fetching recruiter LinkedIn ID:', error);
+        setRecruiterLinkedInId(null);
+        setLinkedInSearchEnabled(false);
+      }
+    };
+
+    fetchRecruiterLinkedInId();
+  }, [formData.recruiterId]);
 
   const fetchGroups = async () => {
     try {
@@ -538,7 +573,8 @@ export default function AddJob() {
           recruiter_id: recruiterIdToSave,
           status: 'Active',
           Processed: 'Yes',
-          Timestamp: new Date().toISOString()
+          Timestamp: new Date().toISOString(),
+          linkedin_search_enabled: linkedInSearchEnabled
         });
 
       if (error) {
@@ -672,6 +708,40 @@ export default function AddJob() {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* LinkedIn Search Toggle */}
+            {formData.recruiterId && (
+              <div className="space-y-2 p-4 border border-border/50 rounded-lg bg-accent/5">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label className="font-medium">LinkedIn Search</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Enable LinkedIn candidate search for this job
+                    </p>
+                  </div>
+                  {recruiterLinkedInId ? (
+                    <Switch
+                      checked={linkedInSearchEnabled}
+                      onCheckedChange={setLinkedInSearchEnabled}
+                    />
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate("/settings")}
+                    >
+                      Connect LinkedIn
+                    </Button>
+                  )}
+                </div>
+                {!recruiterLinkedInId && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400">
+                    The assigned recruiter needs to connect their LinkedIn account to enable this feature.
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Row 3: Job Description */}
             <div className="space-y-2">
