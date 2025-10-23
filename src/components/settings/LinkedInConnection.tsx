@@ -15,7 +15,6 @@ interface LinkedInConnectionProps {
 export function LinkedInConnection({ linkedinId, onUpdate }: LinkedInConnectionProps) {
   const { toast } = useToast();
   const [isConnecting, setIsConnecting] = useState(false);
-  const [isTesting, setIsTesting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [connectionUrl, setConnectionUrl] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -134,32 +133,6 @@ export function LinkedInConnection({ linkedinId, onUpdate }: LinkedInConnectionP
     }
   };
 
-  const handleTest = async () => {
-    setIsTesting(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('linkedin-test-connection');
-
-      if (error) throw error;
-
-      if (data?.success) {
-        toast({
-          title: 'Connection verified',
-          description: 'Your LinkedIn connection is working properly.',
-        });
-      } else {
-        throw new Error(data?.error || 'Connection test failed');
-      }
-    } catch (error) {
-      console.error('LinkedIn test error:', error);
-      toast({
-        title: 'Connection test failed',
-        description: 'Your LinkedIn connection may have expired. Please reconnect.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsTesting(false);
-    }
-  };
 
   const isConnected = !!linkedinId;
 
@@ -220,26 +193,15 @@ export function LinkedInConnection({ linkedinId, onUpdate }: LinkedInConnectionP
             </Button>
           </div>
         ) : (
-          <div className="flex gap-2">
-            <Button
-              onClick={handleTest}
-              disabled={isTesting}
-              variant="outline"
-              className="gap-2"
-            >
-              {isTesting && <Loader2 className="h-4 w-4 animate-spin" />}
-              Test Connection
-            </Button>
-            <Button
-              onClick={handleDisconnect}
-              disabled={isDisconnecting}
-              variant="destructive"
-              className="gap-2"
-            >
-              {isDisconnecting && <Loader2 className="h-4 w-4 animate-spin" />}
-              Disconnect
-            </Button>
-          </div>
+          <Button
+            onClick={handleDisconnect}
+            disabled={isDisconnecting}
+            variant="destructive"
+            className="gap-2"
+          >
+            {isDisconnecting && <Loader2 className="h-4 w-4 animate-spin" />}
+            Disconnect
+          </Button>
         )}
       </CardContent>
     </Card>

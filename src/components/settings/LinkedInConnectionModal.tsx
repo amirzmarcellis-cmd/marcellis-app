@@ -56,8 +56,13 @@ export function LinkedInConnectionModal({
   }, [open, url, onSuccess, onClose]);
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh]">
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      // Only allow closing via the X button, not by clicking outside
+      if (!isOpen) {
+        onClose();
+      }
+    }}>
+      <DialogContent className="max-w-2xl max-h-[80vh]" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Connect Your LinkedIn Account</DialogTitle>
           <DialogDescription>
