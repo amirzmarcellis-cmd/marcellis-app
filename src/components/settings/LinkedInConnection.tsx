@@ -27,7 +27,21 @@ export function LinkedInConnection({ linkedinId, onUpdate }: LinkedInConnectionP
         throw new Error('Session expired. Please log in again.');
       }
 
-      console.log('Session refreshed, calling edge function...');
+      console.log('Session refreshed successfully');
+      console.log('New token expires at:', new Date(sessionData.session.expires_at! * 1000));
+      
+      // Small delay to ensure token is stored in localStorage
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Verify we can get the user with the new token
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !userData.user) {
+        console.error('Failed to verify user after refresh:', userError);
+        throw new Error('Authentication verification failed. Please try again.');
+      }
+      
+      console.log('User verified, calling edge function...');
 
       // Now call the edge function with the fresh token
       const { data, error } = await supabase.functions.invoke('linkedin-connect', {
