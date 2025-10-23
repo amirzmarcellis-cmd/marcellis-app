@@ -5,209 +5,132 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+interface UnipileAccountResponse {
+  object: string;
+  account_id: string;
+  provider: string;
+  email?: string;
+  name?: string;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const UNIPILE_API_KEY = Deno.env.get('UNIPILE_API_KEY');
-    if (!UNIPILE_API_KEY) {
-      throw new Error('UNIPILE_API_KEY not configured');
-    }
-
-    const unipileDsn = 'https://api4.unipile.com:13494';
-
-    // Get authenticated user
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('No authorization header');
-    }
-
-    const token = authHeader.replace('Bearer ', '');
-    
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: { Authorization: req.headers.get('Authorization')! },
+        },
+      }
     );
 
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError || !user) {
-      console.error('Auth error:', userError);
-      throw new Error('Unauthorized');
+    const {
+      data: { user },
+    } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+      throw new Error('Not authenticated');
     }
 
-    const { action } = await req.json();
-    console.log(`Action: ${action} for user: ${user.id}`);
+    const { action, code, state } = await req.json();
+    const UNIPILE_API_KEY = Deno.env.get('UNIPILE_API_KEY');
+    const UNIPILE_DSN = Deno.env.get('UNIPILE_DSN');
 
-    // ======================
-    // ACTION: initiate
-    // ======================
-    if (action === 'initiate') {
-      console.log('=== Initiating LinkedIn OAuth ===');
-
-      // Fetch user's profile name
-      const { data: profile, error: profileError } = await supabaseClient
-        .from('profiles')
-        .select('name')
-        .eq('user_id', user.id)
-        .single();
-
-      if (profileError || !profile?.name) {
-        console.error('Profile fetch error:', profileError);
-        throw new Error('Profile name is required. Please update your profile in Settings.');
-      }
-
-      const connectionName = profile.name.trim();
-      console.log('Connection name:', connectionName);
-
-      // Check for existing pending connection
-      const { data: existingAttempt } = await supabaseClient
-        .from('linkedin_connection_attempts')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('status', 'pending')
-        .maybeSingle();
-
-      if (existingAttempt) {
-        // Delete old pending attempt
-        await supabaseClient
-          .from('linkedin_connection_attempts')
-          .delete()
-          .eq('id', existingAttempt.id);
-      }
-
-      // Create new connection attempt
-      const { error: insertError } = await supabaseClient
-        .from('linkedin_connection_attempts')
-        .insert({
-          user_id: user.id,
-          connection_name: connectionName,
-          status: 'pending'
-        });
-
-      if (insertError) {
-        console.error('Failed to create connection attempt:', insertError);
-        throw new Error('Failed to initialize connection');
-      }
-
-      console.log('Created connection attempt');
-
-      // Build webhook callback URL
-      const supabaseUrl = Deno.env.get('SUPABASE_URL');
-      const notifyUrl = `${supabaseUrl}/functions/v1/linkedin-webhook`;
-
-      // Set expiration to 1 year from now
-      const expiresOn = new Date();
-      expiresOn.setFullYear(expiresOn.getFullYear() + 1);
-
-      console.log('Calling Unipile API...');
-      console.log('Webhook URL:', notifyUrl);
-
-      // Call Unipile hosted accounts link API
-      const response = await fetch(`${unipileDsn}/api/v1/hosted/accounts/link`, {
-        method: 'POST',
-        headers: {
-          'X-API-KEY': UNIPILE_API_KEY,
-          'accept': 'application/json',
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: 'create',
-          providers: ['LINKEDIN'],
-          api_url: unipileDsn,
-          expiresOn: expiresOn.toISOString(),
-          notify_url: notifyUrl,
-          name: connectionName,
-          success_redirect_url: 'https://marcellis.eezi.ai/settings'
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Unipile API error:', response.status, errorText);
-        
-        // Clean up failed attempt
-        await supabaseClient
-          .from('linkedin_connection_attempts')
-          .update({ 
-            status: 'failed',
-            error_message: errorText,
-            completed_at: new Date().toISOString()
-          })
-          .eq('connection_name', connectionName)
-          .eq('user_id', user.id);
-        
-        throw new Error(`Unipile API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log('Unipile response:', data);
-      
-      return new Response(JSON.stringify({ 
-        url: data.hosted_link || data.url,
-        connectionName: connectionName
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+    if (!UNIPILE_API_KEY || !UNIPILE_DSN) {
+      throw new Error('Unipile configuration missing');
     }
 
-    // ======================
-    // ACTION: check-status
-    // ======================
-    if (action === 'check-status') {
-      const { data: attempt, error: fetchError } = await supabaseClient
-        .from('linkedin_connection_attempts')
-        .select('status, account_id, error_message')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
-
-      if (fetchError) {
-        console.error('Failed to fetch connection status:', fetchError);
-        throw new Error('Failed to check connection status');
-      }
-
-      return new Response(JSON.stringify({ 
-        status: attempt.status,
-        account_id: attempt.account_id,
-        error_message: attempt.error_message
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    // ======================
-    // ACTION: disconnect
-    // ======================
+    // Handle disconnect action
     if (action === 'disconnect') {
-      console.log('=== Disconnecting LinkedIn ===');
-
-      const { error: updateError } = await supabaseClient
+      await supabaseClient
         .from('profiles')
         .update({ linkedin_id: null })
         .eq('user_id', user.id);
 
-      if (updateError) {
-        console.error('Failed to disconnect:', updateError);
-        throw new Error('Failed to disconnect LinkedIn account');
+      return new Response(
+        JSON.stringify({ success: true, message: 'LinkedIn disconnected' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Handle initiate OAuth flow
+    if (action === 'initiate') {
+      const response = await fetch(`${UNIPILE_DSN}/api/v1/hosted/accounts/link`, {
+        method: 'POST',
+        headers: {
+          'X-API-KEY': UNIPILE_API_KEY,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          provider: 'linkedin',
+          success_redirect_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/linkedin-connect`,
+          failure_redirect_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/linkedin-connect`,
+          expirity: 600,
+          notify_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/linkedin-connect`,
+          state: JSON.stringify({ user_id: user.id }),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to initiate LinkedIn OAuth');
       }
 
-      console.log('✅ LinkedIn disconnected');
-
-      return new Response(JSON.stringify({ success: true }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      const data = await response.json();
+      return new Response(JSON.stringify({ url: data.url }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    throw new Error('Invalid action');
+    // Handle OAuth callback
+    if (action === 'callback' && code && state) {
+      const stateData = JSON.parse(state);
+      
+      // Get account details from Unipile
+      const response = await fetch(`${UNIPILE_DSN}/api/v1/accounts/${code}`, {
+        headers: {
+          'X-API-KEY': UNIPILE_API_KEY,
+        },
+      });
 
+      if (!response.ok) {
+        throw new Error('Failed to verify LinkedIn account');
+      }
+
+      const accountData: UnipileAccountResponse = await response.json();
+
+      // Update user profile with LinkedIn account ID
+      await supabaseClient
+        .from('profiles')
+        .update({ 
+          linkedin_id: accountData.account_id,
+        })
+        .eq('user_id', stateData.user_id);
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          account_id: accountData.account_id,
+          name: accountData.name,
+          email: accountData.email,
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    throw new Error('Invalid action');
   } catch (error) {
-    console.error('❌ Edge function error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    console.error('LinkedIn connect error:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { 
+        status: 400, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    );
   }
 });

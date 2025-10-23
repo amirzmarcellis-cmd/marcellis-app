@@ -24,13 +24,6 @@ export default function Auth() {
   useEffect(() => {
     // Check if user is already logged in
     const checkUser = async () => {
-      // Check if user just signed out
-      const signingOut = sessionStorage.getItem('signing_out');
-      if (signingOut) {
-        sessionStorage.removeItem('signing_out');
-        return; // Don't auto-redirect if user just signed out
-      }
-
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         navigate('/');
@@ -45,6 +38,12 @@ export default function Auth() {
     setError(null);
 
     try {
+      // Validate email domain
+      const emailDomain = email.split('@')[1];
+      if (emailDomain !== 'marc-ellis.com') {
+        throw new Error('Only @marc-ellis.com email addresses are allowed to access this platform');
+      }
+
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
           email,

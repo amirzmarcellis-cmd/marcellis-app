@@ -235,6 +235,7 @@ export type Database = {
           client_description: string | null
           client_id: string | null
           client_name: string | null
+          companies_to_exclude: string | null
           contract_length: string | null
           Currency: string | null
           group_id: string | null
@@ -269,6 +270,7 @@ export type Database = {
           client_description?: string | null
           client_id?: string | null
           client_name?: string | null
+          companies_to_exclude?: string | null
           contract_length?: string | null
           Currency?: string | null
           group_id?: string | null
@@ -303,6 +305,7 @@ export type Database = {
           client_description?: string | null
           client_id?: string | null
           client_name?: string | null
+          companies_to_exclude?: string | null
           contract_length?: string | null
           Currency?: string | null
           group_id?: string | null

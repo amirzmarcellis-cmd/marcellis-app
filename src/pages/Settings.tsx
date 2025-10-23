@@ -10,7 +10,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { LinkedInConnection } from '@/components/settings/LinkedInConnection';
 
 export default function Settings() {
-  const { profile, updateProfile } = useProfile();
+  const { profile, updateProfile, refetch } = useProfile();
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: '',
@@ -112,11 +112,10 @@ export default function Settings() {
         </CardContent>
       </Card>
 
-      {/* LinkedIn Connection */}
+      {/* LinkedIn Integration */}
       <LinkedInConnection 
         linkedinId={profile?.linkedin_id || null}
-        userName={profile?.name || null}
-        onUpdate={() => window.location.reload()}
+        onUpdate={refetch}
       />
 
       {/* Notification Settings */}

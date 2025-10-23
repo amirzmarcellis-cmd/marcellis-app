@@ -38,17 +38,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      // Set flag to indicate sign-out is in progress
-      sessionStorage.setItem('signing_out', 'true');
-      
-      // Clear local state first
-      setSession(null);
-      setUser(null);
-      
-      // Sign out from Supabase
-      await supabase.auth.signOut();
-      
-      // Redirect to auth page
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error signing out:', error);
+        // Even if there's an error, clear local state
+        setSession(null);
+        setUser(null);
+      }
+      // Redirect to auth page after sign out
       window.location.href = '/auth';
     } catch (error) {
       console.error('Error signing out:', error);
