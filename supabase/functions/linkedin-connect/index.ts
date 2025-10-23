@@ -137,20 +137,21 @@ Deno.serve(async (req) => {
       const data = await response.json();
       console.log('Unipile response:', data);
       
-      // Store the user_id in a temporary mapping or use the account_id for callback
       // Return the hosted link URL for the popup
+      // Note: account_id is not available until after user completes authentication
       return new Response(JSON.stringify({ 
-        url: data.hosted_link || data.url,
-        account_id: data.account_id 
+        url: data.hosted_link || data.url
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Handle OAuth callback/verification with account_id
-    if (action === 'verify' && code) {
-      // Get account details from Unipile using the account_id
-      const response = await fetch(`${unipileDsn}/api/v1/accounts/${code}`, {
+    // Handle OAuth callback/verification - fetch list of accounts to get the newly connected LinkedIn account
+    if (action === 'verify') {
+      console.log('Verifying LinkedIn connection...');
+      
+      // List all accounts to find the newly connected LinkedIn account
+      const response = await fetch(`${unipileDsn}/api/v1/accounts`, {
         headers: {
           'X-API-KEY': UNIPILE_API_KEY,
         },
@@ -158,18 +159,30 @@ Deno.serve(async (req) => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Failed to verify account:', errorText);
-        throw new Error('Failed to verify LinkedIn account');
+        console.error('Failed to fetch accounts:', errorText);
+        throw new Error('Failed to fetch LinkedIn accounts');
       }
 
-      const accountData: UnipileAccountResponse = await response.json();
-      console.log('Account verified:', accountData);
+      const accountsData = await response.json();
+      console.log('Accounts response:', accountsData);
+
+      // Find LinkedIn account for this user
+      const linkedInAccount = accountsData.items?.find(
+        (account: UnipileAccountResponse) => account.provider === 'LINKEDIN'
+      );
+
+      if (!linkedInAccount) {
+        console.error('No LinkedIn account found in accounts list');
+        throw new Error('No LinkedIn account found. Please try connecting again.');
+      }
+
+      console.log('LinkedIn account found:', linkedInAccount);
 
       // Update user profile with LinkedIn account ID
       const { error: updateError } = await supabaseClient
         .from('profiles')
         .update({ 
-          linkedin_id: accountData.account_id,
+          linkedin_id: linkedInAccount.account_id,
         })
         .eq('user_id', user.id);
 
@@ -178,12 +191,14 @@ Deno.serve(async (req) => {
         throw new Error('Failed to update profile with LinkedIn ID');
       }
 
+      console.log('Profile updated successfully with LinkedIn ID:', linkedInAccount.account_id);
+
       return new Response(
         JSON.stringify({ 
           success: true, 
-          account_id: accountData.account_id,
-          name: accountData.name,
-          email: accountData.email,
+          account_id: linkedInAccount.account_id,
+          name: linkedInAccount.name,
+          email: linkedInAccount.email,
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );

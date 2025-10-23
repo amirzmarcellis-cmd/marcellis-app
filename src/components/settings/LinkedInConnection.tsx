@@ -19,7 +19,6 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
   const { toast } = useToast();
   const [isConnecting, setIsConnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
-  const [accountId, setAccountId] = useState('');
   const popupWindow = useRef<Window | null>(null);
   const popupCheckInterval = useRef<NodeJS.Timeout | null>(null);
 
@@ -45,8 +44,6 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
       }
 
       if (data?.url) {
-        setAccountId(data.account_id);
-        
         // Open centered popup window
         const width = 600;
         const height = 700;
@@ -115,28 +112,31 @@ export function LinkedInConnection({ linkedinId: propLinkedinId, onUpdate: propO
 
   const handleAuthComplete = async () => {
     // Verify and save the LinkedIn connection
-    if (accountId) {
-      try {
-        const { data: verifyData, error: verifyError } = await supabase.functions.invoke('linkedin-connect', {
-          body: { action: 'verify', code: accountId },
-        });
+    try {
+      const { data: verifyData, error: verifyError } = await supabase.functions.invoke('linkedin-connect', {
+        body: { action: 'verify' },
+      });
 
-        if (verifyError) {
-          console.error('Verification error:', verifyError);
-          toast({
-            title: 'Connection failed',
-            description: 'Failed to verify LinkedIn connection. Please try again.',
-            variant: 'destructive',
-          });
-        } else if (verifyData?.success) {
-          toast({
-            title: 'Connected',
-            description: 'LinkedIn account connected successfully.',
-          });
-        }
-      } catch (error) {
-        console.error('Verification error:', error);
+      if (verifyError) {
+        console.error('Verification error:', verifyError);
+        toast({
+          title: 'Connection failed',
+          description: 'Failed to verify LinkedIn connection. Please try again.',
+          variant: 'destructive',
+        });
+      } else if (verifyData?.success) {
+        toast({
+          title: 'Connected',
+          description: 'LinkedIn account connected successfully.',
+        });
       }
+    } catch (error) {
+      console.error('Verification error:', error);
+      toast({
+        title: 'Connection failed',
+        description: error instanceof Error ? error.message : 'Failed to verify LinkedIn connection.',
+        variant: 'destructive',
+      });
     }
     
     // Refresh profile to check if connected
