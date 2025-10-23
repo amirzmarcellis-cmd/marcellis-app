@@ -180,55 +180,46 @@ export function LinkedInConnection({ linkedinId, userName, onUpdate }: LinkedInC
 
   return (
     <>
-      <Card className="relative overflow-hidden border-[#0A66C2]/20 bg-gradient-to-br from-[#0A66C2]/5 via-card/50 to-card/30">
-        {/* Decorative background elements */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-[#0A66C2]/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#0A66C2]/5 rounded-full blur-2xl" />
-        
-        <CardHeader className="relative">
-          <div className="flex items-start justify-between gap-4">
+      <Card className="relative overflow-hidden border-border/30">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0A66C2] shadow-lg shadow-[#0A66C2]/20">
-                <Linkedin className="h-6 w-6 text-white" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0A66C2]">
+                <Linkedin className="h-5 w-5 text-white" />
               </div>
               <div>
-                <CardTitle className="text-2xl">LinkedIn</CardTitle>
-                <CardDescription className="mt-1">
+                <CardTitle className="text-2xl font-light">LinkedIn</CardTitle>
+                <CardDescription className="text-xs">
                   Professional network integration
                 </CardDescription>
               </div>
             </div>
-            {isConnected ? (
-              <Badge className="gap-1.5 bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/20">
-                <CheckCircle className="h-3.5 w-3.5" />
-                Active
-              </Badge>
-            ) : (
-              <Badge variant="secondary" className="gap-1.5">
-                <XCircle className="h-3.5 w-3.5" />
-                Inactive
-              </Badge>
-            )}
+            <Badge 
+              variant={isConnected ? "default" : "secondary"}
+              className={isConnected 
+                ? "gap-1.5 bg-[#0A66C2]/10 text-[#0A66C2] hover:bg-[#0A66C2]/20 border-0" 
+                : "gap-1.5"
+              }
+            >
+              {isConnected ? (
+                <><CheckCircle className="h-3 w-3" /> Connected</>
+              ) : (
+                <><XCircle className="h-3 w-3" /> Not Connected</>
+              )}
+            </Badge>
           </div>
         </CardHeader>
-        
-        <CardContent className="relative space-y-4">
+
+        <CardContent className="space-y-3 pt-0">
           {isConnected ? (
             <>
-              <div className="group relative overflow-hidden rounded-2xl border border-[#0A66C2]/20 bg-gradient-to-br from-[#0A66C2]/10 via-[#0A66C2]/5 to-transparent p-5 transition-all duration-300 hover:border-[#0A66C2]/40 hover:shadow-lg hover:shadow-[#0A66C2]/10">
-                <div className="absolute inset-0 bg-gradient-to-tr from-[#0A66C2]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative flex items-start justify-between gap-4">
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      <p className="text-xs font-semibold text-[#0A66C2] uppercase tracking-wider">Connected Account</p>
-                    </div>
-                    <p className="text-sm font-mono text-foreground/90 break-all leading-relaxed pl-3.5">{linkedinId}</p>
-                  </div>
-                  <div className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/10">
-                    <CheckCircle className="h-5 w-5 text-emerald-600" />
-                  </div>
-                </div>
+              <div className="rounded-lg border border-border/50 bg-muted/30 p-3.5">
+                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
+                  Account ID
+                </p>
+                <p className="text-sm font-mono text-foreground break-all leading-relaxed">
+                  {linkedinId}
+                </p>
               </div>
               
               <Button
@@ -239,42 +230,37 @@ export function LinkedInConnection({ linkedinId, userName, onUpdate }: LinkedInC
               >
                 {isDisconnecting ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Disconnecting...
                   </>
                 ) : (
-                  <>
-                    <XCircle className="h-4 w-4" />
-                    Disconnect Account
-                  </>
+                  'Disconnect'
                 )}
               </Button>
             </>
           ) : (
-            <div className="space-y-4">
-              <div className="rounded-xl bg-muted/50 p-4 border border-border/50">
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Connect your LinkedIn account to unlock professional networking features and seamless integration.
-                </p>
-              </div>
+            <>
+              <p className="text-xs text-muted-foreground leading-relaxed pb-1">
+                Connect your LinkedIn account to sync your professional profile.
+              </p>
               <Button
                 onClick={handleConnect}
                 disabled={isConnecting}
-                className="w-full h-12 bg-[#0A66C2] hover:bg-[#004182] text-white shadow-lg shadow-[#0A66C2]/20 hover:shadow-xl hover:shadow-[#0A66C2]/30 transition-all duration-300"
+                className="w-full bg-[#0A66C2] hover:bg-[#004182] text-white"
               >
                 {isConnecting ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Connecting...
                   </>
                 ) : (
                   <>
-                    <Linkedin className="h-5 w-5" />
-                    Connect LinkedIn Account
+                    <Linkedin className="mr-2 h-4 w-4" />
+                    Connect LinkedIn
                   </>
                 )}
               </Button>
-            </div>
+            </>
           )}
         </CardContent>
       </Card>
