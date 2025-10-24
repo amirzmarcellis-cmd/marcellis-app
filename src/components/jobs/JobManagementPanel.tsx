@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Briefcase, Phone, PhoneOff, UserCircle, Calendar, Clock, X } from "lucide-react";
+import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Briefcase, Phone, PhoneOff, UserCircle, Calendar, Clock, X, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
@@ -97,6 +97,41 @@ export function JobManagementPanel() {
       setLoading(false);
     }
   }, [profile?.user_id, isAdmin, isManager, isTeamLeader, profileLoading, rolesLoading]);
+
+  // Real-time subscription for auto-dial changes
+  useEffect(() => {
+    const channel = supabase
+      .channel('jobs-auto-dial-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'Jobs',
+          filter: 'automatic_dial=eq.false'
+        },
+        (payload) => {
+          const updatedJob = payload.new as any;
+          
+          // Check if this job was just disabled due to reaching threshold
+          if (updatedJob.automatic_dial === false && !updatedJob.auto_dial_enabled_at) {
+            toast({
+              title: "Auto-dial disabled",
+              description: `Job "${updatedJob.job_title}" has reached 6 shortlisted candidates. Auto-dial has been automatically disabled.`,
+              duration: 8000,
+            });
+            
+            // Refresh jobs list
+            fetchJobs();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [toast, fetchJobs]);
   const fetchJobs = useCallback(async () => {
     // Guard: Ensure we have all necessary data before fetching
     if (!profile?.user_id) {
@@ -767,12 +802,20 @@ const JobGrid = memo(function JobGrid({
             </div>
 
             {/* Automatic Dial Toggle */}
-            <div className="flex items-center justify-between py-2 border-t border-border/30">
-              <div className="flex items-center gap-2 text-sm">
-                {job.automatic_dial ? <Phone className="h-4 w-4 text-green" /> : <PhoneOff className="h-4 w-4 text-muted-foreground" />}
-                <span className="text-muted-foreground">Automatic Dial</span>
+            <div className="py-2 border-t border-border/30 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm">
+                  {job.automatic_dial ? <Phone className="h-4 w-4 text-green" /> : <PhoneOff className="h-4 w-4 text-muted-foreground" />}
+                  <span className="text-muted-foreground">Automatic Dial</span>
+                </div>
+                <Switch checked={job.automatic_dial || false} onCheckedChange={() => onAutomaticDialToggle(job.job_id, job.automatic_dial)} className="data-[state=checked]:bg-green data-[state=unchecked]:bg-muted" />
               </div>
-              <Switch checked={job.automatic_dial || false} onCheckedChange={() => onAutomaticDialToggle(job.job_id, job.automatic_dial)} className="data-[state=checked]:bg-green data-[state=unchecked]:bg-muted" />
+              {job.automatic_dial === false && (job.shortlisted_count || 0) >= 6 && (
+                <Badge variant="outline" className="text-xs flex items-center gap-1 w-fit">
+                  <Info className="h-3 w-3" />
+                  Auto-disabled (6 shortlisted)
+                </Badge>
+              )}
             </div>
 
             <div className="flex items-center justify-between pt-2">

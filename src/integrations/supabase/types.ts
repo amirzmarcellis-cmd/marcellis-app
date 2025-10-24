@@ -364,6 +364,7 @@ export type Database = {
           candidate_email: string | null
           candidate_name: string | null
           candidate_phone_number: string | null
+          "Chat id": string | null
           client_status: string | null
           comm_score: number | null
           comm_summary: string | null
@@ -378,6 +379,7 @@ export type Database = {
           linkedin_score: number | null
           linkedin_score_reason: string | null
           longlisted_at: string | null
+          Message_count: number | null
           nationality: string | null
           notes: string | null
           notes_updated_at: string | null
@@ -408,6 +410,7 @@ export type Database = {
           candidate_email?: string | null
           candidate_name?: string | null
           candidate_phone_number?: string | null
+          "Chat id"?: string | null
           client_status?: string | null
           comm_score?: number | null
           comm_summary?: string | null
@@ -422,6 +425,7 @@ export type Database = {
           linkedin_score?: number | null
           linkedin_score_reason?: string | null
           longlisted_at?: string | null
+          Message_count?: number | null
           nationality?: string | null
           notes?: string | null
           notes_updated_at?: string | null
@@ -452,6 +456,7 @@ export type Database = {
           candidate_email?: string | null
           candidate_name?: string | null
           candidate_phone_number?: string | null
+          "Chat id"?: string | null
           client_status?: string | null
           comm_score?: number | null
           comm_summary?: string | null
@@ -466,6 +471,7 @@ export type Database = {
           linkedin_score?: number | null
           linkedin_score_reason?: string | null
           longlisted_at?: string | null
+          Message_count?: number | null
           nationality?: string | null
           notes?: string | null
           notes_updated_at?: string | null
