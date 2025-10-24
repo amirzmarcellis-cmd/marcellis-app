@@ -97,41 +97,6 @@ export function JobManagementPanel() {
       setLoading(false);
     }
   }, [profile?.user_id, isAdmin, isManager, isTeamLeader, profileLoading, rolesLoading]);
-
-  // Real-time subscription for auto-dial changes
-  useEffect(() => {
-    const channel = supabase
-      .channel('jobs-auto-dial-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'Jobs',
-          filter: 'automatic_dial=eq.false'
-        },
-        (payload) => {
-          const updatedJob = payload.new as any;
-          
-          // Check if this job was just disabled due to reaching threshold
-          if (updatedJob.automatic_dial === false && !updatedJob.auto_dial_enabled_at) {
-            toast({
-              title: "Auto-dial disabled",
-              description: `Job "${updatedJob.job_title}" has reached 6 shortlisted candidates. Auto-dial has been automatically disabled.`,
-              duration: 8000,
-            });
-            
-            // Refresh jobs list
-            fetchJobs();
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [toast, fetchJobs]);
   const fetchJobs = useCallback(async () => {
     // Guard: Ensure we have all necessary data before fetching
     if (!profile?.user_id) {
@@ -296,6 +261,41 @@ export function JobManagementPanel() {
       console.error('Error fetching groups:', error);
     }
   }, []);
+
+  // Real-time subscription for auto-dial changes
+  useEffect(() => {
+    const channel = supabase
+      .channel('jobs-auto-dial-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'Jobs',
+          filter: 'automatic_dial=eq.false'
+        },
+        (payload) => {
+          const updatedJob = payload.new as any;
+          
+          // Check if this job was just disabled due to reaching threshold
+          if (updatedJob.automatic_dial === false && !updatedJob.auto_dial_enabled_at) {
+            toast({
+              title: "Auto-dial disabled",
+              description: `Job "${updatedJob.job_title}" has reached 6 shortlisted candidates. Auto-dial has been automatically disabled.`,
+              duration: 8000,
+            });
+            
+            // Refresh jobs list
+            fetchJobs();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [toast, fetchJobs]);
   const handleStatusToggle = async (jobId: string, currentProcessed: string | null) => {
     const newProcessed = currentProcessed === "Yes" ? "No" : "Yes";
     
