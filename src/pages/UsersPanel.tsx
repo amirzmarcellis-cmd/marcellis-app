@@ -512,16 +512,28 @@ export default function UsersPanel() {
                     </SelectContent>
                   </Select>
                 </div>
-                {(newUser.role === 'team_member' || newUser.role === 'team_leader') && (
-                  <div className="space-y-2">
-                    <Label htmlFor="team">Team</Label>
-                    <Select value={newUser.team} onValueChange={(value: string) => setNewUser({ ...newUser, team: value })}>
-                      <SelectTrigger className="bg-background border-input z-50">
-                        <SelectValue placeholder="Select a team" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-background border border-border shadow-md z-50">
-                        {userTeams.map((team) => {
-                          const TeamIcon = team.name.toLowerCase().includes('sales') ? DollarSign : 
+                <div className="space-y-2">
+                  <Label htmlFor="team">Team</Label>
+                  <Select
+                    value={newUser.team}
+                    onValueChange={(value: string) => setNewUser({ ...newUser, team: value })}
+                    disabled={!(newUser.role === 'team_member' || newUser.role === 'team_leader')}
+                  >
+                    <SelectTrigger className="bg-background border-input z-50">
+                      <SelectValue placeholder={
+                        newUser.role === 'team_member' || newUser.role === 'team_leader'
+                          ? 'Select a team'
+                          : 'Select role Team Member/Leader to choose a team'
+                      } />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border border-border shadow-md z-50">
+                      {userTeams.length === 0 ? (
+                        <div className="px-2 py-4 text-sm text-muted-foreground text-center">
+                          No teams available
+                        </div>
+                      ) : (
+                        userTeams.map((team) => {
+                          const TeamIcon = team.name.toLowerCase().includes('sales') ? DollarSign :
                                           team.name.toLowerCase().includes('delivery') ? Truck : Users2;
                           return (
                             <SelectItem key={team.id} value={team.id} className="hover:bg-accent hover:text-accent-foreground">
@@ -531,11 +543,11 @@ export default function UsersPanel() {
                               </div>
                             </SelectItem>
                           );
-                        })}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+                        })
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <DialogFooter>
                   <Button type="button" variant="outline" onClick={() => setIsAddUserOpen(false)}>
                     Cancel
