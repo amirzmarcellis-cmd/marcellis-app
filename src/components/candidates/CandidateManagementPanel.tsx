@@ -32,6 +32,9 @@ interface Candidate {
   Linkedin: string | null;
   CV_Link: string | null;
   Timestamp: string | null;
+  Status?: string | null;
+  Source?: string | null;
+  Score?: number | null;
 }
 
 export function CandidateManagementPanel() {
@@ -52,10 +55,48 @@ export function CandidateManagementPanel() {
   }, []);
 
   const fetchData = async () => {
-    // Mock data for single-company structure
     try {
-      setCandidates([]);
-      setJobs([]);
+      // Fetch jobs
+      const { data: jobsData, error: jobsError } = await supabase
+        .from('Jobs')
+        .select('*');
+
+      if (jobsError) throw jobsError;
+
+      // Fetch candidates from Jobs_CVs
+      const { data: candidatesData, error: candidatesError } = await supabase
+        .from('Jobs_CVs')
+        .select('*');
+
+      if (candidatesError) throw candidatesError;
+
+      // Transform Jobs_CVs data to match Candidate interface
+      const transformedCandidates = candidatesData?.map((record: any) => ({
+        Cadndidate_ID: record.user_id || record.recordid?.toString(),
+        "First Name": record.candidate_name?.split(' ')[0] || null,
+        "Last Name": record.candidate_name?.split(' ').slice(1).join(' ') || null,
+        Email: record.candidate_email,
+        "Phone Number": record.candidate_phone_number,
+        Title: null,
+        Location: null,
+        "Current Company": null,
+        Skills: null,
+        "Applied for": record.job_id ? [record.job_id] : [],
+        "CV Summary": record.call_summary,
+        Experience: null,
+        Education: null,
+        Certifications: null,
+        Language: null,
+        Linkedin: null,
+        CV_Link: null,
+        Timestamp: record.longlisted_at,
+        Status: record.contacted,
+        Source: record.source,
+        Score: record.after_call_score,
+      })) || [];
+
+      setCandidates(transformedCandidates);
+      setJobs(jobsData || []);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
@@ -95,8 +136,8 @@ export function CandidateManagementPanel() {
 
   const getJobTitle = (jobId: string | null) => {
     if (!jobId) return "No Job Applied";
-    const job = jobs.find(j => j["Job ID"] === jobId);
-    return job?.["Job Title"] || jobId;
+    const job = jobs.find(j => j.job_id === jobId);
+    return job?.job_title || jobId;
   };
 
   return (
@@ -190,7 +231,7 @@ export function CandidateManagementPanel() {
                     {candidate.Title || "No title specified"}
                   </p>
                   <div className="flex items-center space-x-2 mt-2">
-                    {getStatusBadge("Not Reached")} {/* Default status for now */}
+                    {getStatusBadge((candidate as any).Status || "Not Reached")}
                   </div>
                 </div>
               </div>
