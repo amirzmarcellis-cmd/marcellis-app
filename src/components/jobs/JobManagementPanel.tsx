@@ -147,7 +147,7 @@ export function JobManagementPanel() {
       // Optimized: Fetch candidates per job with reduced limit
       const candidatesByJob = new Map<string, any[]>();
       if (jobIds.length > 0) {
-        const perJobPromises = jobIds.map(jid => supabase.from('Jobs_CVs').select('job_id, source, contacted, shortlisted_at, longlisted_at, submitted_at').eq('job_id', jid).limit(500)); // Reduced from 10000 to 500
+        const perJobPromises = jobIds.map(jid => supabase.from('Jobs_CVs').select('job_id, source, contacted, shortlisted_at, longlisted_at, submitted_at, after_call_score').eq('job_id', jid).limit(500)); // Reduced from 10000 to 500
         const perJobResults = await Promise.all(perJobPromises);
         perJobResults.forEach((res, idx) => {
           if (res.error) {
