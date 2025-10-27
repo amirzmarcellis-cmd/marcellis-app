@@ -181,28 +181,27 @@ export default function CallLog() {
     try {
       setLoading(true);
       
-      // Fetch call logs from Jobs_CVs table
-      const { data: callLogsData, error: callLogsError } = await supabase
-        .from('Jobs_CVs')
-        .select('*')
-        .not('callcount', 'is', null)
-        .gt('callcount', 0)
-        .order('recordid', { ascending: false });
+      // Parallel fetch for faster loading
+      const [callLogsResult, jobsResult] = await Promise.all([
+        supabase
+          .from('Jobs_CVs')
+          .select('recordid, job_id, user_id, recruiter_id, contacted, transcript, cv_score, after_call_score, linkedin_score, source, candidate_name, candidate_email, candidate_phone_number, notice_period, salary_expectations, current_salary, notes, callcount, lastcalltime, duration, recording, longlisted_at, shortlisted_at, nationality')
+          .not('callcount', 'is', null)
+          .gt('callcount', 0)
+          .order('recordid', { ascending: false })
+          .limit(200), // Limit to 200 most recent call logs
+        
+        supabase
+          .from('Jobs')
+          .select('job_id, job_title')
+          .order('job_title')
+      ]);
 
-      if (callLogsError) {
-        console.error('Error fetching call logs:', callLogsError);
-        throw callLogsError;
-      }
+      const { data: callLogsData, error: callLogsError } = callLogsResult;
+      const { data: jobsData, error: jobsError } = jobsResult;
 
-      // Fetch jobs for filter dropdown
-      const { data: jobsData, error: jobsError } = await supabase
-        .from('Jobs')
-        .select('job_id, job_title')
-        .order('job_title');
-
-      if (jobsError) {
-        console.error('Error fetching jobs:', jobsError);
-      }
+      if (callLogsError) throw callLogsError;
+      if (jobsError) console.error('Error fetching jobs:', jobsError);
 
       // Extract unique nationalities
       const uniqueNationalities = Array.from(
@@ -212,10 +211,6 @@ export default function CallLog() {
             .filter(Boolean)
         )
       ).sort();
-
-      console.log('Fetched call logs:', callLogsData);
-      console.log('Fetched jobs:', jobsData);
-      console.log('Unique nationalities:', uniqueNationalities);
 
       setCallLogs(callLogsData || []);
       setJobs(jobsData || []);

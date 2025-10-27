@@ -56,18 +56,23 @@ export function CandidateManagementPanel() {
 
   const fetchData = async () => {
     try {
-      // Fetch jobs
-      const { data: jobsData, error: jobsError } = await supabase
-        .from('Jobs')
-        .select('*');
+      // Parallel fetch with only required fields
+      const [jobsResult, candidatesResult] = await Promise.all([
+        supabase
+          .from('Jobs')
+          .select('job_id, job_title'),
+        
+        supabase
+          .from('Jobs_CVs')
+          .select('recordid, user_id, job_id, candidate_name, candidate_email, candidate_phone_number, contacted, source, after_call_score, call_summary, longlisted_at')
+          .order('recordid', { ascending: false })
+          .limit(150) // Limit for faster initial load
+      ]);
+
+      const { data: jobsData, error: jobsError } = jobsResult;
+      const { data: candidatesData, error: candidatesError } = candidatesResult;
 
       if (jobsError) throw jobsError;
-
-      // Fetch candidates from Jobs_CVs
-      const { data: candidatesData, error: candidatesError } = await supabase
-        .from('Jobs_CVs')
-        .select('*');
-
       if (candidatesError) throw candidatesError;
 
       // Transform Jobs_CVs data to match Candidate interface

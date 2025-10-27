@@ -223,7 +223,7 @@ export default function Index() {
         const {
           data,
           error
-        } = await supabase.from('Jobs_CVs').select('job_id, recordid, cv_score, after_call_score, shortlisted_at, contacted, candidate_name, candidate_email, candidate_phone_number, call_summary, after_call_reason, lastcalltime, user_id, source').in('job_id', jobIds).limit(5000);
+        } = await supabase.from('Jobs_CVs').select('job_id, recordid, cv_score, after_call_score, shortlisted_at, contacted, candidate_name, candidate_email, candidate_phone_number, call_summary, lastcalltime, user_id, source').in('job_id', jobIds).limit(1000); // Reduced from 5000 to 1000 for faster loading
         jobsCvsData = data || [];
         jobsCvsError = error;
       }

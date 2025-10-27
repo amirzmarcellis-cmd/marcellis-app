@@ -144,10 +144,10 @@ export function JobManagementPanel() {
 
       // Fetch candidates only for the jobs we have access to
       const jobIds = initialJobs.map(j => j.job_id).filter(Boolean);
-      // Fetch candidates per job to avoid PostgREST max-rows cap on multi-job queries
+      // Optimized: Fetch candidates per job with reduced limit
       const candidatesByJob = new Map<string, any[]>();
       if (jobIds.length > 0) {
-        const perJobPromises = jobIds.map(jid => supabase.from('Jobs_CVs').select('job_id, source, contacted, shortlisted_at, longlisted_at, after_call_score').eq('job_id', jid).limit(10000));
+        const perJobPromises = jobIds.map(jid => supabase.from('Jobs_CVs').select('job_id, source, contacted, shortlisted_at, longlisted_at, submitted_at').eq('job_id', jid).limit(500)); // Reduced from 10000 to 500
         const perJobResults = await Promise.all(perJobPromises);
         perJobResults.forEach((res, idx) => {
           if (res.error) {

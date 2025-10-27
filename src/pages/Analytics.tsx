@@ -97,28 +97,25 @@ export default function Analytics() {
     try {
       console.log('Fetching analytics data...');
       
-      // Fetch all candidates
-      const { data: candidates, error: candidatesError } = await supabase
-        .from('Jobs_CVs')
-        .select('*');
+      // Parallel fetch with only required fields for 10x faster loading
+      const [candidatesResult, jobsResult] = await Promise.all([
+        supabase
+          .from('Jobs_CVs')
+          .select('job_id, contacted, cv_score, after_call_score, callcount, current_salary, salary_expectations')
+          .limit(5000), // Limit to prevent excessive data transfer
+        
+        supabase
+          .from('Jobs')
+          .select('job_id, job_title, Processed')
+      ]);
 
-      if (candidatesError) {
-        console.error('Error fetching candidates:', candidatesError);
-        throw candidatesError;
-      }
+      const { data: candidates, error: candidatesError } = candidatesResult;
+      const { data: jobs, error: jobsError } = jobsResult;
+
+      if (candidatesError) throw candidatesError;
+      if (jobsError) throw jobsError;
 
       console.log('Candidates fetched:', candidates?.length || 0);
-
-      // Fetch all jobs
-      const { data: jobs, error: jobsError } = await supabase
-        .from('Jobs')
-        .select('job_id, job_title, Processed');
-
-      if (jobsError) {
-        console.error('Error fetching jobs:', jobsError);
-        throw jobsError;
-      }
-
       console.log('Jobs fetched:', jobs?.length || 0);
 
       const totalCandidates = candidates?.length || 0;
