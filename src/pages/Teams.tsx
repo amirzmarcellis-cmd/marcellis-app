@@ -94,7 +94,10 @@ export default function Teams() {
           .from('teams')
           .insert(teamsToCreate);
 
-        if (insertError) throw insertError;
+        // Ignore duplicate key errors (23505) - teams already exist
+        if (insertError && insertError.code !== '23505') {
+          throw insertError;
+        }
       }
 
       // Fetch all teams
