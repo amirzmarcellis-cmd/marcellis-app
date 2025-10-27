@@ -733,11 +733,17 @@ export default function Teams() {
                   <SelectValue placeholder="Choose a user" />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableUsers.map((user) => (
-                    <SelectItem key={user.user_id} value={user.user_id}>
-                      {user.name || user.email} ({user.email})
-                    </SelectItem>
-                  ))}
+                  {availableUsers.length === 0 ? (
+                    <div className="px-2 py-4 text-sm text-muted-foreground text-center">
+                      No available users to add
+                    </div>
+                  ) : (
+                    availableUsers.map((user) => (
+                      <SelectItem key={user.user_id} value={user.user_id}>
+                        {user.name || user.email} ({user.email})
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
