@@ -260,24 +260,27 @@ export default function Apply() {
       const lastName = cleanText(data.lastName);
       const fullName = lastName ? `${firstName} ${lastName}` : firstName;
       
-      const { error: insertError } = await supabase
-        .from("CVs")
-        .insert([{
-          user_id: cleanText(data.user_id),
-          Firstname: firstName,
-          Lastname: lastName || null,
-          name: fullName,
-          email: cleanText(data.email),
-          phone_number: cleanText(data.phoneNumber),
-          notes: "",
-          job_id: cleanText(jobIdFromUrl),
-          cv_text: cleanText(validFiles.map(f => f.text || '').join('\n')),
-          cv_link: validFiles.map(f => f.url).join(', ')
-        }]);
+      // Submit via edge function to ensure reliable inserts across public/auth contexts
+      const payload = {
+        user_id: cleanText(data.user_id),
+        Firstname: firstName,
+        Lastname: lastName || null,
+        name: fullName,
+        email: cleanText(data.email),
+        phone_number: cleanText(data.phoneNumber),
+        job_id: cleanText(jobIdFromUrl),
+        cv_text: cleanText(validFiles.map(f => f.text || '').join('\n')),
+        cv_links: validFiles.map(f => f.url),
+      };
 
-      if (insertError) {
-        console.error("Insert failed:", insertError);
-        throw insertError;
+      const { data: fnRes, error: fnError } = await supabase.functions.invoke('submit_application', {
+        body: payload,
+      });
+
+      if (fnError || (fnRes && (fnRes as any).error)) {
+        const message = fnError?.message || (fnRes as any)?.error || 'Unknown error';
+        console.error('Submit application failed:', message);
+        throw new Error(message);
       }
 
       console.log("Application submitted successfully - Supabase webhook will be triggered automatically");
