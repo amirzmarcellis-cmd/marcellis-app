@@ -18,7 +18,6 @@ import { Progress } from "@/components/ui/progress";
 import { Upload, X, FileText } from "lucide-react";
 
 const applicationSchema = z.object({
-  user_id: z.string().min(1, "User ID is required"),
   firstName: z.string().min(1, "First name is required").min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(1, "Last name is required").min(2, "Last name must be at least 2 characters"),
   phoneNumber: z.string().min(1, "Phone number is required").min(10, "Please enter a valid phone number"),
@@ -42,7 +41,7 @@ export default function Apply() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [jobName, setJobName] = useState<string>("");
-  const [nextUserId, setNextUserId] = useState<string>("");
+  const [submittedUserId, setSubmittedUserId] = useState<string>("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
   const { id: jobId } = useParams();
@@ -50,7 +49,6 @@ export default function Apply() {
   const form = useForm<ApplicationForm>({
     resolver: zodResolver(applicationSchema),
     defaultValues: {
-      user_id: "",
       firstName: "",
       lastName: "",
       phoneNumber: "",
@@ -61,15 +59,10 @@ export default function Apply() {
 
 
 
-  // Generate next user ID and fetch job details
+  // Fetch job details on mount
   useEffect(() => {
     const initializeForm = async () => {
       try {
-        // Generate next user ID first
-        const userId = await generateNextUserId();
-        setNextUserId(userId);
-        form.setValue("user_id", userId);
-
         // Resolve job id from router params or URL path as a fallback
         const path = window.location.pathname;
         const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
@@ -106,61 +99,6 @@ export default function Apply() {
   }, [form, jobId]);
 
 
-
-  const generateNextUserId = async (): Promise<string> => {
-    try {
-      // Get all existing App IDs to find the highest number
-      const { data, error } = await supabase
-        .from("CVs")
-        .select("user_id")
-        .like("user_id", "App%")
-        .order("user_id", { ascending: false });
-
-      if (error) throw error;
-
-      let nextNumber = 1;
-      
-      if (data && data.length > 0) {
-        // Extract all numbers and find the maximum
-        const numbers = data
-          .map(item => {
-            const match = item.user_id.match(/App(\d+)/);
-            return match ? parseInt(match[1]) : 0;
-          })
-          .filter(num => num > 0);
-        
-        if (numbers.length > 0) {
-          nextNumber = Math.max(...numbers) + 1;
-        }
-      }
-      
-      // Keep incrementing until we find an available ID
-      let attempts = 0;
-      while (attempts < 100) {
-        const candidateId = `App${nextNumber.toString().padStart(4, '0')}`;
-        
-        // Check if this ID exists
-        const { data: existing } = await supabase
-          .from("CVs")
-          .select("user_id")
-          .eq("user_id", candidateId)
-          .maybeSingle();
-        
-        if (!existing) {
-          return candidateId;
-        }
-        
-        nextNumber++;
-        attempts++;
-      }
-      
-      // Fallback to timestamp-based ID if we can't find a free sequential one
-      return `App${Date.now().toString().slice(-4)}`;
-    } catch (error) {
-      console.error("Error generating user ID:", error);
-      return `App${Date.now().toString().slice(-4)}`;
-    }
-  };
 
   const fetchJobName = async (jobId: string): Promise<string> => {
     try {
@@ -262,7 +200,6 @@ export default function Apply() {
       
       // Submit via edge function to ensure reliable inserts across public/auth contexts
       const payload = {
-        user_id: cleanText(data.user_id),
         Firstname: firstName,
         Lastname: lastName || null,
         name: fullName,
@@ -283,11 +220,14 @@ export default function Apply() {
         throw new Error(message);
       }
 
+      const userId = (fnRes as any)?.user_id || "Unknown";
+      setSubmittedUserId(userId);
+
       console.log("Application submitted successfully - Supabase webhook will be triggered automatically");
       
       toast({
         title: "Application Submitted",
-        description: `Your application has been submitted with User ID: ${data.user_id}`,
+        description: `Your application has been submitted successfully! Your application ID is: ${userId}`,
       });
 
       setIsSubmitted(true);
@@ -423,6 +363,11 @@ export default function Apply() {
                 <DialogTitle className="text-5xl font-light font-work tracking-tight text-center">Thank You!</DialogTitle>
                 <DialogDescription className="text-center text-base font-light font-inter">
                   Your application has been submitted successfully. We will review it and get back to you soon.
+                  {submittedUserId && (
+                    <span className="block mt-3 font-medium text-primary">
+                      Your Application ID: {submittedUserId}
+                    </span>
+                  )}
                 </DialogDescription>
               </DialogHeader>
               <div className="mt-6 text-center">
