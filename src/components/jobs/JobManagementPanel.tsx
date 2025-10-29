@@ -462,21 +462,29 @@ export function JobManagementPanel() {
   const handleDelete = async (jobId: string) => {
     if (!confirm("Are you sure you want to delete this job?")) return;
     try {
-      const {
-        error
-      } = await supabase.from('Jobs').delete().eq('job_id', jobId);
-      if (error) throw error;
+      const { error } = await supabase
+        .from('Jobs')
+        .delete()
+        .eq('job_id', jobId);
+      
+      if (error) {
+        console.error('Delete error:', error);
+        throw error;
+      }
+      
       await fetchJobs();
       toast({
-        title: "Success",
-        description: "Job deleted successfully"
+        title: "✓ Success",
+        description: "Job deleted successfully",
+        duration: 3000,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting job:', error);
       toast({
-        title: "Error",
-        description: "Failed to delete job",
-        variant: "destructive"
+        title: "Error Deleting Job",
+        description: error?.message || "Failed to delete job. Please check your permissions.",
+        variant: "destructive",
+        duration: 5000,
       });
     }
   };
