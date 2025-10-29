@@ -225,6 +225,33 @@ export function JobManagementPanel() {
           recruiter_name: job.recruiter_id ? recruiterNamesMap.get(job.recruiter_id) || null : null
         };
       });
+      
+      // Auto-disable auto-dial for jobs that reached 6 shortlisted candidates
+      const jobsToDisable = jobsWithCounts.filter(
+        job => job.automatic_dial === true && job.shortlisted_count >= 6
+      );
+      
+      if (jobsToDisable.length > 0) {
+        console.log('JobManagementPanel: Auto-disabling auto-dial for jobs:', jobsToDisable.map(j => j.job_id));
+        await Promise.all(
+          jobsToDisable.map(job =>
+            supabase
+              .from('Jobs')
+              .update({ 
+                automatic_dial: false, 
+                auto_dial_enabled_at: null 
+              })
+              .eq('job_id', job.job_id)
+          )
+        );
+        
+        // Update the jobs array to reflect the changes
+        jobsToDisable.forEach(job => {
+          job.automatic_dial = false;
+          job.auto_dial_enabled_at = null;
+        });
+      }
+      
       const endTime = performance.now();
       console.log(`JobManagementPanel: Fetch completed in ${(endTime - startTime).toFixed(2)}ms`);
       console.log('JobManagementPanel: Jobs with counts:', jobsWithCounts.length);
@@ -371,6 +398,20 @@ export function JobManagementPanel() {
   };
   const handleAutomaticDialToggle = async (jobId: string, currentValue: boolean | null) => {
     const newValue = !currentValue;
+    
+    // Prevent enabling if already at 6+ shortlisted candidates
+    if (newValue) {
+      const job = jobs.find(j => j.job_id === jobId);
+      if (job && job.shortlisted_count >= 6) {
+        toast({
+          title: "Cannot Enable Auto-Dial",
+          description: "This job already has 6 or more shortlisted candidates. Auto-dial threshold reached.",
+          variant: "destructive",
+          duration: 4000,
+        });
+        return;
+      }
+    }
     
     // Optimistic UI update
     setJobs(prevJobs => prevJobs.map(job => 
