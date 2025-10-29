@@ -380,11 +380,20 @@ export function JobManagementPanel() {
     ));
     
     try {
-      const {
-        error
-      } = await supabase.from('Jobs').update({
+      // Update with timestamp when enabling
+      const updateData: { automatic_dial: boolean; auto_dial_enabled_at?: string | null } = {
         automatic_dial: newValue
-      }).eq('job_id', jobId);
+      };
+      
+      if (newValue) {
+        // Set timestamp when enabling
+        updateData.auto_dial_enabled_at = new Date().toISOString();
+      } else {
+        // Clear timestamp when disabling
+        updateData.auto_dial_enabled_at = null;
+      }
+      
+      const { error } = await supabase.from('Jobs').update(updateData).eq('job_id', jobId);
       if (error) throw error;
       
       // Refresh to get accurate data
@@ -392,8 +401,10 @@ export function JobManagementPanel() {
       
       toast({
         title: "✓ Success",
-        description: `Automatic dial ${newValue ? "enabled" : "disabled"} successfully`,
-        duration: 3000,
+        description: newValue 
+          ? "Automatic dial enabled - will auto-disable after 48 hours or when 6 candidates are shortlisted" 
+          : "Automatic dial disabled successfully",
+        duration: 4000,
       });
     } catch (error) {
       console.error('Error updating automatic dial:', error);
@@ -837,11 +848,26 @@ const JobGrid = memo(function JobGrid({
                 </div>
                 <Switch checked={job.automatic_dial || false} onCheckedChange={() => onAutomaticDialToggle(job.job_id, job.automatic_dial)} />
               </div>
+              
+              {/* Show status badges */}
               {job.automatic_dial === false && (job.shortlisted_count || 0) >= 6 && (
-                <Badge variant="outline" className="text-xs flex items-center gap-1 w-fit">
+                <Badge variant="outline" className="text-xs flex items-center gap-1 w-fit bg-warning/10 border-warning/30">
                   <Info className="h-3 w-3" />
-                  Auto-disabled (6 shortlisted)
+                  Auto-disabled: 6 shortlisted reached
                 </Badge>
+              )}
+              
+              {job.automatic_dial === true && (job.shortlisted_count || 0) >= 5 && (job.shortlisted_count || 0) < 6 && (
+                <Badge variant="outline" className="text-xs flex items-center gap-1 w-fit bg-warning/10 border-warning/30 text-warning">
+                  <Info className="h-3 w-3" />
+                  {job.shortlisted_count}/6 - Will auto-disable at 6
+                </Badge>
+              )}
+              
+              {job.automatic_dial === true && (job.shortlisted_count || 0) < 5 && (
+                <span className="text-xs text-muted-foreground">
+                  Active • {job.shortlisted_count || 0}/6 shortlisted
+                </span>
               )}
             </div>
 
