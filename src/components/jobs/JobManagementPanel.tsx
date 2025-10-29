@@ -299,6 +299,13 @@ export function JobManagementPanel() {
   const handleStatusToggle = async (jobId: string, currentProcessed: string | null) => {
     const newProcessed = currentProcessed === "Yes" ? "No" : "Yes";
     
+    // Optimistic UI update
+    setJobs(prevJobs => prevJobs.map(job => 
+      job.job_id === jobId 
+        ? { ...job, Processed: newProcessed, status: newProcessed === "No" ? "Complete" : "Active" }
+        : job
+    ));
+    
     try {
       let newStatus = null;
       
@@ -342,23 +349,36 @@ export function JobManagementPanel() {
       
       if (error) throw error;
       
+      // Refresh to get accurate data
       await fetchJobs();
       
       toast({
-        title: "Success",
-        description: newProcessed === "Yes" ? "Job reactivated" : "Job marked as completed"
+        title: "✓ Success",
+        description: newProcessed === "Yes" ? "Job reactivated and active" : "Job paused successfully",
+        duration: 3000,
       });
     } catch (error) {
       console.error('Error updating job status:', error);
+      // Revert optimistic update on error
+      await fetchJobs();
       toast({
         title: "Error",
-        description: "Failed to update job status",
-        variant: "destructive"
+        description: "Failed to update job status. Please try again.",
+        variant: "destructive",
+        duration: 5000,
       });
     }
   };
   const handleAutomaticDialToggle = async (jobId: string, currentValue: boolean | null) => {
     const newValue = !currentValue;
+    
+    // Optimistic UI update
+    setJobs(prevJobs => prevJobs.map(job => 
+      job.job_id === jobId 
+        ? { ...job, automatic_dial: newValue }
+        : job
+    ));
+    
     try {
       const {
         error
@@ -366,17 +386,24 @@ export function JobManagementPanel() {
         automatic_dial: newValue
       }).eq('job_id', jobId);
       if (error) throw error;
+      
+      // Refresh to get accurate data
       await fetchJobs();
+      
       toast({
-        title: "Success",
-        description: `Automatic dial ${newValue ? "enabled" : "disabled"}`
+        title: "✓ Success",
+        description: `Automatic dial ${newValue ? "enabled" : "disabled"} successfully`,
+        duration: 3000,
       });
     } catch (error) {
       console.error('Error updating automatic dial:', error);
+      // Revert optimistic update on error
+      await fetchJobs();
       toast({
         title: "Error",
-        description: "Failed to update automatic dial setting",
-        variant: "destructive"
+        description: "Failed to update automatic dial. Please try again.",
+        variant: "destructive",
+        duration: 5000,
       });
     }
   };
