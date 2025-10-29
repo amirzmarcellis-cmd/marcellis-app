@@ -778,8 +778,8 @@ const JobGrid = memo(function JobGrid({
                 </div>
                 <span className="text-xs text-muted-foreground mt-1">Longlisted</span>
               </div>
-              <div className="flex flex-col items-center p-2 rounded-md bg-yellow/10 border border-yellow/20">
-                <div className="flex items-center gap-1 text-yellow">
+              <div className="flex flex-col items-center p-2 rounded-md bg-warning/10 border border-warning/20">
+                <div className="flex items-center gap-1 text-warning">
                   <Users className="h-3 w-3" />
                   <span className="font-bold text-lg">{job.shortlisted_count || 0}</span>
                 </div>
@@ -792,8 +792,8 @@ const JobGrid = memo(function JobGrid({
                 </div>
                 <span className="text-xs text-muted-foreground mt-1">Rejected</span>
               </div>
-              <div className="flex flex-col items-center p-2 rounded-md bg-green/10 border border-green/20">
-                <div className="flex items-center gap-1 text-green">
+              <div className="flex flex-col items-center p-2 rounded-md bg-success/10 border border-success/20">
+                <div className="flex items-center gap-1 text-success">
                   <Users className="h-3 w-3" />
                   <span className="font-bold text-lg">{job.submitted_count || 0}</span>
                 </div>
@@ -805,10 +805,10 @@ const JobGrid = memo(function JobGrid({
             <div className="py-2 border-t border-border/30 space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-sm">
-                  {job.automatic_dial ? <Phone className="h-4 w-4 text-green" /> : <PhoneOff className="h-4 w-4 text-muted-foreground" />}
+                  {job.automatic_dial ? <Phone className="h-4 w-4 text-emerald-500" /> : <PhoneOff className="h-4 w-4 text-muted-foreground" />}
                   <span className="text-muted-foreground">Automatic Dial</span>
                 </div>
-                <Switch checked={job.automatic_dial || false} onCheckedChange={() => onAutomaticDialToggle(job.job_id, job.automatic_dial)} className="data-[state=checked]:bg-green data-[state=unchecked]:bg-muted" />
+                <Switch checked={job.automatic_dial || false} onCheckedChange={() => onAutomaticDialToggle(job.job_id, job.automatic_dial)} />
               </div>
               {job.automatic_dial === false && (job.shortlisted_count || 0) >= 6 && (
                 <Badge variant="outline" className="text-xs flex items-center gap-1 w-fit">
