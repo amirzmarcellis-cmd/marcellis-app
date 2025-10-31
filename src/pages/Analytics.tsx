@@ -24,6 +24,7 @@ interface AnalyticsData {
   totalCandidates: number;
   activeCandidates: number;
   activeJobs: number;
+  totalJobs: number;
   totalCallLogs: number;
   contactedCount: number;
   averageScore: number;
@@ -123,9 +124,11 @@ export default function Analytics() {
       console.log('Jobs fetched:', jobs?.length || 0);
 
       const totalCandidates = candidates?.length || 0;
+      const totalJobs = jobs?.length || 0;
       const activeJobs = jobs?.filter(j => j.Processed === 'Yes').length || 0;
 
       console.log('Total candidates:', totalCandidates);
+      console.log('Total jobs:', totalJobs);
       console.log('Active jobs:', activeJobs);
 
       // Calculate contact status counts
@@ -224,6 +227,7 @@ export default function Analytics() {
         totalCandidates,
         activeCandidates: totalCandidates,
         activeJobs,
+        totalJobs,
         totalCallLogs,
         contactedCount,
         averageScore,
@@ -252,6 +256,7 @@ export default function Analytics() {
         totalCandidates: 0,
         activeCandidates: 0,
         activeJobs: 0,
+        totalJobs: 0,
         totalCallLogs: 0,
         contactedCount: 0,
         averageScore: 0,
@@ -434,8 +439,8 @@ export default function Analytics() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">Number of Jobs</p>
-                  <p className="text-5xl font-light font-work text-foreground mt-2">{data?.activeJobs || 0}</p>
-                  <p className="text-xs font-light font-inter text-muted-foreground mt-1">Total active jobs</p>
+                  <p className="text-5xl font-light font-work text-foreground mt-2">{data?.totalJobs || 0}</p>
+                  <p className="text-xs font-light font-inter text-muted-foreground mt-1">All jobs in system</p>
                 </div>
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center">
                   <Briefcase className="w-8 h-8 text-white" />
