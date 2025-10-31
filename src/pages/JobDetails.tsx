@@ -1361,10 +1361,14 @@ export default function JobDetails() {
     }
   };
   const handleSearchMoreCandidates = async (searchType: "linkedin" | "database" | "both" = "both") => {
-    if (regenerateCooldown.isDisabled) return;
+    if (regenerateCooldown.isDisabled) {
+      console.log("Regenerate button is on cooldown, ignoring click");
+      return;
+    }
     
     try {
       // Start cooldown immediately
+      console.log("Starting regenerate cooldown...");
       regenerateCooldown.startCooldown();
       
       // Get user_ids from AI Boolean Search candidates (filteredCandidates) as comma-separated string
@@ -1414,10 +1418,14 @@ export default function JobDetails() {
     }
   };
   const handleGenerateLongList = async () => {
-    if (generateCooldown.isDisabled) return;
+    if (generateCooldown.isDisabled) {
+      console.log("Generate button is on cooldown, ignoring click");
+      return;
+    }
     
     try {
       // Start cooldown immediately
+      console.log("Starting generate cooldown...");
       generateCooldown.startCooldown();
       
       console.log("Starting Generate Long List process...");

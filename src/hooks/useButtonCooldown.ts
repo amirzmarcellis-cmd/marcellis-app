@@ -17,11 +17,13 @@ export function useButtonCooldown(storageKey: string) {
         if (now < endTime) {
           setIsDisabled(true);
           setRemainingTime(endTime - now);
+          console.log(`[Cooldown ${storageKey}] Active, remaining: ${endTime - now}ms`);
         } else {
           // Cooldown expired, clean up
           localStorage.removeItem(storageKey);
           setIsDisabled(false);
           setRemainingTime(0);
+          console.log(`[Cooldown ${storageKey}] Expired and cleared`);
         }
       }
     };
@@ -59,6 +61,7 @@ export function useButtonCooldown(storageKey: string) {
     localStorage.setItem(storageKey, endTime.toString());
     setIsDisabled(true);
     setRemainingTime(COOLDOWN_DURATION);
+    console.log(`[Cooldown ${storageKey}] Started, will end at ${new Date(endTime).toLocaleTimeString()}`);
   }, [storageKey]);
 
   // Format remaining time as "Xm Ys" or "X minutes"

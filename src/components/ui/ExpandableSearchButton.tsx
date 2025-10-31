@@ -21,10 +21,12 @@ export function ExpandableSearchButton({
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleToggle = () => {
+    if (disabled) return;
     setIsExpanded(!isExpanded);
   };
 
   const handleOptionClick = (callback: () => void) => {
+    if (disabled) return;
     callback();
     setIsExpanded(false);
   };
