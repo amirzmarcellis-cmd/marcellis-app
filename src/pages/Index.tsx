@@ -223,7 +223,7 @@ export default function Index() {
         const {
           data,
           error
-        } = await supabase.from('Jobs_CVs').select('job_id, recordid, cv_score, after_call_score, shortlisted_at, contacted, candidate_name, candidate_email, candidate_phone_number, call_summary, lastcalltime, user_id, source').in('job_id', jobIds).limit(1000); // Reduced from 5000 to 1000 for faster loading
+        } = await supabase.from('Jobs_CVs').select('job_id, recordid, cv_score, after_call_score, shortlisted_at, contacted, candidate_name, candidate_email, candidate_phone_number, call_summary, lastcalltime, user_id, source, submitted_at').in('job_id', jobIds).limit(1000); // Reduced from 5000 to 1000 for faster loading
         jobsCvsData = data || [];
         jobsCvsError = error;
       }
@@ -287,9 +287,25 @@ export default function Index() {
       setJobStats(stats);
 
       // Calculate total shortlisted, submitted, and rejected counts
-      const totalShortlisted = links.filter((jc: any) => jc.shortlisted_at !== null).length;
-      const totalSubmitted = links.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase().trim() === 'submitted').length;
-      const totalRejected = links.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase().trim() === 'rejected').length;
+      // Shortlisted: Call Done with score >= 75
+      const totalShortlisted = links.filter((jc: any) => 
+        jc.contacted === 'Call Done' && 
+        jc.after_call_score !== null && 
+        parseInt(jc.after_call_score?.toString() || '0') >= 75
+      ).length;
+      
+      // Longlisted: Call Done with score < 75
+      const totalLonglisted = links.filter((jc: any) => 
+        jc.contacted === 'Call Done' && 
+        jc.after_call_score !== null && 
+        parseInt(jc.after_call_score?.toString() || '0') < 75
+      ).length;
+      
+      // Submitted: submitted_at is not null
+      const totalSubmitted = links.filter((jc: any) => jc.submitted_at !== null).length;
+      
+      // Rejected: contacted = 'Rejected'
+      const totalRejected = links.filter((jc: any) => jc.contacted === 'Rejected').length;
       
       setTotalShortlistedCount(totalShortlisted);
       setTotalSubmittedCount(totalSubmitted);

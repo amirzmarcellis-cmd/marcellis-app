@@ -148,11 +148,24 @@ export default function Analytics() {
       const contactedCount = contactStatus.callDone + contactStatus.contacted;
 
       // Calculate job aggregate metrics
+      // Longlisted: Call Done with score < 75
       const totalLonglisted = candidates?.filter(c => 
-        c.contacted === 'Longlisted' || (c.after_call_score && parseInt(c.after_call_score?.toString()) >= 74)
+        c.contacted === 'Call Done' && 
+        c.after_call_score !== null && 
+        parseInt(c.after_call_score?.toString() || '0') < 75
       ).length || 0;
-      const totalShortlisted = candidates?.filter(c => c.contacted === 'Shortlisted').length || 0;
+      
+      // Shortlisted: Call Done with score >= 75
+      const totalShortlisted = candidates?.filter(c => 
+        c.contacted === 'Call Done' && 
+        c.after_call_score !== null && 
+        parseInt(c.after_call_score?.toString() || '0') >= 75
+      ).length || 0;
+      
+      // Rejected: contacted = 'Rejected'
       const totalRejected = candidates?.filter(c => c.contacted === 'Rejected').length || 0;
+      
+      // Submitted: submitted_at is not null
       const totalSubmitted = candidates?.filter(c => c.submitted_at !== null).length || 0;
 
       // Calculate average scores
