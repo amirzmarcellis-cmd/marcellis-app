@@ -106,7 +106,7 @@ export default function Analytics() {
       const [candidatesResult, jobsResult] = await Promise.all([
         supabase
           .from('Jobs_CVs')
-          .select('job_id, contacted, cv_score, after_call_score, callcount, current_salary, salary_expectations')
+          .select('job_id, contacted, cv_score, after_call_score, callcount, current_salary, salary_expectations, submitted_at')
           .limit(5000), // Limit to prevent excessive data transfer
         
         supabase
@@ -153,7 +153,7 @@ export default function Analytics() {
       ).length || 0;
       const totalShortlisted = candidates?.filter(c => c.contacted === 'Shortlisted').length || 0;
       const totalRejected = candidates?.filter(c => c.contacted === 'Rejected').length || 0;
-      const totalSubmitted = candidates?.filter(c => c.contacted === 'Submitted').length || 0;
+      const totalSubmitted = candidates?.filter(c => c.submitted_at !== null).length || 0;
 
       // Calculate average scores
       const candidatesWithScores = candidates?.filter(c => c.cv_score !== null && c.cv_score !== undefined) || [];
