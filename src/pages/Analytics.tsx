@@ -28,6 +28,10 @@ interface AnalyticsData {
   contactedCount: number;
   averageScore: number;
   avgDaysToHire: number;
+  totalLonglisted: number;
+  totalShortlisted: number;
+  totalRejected: number;
+  totalSubmitted: number;
   scoreDistribution: {
     high: number;
     medium: number;
@@ -140,6 +144,14 @@ export default function Analytics() {
       const totalCallLogs = candidates?.filter(c => c.callcount && c.callcount > 0).length || 0;
       const contactedCount = contactStatus.callDone + contactStatus.contacted;
 
+      // Calculate job aggregate metrics
+      const totalLonglisted = candidates?.filter(c => 
+        c.contacted === 'Longlisted' || (c.after_call_score && parseInt(c.after_call_score?.toString()) >= 74)
+      ).length || 0;
+      const totalShortlisted = candidates?.filter(c => c.contacted === 'Shortlisted').length || 0;
+      const totalRejected = candidates?.filter(c => c.contacted === 'Rejected').length || 0;
+      const totalSubmitted = candidates?.filter(c => c.contacted === 'Submitted').length || 0;
+
       // Calculate average scores
       const candidatesWithScores = candidates?.filter(c => c.cv_score !== null && c.cv_score !== undefined) || [];
       const averageScore = candidatesWithScores.length > 0
@@ -216,6 +228,10 @@ export default function Analytics() {
         contactedCount,
         averageScore,
         avgDaysToHire: 0,
+        totalLonglisted,
+        totalShortlisted,
+        totalRejected,
+        totalSubmitted,
         scoreDistribution,
         contactStatus,
         candidatesPerJob: jobCandidateCounts,
@@ -240,6 +256,10 @@ export default function Analytics() {
         contactedCount: 0,
         averageScore: 0,
         avgDaysToHire: 0,
+        totalLonglisted: 0,
+        totalShortlisted: 0,
+        totalRejected: 0,
+        totalSubmitted: 0,
         scoreDistribution: { high: 0, medium: 0, low: 0 },
         contactStatus: {
           callDone: 0,
@@ -403,6 +423,87 @@ export default function Analytics() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Job Aggregate Metrics Section */}
+      <div className="mb-8">
+        <h2 className="text-3xl font-light font-work text-foreground mb-4">Jobs Overview</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">Number of Jobs</p>
+                  <p className="text-5xl font-light font-work text-foreground mt-2">{data?.activeJobs || 0}</p>
+                  <p className="text-xs font-light font-inter text-muted-foreground mt-1">Total active jobs</p>
+                </div>
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center">
+                  <Briefcase className="w-8 h-8 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">Total Longlisted</p>
+                  <p className="text-5xl font-light font-work text-foreground mt-2">{data?.totalLonglisted || 0}</p>
+                  <p className="text-xs font-light font-inter text-muted-foreground mt-1">Across all jobs</p>
+                </div>
+                <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">Total Shortlisted</p>
+                  <p className="text-5xl font-light font-work text-foreground mt-2">{data?.totalShortlisted || 0}</p>
+                  <p className="text-xs font-light font-inter text-muted-foreground mt-1">Across all jobs</p>
+                </div>
+                <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
+                  <CheckCircle className="w-8 h-8 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">Total Rejected</p>
+                  <p className="text-5xl font-light font-work text-foreground mt-2">{data?.totalRejected || 0}</p>
+                  <p className="text-xs font-light font-inter text-muted-foreground mt-1">Across all jobs</p>
+                </div>
+                <div className="w-16 h-16 bg-gradient-to-br from-red-400 to-pink-500 rounded-xl flex items-center justify-center">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">Total Submitted</p>
+                  <p className="text-5xl font-light font-work text-foreground mt-2">{data?.totalSubmitted || 0}</p>
+                  <p className="text-xs font-light font-inter text-muted-foreground mt-1">Across all jobs</p>
+                </div>
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-violet-500 rounded-xl flex items-center justify-center">
+                  <Star className="w-8 h-8 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Charts Section */}
