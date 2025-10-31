@@ -168,6 +168,41 @@ export default function Analytics() {
       // Submitted: submitted_at is not null
       const totalSubmitted = candidates?.filter(c => c.submitted_at !== null).length || 0;
 
+      // === DEBUG: Detailed Filter Results ===
+      console.log('=== ANALYTICS DEBUG: Filter Results ===');
+      console.log('Total candidates fetched:', candidates?.length || 0);
+      console.log('');
+      console.log('Candidates with "call done" (case-insensitive):', 
+        candidates?.filter(c => c.contacted?.toLowerCase() === 'call done').length || 0);
+      console.log('  - With score >= 75 (SHORTLISTED):', 
+        candidates?.filter(c => c.contacted?.toLowerCase() === 'call done' && c.after_call_score !== null && parseInt(c.after_call_score?.toString() || '0') >= 75).length || 0);
+      console.log('  - With score < 75 (LONGLISTED):', 
+        candidates?.filter(c => c.contacted?.toLowerCase() === 'call done' && c.after_call_score !== null && parseInt(c.after_call_score?.toString() || '0') < 75).length || 0);
+      console.log('  - With null/undefined score:', 
+        candidates?.filter(c => c.contacted?.toLowerCase() === 'call done' && (c.after_call_score === null || c.after_call_score === undefined)).length || 0);
+      console.log('');
+      console.log('Candidates with "rejected" (case-insensitive):', 
+        candidates?.filter(c => c.contacted?.toLowerCase() === 'rejected').length || 0);
+      console.log('Candidates with submitted_at not null (SUBMITTED):', 
+        candidates?.filter(c => c.submitted_at !== null).length || 0);
+      console.log('');
+      console.log('CALCULATED TOTALS:');
+      console.log('  - totalLonglisted:', totalLonglisted);
+      console.log('  - totalShortlisted:', totalShortlisted);
+      console.log('  - totalRejected:', totalRejected);
+      console.log('  - totalSubmitted:', totalSubmitted);
+      console.log('');
+      console.log('Sample of first 5 candidates with contacted status:');
+      candidates?.slice(0, 5).forEach((c, idx) => {
+        console.log(`  ${idx + 1}. contacted="${c.contacted}", after_call_score=${c.after_call_score}, submitted_at=${c.submitted_at}`);
+      });
+      console.log('');
+      console.log('Unique contacted values in dataset:');
+      const uniqueContacted = [...new Set(candidates?.map(c => c.contacted || 'NULL'))];
+      console.log(uniqueContacted);
+      console.log('=== END ANALYTICS DEBUG ===');
+      console.log('');
+
       // Calculate average scores
       const candidatesWithScores = candidates?.filter(c => c.cv_score !== null && c.cv_score !== undefined) || [];
       const averageScore = candidatesWithScores.length > 0
