@@ -107,7 +107,7 @@ export default function Analytics() {
         supabase
           .from('Jobs_CVs')
           .select('job_id, contacted, cv_score, after_call_score, callcount, current_salary, salary_expectations, submitted_at')
-          .limit(5000), // Limit to prevent excessive data transfer
+          .limit(10000), // Increased limit to fetch all records
         
         supabase
           .from('Jobs')
@@ -131,13 +131,13 @@ export default function Analytics() {
       console.log('Total jobs:', totalJobs);
       console.log('Active jobs:', activeJobs);
 
-      // Calculate contact status counts
+      // Calculate contact status counts (case-insensitive)
       const contactStatus = {
-        callDone: candidates?.filter(c => c.contacted === 'Call Done').length || 0,
-        contacted: candidates?.filter(c => c.contacted === 'Contacted').length || 0,
-        readyToContact: candidates?.filter(c => c.contacted === 'Ready to Contact').length || 0,
-        notContacted: candidates?.filter(c => !c.contacted || c.contacted === 'Not Contacted').length || 0,
-        rejected: candidates?.filter(c => c.contacted === 'Rejected').length || 0,
+        callDone: candidates?.filter(c => c.contacted?.toLowerCase() === 'call done').length || 0,
+        contacted: candidates?.filter(c => c.contacted?.toLowerCase() === 'contacted').length || 0,
+        readyToContact: candidates?.filter(c => c.contacted?.toLowerCase() === 'ready to contact').length || 0,
+        notContacted: candidates?.filter(c => !c.contacted || c.contacted?.toLowerCase() === 'not contacted').length || 0,
+        rejected: candidates?.filter(c => c.contacted?.toLowerCase() === 'rejected').length || 0,
         shortlisted: candidates?.filter(c => c.contacted === 'Shortlisted').length || 0,
         tasked: candidates?.filter(c => c.contacted === 'Tasked').length || 0,
         interview: candidates?.filter(c => c.contacted === 'Interview').length || 0,
@@ -148,22 +148,22 @@ export default function Analytics() {
       const contactedCount = contactStatus.callDone + contactStatus.contacted;
 
       // Calculate job aggregate metrics
-      // Longlisted: Call Done with score < 75
+      // Longlisted: Call Done with score < 75 (case-insensitive)
       const totalLonglisted = candidates?.filter(c => 
-        c.contacted === 'Call Done' && 
+        c.contacted?.toLowerCase() === 'call done' && 
         c.after_call_score !== null && 
         parseInt(c.after_call_score?.toString() || '0') < 75
       ).length || 0;
       
-      // Shortlisted: Call Done with score >= 75
+      // Shortlisted: Call Done with score >= 75 (case-insensitive)
       const totalShortlisted = candidates?.filter(c => 
-        c.contacted === 'Call Done' && 
+        c.contacted?.toLowerCase() === 'call done' && 
         c.after_call_score !== null && 
         parseInt(c.after_call_score?.toString() || '0') >= 75
       ).length || 0;
       
-      // Rejected: contacted = 'Rejected'
-      const totalRejected = candidates?.filter(c => c.contacted === 'Rejected').length || 0;
+      // Rejected: contacted = 'Rejected' (case-insensitive)
+      const totalRejected = candidates?.filter(c => c.contacted?.toLowerCase() === 'rejected').length || 0;
       
       // Submitted: submitted_at is not null
       const totalSubmitted = candidates?.filter(c => c.submitted_at !== null).length || 0;

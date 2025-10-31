@@ -286,17 +286,17 @@ export default function Index() {
       });
       setJobStats(stats);
 
-      // Calculate total shortlisted, submitted, and rejected counts
+      // Calculate total shortlisted, submitted, and rejected counts (case-insensitive)
       // Shortlisted: Call Done with score >= 75
       const totalShortlisted = links.filter((jc: any) => 
-        jc.contacted === 'Call Done' && 
+        jc.contacted?.toLowerCase() === 'call done' && 
         jc.after_call_score !== null && 
         parseInt(jc.after_call_score?.toString() || '0') >= 75
       ).length;
       
       // Longlisted: Call Done with score < 75
       const totalLonglisted = links.filter((jc: any) => 
-        jc.contacted === 'Call Done' && 
+        jc.contacted?.toLowerCase() === 'call done' && 
         jc.after_call_score !== null && 
         parseInt(jc.after_call_score?.toString() || '0') < 75
       ).length;
@@ -304,8 +304,8 @@ export default function Index() {
       // Submitted: submitted_at is not null
       const totalSubmitted = links.filter((jc: any) => jc.submitted_at !== null).length;
       
-      // Rejected: contacted = 'Rejected'
-      const totalRejected = links.filter((jc: any) => jc.contacted === 'Rejected').length;
+      // Rejected: contacted = 'Rejected' (case-insensitive)
+      const totalRejected = links.filter((jc: any) => jc.contacted?.toLowerCase() === 'rejected').length;
       
       setTotalShortlistedCount(totalShortlisted);
       setTotalSubmittedCount(totalSubmitted);
