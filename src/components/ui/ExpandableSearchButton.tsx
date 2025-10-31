@@ -8,6 +8,7 @@ interface ExpandableSearchButtonProps {
   onSearchDatabase: () => void;
   onSearchBoth: () => void;
   disabled?: boolean;
+  cooldownText?: string;
 }
 
 export function ExpandableSearchButton({
@@ -15,6 +16,7 @@ export function ExpandableSearchButton({
   onSearchDatabase,
   onSearchBoth,
   disabled = false,
+  cooldownText,
 }: ExpandableSearchButtonProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -46,7 +48,7 @@ export function ExpandableSearchButton({
           "w-4 h-4 mr-2 transition-transform duration-500",
           isExpanded && "rotate-90"
         )} />
-        Regenerate AI
+        {disabled && cooldownText ? `Wait ${cooldownText}` : "Regenerate AI"}
       </Button>
 
       {/* Expanded Options */}

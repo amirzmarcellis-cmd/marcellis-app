@@ -62,6 +62,7 @@ import { StatusDropdown } from "@/components/candidates/StatusDropdown";
 import { useToast } from "@/components/ui/use-toast";
 import { formatDate } from "@/lib/utils";
 import { useProfile } from "@/hooks/useProfile";
+import { useButtonCooldown } from "@/hooks/useButtonCooldown";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -88,6 +89,8 @@ export default function JobDetails() {
   const [isShaking, setIsShaking] = useState(false);
   const { profile } = useProfile();
   const { toast } = useToast();
+  const generateCooldown = useButtonCooldown(`generate-ai-cooldown-${id}`);
+  const regenerateCooldown = useButtonCooldown(`regenerate-ai-cooldown-${id}`);
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [automaticDialSaving, setAutomaticDialSaving] = useState(false);
@@ -1358,7 +1361,12 @@ export default function JobDetails() {
     }
   };
   const handleSearchMoreCandidates = async (searchType: "linkedin" | "database" | "both" = "both") => {
+    if (regenerateCooldown.isDisabled) return;
+    
     try {
+      // Start cooldown immediately
+      regenerateCooldown.startCooldown();
+      
       // Get user_ids from AI Boolean Search candidates (filteredCandidates) as comma-separated string
       const booleanSearchUserIds = filteredCandidates
         .map((candidate) => candidate.user_id)
@@ -1394,7 +1402,7 @@ export default function JobDetails() {
       }
       toast({
         title: "Success",
-        description: "AI is searching for more candidates",
+        description: "AI is searching for more candidates. Next search available in 30 minutes.",
       });
     } catch (error) {
       console.error("Error searching for more candidates:", error);
@@ -1406,7 +1414,12 @@ export default function JobDetails() {
     }
   };
   const handleGenerateLongList = async () => {
+    if (generateCooldown.isDisabled) return;
+    
     try {
+      // Start cooldown immediately
+      generateCooldown.startCooldown();
+      
       console.log("Starting Generate Long List process...");
       console.log("Current job:", job);
       console.log("Current profile:", profile);
@@ -1457,8 +1470,7 @@ export default function JobDetails() {
       console.log("Webhook success response:", responseData);
       toast({
         title: "Success",
-        description:
-          job?.longlist && job.longlist > 0 ? "Long list regenerated successfully" : "Long list generated successfully",
+        description: "Long list generated successfully. Next generation available in 30 minutes.",
       });
     } catch (error) {
       console.error("Error generating long list:", error);
@@ -3530,11 +3542,19 @@ mainCandidate["linkedin_score_reason"] ? (
                       onSearchLinkedIn={() => handleSearchMoreCandidates("linkedin")}
                       onSearchDatabase={() => handleSearchMoreCandidates("database")}
                       onSearchBoth={() => handleSearchMoreCandidates("both")}
+                      disabled={regenerateCooldown.isDisabled}
+                      cooldownText={regenerateCooldown.isDisabled ? regenerateCooldown.formatTime() : undefined}
                     />
                   ) : (
-                    <Button onClick={handleGenerateLongList} disabled={job?.longlist === 3} size="sm">
+                    <Button 
+                      onClick={handleGenerateLongList} 
+                      disabled={job?.longlist === 3 || generateCooldown.isDisabled} 
+                      size="sm"
+                    >
                       <Zap className="w-4 h-4 mr-2" />
-                      Generate AI
+                      {generateCooldown.isDisabled 
+                        ? `Wait ${generateCooldown.formatTime()}` 
+                        : "Generate AI"}
                     </Button>
                   )}
                 </div>
