@@ -848,7 +848,7 @@ const JobGrid = memo(function JobGrid({
               
               {job.Timestamp && <div className="flex items-center text-muted-foreground">
                   <Calendar className="h-4 w-4 mr-2 text-primary" />
-                  Created: {format(new Date(job.Timestamp), 'MMM dd, yyyy')}
+                  Created: {format(new Date(job.Timestamp), 'MMM dd, yyyy HH:mm')}
                 </div>}
             </div>
 
