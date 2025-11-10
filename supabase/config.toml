@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.submit_application]
 verify_jwt = false
+
+[functions.redirect-webhook]
+verify_jwt = false
