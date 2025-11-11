@@ -2715,15 +2715,30 @@ mainCandidate["linkedin_score_reason"] ? (
   };
 
   // Short list candidates (after_call_score > 74) sorted by Overall Score descending
+  // Exclude rejected candidates from the main list
   const shortListCandidates = candidates
     .filter((candidate) => {
       const score = parseFloat(candidate.after_call_score || "0");
-      return score > 74;
+      const isRejected = candidate["Contacted"] === "Rejected";
+      return score > 74 && !isRejected;
     })
     .sort((a, b) => {
       const overallScoreA = calculateOverallScore(a);
       const overallScoreB = calculateOverallScore(b);
       return overallScoreB - overallScoreA; // Sort highest score first
+    });
+
+  // Rejected candidates (after_call_score > 74 AND Contacted === "Rejected")
+  const rejectedShortListCandidates = candidates
+    .filter((candidate) => {
+      const score = parseFloat(candidate.after_call_score || "0");
+      const isRejected = candidate["Contacted"] === "Rejected";
+      return score > 74 && isRejected;
+    })
+    .sort((a, b) => {
+      const overallScoreA = calculateOverallScore(a);
+      const overallScoreB = calculateOverallScore(b);
+      return overallScoreB - overallScoreA;
     });
 
   // Helper function to parse salary as number
@@ -2870,6 +2885,9 @@ mainCandidate["linkedin_score_reason"] ? (
       return !matchesPreferredNationality(candidateNationality, preferredNationality);
     }),
   );
+
+  // Filter out rejected candidates and apply filters for rejected section
+  const filteredRejectedCandidates = filterShortListCandidates(rejectedShortListCandidates);
 
   // Filter candidates into budget categories with applied filters (only from matching nationality)
   const withinBudgetCandidates = filterShortListCandidates(
@@ -4569,6 +4587,131 @@ mainCandidate["linkedin_score_reason"] ? (
                           },
                         );
                         return sortedNationalityMismatchEntries.map(
+                          ([candidateId, candidateContacts]: [string, any[]]) => {
+                            const mainCandidate = candidateContacts[0];
+                            return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
+                          },
+                        );
+                      })()}
+                    </div>
+                  </ScrollArea>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Rejected Candidates Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <X className="w-5 h-5 mr-2" />
+                  Rejected Candidates ({filteredRejectedCandidates.length} candidates)
+                </CardTitle>
+                <CardDescription>
+                  High-scoring candidates who have been rejected from the shortlist
+                </CardDescription>
+
+                {/* AI Short List Filters */}
+                <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center">
+                  <div className="relative min-w-0 flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    <Input
+                      placeholder="Name..."
+                      value={shortListNameFilter}
+                      onChange={(e) => setShortListNameFilter(e.target.value)}
+                      className="pl-10 h-9 text-sm"
+                    />
+                  </div>
+                  <Input
+                    placeholder="Email..."
+                    value={shortListEmailFilter}
+                    onChange={(e) => setShortListEmailFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Input
+                    placeholder="Phone..."
+                    value={shortListPhoneFilter}
+                    onChange={(e) => setShortListPhoneFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Input
+                    placeholder="User ID..."
+                    value={shortListUserIdFilter}
+                    onChange={(e) => setShortListUserIdFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Input
+                    placeholder="Source..."
+                    value={shortListSourceFilter}
+                    onChange={(e) => setShortListSourceFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
+                    <SelectTrigger className="h-9 text-sm w-32">
+                      <SelectValue placeholder="Source" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Sources</SelectItem>
+                      <SelectItem value="Itris">Itris</SelectItem>
+                      <SelectItem value="Linkedin">LinkedIn</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
+                    <SelectTrigger className="h-9 text-sm w-32">
+                      <SelectValue placeholder="Score" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Scores</SelectItem>
+                      <SelectItem value="90+">90+</SelectItem>
+                      <SelectItem value="85+">85+</SelectItem>
+                      <SelectItem value="80+">80+</SelectItem>
+                      <SelectItem value="75+">75+</SelectItem>
+                      <SelectItem value="70+">70+</SelectItem>
+                      <SelectItem value="high">High (85+)</SelectItem>
+                      <SelectItem value="medium">Medium (70-84)</SelectItem>
+                      <SelectItem value="low">Low (&lt;70)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {filteredRejectedCandidates.length === 0 ? (
+                  <div className="text-center py-8">
+                    <X className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No rejected candidates</h3>
+                    <p className="text-muted-foreground">
+                      Rejected candidates from the shortlist will appear here
+                    </p>
+                  </div>
+                ) : (
+                  <ScrollArea className="h-[600px] w-full">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
+                      {(() => {
+                        // Group rejected candidates by user_id and sort by Overall Score
+                        const groupedRejected = filteredRejectedCandidates.reduce(
+                          (acc, candidate) => {
+                            const candidateId = candidate["user_id"] || candidate["Candidate_ID"];
+                            if (!acc[candidateId]) {
+                              acc[candidateId] = [];
+                            }
+                            acc[candidateId].push(candidate);
+                            return acc;
+                          },
+                          {} as Record<string, any[]>,
+                        );
+
+                        // Sort by Overall Score descending (highest first)
+                        const sortedRejectedEntries = Object.entries(groupedRejected).sort(
+                          ([, candidateContactsA], [, candidateContactsB]) => {
+                            const candidateA = candidateContactsA[0];
+                            const candidateB = candidateContactsB[0];
+
+                            // Use the calculateOverallScore function for consistent scoring
+                            const overallScoreA = calculateOverallScore(candidateA);
+                            const overallScoreB = calculateOverallScore(candidateB);
+                            return overallScoreB - overallScoreA; // Sort in descending order (highest Overall Score first)
+                          },
+                        );
+                        return sortedRejectedEntries.map(
                           ([candidateId, candidateContacts]: [string, any[]]) => {
                             const mainCandidate = candidateContacts[0];
                             return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
