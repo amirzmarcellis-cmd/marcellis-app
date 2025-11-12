@@ -188,18 +188,43 @@ export default function CallLogDetails() {
         .eq('job_id', jobIdForLookup)
         .maybeSingle()
 
-      // Try to resolve CV link from Jobs_CVs or CVs table
-      let cvLink = data.cv_link;
+      // Try to resolve CV link from Jobs_CVs, then CVs by user_id, then by email
+      const pickFirstUrl = (raw?: string | null) => {
+        if (!raw) return null;
+        const parts = String(raw)
+          .split(/[\s,\n]+/)
+          .map(s => s.trim())
+          .filter(Boolean);
+        const url = parts.find(p => /^https?:\/\//i.test(p));
+        return url || null;
+      };
+
+      let cvLink = pickFirstUrl(data.cv_link);
+
       if (!cvLink) {
-        const { data: cvRow } = await supabase
+        const { data: cvRowByUser } = await supabase
           .from('CVs')
-          .select('cv_link')
+          .select('cv_link, updated_time')
           .eq('user_id', data.user_id)
           .not('cv_link', 'is', null)
+          .neq('cv_link', '')
           .order('updated_time', { ascending: false })
           .limit(1)
           .maybeSingle();
-        cvLink = cvRow?.cv_link || null;
+        cvLink = pickFirstUrl(cvRowByUser?.cv_link) || cvLink;
+      }
+
+      if (!cvLink && data.candidate_email) {
+        const { data: cvRowByEmail } = await supabase
+          .from('CVs')
+          .select('cv_link, updated_time')
+          .eq('email', data.candidate_email)
+          .not('cv_link', 'is', null)
+          .neq('cv_link', '')
+          .order('updated_time', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        cvLink = pickFirstUrl(cvRowByEmail?.cv_link) || cvLink;
       }
 
       // Direct mapping using snake_case field names from database
