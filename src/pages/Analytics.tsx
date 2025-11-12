@@ -786,27 +786,33 @@ export default function Analytics() {
           </CardHeader>
           <CardContent>
             <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={data?.candidatesPerJob}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis 
-                  dataKey="jobTitle" 
-                  angle={-45}
-                  textAnchor="end"
-                  height={100}
-                  tick={{ fontSize: 10, fill: '#93c5fd' }}
-                />
-                <YAxis tick={{ fill: '#93c5fd' }} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1f2937', 
-                    border: '1px solid #374151',
-                    borderRadius: '8px'
-                  }}
-                />
-                <Bar dataKey="count" fill={COLORS.primary} />
-              </BarChart>
-            </ResponsiveContainer>
+              {data?.candidatesPerJob && data.candidatesPerJob.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={data.candidatesPerJob}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                  <XAxis 
+                    dataKey="jobTitle" 
+                    angle={-45}
+                    textAnchor="end"
+                    height={100}
+                    tick={{ fontSize: 10, fill: '#93c5fd' }}
+                  />
+                  <YAxis tick={{ fill: '#93c5fd' }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1f2937', 
+                      border: '1px solid #374151',
+                      borderRadius: '8px'
+                    }}
+                  />
+                  <Bar dataKey="count" name="Candidates" fill={COLORS.primary} />
+                </BarChart>
+              </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                  No candidate data available for jobs
+                </div>
+              )}
             </Suspense>
           </CardContent>
         </Card>
@@ -821,28 +827,34 @@ export default function Analytics() {
           </CardHeader>
           <CardContent>
             <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={data?.topPerformingJobs}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis 
-                    dataKey="jobTitle" 
-                    angle={-45}
-                    textAnchor="end"
-                    height={100}
-                    tick={{ fontSize: 10, fill: '#93c5fd' }}
-                  />
-                  <YAxis tick={{ fill: '#93c5fd' }} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1f2937', 
-                      border: '1px solid #374151',
-                      borderRadius: '8px'
-                    }}
-                  />
-                  <Bar dataKey="averageScore" name="Avg Score" fill="#10b981" />
-                  <Bar dataKey="candidateCount" name="Candidates" fill="#f59e0b" />
-                </BarChart>
-              </ResponsiveContainer>
+              {data?.topPerformingJobs && data.topPerformingJobs.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={data.topPerformingJobs}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis 
+                      dataKey="jobTitle" 
+                      angle={-45}
+                      textAnchor="end"
+                      height={100}
+                      tick={{ fontSize: 10, fill: '#93c5fd' }}
+                    />
+                    <YAxis tick={{ fill: '#93c5fd' }} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: '#1f2937', 
+                        border: '1px solid #374151',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Bar dataKey="averageScore" name="Avg Score" fill="#10b981" />
+                    <Bar dataKey="candidateCount" name="Candidates" fill="#f59e0b" />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                  No job performance data available
+                </div>
+              )}
             </Suspense>
           </CardContent>
         </Card>
@@ -857,43 +869,9 @@ export default function Analytics() {
           </CardHeader>
           <CardContent>
             <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={data?.averageScoresByJob}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis 
-                  dataKey="jobTitle" 
-                  angle={-45}
-                  textAnchor="end"
-                  height={100}
-                  tick={{ fontSize: 10, fill: '#93c5fd' }}
-                />
-                <YAxis tick={{ fill: '#93c5fd' }} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1f2937', 
-                    border: '1px solid #374151',
-                    borderRadius: '8px'
-                  }}
-                />
-                <Bar dataKey="averageScore" fill={COLORS.primary} />
-              </BarChart>
-            </ResponsiveContainer>
-            </Suspense>
-          </CardContent>
-        </Card>
-
-        {/* Average Salaries by Job */}
-        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
-          <CardHeader>
-            <CardTitle className="text-foreground flex items-center">
-              <TrendingUp className="w-5 h-5 mr-2" />
-              Average Salaries by Job
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={data?.averageSalariesByJob}>
+              {data?.averageScoresByJob && data.averageScoresByJob.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={data.averageScoresByJob}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                   <XAxis 
                     dataKey="jobTitle" 
@@ -910,10 +888,56 @@ export default function Analytics() {
                       borderRadius: '8px'
                     }}
                   />
-                  <Bar dataKey="avgCurrent" name="Avg Current" fill="#3b82f6" />
-                  <Bar dataKey="avgExpected" name="Avg Expected" fill="#f59e0b" />
+                  <Bar dataKey="averageScore" name="Average Score" fill={COLORS.primary} />
                 </BarChart>
               </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                  No score data available for jobs
+                </div>
+              )}
+            </Suspense>
+          </CardContent>
+        </Card>
+
+        {/* Average Salaries by Job */}
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
+          <CardHeader>
+            <CardTitle className="text-foreground flex items-center">
+              <TrendingUp className="w-5 h-5 mr-2" />
+              Average Salaries by Job
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
+              {data?.averageSalariesByJob && data.averageSalariesByJob.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={data.averageSalariesByJob}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis 
+                      dataKey="jobTitle" 
+                      angle={-45}
+                      textAnchor="end"
+                      height={100}
+                      tick={{ fontSize: 10, fill: '#93c5fd' }}
+                    />
+                    <YAxis tick={{ fill: '#93c5fd' }} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: '#1f2937', 
+                        border: '1px solid #374151',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Bar dataKey="avgCurrent" name="Current Salary" fill="#3b82f6" />
+                    <Bar dataKey="avgExpected" name="Expected Salary" fill="#f59e0b" />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                  No salary data available for jobs
+                </div>
+              )}
             </Suspense>
           </CardContent>
         </Card>
