@@ -153,15 +153,18 @@ export default function Analytics() {
 
       // Calculate contact status counts (case-insensitive)
       const contactStatus = {
-        callDone: candidates?.filter(c => c.contacted?.toLowerCase() === 'call done').length || 0,
-        contacted: candidates?.filter(c => c.contacted?.toLowerCase() === 'contacted').length || 0,
-        readyToContact: candidates?.filter(c => c.contacted?.toLowerCase() === 'ready to contact').length || 0,
-        notContacted: candidates?.filter(c => !c.contacted || c.contacted?.toLowerCase() === 'not contacted').length || 0,
-        rejected: candidates?.filter(c => c.contacted?.toLowerCase() === 'rejected').length || 0,
-        shortlisted: candidates?.filter(c => c.contacted === 'Shortlisted').length || 0,
-        tasked: candidates?.filter(c => c.contacted === 'Tasked').length || 0,
-        interview: candidates?.filter(c => c.contacted === 'Interview').length || 0,
-        hired: candidates?.filter(c => c.contacted === 'Hired').length || 0,
+        callDone: candidates?.filter(c => (c.contacted?.toLowerCase().includes('call done') ?? false) || (typeof c.after_call_score === 'number' && c.after_call_score > 0)).length || 0,
+        contacted: candidates?.filter(c => c.contacted?.toLowerCase().includes('contacted') ?? false).length || 0,
+        readyToContact: candidates?.filter(c => c.contacted?.toLowerCase().includes('ready to contact') ?? false).length || 0,
+        notContacted: candidates?.filter(c => {
+          const s = (c.contacted || '').toLowerCase();
+          return !s || s.includes('not contacted') || s.includes('no answer') || s.includes('connection sent');
+        }).length || 0,
+        rejected: candidates?.filter(c => (c.contacted?.toLowerCase().includes('reject') ?? false)).length || 0,
+        shortlisted: candidates?.filter(c => (c.contacted?.toLowerCase().includes('shortlist') ?? false) || (c.shortlisted_at !== null && String(c.shortlisted_at).trim() !== '')).length || 0,
+        tasked: candidates?.filter(c => c.contacted?.toLowerCase().includes('task') ?? false).length || 0,
+        interview: candidates?.filter(c => c.contacted?.toLowerCase().includes('interview') ?? false).length || 0,
+        hired: candidates?.filter(c => c.contacted?.toLowerCase().includes('hire') ?? false).length || 0,
       };
 
       const totalCallLogs = candidates?.filter(c => c.callcount && c.callcount > 0).length || 0;
@@ -252,20 +255,22 @@ export default function Analytics() {
           ? Math.round(jobCandidates.reduce((sum, c) => sum + (c.cv_score || 0), 0) / jobCandidates.length)
           : 0;
         return {
+          jobId: job.job_id,
           jobTitle: job.job_title || 'Unknown',
           averageScore: avgScore
         };
       }).filter(j => j.averageScore > 0) || [];
 
       // Top performing jobs
-      const topPerformingJobs = averageScoresByJob
+      const topPerformingJobs = (averageScoresByJob || [])
+        .slice()
+        .sort((a, b) => b.averageScore - a.averageScore)
+        .slice(0, 5)
         .map((job, index) => ({
           ...job,
-          candidateCount: candidates?.filter(c => c.job_id === jobs?.find(j => j.job_title === job.jobTitle)?.job_id).length || 0,
+          candidateCount: candidates?.filter(c => c.job_id === job.jobId).length || 0,
           rank: index + 1
-        }))
-        .sort((a, b) => b.averageScore - a.averageScore)
-        .slice(0, 5);
+        }));
 
       // Average salaries by job
       const averageSalariesByJob = jobs?.map(job => {
