@@ -275,7 +275,7 @@ export default function Analytics() {
         };
       }).filter(j => j.avgCurrent > 0 || j.avgExpected > 0) || [];
 
-      // Calculate average days to hire (shortlisted -> submitted)
+      // Calculate average days to hire (longlist -> shortlist) + (shortlist -> submitted)
       const toDate = (val: any): Date | null => {
         if (!val) return null;
         const s = String(val).trim();
@@ -288,22 +288,39 @@ export default function Analytics() {
         return isNaN(d.getTime()) ? null : d;
       };
 
-      const timeDiffsInDays: number[] = (candidates || [])
+      // Phase 1: Longlist -> Shortlist
+      const l2sDiffsDays: number[] = (candidates || [])
         .map((c) => {
+          const longlisted = toDate(c.longlisted_at);
+          const shortlisted = toDate(c.shortlisted_at);
+          if (!longlisted || !shortlisted) return null;
+          const diff = (shortlisted.getTime() - longlisted.getTime()) / (1000 * 60 * 60 * 24);
+          return diff >= 0 ? diff : null;
+        })
+        .filter((v): v is number => v !== null);
+
+      // Phase 2: Shortlist -> Submitted
+      const s2subDiffsDays: number[] = (candidates || [])
+        .map((c) => {
+          const shortlisted = toDate(c.shortlisted_at);
           const submitted = toDate(c.submitted_at);
-          const shortlisted = toDate(c.shortlisted_at) || toDate(c.longlisted_at) || toDate(c.lastcalltime);
-          if (!submitted || !shortlisted) return null;
+          if (!shortlisted || !submitted) return null;
           const diff = (submitted.getTime() - shortlisted.getTime()) / (1000 * 60 * 60 * 24);
           return diff >= 0 ? diff : null;
         })
         .filter((v): v is number => v !== null);
 
-      const avgDaysToHire = timeDiffsInDays.length
-        ? Math.ceil(timeDiffsInDays.reduce((a, b) => a + b, 0) / timeDiffsInDays.length)
+      const avgL2S = l2sDiffsDays.length
+        ? l2sDiffsDays.reduce((a, b) => a + b, 0) / l2sDiffsDays.length
+        : 0;
+      const avgS2Sub = s2subDiffsDays.length
+        ? s2subDiffsDays.reduce((a, b) => a + b, 0) / s2subDiffsDays.length
         : 0;
 
-      console.log('Avg days to hire - samples:', timeDiffsInDays.slice(0, 5));
-      console.log('Avg days to hire - count used:', timeDiffsInDays.length);
+      const avgDaysToHire = Math.ceil(avgL2S + avgS2Sub);
+
+      console.log('Avg L2S samples:', l2sDiffsDays.slice(0, 5), 'count:', l2sDiffsDays.length, 'avg:', avgL2S);
+      console.log('Avg S2Sub samples:', s2subDiffsDays.slice(0, 5), 'count:', s2subDiffsDays.length, 'avg:', avgS2Sub);
 
       const analyticsData = {
         totalCandidates,
