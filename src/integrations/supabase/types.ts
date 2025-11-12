@@ -362,6 +362,7 @@ export type Database = {
           call_summary: string | null
           callcount: number | null
           candidate_email: string | null
+          candidate_fit: string | null
           candidate_name: string | null
           candidate_phone_number: string | null
           "Chat id": string | null
@@ -408,6 +409,7 @@ export type Database = {
           call_summary?: string | null
           callcount?: number | null
           candidate_email?: string | null
+          candidate_fit?: string | null
           candidate_name?: string | null
           candidate_phone_number?: string | null
           "Chat id"?: string | null
@@ -454,6 +456,7 @@ export type Database = {
           call_summary?: string | null
           callcount?: number | null
           candidate_email?: string | null
+          candidate_fit?: string | null
           candidate_name?: string | null
           candidate_phone_number?: string | null
           "Chat id"?: string | null
