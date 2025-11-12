@@ -17,7 +17,7 @@ import RulerScore from "@/components/ui/ruler-score"
 import { useProfile } from "@/hooks/useProfile"
 import { useUserRole } from "@/hooks/useUserRole"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 
 interface CallLogDetail {
   job_id: string | null
@@ -461,7 +461,6 @@ export default function CallLogDetails() {
                   }
                 }}
                 className="mt-2"
-                disabled={!callLog.cv_link}
               >
                 <Link2 className="w-4 h-4 mr-2" />
                 View CV
