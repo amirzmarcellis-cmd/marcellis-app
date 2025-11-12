@@ -17,6 +17,7 @@ import RulerScore from "@/components/ui/ruler-score"
 import { useProfile } from "@/hooks/useProfile"
 import { useUserRole } from "@/hooks/useUserRole"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useToast } from "@/components/ui/use-toast"
 
 interface CallLogDetail {
   job_id: string | null
@@ -75,6 +76,7 @@ export default function CallLogDetails() {
   const firstMatchRef = useRef<HTMLElement | null>(null)
   const { profile } = useProfile()
   const { isManager, isCompanyAdmin } = useUserRole()
+  const { toast } = useToast()
 
   const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
   const highlightedTranscript = useMemo(() => {
@@ -419,17 +421,26 @@ export default function CallLogDetails() {
               {callLog.nationality && (
                 <p className="text-sm font-light font-inter text-muted-foreground">Nationality: {callLog.nationality}</p>
               )}
-              {callLog.cv_link && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => window.open(callLog.cv_link, '_blank')}
-                  className="mt-2"
-                >
-                  <Link2 className="w-4 h-4 mr-2" />
-                  View CV
-                </Button>
-              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (callLog.cv_link) {
+                    window.open(callLog.cv_link, '_blank');
+                  } else {
+                    toast({
+                      title: 'CV link not found',
+                      description: 'No CV link is stored for this candidate in CVs table.',
+                      variant: 'destructive'
+                    });
+                  }
+                }}
+                className="mt-2"
+                disabled={!callLog.cv_link}
+              >
+                <Link2 className="w-4 h-4 mr-2" />
+                View CV
+              </Button>
               <div className="flex flex-wrap gap-2 mt-2">
                 <Badge variant="outline" className="text-xs">
                   User ID: {callLog.user_id}
