@@ -151,26 +151,29 @@ export default function Analytics() {
       const totalCallLogs = candidates?.filter(c => c.callcount && c.callcount > 0).length || 0;
       const contactedCount = contactStatus.callDone + contactStatus.contacted;
 
-      // Calculate job aggregate metrics based on timestamp fields
-      // Longlisted: longlisted_at is not null
+      // Helper to validate date-like values
+      const hasDate = (val: any) => {
+        const s = String(val ?? '').trim();
+        if (!s) return false;
+        const d = new Date(s.includes(' ') ? s.replace(' ', 'T') : s);
+        return !isNaN(d.getTime());
+      };
+
+      // Calculate job aggregate metrics using real stage markers
       const totalLonglisted = candidates?.filter(c => 
-        c.longlisted_at !== null && String(c.longlisted_at).trim() !== ''
+        hasDate(c.longlisted_at) || (c.contacted?.toLowerCase().includes('longlist') ?? false)
       ).length || 0;
       
-      // Shortlisted: shortlisted_at is not null
       const totalShortlisted = candidates?.filter(c => 
-        c.shortlisted_at !== null && String(c.shortlisted_at).trim() !== ''
+        hasDate(c.shortlisted_at) || (c.contacted?.toLowerCase().includes('shortlist') ?? false)
       ).length || 0;
       
-      // Rejected: contacted = 'Rejected' (case-insensitive)
       const totalRejected = candidates?.filter(c => 
-        c.contacted?.toLowerCase() === 'rejected'
+        (c.contacted?.toLowerCase().includes('reject') ?? false)
       ).length || 0;
       
-      // Submitted: submitted_at is not null OR contacted = 'Submitted'
       const totalSubmitted = candidates?.filter(c => 
-        (c.submitted_at !== null && String(c.submitted_at).trim() !== '') ||
-        c.contacted?.toLowerCase() === 'submitted'
+        hasDate(c.submitted_at) || (c.contacted?.toLowerCase().includes('submit') ?? false)
       ).length || 0;
 
       // === DEBUG: Detailed Filter Results ===
