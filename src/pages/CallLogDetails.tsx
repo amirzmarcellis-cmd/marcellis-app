@@ -186,6 +186,19 @@ export default function CallLogDetails() {
         .eq('job_id', jobIdForLookup)
         .maybeSingle()
 
+      // Try to resolve CV link
+      let cvLink = data.cv_link;
+      if (!cvLink) {
+        const { data: cvRow } = await supabase
+          .from('CVs')
+          .select('cv_link')
+          .eq('user_id', data.user_id)
+          .order('updated_time', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        cvLink = cvRow?.cv_link || null;
+      }
+
       // Direct mapping using snake_case field names from database
       const enrichedData: CallLogDetail = {
         job_id: data.job_id,
@@ -221,7 +234,7 @@ export default function CallLogDetails() {
         comm_summary: data.comm_summary,
         comm_score: data.comm_score?.toString(),
         nationality: data.nationality,
-        cv_link: data.cv_link
+        cv_link: cvLink
       }
 
       console.log('Enriched data:', enrichedData);
