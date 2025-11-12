@@ -106,7 +106,7 @@ export default function Analytics() {
       const [candidatesResult, jobsResult, countResult] = await Promise.all([
         supabase
           .from('Jobs_CVs')
-          .select('job_id, contacted, cv_score, after_call_score, callcount, current_salary, salary_expectations, submitted_at, longlisted_at'),
+          .select('job_id, contacted, cv_score, after_call_score, callcount, current_salary, salary_expectations, submitted_at, longlisted_at, shortlisted_at'),
         
         supabase
           .from('Jobs')
@@ -275,6 +275,22 @@ export default function Analytics() {
         };
       }).filter(j => j.avgCurrent > 0 || j.avgExpected > 0) || [];
 
+      // Calculate average days to hire (shortlisted to submitted)
+      const submittedCandidates = candidates?.filter(c => 
+        c.shortlisted_at && c.submitted_at
+      ) || [];
+      
+      const avgDaysToHire = submittedCandidates.length > 0
+        ? Math.round(
+            submittedCandidates.reduce((sum, c) => {
+              const shortlistedDate = new Date(c.shortlisted_at);
+              const submittedDate = new Date(c.submitted_at);
+              const daysDiff = Math.abs(submittedDate.getTime() - shortlistedDate.getTime()) / (1000 * 60 * 60 * 24);
+              return sum + daysDiff;
+            }, 0) / submittedCandidates.length
+          )
+        : 0;
+
       const analyticsData = {
         totalCandidates,
         activeCandidates: totalCandidates,
@@ -283,7 +299,7 @@ export default function Analytics() {
         totalCallLogs,
         contactedCount,
         averageScore,
-        avgDaysToHire: 0,
+        avgDaysToHire,
         totalLonglisted,
         totalShortlisted,
         totalRejected,
