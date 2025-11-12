@@ -52,6 +52,7 @@ interface CallLogDetail {
   comm_summary: string | null
   comm_score: string | null
   nationality: string | null
+  cv_link: string | null
 }
 
 export default function CallLogDetails() {
@@ -219,7 +220,8 @@ export default function CallLogDetails() {
         Reason_to_Hire: data.Reason_to_Hire,
         comm_summary: data.comm_summary,
         comm_score: data.comm_score?.toString(),
-        nationality: data.nationality
+        nationality: data.nationality,
+        cv_link: data.cv_link
       }
 
       console.log('Enriched data:', enrichedData);
@@ -402,6 +404,17 @@ export default function CallLogDetails() {
               <p className="text-sm font-light font-inter">{callLog.job_title}</p>
               {callLog.nationality && (
                 <p className="text-sm font-light font-inter text-muted-foreground">Nationality: {callLog.nationality}</p>
+              )}
+              {callLog.cv_link && (
+                <a 
+                  href={callLog.cv_link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-sm font-light font-inter text-primary hover:text-primary/80 underline flex items-center gap-1"
+                >
+                  <Link2 className="w-3 h-3" />
+                  View CV
+                </a>
               )}
               <div className="flex flex-wrap gap-2 mt-2">
                 <Badge variant="outline" className="text-xs">
