@@ -299,7 +299,7 @@ export default function Analytics() {
         .filter((v): v is number => v !== null);
 
       const avgDaysToHire = timeDiffsInDays.length
-        ? Math.round(timeDiffsInDays.reduce((a, b) => a + b, 0) / timeDiffsInDays.length)
+        ? Math.ceil(timeDiffsInDays.reduce((a, b) => a + b, 0) / timeDiffsInDays.length)
         : 0;
 
       console.log('Avg days to hire - samples:', timeDiffsInDays.slice(0, 5));
