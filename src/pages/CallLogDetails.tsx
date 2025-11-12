@@ -420,15 +420,15 @@ export default function CallLogDetails() {
                 <p className="text-sm font-light font-inter text-muted-foreground">Nationality: {callLog.nationality}</p>
               )}
               {callLog.cv_link && (
-                <a 
-                  href={callLog.cv_link} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-sm font-light font-inter text-primary hover:text-primary/80 underline flex items-center gap-1 mt-1"
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(callLog.cv_link, '_blank')}
+                  className="mt-2"
                 >
-                  <Link2 className="w-3 h-3" />
+                  <Link2 className="w-4 h-4 mr-2" />
                   View CV
-                </a>
+                </Button>
               )}
               <div className="flex flex-wrap gap-2 mt-2">
                 <Badge variant="outline" className="text-xs">
