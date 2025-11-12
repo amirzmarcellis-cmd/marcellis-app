@@ -8,17 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Users, Briefcase, Phone, TrendingUp, Star, CheckCircle, PhoneCall, Clock } from 'lucide-react';
 
-// Lazy load chart components
-const PieChart = lazy(() => import('recharts').then(mod => ({ default: mod.PieChart })));
-const Pie = lazy(() => import('recharts').then(mod => ({ default: mod.Pie })));
-const Cell = lazy(() => import('recharts').then(mod => ({ default: mod.Cell })));
-const BarChart = lazy(() => import('recharts').then(mod => ({ default: mod.BarChart })));
-const Bar = lazy(() => import('recharts').then(mod => ({ default: mod.Bar })));
-const XAxis = lazy(() => import('recharts').then(mod => ({ default: mod.XAxis })));
-const YAxis = lazy(() => import('recharts').then(mod => ({ default: mod.YAxis })));
-const CartesianGrid = lazy(() => import('recharts').then(mod => ({ default: mod.CartesianGrid })));
-const Tooltip = lazy(() => import('recharts').then(mod => ({ default: mod.Tooltip })));
-const ResponsiveContainer = lazy(() => import('recharts').then(mod => ({ default: mod.ResponsiveContainer })));
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface AnalyticsData {
   totalCandidates: number;
@@ -522,11 +512,11 @@ export default function Analytics() {
               <div>
                 <p className="text-blue-200 text-sm font-medium">Total Call Logs</p>
                 <p className="text-4xl font-bold text-foreground mt-2">{data?.totalCallLogs || 0}</p>
-                <p className="text-xs text-cyan-300 mt-1">
+                <div className="text-xs text-cyan-300 mt-1">
                   <Badge className="bg-cyan-400/20 text-cyan-400 border-cyan-400/30">
                     {data?.contactedCount || 0} Contacted
                   </Badge>
-                </p>
+                </div>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
                 <Phone className="w-8 h-8 text-white" />
@@ -664,7 +654,7 @@ export default function Analytics() {
             <Suspense fallback={<Skeleton className="h-[350px] w-full" />}>
               {((data?.scoreDistribution.high || 0) + (data?.scoreDistribution.medium || 0) + (data?.scoreDistribution.low || 0)) > 0 ? (
                 <div className="flex items-center justify-center h-[350px]">
-                  <ResponsiveContainer width="50%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={scoreDistributionData}
@@ -730,7 +720,7 @@ export default function Analytics() {
             <Suspense fallback={<Skeleton className="h-[400px] w-full" />}>
               {contactStatusData.length > 0 ? (
                 <div className="flex items-center justify-center h-[400px]">
-                  <ResponsiveContainer width="50%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={contactStatusData}
