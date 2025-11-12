@@ -404,7 +404,7 @@ export default function Analytics() {
               <div>
                 <p className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">Total Candidates</p>
                 <p className="text-5xl font-light font-work text-foreground mt-2">{data?.totalCandidates || 0}</p>
-                <p className="text-xs font-light font-inter text-muted-foreground mt-1">Active candidates in pipeline</p>
+                <p className="text-xs font-light font-inter text-muted-foreground mt-1">From Jobs_CVs table</p>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
                 <Users className="w-8 h-8 text-white" />
