@@ -449,13 +449,62 @@ export default function CallLogDetails() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => {
-                  if (callLog.cv_link) {
-                    window.open(callLog.cv_link, '_blank');
-                  } else {
+                onClick={async () => {
+                  const pickFirstUrl = (raw?: string | null) => {
+                    if (!raw) return null;
+                    const parts = String(raw)
+                      .split(/[\s,\n]+/)
+                      .map(s => s.trim())
+                      .filter(Boolean);
+                    const url = parts.find(p => /^https?:\/\//i.test(p));
+                    return url || null;
+                  };
+
+                  try {
+                    let link: string | null = null;
+
+                    if (callLog.user_id) {
+                      const { data: cvRowByUser } = await supabase
+                        .from('CVs')
+                        .select('cv_link, updated_time')
+                        .eq('user_id', callLog.user_id)
+                        .not('cv_link', 'is', null)
+                        .neq('cv_link', '')
+                        .order('updated_time', { ascending: false })
+                        .limit(1)
+                        .maybeSingle();
+                      link = pickFirstUrl(cvRowByUser?.cv_link);
+                    }
+
+                    if (!link && callLog.candidate_email) {
+                      const { data: cvRowByEmail } = await supabase
+                        .from('CVs')
+                        .select('cv_link, updated_time')
+                        .eq('email', callLog.candidate_email)
+                        .not('cv_link', 'is', null)
+                        .neq('cv_link', '')
+                        .order('updated_time', { ascending: false })
+                        .limit(1)
+                        .maybeSingle();
+                      link = pickFirstUrl(cvRowByEmail?.cv_link);
+                    }
+
+                    // Fallback to loaded value if DB returns nothing
+                    if (!link) link = pickFirstUrl(callLog.cv_link);
+
+                    if (link) {
+                      window.open(link, '_blank');
+                    } else {
+                      toast({
+                        title: 'CV link not found',
+                        description: 'No CV link is stored for this candidate in the CVs table.',
+                        variant: 'destructive'
+                      });
+                    }
+                  } catch (e) {
                     toast({
-                      title: 'CV link not found',
-                      description: 'No CV link is stored for this candidate in CVs table.',
+                      title: 'Unable to open CV',
+                      description: 'There was an error fetching the CV link. Please try again.',
                       variant: 'destructive'
                     });
                   }
