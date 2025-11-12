@@ -950,7 +950,9 @@ export default function Analytics() {
             <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
             <p className="text-green-400 text-sm font-medium">Call Success Rate</p>
             <p className="text-4xl font-bold text-foreground mt-2">{data?.callSuccessRate || 0}%</p>
-            <p className="text-xs text-green-300 mt-1">Score +50</p>
+            <p className="text-xs text-green-300 mt-1">
+              {data?.contactedCount || 0} contacted / {data?.totalCallLogs || 0} calls
+            </p>
           </CardContent>
         </Card>
 
@@ -959,7 +961,9 @@ export default function Analytics() {
             <Phone className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
             <p className="text-cyan-400 text-sm font-medium">Contact Rate</p>
             <p className="text-4xl font-bold text-foreground mt-2">{data?.contactRate || 0}%</p>
-            <p className="text-xs text-cyan-300 mt-1">{data?.contactedCount || 0} of {data?.totalCandidates || 0}</p>
+            <p className="text-xs text-cyan-300 mt-1">
+              {data?.contactedCount || 0} contacted / {data?.totalCandidates || 0} total
+            </p>
           </CardContent>
         </Card>
 
@@ -968,7 +972,9 @@ export default function Analytics() {
             <Clock className="w-12 h-12 text-purple-400 mx-auto mb-4" />
             <p className="text-purple-400 text-sm font-medium">Avg Candidates/Job</p>
             <p className="text-4xl font-bold text-foreground mt-2">{data?.avgCandidatesPerJob || 0}</p>
-            <p className="text-xs text-purple-300 mt-1">Per job opening</p>
+            <p className="text-xs text-purple-300 mt-1">
+              {data?.totalCandidates || 0} candidates / {data?.activeJobs || 0} active jobs
+            </p>
           </CardContent>
         </Card>
       </div>
