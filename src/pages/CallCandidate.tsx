@@ -247,7 +247,7 @@ export default function CallCandidate() {
     <MissionBackground>
       <div className="min-h-screen flex items-center justify-center p-4">
         <GlassCard className="max-w-xl w-full p-8">
-          <div className="text-center mb-8 space-y-6">
+          <div className="text-center mb-8 space-y-8">
             <div className="w-48 h-48 mx-auto">
               <img 
                 src={theme === 'dark' 
