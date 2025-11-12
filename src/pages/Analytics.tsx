@@ -271,31 +271,6 @@ export default function Analytics() {
         };
       }).filter(j => j.avgCurrent > 0 || j.avgExpected > 0) || [];
 
-      // Calculate average days to hire
-      // We need to fetch Jobs_CVs with longlisted_at and submitted_at to calculate this
-      const hiredCandidates = candidates?.filter(c => c.submitted_at !== null) || [];
-      let avgDaysToHire = 0;
-      
-      if (hiredCandidates.length > 0) {
-        // Fetch full records with longlisted_at for hired candidates
-        const { data: hiredCandidatesWithDates } = await supabase
-          .from('Jobs_CVs')
-          .select('longlisted_at, submitted_at')
-          .not('submitted_at', 'is', null)
-          .not('longlisted_at', 'is', null);
-        
-        if (hiredCandidatesWithDates && hiredCandidatesWithDates.length > 0) {
-          const totalDays = hiredCandidatesWithDates.reduce((sum, c) => {
-            const startDate = new Date(c.longlisted_at);
-            const endDate = new Date(c.submitted_at);
-            const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            return sum + diffDays;
-          }, 0);
-          avgDaysToHire = Math.round(totalDays / hiredCandidatesWithDates.length);
-        }
-      }
-
       const analyticsData = {
         totalCandidates,
         activeCandidates: totalCandidates,
@@ -304,7 +279,7 @@ export default function Analytics() {
         totalCallLogs,
         contactedCount,
         averageScore,
-        avgDaysToHire,
+        avgDaysToHire: 0,
         totalLonglisted,
         totalShortlisted,
         totalRejected,
