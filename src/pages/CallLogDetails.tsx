@@ -418,16 +418,26 @@ export default function CallLogDetails() {
               {callLog.nationality && (
                 <p className="text-sm font-light font-inter text-muted-foreground">Nationality: {callLog.nationality}</p>
               )}
-              {callLog.cv_link && (
+              {callLog.cv_link ? (
                 <a 
                   href={callLog.cv_link} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-sm font-light font-inter text-primary hover:text-primary/80 underline flex items-center gap-1"
+                  className="text-sm font-light font-inter text-primary hover:text-primary/80 underline flex items-center gap-1 mt-1"
                 >
                   <Link2 className="w-3 h-3" />
                   View CV
                 </a>
+              ) : (
+                callLog.user_id && callLog.job_id ? (
+                  <a
+                    href={`/cv-viewer/${callLog.user_id}/${callLog.job_id}`}
+                    className="text-sm font-light font-inter text-primary hover:text-primary/80 underline flex items-center gap-1 mt-1"
+                  >
+                    <Link2 className="w-3 h-3" />
+                    Open CV Viewer
+                  </a>
+                ) : null
               )}
               <div className="flex flex-wrap gap-2 mt-2">
                 <Badge variant="outline" className="text-xs">
