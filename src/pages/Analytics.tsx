@@ -462,7 +462,11 @@ export default function Analytics() {
     { name: 'Contacted', value: data?.contactStatus.contacted || 0, color: COLORS.contacted },
     { name: 'Ready to Contact', value: data?.contactStatus.readyToContact || 0, color: COLORS.readyToContact },
     { name: 'Not Contacted', value: data?.contactStatus.notContacted || 0, color: COLORS.notContacted },
-  ];
+    { name: 'Rejected', value: data?.contactStatus.rejected || 0, color: COLORS.rejected },
+    { name: 'Shortlisted', value: data?.contactStatus.shortlisted || 0, color: COLORS.shortlisted },
+    { name: 'Tasked', value: data?.contactStatus.tasked || 0, color: COLORS.tasked },
+    { name: 'Interview', value: data?.contactStatus.interview || 0, color: COLORS.interview },
+  ].filter(item => item.value > 0); // Only show statuses with values
 
   return (
     <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-br dark:from-slate-900 dark:via-blue-900 dark:to-slate-900 p-6">
@@ -652,43 +656,61 @@ export default function Analytics() {
               <TrendingUp className="w-5 h-5 mr-2" />
               Score Distribution
             </CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              CV Scores: {(data?.scoreDistribution.high || 0) + (data?.scoreDistribution.medium || 0) + (data?.scoreDistribution.low || 0)} total candidates
+            </p>
           </CardHeader>
           <CardContent>
-            <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
-              <div className="flex items-center justify-center h-[300px]">
-                <ResponsiveContainer width="50%" height="100%">
-                  <PieChart>
-                  <Pie
-                    data={scoreDistributionData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={120}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {scoreDistributionData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+            <Suspense fallback={<Skeleton className="h-[350px] w-full" />}>
+              {((data?.scoreDistribution.high || 0) + (data?.scoreDistribution.medium || 0) + (data?.scoreDistribution.low || 0)) > 0 ? (
+                <div className="flex items-center justify-center h-[350px]">
+                  <ResponsiveContainer width="50%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={scoreDistributionData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={70}
+                        outerRadius={130}
+                        paddingAngle={5}
+                        dataKey="value"
+                        label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
+                        labelLine={false}
+                      >
+                        {scoreDistributionData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--card))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                          color: 'hsl(var(--foreground))'
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="ml-8 space-y-3">
+                    {scoreDistributionData.map((item, index) => (
+                      <div key={index} className="flex items-center justify-between min-w-[140px]">
+                        <div className="flex items-center">
+                          <div 
+                            className="w-4 h-4 rounded-full mr-3" 
+                            style={{ backgroundColor: item.color }}
+                          ></div>
+                          <span className="text-foreground text-sm font-medium">{item.name}</span>
+                        </div>
+                        <span className="text-foreground font-bold text-lg">{item.value}</span>
+                      </div>
                     ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="ml-8 space-y-3">
-                {scoreDistributionData.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between min-w-[120px]">
-                    <div className="flex items-center">
-                      <div 
-                        className="w-3 h-3 rounded-full mr-2" 
-                        style={{ backgroundColor: item.color }}
-                      ></div>
-                      <span className="text-foreground text-sm">{item.name}</span>
-                    </div>
-                    <span className="text-foreground font-bold">{item.value}</span>
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-[350px] text-muted-foreground">
+                  No score data available
+                </div>
+              )}
             </Suspense>
           </CardContent>
         </Card>
@@ -700,43 +722,63 @@ export default function Analytics() {
               <PhoneCall className="w-5 h-5 mr-2" />
               Contact Status
             </CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              Total candidates tracked: {data?.totalCandidates || 0}
+            </p>
           </CardHeader>
           <CardContent>
-            <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
-              <div className="flex items-center justify-center h-[300px]">
-                <ResponsiveContainer width="50%" height="100%">
-                  <PieChart>
-                  <Pie
-                    data={contactStatusData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={120}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {contactStatusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="ml-8 space-y-3">
-                {contactStatusData.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between min-w-[140px]">
-                    <div className="flex items-center">
-                      <div 
-                        className="w-3 h-3 rounded-full mr-2" 
-                        style={{ backgroundColor: item.color }}
-                      ></div>
-                      <span className="text-foreground text-sm">{item.name}</span>
+            <Suspense fallback={<Skeleton className="h-[400px] w-full" />}>
+              {contactStatusData.length > 0 ? (
+                <div className="flex items-center justify-center h-[400px]">
+                  <ResponsiveContainer width="50%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={contactStatusData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={70}
+                        outerRadius={130}
+                        paddingAngle={3}
+                        dataKey="value"
+                        label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
+                        labelLine={false}
+                      >
+                        {contactStatusData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--card))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                          color: 'hsl(var(--foreground))'
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <ScrollArea className="ml-8 h-[380px]">
+                    <div className="space-y-3 pr-4">
+                      {contactStatusData.map((item, index) => (
+                        <div key={index} className="flex items-center justify-between min-w-[160px]">
+                          <div className="flex items-center">
+                            <div 
+                              className="w-4 h-4 rounded-full mr-3" 
+                              style={{ backgroundColor: item.color }}
+                            ></div>
+                            <span className="text-foreground text-sm font-medium">{item.name}</span>
+                          </div>
+                          <span className="text-foreground font-bold text-lg">{item.value}</span>
+                        </div>
+                      ))}
                     </div>
-                    <span className="text-foreground font-bold">{item.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+                  </ScrollArea>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-[400px] text-muted-foreground">
+                  No contact status data available
+                </div>
+              )}
             </Suspense>
           </CardContent>
         </Card>
