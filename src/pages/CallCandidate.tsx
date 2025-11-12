@@ -9,6 +9,9 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { MissionBackground } from "@/components/layout/MissionBackground";
 import { Phone, Loader2, AlertCircle } from "lucide-react";
 import { z } from "zod";
+import { useAppSettings } from "@/contexts/AppSettingsContext";
+import { useTheme } from "next-themes";
+import defaultLogo from "@/assets/default-logo.png";
 
 const phoneSchema = z.string()
   .min(1, "Phone number is required")
@@ -37,6 +40,8 @@ export default function CallCandidate() {
   const [error, setError] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { settings } = useAppSettings();
+  const { theme } = useTheme();
 
   const userId = searchParams.get("user_id");
   const jobId = searchParams.get("job_id");
@@ -196,7 +201,16 @@ export default function CallCandidate() {
     return (
       <MissionBackground>
         <div className="min-h-screen flex items-center justify-center p-4">
-          <div className="text-center">
+          <div className="text-center space-y-6">
+            <div className="w-48 h-48 mx-auto">
+              <img 
+                src={theme === 'dark' 
+                  ? (settings.logoLight || settings.logo || defaultLogo)
+                  : (settings.logoDark || settings.logo || defaultLogo)} 
+                alt="Company Logo" 
+                className="w-full h-full object-contain rounded-lg"
+              />
+            </div>
             <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
             <p className="mt-4 text-muted-foreground">Loading candidate details...</p>
           </div>
@@ -209,7 +223,16 @@ export default function CallCandidate() {
     return (
       <MissionBackground>
         <div className="min-h-screen flex items-center justify-center p-4">
-          <GlassCard className="max-w-md w-full p-8 text-center">
+          <GlassCard className="max-w-md w-full p-8 text-center space-y-6">
+            <div className="w-48 h-48 mx-auto">
+              <img 
+                src={theme === 'dark' 
+                  ? (settings.logoLight || settings.logo || defaultLogo)
+                  : (settings.logoDark || settings.logo || defaultLogo)} 
+                alt="Company Logo" 
+                className="w-full h-full object-contain rounded-lg"
+              />
+            </div>
             <AlertCircle className="w-16 h-16 mx-auto text-destructive mb-4" />
             <h1 className="text-2xl font-semibold mb-2">Error</h1>
             <p className="text-muted-foreground mb-6">{error || "Failed to load candidate data"}</p>
@@ -224,10 +247,21 @@ export default function CallCandidate() {
     <MissionBackground>
       <div className="min-h-screen flex items-center justify-center p-4">
         <GlassCard className="max-w-xl w-full p-8">
-          <div className="text-center mb-8">
-            <Phone className="w-16 h-16 mx-auto text-primary mb-4" />
-            <h1 className="text-4xl font-light tracking-tight mb-2">Call Candidate</h1>
-            <p className="text-muted-foreground">Review and confirm details before initiating the call</p>
+          <div className="text-center mb-8 space-y-6">
+            <div className="w-48 h-48 mx-auto">
+              <img 
+                src={theme === 'dark' 
+                  ? (settings.logoLight || settings.logo || defaultLogo)
+                  : (settings.logoDark || settings.logo || defaultLogo)} 
+                alt="Company Logo" 
+                className="w-full h-full object-contain rounded-lg"
+              />
+            </div>
+            <div>
+              <Phone className="w-16 h-16 mx-auto text-primary mb-4" />
+              <h1 className="text-4xl font-light tracking-tight mb-2">Call Candidate</h1>
+              <p className="text-muted-foreground">Review and confirm details before initiating the call</p>
+            </div>
           </div>
 
           <div className="space-y-6">
