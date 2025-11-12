@@ -151,19 +151,15 @@ export default function Analytics() {
       const totalCallLogs = candidates?.filter(c => c.callcount && c.callcount > 0).length || 0;
       const contactedCount = contactStatus.callDone + contactStatus.contacted;
 
-      // Calculate job aggregate metrics
-      // Longlisted: Call Done with score < 75 (case-insensitive)
+      // Calculate job aggregate metrics based on timestamp fields
+      // Longlisted: longlisted_at is not null
       const totalLonglisted = candidates?.filter(c => 
-        c.contacted?.toLowerCase() === 'call done' && 
-        c.after_call_score !== null && 
-        parseInt(c.after_call_score?.toString() || '0') < 75
+        c.longlisted_at !== null && String(c.longlisted_at).trim() !== ''
       ).length || 0;
       
-      // Shortlisted: Call Done with score >= 75 (case-insensitive)
+      // Shortlisted: shortlisted_at is not null
       const totalShortlisted = candidates?.filter(c => 
-        c.contacted?.toLowerCase() === 'call done' && 
-        c.after_call_score !== null && 
-        parseInt(c.after_call_score?.toString() || '0') >= 75
+        c.shortlisted_at !== null && String(c.shortlisted_at).trim() !== ''
       ).length || 0;
       
       // Rejected: contacted = 'Rejected' (case-insensitive)
