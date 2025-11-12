@@ -50,40 +50,46 @@ export default function CallCandidate() {
       }
 
       try {
-        const { data, error: fetchError } = await supabase
+        // First, fetch candidate data from Jobs_CVs
+        const { data: candidateData, error: candidateError } = await supabase
           .from("Jobs_CVs")
-          .select(`
-            user_id,
-            job_id,
-            candidate_name,
-            candidate_phone_number,
-            candidate_email,
-            Jobs (job_title)
-          `)
+          .select("user_id, job_id, candidate_name, candidate_phone_number, candidate_email")
           .eq("user_id", userId)
           .eq("job_id", jobId)
           .maybeSingle();
 
-        if (fetchError) {
-          console.error("Error fetching candidate:", fetchError);
+        if (candidateError) {
+          console.error("Error fetching candidate:", candidateError);
           setError("Failed to load candidate data");
           setLoading(false);
           return;
         }
 
-        if (!data) {
+        if (!candidateData) {
           setError("Candidate not found");
           setLoading(false);
           return;
         }
 
+        // Then, fetch job title from Jobs table
+        const { data: jobData, error: jobError } = await supabase
+          .from("Jobs")
+          .select("job_title")
+          .eq("job_id", candidateData.job_id)
+          .maybeSingle();
+
+        if (jobError) {
+          console.error("Error fetching job:", jobError);
+          // Continue with default job title instead of failing
+        }
+
         const candidateInfo: CandidateData = {
-          job_title: (data.Jobs as any)?.job_title || "Unknown Position",
-          candidate_name: data.candidate_name || "Unknown Candidate",
-          candidate_phone_number: data.candidate_phone_number || "",
-          candidate_email: data.candidate_email || "",
-          user_id: data.user_id,
-          job_id: data.job_id,
+          job_title: jobData?.job_title || "Unknown Position",
+          candidate_name: candidateData.candidate_name || "Unknown Candidate",
+          candidate_phone_number: candidateData.candidate_phone_number || "",
+          candidate_email: candidateData.candidate_email || "",
+          user_id: candidateData.user_id,
+          job_id: candidateData.job_id,
         };
 
         setCandidateData(candidateInfo);
