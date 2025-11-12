@@ -103,31 +103,35 @@ export default function Analytics() {
       console.log('Fetching analytics data...');
       
       // Parallel fetch with only required fields for 10x faster loading
-      const [candidatesResult, jobsResult] = await Promise.all([
+      const [candidatesResult, jobsResult, countResult] = await Promise.all([
         supabase
           .from('Jobs_CVs')
-          .select('job_id, contacted, cv_score, after_call_score, callcount, current_salary, salary_expectations, submitted_at')
-          .limit(10000), // Increased limit to fetch all records
+          .select('job_id, contacted, cv_score, after_call_score, callcount, current_salary, salary_expectations, submitted_at, longlisted_at'),
         
         supabase
           .from('Jobs')
-          .select('job_id, job_title, Processed')
+          .select('job_id, job_title, Processed'),
+        
+        supabase
+          .from('Jobs_CVs')
+          .select('*', { count: 'exact', head: true })
       ]);
 
       const { data: candidates, error: candidatesError } = candidatesResult;
       const { data: jobs, error: jobsError } = jobsResult;
+      const { count: totalCandidates, error: countError } = countResult;
 
       if (candidatesError) throw candidatesError;
       if (jobsError) throw jobsError;
+      if (countError) throw countError;
 
       console.log('Candidates fetched:', candidates?.length || 0);
+      console.log('Total candidates count:', totalCandidates || 0);
       console.log('Jobs fetched:', jobs?.length || 0);
-
-      const totalCandidates = candidates?.length || 0;
       const totalJobs = jobs?.length || 0;
       const activeJobs = jobs?.filter(j => j.Processed === 'Yes').length || 0;
 
-      console.log('Total candidates:', totalCandidates);
+      console.log('Total candidates (accurate count):', totalCandidates || 0);
       console.log('Total jobs:', totalJobs);
       console.log('Active jobs:', activeJobs);
 
