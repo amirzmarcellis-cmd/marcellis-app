@@ -103,7 +103,7 @@ export default function Analytics() {
       console.log('Fetching analytics data...');
       
       // Parallel fetch with only required fields for 10x faster loading
-      const [candidatesResult, jobsResult, countResult, submittedCountResult, rejectedCountResult] = await Promise.all([
+      const [candidatesResult, jobsResult, countResult, submittedCountResult, rejectedCountResult, shortlistedCountResult, longlistedCountResult] = await Promise.all([
         supabase
           .from('Jobs_CVs')
           .select('job_id, contacted, cv_score, after_call_score, callcount, current_salary, salary_expectations, submitted_at, longlisted_at, shortlisted_at, lastcalltime'),
@@ -126,7 +126,19 @@ export default function Analytics() {
         supabase
           .from('Jobs_CVs')
           .select('*', { count: 'exact', head: true })
-          .ilike('contacted', '%reject%')
+          .ilike('contacted', '%reject%'),
+        
+        // Accurate server-side count for shortlisted
+        supabase
+          .from('Jobs_CVs')
+          .select('*', { count: 'exact', head: true })
+          .not('shortlisted_at', 'is', null),
+        
+        // Accurate server-side count for longlisted
+        supabase
+          .from('Jobs_CVs')
+          .select('*', { count: 'exact', head: true })
+          .not('longlisted_at', 'is', null)
       ]);
 
       const { data: candidates, error: candidatesError } = candidatesResult;
@@ -134,12 +146,16 @@ export default function Analytics() {
       const { count: totalCandidates, error: countError } = countResult;
       const { count: submittedCount, error: submittedCountError } = submittedCountResult;
       const { count: rejectedCount, error: rejectedCountError } = rejectedCountResult;
+      const { count: shortlistedCount, error: shortlistedCountError } = shortlistedCountResult;
+      const { count: longlistedCount, error: longlistedCountError } = longlistedCountResult;
 
       if (candidatesError) throw candidatesError;
       if (jobsError) throw jobsError;
       if (countError) throw countError;
       if (submittedCountError) throw submittedCountError;
       if (rejectedCountError) throw rejectedCountError;
+      if (shortlistedCountError) throw shortlistedCountError;
+      if (longlistedCountError) throw longlistedCountError;
 
       console.log('Candidates fetched:', candidates?.length || 0);
       console.log('Total candidates count:', totalCandidates || 0);
@@ -178,14 +194,10 @@ export default function Analytics() {
         return !isNaN(d.getTime());
       };
 
-      // Calculate job aggregate metrics using real stage markers
-      const totalLonglisted = candidates?.filter(c => 
-        hasDate(c.longlisted_at) || (c.contacted?.toLowerCase().includes('longlist') ?? false)
-      ).length || 0;
+      // Use accurate server-side counts for stage metrics
+      const totalLonglisted = longlistedCount || 0;
       
-      const totalShortlisted = candidates?.filter(c => 
-        hasDate(c.shortlisted_at) || (c.contacted?.toLowerCase().includes('shortlist') ?? false)
-      ).length || 0;
+      const totalShortlisted = shortlistedCount || 0;
       
       const totalRejected = rejectedCount || 0;
       
