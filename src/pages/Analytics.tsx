@@ -163,10 +163,15 @@ export default function Analytics() {
       ).length || 0;
       
       // Rejected: contacted = 'Rejected' (case-insensitive)
-      const totalRejected = candidates?.filter(c => c.contacted?.toLowerCase() === 'rejected').length || 0;
+      const totalRejected = candidates?.filter(c => 
+        c.contacted?.toLowerCase() === 'rejected'
+      ).length || 0;
       
-      // Submitted: submitted_at is not null
-      const totalSubmitted = candidates?.filter(c => c.submitted_at !== null).length || 0;
+      // Submitted: submitted_at is not null OR contacted = 'Submitted'
+      const totalSubmitted = candidates?.filter(c => 
+        (c.submitted_at !== null && String(c.submitted_at).trim() !== '') ||
+        c.contacted?.toLowerCase() === 'submitted'
+      ).length || 0;
 
       // === DEBUG: Detailed Filter Results ===
       console.log('=== ANALYTICS DEBUG: Filter Results ===');
