@@ -202,7 +202,7 @@ export default function CallCandidate() {
       <MissionBackground>
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center space-y-6">
-            <div className="w-48 h-48 mx-auto">
+            <div className="w-32 h-32 mx-auto">
               <img 
                 src={theme === 'dark' 
                   ? (settings.logoLight || settings.logo || defaultLogo)
@@ -224,7 +224,7 @@ export default function CallCandidate() {
       <MissionBackground>
         <div className="min-h-screen flex items-center justify-center p-4">
           <GlassCard className="max-w-md w-full p-8 text-center space-y-6">
-            <div className="w-48 h-48 mx-auto">
+            <div className="w-32 h-32 mx-auto">
               <img 
                 src={theme === 'dark' 
                   ? (settings.logoLight || settings.logo || defaultLogo)
@@ -248,7 +248,7 @@ export default function CallCandidate() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <GlassCard className="max-w-xl w-full p-8">
           <div className="text-center mb-8 space-y-8">
-            <div className="w-48 h-48 mx-auto">
+            <div className="w-32 h-32 mx-auto">
               <img 
                 src={theme === 'dark' 
                   ? (settings.logoLight || settings.logo || defaultLogo)
