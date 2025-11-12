@@ -34,6 +34,7 @@ const Interviews = lazy(() => import("./pages/Interviews"));
 const Tasks = lazy(() => import("./pages/Tasks"));
 const Apply = lazy(() => import("./pages/Apply"));
 const CallCandidate = lazy(() => import("./pages/CallCandidate"));
+const RedirectWebhook = lazy(() => import("./pages/RedirectWebhook"));
 const UsersPanel = lazy(() => import("./pages/UsersPanel"));
 const TeamUsers = lazy(() => import("./pages/TeamUsers"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -67,6 +68,7 @@ const App = () => (
                   <Route path="/apply" element={<Apply />} />
                   <Route path="/apply/:subdomain" element={<Apply />} />
                   <Route path="/call-candidate" element={<CallCandidate />} />
+                  <Route path="/redirect-webhook" element={<RedirectWebhook />} />
                   <Route path="/" element={<DashboardLayout><Index /></DashboardLayout>} />
                   <Route path="/live-feed" element={<DashboardLayout><LiveCandidateFeed /></DashboardLayout>} />
                   <Route path="/tasks" element={<DashboardLayout><Tasks /></DashboardLayout>} />
