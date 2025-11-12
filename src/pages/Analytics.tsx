@@ -103,7 +103,7 @@ export default function Analytics() {
       console.log('Fetching analytics data...');
       
       // Parallel fetch with only required fields for 10x faster loading
-      const [candidatesResult, jobsResult, countResult, submittedCountResult] = await Promise.all([
+      const [candidatesResult, jobsResult, countResult, submittedCountResult, rejectedCountResult] = await Promise.all([
         supabase
           .from('Jobs_CVs')
           .select('job_id, contacted, cv_score, after_call_score, callcount, current_salary, salary_expectations, submitted_at, longlisted_at, shortlisted_at, lastcalltime'),
@@ -120,18 +120,26 @@ export default function Analytics() {
         supabase
           .from('Jobs_CVs')
           .select('*', { count: 'exact', head: true })
-          .or('submitted_at.not.is.null,contacted.ilike.%submit%')
+          .or('submitted_at.not.is.null,contacted.ilike.%submit%'),
+        
+        // Accurate server-side count for rejected
+        supabase
+          .from('Jobs_CVs')
+          .select('*', { count: 'exact', head: true })
+          .ilike('contacted', '%reject%')
       ]);
 
       const { data: candidates, error: candidatesError } = candidatesResult;
       const { data: jobs, error: jobsError } = jobsResult;
       const { count: totalCandidates, error: countError } = countResult;
       const { count: submittedCount, error: submittedCountError } = submittedCountResult;
+      const { count: rejectedCount, error: rejectedCountError } = rejectedCountResult;
 
       if (candidatesError) throw candidatesError;
       if (jobsError) throw jobsError;
       if (countError) throw countError;
       if (submittedCountError) throw submittedCountError;
+      if (rejectedCountError) throw rejectedCountError;
 
       console.log('Candidates fetched:', candidates?.length || 0);
       console.log('Total candidates count:', totalCandidates || 0);
@@ -176,9 +184,7 @@ export default function Analytics() {
         hasDate(c.shortlisted_at) || (c.contacted?.toLowerCase().includes('shortlist') ?? false)
       ).length || 0;
       
-      const totalRejected = candidates?.filter(c => 
-        (c.contacted?.toLowerCase().includes('reject') ?? false)
-      ).length || 0;
+      const totalRejected = rejectedCount || 0;
       
       const totalSubmitted = submittedCount || 0;
 
