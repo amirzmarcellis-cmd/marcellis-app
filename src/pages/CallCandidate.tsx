@@ -258,7 +258,7 @@ export default function CallCandidate() {
               />
             </div>
             <div>
-              <Phone className="w-16 h-16 mx-auto text-primary mb-4" />
+              <Phone className="w-10 h-10 mx-auto text-primary mb-4" />
               <h1 className="text-4xl font-light tracking-tight mb-2">Call Candidate</h1>
               <p className="text-muted-foreground">Review and confirm details before initiating the call</p>
             </div>
