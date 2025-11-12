@@ -65,6 +65,7 @@ export default function CallLogDetails() {
   const navigate = useNavigate()
   const [callLog, setCallLog] = useState<CallLogDetail | null>(null)
   const [loading, setLoading] = useState(true)
+  const [hasCvLink, setHasCvLink] = useState(false)
   const [notes, setNotes] = useState("")
   const [saving, setSaving] = useState(false)
   const [search, setSearch] = useState("")
@@ -266,6 +267,9 @@ export default function CallLogDetails() {
       }
 
       console.log('Enriched data:', enrichedData);
+      
+      // Set hasCvLink state
+      setHasCvLink(!!cvLink);
 
       // If there's a notes_updated_by user ID, fetch their profile
       if (enrichedData.notes_updated_by) {
@@ -446,7 +450,8 @@ export default function CallLogDetails() {
               {callLog.nationality && (
                 <p className="text-sm font-light font-inter text-muted-foreground">Nationality: {callLog.nationality}</p>
               )}
-              <Button
+              {hasCvLink && (
+                <Button
                 variant="outline"
                 size="sm"
                 onClick={async () => {
@@ -514,6 +519,7 @@ export default function CallLogDetails() {
                 <Link2 className="w-4 h-4 mr-2" />
                 View CV
               </Button>
+              )}
               <div className="flex flex-wrap gap-2 mt-2">
                 <Badge variant="outline" className="text-xs">
                   User ID: {callLog.user_id}
