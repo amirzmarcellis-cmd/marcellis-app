@@ -696,7 +696,7 @@ export default function CallLogDetails() {
                       const amt = parseInt(String(callLog.current_salary), 10);
                       if (isNaN(amt)) return callLog.current_salary;
                       const sar = convertToSAR(amt, 'PKR');
-                      return `SAR ${sar.toLocaleString()} (from PKR ${amt.toLocaleString()})`;
+                      return `SAR ${sar.toLocaleString()}`;
                     })()
                   : 'N/A'}
               </p>
