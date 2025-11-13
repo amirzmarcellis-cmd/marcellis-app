@@ -223,7 +223,7 @@ export default function Index() {
         const {
           data,
           error
-        } = await supabase.from('Jobs_CVs').select('job_id, recordid, cv_score, after_call_score, shortlisted_at, contacted, candidate_name, candidate_email, candidate_phone_number, call_summary, lastcalltime, user_id, source, submitted_at').in('job_id', jobIds).limit(1000); // Reduced from 5000 to 1000 for faster loading
+        } = await supabase.from('Jobs_CVs').select('job_id, recordid, cv_score, after_call_score, shortlisted_at, contacted, candidate_name, candidate_email, candidate_phone_number, call_summary, lastcalltime, user_id, source, submitted_at, salary_expectations').in('job_id', jobIds).limit(1000); // Reduced from 5000 to 1000 for faster loading
         jobsCvsData = data || [];
         jobsCvsError = error;
       }
@@ -771,6 +771,11 @@ export default function Index() {
                                  <Badge variant="outline" className="text-xs border-purple-400/50 text-purple-400 bg-purple-400/10">
                                    Job ID: {candidate.job_id}
                                  </Badge>
+                                 {candidate.salary_expectations && (
+                                   <Badge variant="outline" className="text-xs border-emerald-400/50 text-emerald-400 bg-emerald-400/10">
+                                     Expected: {candidate.salary_expectations}
+                                   </Badge>
+                                 )}
                                </div>
                              </div>
                           </div>
