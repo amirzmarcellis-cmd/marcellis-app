@@ -29,9 +29,18 @@ const convertSalary = (salaryStr: string | null, targetCurrency: string = 'SAR')
   // Extract numbers and currency from string (e.g., "35000 aed to 40000 aed")
   const numbers = salaryStr.match(/\d+/g)?.map(n => parseInt(n)) || [];
   const currencyMatch = salaryStr.match(/aed|sar|usd|eur|gbp|inr|pkr|egp/gi);
-  const sourceCurrency = currencyMatch ? currencyMatch[0].toUpperCase() : 'AED';
   
   if (numbers.length === 0) return salaryStr;
+  
+  // If no currency found in string, assume it's already in the job's currency
+  if (!currencyMatch) {
+    if (numbers.length === 2) {
+      return `${targetCurrency} ${numbers[0].toLocaleString()} - ${numbers[1].toLocaleString()}`;
+    }
+    return `${targetCurrency} ${numbers[0].toLocaleString()}`;
+  }
+  
+  const sourceCurrency = currencyMatch[0].toUpperCase();
   
   // If already in target currency, just format
   if (sourceCurrency === targetCurrency) {
@@ -49,11 +58,11 @@ const convertSalary = (salaryStr: string | null, targetCurrency: string = 'SAR')
   if (numbers.length === 2) {
     const min = Math.round(numbers[0] * finalRate);
     const max = Math.round(numbers[1] * finalRate);
-    return `${targetCurrency} ${min.toLocaleString()} - ${max.toLocaleString()} (converted from ${sourceCurrency})`;
+    return `${targetCurrency} ${min.toLocaleString()} - ${max.toLocaleString()} (from ${sourceCurrency})`;
   }
   
   const converted = Math.round(numbers[0] * finalRate);
-  return `${targetCurrency} ${converted.toLocaleString()} (converted from ${sourceCurrency})`;
+  return `${targetCurrency} ${converted.toLocaleString()} (from ${sourceCurrency})`;
 };
 
 export default function CallLogDetailPage() {
