@@ -299,11 +299,16 @@ export default function Analytics() {
             }, 0) / candidatesWithExpectedSalary.length)
           : 0;
         
-        return {
+        const result = {
           jobTitle: job.job_title || 'Unknown',
           avgCurrent,
           avgExpected
         };
+        
+        // Debug logging to identify which job has high values
+        console.log(`Job: ${result.jobTitle}, Avg Current: ${avgCurrent}, Avg Expected: ${avgExpected}`);
+        
+        return result;
       }).filter(j => j.avgCurrent > 0 || j.avgExpected > 0) || [];
 
       // Calculate average days to hire (longlist -> shortlist) + (shortlist -> submitted)
