@@ -2164,8 +2164,24 @@ export default function JobDetails() {
     );
   };
   const formatCurrency = (amountStr: string | null | undefined, currency?: string | null) => {
-    const amount = parseFloat((amountStr || "").toString().replace(/[^0-9.]/g, ""));
-    if (!amount || !currency) return amountStr || "N/A";
+    if (!amountStr) return "N/A";
+    const raw = String(amountStr);
+    // Extract numeric parts (handles ranges like "35000 aed to 40000 aed" or "35,000 - 40,000")
+    const nums = (raw.match(/\d+(?:[.,]\d+)?/g) || []).map((s) => parseFloat(s.replace(/,/g, "")));
+
+    // If we have a range (2+ numbers), format as "AED 35,000 - 40,000"
+    if (nums.length >= 2) {
+      const [a, b] = nums;
+      const min = Math.min(a, b);
+      const max = Math.max(a, b);
+      const nf = new Intl.NumberFormat("en", { maximumFractionDigits: 0 });
+      const cur = currency || "AED";
+      return `${cur} ${nf.format(min)} - ${nf.format(max)}`;
+    }
+
+    // Single value fallback
+    const amount = nums[0];
+    if (amount === undefined || amount === null || isNaN(amount) || !currency) return amountStr || "N/A";
     try {
       return new Intl.NumberFormat("en", {
         style: "currency",
@@ -2174,7 +2190,8 @@ export default function JobDetails() {
         maximumFractionDigits: 0,
       }).format(amount);
     } catch {
-      return `${currency} ${isNaN(amount) ? amountStr : amount.toLocaleString()}`;
+      const nf = new Intl.NumberFormat("en", { maximumFractionDigits: 0 });
+      return `${currency} ${nf.format(amount)}`;
     }
   };
 
