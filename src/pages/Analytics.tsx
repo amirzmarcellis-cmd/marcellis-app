@@ -531,7 +531,6 @@ export default function Analytics() {
               <div>
                 <p className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">Total Candidates</p>
                 <p className="text-5xl font-light font-work text-foreground mt-2">{data?.totalCandidates || 0}</p>
-                <p className="text-xs font-light font-inter text-muted-foreground mt-1">From Jobs_CVs table</p>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
                 <Users className="w-8 h-8 text-white" />
@@ -561,11 +560,6 @@ export default function Analytics() {
               <div>
                 <p className="text-blue-200 text-sm font-medium">Total Call Logs</p>
                 <p className="text-4xl font-bold text-foreground mt-2">{data?.totalCallLogs || 0}</p>
-                <div className="text-xs text-cyan-300 mt-1">
-                  <Badge className="bg-cyan-400/20 text-cyan-400 border-cyan-400/30">
-                    {data?.contactedCount || 0} Contacted
-                  </Badge>
-                </div>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
                 <Phone className="w-8 h-8 text-white" />
@@ -727,6 +721,7 @@ export default function Analytics() {
                           borderRadius: '8px',
                           color: 'hsl(var(--foreground))'
                         }}
+                        formatter={(value: any, name: any, props: any) => [value, props.payload.name]}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -793,6 +788,7 @@ export default function Analytics() {
                           borderRadius: '8px',
                           color: 'hsl(var(--foreground))'
                         }}
+                        formatter={(value: any, name: any, props: any) => [value, props.payload.name]}
                       />
                     </PieChart>
                   </ResponsiveContainer>
