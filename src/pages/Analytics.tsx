@@ -100,7 +100,7 @@ export default function Analytics() {
         
         supabase
           .from('Jobs')
-          .select('job_id, job_title, Processed'),
+          .select('job_id, job_title, Processed, Currency'),
         
         supabase
           .from('Jobs_CVs')
@@ -274,6 +274,22 @@ export default function Analytics() {
           rank: index + 1
         }));
 
+      // Currency conversion rates to SAR
+      const CURRENCY_TO_SAR: { [key: string]: number } = {
+        'PKR': 0.013,
+        'AED': 1.0,
+        'SAR': 1.0,
+        'USD': 3.75,
+        'EUR': 4.1,
+        'GBP': 4.7
+      };
+
+      const convertToSAR = (amount: number, currency?: string): number => {
+        if (!currency) return amount;
+        const rate = CURRENCY_TO_SAR[currency.toUpperCase()] || 1.0;
+        return Math.round(amount * rate);
+      };
+
       // Average salaries by job
       const averageSalariesByJob = jobs?.map(job => {
         const jobCandidates = candidates?.filter(c => c.job_id === job.job_id) || [];
@@ -281,21 +297,34 @@ export default function Analytics() {
         const candidatesWithExpectedSalary = jobCandidates.filter(c => c.salary_expectations);
         
         const avgCurrent = candidatesWithCurrentSalary.length > 0
-          ? Math.round(candidatesWithCurrentSalary.reduce((sum, c) => sum + (c.current_salary || 0), 0) / candidatesWithCurrentSalary.length)
+          ? Math.round(candidatesWithCurrentSalary.reduce((sum, c) => {
+              // Convert all salaries to SAR before averaging
+              const salaryInSAR = convertToSAR(c.current_salary || 0, job.Currency);
+              return sum + salaryInSAR;
+            }, 0) / candidatesWithCurrentSalary.length)
           : 0;
         
         const avgExpected = candidatesWithExpectedSalary.length > 0
           ? Math.round(candidatesWithExpectedSalary.reduce((sum, c) => {
               // Parse salary expectations handling ranges like "35000 aed to 40000 aed"
-              const salaryStr = String(c.salary_expectations || '');
+              const salaryStr = String(c.salary_expectations || '').toLowerCase();
               const nums = (salaryStr.match(/\d+(?:[.,]\d+)?/g) || []).map(s => parseFloat(s.replace(/,/g, '')));
+              
+              // Extract currency from salary string
+              let currency = job.Currency || 'SAR';
+              if (salaryStr.includes('pkr')) currency = 'PKR';
+              else if (salaryStr.includes('aed')) currency = 'AED';
+              else if (salaryStr.includes('sar')) currency = 'SAR';
+              else if (salaryStr.includes('usd')) currency = 'USD';
               
               // If range, take average of min and max, otherwise use single value
               const salary = nums.length >= 2 
                 ? (Math.min(...nums) + Math.max(...nums)) / 2
                 : (nums[0] || 0);
               
-              return sum + salary;
+              // Convert to SAR before summing
+              const salaryInSAR = convertToSAR(salary, currency);
+              return sum + salaryInSAR;
             }, 0) / candidatesWithExpectedSalary.length)
           : 0;
         
