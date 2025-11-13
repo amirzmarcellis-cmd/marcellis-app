@@ -58,6 +58,16 @@ interface AnalyticsData {
     avgExpected: number;
     avgCurrent: number;
   }>;
+  averageSalariesByJobAED: Array<{
+    jobTitle: string;
+    avgExpected: number;
+    avgCurrent: number;
+  }>;
+  averageSalariesByJobSAR: Array<{
+    jobTitle: string;
+    avgExpected: number;
+    avgCurrent: number;
+  }>;
   callSuccessRate: number;
   contactRate: number;
   avgCandidatesPerJob: number;
@@ -100,7 +110,7 @@ export default function Analytics() {
         
         supabase
           .from('Jobs')
-          .select('job_id, job_title, Processed'),
+          .select('job_id, job_title, Processed, Currency'),
         
         supabase
           .from('Jobs_CVs')
@@ -302,14 +312,19 @@ export default function Analytics() {
         const result = {
           jobTitle: job.job_title || 'Unknown',
           avgCurrent,
-          avgExpected
+          avgExpected,
+          currency: job.Currency || 'SAR'
         };
         
         // Debug logging to identify which job has high values
-        console.log(`Job: ${result.jobTitle}, Avg Current: ${avgCurrent}, Avg Expected: ${avgExpected}`);
+        console.log(`Job: ${result.jobTitle}, Avg Current: ${avgCurrent}, Avg Expected: ${avgExpected}, Currency: ${result.currency}`);
         
         return result;
       }).filter(j => j.avgCurrent > 0 || j.avgExpected > 0) || [];
+
+      // Split by currency
+      const averageSalariesByJobAED = averageSalariesByJob.filter(j => j.currency?.toUpperCase() === 'AED');
+      const averageSalariesByJobSAR = averageSalariesByJob.filter(j => j.currency?.toUpperCase() === 'SAR' || !j.currency);
 
       // Calculate average days to hire (longlist -> shortlist) + (shortlist -> submitted)
       const toDate = (val: any): Date | null => {
@@ -377,6 +392,8 @@ export default function Analytics() {
         topPerformingJobs,
         averageScoresByJob,
         averageSalariesByJob,
+        averageSalariesByJobAED,
+        averageSalariesByJobSAR,
         callSuccessRate: totalCallLogs > 0 ? Math.round((contactedCount / totalCallLogs) * 100) : 0,
         contactRate: totalCandidates > 0 ? Math.round((contactedCount / totalCandidates) * 100) : 0,
         avgCandidatesPerJob: activeJobs > 0 ? Math.round(totalCandidates / activeJobs) : 0
@@ -416,6 +433,8 @@ export default function Analytics() {
         topPerformingJobs: [],
         averageScoresByJob: [],
         averageSalariesByJob: [],
+        averageSalariesByJobAED: [],
+        averageSalariesByJobSAR: [],
         callSuccessRate: 0,
         contactRate: 0,
         avgCandidatesPerJob: 0
@@ -787,7 +806,7 @@ export default function Analytics() {
         </Card>
       </div>
 
-      {/* Bottom Section */}
+      {/* Bottom Section - Candidates and Jobs */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Candidates per Job */}
         <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
@@ -913,19 +932,23 @@ export default function Analytics() {
           </CardContent>
         </Card>
 
-        {/* Average Salaries by Job */}
+      </div>
+
+      {/* Salary Analytics by Currency */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+        {/* Average Salaries - SAR Jobs */}
         <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
           <CardHeader>
             <CardTitle className="text-foreground flex items-center">
               <TrendingUp className="w-5 h-5 mr-2" />
-              Average Salaries by Job
+              Average Salaries by Job (SAR)
             </CardTitle>
           </CardHeader>
           <CardContent>
             <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
-              {data?.averageSalariesByJob && data.averageSalariesByJob.length > 0 ? (
+              {data?.averageSalariesByJobSAR && data.averageSalariesByJobSAR.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={data.averageSalariesByJob}>
+                  <BarChart data={data.averageSalariesByJobSAR}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                     <XAxis 
                       dataKey="jobTitle" 
@@ -942,13 +965,55 @@ export default function Analytics() {
                         borderRadius: '8px'
                       }}
                     />
-                    <Bar dataKey="avgCurrent" name="Current Salary" fill="#3b82f6" />
-                    <Bar dataKey="avgExpected" name="Expected Salary" fill="#f59e0b" />
+                    <Bar dataKey="avgCurrent" name="Current Salary (SAR)" fill="#3b82f6" />
+                    <Bar dataKey="avgExpected" name="Expected Salary (SAR)" fill="#f59e0b" />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
                 <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-                  No salary data available for jobs
+                  No SAR salary data available
+                </div>
+              )}
+            </Suspense>
+          </CardContent>
+        </Card>
+
+        {/* Average Salaries - AED Jobs */}
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
+          <CardHeader>
+            <CardTitle className="text-foreground flex items-center">
+              <TrendingUp className="w-5 h-5 mr-2" />
+              Average Salaries by Job (AED)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
+              {data?.averageSalariesByJobAED && data.averageSalariesByJobAED.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={data.averageSalariesByJobAED}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis 
+                      dataKey="jobTitle" 
+                      angle={-45}
+                      textAnchor="end"
+                      height={100}
+                      tick={{ fontSize: 10, fill: '#93c5fd' }}
+                    />
+                    <YAxis tick={{ fill: '#93c5fd' }} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: '#1f2937', 
+                        border: '1px solid #374151',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Bar dataKey="avgCurrent" name="Current Salary (AED)" fill="#10b981" />
+                    <Bar dataKey="avgExpected" name="Expected Salary (AED)" fill="#ec4899" />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                  No AED salary data available
                 </div>
               )}
             </Suspense>
