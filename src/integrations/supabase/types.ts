@@ -399,7 +399,7 @@ export type Database = {
           submitted_at: string | null
           transcript: string | null
           two_questions_of_interview: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           after_call_cons?: string | null
@@ -446,7 +446,7 @@ export type Database = {
           submitted_at?: string | null
           transcript?: string | null
           two_questions_of_interview?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           after_call_cons?: string | null
@@ -493,7 +493,7 @@ export type Database = {
           submitted_at?: string | null
           transcript?: string | null
           two_questions_of_interview?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -504,13 +504,13 @@ export type Database = {
           connection_request_time: string | null
           id: number
           invitation_id: string | null
-          job_id: string | null
-          linkedin_id: string | null
-          recruiter_id: string | null
-          status: string | null
+          job_id: string
+          linkedin_id: string
+          recruiter_id: string
+          status: string
           thread_id: string | null
-          unipile_user_id: string | null
-          user_id: string | null
+          unipile_user_id: string
+          user_id: string
         }
         Insert: {
           apollo_id?: string | null
@@ -518,13 +518,13 @@ export type Database = {
           connection_request_time?: string | null
           id?: number
           invitation_id?: string | null
-          job_id?: string | null
-          linkedin_id?: string | null
-          recruiter_id?: string | null
-          status?: string | null
+          job_id: string
+          linkedin_id: string
+          recruiter_id: string
+          status: string
           thread_id?: string | null
-          unipile_user_id?: string | null
-          user_id?: string | null
+          unipile_user_id: string
+          user_id?: string
         }
         Update: {
           apollo_id?: string | null
@@ -532,13 +532,13 @@ export type Database = {
           connection_request_time?: string | null
           id?: number
           invitation_id?: string | null
-          job_id?: string | null
-          linkedin_id?: string | null
-          recruiter_id?: string | null
-          status?: string | null
+          job_id?: string
+          linkedin_id?: string
+          recruiter_id?: string
+          status?: string
           thread_id?: string | null
-          unipile_user_id?: string | null
-          user_id?: string | null
+          unipile_user_id?: string
+          user_id?: string
         }
         Relationships: []
       }
