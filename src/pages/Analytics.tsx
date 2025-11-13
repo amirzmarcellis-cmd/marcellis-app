@@ -289,22 +289,22 @@ export default function Analytics() {
           rank: index + 1
         }));
 
-      // Average salaries by job - with currency conversion to SAR
+      // Average salaries by job - with currency conversion to AED
       const averageSalariesByJob = jobs?.map(job => {
         const jobCandidates = candidates?.filter(c => c.job_id === job.job_id) || [];
         const candidatesWithCurrentSalary = jobCandidates.filter(c => c.current_salary);
         const candidatesWithExpectedSalary = jobCandidates.filter(c => c.salary_expectations);
         
-        const avgCurrent = candidatesWithCurrentSalary.length > 0
-          ? Math.round(candidatesWithCurrentSalary.reduce((sum, c) => {
+        const avgCurrentSAR = candidatesWithCurrentSalary.length > 0
+          ? candidatesWithCurrentSalary.reduce((sum, c) => {
               const amount = parseInt(String(c.current_salary || 0), 10);
               // Assume PKR for current_salary as it's typically stored as numeric PKR values
               return sum + convertToSAR(amount, 'PKR');
-            }, 0) / candidatesWithCurrentSalary.length)
+            }, 0) / candidatesWithCurrentSalary.length
           : 0;
         
-        const avgExpected = candidatesWithExpectedSalary.length > 0
-          ? Math.round(candidatesWithExpectedSalary.reduce((sum, c) => {
+        const avgExpectedSAR = candidatesWithExpectedSalary.length > 0
+          ? candidatesWithExpectedSalary.reduce((sum, c) => {
               // Parse salary expectations handling ranges like "35000 aed to 40000 aed"
               const salaryStr = String(c.salary_expectations || '').toLowerCase();
               const nums = (salaryStr.match(/\d+(?:[.,]\d+)?/g) || []).map(s => parseFloat(s.replace(/,/g, '')));
@@ -324,8 +324,12 @@ export default function Analytics() {
               
               // Convert to SAR
               return sum + convertToSAR(salary, currency);
-            }, 0) / candidatesWithExpectedSalary.length)
+            }, 0) / candidatesWithExpectedSalary.length
           : 0;
+        
+        // Convert from SAR to AED for display (1 AED = 1.02 SAR)
+        const avgCurrent = Math.round(avgCurrentSAR / 1.02);
+        const avgExpected = Math.round(avgExpectedSAR / 1.02);
         
         const result = {
           jobTitle: job.job_title || 'Unknown',
@@ -946,7 +950,7 @@ export default function Analytics() {
           <CardHeader>
             <CardTitle className="text-foreground flex items-center">
               <TrendingUp className="w-5 h-5 mr-2" />
-              Average Salaries by Job
+              Average Salaries by Job (AED)
             </CardTitle>
           </CardHeader>
           <CardContent>
