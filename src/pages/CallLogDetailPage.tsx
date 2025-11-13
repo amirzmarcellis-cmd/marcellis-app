@@ -308,7 +308,16 @@ export default function CallLogDetailPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <span className="text-muted-foreground">Current Salary:</span>
-              <p className="font-medium">{record.current_salary || 'N/A'}</p>
+              <div className="space-y-1">
+                <p className="font-medium text-sm text-muted-foreground">
+                  {record.current_salary ? `PKR ${parseInt(record.current_salary).toLocaleString()}` : 'N/A'}
+                </p>
+                {job?.Currency && record.current_salary && (
+                  <p className="font-medium text-primary">
+                    {job.Currency} {Math.round(parseInt(record.current_salary) * CURRENCY_TO_SAR['PKR']).toLocaleString()} (from PKR)
+                  </p>
+                )}
+              </div>
             </div>
             <div className="space-y-2">
               <span className="text-muted-foreground">Salary Expectations:</span>
