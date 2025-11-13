@@ -10,10 +10,57 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 
+// Currency conversion rates (approximate, to SAR base)
+const CURRENCY_TO_SAR: { [key: string]: number } = {
+  'SAR': 1,
+  'AED': 1.02, // 1 AED ≈ 1.02 SAR
+  'USD': 3.75,
+  'EUR': 4.10,
+  'GBP': 4.75,
+  'INR': 0.045,
+  'PKR': 0.013,
+  'EGP': 0.076,
+};
+
+// Parse salary string and convert to target currency
+const convertSalary = (salaryStr: string | null, targetCurrency: string = 'SAR'): string => {
+  if (!salaryStr) return 'N/A';
+  
+  // Extract numbers and currency from string (e.g., "35000 aed to 40000 aed")
+  const numbers = salaryStr.match(/\d+/g)?.map(n => parseInt(n)) || [];
+  const currencyMatch = salaryStr.match(/aed|sar|usd|eur|gbp|inr|pkr|egp/gi);
+  const sourceCurrency = currencyMatch ? currencyMatch[0].toUpperCase() : 'AED';
+  
+  if (numbers.length === 0) return salaryStr;
+  
+  // If already in target currency, just format
+  if (sourceCurrency === targetCurrency) {
+    if (numbers.length === 2) {
+      return `${targetCurrency} ${numbers[0].toLocaleString()} - ${numbers[1].toLocaleString()}`;
+    }
+    return `${targetCurrency} ${numbers[0].toLocaleString()}`;
+  }
+  
+  // Convert to target currency
+  const conversionRate = CURRENCY_TO_SAR[sourceCurrency] || 1;
+  const targetRate = CURRENCY_TO_SAR[targetCurrency] || 1;
+  const finalRate = conversionRate / targetRate;
+  
+  if (numbers.length === 2) {
+    const min = Math.round(numbers[0] * finalRate);
+    const max = Math.round(numbers[1] * finalRate);
+    return `${targetCurrency} ${min.toLocaleString()} - ${max.toLocaleString()} (converted from ${sourceCurrency})`;
+  }
+  
+  const converted = Math.round(numbers[0] * finalRate);
+  return `${targetCurrency} ${converted.toLocaleString()} (converted from ${sourceCurrency})`;
+};
+
 export default function CallLogDetailPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [record, setRecord] = useState<any>(null);
+  const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   const recordId = searchParams.get('recordId');
@@ -45,6 +92,19 @@ export default function CallLogDetailPage() {
 
       if (error) throw error;
       setRecord(data);
+      
+      // Fetch job details to get currency
+      if (data?.job_id) {
+        const { data: jobData } = await supabase
+          .from('Jobs')
+          .select('Currency, job_title')
+          .eq('job_id', data.job_id)
+          .single();
+        
+        if (jobData) {
+          setJob(jobData);
+        }
+      }
     } catch (error) {
       console.error('Error fetching record:', error);
     } finally {
@@ -243,7 +303,14 @@ export default function CallLogDetailPage() {
             </div>
             <div className="space-y-2">
               <span className="text-muted-foreground">Salary Expectations:</span>
-              <p className="font-medium">{record.salary_expectations || 'N/A'}</p>
+              <div className="space-y-1">
+                <p className="font-medium text-sm text-muted-foreground">{record.salary_expectations || 'N/A'}</p>
+                {job?.Currency && record.salary_expectations && (
+                  <p className="font-medium text-primary">
+                    {convertSalary(record.salary_expectations, job.Currency)}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </CardContent>
