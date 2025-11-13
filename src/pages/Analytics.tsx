@@ -286,7 +286,15 @@ export default function Analytics() {
         
         const avgExpected = candidatesWithExpectedSalary.length > 0
           ? Math.round(candidatesWithExpectedSalary.reduce((sum, c) => {
-              const salary = parseInt(c.salary_expectations?.replace(/[^\d]/g, '') || '0');
+              // Parse salary expectations handling ranges like "35000 aed to 40000 aed"
+              const salaryStr = String(c.salary_expectations || '');
+              const nums = (salaryStr.match(/\d+(?:[.,]\d+)?/g) || []).map(s => parseFloat(s.replace(/,/g, '')));
+              
+              // If range, take average of min and max, otherwise use single value
+              const salary = nums.length >= 2 
+                ? (Math.min(...nums) + Math.max(...nums)) / 2
+                : (nums[0] || 0);
+              
               return sum + salary;
             }, 0) / candidatesWithExpectedSalary.length)
           : 0;
