@@ -703,7 +703,32 @@ export default function CallLogDetails() {
             </div>
             <div>
               <label className="text-sm font-medium text-muted-foreground">Expected Salary</label>
-              <p className="text-lg">{callLog.salary_expectations || 'N/A'}</p>
+              <p className="text-lg">
+                {callLog.salary_expectations
+                  ? (() => {
+                      const str = String(callLog.salary_expectations);
+                      const numbers = str.match(/\d+/g)?.map((n) => parseInt(n, 10)) || [];
+                      const currencyMatch = str.match(/aed|sar|usd|eur|gbp|inr|pkr|egp/gi);
+                      const src = (currencyMatch?.[0] || 'SAR').toUpperCase();
+                      const toSar = (val: number) => convertToSAR(val, src);
+                      if (numbers.length === 0) return `SAR ${str}`;
+                      if (numbers.length >= 2) {
+                        const minSar = toSar(numbers[0]).toLocaleString();
+                        const maxSar = toSar(numbers[1]).toLocaleString();
+                        if (src !== 'SAR') {
+                          return `SAR ${minSar} - ${maxSar} (from ${src} ${numbers[0].toLocaleString()} - ${numbers[1].toLocaleString()})`;
+                        }
+                        return `SAR ${numbers[0].toLocaleString()} - ${numbers[1].toLocaleString()}`;
+                      } else {
+                        const sarVal = toSar(numbers[0]).toLocaleString();
+                        if (src !== 'SAR') {
+                          return `SAR ${sarVal} (from ${src} ${numbers[0].toLocaleString()})`;
+                        }
+                        return `SAR ${numbers[0].toLocaleString()}`;
+                      }
+                    })()
+                  : 'N/A'}
+              </p>
             </div>
           </CardContent>
         </Card>
