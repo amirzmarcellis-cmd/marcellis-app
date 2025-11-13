@@ -79,21 +79,6 @@ const COLORS = {
   primary: '#00ffff',  // cyan-400
 };
 
-// Currency conversion rates to SAR
-const CURRENCY_TO_SAR: Record<string, number> = {
-  SAR: 1,
-  AED: 1.02,
-  PKR: 0.013,
-  USD: 3.75,
-  EUR: 4.10,
-  GBP: 4.76,
-};
-
-const convertToSAR = (amount: number, currency: string): number => {
-  const rate = CURRENCY_TO_SAR[currency.toUpperCase()] || 1;
-  return Math.round(amount * rate);
-};
-
 export default function Analytics() {
   
   const [data, setData] = useState<AnalyticsData | null>(null);
@@ -289,47 +274,30 @@ export default function Analytics() {
           rank: index + 1
         }));
 
-      // Average salaries by job - with currency conversion to AED
+      // Average salaries by job
       const averageSalariesByJob = jobs?.map(job => {
         const jobCandidates = candidates?.filter(c => c.job_id === job.job_id) || [];
         const candidatesWithCurrentSalary = jobCandidates.filter(c => c.current_salary);
         const candidatesWithExpectedSalary = jobCandidates.filter(c => c.salary_expectations);
         
-        const avgCurrentSAR = candidatesWithCurrentSalary.length > 0
-          ? candidatesWithCurrentSalary.reduce((sum, c) => {
-              const amount = parseInt(String(c.current_salary || 0), 10);
-              // Assume PKR for current_salary as it's typically stored as numeric PKR values
-              return sum + convertToSAR(amount, 'PKR');
-            }, 0) / candidatesWithCurrentSalary.length
+        const avgCurrent = candidatesWithCurrentSalary.length > 0
+          ? Math.round(candidatesWithCurrentSalary.reduce((sum, c) => sum + (c.current_salary || 0), 0) / candidatesWithCurrentSalary.length)
           : 0;
         
-        const avgExpectedSAR = candidatesWithExpectedSalary.length > 0
-          ? candidatesWithExpectedSalary.reduce((sum, c) => {
+        const avgExpected = candidatesWithExpectedSalary.length > 0
+          ? Math.round(candidatesWithExpectedSalary.reduce((sum, c) => {
               // Parse salary expectations handling ranges like "35000 aed to 40000 aed"
-              const salaryStr = String(c.salary_expectations || '').toLowerCase();
+              const salaryStr = String(c.salary_expectations || '');
               const nums = (salaryStr.match(/\d+(?:[.,]\d+)?/g) || []).map(s => parseFloat(s.replace(/,/g, '')));
-              
-              // Detect currency from string
-              let currency = 'SAR'; // default
-              if (salaryStr.includes('pkr')) currency = 'PKR';
-              else if (salaryStr.includes('aed')) currency = 'AED';
-              else if (salaryStr.includes('usd')) currency = 'USD';
-              else if (salaryStr.includes('eur')) currency = 'EUR';
-              else if (salaryStr.includes('gbp')) currency = 'GBP';
               
               // If range, take average of min and max, otherwise use single value
               const salary = nums.length >= 2 
                 ? (Math.min(...nums) + Math.max(...nums)) / 2
                 : (nums[0] || 0);
               
-              // Convert to SAR
-              return sum + convertToSAR(salary, currency);
-            }, 0) / candidatesWithExpectedSalary.length
+              return sum + salary;
+            }, 0) / candidatesWithExpectedSalary.length)
           : 0;
-        
-        // Convert from SAR to AED for display (1 AED = 1.02 SAR)
-        const avgCurrent = Math.round(avgCurrentSAR / 1.02);
-        const avgExpected = Math.round(avgExpectedSAR / 1.02);
         
         const result = {
           jobTitle: job.job_title || 'Unknown',
@@ -950,7 +918,7 @@ export default function Analytics() {
           <CardHeader>
             <CardTitle className="text-foreground flex items-center">
               <TrendingUp className="w-5 h-5 mr-2" />
-              Average Salaries by Job (AED)
+              Average Salaries by Job
             </CardTitle>
           </CardHeader>
           <CardContent>
