@@ -103,7 +103,7 @@ export default function Analytics() {
           .select('job_id, job_title, Processed, Currency'),
         
         supabase
-          .from('Jobs_CVs')
+          .from('CVs')
           .select('*', { count: 'exact', head: true }),
         
         // Accurate server-side count for submitted
