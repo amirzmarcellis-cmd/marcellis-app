@@ -773,7 +773,7 @@ export default function Index() {
                                  </Badge>
                                  {candidate.salary_expectations && (
                                    <Badge variant="outline" className="text-xs border-emerald-400/50 text-emerald-400 bg-emerald-400/10">
-                                     Expected: {candidate.salary_expectations}
+                                     Expected: {String(candidate.salary_expectations)}
                                    </Badge>
                                  )}
                                </div>
