@@ -709,6 +709,7 @@ export default function Analytics() {
                         dataKey="value"
                         label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
                         labelLine={false}
+                        isAnimationActive={false}
                       >
                         {scoreDistributionData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
@@ -721,6 +722,7 @@ export default function Analytics() {
                           borderRadius: '8px',
                           color: 'hsl(var(--foreground))'
                         }}
+                        wrapperStyle={{ pointerEvents: 'none' }}
                         formatter={(value: any, name: any, props: any) => [value, props.payload.name]}
                       />
                     </PieChart>
@@ -776,6 +778,7 @@ export default function Analytics() {
                         dataKey="value"
                         label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
                         labelLine={false}
+                        isAnimationActive={false}
                       >
                         {contactStatusData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
@@ -788,6 +791,7 @@ export default function Analytics() {
                           borderRadius: '8px',
                           color: 'hsl(var(--foreground))'
                         }}
+                        wrapperStyle={{ pointerEvents: 'none' }}
                         formatter={(value: any, name: any, props: any) => [value, props.payload.name]}
                       />
                     </PieChart>
