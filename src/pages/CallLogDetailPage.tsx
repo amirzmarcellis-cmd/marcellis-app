@@ -104,11 +104,13 @@ export default function CallLogDetailPage() {
       
       // Fetch job details to get currency
       if (data?.job_id) {
-        const { data: jobData } = await supabase
+        const { data: jobData, error: jobError } = await supabase
           .from('Jobs')
-          .select('Currency, job_title')
+          .select('"Currency", job_title')
           .eq('job_id', data.job_id)
           .single();
+        
+        console.log('Job data fetched:', jobData, jobError);
         
         if (jobData) {
           setJob(jobData);
