@@ -93,7 +93,7 @@ export default function Analytics() {
       console.log('Fetching analytics data...');
       
       // Parallel fetch with only required fields for 10x faster loading
-      const [candidatesResult, jobsResult, countResult, submittedCountResult, rejectedCountResult, shortlistedCountResult, longlistedCountResult] = await Promise.all([
+      const [candidatesResult, jobsResult, countResult, callLogsCountResult, submittedCountResult, rejectedCountResult, shortlistedCountResult, longlistedCountResult] = await Promise.all([
         supabase
           .from('Jobs_CVs')
           .select('job_id, contacted, cv_score, after_call_score, callcount, current_salary, salary_expectations, submitted_at, longlisted_at, shortlisted_at, lastcalltime'),
@@ -104,6 +104,11 @@ export default function Analytics() {
         
         supabase
           .from('CVs')
+          .select('*', { count: 'exact', head: true }),
+        
+        // Total call logs count from Jobs_CVs
+        supabase
+          .from('Jobs_CVs')
           .select('*', { count: 'exact', head: true }),
         
         // Accurate server-side count for submitted
@@ -134,6 +139,7 @@ export default function Analytics() {
       const { data: candidates, error: candidatesError } = candidatesResult;
       const { data: jobs, error: jobsError } = jobsResult;
       const { count: totalCandidates, error: countError } = countResult;
+      const { count: totalCallLogsCount, error: callLogsCountError } = callLogsCountResult;
       const { count: submittedCount, error: submittedCountError } = submittedCountResult;
       const { count: rejectedCount, error: rejectedCountError } = rejectedCountResult;
       const { count: shortlistedCount, error: shortlistedCountError } = shortlistedCountResult;
@@ -142,6 +148,7 @@ export default function Analytics() {
       if (candidatesError) throw candidatesError;
       if (jobsError) throw jobsError;
       if (countError) throw countError;
+      if (callLogsCountError) throw callLogsCountError;
       if (submittedCountError) throw submittedCountError;
       if (rejectedCountError) throw rejectedCountError;
       if (shortlistedCountError) throw shortlistedCountError;
@@ -173,7 +180,7 @@ export default function Analytics() {
         hired: candidates?.filter(c => c.contacted?.toLowerCase().includes('hire') ?? false).length || 0,
       };
 
-      const totalCallLogs = candidates?.filter(c => c.callcount && c.callcount > 0).length || 0;
+      const totalCallLogs = totalCallLogsCount || 0;
       const contactedCount = contactStatus.callDone + contactStatus.contacted;
 
       // Helper to validate date-like values
