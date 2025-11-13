@@ -79,6 +79,19 @@ const COLORS = {
   primary: '#00ffff',  // cyan-400
 };
 
+const CustomPieTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const item = payload[0];
+    return (
+      <div className="px-2 py-1 rounded-md border" style={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', color: 'hsl(var(--foreground))' }}>
+        <div className="text-xs">{item.payload.name}</div>
+        <div className="text-sm font-medium">{item.value}</div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function Analytics() {
   
   const [data, setData] = useState<AnalyticsData | null>(null);
@@ -706,6 +719,7 @@ export default function Analytics() {
                         innerRadius={70}
                         outerRadius={130}
                         paddingAngle={5}
+                        nameKey="name"
                         dataKey="value"
                         label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
                         labelLine={false}
@@ -716,14 +730,9 @@ export default function Analytics() {
                         ))}
                       </Pie>
                       <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px',
-                          color: 'hsl(var(--foreground))'
-                        }}
+                        content={<CustomPieTooltip />}
                         wrapperStyle={{ pointerEvents: 'none' }}
-                        formatter={(value: any, name: any, props: any) => [value, props.payload.name]}
+                        allowEscapeViewBox={{ x: true, y: true }}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -775,6 +784,7 @@ export default function Analytics() {
                         innerRadius={70}
                         outerRadius={130}
                         paddingAngle={3}
+                        nameKey="name"
                         dataKey="value"
                         label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
                         labelLine={false}
@@ -785,14 +795,9 @@ export default function Analytics() {
                         ))}
                       </Pie>
                       <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px',
-                          color: 'hsl(var(--foreground))'
-                        }}
+                        content={<CustomPieTooltip />}
                         wrapperStyle={{ pointerEvents: 'none' }}
-                        formatter={(value: any, name: any, props: any) => [value, props.payload.name]}
+                        allowEscapeViewBox={{ x: true, y: true }}
                       />
                     </PieChart>
                   </ResponsiveContainer>
