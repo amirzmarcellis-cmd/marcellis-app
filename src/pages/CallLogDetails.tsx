@@ -19,6 +19,22 @@ import { useUserRole } from "@/hooks/useUserRole"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 
+// Currency conversion to SAR
+const CURRENCY_TO_SAR: Record<string, number> = {
+  SAR: 1,
+  AED: 1.02,
+  USD: 3.75,
+  EUR: 4.10,
+  GBP: 4.75,
+  INR: 0.045,
+  PKR: 0.013,
+  EGP: 0.076,
+};
+
+const convertToSAR = (amount: number, sourceCurrency: string) =>
+  Math.round(amount * (CURRENCY_TO_SAR[sourceCurrency.toUpperCase()] || 1));
+
+// Existing interface
 interface CallLogDetail {
   job_id: string | null
   user_id: string | null
@@ -674,7 +690,16 @@ export default function CallLogDetails() {
             </div>
             <div>
               <label className="text-sm font-medium text-muted-foreground">Current Salary</label>
-              <p className="text-lg">{callLog.current_salary || 'N/A'}</p>
+              <p className="text-lg">
+                {callLog.current_salary
+                  ? (() => {
+                      const amt = parseInt(String(callLog.current_salary), 10);
+                      if (isNaN(amt)) return callLog.current_salary;
+                      const sar = convertToSAR(amt, 'PKR');
+                      return `SAR ${sar.toLocaleString()} (from PKR ${amt.toLocaleString()})`;
+                    })()
+                  : 'N/A'}
+              </p>
             </div>
             <div>
               <label className="text-sm font-medium text-muted-foreground">Expected Salary</label>
