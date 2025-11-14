@@ -115,7 +115,7 @@ export default function Auth() {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-black via-gray-950 to-gray-900 relative overflow-hidden">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative overflow-hidden" style={{ backgroundColor: '#1a1d23' }}>
         <MissionBackground className="absolute inset-0" />
         
         <div className="w-full max-w-md relative z-10">
