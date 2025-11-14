@@ -11,6 +11,9 @@ import { useAppSettings } from '@/contexts/AppSettingsContext';
 import defaultLogo from '@/assets/default-logo.png';
 import { MissionBackground } from '@/components/layout/MissionBackground';
 import { useTheme } from 'next-themes';
+import candidate1 from '@/assets/candidate-1.jpg';
+import candidate2 from '@/assets/candidate-2.jpg';
+import candidate3 from '@/assets/candidate-3.jpg';
 export default function Auth() {
   const { settings } = useAppSettings();
   const { theme } = useTheme();
@@ -238,9 +241,9 @@ export default function Auth() {
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2.5 p-2 bg-gray-800/30 rounded-lg border border-gray-700/20">
                   <img 
-                    src="https://i.pravatar.cc/150?img=12" 
+                    src={candidate1} 
                     alt="Candidate" 
-                    className="w-8 h-8 rounded-full ring-1 ring-gray-700/50"
+                    className="w-8 h-8 rounded-full ring-1 ring-gray-700/50 object-cover"
                   />
                   <div className="flex-1 space-y-1">
                     <div className="h-1.5 bg-gray-600/50 rounded-full w-full"></div>
@@ -250,9 +253,9 @@ export default function Auth() {
                 </div>
                 <div className="flex items-center gap-2.5 p-2 bg-gray-800/20 rounded-lg border border-gray-700/10 opacity-60">
                   <img 
-                    src="https://i.pravatar.cc/150?img=32" 
+                    src={candidate2} 
                     alt="Candidate" 
-                    className="w-8 h-8 rounded-full ring-1 ring-gray-700/30"
+                    className="w-8 h-8 rounded-full ring-1 ring-gray-700/30 object-cover"
                   />
                   <div className="flex-1 space-y-1">
                     <div className="h-1.5 bg-gray-600/40 rounded-full w-full"></div>
@@ -262,9 +265,9 @@ export default function Auth() {
                 </div>
                 <div className="flex items-center gap-2.5 p-2 bg-gray-800/20 rounded-lg border border-gray-700/10 opacity-60">
                   <img 
-                    src="https://i.pravatar.cc/150?img=68" 
+                    src={candidate3} 
                     alt="Candidate" 
-                    className="w-8 h-8 rounded-full ring-1 ring-gray-700/30"
+                    className="w-8 h-8 rounded-full ring-1 ring-gray-700/30 object-cover"
                   />
                   <div className="flex-1 space-y-1">
                     <div className="h-1.5 bg-gray-600/40 rounded-full w-full"></div>
