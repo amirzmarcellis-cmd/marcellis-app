@@ -207,7 +207,7 @@ export default function Auth() {
         style={{
           backgroundColor: '#1a1d23',
           backgroundImage: 'url(/auth-bg-pattern.png)',
-          backgroundSize: '200px 200px',
+          backgroundSize: '400px 400px',
           backgroundPosition: 'center',
           backgroundRepeat: 'repeat',
           opacity: 1
