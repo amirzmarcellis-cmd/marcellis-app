@@ -250,19 +250,19 @@ export default function Auth() {
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 0 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 0 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
             {/* UI Mockup Card - Centered */}
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
+            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-gray-800/40 w-64 sm:w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
               {/* Browser Controls */}
-              <div className="flex gap-1.5 mb-3">
-                <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
-                <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
-                <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
+              <div className="flex gap-1.5 mb-2 sm:mb-3">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-500/80"></div>
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-yellow-500/80"></div>
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500/80"></div>
               </div>
               
               {/* Header */}
-              <div className="mb-3">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-white font-semibold text-sm">Top Candidates</h3>
-                  <span className="text-blue-400 text-xs">View All</span>
+              <div className="mb-2 sm:mb-3">
+                <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                  <h3 className="text-white font-semibold text-xs sm:text-sm">Top Candidates</h3>
+                  <span className="text-blue-400 text-[10px] sm:text-xs">View All</span>
                 </div>
                 <div className="h-1 bg-gray-700/50 rounded-full w-full">
                   <div className="h-1 bg-blue-500/90 rounded-full w-3/4 shadow-[0_0_10px_rgba(59,130,246,0.4)]"></div>
@@ -270,82 +270,82 @@ export default function Auth() {
               </div>
 
               {/* Candidate List */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-3 p-2.5 bg-gray-800/40 rounded-lg border border-gray-700/30 hover:bg-gray-800/60 transition-colors">
+              <div className="space-y-1.5 sm:space-y-2">
+                <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 bg-gray-800/40 rounded-lg border border-gray-700/30 hover:bg-gray-800/60 transition-colors">
                   <img 
                     src={candidate1} 
                     alt="Sarah Johnson" 
-                    className="w-10 h-10 rounded-full ring-2 ring-blue-500/30 object-cover"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full ring-2 ring-blue-500/30 object-cover"
                   />
-                  <div className="flex-1">
-                    <p className="text-white text-sm font-medium">Sarah Johnson</p>
-                    <p className="text-gray-400 text-xs">Product Designer</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-xs sm:text-sm font-medium truncate">Sarah Johnson</p>
+                    <p className="text-gray-400 text-[10px] sm:text-xs truncate">Product Designer</p>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <span className="text-yellow-400 text-sm">⭐</span>
-                    <span className="text-gray-300 text-xs font-medium">4.8</span>
+                  <div className="flex items-center gap-0.5 sm:gap-1">
+                    <span className="text-yellow-400 text-xs sm:text-sm">⭐</span>
+                    <span className="text-gray-300 text-[10px] sm:text-xs font-medium">4.8</span>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3 p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20">
+                <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20">
                   <img 
                     src={candidate2} 
                     alt="Michael Chen" 
-                    className="w-10 h-10 rounded-full ring-1 ring-gray-700/40 object-cover"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full ring-1 ring-gray-700/40 object-cover"
                   />
-                  <div className="flex-1">
-                    <p className="text-white text-sm font-medium">Michael Chen</p>
-                    <p className="text-gray-400 text-xs">Senior Developer</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-xs sm:text-sm font-medium truncate">Michael Chen</p>
+                    <p className="text-gray-400 text-[10px] sm:text-xs truncate">Senior Developer</p>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <span className="text-gray-500 text-sm">☆</span>
-                    <span className="text-gray-400 text-xs">4.2</span>
+                  <div className="flex items-center gap-0.5 sm:gap-1">
+                    <span className="text-gray-500 text-xs sm:text-sm">☆</span>
+                    <span className="text-gray-400 text-[10px] sm:text-xs">4.2</span>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3 p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20">
+                <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20">
                   <img 
                     src={candidate3} 
                     alt="Emma Martinez" 
-                    className="w-10 h-10 rounded-full ring-1 ring-gray-700/40 object-cover"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full ring-1 ring-gray-700/40 object-cover"
                   />
-                  <div className="flex-1">
-                    <p className="text-white text-sm font-medium">Emma Martinez</p>
-                    <p className="text-gray-400 text-xs">Product Manager</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-xs sm:text-sm font-medium truncate">Emma Martinez</p>
+                    <p className="text-gray-400 text-[10px] sm:text-xs truncate">Product Manager</p>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <span className="text-gray-500 text-sm">☆</span>
-                    <span className="text-gray-400 text-xs">3.9</span>
+                  <div className="flex items-center gap-0.5 sm:gap-1">
+                    <span className="text-gray-500 text-xs sm:text-sm">☆</span>
+                    <span className="text-gray-400 text-[10px] sm:text-xs">3.9</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Floating Role Badges with Neon Glow - Positioned around the card */}
-            <div className="absolute -top-16 -left-20 animate-float">
-              <div className="flex items-center gap-2 bg-blue-600/90 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.6)] border border-blue-500/30">
-                <div className="w-5 h-5 bg-blue-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(59,130,246,0.8)]">
-                  <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
+            <div className="absolute -top-12 sm:-top-16 -left-16 sm:-left-20 animate-float">
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-blue-600/90 backdrop-blur-md px-2 py-1.5 sm:px-3 sm:py-2 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.6)] border border-blue-500/30">
+                <div className="w-4 h-4 sm:w-5 sm:h-5 bg-blue-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(59,130,246,0.8)]">
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-sm"></div>
                 </div>
-                <span className="text-white font-medium text-sm">Product Developer</span>
+                <span className="text-white font-medium text-xs sm:text-sm">Product Developer</span>
               </div>
             </div>
 
-            <div className="absolute -bottom-4 -left-24 animate-float-delayed">
-              <div className="flex items-center gap-2 bg-green-600/90 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(22,163,74,0.6)] border border-green-500/30">
-                <div className="w-5 h-5 bg-green-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(34,197,94,0.8)]">
-                  <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
+            <div className="absolute -bottom-4 -left-16 sm:-left-24 animate-float-delayed">
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-green-600/90 backdrop-blur-md px-2 py-1.5 sm:px-3 sm:py-2 rounded-full shadow-[0_0_20px_rgba(22,163,74,0.6)] border border-green-500/30">
+                <div className="w-4 h-4 sm:w-5 sm:h-5 bg-green-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(34,197,94,0.8)]">
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-sm"></div>
                 </div>
-                <span className="text-white font-medium text-sm">Product Manager</span>
+                <span className="text-white font-medium text-xs sm:text-sm">Product Manager</span>
               </div>
             </div>
 
-            <div className="absolute top-1/2 -right-24 animate-float">
-              <div className="flex items-center gap-2 bg-orange-600/90 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(234,88,12,0.6)] border border-orange-500/30">
-                <div className="w-5 h-5 bg-orange-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(249,115,22,0.8)]">
-                  <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
+            <div className="absolute top-1/2 -right-16 sm:-right-24 animate-float hidden sm:flex">
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-orange-600/90 backdrop-blur-md px-2 py-1.5 sm:px-3 sm:py-2 rounded-full shadow-[0_0_20px_rgba(234,88,12,0.6)] border border-orange-500/30">
+                <div className="w-4 h-4 sm:w-5 sm:h-5 bg-orange-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(249,115,22,0.8)]">
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-sm"></div>
                 </div>
-                <span className="text-white font-medium text-sm">Product Designer</span>
+                <span className="text-white font-medium text-xs sm:text-sm">Product Designer</span>
               </div>
             </div>
           </div>
@@ -354,17 +354,17 @@ export default function Auth() {
         {/* Slide 1 - Analytics Dashboard */}
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 1 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 1 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
-              <div className="flex gap-1.5 mb-3">
-                <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
-                <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
-                <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
+            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-gray-800/40 w-64 sm:w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
+              <div className="flex gap-1.5 mb-2 sm:mb-3">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-500/80"></div>
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-yellow-500/80"></div>
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500/80"></div>
               </div>
               
               {/* Header */}
-              <div className="mb-3">
-                <h3 className="text-white font-semibold text-sm mb-1">Performance Analytics</h3>
-                <p className="text-gray-400 text-xs">Last 7 days</p>
+              <div className="mb-2 sm:mb-3">
+                <h3 className="text-white font-semibold text-xs sm:text-sm mb-1">Performance Analytics</h3>
+                <p className="text-gray-400 text-[10px] sm:text-xs">Last 7 days</p>
               </div>
 
               {/* Analytics Chart */}
@@ -413,12 +413,12 @@ export default function Auth() {
               </div>
             </div>
 
-            <div className="absolute -top-12 -left-16 animate-float">
-              <div className="flex items-center gap-2 bg-purple-600/90 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(147,51,234,0.6)] border border-purple-500/30">
-                <div className="w-5 h-5 bg-purple-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(168,85,247,0.8)]">
-                  <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
+            <div className="absolute -top-12 sm:-top-12 -left-12 sm:-left-16 animate-float">
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-purple-600/90 backdrop-blur-md px-2 py-1.5 sm:px-3 sm:py-2 rounded-full shadow-[0_0_20px_rgba(147,51,234,0.6)] border border-purple-500/30">
+                <div className="w-4 h-4 sm:w-5 sm:h-5 bg-purple-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(168,85,247,0.8)]">
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-sm"></div>
                 </div>
-                <span className="text-white font-medium text-sm">Real-time Analytics</span>
+                <span className="text-white font-medium text-xs sm:text-sm">Real-time Analytics</span>
               </div>
             </div>
           </div>
@@ -427,18 +427,18 @@ export default function Auth() {
         {/* Slide 2 - Interview Scheduling */}
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 2 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 2 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
-              <div className="flex gap-1.5 mb-3">
-                <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
-                <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
-                <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
+            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-gray-800/40 w-64 sm:w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
+              <div className="flex gap-1.5 mb-2 sm:mb-3">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-500/80"></div>
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-yellow-500/80"></div>
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500/80"></div>
               </div>
               
               {/* Header */}
-              <div className="mb-3">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-white font-semibold text-sm">Interview Schedule</h3>
-                  <span className="text-cyan-400 text-xs">December 2024</span>
+              <div className="mb-2 sm:mb-3">
+                <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                  <h3 className="text-white font-semibold text-xs sm:text-sm">Interview Schedule</h3>
+                  <span className="text-cyan-400 text-[10px] sm:text-xs">December 2024</span>
                 </div>
               </div>
 
@@ -472,32 +472,32 @@ export default function Auth() {
                 </div>
                 
                 {/* Upcoming Interviews */}
-                <div className="space-y-1.5 mt-3">
-                  <p className="text-white text-xs font-medium mb-1">Upcoming</p>
-                  <div className="flex items-center gap-2 p-2 bg-cyan-500/10 rounded-lg border border-cyan-500/30">
-                    <div className="w-1 h-10 bg-cyan-500 rounded-full"></div>
-                    <div className="flex-1">
-                      <p className="text-white text-xs font-medium">Sarah Johnson</p>
-                      <p className="text-gray-400 text-[10px]">Today • 2:00 PM</p>
+                <div className="space-y-1.5 mt-2 sm:mt-3">
+                  <p className="text-white text-[10px] sm:text-xs font-medium mb-1">Upcoming</p>
+                  <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-cyan-500/10 rounded-lg border border-cyan-500/30">
+                    <div className="w-0.5 sm:w-1 h-8 sm:h-10 bg-cyan-500 rounded-full"></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-[10px] sm:text-xs font-medium truncate">Sarah Johnson</p>
+                      <p className="text-gray-400 text-[9px] sm:text-[10px]">Today • 2:00 PM</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 p-2 bg-gray-800/20 rounded-lg border border-gray-700/20">
-                    <div className="w-1 h-10 bg-gray-600 rounded-full"></div>
-                    <div className="flex-1">
-                      <p className="text-white text-xs font-medium">Michael Chen</p>
-                      <p className="text-gray-400 text-[10px]">Dec 18 • 10:00 AM</p>
+                  <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-gray-800/20 rounded-lg border border-gray-700/20">
+                    <div className="w-0.5 sm:w-1 h-8 sm:h-10 bg-gray-600 rounded-full"></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-[10px] sm:text-xs font-medium truncate">Michael Chen</p>
+                      <p className="text-gray-400 text-[9px] sm:text-[10px]">Dec 18 • 10:00 AM</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="absolute -top-16 -right-20 animate-float">
-              <div className="flex items-center gap-2 bg-cyan-600/90 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(6,182,212,0.6)] border border-cyan-500/30">
-                <div className="w-5 h-5 bg-cyan-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(34,211,238,0.8)]">
-                  <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
+            <div className="absolute -top-12 sm:-top-16 -right-16 sm:-right-20 animate-float hidden sm:flex">
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-cyan-600/90 backdrop-blur-md px-2 py-1.5 sm:px-3 sm:py-2 rounded-full shadow-[0_0_20px_rgba(6,182,212,0.6)] border border-cyan-500/30">
+                <div className="w-4 h-4 sm:w-5 sm:h-5 bg-cyan-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(34,211,238,0.8)]">
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-sm"></div>
                 </div>
-                <span className="text-white font-medium text-sm">Smart Scheduling</span>
+                <span className="text-white font-medium text-xs sm:text-sm">Smart Scheduling</span>
               </div>
             </div>
           </div>
@@ -506,59 +506,59 @@ export default function Auth() {
         {/* Slide 3 - AI Insights */}
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 3 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 3 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
-              <div className="flex gap-1.5 mb-3">
-                <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
-                <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
-                <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
+            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-gray-800/40 w-64 sm:w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
+              <div className="flex gap-1.5 mb-2 sm:mb-3">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-500/80"></div>
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-yellow-500/80"></div>
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500/80"></div>
               </div>
               
               {/* Header */}
-              <div className="mb-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-purple-500 rounded-lg shadow-[0_0_15px_rgba(236,72,153,0.5)] flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">AI</span>
+              <div className="mb-2 sm:mb-3">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-br from-pink-500 to-purple-500 rounded-lg shadow-[0_0_15px_rgba(236,72,153,0.5)] flex items-center justify-center">
+                    <span className="text-white text-[10px] sm:text-xs font-bold">AI</span>
                   </div>
-                  <h3 className="text-white font-semibold text-sm">Smart Recommendations</h3>
+                  <h3 className="text-white font-semibold text-xs sm:text-sm">Smart Recommendations</h3>
                 </div>
               </div>
 
               {/* AI Insights */}
-              <div className="space-y-2">
-                <div className="p-3 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-lg border border-pink-500/40">
-                  <div className="flex items-start gap-2 mb-2">
-                    <span className="text-pink-400 text-sm">⚡</span>
-                    <div className="flex-1">
-                      <p className="text-white text-xs font-medium mb-1">Perfect Match Found</p>
-                      <p className="text-gray-300 text-[10px] leading-relaxed">
+              <div className="space-y-1.5 sm:space-y-2">
+                <div className="p-2 sm:p-3 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-lg border border-pink-500/40">
+                  <div className="flex items-start gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                    <span className="text-pink-400 text-xs sm:text-sm">⚡</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-[10px] sm:text-xs font-medium mb-0.5 sm:mb-1">Perfect Match Found</p>
+                      <p className="text-gray-300 text-[9px] sm:text-[10px] leading-relaxed">
                         Sarah Johnson's skills align 95% with the Product Designer role requirements.
                       </p>
                     </div>
                   </div>
-                  <div className="flex gap-1 mt-2">
-                    <span className="text-[9px] bg-pink-500/20 text-pink-300 px-2 py-0.5 rounded-full">Figma Expert</span>
-                    <span className="text-[9px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">5+ years</span>
+                  <div className="flex gap-1 flex-wrap mt-1.5 sm:mt-2">
+                    <span className="text-[8px] sm:text-[9px] bg-pink-500/20 text-pink-300 px-1.5 sm:px-2 py-0.5 rounded-full">Figma Expert</span>
+                    <span className="text-[8px] sm:text-[9px] bg-purple-500/20 text-purple-300 px-1.5 sm:px-2 py-0.5 rounded-full">5+ years</span>
                   </div>
                 </div>
                 
-                <div className="p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20">
-                  <div className="flex items-start gap-2">
-                    <span className="text-blue-400 text-sm">💡</span>
-                    <div className="flex-1">
-                      <p className="text-white text-xs font-medium mb-1">Interview Tip</p>
-                      <p className="text-gray-400 text-[10px]">
+                <div className="p-2 sm:p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20">
+                  <div className="flex items-start gap-1.5 sm:gap-2">
+                    <span className="text-blue-400 text-xs sm:text-sm">💡</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-[10px] sm:text-xs font-medium mb-0.5 sm:mb-1">Interview Tip</p>
+                      <p className="text-gray-400 text-[9px] sm:text-[10px]">
                         Ask about their mobile app design experience.
                       </p>
                     </div>
                   </div>
                 </div>
                 
-                <div className="p-2.5 bg-gray-800/20 rounded-lg border border-gray-700/10">
-                  <div className="flex items-start gap-2">
-                    <span className="text-green-400 text-sm">📊</span>
-                    <div className="flex-1">
-                      <p className="text-white text-xs font-medium mb-1">Market Insight</p>
-                      <p className="text-gray-400 text-[10px]">
+                <div className="p-2 sm:p-2.5 bg-gray-800/20 rounded-lg border border-gray-700/10">
+                  <div className="flex items-start gap-1.5 sm:gap-2">
+                    <span className="text-green-400 text-xs sm:text-sm">📊</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-[10px] sm:text-xs font-medium mb-0.5 sm:mb-1">Market Insight</p>
+                      <p className="text-gray-400 text-[9px] sm:text-[10px]">
                         Similar roles offer 15% higher salary range.
                       </p>
                     </div>
@@ -567,26 +567,26 @@ export default function Auth() {
               </div>
             </div>
 
-            <div className="absolute -bottom-8 -left-20 animate-float-delayed">
-              <div className="flex items-center gap-2 bg-gradient-to-r from-pink-600 to-purple-600 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(236,72,153,0.6)] border border-pink-500/30">
-                <div className="w-5 h-5 bg-gradient-to-br from-pink-500 to-purple-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(236,72,153,0.8)]">
-                  <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
+            <div className="absolute -bottom-6 sm:-bottom-8 -left-16 sm:-left-20 animate-float-delayed">
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-pink-600 to-purple-600 backdrop-blur-md px-2 py-1.5 sm:px-3 sm:py-2 rounded-full shadow-[0_0_20px_rgba(236,72,153,0.6)] border border-pink-500/30">
+                <div className="w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-br from-pink-500 to-purple-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(236,72,153,0.8)]">
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-sm"></div>
                 </div>
-                <span className="text-white font-medium text-sm">AI-Powered Insights</span>
+                <span className="text-white font-medium text-xs sm:text-sm">AI-Powered Insights</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Bottom Text - Dynamic based on slide */}
-        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 text-center max-w-md z-10">
-          <h2 className="text-3xl font-light text-white mb-2 transition-opacity duration-500">
+        <div className="absolute bottom-12 sm:bottom-16 left-1/2 -translate-x-1/2 text-center max-w-sm sm:max-w-md z-10 px-4">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-light text-white mb-1 sm:mb-2 transition-opacity duration-500">
             {activeSlide === 0 && "Find your best candidates with Marc Ellis"}
             {activeSlide === 1 && "Track performance with real-time analytics"}
             {activeSlide === 2 && "Schedule interviews effortlessly"}
             {activeSlide === 3 && "Get AI-powered hiring recommendations"}
           </h2>
-          <p className="text-gray-400 text-sm transition-opacity duration-500">
+          <p className="text-gray-400 text-xs sm:text-sm transition-opacity duration-500">
             {activeSlide === 0 && "Streamline hiring and find top talent with Marc Ellis's tools"}
             {activeSlide === 1 && "Monitor your recruitment metrics and make data-driven decisions"}
             {activeSlide === 2 && "Coordinate interviews with candidates and team members seamlessly"}
