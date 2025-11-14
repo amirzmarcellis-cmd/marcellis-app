@@ -238,7 +238,7 @@ export default function Auth() {
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2.5 p-2 bg-gray-800/30 rounded-lg border border-gray-700/20">
                   <img 
-                    src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" 
+                    src="https://i.pravatar.cc/150?img=12" 
                     alt="Candidate" 
                     className="w-8 h-8 rounded-full ring-1 ring-gray-700/50"
                   />
@@ -250,7 +250,7 @@ export default function Auth() {
                 </div>
                 <div className="flex items-center gap-2.5 p-2 bg-gray-800/20 rounded-lg border border-gray-700/10 opacity-60">
                   <img 
-                    src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" 
+                    src="https://i.pravatar.cc/150?img=32" 
                     alt="Candidate" 
                     className="w-8 h-8 rounded-full ring-1 ring-gray-700/30"
                   />
@@ -262,7 +262,7 @@ export default function Auth() {
                 </div>
                 <div className="flex items-center gap-2.5 p-2 bg-gray-800/20 rounded-lg border border-gray-700/10 opacity-60">
                   <img 
-                    src="https://api.dicebear.com/7.x/avataaars/svg?seed=Milo" 
+                    src="https://i.pravatar.cc/150?img=68" 
                     alt="Candidate" 
                     className="w-8 h-8 rounded-full ring-1 ring-gray-700/30"
                   />
