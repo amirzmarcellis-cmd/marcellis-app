@@ -629,6 +629,10 @@ export default function Auth() {
             box-shadow: 0 25px 80px -10px rgba(0,0,0,0.9), 0 0 30px rgba(59,130,246,0.3), 0 0 0 1px rgba(59,130,246,0.2);
           }
         }
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
         .animate-float {
           animation: float 6s ease-in-out infinite;
         }
@@ -640,6 +644,20 @@ export default function Auth() {
         }
         .animate-pulse-glow {
           animation: pulse-glow 120s ease-in-out infinite;
+          position: relative;
+          overflow: hidden;
+        }
+        .animate-pulse-glow::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+          animation: shimmer 3s infinite;
+          animation-delay: 1s;
+          pointer-events: none;
         }
       `}</style>
     </div>
