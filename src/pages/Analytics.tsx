@@ -96,7 +96,7 @@ export default function Analytics() {
   
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isGridLayout, setIsGridLayout] = useState(false);
+  const [isGridLayout, setIsGridLayout] = useState(true);
 
   useEffect(() => {
     fetchAnalyticsData();
