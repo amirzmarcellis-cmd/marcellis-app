@@ -231,49 +231,65 @@ export default function Auth() {
                 <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
               </div>
               
-              {/* Blue Progress Bar */}
+              {/* Header */}
               <div className="mb-3">
-                <div className="h-6 bg-blue-500/90 rounded-lg w-20 shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
-                <div className="h-1 bg-gray-700/50 rounded-full w-28 mt-2"></div>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-white font-semibold text-sm">Top Candidates</h3>
+                  <span className="text-blue-400 text-xs">View All</span>
+                </div>
+                <div className="h-1 bg-gray-700/50 rounded-full w-full">
+                  <div className="h-1 bg-blue-500/90 rounded-full w-3/4 shadow-[0_0_10px_rgba(59,130,246,0.4)]"></div>
+                </div>
               </div>
 
               {/* Candidate List */}
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-2.5 p-2 bg-gray-800/30 rounded-lg border border-gray-700/20">
+              <div className="space-y-2">
+                <div className="flex items-center gap-3 p-2.5 bg-gray-800/40 rounded-lg border border-gray-700/30 hover:bg-gray-800/60 transition-colors">
                   <img 
                     src={candidate1} 
-                    alt="Candidate" 
-                    className="w-8 h-8 rounded-full ring-1 ring-gray-700/50 object-cover"
+                    alt="Sarah Johnson" 
+                    className="w-10 h-10 rounded-full ring-2 ring-blue-500/30 object-cover"
                   />
-                  <div className="flex-1 space-y-1">
-                    <div className="h-1.5 bg-gray-600/50 rounded-full w-full"></div>
-                    <div className="h-1.5 bg-gray-600/50 rounded-full w-2/3"></div>
+                  <div className="flex-1">
+                    <p className="text-white text-sm font-medium">Sarah Johnson</p>
+                    <p className="text-gray-400 text-xs">Product Designer</p>
                   </div>
-                  <div className="text-yellow-400 text-xs">⭐</div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-yellow-400 text-sm">⭐</span>
+                    <span className="text-gray-300 text-xs font-medium">4.8</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2.5 p-2 bg-gray-800/20 rounded-lg border border-gray-700/10 opacity-60">
+                
+                <div className="flex items-center gap-3 p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20">
                   <img 
                     src={candidate2} 
-                    alt="Candidate" 
-                    className="w-8 h-8 rounded-full ring-1 ring-gray-700/30 object-cover"
+                    alt="Michael Chen" 
+                    className="w-10 h-10 rounded-full ring-1 ring-gray-700/40 object-cover"
                   />
-                  <div className="flex-1 space-y-1">
-                    <div className="h-1.5 bg-gray-600/40 rounded-full w-full"></div>
-                    <div className="h-1.5 bg-gray-600/40 rounded-full w-2/3"></div>
+                  <div className="flex-1">
+                    <p className="text-white text-sm font-medium">Michael Chen</p>
+                    <p className="text-gray-400 text-xs">Senior Developer</p>
                   </div>
-                  <div className="text-gray-600 text-xs">☆</div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-gray-500 text-sm">☆</span>
+                    <span className="text-gray-400 text-xs">4.2</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2.5 p-2 bg-gray-800/20 rounded-lg border border-gray-700/10 opacity-60">
+                
+                <div className="flex items-center gap-3 p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20">
                   <img 
                     src={candidate3} 
-                    alt="Candidate" 
-                    className="w-8 h-8 rounded-full ring-1 ring-gray-700/30 object-cover"
+                    alt="Emma Martinez" 
+                    className="w-10 h-10 rounded-full ring-1 ring-gray-700/40 object-cover"
                   />
-                  <div className="flex-1 space-y-1">
-                    <div className="h-1.5 bg-gray-600/40 rounded-full w-full"></div>
-                    <div className="h-1.5 bg-gray-600/40 rounded-full w-2/3"></div>
+                  <div className="flex-1">
+                    <p className="text-white text-sm font-medium">Emma Martinez</p>
+                    <p className="text-gray-400 text-xs">Product Manager</p>
                   </div>
-                  <div className="text-gray-600 text-xs">☆</div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-gray-500 text-sm">☆</span>
+                    <span className="text-gray-400 text-xs">3.9</span>
+                  </div>
                 </div>
               </div>
             </div>
