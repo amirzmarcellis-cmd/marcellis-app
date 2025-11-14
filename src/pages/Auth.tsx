@@ -220,7 +220,7 @@ export default function Auth() {
         </div>
 
         {/* Slide 0 - Candidate Management */}
-        <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ${activeSlide === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 0 ? 'opacity-100 translate-x-0' : activeSlide > 0 ? 'opacity-0 -translate-x-full pointer-events-none' : 'opacity-0 translate-x-full pointer-events-none'}`}>
           <div className="relative">
             {/* UI Mockup Card - Centered */}
             <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-gray-800/40 w-72">
@@ -325,7 +325,7 @@ export default function Auth() {
         </div>
 
         {/* Slide 1 - Analytics Dashboard */}
-        <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ${activeSlide === 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 1 ? 'opacity-100 translate-x-0' : activeSlide > 1 ? 'opacity-0 -translate-x-full pointer-events-none' : 'opacity-0 translate-x-full pointer-events-none'}`}>
           <div className="relative">
             <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-gray-800/40 w-72">
               <div className="flex gap-1.5 mb-3">
@@ -398,7 +398,7 @@ export default function Auth() {
         </div>
 
         {/* Slide 2 - Interview Scheduling */}
-        <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ${activeSlide === 2 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 2 ? 'opacity-100 translate-x-0' : activeSlide > 2 ? 'opacity-0 -translate-x-full pointer-events-none' : 'opacity-0 translate-x-full pointer-events-none'}`}>
           <div className="relative">
             <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-gray-800/40 w-72">
               <div className="flex gap-1.5 mb-3">
@@ -477,7 +477,7 @@ export default function Auth() {
         </div>
 
         {/* Slide 3 - AI Insights */}
-        <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ${activeSlide === 3 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 3 ? 'opacity-100 translate-x-0' : activeSlide > 3 ? 'opacity-0 -translate-x-full pointer-events-none' : 'opacity-0 translate-x-full pointer-events-none'}`}>
           <div className="relative">
             <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-gray-800/40 w-72">
               <div className="flex gap-1.5 mb-3">
