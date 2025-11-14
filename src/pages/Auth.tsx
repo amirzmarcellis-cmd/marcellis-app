@@ -180,7 +180,11 @@ export default function Auth() {
           </div>
           <div className="space-y-3">
             <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg">
-              <div className="w-10 h-10 bg-blue-500 rounded-full"></div>
+              <img 
+                src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" 
+                alt="Candidate" 
+                className="w-10 h-10 rounded-full"
+              />
               <div className="flex-1">
                 <div className="h-2 bg-gray-600 rounded w-full mb-2"></div>
                 <div className="h-2 bg-gray-600 rounded w-2/3"></div>
@@ -188,7 +192,11 @@ export default function Auth() {
               <div className="text-yellow-400">⭐</div>
             </div>
             <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg opacity-60">
-              <div className="w-10 h-10 bg-gray-600 rounded-full"></div>
+              <img 
+                src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" 
+                alt="Candidate" 
+                className="w-10 h-10 rounded-full"
+              />
               <div className="flex-1">
                 <div className="h-2 bg-gray-600 rounded w-full mb-2"></div>
                 <div className="h-2 bg-gray-600 rounded w-2/3"></div>
@@ -196,7 +204,11 @@ export default function Auth() {
               <div className="text-gray-500">☆</div>
             </div>
             <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg opacity-60">
-              <div className="w-10 h-10 bg-gray-600 rounded-full"></div>
+              <img 
+                src="https://api.dicebear.com/7.x/avataaars/svg?seed=Milo" 
+                alt="Candidate" 
+                className="w-10 h-10 rounded-full"
+              />
               <div className="flex-1">
                 <div className="h-2 bg-gray-600 rounded w-full mb-2"></div>
                 <div className="h-2 bg-gray-600 rounded w-2/3"></div>
@@ -209,10 +221,10 @@ export default function Auth() {
         {/* Bottom Text */}
         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 text-center">
           <h2 className="text-3xl font-light text-white mb-2">
-            Find your best candidates with Hirever
+            Find your best candidates with Marcellis
           </h2>
           <p className="text-gray-400">
-            Streamline hiring and find top talent with Hirever's tools
+            Streamline hiring and find top talent with Marcellis's tools
           </p>
           
           {/* Navigation Dots */}
