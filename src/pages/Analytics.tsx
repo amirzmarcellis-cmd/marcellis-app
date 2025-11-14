@@ -694,7 +694,7 @@ export default function Analytics() {
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <div className="grid grid-cols-1 gap-8 mb-8">
         {/* Score Distribution */}
         <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
           <CardHeader>
@@ -829,7 +829,7 @@ export default function Analytics() {
       </div>
 
       {/* Bottom Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 gap-8">
         {/* Candidates per Job */}
         <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
           <CardHeader>
