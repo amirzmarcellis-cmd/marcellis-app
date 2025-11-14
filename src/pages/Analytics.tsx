@@ -557,7 +557,7 @@ export default function Analytics() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-blue-200 text-sm font-medium">Active Jobs</p>
-                <p className="text-4xl font-bold text-foreground mt-2">{data?.activeJobs || 0}</p>
+                <p className="text-4xl font-light font-work text-foreground mt-2">{data?.activeJobs || 0}</p>
                 <p className="text-xs text-blue-300 mt-1">Open job openings</p>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-xl flex items-center justify-center">
@@ -572,7 +572,7 @@ export default function Analytics() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-blue-200 text-sm font-medium">Total Call Logs</p>
-                <p className="text-4xl font-bold text-foreground mt-2">{data?.totalCallLogs || 0}</p>
+                <p className="text-4xl font-light font-work text-foreground mt-2">{data?.totalCallLogs || 0}</p>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
                 <Phone className="w-8 h-8 text-white" />
@@ -586,7 +586,7 @@ export default function Analytics() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-blue-200 text-sm font-medium">Average Score</p>
-                <p className="text-4xl font-bold text-foreground mt-2">{data?.averageScore || 0}</p>
+                <p className="text-4xl font-light font-work text-foreground mt-2">{data?.averageScore || 0}</p>
                 <p className="text-xs text-blue-300 mt-1">/100</p>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center">
@@ -601,7 +601,7 @@ export default function Analytics() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-blue-200 text-sm font-medium">Avg Days to Hire</p>
-                <p className="text-4xl font-bold text-foreground mt-2">{data?.avgDaysToHire || 0}</p>
+                <p className="text-4xl font-light font-work text-foreground mt-2">{data?.avgDaysToHire || 0}</p>
                 <p className="text-xs text-blue-300 mt-1">days</p>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center">
@@ -1003,7 +1003,7 @@ export default function Analytics() {
           <CardContent className="p-6 text-center">
             <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
             <p className="text-green-400 text-sm font-medium">Call Success Rate</p>
-            <p className="text-4xl font-bold text-foreground mt-2">{data?.callSuccessRate || 0}%</p>
+            <p className="text-4xl font-light font-work text-foreground mt-2">{data?.callSuccessRate || 0}%</p>
             <p className="text-xs text-green-300 mt-1">
               {data?.contactedCount || 0} contacted / {data?.totalCallLogs || 0} calls
             </p>
@@ -1014,7 +1014,7 @@ export default function Analytics() {
           <CardContent className="p-6 text-center">
             <Phone className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
             <p className="text-cyan-400 text-sm font-medium">Contact Rate</p>
-            <p className="text-4xl font-bold text-foreground mt-2">{data?.contactRate || 0}%</p>
+            <p className="text-4xl font-light font-work text-foreground mt-2">{data?.contactRate || 0}%</p>
             <p className="text-xs text-cyan-300 mt-1">
               {data?.contactedCount || 0} contacted / {data?.totalCandidates || 0} total
             </p>
@@ -1025,7 +1025,7 @@ export default function Analytics() {
           <CardContent className="p-6 text-center">
             <Clock className="w-12 h-12 text-purple-400 mx-auto mb-4" />
             <p className="text-purple-400 text-sm font-medium">Avg Candidates/Job</p>
-            <p className="text-4xl font-bold text-foreground mt-2">{data?.avgCandidatesPerJob || 0}</p>
+            <p className="text-4xl font-light font-work text-foreground mt-2">{data?.avgCandidatesPerJob || 0}</p>
             <p className="text-xs text-purple-300 mt-1">
               {data?.totalCandidates || 0} candidates / {data?.activeJobs || 0} active jobs
             </p>
