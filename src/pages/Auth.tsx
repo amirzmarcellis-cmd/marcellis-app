@@ -241,10 +241,10 @@ export default function Auth() {
         {/* Bottom Text */}
         <div className="absolute bottom-16 left-1/2 -translate-x-1/2 text-center max-w-md z-10">
           <h2 className="text-3xl font-light text-white mb-2">
-            Find your best candidates with Hirever
+            Find your best candidates with Marc Ellis
           </h2>
           <p className="text-gray-400 text-sm">
-            Streamline hiring and find top talent with Hirever's tools
+            Streamline hiring and find top talent with Marc Ellis's tools
           </p>
           
           {/* Navigation Dots */}
