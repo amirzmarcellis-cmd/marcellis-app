@@ -558,7 +558,7 @@ export default function Analytics() {
               <div>
                 <p className="text-blue-200 text-sm font-light font-work">Active Jobs</p>
                 <p className="text-4xl font-light font-work text-foreground mt-2">{data?.activeJobs || 0}</p>
-                <p className="text-xs text-blue-300 mt-1">Open job openings</p>
+                <p className="text-xs font-light font-work text-blue-300 mt-1">Open job openings</p>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-xl flex items-center justify-center">
                 <Briefcase className="w-8 h-8 text-white" />
@@ -587,7 +587,7 @@ export default function Analytics() {
               <div>
                 <p className="text-blue-200 text-sm font-light font-work">Average Score</p>
                 <p className="text-4xl font-light font-work text-foreground mt-2">{data?.averageScore || 0}</p>
-                <p className="text-xs text-blue-300 mt-1">/100</p>
+                <p className="text-xs font-light font-work text-blue-300 mt-1">/100</p>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center">
                 <TrendingUp className="w-8 h-8 text-white" />
@@ -602,7 +602,7 @@ export default function Analytics() {
               <div>
                 <p className="text-blue-200 text-sm font-light font-work">Avg Days to Hire</p>
                 <p className="text-4xl font-light font-work text-foreground mt-2">{data?.avgDaysToHire || 0}</p>
-                <p className="text-xs text-blue-300 mt-1">days</p>
+                <p className="text-xs font-light font-work text-blue-300 mt-1">days</p>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center">
                 <Clock className="w-8 h-8 text-white" />
@@ -1004,7 +1004,7 @@ export default function Analytics() {
             <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
             <p className="text-green-400 text-sm font-light font-work">Call Success Rate</p>
             <p className="text-4xl font-light font-work text-foreground mt-2">{data?.callSuccessRate || 0}%</p>
-            <p className="text-xs text-green-300 mt-1">
+            <p className="text-xs font-light font-work text-green-300 mt-1">
               {data?.contactedCount || 0} contacted / {data?.totalCallLogs || 0} calls
             </p>
           </CardContent>
@@ -1015,7 +1015,7 @@ export default function Analytics() {
             <Phone className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
             <p className="text-cyan-400 text-sm font-light font-work">Contact Rate</p>
             <p className="text-4xl font-light font-work text-foreground mt-2">{data?.contactRate || 0}%</p>
-            <p className="text-xs text-cyan-300 mt-1">
+            <p className="text-xs font-light font-work text-cyan-300 mt-1">
               {data?.contactedCount || 0} contacted / {data?.totalCandidates || 0} total
             </p>
           </CardContent>
@@ -1026,7 +1026,7 @@ export default function Analytics() {
             <Clock className="w-12 h-12 text-purple-400 mx-auto mb-4" />
             <p className="text-purple-400 text-sm font-light font-work">Avg Candidates/Job</p>
             <p className="text-4xl font-light font-work text-foreground mt-2">{data?.avgCandidatesPerJob || 0}</p>
-            <p className="text-xs text-purple-300 mt-1">
+            <p className="text-xs font-light font-work text-purple-300 mt-1">
               {data?.totalCandidates || 0} candidates / {data?.activeJobs || 0} active jobs
             </p>
           </CardContent>
