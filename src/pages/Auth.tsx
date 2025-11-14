@@ -175,7 +175,8 @@ export default function Auth() {
             )}
             <Button 
               type="submit" 
-              className="w-full bg-cyan-500 hover:bg-cyan-600 text-black font-medium h-12 rounded-full"
+              className="w-full h-12 rounded-full font-medium text-black"
+              style={{ backgroundColor: '#00d9ff' }}
               disabled={loading}
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
