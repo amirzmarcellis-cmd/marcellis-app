@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Users, Briefcase, Phone, TrendingUp, Star, CheckCircle, PhoneCall, Clock } from 'lucide-react';
+import { Users, Briefcase, Phone, TrendingUp, Star, CheckCircle, PhoneCall, Clock, LayoutGrid, Maximize2 } from 'lucide-react';
 
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -96,6 +96,7 @@ export default function Analytics() {
   
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isGridLayout, setIsGridLayout] = useState(false);
 
   useEffect(() => {
     fetchAnalyticsData();
@@ -693,8 +694,40 @@ export default function Analytics() {
         </div>
       </div>
 
+      {/* Charts Section Header with Toggle */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-light font-work text-foreground">Analytics Charts</h2>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-light font-work text-muted-foreground">Layout:</span>
+          <div className="flex items-center gap-1 p-1 bg-card border border-border rounded-lg">
+            <button
+              onClick={() => setIsGridLayout(false)}
+              className={`p-2 rounded transition-all ${
+                !isGridLayout 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+              title="Full Width"
+            >
+              <Maximize2 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setIsGridLayout(true)}
+              className={`p-2 rounded transition-all ${
+                isGridLayout 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+              title="Grid View"
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Charts Section */}
-      <div className="grid grid-cols-1 gap-8 mb-8">
+      <div className={`grid grid-cols-1 ${isGridLayout ? 'lg:grid-cols-2' : ''} gap-8 mb-8`}>
         {/* Score Distribution */}
         <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
           <CardHeader>
@@ -829,7 +862,7 @@ export default function Analytics() {
       </div>
 
       {/* Bottom Section */}
-      <div className="grid grid-cols-1 gap-8">
+      <div className={`grid grid-cols-1 ${isGridLayout ? 'lg:grid-cols-4' : ''} gap-8`}>
         {/* Candidates per Job */}
         <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
           <CardHeader>
