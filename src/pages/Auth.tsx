@@ -207,11 +207,10 @@ export default function Auth() {
         style={{
           backgroundColor: '#1a1d23',
           backgroundImage: 'url(/auth-bg-pattern.png)',
-          backgroundSize: 'auto',
+          backgroundSize: '200px 200px',
           backgroundPosition: 'center',
           backgroundRepeat: 'repeat',
-          backgroundBlendMode: 'soft-light',
-          opacity: 0.95
+          opacity: 1
         }}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
@@ -221,7 +220,7 @@ export default function Auth() {
         onTouchEnd={onTouchEnd}
       >
         {/* Dark overlay to control pattern visibility */}
-        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="absolute inset-0 bg-black/60" style={{ mixBlendMode: 'multiply' }}></div>
         {/* Subtle Geometric Background Patterns with Parallax */}
         <div className="absolute inset-0 overflow-hidden">
           <div 
