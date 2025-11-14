@@ -249,7 +249,7 @@ export default function Auth() {
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 0 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 0 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
             {/* UI Mockup Card - Centered */}
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-gray-800/40 w-72">
+            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow">
               {/* Browser Controls */}
               <div className="flex gap-1.5 mb-3">
                 <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
@@ -353,7 +353,7 @@ export default function Auth() {
         {/* Slide 1 - Analytics Dashboard */}
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 1 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 1 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-gray-800/40 w-72">
+            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow">
               <div className="flex gap-1.5 mb-3">
                 <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
                 <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
@@ -426,7 +426,7 @@ export default function Auth() {
         {/* Slide 2 - Interview Scheduling */}
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 2 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 2 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-gray-800/40 w-72">
+            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow">
               <div className="flex gap-1.5 mb-3">
                 <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
                 <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
@@ -505,7 +505,7 @@ export default function Auth() {
         {/* Slide 3 - AI Insights */}
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 3 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 3 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-gray-800/40 w-72">
+            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow">
               <div className="flex gap-1.5 mb-3">
                 <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
                 <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
@@ -621,6 +621,14 @@ export default function Auth() {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
+        @keyframes pulse-glow {
+          0%, 100% { 
+            box-shadow: 0 20px 60px -15px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05);
+          }
+          50% { 
+            box-shadow: 0 25px 80px -10px rgba(0,0,0,0.9), 0 0 30px rgba(59,130,246,0.3), 0 0 0 1px rgba(59,130,246,0.2);
+          }
+        }
         .animate-float {
           animation: float 6s ease-in-out infinite;
         }
@@ -629,6 +637,9 @@ export default function Auth() {
         }
         .animate-rotate-pattern {
           animation: rotate-pattern 120s linear infinite;
+        }
+        .animate-pulse-glow {
+          animation: pulse-glow 120s ease-in-out infinite;
         }
       `}</style>
     </div>
