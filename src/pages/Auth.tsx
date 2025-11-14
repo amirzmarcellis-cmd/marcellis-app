@@ -190,9 +190,9 @@ export default function Auth() {
         className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-black via-gray-950 to-gray-900 relative overflow-hidden items-center justify-center p-12"
         style={{
           backgroundImage: 'url(/auth-pattern.png)',
-          backgroundSize: '400px 400px',
+          backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundRepeat: 'repeat',
+          backgroundRepeat: 'no-repeat',
           backgroundBlendMode: 'soft-light',
           opacity: 0.95
         }}
