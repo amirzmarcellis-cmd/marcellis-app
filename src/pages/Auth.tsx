@@ -142,78 +142,81 @@ export default function Auth() {
       </div>
 
       {/* Right Side - Visual Content */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden items-center justify-center p-12">
-        {/* Floating Role Badges */}
-        <div className="absolute top-20 right-20 animate-float">
-          <div className="flex items-center gap-2 bg-blue-600/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
-            <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center">
-              <span className="text-white text-xs">👨‍💻</span>
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-gray-950 via-gray-900 to-black relative overflow-hidden items-center justify-center p-12">
+        {/* Central Content Container */}
+        <div className="relative">
+          {/* UI Mockup Card - Centered */}
+          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-gray-700/50 w-80">
+            <div className="flex gap-2 mb-4">
+              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
             </div>
-            <span className="text-white font-medium">Product Developer</span>
-          </div>
-        </div>
-
-        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 animate-float-delayed">
-          <div className="flex items-center gap-2 bg-green-600/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
-            <div className="w-6 h-6 bg-green-500 rounded flex items-center justify-center">
-              <span className="text-white text-xs">📊</span>
-            </div>
-            <span className="text-white font-medium">Product Manager</span>
-          </div>
-        </div>
-
-        <div className="absolute bottom-32 right-32 animate-float">
-          <div className="flex items-center gap-2 bg-orange-600/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
-            <div className="w-6 h-6 bg-orange-500 rounded flex items-center justify-center">
-              <span className="text-white text-xs">🎨</span>
-            </div>
-            <span className="text-white font-medium">Product Designer</span>
-          </div>
-        </div>
-
-        {/* UI Mockup Card */}
-        <div className="absolute top-1/3 right-1/4 bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-gray-700/50 w-72">
-          <div className="flex gap-2 mb-4">
-            <div className="w-3 h-3 rounded-full bg-red-500"></div>
-            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
-          </div>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg">
-              <img 
-                src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" 
-                alt="Candidate" 
-                className="w-10 h-10 rounded-full"
-              />
-              <div className="flex-1">
-                <div className="h-2 bg-gray-600 rounded w-full mb-2"></div>
-                <div className="h-2 bg-gray-600 rounded w-2/3"></div>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg">
+                <img 
+                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" 
+                  alt="Candidate" 
+                  className="w-10 h-10 rounded-full"
+                />
+                <div className="flex-1">
+                  <div className="h-2 bg-gray-600 rounded w-full mb-2"></div>
+                  <div className="h-2 bg-gray-600 rounded w-2/3"></div>
+                </div>
+                <div className="text-yellow-400">⭐</div>
               </div>
-              <div className="text-yellow-400">⭐</div>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg opacity-60">
-              <img 
-                src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" 
-                alt="Candidate" 
-                className="w-10 h-10 rounded-full"
-              />
-              <div className="flex-1">
-                <div className="h-2 bg-gray-600 rounded w-full mb-2"></div>
-                <div className="h-2 bg-gray-600 rounded w-2/3"></div>
+              <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg opacity-60">
+                <img 
+                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" 
+                  alt="Candidate" 
+                  className="w-10 h-10 rounded-full"
+                />
+                <div className="flex-1">
+                  <div className="h-2 bg-gray-600 rounded w-full mb-2"></div>
+                  <div className="h-2 bg-gray-600 rounded w-2/3"></div>
+                </div>
+                <div className="text-gray-500">☆</div>
               </div>
-              <div className="text-gray-500">☆</div>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg opacity-60">
-              <img 
-                src="https://api.dicebear.com/7.x/avataaars/svg?seed=Milo" 
-                alt="Candidate" 
-                className="w-10 h-10 rounded-full"
-              />
-              <div className="flex-1">
-                <div className="h-2 bg-gray-600 rounded w-full mb-2"></div>
-                <div className="h-2 bg-gray-600 rounded w-2/3"></div>
+              <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg opacity-60">
+                <img 
+                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=Milo" 
+                  alt="Candidate" 
+                  className="w-10 h-10 rounded-full"
+                />
+                <div className="flex-1">
+                  <div className="h-2 bg-gray-600 rounded w-full mb-2"></div>
+                  <div className="h-2 bg-gray-600 rounded w-2/3"></div>
+                </div>
+                <div className="text-gray-500">☆</div>
               </div>
-              <div className="text-gray-500">☆</div>
+            </div>
+          </div>
+
+          {/* Floating Role Badges - Positioned around the card */}
+          <div className="absolute -top-16 -left-12 animate-float">
+            <div className="flex items-center gap-2 bg-blue-600/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
+              <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center">
+                <span className="text-white text-xs">👨‍💻</span>
+              </div>
+              <span className="text-white font-medium">Product Developer</span>
+            </div>
+          </div>
+
+          <div className="absolute -bottom-8 -left-16 animate-float-delayed">
+            <div className="flex items-center gap-2 bg-green-600/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
+              <div className="w-6 h-6 bg-green-500 rounded flex items-center justify-center">
+                <span className="text-white text-xs">📊</span>
+              </div>
+              <span className="text-white font-medium">Product Manager</span>
+            </div>
+          </div>
+
+          <div className="absolute -bottom-8 -right-16 animate-float">
+            <div className="flex items-center gap-2 bg-orange-600/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
+              <div className="w-6 h-6 bg-orange-500 rounded flex items-center justify-center">
+                <span className="text-white text-xs">🎨</span>
+              </div>
+              <span className="text-white font-medium">Product Designer</span>
             </div>
           </div>
         </div>
@@ -237,8 +240,8 @@ export default function Auth() {
         </div>
 
         {/* Background Circle Decorations */}
-        <div className="absolute top-10 left-10 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-20 left-20 w-96 h-96 bg-gray-700/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-gray-600/10 rounded-full blur-3xl"></div>
       </div>
 
       <style>{`
