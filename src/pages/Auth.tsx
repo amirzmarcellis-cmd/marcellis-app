@@ -249,7 +249,7 @@ export default function Auth() {
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 0 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 0 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
             {/* UI Mockup Card - Centered */}
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow">
+            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
               {/* Browser Controls */}
               <div className="flex gap-1.5 mb-3">
                 <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
@@ -353,7 +353,7 @@ export default function Auth() {
         {/* Slide 1 - Analytics Dashboard */}
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 1 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 1 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow">
+            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
               <div className="flex gap-1.5 mb-3">
                 <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
                 <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
@@ -426,7 +426,7 @@ export default function Auth() {
         {/* Slide 2 - Interview Scheduling */}
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 2 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 2 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow">
+            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
               <div className="flex gap-1.5 mb-3">
                 <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
                 <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
@@ -505,7 +505,7 @@ export default function Auth() {
         {/* Slide 3 - AI Insights */}
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 3 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 3 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow">
+            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
               <div className="flex gap-1.5 mb-3">
                 <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
                 <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
