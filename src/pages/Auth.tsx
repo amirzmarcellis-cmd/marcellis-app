@@ -152,100 +152,243 @@ export default function Auth() {
           <div className="absolute bottom-1/4 left-1/4 w-56 h-56 bg-gray-700/10 rounded-3xl -rotate-45 blur-2xl"></div>
         </div>
 
-        {/* Central Content Container */}
-        <div className="relative z-10">
-          {/* UI Mockup Card - Centered */}
-          <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-gray-800/40 w-72">
-            {/* Browser Controls */}
-            <div className="flex gap-1.5 mb-3">
-              <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
-              <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
-              <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
-            </div>
-            
-            {/* Blue Progress Bar */}
-            <div className="mb-3">
-              <div className="h-6 bg-blue-500/90 rounded-lg w-20 shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
-              <div className="h-1 bg-gray-700/50 rounded-full w-28 mt-2"></div>
-            </div>
+        {/* Slide 0 - Candidate Management */}
+        <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ${activeSlide === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <div className="relative">
+            {/* UI Mockup Card - Centered */}
+            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-gray-800/40 w-72">
+              {/* Browser Controls */}
+              <div className="flex gap-1.5 mb-3">
+                <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
+                <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
+                <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
+              </div>
+              
+              {/* Blue Progress Bar */}
+              <div className="mb-3">
+                <div className="h-6 bg-blue-500/90 rounded-lg w-20 shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
+                <div className="h-1 bg-gray-700/50 rounded-full w-28 mt-2"></div>
+              </div>
 
-            {/* Candidate List */}
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2.5 p-2 bg-gray-800/30 rounded-lg border border-gray-700/20">
-                <img 
-                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" 
-                  alt="Candidate" 
-                  className="w-8 h-8 rounded-full ring-1 ring-gray-700/50"
-                />
-                <div className="flex-1 space-y-1">
-                  <div className="h-1.5 bg-gray-600/50 rounded-full w-full"></div>
-                  <div className="h-1.5 bg-gray-600/50 rounded-full w-2/3"></div>
+              {/* Candidate List */}
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2.5 p-2 bg-gray-800/30 rounded-lg border border-gray-700/20">
+                  <img 
+                    src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" 
+                    alt="Candidate" 
+                    className="w-8 h-8 rounded-full ring-1 ring-gray-700/50"
+                  />
+                  <div className="flex-1 space-y-1">
+                    <div className="h-1.5 bg-gray-600/50 rounded-full w-full"></div>
+                    <div className="h-1.5 bg-gray-600/50 rounded-full w-2/3"></div>
+                  </div>
+                  <div className="text-yellow-400 text-xs">⭐</div>
                 </div>
-                <div className="text-yellow-400 text-xs">⭐</div>
-              </div>
-              <div className="flex items-center gap-2.5 p-2 bg-gray-800/20 rounded-lg border border-gray-700/10 opacity-60">
-                <img 
-                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" 
-                  alt="Candidate" 
-                  className="w-8 h-8 rounded-full ring-1 ring-gray-700/30"
-                />
-                <div className="flex-1 space-y-1">
-                  <div className="h-1.5 bg-gray-600/40 rounded-full w-full"></div>
-                  <div className="h-1.5 bg-gray-600/40 rounded-full w-2/3"></div>
+                <div className="flex items-center gap-2.5 p-2 bg-gray-800/20 rounded-lg border border-gray-700/10 opacity-60">
+                  <img 
+                    src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" 
+                    alt="Candidate" 
+                    className="w-8 h-8 rounded-full ring-1 ring-gray-700/30"
+                  />
+                  <div className="flex-1 space-y-1">
+                    <div className="h-1.5 bg-gray-600/40 rounded-full w-full"></div>
+                    <div className="h-1.5 bg-gray-600/40 rounded-full w-2/3"></div>
+                  </div>
+                  <div className="text-gray-600 text-xs">☆</div>
                 </div>
-                <div className="text-gray-600 text-xs">☆</div>
-              </div>
-              <div className="flex items-center gap-2.5 p-2 bg-gray-800/20 rounded-lg border border-gray-700/10 opacity-60">
-                <img 
-                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=Milo" 
-                  alt="Candidate" 
-                  className="w-8 h-8 rounded-full ring-1 ring-gray-700/30"
-                />
-                <div className="flex-1 space-y-1">
-                  <div className="h-1.5 bg-gray-600/40 rounded-full w-full"></div>
-                  <div className="h-1.5 bg-gray-600/40 rounded-full w-2/3"></div>
+                <div className="flex items-center gap-2.5 p-2 bg-gray-800/20 rounded-lg border border-gray-700/10 opacity-60">
+                  <img 
+                    src="https://api.dicebear.com/7.x/avataaars/svg?seed=Milo" 
+                    alt="Candidate" 
+                    className="w-8 h-8 rounded-full ring-1 ring-gray-700/30"
+                  />
+                  <div className="flex-1 space-y-1">
+                    <div className="h-1.5 bg-gray-600/40 rounded-full w-full"></div>
+                    <div className="h-1.5 bg-gray-600/40 rounded-full w-2/3"></div>
+                  </div>
+                  <div className="text-gray-600 text-xs">☆</div>
                 </div>
-                <div className="text-gray-600 text-xs">☆</div>
               </div>
             </div>
-          </div>
 
-          {/* Floating Role Badges with Neon Glow - Positioned around the card */}
-          <div className="absolute -top-16 -left-20 animate-float">
-            <div className="flex items-center gap-2 bg-blue-600/90 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.6)] border border-blue-500/30">
-              <div className="w-5 h-5 bg-blue-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(59,130,246,0.8)]">
-                <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
+            {/* Floating Role Badges with Neon Glow - Positioned around the card */}
+            <div className="absolute -top-16 -left-20 animate-float">
+              <div className="flex items-center gap-2 bg-blue-600/90 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.6)] border border-blue-500/30">
+                <div className="w-5 h-5 bg-blue-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(59,130,246,0.8)]">
+                  <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
+                </div>
+                <span className="text-white font-medium text-sm">Product Developer</span>
               </div>
-              <span className="text-white font-medium text-sm">Product Developer</span>
             </div>
-          </div>
 
-          <div className="absolute -bottom-4 -left-24 animate-float-delayed">
-            <div className="flex items-center gap-2 bg-green-600/90 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(22,163,74,0.6)] border border-green-500/30">
-              <div className="w-5 h-5 bg-green-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(34,197,94,0.8)]">
-                <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
+            <div className="absolute -bottom-4 -left-24 animate-float-delayed">
+              <div className="flex items-center gap-2 bg-green-600/90 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(22,163,74,0.6)] border border-green-500/30">
+                <div className="w-5 h-5 bg-green-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(34,197,94,0.8)]">
+                  <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
+                </div>
+                <span className="text-white font-medium text-sm">Product Manager</span>
               </div>
-              <span className="text-white font-medium text-sm">Product Manager</span>
             </div>
-          </div>
 
-          <div className="absolute top-1/2 -right-24 animate-float">
-            <div className="flex items-center gap-2 bg-orange-600/90 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(234,88,12,0.6)] border border-orange-500/30">
-              <div className="w-5 h-5 bg-orange-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(249,115,22,0.8)]">
-                <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
+            <div className="absolute top-1/2 -right-24 animate-float">
+              <div className="flex items-center gap-2 bg-orange-600/90 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(234,88,12,0.6)] border border-orange-500/30">
+                <div className="w-5 h-5 bg-orange-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(249,115,22,0.8)]">
+                  <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
+                </div>
+                <span className="text-white font-medium text-sm">Product Designer</span>
               </div>
-              <span className="text-white font-medium text-sm">Product Designer</span>
             </div>
           </div>
         </div>
 
-        {/* Bottom Text */}
+        {/* Slide 1 - Analytics Dashboard */}
+        <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ${activeSlide === 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <div className="relative">
+            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-gray-800/40 w-72">
+              <div className="flex gap-1.5 mb-3">
+                <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
+                <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
+                <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
+              </div>
+              
+              {/* Analytics Chart */}
+              <div className="space-y-3">
+                <div className="flex items-end gap-1.5 h-20">
+                  <div className="flex-1 bg-purple-500/70 rounded-t-lg h-12"></div>
+                  <div className="flex-1 bg-purple-500/70 rounded-t-lg h-16"></div>
+                  <div className="flex-1 bg-purple-500/90 rounded-t-lg h-20 shadow-[0_0_15px_rgba(168,85,247,0.5)]"></div>
+                  <div className="flex-1 bg-purple-500/70 rounded-t-lg h-14"></div>
+                  <div className="flex-1 bg-purple-500/70 rounded-t-lg h-10"></div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-gray-800/30 rounded-lg">
+                    <div className="h-1.5 bg-gray-600/50 rounded-full w-20"></div>
+                    <div className="text-green-400 text-xs">↑ 23%</div>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-gray-800/20 rounded-lg opacity-60">
+                    <div className="h-1.5 bg-gray-600/40 rounded-full w-16"></div>
+                    <div className="text-gray-500 text-xs">↓ 5%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="absolute -top-12 -left-16 animate-float">
+              <div className="flex items-center gap-2 bg-purple-600/90 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(147,51,234,0.6)] border border-purple-500/30">
+                <div className="w-5 h-5 bg-purple-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(168,85,247,0.8)]">
+                  <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
+                </div>
+                <span className="text-white font-medium text-sm">Real-time Analytics</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Slide 2 - Interview Scheduling */}
+        <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ${activeSlide === 2 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <div className="relative">
+            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-gray-800/40 w-72">
+              <div className="flex gap-1.5 mb-3">
+                <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
+                <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
+                <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
+              </div>
+              
+              {/* Calendar Interface */}
+              <div className="space-y-2">
+                <div className="h-5 bg-cyan-500/90 rounded-lg w-24 shadow-[0_0_15px_rgba(6,182,212,0.5)] mb-3"></div>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {[...Array(12)].map((_, i) => (
+                    <div 
+                      key={i}
+                      className={`aspect-square rounded ${
+                        i === 5 ? 'bg-cyan-500/80 shadow-[0_0_10px_rgba(6,182,212,0.5)]' : 
+                        i === 9 ? 'bg-cyan-500/50' : 
+                        'bg-gray-800/30'
+                      }`}
+                    ></div>
+                  ))}
+                </div>
+                <div className="space-y-1.5 mt-3">
+                  <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-lg">
+                    <div className="w-1 h-8 bg-cyan-500 rounded-full"></div>
+                    <div className="flex-1 space-y-1">
+                      <div className="h-1.5 bg-gray-600/50 rounded-full w-full"></div>
+                      <div className="h-1 bg-gray-600/40 rounded-full w-16"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="absolute -top-16 -right-20 animate-float">
+              <div className="flex items-center gap-2 bg-cyan-600/90 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(6,182,212,0.6)] border border-cyan-500/30">
+                <div className="w-5 h-5 bg-cyan-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(34,211,238,0.8)]">
+                  <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
+                </div>
+                <span className="text-white font-medium text-sm">Smart Scheduling</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Slide 3 - AI Insights */}
+        <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ${activeSlide === 3 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <div className="relative">
+            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-gray-800/40 w-72">
+              <div className="flex gap-1.5 mb-3">
+                <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
+                <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
+                <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
+              </div>
+              
+              {/* AI Insights */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-purple-500 rounded-lg shadow-[0_0_15px_rgba(236,72,153,0.5)]"></div>
+                  <div className="h-2 bg-pink-500/70 rounded-full w-16"></div>
+                </div>
+                <div className="space-y-2">
+                  <div className="p-2.5 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-lg border border-pink-500/30">
+                    <div className="h-1.5 bg-gray-300/70 rounded-full w-full mb-1"></div>
+                    <div className="h-1.5 bg-gray-300/70 rounded-full w-4/5"></div>
+                  </div>
+                  <div className="p-2 bg-gray-800/30 rounded-lg opacity-70">
+                    <div className="h-1.5 bg-gray-600/50 rounded-full w-full mb-1"></div>
+                    <div className="h-1.5 bg-gray-600/50 rounded-full w-3/5"></div>
+                  </div>
+                  <div className="p-2 bg-gray-800/20 rounded-lg opacity-60">
+                    <div className="h-1.5 bg-gray-600/40 rounded-full w-full mb-1"></div>
+                    <div className="h-1.5 bg-gray-600/40 rounded-full w-2/3"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="absolute -bottom-8 -left-20 animate-float-delayed">
+              <div className="flex items-center gap-2 bg-gradient-to-r from-pink-600 to-purple-600 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(236,72,153,0.6)] border border-pink-500/30">
+                <div className="w-5 h-5 bg-gradient-to-br from-pink-500 to-purple-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(236,72,153,0.8)]">
+                  <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
+                </div>
+                <span className="text-white font-medium text-sm">AI-Powered Insights</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Text - Dynamic based on slide */}
         <div className="absolute bottom-16 left-1/2 -translate-x-1/2 text-center max-w-md z-10">
-          <h2 className="text-3xl font-light text-white mb-2">
-            Find your best candidates with Marc Ellis
+          <h2 className="text-3xl font-light text-white mb-2 transition-opacity duration-500">
+            {activeSlide === 0 && "Find your best candidates with Marc Ellis"}
+            {activeSlide === 1 && "Track performance with real-time analytics"}
+            {activeSlide === 2 && "Schedule interviews effortlessly"}
+            {activeSlide === 3 && "Get AI-powered hiring recommendations"}
           </h2>
-          <p className="text-gray-400 text-sm">
-            Streamline hiring and find top talent with Marc Ellis's tools
+          <p className="text-gray-400 text-sm transition-opacity duration-500">
+            {activeSlide === 0 && "Streamline hiring and find top talent with Marc Ellis's tools"}
+            {activeSlide === 1 && "Monitor your recruitment metrics and make data-driven decisions"}
+            {activeSlide === 2 && "Coordinate interviews with candidates and team members seamlessly"}
+            {activeSlide === 3 && "Leverage AI to identify the perfect candidates faster"}
           </p>
           
           {/* Navigation Dots */}
