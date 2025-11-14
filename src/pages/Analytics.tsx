@@ -727,9 +727,9 @@ export default function Analytics() {
       </div>
 
       {/* Charts Section */}
-      <div className={`grid grid-cols-1 ${isGridLayout ? 'lg:grid-cols-2' : ''} gap-8 mb-8`}>
+      <div className={`grid grid-cols-1 ${isGridLayout ? 'lg:grid-cols-2' : ''} gap-8 mb-8 transition-all duration-500 ease-in-out`}>
         {/* Score Distribution */}
-        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 transition-all duration-500 ease-in-out animate-fade-in">
           <CardHeader>
             <CardTitle className="text-foreground flex items-center">
               <TrendingUp className="w-5 h-5 mr-2" />
@@ -794,7 +794,7 @@ export default function Analytics() {
         </Card>
 
         {/* Contact Status */}
-        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
+        <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 transition-all duration-500 ease-in-out animate-fade-in">
           <CardHeader>
             <CardTitle className="text-foreground flex items-center">
               <PhoneCall className="w-5 h-5 mr-2" />
