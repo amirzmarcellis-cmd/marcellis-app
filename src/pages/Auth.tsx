@@ -126,9 +126,9 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
+    <div className="min-h-screen w-full flex flex-col lg:flex-row overflow-x-hidden">
       {/* Left Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-8 relative overflow-hidden min-h-[100vh] lg:min-h-screen" style={{ backgroundColor: '#1a1d23' }}>
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-8 relative overflow-hidden min-h-screen shrink-0" style={{ backgroundColor: '#1a1d23' }}>
         <MissionBackground className="absolute inset-0" />
         
         {/* Scroll Indicator - Only visible on mobile/tablet */}
@@ -211,7 +211,7 @@ export default function Auth() {
 
       {/* Right Side - Visual Content */}
       <div 
-        className="w-full lg:w-1/2 flex relative overflow-hidden items-center justify-center p-6 md:p-12 min-h-[100vh] lg:min-h-screen"
+        className="w-full lg:w-1/2 flex relative overflow-hidden items-center justify-center p-6 md:p-12 min-h-screen shrink-0"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onMouseMove={handleMouseMove}
