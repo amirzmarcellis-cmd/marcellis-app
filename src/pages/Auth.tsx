@@ -219,8 +219,8 @@ export default function Auth() {
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        {/* Dark overlay to control pattern visibility */}
-        <div className="absolute inset-0 bg-black/60" style={{ mixBlendMode: 'multiply' }}></div>
+        {/* Subtle overlay to control pattern visibility */}
+        <div className="absolute inset-0 bg-black/20" style={{ mixBlendMode: 'overlay' }}></div>
         {/* Subtle Geometric Background Patterns with Parallax */}
         <div className="absolute inset-0 overflow-hidden">
           <div 
