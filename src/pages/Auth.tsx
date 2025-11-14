@@ -20,6 +20,7 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,6 +33,17 @@ export default function Auth() {
     };
     checkUser();
   }, [navigate]);
+
+  // Auto-rotate slides every 5 seconds
+  useEffect(() => {
+    if (isPaused) return;
+
+    const interval = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % 4);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [isPaused]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -143,7 +155,11 @@ export default function Auth() {
       </div>
 
       {/* Right Side - Visual Content */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-black via-gray-950 to-gray-900 relative overflow-hidden items-center justify-center p-12">
+      <div 
+        className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-black via-gray-950 to-gray-900 relative overflow-hidden items-center justify-center p-12"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
         {/* Subtle Geometric Background Patterns */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-20 left-10 w-64 h-64 bg-gray-800/10 rounded-3xl rotate-12 blur-xl"></div>
