@@ -187,8 +187,9 @@ export default function Auth() {
 
       {/* Right Side - Visual Content */}
       <div 
-        className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-black via-gray-950 to-gray-900 relative overflow-hidden items-center justify-center p-12"
+        className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center p-12"
         style={{
+          backgroundColor: '#1a1d23',
           backgroundImage: 'url(/auth-pattern.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
