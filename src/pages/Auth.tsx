@@ -132,10 +132,10 @@ export default function Auth() {
         <MissionBackground className="absolute inset-0" />
         
         
-        <div className="w-full max-w-md relative z-10">
-          <div className="mb-8">
-            <div className="flex items-center justify-center mb-6">
-              <div className="w-32 h-32 flex items-center justify-center">
+        <div className="w-full max-w-md relative z-10 px-2 sm:px-0">
+          <div className="mb-6 sm:mb-8">
+            <div className="flex items-center justify-center mb-4 sm:mb-6">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center">
                 <img 
                   src={theme === 'dark' 
                     ? (settings.logoLight || settings.logo || defaultLogo)
@@ -146,15 +146,15 @@ export default function Auth() {
                 />
               </div>
             </div>
-            <h1 className="text-4xl font-light text-foreground text-center mb-2">Welcome back!</h1>
-            <p className="text-center text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-light text-foreground text-center mb-2">Welcome back!</h1>
+            <p className="text-center text-muted-foreground text-sm sm:text-base">
               Log in now and save time on employee administration.
             </p>
           </div>
 
-          <form onSubmit={handleAuth} className="space-y-6">
+          <form onSubmit={handleAuth} className="space-y-5 sm:space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground">Email</Label>
+              <Label htmlFor="email" className="text-foreground text-sm sm:text-base">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -162,11 +162,11 @@ export default function Auth() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="bg-input/50 border-border/50 backdrop-blur-sm"
+                className="bg-input/50 border-border/50 backdrop-blur-sm h-12 sm:h-11 text-base"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground">Password</Label>
+              <Label htmlFor="password" className="text-foreground text-sm sm:text-base">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -174,10 +174,10 @@ export default function Auth() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="bg-input/50 border-border/50 backdrop-blur-sm"
+                className="bg-input/50 border-border/50 backdrop-blur-sm h-12 sm:h-11 text-base"
               />
-              <div className="flex justify-end">
-                <button type="button" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <div className="flex justify-end pt-1">
+                <button type="button" className="text-sm sm:text-sm text-muted-foreground hover:text-foreground transition-colors py-1">
                   Forgot password
                 </button>
               </div>
@@ -189,13 +189,13 @@ export default function Auth() {
             )}
             <Button 
               type="submit" 
-              className="w-full h-12 rounded-full font-medium text-black transition-all duration-200"
+              className="w-full h-14 sm:h-12 rounded-full font-medium text-black transition-all duration-200 text-base"
               style={{ backgroundColor: '#00d9ff' }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#00b8d4'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#00d9ff'}
               disabled={loading}
             >
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {loading && <Loader2 className="mr-2 h-5 w-5 sm:h-4 sm:w-4 animate-spin" />}
               {isLogin ? 'Sign in' : 'Sign Up'}
             </Button>
           </form>
