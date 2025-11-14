@@ -247,10 +247,10 @@ export default function Auth() {
         </div>
 
         {/* Slide 0 - Candidate Management */}
-        <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 0 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 0 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
+        <div className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ease-in-out ${activeSlide === 0 ? 'opacity-100 translate-x-0 scale-100 blur-0 animate-fade-in' : activeSlide > 0 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
             {/* UI Mockup Card - Centered */}
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-gray-800/40 w-64 sm:w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
+            <div className={`bg-gray-900/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-gray-800/40 w-64 sm:w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer ${activeSlide === 0 ? 'animate-scale-in' : ''}`}>
               {/* Browser Controls */}
               <div className="flex gap-1.5 mb-2 sm:mb-3">
                 <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-500/80"></div>
@@ -352,9 +352,9 @@ export default function Auth() {
         </div>
 
         {/* Slide 1 - Analytics Dashboard */}
-        <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 1 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 1 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
+        <div className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ease-in-out ${activeSlide === 1 ? 'opacity-100 translate-x-0 scale-100 blur-0 animate-fade-in' : activeSlide > 1 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-gray-800/40 w-64 sm:w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
+            <div className={`bg-gray-900/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-gray-800/40 w-64 sm:w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer ${activeSlide === 1 ? 'animate-scale-in' : ''}`}>
               <div className="flex gap-1.5 mb-2 sm:mb-3">
                 <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-500/80"></div>
                 <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-yellow-500/80"></div>
@@ -425,9 +425,9 @@ export default function Auth() {
         </div>
 
         {/* Slide 2 - Interview Scheduling */}
-        <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 2 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 2 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
+        <div className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ease-in-out ${activeSlide === 2 ? 'opacity-100 translate-x-0 scale-100 blur-0 animate-fade-in' : activeSlide > 2 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-gray-800/40 w-64 sm:w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
+            <div className={`bg-gray-900/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-gray-800/40 w-64 sm:w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer ${activeSlide === 2 ? 'animate-scale-in' : ''}`}>
               <div className="flex gap-1.5 mb-2 sm:mb-3">
                 <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-500/80"></div>
                 <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-yellow-500/80"></div>
@@ -504,9 +504,9 @@ export default function Auth() {
         </div>
 
         {/* Slide 3 - AI Insights */}
-        <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 3 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 3 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
+        <div className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ease-in-out ${activeSlide === 3 ? 'opacity-100 translate-x-0 scale-100 blur-0 animate-fade-in' : activeSlide > 3 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-gray-800/40 w-64 sm:w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
+            <div className={`bg-gray-900/60 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-gray-800/40 w-64 sm:w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer ${activeSlide === 3 ? 'animate-scale-in' : ''}`}>
               <div className="flex gap-1.5 mb-2 sm:mb-3">
                 <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-500/80"></div>
                 <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-yellow-500/80"></div>
