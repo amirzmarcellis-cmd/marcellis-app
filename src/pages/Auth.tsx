@@ -334,23 +334,53 @@ export default function Auth() {
                 <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
               </div>
               
+              {/* Header */}
+              <div className="mb-3">
+                <h3 className="text-white font-semibold text-sm mb-1">Performance Analytics</h3>
+                <p className="text-gray-400 text-xs">Last 7 days</p>
+              </div>
+
               {/* Analytics Chart */}
               <div className="space-y-3">
-                <div className="flex items-end gap-1.5 h-20">
-                  <div className="flex-1 bg-purple-500/70 rounded-t-lg h-12"></div>
-                  <div className="flex-1 bg-purple-500/70 rounded-t-lg h-16"></div>
-                  <div className="flex-1 bg-purple-500/90 rounded-t-lg h-20 shadow-[0_0_15px_rgba(168,85,247,0.5)]"></div>
-                  <div className="flex-1 bg-purple-500/70 rounded-t-lg h-14"></div>
-                  <div className="flex-1 bg-purple-500/70 rounded-t-lg h-10"></div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between p-2 bg-gray-800/30 rounded-lg">
-                    <div className="h-1.5 bg-gray-600/50 rounded-full w-20"></div>
-                    <div className="text-green-400 text-xs">↑ 23%</div>
+                <div className="flex items-end gap-1.5 h-20 bg-gray-800/20 rounded-lg p-2">
+                  <div className="flex-1 bg-purple-500/70 rounded-t-lg h-12 relative group">
+                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">48</span>
                   </div>
-                  <div className="flex items-center justify-between p-2 bg-gray-800/20 rounded-lg opacity-60">
-                    <div className="h-1.5 bg-gray-600/40 rounded-full w-16"></div>
-                    <div className="text-gray-500 text-xs">↓ 5%</div>
+                  <div className="flex-1 bg-purple-500/70 rounded-t-lg h-16 relative group">
+                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">62</span>
+                  </div>
+                  <div className="flex-1 bg-purple-500/90 rounded-t-lg h-20 shadow-[0_0_15px_rgba(168,85,247,0.5)] relative group">
+                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity">85</span>
+                  </div>
+                  <div className="flex-1 bg-purple-500/70 rounded-t-lg h-14 relative group">
+                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">56</span>
+                  </div>
+                  <div className="flex-1 bg-purple-500/70 rounded-t-lg h-10 relative group">
+                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">38</span>
+                  </div>
+                </div>
+                
+                {/* Stats */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20">
+                    <div>
+                      <p className="text-white text-xs font-medium">Active Applications</p>
+                      <p className="text-gray-400 text-[10px]">This week</p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-green-400 text-xs">↑</span>
+                      <span className="text-green-400 text-sm font-semibold">23%</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between p-2.5 bg-gray-800/20 rounded-lg border border-gray-700/10">
+                    <div>
+                      <p className="text-white text-xs font-medium">Interviews Scheduled</p>
+                      <p className="text-gray-400 text-[10px]">This week</p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-red-400 text-xs">↓</span>
+                      <span className="text-gray-400 text-sm font-semibold">5%</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -377,27 +407,58 @@ export default function Auth() {
                 <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
               </div>
               
+              {/* Header */}
+              <div className="mb-3">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-white font-semibold text-sm">Interview Schedule</h3>
+                  <span className="text-cyan-400 text-xs">December 2024</span>
+                </div>
+              </div>
+
               {/* Calendar Interface */}
               <div className="space-y-2">
-                <div className="h-5 bg-cyan-500/90 rounded-lg w-24 shadow-[0_0_15px_rgba(6,182,212,0.5)] mb-3"></div>
-                <div className="grid grid-cols-4 gap-1.5">
-                  {[...Array(12)].map((_, i) => (
-                    <div 
-                      key={i}
-                      className={`aspect-square rounded ${
-                        i === 5 ? 'bg-cyan-500/80 shadow-[0_0_10px_rgba(6,182,212,0.5)]' : 
-                        i === 9 ? 'bg-cyan-500/50' : 
-                        'bg-gray-800/30'
-                      }`}
-                    ></div>
+                {/* Calendar Grid */}
+                <div className="grid grid-cols-7 gap-1 mb-2">
+                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
+                    <div key={i} className="text-gray-500 text-[10px] text-center font-medium">{day}</div>
                   ))}
                 </div>
+                <div className="grid grid-cols-7 gap-1">
+                  {[...Array(35)].map((_, i) => {
+                    const dayNum = i - 2;
+                    const isToday = dayNum === 15;
+                    const hasInterview = [5, 9, 18, 22].includes(dayNum);
+                    return (
+                      <div 
+                        key={i}
+                        className={`aspect-square rounded text-[10px] flex items-center justify-center ${
+                          dayNum < 1 || dayNum > 31 ? 'text-gray-700' :
+                          isToday ? 'bg-cyan-500/80 text-white font-bold shadow-[0_0_10px_rgba(6,182,212,0.5)]' : 
+                          hasInterview ? 'bg-cyan-500/30 text-cyan-300 border border-cyan-500/40' : 
+                          'text-gray-400 hover:bg-gray-800/30'
+                        }`}
+                      >
+                        {dayNum > 0 && dayNum <= 31 ? dayNum : ''}
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                {/* Upcoming Interviews */}
                 <div className="space-y-1.5 mt-3">
-                  <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-lg">
-                    <div className="w-1 h-8 bg-cyan-500 rounded-full"></div>
-                    <div className="flex-1 space-y-1">
-                      <div className="h-1.5 bg-gray-600/50 rounded-full w-full"></div>
-                      <div className="h-1 bg-gray-600/40 rounded-full w-16"></div>
+                  <p className="text-white text-xs font-medium mb-1">Upcoming</p>
+                  <div className="flex items-center gap-2 p-2 bg-cyan-500/10 rounded-lg border border-cyan-500/30">
+                    <div className="w-1 h-10 bg-cyan-500 rounded-full"></div>
+                    <div className="flex-1">
+                      <p className="text-white text-xs font-medium">Sarah Johnson</p>
+                      <p className="text-gray-400 text-[10px]">Today • 2:00 PM</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 bg-gray-800/20 rounded-lg border border-gray-700/20">
+                    <div className="w-1 h-10 bg-gray-600 rounded-full"></div>
+                    <div className="flex-1">
+                      <p className="text-white text-xs font-medium">Michael Chen</p>
+                      <p className="text-gray-400 text-[10px]">Dec 18 • 10:00 AM</p>
                     </div>
                   </div>
                 </div>
@@ -425,24 +486,55 @@ export default function Auth() {
                 <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
               </div>
               
+              {/* Header */}
+              <div className="mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-purple-500 rounded-lg shadow-[0_0_15px_rgba(236,72,153,0.5)] flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">AI</span>
+                  </div>
+                  <h3 className="text-white font-semibold text-sm">Smart Recommendations</h3>
+                </div>
+              </div>
+
               {/* AI Insights */}
               <div className="space-y-2">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-purple-500 rounded-lg shadow-[0_0_15px_rgba(236,72,153,0.5)]"></div>
-                  <div className="h-2 bg-pink-500/70 rounded-full w-16"></div>
+                <div className="p-3 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-lg border border-pink-500/40">
+                  <div className="flex items-start gap-2 mb-2">
+                    <span className="text-pink-400 text-sm">⚡</span>
+                    <div className="flex-1">
+                      <p className="text-white text-xs font-medium mb-1">Perfect Match Found</p>
+                      <p className="text-gray-300 text-[10px] leading-relaxed">
+                        Sarah Johnson's skills align 95% with the Product Designer role requirements.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-1 mt-2">
+                    <span className="text-[9px] bg-pink-500/20 text-pink-300 px-2 py-0.5 rounded-full">Figma Expert</span>
+                    <span className="text-[9px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">5+ years</span>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <div className="p-2.5 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-lg border border-pink-500/30">
-                    <div className="h-1.5 bg-gray-300/70 rounded-full w-full mb-1"></div>
-                    <div className="h-1.5 bg-gray-300/70 rounded-full w-4/5"></div>
+                
+                <div className="p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20">
+                  <div className="flex items-start gap-2">
+                    <span className="text-blue-400 text-sm">💡</span>
+                    <div className="flex-1">
+                      <p className="text-white text-xs font-medium mb-1">Interview Tip</p>
+                      <p className="text-gray-400 text-[10px]">
+                        Ask about their mobile app design experience.
+                      </p>
+                    </div>
                   </div>
-                  <div className="p-2 bg-gray-800/30 rounded-lg opacity-70">
-                    <div className="h-1.5 bg-gray-600/50 rounded-full w-full mb-1"></div>
-                    <div className="h-1.5 bg-gray-600/50 rounded-full w-3/5"></div>
-                  </div>
-                  <div className="p-2 bg-gray-800/20 rounded-lg opacity-60">
-                    <div className="h-1.5 bg-gray-600/40 rounded-full w-full mb-1"></div>
-                    <div className="h-1.5 bg-gray-600/40 rounded-full w-2/3"></div>
+                </div>
+                
+                <div className="p-2.5 bg-gray-800/20 rounded-lg border border-gray-700/10">
+                  <div className="flex items-start gap-2">
+                    <span className="text-green-400 text-sm">📊</span>
+                    <div className="flex-1">
+                      <p className="text-white text-xs font-medium mb-1">Market Insight</p>
+                      <p className="text-gray-400 text-[10px]">
+                        Similar roles offer 15% higher salary range.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
