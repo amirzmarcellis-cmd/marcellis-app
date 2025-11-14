@@ -142,88 +142,96 @@ export default function Auth() {
       </div>
 
       {/* Right Side - Visual Content */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-gray-950 via-gray-900 to-black relative overflow-hidden items-center justify-center p-12">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-black via-gray-950 to-gray-900 relative overflow-hidden items-center justify-center p-12">
+        {/* Subtle Geometric Background Patterns */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-20 left-10 w-64 h-64 bg-gray-800/10 rounded-3xl rotate-12 blur-xl"></div>
+          <div className="absolute bottom-32 right-16 w-80 h-80 bg-gray-700/10 rounded-3xl -rotate-12 blur-2xl"></div>
+          <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-gray-800/10 rounded-3xl rotate-45 blur-xl"></div>
+          <div className="absolute bottom-1/4 left-1/4 w-56 h-56 bg-gray-700/10 rounded-3xl -rotate-45 blur-2xl"></div>
+        </div>
+
         {/* Central Content Container */}
-        <div className="relative">
+        <div className="relative z-10">
           {/* UI Mockup Card - Centered */}
-          <div className="bg-gray-800/40 backdrop-blur-sm rounded-2xl p-5 shadow-2xl border border-gray-700/30 w-80">
+          <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-gray-800/40 w-72">
             {/* Browser Controls */}
-            <div className="flex gap-1.5 mb-4">
-              <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
-              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
-              <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+            <div className="flex gap-1.5 mb-3">
+              <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
+              <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
+              <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
             </div>
             
             {/* Blue Progress Bar */}
-            <div className="mb-4">
-              <div className="h-8 bg-blue-500 rounded-lg w-24"></div>
-              <div className="h-1.5 bg-gray-700 rounded-full w-32 mt-2"></div>
+            <div className="mb-3">
+              <div className="h-6 bg-blue-500/90 rounded-lg w-20 shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
+              <div className="h-1 bg-gray-700/50 rounded-full w-28 mt-2"></div>
             </div>
 
             {/* Candidate List */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-3 p-2.5 bg-gray-700/20 rounded-lg">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2.5 p-2 bg-gray-800/30 rounded-lg border border-gray-700/20">
                 <img 
                   src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" 
                   alt="Candidate" 
-                  className="w-9 h-9 rounded-full"
+                  className="w-8 h-8 rounded-full ring-1 ring-gray-700/50"
                 />
-                <div className="flex-1">
-                  <div className="h-1.5 bg-gray-600/60 rounded-full w-full mb-1.5"></div>
-                  <div className="h-1.5 bg-gray-600/60 rounded-full w-2/3"></div>
+                <div className="flex-1 space-y-1">
+                  <div className="h-1.5 bg-gray-600/50 rounded-full w-full"></div>
+                  <div className="h-1.5 bg-gray-600/50 rounded-full w-2/3"></div>
                 </div>
-                <div className="text-yellow-400 text-sm">⭐</div>
+                <div className="text-yellow-400 text-xs">⭐</div>
               </div>
-              <div className="flex items-center gap-3 p-2.5 bg-gray-700/20 rounded-lg opacity-50">
+              <div className="flex items-center gap-2.5 p-2 bg-gray-800/20 rounded-lg border border-gray-700/10 opacity-60">
                 <img 
                   src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" 
                   alt="Candidate" 
-                  className="w-9 h-9 rounded-full"
+                  className="w-8 h-8 rounded-full ring-1 ring-gray-700/30"
                 />
-                <div className="flex-1">
-                  <div className="h-1.5 bg-gray-600/60 rounded-full w-full mb-1.5"></div>
-                  <div className="h-1.5 bg-gray-600/60 rounded-full w-2/3"></div>
+                <div className="flex-1 space-y-1">
+                  <div className="h-1.5 bg-gray-600/40 rounded-full w-full"></div>
+                  <div className="h-1.5 bg-gray-600/40 rounded-full w-2/3"></div>
                 </div>
-                <div className="text-gray-500 text-sm">☆</div>
+                <div className="text-gray-600 text-xs">☆</div>
               </div>
-              <div className="flex items-center gap-3 p-2.5 bg-gray-700/20 rounded-lg opacity-50">
+              <div className="flex items-center gap-2.5 p-2 bg-gray-800/20 rounded-lg border border-gray-700/10 opacity-60">
                 <img 
                   src="https://api.dicebear.com/7.x/avataaars/svg?seed=Milo" 
                   alt="Candidate" 
-                  className="w-9 h-9 rounded-full"
+                  className="w-8 h-8 rounded-full ring-1 ring-gray-700/30"
                 />
-                <div className="flex-1">
-                  <div className="h-1.5 bg-gray-600/60 rounded-full w-full mb-1.5"></div>
-                  <div className="h-1.5 bg-gray-600/60 rounded-full w-2/3"></div>
+                <div className="flex-1 space-y-1">
+                  <div className="h-1.5 bg-gray-600/40 rounded-full w-full"></div>
+                  <div className="h-1.5 bg-gray-600/40 rounded-full w-2/3"></div>
                 </div>
-                <div className="text-gray-500 text-sm">☆</div>
+                <div className="text-gray-600 text-xs">☆</div>
               </div>
             </div>
           </div>
 
-          {/* Floating Role Badges - Positioned around the card */}
-          <div className="absolute -top-20 -left-16 animate-float">
-            <div className="flex items-center gap-2.5 bg-blue-600/90 backdrop-blur-sm px-3.5 py-2 rounded-lg shadow-xl">
-              <div className="w-5 h-5 bg-blue-500 rounded-sm flex items-center justify-center">
-                <div className="w-3 h-3 bg-white rounded-sm"></div>
+          {/* Floating Role Badges with Neon Glow - Positioned around the card */}
+          <div className="absolute -top-16 -left-20 animate-float">
+            <div className="flex items-center gap-2 bg-blue-600/90 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.6)] border border-blue-500/30">
+              <div className="w-5 h-5 bg-blue-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(59,130,246,0.8)]">
+                <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
               </div>
               <span className="text-white font-medium text-sm">Product Developer</span>
             </div>
           </div>
 
-          <div className="absolute bottom-6 -left-20 animate-float-delayed">
-            <div className="flex items-center gap-2.5 bg-green-600/90 backdrop-blur-sm px-3.5 py-2 rounded-lg shadow-xl">
-              <div className="w-5 h-5 bg-green-500 rounded-sm flex items-center justify-center">
-                <div className="w-3 h-3 bg-white rounded-sm"></div>
+          <div className="absolute -bottom-4 -left-24 animate-float-delayed">
+            <div className="flex items-center gap-2 bg-green-600/90 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(22,163,74,0.6)] border border-green-500/30">
+              <div className="w-5 h-5 bg-green-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(34,197,94,0.8)]">
+                <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
               </div>
               <span className="text-white font-medium text-sm">Product Manager</span>
             </div>
           </div>
 
-          <div className="absolute bottom-0 -right-20 animate-float">
-            <div className="flex items-center gap-2.5 bg-orange-600/90 backdrop-blur-sm px-3.5 py-2 rounded-lg shadow-xl">
-              <div className="w-5 h-5 bg-orange-500 rounded-sm flex items-center justify-center">
-                <div className="w-3 h-3 bg-white rounded-sm"></div>
+          <div className="absolute top-1/2 -right-24 animate-float">
+            <div className="flex items-center gap-2 bg-orange-600/90 backdrop-blur-md px-3 py-2 rounded-full shadow-[0_0_20px_rgba(234,88,12,0.6)] border border-orange-500/30">
+              <div className="w-5 h-5 bg-orange-500 rounded-md flex items-center justify-center shadow-[0_0_10px_rgba(249,115,22,0.8)]">
+                <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
               </div>
               <span className="text-white font-medium text-sm">Product Designer</span>
             </div>
@@ -231,12 +239,12 @@ export default function Auth() {
         </div>
 
         {/* Bottom Text */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 text-center">
+        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 text-center max-w-md z-10">
           <h2 className="text-3xl font-light text-white mb-2">
-            Find your best candidates with Marcellis
+            Find your best candidates with Hirever
           </h2>
-          <p className="text-gray-400">
-            Streamline hiring and find top talent with Marcellis's tools
+          <p className="text-gray-400 text-sm">
+            Streamline hiring and find top talent with Hirever's tools
           </p>
           
           {/* Navigation Dots */}
@@ -247,10 +255,6 @@ export default function Auth() {
             <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
           </div>
         </div>
-
-        {/* Background Circle Decorations */}
-        <div className="absolute top-20 left-20 w-96 h-96 bg-gray-700/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-gray-600/10 rounded-full blur-3xl"></div>
       </div>
 
       <style>{`
