@@ -206,10 +206,10 @@ export default function Auth() {
         className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center p-12"
         style={{
           backgroundColor: '#1a1d23',
-          backgroundImage: 'url(/auth-pattern.png)',
-          backgroundSize: 'cover',
+          backgroundImage: 'url(/auth-bg-pattern.png)',
+          backgroundSize: 'auto',
           backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
+          backgroundRepeat: 'repeat',
           backgroundBlendMode: 'soft-light',
           opacity: 0.95
         }}
@@ -221,7 +221,7 @@ export default function Auth() {
         onTouchEnd={onTouchEnd}
       >
         {/* Dark overlay to control pattern visibility */}
-        <div className="absolute inset-0 bg-black/30"></div>
+        <div className="absolute inset-0 bg-black/40"></div>
         {/* Subtle Geometric Background Patterns with Parallax */}
         <div className="absolute inset-0 overflow-hidden">
           <div 
