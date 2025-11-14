@@ -204,14 +204,6 @@ export default function Auth() {
       {/* Right Side - Visual Content */}
       <div 
         className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center p-12"
-        style={{
-          backgroundColor: '#1a1d23',
-          backgroundImage: 'url(/auth-bg-pattern.png)',
-          backgroundSize: '400px 400px',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'repeat',
-          opacity: 1
-        }}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onMouseMove={handleMouseMove}
@@ -219,6 +211,18 @@ export default function Auth() {
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
+        {/* Animated Background Pattern */}
+        <div 
+          className="absolute inset-0 animate-rotate-pattern"
+          style={{
+            backgroundColor: '#1a1d23',
+            backgroundImage: 'url(/auth-bg-pattern.png)',
+            backgroundSize: '400px 400px',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'repeat',
+          }}
+        ></div>
+        
         {/* Subtle overlay to control pattern visibility */}
         <div className="absolute inset-0 bg-black/20" style={{ mixBlendMode: 'overlay' }}></div>
         {/* Subtle Geometric Background Patterns with Parallax */}
@@ -613,11 +617,18 @@ export default function Auth() {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-15px); }
         }
+        @keyframes rotate-pattern {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
         .animate-float {
           animation: float 6s ease-in-out infinite;
         }
         .animate-float-delayed {
           animation: float-delayed 8s ease-in-out infinite;
+        }
+        .animate-rotate-pattern {
+          animation: rotate-pattern 120s linear infinite;
         }
       `}</style>
     </div>
