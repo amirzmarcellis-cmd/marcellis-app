@@ -89,6 +89,17 @@ export default function Auth() {
     setMouseY(y);
   };
 
+  const createRipple = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    ripple.style.left = `${e.clientX - rect.left - 10}px`;
+    ripple.style.top = `${e.clientY - rect.top - 10}px`;
+    card.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -249,7 +260,10 @@ export default function Auth() {
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 0 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 0 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
             {/* UI Mockup Card - Centered */}
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
+            <div 
+              className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer"
+              onClick={createRipple}
+            >
               {/* Browser Controls */}
               <div className="flex gap-1.5 mb-3">
                 <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
@@ -353,7 +367,10 @@ export default function Auth() {
         {/* Slide 1 - Analytics Dashboard */}
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 1 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 1 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
+            <div 
+              className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer"
+              onClick={createRipple}
+            >
               <div className="flex gap-1.5 mb-3">
                 <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
                 <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
@@ -426,7 +443,10 @@ export default function Auth() {
         {/* Slide 2 - Interview Scheduling */}
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 2 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 2 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
+            <div 
+              className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer"
+              onClick={createRipple}
+            >
               <div className="flex gap-1.5 mb-3">
                 <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
                 <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
@@ -505,7 +525,10 @@ export default function Auth() {
         {/* Slide 3 - AI Insights */}
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 3 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 3 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
           <div className="relative">
-            <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer">
+            <div 
+              className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer"
+              onClick={createRipple}
+            >
               <div className="flex gap-1.5 mb-3">
                 <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
                 <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
@@ -633,6 +656,16 @@ export default function Auth() {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
         }
+        @keyframes ripple {
+          0% {
+            transform: scale(0);
+            opacity: 0.6;
+          }
+          100% {
+            transform: scale(4);
+            opacity: 0;
+          }
+        }
         .animate-float {
           animation: float 6s ease-in-out infinite;
         }
@@ -657,6 +690,15 @@ export default function Auth() {
           background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
           animation: shimmer 3s infinite;
           animation-delay: 1s;
+          pointer-events: none;
+        }
+        .ripple {
+          position: absolute;
+          border-radius: 50%;
+          background: rgba(59, 130, 246, 0.5);
+          width: 20px;
+          height: 20px;
+          animation: ripple 0.6s ease-out;
           pointer-events: none;
         }
       `}</style>
