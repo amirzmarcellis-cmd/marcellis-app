@@ -126,9 +126,9 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row overflow-x-hidden">
+    <div className="min-h-screen w-full flex flex-col lg:flex-row overflow-x-hidden snap-y snap-mandatory lg:snap-none overflow-y-auto">
       {/* Left Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-8 relative overflow-hidden min-h-screen shrink-0" style={{ backgroundColor: '#1a1d23' }}>
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-8 relative overflow-hidden min-h-screen shrink-0 snap-start lg:snap-align-none" style={{ backgroundColor: '#1a1d23' }}>
         <MissionBackground className="absolute inset-0" />
         
         
@@ -204,7 +204,7 @@ export default function Auth() {
 
       {/* Right Side - Visual Content */}
       <div 
-        className="w-full lg:w-1/2 flex relative overflow-hidden items-center justify-center p-4 md:p-8 pt-16 md:pt-8 min-h-screen shrink-0"
+        className="w-full lg:w-1/2 flex relative overflow-hidden items-center justify-center p-4 md:p-8 pt-16 md:pt-8 min-h-screen shrink-0 snap-start lg:snap-align-none"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onMouseMove={handleMouseMove}
