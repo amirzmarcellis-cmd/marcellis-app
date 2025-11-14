@@ -204,7 +204,7 @@ export default function Auth() {
 
       {/* Right Side - Visual Content */}
       <div 
-        className="w-full lg:w-1/2 flex relative overflow-hidden items-center justify-center p-4 md:p-8 min-h-screen shrink-0"
+        className="w-full lg:w-1/2 flex relative overflow-hidden items-center justify-center p-4 md:p-8 pt-16 md:pt-8 min-h-screen shrink-0"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onMouseMove={handleMouseMove}
