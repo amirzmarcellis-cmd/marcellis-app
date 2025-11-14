@@ -258,21 +258,21 @@ export default function Auth() {
 
         {/* Slide 0 - Candidate Management */}
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 0 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 0 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
-          <div className="relative">
+          <div key={`slide-0-${activeSlide}`} className="relative">
             {/* UI Mockup Card - Centered */}
             <div 
               className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer"
               onClick={createRipple}
             >
               {/* Browser Controls */}
-              <div className="flex gap-1.5 mb-3">
+              <div className="flex gap-1.5 mb-3 animate-fade-in" style={{ animationDelay: '0ms' }}>
                 <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
                 <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
                 <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
               </div>
               
               {/* Header */}
-              <div className="mb-3">
+              <div className="mb-3 animate-fade-in" style={{ animationDelay: '100ms' }}>
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-white font-semibold text-sm">Top Candidates</h3>
                   <span className="text-blue-400 text-xs">View All</span>
@@ -284,7 +284,7 @@ export default function Auth() {
 
               {/* Candidate List */}
               <div className="space-y-2">
-                <div className="flex items-center gap-3 p-2.5 bg-gray-800/40 rounded-lg border border-gray-700/30 hover:bg-gray-800/60 transition-colors">
+                <div className="flex items-center gap-3 p-2.5 bg-gray-800/40 rounded-lg border border-gray-700/30 hover:bg-gray-800/60 transition-colors animate-fade-in" style={{ animationDelay: '200ms' }}>
                   <img 
                     src={candidate1} 
                     alt="Sarah Johnson" 
@@ -300,7 +300,7 @@ export default function Auth() {
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3 p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20">
+                <div className="flex items-center gap-3 p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20 hover:bg-gray-800/50 transition-colors animate-fade-in" style={{ animationDelay: '300ms' }}>
                   <img 
                     src={candidate2} 
                     alt="Michael Chen" 
@@ -316,7 +316,7 @@ export default function Auth() {
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3 p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20">
+                <div className="flex items-center gap-3 p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20 animate-fade-in" style={{ animationDelay: '400ms' }}>
                   <img 
                     src={candidate3} 
                     alt="Emma Martinez" 
@@ -366,26 +366,26 @@ export default function Auth() {
 
         {/* Slide 1 - Analytics Dashboard */}
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 1 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 1 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
-          <div className="relative">
+          <div key={`slide-1-${activeSlide}`} className="relative">
             <div 
               className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer"
               onClick={createRipple}
             >
-              <div className="flex gap-1.5 mb-3">
+              <div className="flex gap-1.5 mb-3 animate-fade-in" style={{ animationDelay: '0ms' }}>
                 <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
                 <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
                 <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
               </div>
               
               {/* Header */}
-              <div className="mb-3">
+              <div className="mb-3 animate-fade-in" style={{ animationDelay: '100ms' }}>
                 <h3 className="text-white font-semibold text-sm mb-1">Performance Analytics</h3>
                 <p className="text-gray-400 text-xs">Last 7 days</p>
               </div>
 
               {/* Analytics Chart */}
               <div className="space-y-3">
-                <div className="flex items-end gap-1.5 h-20 bg-gray-800/20 rounded-lg p-2">
+                <div className="flex items-end gap-1.5 h-20 bg-gray-800/20 rounded-lg p-2 animate-fade-in" style={{ animationDelay: '200ms' }}>
                   <div className="flex-1 bg-purple-500/70 rounded-t-lg h-12 relative group">
                     <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">48</span>
                   </div>
@@ -405,7 +405,7 @@ export default function Auth() {
                 
                 {/* Stats */}
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20">
+                  <div className="flex items-center justify-between p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20 animate-fade-in" style={{ animationDelay: '300ms' }}>
                     <div>
                       <p className="text-white text-xs font-medium">Active Applications</p>
                       <p className="text-gray-400 text-[10px]">This week</p>
@@ -415,7 +415,7 @@ export default function Auth() {
                       <span className="text-green-400 text-sm font-semibold">23%</span>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between p-2.5 bg-gray-800/20 rounded-lg border border-gray-700/10">
+                  <div className="flex items-center justify-between p-2.5 bg-gray-800/20 rounded-lg border border-gray-700/10 animate-fade-in" style={{ animationDelay: '400ms' }}>
                     <div>
                       <p className="text-white text-xs font-medium">Interviews Scheduled</p>
                       <p className="text-gray-400 text-[10px]">This week</p>
@@ -442,19 +442,19 @@ export default function Auth() {
 
         {/* Slide 2 - Interview Scheduling */}
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 2 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 2 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
-          <div className="relative">
+          <div key={`slide-2-${activeSlide}`} className="relative">
             <div 
               className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer"
               onClick={createRipple}
             >
-              <div className="flex gap-1.5 mb-3">
+              <div className="flex gap-1.5 mb-3 animate-fade-in" style={{ animationDelay: '0ms' }}>
                 <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
                 <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
                 <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
               </div>
               
               {/* Header */}
-              <div className="mb-3">
+              <div className="mb-3 animate-fade-in" style={{ animationDelay: '100ms' }}>
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-white font-semibold text-sm">Interview Schedule</h3>
                   <span className="text-cyan-400 text-xs">December 2024</span>
@@ -464,7 +464,7 @@ export default function Auth() {
               {/* Calendar Interface */}
               <div className="space-y-2">
                 {/* Calendar Grid */}
-                <div className="grid grid-cols-7 gap-1 mb-2">
+                <div className="grid grid-cols-7 gap-1 mb-2 animate-fade-in" style={{ animationDelay: '200ms' }}>
                   {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
                     <div key={i} className="text-gray-500 text-[10px] text-center font-medium">{day}</div>
                   ))}
@@ -491,16 +491,16 @@ export default function Auth() {
                 </div>
                 
                 {/* Upcoming Interviews */}
-                <div className="space-y-1.5 mt-3">
+                <div className="space-y-1.5 mt-3 animate-fade-in" style={{ animationDelay: '300ms' }}>
                   <p className="text-white text-xs font-medium mb-1">Upcoming</p>
-                  <div className="flex items-center gap-2 p-2 bg-cyan-500/10 rounded-lg border border-cyan-500/30">
+                  <div className="flex items-center gap-2 p-2 bg-cyan-500/10 rounded-lg border border-cyan-500/30 animate-fade-in" style={{ animationDelay: '400ms' }}>
                     <div className="w-1 h-10 bg-cyan-500 rounded-full"></div>
                     <div className="flex-1">
                       <p className="text-white text-xs font-medium">Sarah Johnson</p>
                       <p className="text-gray-400 text-[10px]">Today • 2:00 PM</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 p-2 bg-gray-800/20 rounded-lg border border-gray-700/20">
+                  <div className="flex items-center gap-2 p-2 bg-gray-800/20 rounded-lg border border-gray-700/20 animate-fade-in" style={{ animationDelay: '500ms' }}>
                     <div className="w-1 h-10 bg-gray-600 rounded-full"></div>
                     <div className="flex-1">
                       <p className="text-white text-xs font-medium">Michael Chen</p>
@@ -524,19 +524,19 @@ export default function Auth() {
 
         {/* Slide 3 - AI Insights */}
         <div className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ${activeSlide === 3 ? 'opacity-100 translate-x-0 scale-100 blur-0' : activeSlide > 3 ? 'opacity-0 -translate-x-full scale-95 blur-sm pointer-events-none' : 'opacity-0 translate-x-full scale-95 blur-sm pointer-events-none'}`}>
-          <div className="relative">
+          <div key={`slide-3-${activeSlide}`} className="relative">
             <div 
               className="bg-gray-900/60 backdrop-blur-md rounded-2xl p-4 border border-gray-800/40 w-72 animate-pulse-glow transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer"
               onClick={createRipple}
             >
-              <div className="flex gap-1.5 mb-3">
+              <div className="flex gap-1.5 mb-3 animate-fade-in" style={{ animationDelay: '0ms' }}>
                 <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
                 <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
                 <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
               </div>
               
               {/* Header */}
-              <div className="mb-3">
+              <div className="mb-3 animate-fade-in" style={{ animationDelay: '100ms' }}>
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-purple-500 rounded-lg shadow-[0_0_15px_rgba(236,72,153,0.5)] flex items-center justify-center">
                     <span className="text-white text-xs font-bold">AI</span>
@@ -547,7 +547,7 @@ export default function Auth() {
 
               {/* AI Insights */}
               <div className="space-y-2">
-                <div className="p-3 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-lg border border-pink-500/40">
+                <div className="p-3 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-lg border border-pink-500/40 animate-fade-in" style={{ animationDelay: '200ms' }}>
                   <div className="flex items-start gap-2 mb-2">
                     <span className="text-pink-400 text-sm">⚡</span>
                     <div className="flex-1">
@@ -563,7 +563,7 @@ export default function Auth() {
                   </div>
                 </div>
                 
-                <div className="p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20">
+                <div className="p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20 animate-fade-in" style={{ animationDelay: '300ms' }}>
                   <div className="flex items-start gap-2">
                     <span className="text-blue-400 text-sm">💡</span>
                     <div className="flex-1">
@@ -575,7 +575,7 @@ export default function Auth() {
                   </div>
                 </div>
                 
-                <div className="p-2.5 bg-gray-800/20 rounded-lg border border-gray-700/10">
+                <div className="p-2.5 bg-gray-800/20 rounded-lg border border-gray-700/10 animate-fade-in" style={{ animationDelay: '400ms' }}>
                   <div className="flex items-start gap-2">
                     <span className="text-green-400 text-sm">📊</span>
                     <div className="flex-1">
