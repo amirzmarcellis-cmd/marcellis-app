@@ -115,7 +115,7 @@ export default function Auth() {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-background relative overflow-hidden">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-black via-gray-950 to-gray-900 relative overflow-hidden">
         <MissionBackground className="absolute inset-0" />
         
         <div className="w-full max-w-md relative z-10">
@@ -190,9 +190,11 @@ export default function Auth() {
         className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-black via-gray-950 to-gray-900 relative overflow-hidden items-center justify-center p-12"
         style={{
           backgroundImage: 'url(/auth-pattern.png)',
-          backgroundSize: 'cover',
+          backgroundSize: '400px 400px',
           backgroundPosition: 'center',
-          backgroundBlendMode: 'overlay'
+          backgroundRepeat: 'repeat',
+          backgroundBlendMode: 'soft-light',
+          opacity: 0.95
         }}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
@@ -200,6 +202,8 @@ export default function Auth() {
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
+        {/* Dark overlay to control pattern visibility */}
+        <div className="absolute inset-0 bg-black/30"></div>
         {/* Subtle Geometric Background Patterns */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-20 left-10 w-64 h-64 bg-gray-800/10 rounded-3xl rotate-12 blur-xl"></div>
