@@ -19,6 +19,7 @@ export default function Auth() {
   const [isLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeSlide, setActiveSlide] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -249,10 +250,16 @@ export default function Auth() {
           
           {/* Navigation Dots */}
           <div className="flex gap-2 justify-center mt-6">
-            <div className="w-8 h-2 bg-white rounded-full"></div>
-            <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
-            <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
-            <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+            {[0, 1, 2, 3].map((index) => (
+              <button
+                key={index}
+                onClick={() => setActiveSlide(index)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  activeSlide === index ? 'w-8 bg-white' : 'w-2 bg-gray-600 hover:bg-gray-500'
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
           </div>
         </div>
       </div>
