@@ -226,31 +226,7 @@ export function JobManagementPanel() {
         };
       });
       
-      // Auto-disable auto-dial for jobs that reached 6 shortlisted candidates
-      const jobsToDisable = jobsWithCounts.filter(
-        job => job.automatic_dial === true && job.shortlisted_count >= 6
-      );
-      
-      if (jobsToDisable.length > 0) {
-        console.log('JobManagementPanel: Auto-disabling auto-dial for jobs:', jobsToDisable.map(j => j.job_id));
-        await Promise.all(
-          jobsToDisable.map(job =>
-            supabase
-              .from('Jobs')
-              .update({ 
-                automatic_dial: false, 
-                auto_dial_enabled_at: null 
-              })
-              .eq('job_id', job.job_id)
-          )
-        );
-        
-        // Update the jobs array to reflect the changes
-        jobsToDisable.forEach(job => {
-          job.automatic_dial = false;
-          job.auto_dial_enabled_at = null;
-        });
-      }
+      // Auto-disable removed - users have full manual control
       
       const endTime = performance.now();
       console.log(`JobManagementPanel: Fetch completed in ${(endTime - startTime).toFixed(2)}ms`);
@@ -398,20 +374,6 @@ export function JobManagementPanel() {
   };
   const handleAutomaticDialToggle = async (jobId: string, currentValue: boolean | null) => {
     const newValue = !currentValue;
-    
-    // Prevent enabling if already at 6+ shortlisted candidates
-    if (newValue) {
-      const job = jobs.find(j => j.job_id === jobId);
-      if (job && job.shortlisted_count >= 6) {
-        toast({
-          title: "Cannot Enable Auto-Dial",
-          description: "This job already has 6 or more shortlisted candidates. Auto-dial threshold reached.",
-          variant: "destructive",
-          duration: 4000,
-        });
-        return;
-      }
-    }
     
     // Optimistic UI update
     setJobs(prevJobs => prevJobs.map(job => 
@@ -898,24 +860,10 @@ const JobGrid = memo(function JobGrid({
                 <Switch checked={job.automatic_dial || false} onCheckedChange={() => onAutomaticDialToggle(job.job_id, job.automatic_dial)} />
               </div>
               
-              {/* Show status badges */}
-              {job.automatic_dial === false && (job.shortlisted_count || 0) >= 6 && (
-                <Badge variant="outline" className="text-xs flex items-center gap-1 w-fit bg-warning/10 border-warning/30">
-                  <Info className="h-3 w-3" />
-                  Auto-disabled: 6 shortlisted reached
-                </Badge>
-              )}
-              
-              {job.automatic_dial === true && (job.shortlisted_count || 0) >= 5 && (job.shortlisted_count || 0) < 6 && (
-                <Badge variant="outline" className="text-xs flex items-center gap-1 w-fit bg-warning/10 border-warning/30 text-warning">
-                  <Info className="h-3 w-3" />
-                  {job.shortlisted_count}/6 - Will auto-disable at 6
-                </Badge>
-              )}
-              
-              {job.automatic_dial === true && (job.shortlisted_count || 0) < 5 && (
+              {/* Show status info */}
+              {job.automatic_dial === true && (
                 <span className="text-xs text-muted-foreground">
-                  Active • {job.shortlisted_count || 0}/6 shortlisted
+                  Active • {job.shortlisted_count || 0} shortlisted
                 </span>
               )}
             </div>
