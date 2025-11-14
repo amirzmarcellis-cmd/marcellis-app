@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Phone } from 'lucide-react';
+import { Loader2, Phone, ChevronDown } from 'lucide-react';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
 import defaultLogo from '@/assets/default-logo.png';
 import { MissionBackground } from '@/components/layout/MissionBackground';
@@ -128,8 +128,16 @@ export default function Auth() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-8 relative overflow-hidden min-h-[50vh] lg:min-h-screen" style={{ backgroundColor: '#1a1d23' }}>
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-8 relative overflow-hidden min-h-[100vh] lg:min-h-screen" style={{ backgroundColor: '#1a1d23' }}>
         <MissionBackground className="absolute inset-0" />
+        
+        {/* Scroll Indicator - Only visible on mobile/tablet */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 lg:hidden z-20 animate-bounce">
+          <div className="flex flex-col items-center gap-2">
+            <span className="text-muted-foreground text-sm">Scroll to explore</span>
+            <ChevronDown className="w-6 h-6 text-primary" />
+          </div>
+        </div>
         
         <div className="w-full max-w-md relative z-10">
           <div className="mb-8">
@@ -203,7 +211,7 @@ export default function Auth() {
 
       {/* Right Side - Visual Content */}
       <div 
-        className="w-full lg:w-1/2 flex relative overflow-hidden items-center justify-center p-6 md:p-12 min-h-[50vh] lg:min-h-screen"
+        className="w-full lg:w-1/2 flex relative overflow-hidden items-center justify-center p-6 md:p-12 min-h-[100vh] lg:min-h-screen"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onMouseMove={handleMouseMove}
