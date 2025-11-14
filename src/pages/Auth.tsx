@@ -146,77 +146,86 @@ export default function Auth() {
         {/* Central Content Container */}
         <div className="relative">
           {/* UI Mockup Card - Centered */}
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-gray-700/50 w-80">
-            <div className="flex gap-2 mb-4">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+          <div className="bg-gray-800/40 backdrop-blur-sm rounded-2xl p-5 shadow-2xl border border-gray-700/30 w-80">
+            {/* Browser Controls */}
+            <div className="flex gap-1.5 mb-4">
+              <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
             </div>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg">
+            
+            {/* Blue Progress Bar */}
+            <div className="mb-4">
+              <div className="h-8 bg-blue-500 rounded-lg w-24"></div>
+              <div className="h-1.5 bg-gray-700 rounded-full w-32 mt-2"></div>
+            </div>
+
+            {/* Candidate List */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-3 p-2.5 bg-gray-700/20 rounded-lg">
                 <img 
                   src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" 
                   alt="Candidate" 
-                  className="w-10 h-10 rounded-full"
+                  className="w-9 h-9 rounded-full"
                 />
                 <div className="flex-1">
-                  <div className="h-2 bg-gray-600 rounded w-full mb-2"></div>
-                  <div className="h-2 bg-gray-600 rounded w-2/3"></div>
+                  <div className="h-1.5 bg-gray-600/60 rounded-full w-full mb-1.5"></div>
+                  <div className="h-1.5 bg-gray-600/60 rounded-full w-2/3"></div>
                 </div>
-                <div className="text-yellow-400">⭐</div>
+                <div className="text-yellow-400 text-sm">⭐</div>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg opacity-60">
+              <div className="flex items-center gap-3 p-2.5 bg-gray-700/20 rounded-lg opacity-50">
                 <img 
                   src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" 
                   alt="Candidate" 
-                  className="w-10 h-10 rounded-full"
+                  className="w-9 h-9 rounded-full"
                 />
                 <div className="flex-1">
-                  <div className="h-2 bg-gray-600 rounded w-full mb-2"></div>
-                  <div className="h-2 bg-gray-600 rounded w-2/3"></div>
+                  <div className="h-1.5 bg-gray-600/60 rounded-full w-full mb-1.5"></div>
+                  <div className="h-1.5 bg-gray-600/60 rounded-full w-2/3"></div>
                 </div>
-                <div className="text-gray-500">☆</div>
+                <div className="text-gray-500 text-sm">☆</div>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg opacity-60">
+              <div className="flex items-center gap-3 p-2.5 bg-gray-700/20 rounded-lg opacity-50">
                 <img 
                   src="https://api.dicebear.com/7.x/avataaars/svg?seed=Milo" 
                   alt="Candidate" 
-                  className="w-10 h-10 rounded-full"
+                  className="w-9 h-9 rounded-full"
                 />
                 <div className="flex-1">
-                  <div className="h-2 bg-gray-600 rounded w-full mb-2"></div>
-                  <div className="h-2 bg-gray-600 rounded w-2/3"></div>
+                  <div className="h-1.5 bg-gray-600/60 rounded-full w-full mb-1.5"></div>
+                  <div className="h-1.5 bg-gray-600/60 rounded-full w-2/3"></div>
                 </div>
-                <div className="text-gray-500">☆</div>
+                <div className="text-gray-500 text-sm">☆</div>
               </div>
             </div>
           </div>
 
           {/* Floating Role Badges - Positioned around the card */}
-          <div className="absolute -top-16 -left-12 animate-float">
-            <div className="flex items-center gap-2 bg-blue-600/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
-              <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center">
-                <span className="text-white text-xs">👨‍💻</span>
+          <div className="absolute -top-20 -left-16 animate-float">
+            <div className="flex items-center gap-2.5 bg-blue-600/90 backdrop-blur-sm px-3.5 py-2 rounded-lg shadow-xl">
+              <div className="w-5 h-5 bg-blue-500 rounded-sm flex items-center justify-center">
+                <div className="w-3 h-3 bg-white rounded-sm"></div>
               </div>
-              <span className="text-white font-medium">Product Developer</span>
+              <span className="text-white font-medium text-sm">Product Developer</span>
             </div>
           </div>
 
-          <div className="absolute -bottom-8 -left-16 animate-float-delayed">
-            <div className="flex items-center gap-2 bg-green-600/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
-              <div className="w-6 h-6 bg-green-500 rounded flex items-center justify-center">
-                <span className="text-white text-xs">📊</span>
+          <div className="absolute bottom-6 -left-20 animate-float-delayed">
+            <div className="flex items-center gap-2.5 bg-green-600/90 backdrop-blur-sm px-3.5 py-2 rounded-lg shadow-xl">
+              <div className="w-5 h-5 bg-green-500 rounded-sm flex items-center justify-center">
+                <div className="w-3 h-3 bg-white rounded-sm"></div>
               </div>
-              <span className="text-white font-medium">Product Manager</span>
+              <span className="text-white font-medium text-sm">Product Manager</span>
             </div>
           </div>
 
-          <div className="absolute -bottom-8 -right-16 animate-float">
-            <div className="flex items-center gap-2 bg-orange-600/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
-              <div className="w-6 h-6 bg-orange-500 rounded flex items-center justify-center">
-                <span className="text-white text-xs">🎨</span>
+          <div className="absolute bottom-0 -right-20 animate-float">
+            <div className="flex items-center gap-2.5 bg-orange-600/90 backdrop-blur-sm px-3.5 py-2 rounded-lg shadow-xl">
+              <div className="w-5 h-5 bg-orange-500 rounded-sm flex items-center justify-center">
+                <div className="w-3 h-3 bg-white rounded-sm"></div>
               </div>
-              <span className="text-white font-medium">Product Designer</span>
+              <span className="text-white font-medium text-sm">Product Designer</span>
             </div>
           </div>
         </div>
