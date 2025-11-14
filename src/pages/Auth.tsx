@@ -26,6 +26,8 @@ export default function Auth() {
   const [isPaused, setIsPaused] = useState(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [mouseX, setMouseX] = useState(0);
+  const [mouseY, setMouseY] = useState(0);
   const navigate = useNavigate();
 
   // Minimum swipe distance (in px)
@@ -77,6 +79,14 @@ export default function Auth() {
       // Swipe right - go to previous slide
       setActiveSlide((prev) => (prev - 1 + 4) % 4);
     }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setMouseX(x);
+    setMouseY(y);
   };
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -205,18 +215,31 @@ export default function Auth() {
         }}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
+        onMouseMove={handleMouseMove}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
         {/* Dark overlay to control pattern visibility */}
         <div className="absolute inset-0 bg-black/30"></div>
-        {/* Subtle Geometric Background Patterns */}
+        {/* Subtle Geometric Background Patterns with Parallax */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-10 w-64 h-64 bg-gray-800/10 rounded-3xl rotate-12 blur-xl"></div>
-          <div className="absolute bottom-32 right-16 w-80 h-80 bg-gray-700/10 rounded-3xl -rotate-12 blur-2xl"></div>
-          <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-gray-800/10 rounded-3xl rotate-45 blur-xl"></div>
-          <div className="absolute bottom-1/4 left-1/4 w-56 h-56 bg-gray-700/10 rounded-3xl -rotate-45 blur-2xl"></div>
+          <div 
+            className="absolute top-20 left-10 w-64 h-64 bg-gray-800/10 rounded-3xl rotate-12 blur-xl transition-transform duration-300 ease-out"
+            style={{ transform: `translate(${mouseX * 30}px, ${mouseY * 30}px)` }}
+          ></div>
+          <div 
+            className="absolute bottom-32 right-16 w-80 h-80 bg-gray-700/10 rounded-3xl -rotate-12 blur-2xl transition-transform duration-300 ease-out"
+            style={{ transform: `translate(${mouseX * -40}px, ${mouseY * -40}px)` }}
+          ></div>
+          <div 
+            className="absolute top-1/3 right-1/4 w-48 h-48 bg-gray-800/10 rounded-3xl rotate-45 blur-xl transition-transform duration-300 ease-out"
+            style={{ transform: `translate(${mouseX * 20}px, ${mouseY * 20}px)` }}
+          ></div>
+          <div 
+            className="absolute bottom-1/4 left-1/4 w-56 h-56 bg-gray-700/10 rounded-3xl -rotate-45 blur-2xl transition-transform duration-300 ease-out"
+            style={{ transform: `translate(${mouseX * -25}px, ${mouseY * -25}px)` }}
+          ></div>
         </div>
 
         {/* Slide 0 - Candidate Management */}
