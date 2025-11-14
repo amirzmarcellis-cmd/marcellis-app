@@ -862,7 +862,7 @@ export default function Analytics() {
       </div>
 
       {/* Bottom Section */}
-      <div className={`grid grid-cols-1 ${isGridLayout ? 'lg:grid-cols-4' : ''} gap-8`}>
+      <div className="grid grid-cols-1 gap-8">
         {/* Candidates per Job */}
         <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
           <CardHeader>
