@@ -175,8 +175,10 @@ export default function Auth() {
             )}
             <Button 
               type="submit" 
-              className="w-full h-12 rounded-full font-medium text-black"
+              className="w-full h-12 rounded-full font-medium text-black transition-all duration-200"
               style={{ backgroundColor: '#00d9ff' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#00b8d4'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#00d9ff'}
               disabled={loading}
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
