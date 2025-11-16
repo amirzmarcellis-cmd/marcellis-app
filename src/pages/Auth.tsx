@@ -188,6 +188,7 @@ export default function Auth() {
               </Alert>
             )}
             <Button 
+              id="sign-in-btn"
               type="submit" 
               className="w-full h-14 sm:h-12 rounded-full font-medium text-black transition-all duration-200 text-base"
               style={{ backgroundColor: '#00d9ff' }}
