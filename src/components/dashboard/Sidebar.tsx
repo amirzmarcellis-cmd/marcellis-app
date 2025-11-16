@@ -166,7 +166,7 @@ export function DashboardSidebar() {
               </div>
               
               {/* Theme Toggle */}
-              <Button onClick={toggleTheme} variant="ghost" className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-card/30 font-light rounded-full">
+              <Button id="mode-btn" onClick={toggleTheme} variant="ghost" className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-card/30 font-light rounded-full">
                 {theme === 'dark' ? <Sun className="w-4 h-4 mr-3" /> : <Moon className="w-4 h-4 mr-3" />}
                 {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
               </Button>
