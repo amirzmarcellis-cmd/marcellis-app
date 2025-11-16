@@ -42,14 +42,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(null);
       setUser(null);
       
-      // Sign out from Supabase
-      const { error } = await supabase.auth.signOut();
-      if (error) {
+      // Sign out from Supabase with global scope to revoke all tokens
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
+      
+      // Don't treat "session missing" as an error - it's expected if session expired
+      if (error && error.message !== 'Auth session missing!') {
         console.error('Error signing out:', error);
       }
       
+      // Force clear all auth-related items from localStorage
+      const keysToRemove = Object.keys(localStorage).filter(
+        key => key.startsWith('sb-') || key.includes('auth-token')
+      );
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
       // Wait a moment for session to clear from localStorage
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 150));
       
       // Now redirect
       window.location.href = '/auth';
@@ -57,8 +65,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Error signing out:', error);
       setSession(null);
       setUser(null);
+      
+      // Force cleanup on error - clear all auth-related keys
+      const keysToRemove = Object.keys(localStorage).filter(
+        key => key.startsWith('sb-') || key.includes('auth-token')
+      );
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
       // Wait before redirect even on error
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 150));
       window.location.href = '/auth';
     }
   };
