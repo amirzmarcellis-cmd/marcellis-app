@@ -34,14 +34,15 @@ export default function Auth() {
   const minSwipeDistance = 50;
 
   useEffect(() => {
-    // Check if user is already logged in
-    const checkUser = async () => {
+    // Small delay to ensure sign-out has fully processed
+    const timer = setTimeout(async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         navigate('/');
       }
-    };
-    checkUser();
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, [navigate]);
 
   // Auto-rotate slides every 5 seconds
