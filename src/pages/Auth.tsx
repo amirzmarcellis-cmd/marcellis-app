@@ -19,7 +19,7 @@ export default function Auth() {
   const { theme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeSlide, setActiveSlide] = useState(0);
@@ -89,6 +89,11 @@ export default function Auth() {
     setMouseY(y);
   };
 
+  const toggleMode = () => {
+    setIsLogin(!isLogin);
+    setError(null);
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -146,9 +151,13 @@ export default function Auth() {
                 />
               </div>
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-light text-foreground text-center mb-2">Welcome back!</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-light text-foreground text-center mb-2">
+              {isLogin ? 'Welcome back!' : 'Create your account'}
+            </h1>
             <p className="text-center text-muted-foreground text-sm sm:text-base">
-              Log in now and save time on employee administration.
+              {isLogin 
+                ? 'Log in now and save time on employee administration.'
+                : 'Sign up to get started with your recruitment platform.'}
             </p>
           </div>
 
@@ -176,11 +185,13 @@ export default function Auth() {
                 required
                 className="bg-input/50 border-border/50 backdrop-blur-sm h-12 sm:h-11 text-base"
               />
-              <div className="flex justify-end pt-1">
-                <button type="button" className="text-sm sm:text-sm text-muted-foreground hover:text-foreground transition-colors py-1">
-                  Forgot password
-                </button>
-              </div>
+              {isLogin && (
+                <div className="flex justify-end pt-1">
+                  <button type="button" className="text-sm sm:text-sm text-muted-foreground hover:text-foreground transition-colors py-1">
+                    Forgot password
+                  </button>
+                </div>
+              )}
             </div>
             {error && (
               <Alert variant="destructive">
@@ -199,6 +210,19 @@ export default function Auth() {
               {loading && <Loader2 className="mr-2 h-5 w-5 sm:h-4 sm:w-4 animate-spin" />}
               {isLogin ? 'Sign in' : 'Sign Up'}
             </Button>
+            
+            <div className="text-center pt-2">
+              <button 
+                type="button" 
+                onClick={toggleMode}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {isLogin ? "Don't have an account? " : "Already have an account? "}
+                <span className="font-medium" style={{ color: '#00d9ff' }}>
+                  {isLogin ? 'Sign up' : 'Sign in'}
+                </span>
+              </button>
+            </div>
           </form>
         </div>
       </div>
