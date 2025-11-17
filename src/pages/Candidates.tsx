@@ -397,7 +397,7 @@ export default function Candidates() {
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              className="h-7 py-1 text-xs w-full" 
+                              className="h-8 px-2 text-xs w-full whitespace-nowrap" 
                               onClick={() => handleEditCandidate(cv)}
                               aria-label="Edit CV"
                             >
@@ -407,7 +407,7 @@ export default function Candidates() {
                             <Button 
                               variant="destructive" 
                               size="sm" 
-                              className="h-7 py-1 text-xs w-full" 
+                              className="h-8 px-2 text-xs w-full whitespace-nowrap" 
                               onClick={() => handleDeleteCV(cv.user_id)}
                               aria-label="Delete CV"
                             >
