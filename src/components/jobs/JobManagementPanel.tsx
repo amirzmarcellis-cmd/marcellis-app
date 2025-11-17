@@ -764,9 +764,9 @@ const JobGrid = memo(function JobGrid({
       </Card>;
   }
   return <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-      {jobs.map(job => <Card key={job.job_id} className="mission-card group">
+      {jobs.map(job => <Card key={job.job_id} className="mission-card group overflow-hidden max-w-full">
           <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4 lg:p-6">
-            <div className="flex items-start justify-between">
+            <div className="flex items-start justify-between min-w-0">
               <div className="flex-1 min-w-0">
                 <h4 className="line-clamp-2 mb-2 text-base sm:text-lg lg:text-xl font-normal">
                   {job.job_title || "Untitled Position"}
@@ -789,28 +789,28 @@ const JobGrid = memo(function JobGrid({
           
           <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-4 lg:p-6">
             <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm">
-              {job.recruiter_name && <div className="flex items-center text-muted-foreground">
-                  <UserCircle className="h-4 w-4 mr-2 text-primary" />
-                  <span className="font-medium">{job.recruiter_name}</span>
+              {job.recruiter_name && <div className="flex items-center text-muted-foreground min-w-0">
+                  <UserCircle className="h-4 w-4 mr-2 text-primary flex-shrink-0" />
+                  <span className="font-medium truncate">{job.recruiter_name}</span>
                 </div>}
-              {job.job_location && <div className="flex items-center text-muted-foreground">
-                  <MapPin className="h-4 w-4 mr-2 text-cyan" />
-                  {job.job_location}
-                </div>}
-              
-              {job.job_salary_range && <div className="flex items-center text-muted-foreground">
-                  <Banknote className="h-4 w-4 mr-2 text-green" />
-                  {formatCurrency(job.job_salary_range, job["Currency"] as string | null)}
+              {job.job_location && <div className="flex items-center text-muted-foreground min-w-0">
+                  <MapPin className="h-4 w-4 mr-2 text-cyan flex-shrink-0" />
+                  <span className="truncate">{job.job_location}</span>
                 </div>}
               
-              {job.contract_length && <div className="flex items-center text-muted-foreground">
-                  <Clock className="h-4 w-4 mr-2 text-primary" />
-                  {job.contract_length}
+              {job.job_salary_range && <div className="flex items-center text-muted-foreground min-w-0">
+                  <Banknote className="h-4 w-4 mr-2 text-green flex-shrink-0" />
+                  <span className="truncate">{formatCurrency(job.job_salary_range, job["Currency"] as string | null)}</span>
                 </div>}
               
-              {job.Timestamp && <div className="flex items-center text-muted-foreground">
-                  <Calendar className="h-4 w-4 mr-2 text-primary" />
-                  Created: {format(new Date(job.Timestamp), 'MMM dd, yyyy HH:mm')}
+              {job.contract_length && <div className="flex items-center text-muted-foreground min-w-0">
+                  <Clock className="h-4 w-4 mr-2 text-primary flex-shrink-0" />
+                  <span className="truncate">{job.contract_length}</span>
+                </div>}
+              
+              {job.Timestamp && <div className="flex items-center text-muted-foreground min-w-0">
+                  <Calendar className="h-4 w-4 mr-2 text-primary flex-shrink-0" />
+                  <span className="truncate">Created: {format(new Date(job.Timestamp), 'MMM dd, yyyy HH:mm')}</span>
                 </div>}
             </div>
 
@@ -819,7 +819,7 @@ const JobGrid = memo(function JobGrid({
               </p>}
 
             {/* Candidate Counts */}
-            <div className="grid grid-cols-4 gap-2 text-sm">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
               <div className="flex flex-col items-center p-2 rounded-md bg-blue/10 border border-blue/20">
                 <div className="flex items-center gap-1 text-blue">
                   <Users className="h-3 w-3" />
