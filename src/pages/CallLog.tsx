@@ -403,7 +403,7 @@ export default function CallLog() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0 sm:p-6">
-            <div className="hidden sm:block overflow-x-auto">
+            <div className="hidden md:block overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="border-border">
@@ -543,7 +543,7 @@ export default function CallLog() {
               </TableBody>
               </Table>
             </div>
-            <div className="sm:hidden p-3 space-y-2">
+            <div className="md:hidden p-3 space-y-2">
               {loading ? (
                 <div className="py-6 text-center text-muted-foreground text-sm">Loading call logs...</div>
               ) : filteredCallLogs.length === 0 ? (
