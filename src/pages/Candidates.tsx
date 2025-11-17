@@ -337,19 +337,21 @@ export default function Candidates() {
                           <Button 
                             variant="secondary" 
                             size="sm" 
-                            className="h-8 px-3 min-w-[96px] whitespace-nowrap text-sm font-medium"
+                            className="h-9 px-3 min-w-[96px] whitespace-nowrap text-base font-semibold md:h-8 md:text-sm md:font-medium"
                             onClick={() => handleEditCandidate(cv)}
                             aria-label="Edit CV"
                           >
+                            <Edit className="w-4 h-4 mr-1.5 md:hidden" />
                             Edit
                           </Button>
                           <Button 
                             variant="secondary" 
                             size="sm" 
-                            className="h-8 px-3 min-w-[96px] whitespace-nowrap text-sm font-medium"
+                            className="h-9 px-3 min-w-[96px] whitespace-nowrap text-base font-semibold md:h-8 md:text-sm md:font-medium"
                             onClick={() => handleDeleteCV(cv.user_id)}
                             aria-label="Delete CV"
                           >
+                            <Trash2 className="w-4 h-4 mr-1.5 md:hidden" />
                             Delete
                           </Button>
                         </div>
@@ -395,19 +397,21 @@ export default function Candidates() {
                             <Button 
                               variant="secondary" 
                               size="sm" 
-                              className="h-8 px-3 text-sm w-full min-w-[96px] whitespace-nowrap font-medium"
+                              className="h-10 px-4 text-base w-full min-w-[96px] whitespace-nowrap font-semibold md:h-8 md:text-sm md:font-medium"
                               onClick={() => handleEditCandidate(cv)}
                               aria-label="Edit CV"
                             >
+                              <Edit className="w-4 h-4 mr-2 md:hidden" />
                               Edit
                             </Button>
                             <Button 
                               variant="secondary" 
                               size="sm" 
-                              className="h-8 px-3 text-sm w-full min-w-[96px] whitespace-nowrap font-medium" 
+                              className="h-10 px-4 text-base w-full min-w-[96px] whitespace-nowrap font-semibold md:h-8 md:text-sm md:font-medium" 
                               onClick={() => handleDeleteCV(cv.user_id)}
                               aria-label="Delete CV"
                             >
+                              <Trash2 className="w-4 h-4 mr-2 md:hidden" />
                               Delete
                             </Button>
                           </div>
