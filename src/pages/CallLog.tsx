@@ -450,9 +450,23 @@ export default function CallLog() {
                               <div className="min-w-0 flex-1">
                                 <div className="font-light font-work truncate text-xs sm:text-sm">{log.candidate_name || "N/A"}</div>
                                 <div className="text-[10px] sm:text-sm font-light font-inter text-muted-foreground truncate hidden sm:block">{log.candidate_email || "N/A"}</div>
-                                {/* Show job on mobile (hidden column on mobile) */}
-                                <div className="text-[10px] font-light font-inter text-muted-foreground truncate lg:hidden mt-0.5">
-                                  {log.job_title || "N/A"}
+                                {/* Mobile details to show all values */}
+                                <div className="lg:hidden mt-1 space-y-1">
+                                  <div className="text-[10px] font-light font-inter text-muted-foreground truncate">
+                                    {log.job_title || "N/A"}
+                                    <Badge variant="outline" className="ml-1 text-[10px] align-middle">{(log.job_id || "N/A").substring(0, 8)}...</Badge>
+                                  </div>
+                                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                                    <span className="font-medium text-foreground/80">Nationality:</span>
+                                    <Badge variant="outline" className="text-[10px]">{log.nationality || "N/A"}</Badge>
+                                  </div>
+                                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                                    <Clock className="w-3 h-3 flex-shrink-0" />
+                                    <span className="truncate">{log.notice_period || "N/A"}</span>
+                                  </div>
+                                  <div className="text-[10px] text-muted-foreground">
+                                    <span className="font-medium text-foreground/80">Salary:</span> <span className="truncate">{log.salary_expectations || "N/A"}</span>
+                                  </div>
                                 </div>
                               </div>
                             </div>
