@@ -311,56 +311,68 @@ export default function Candidates() {
                             </Badge>
                           </div>
                         </div>
-                        <div className="flex items-center gap-0.5 flex-shrink-0">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-6 w-6 p-0"
-                            onClick={() => handleEditCandidate(cv)}
-                          >
-                            <Edit className="w-3 h-3" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-6 w-6 p-0 text-destructive hover:text-destructive"
-                            onClick={() => handleDeleteCV(cv.user_id)}
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
-                        </div>
+                        <div className="hidden" />
                       </div>
 
-                      <div className="space-y-1.5">
-                        <div className="flex items-center gap-1.5 text-[11px] min-w-0">
-                          <Mail className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                          <span className="text-foreground/80 truncate">{cv.email || "N/A"}</span>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-[11px] min-w-0">
+                          <span className="text-muted-foreground">Email</span>
+                          <span className="text-foreground/80 truncate">{cv.email || "—"}</span>
                         </div>
 
-                        <div className="flex items-center gap-1.5 text-[11px] min-w-0">
-                          <Phone className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                          <span className="text-foreground/80 truncate">{cv.phone_number || "N/A"}</span>
+                        <div className="flex items-center justify-between text-[11px] min-w-0">
+                          <span className="text-muted-foreground">Phone</span>
+                          <span className="text-foreground/80 truncate">{cv.phone_number || "—"}</span>
                         </div>
 
-                        {cv.cv_link && (
-                          <div className="flex items-center gap-1.5 text-[11px] min-w-0">
-                            <ExternalLink className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                        <div className="flex items-center justify-between text-[11px] min-w-0">
+                          <span className="text-muted-foreground">CV Link</span>
+                          {cv.cv_link ? (
                             <a 
                               href={cv.cv_link} 
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className="text-primary hover:underline truncate"
+                              className="text-primary hover:underline truncate max-w-[60%] text-right"
                             >
                               View CV
                             </a>
-                          </div>
-                        )}
+                          ) : (
+                            <span className="text-foreground/60">—</span>
+                          )}
+                        </div>
 
-                        {cv.cv_text && (
-                          <div className="text-[10px] text-muted-foreground pt-1.5 border-t border-border/50 line-clamp-2 break-words">
-                            {cv.cv_text}
+                        <div className="text-[11px] min-w-0">
+                          <div className="text-muted-foreground mb-1">CV Preview</div>
+                          <div className="text-foreground/80 line-clamp-2 break-words border-t border-border/50 pt-1">
+                            {cv.cv_text || "No CV text"}
                           </div>
-                        )}
+                        </div>
+
+                        <div className="text-[11px]">
+                          <div className="text-muted-foreground mb-1">Actions</div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-7 py-1 text-xs" 
+                              onClick={() => handleEditCandidate(cv)}
+                              aria-label="Edit CV"
+                            >
+                              <Edit className="w-3 h-3" />
+                              Edit
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-7 py-1 text-xs text-destructive hover:text-destructive" 
+                              onClick={() => handleDeleteCV(cv.user_id)}
+                              aria-label="Delete CV"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                              Delete
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )
