@@ -296,8 +296,8 @@ export default function Candidates() {
                     : cv.user_id;
                   
                   return (
-                    <div key={cv.user_id} className="border border-border rounded-lg p-2 bg-card/50 max-w-full overflow-visible">
-                      <div className="flex items-center justify-between gap-2 mb-2">
+                    <div key={cv.user_id} className="border border-border rounded-lg p-1.5 bg-card/50 max-w-full overflow-visible">
+                      <div className="flex items-center justify-between gap-1.5 mb-1.5">
                         <div className="flex items-center gap-2 min-w-0 flex-1">
                           <Avatar className="w-8 h-8 flex-shrink-0">
                             <AvatarFallback className="bg-gradient-primary text-white text-xs font-light font-work">
@@ -342,7 +342,7 @@ export default function Candidates() {
                             aria-label="Edit CV"
                           >
                             <Edit className="w-3 h-3" />
-                            Edit CV
+                            Edit
                           </Button>
                           <Button 
                             variant="destructive" 
@@ -352,12 +352,12 @@ export default function Candidates() {
                             aria-label="Delete CV"
                           >
                             <Trash2 className="w-3 h-3" />
-                            Delete CV
+                            Delete
                           </Button>
                         </div>
                       </div>
 
-                      <div className="space-y-2">
+                      <div className="space-y-1.5">
                         <div className="flex items-center justify-between text-[11px] min-w-0">
                           <span className="text-muted-foreground">Email</span>
                           <span className="text-foreground/80 truncate">{cv.email || "—"}</span>
@@ -402,7 +402,7 @@ export default function Candidates() {
                               aria-label="Edit CV"
                             >
                               <Edit className="w-3 h-3" />
-                              Edit CV
+                              Edit
                             </Button>
                             <Button 
                               variant="destructive" 
@@ -412,7 +412,7 @@ export default function Candidates() {
                               aria-label="Delete CV"
                             >
                               <Trash2 className="w-3 h-3" />
-                              Delete CV
+                              Delete
                             </Button>
                           </div>
                         </div>
