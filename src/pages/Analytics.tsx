@@ -522,73 +522,73 @@ export default function Analytics() {
   ].filter(item => item.value > 0); // Only show statuses with values
 
   return (
-    <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-br dark:from-slate-900 dark:via-blue-900 dark:to-slate-900 p-6">
+    <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-br dark:from-slate-900 dark:via-blue-900 dark:to-slate-900 p-3 sm:p-4 lg:p-6">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
           <div>
-            <h1 className="text-6xl font-light font-work tracking-tight text-foreground mb-2">Analytics Dashboard</h1>
-            <p className="text-base font-light font-work text-muted-foreground">Comprehensive recruitment performance insights</p>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-light font-work tracking-tight text-foreground mb-1 sm:mb-2">Analytics Dashboard</h1>
+            <p className="text-sm sm:text-base font-light font-work text-muted-foreground">Comprehensive recruitment performance insights</p>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-green-400 font-light font-work">Live Dashboard</span>
+            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-green-400 rounded-full animate-pulse"></div>
+            <span className="text-xs sm:text-sm text-green-400 font-light font-work">Live Dashboard</span>
           </div>
         </div>
       </div>
 
       {/* Top Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
         <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-light font-work uppercase tracking-wide text-muted-foreground">Total Candidates</p>
-                <p className="text-5xl font-light font-work text-foreground mt-2">{data?.totalCandidates || 0}</p>
+                <p className="text-xs sm:text-sm font-light font-work uppercase tracking-wide text-muted-foreground">Total Candidates</p>
+                <p className="text-3xl sm:text-4xl lg:text-5xl font-light font-work text-foreground mt-1 sm:mt-2">{data?.totalCandidates || 0}</p>
               </div>
-              <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
-                <Users className="w-8 h-8 text-white" />
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Users className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-200 text-sm font-light font-work">Active Jobs</p>
-                <p className="text-4xl font-light font-work text-foreground mt-2">{data?.activeJobs || 0}</p>
-                <p className="text-xs font-light font-work text-blue-300 mt-1">Open job openings</p>
+                <p className="text-blue-200 text-xs sm:text-sm font-light font-work">Active Jobs</p>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-light font-work text-foreground mt-1 sm:mt-2">{data?.activeJobs || 0}</p>
+                <p className="text-[10px] sm:text-xs font-light font-work text-blue-300 mt-1">Open job openings</p>
               </div>
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-xl flex items-center justify-center">
-                <Briefcase className="w-8 h-8 text-white" />
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Briefcase className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-200 text-sm font-light font-work">Total Call Logs</p>
-                <p className="text-4xl font-light font-work text-foreground mt-2">{data?.totalCallLogs || 0}</p>
+                <p className="text-blue-200 text-xs sm:text-sm font-light font-work">Total Call Logs</p>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-light font-work text-foreground mt-1 sm:mt-2">{data?.totalCallLogs || 0}</p>
               </div>
-              <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
-                <Phone className="w-8 h-8 text-white" />
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Phone className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-200 text-sm font-light font-work">Average Score</p>
-                <p className="text-4xl font-light font-work text-foreground mt-2">{data?.averageScore || 0}</p>
-                <p className="text-xs font-light font-work text-blue-300 mt-1">/100</p>
+                <p className="text-blue-200 text-xs sm:text-sm font-light font-work">Average Score</p>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-light font-work text-foreground mt-1 sm:mt-2">{data?.averageScore || 0}</p>
+                <p className="text-[10px] sm:text-xs font-light font-work text-blue-300 mt-1">/100</p>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center">
                 <TrendingUp className="w-8 h-8 text-white" />

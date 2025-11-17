@@ -162,54 +162,54 @@ export default function Clients() {
     }
   };
   return <div className="min-h-screen bg-background">
-      <div className="max-w-5xl mx-auto px-6 py-8 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="max-w-5xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8 space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Clients</h1>
-          <p className="text-muted-foreground mt-1 text-sm">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">Clients</h1>
+          <p className="text-muted-foreground mt-1 text-xs sm:text-sm">
             Manage your client database
           </p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={handleDialogOpenChange}>
           <DialogTrigger asChild>
-            <Button className="shadow-sm">
+            <Button className="shadow-sm text-sm w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Add Client
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="w-[95vw] sm:w-full max-w-lg">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold">
+              <DialogTitle className="text-lg sm:text-xl font-semibold">
                 {editingClient ? "Edit Client" : "Add New Client"}
               </DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-xs sm:text-sm">
                 {editingClient ? "Update client information" : "Add a new client to your database"}
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">
+                <Label htmlFor="name" className="text-sm">
                   Client Name *
                 </Label>
                 <Input id="name" value={formData.name} onChange={e => setFormData({
                 ...formData,
                 name: e.target.value
-              })} placeholder="Enter client name" required />
+              })} placeholder="Enter client name" required className="text-sm" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="description">
+                <Label htmlFor="description" className="text-sm">
                   Description
                 </Label>
                 <Textarea id="description" value={formData.description} onChange={e => setFormData({
                 ...formData,
                 description: e.target.value
-              })} placeholder="Enter client description" rows={4} />
+              })} placeholder="Enter client description" rows={4} className="text-sm" />
               </div>
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => handleDialogOpenChange(false)}>
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => handleDialogOpenChange(false)} className="text-sm">
                   Cancel
                 </Button>
-                <Button type="submit">
+                <Button type="submit" className="text-sm">
                   {editingClient ? "Update" : "Add"} Client
                 </Button>
               </div>

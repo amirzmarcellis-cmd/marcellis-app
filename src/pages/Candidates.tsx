@@ -126,18 +126,19 @@ export default function Candidates() {
   }
 
   return (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <HeroHeader
           title="CVs Database"
           subtitle="View and manage all uploaded CVs"
           actions={
-            <div className="flex gap-2">
-              <Button onClick={() => setBulkUploadOpen(true)} variant="outline" className="gap-2 font-light font-inter">
-                <Upload className="w-4 h-4" />
-                Add Multiple CVs
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <Button onClick={() => setBulkUploadOpen(true)} variant="outline" className="gap-2 font-light font-inter text-xs sm:text-sm">
+                <Upload className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Add Multiple CVs</span>
+                <span className="sm:hidden">Bulk Upload</span>
               </Button>
-              <Button onClick={handleAddCandidate} className="gap-2 font-light font-inter">
-                <UserPlus className="w-4 h-4" />
+              <Button onClick={handleAddCandidate} className="gap-2 font-light font-inter text-xs sm:text-sm">
+                <UserPlus className="w-3 h-3 sm:w-4 sm:h-4" />
                 Add CV
               </Button>
             </div>
@@ -145,15 +146,15 @@ export default function Candidates() {
         />
 
         {/* Filters */}
-        <Card className="p-6 bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass">
-          <div className="flex flex-wrap gap-4">
+        <Card className="p-3 sm:p-4 lg:p-6 bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass">
+          <div className="flex flex-wrap gap-3 sm:gap-4">
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-3 h-3 sm:w-4 sm:h-4" />
               <Input
-                placeholder="Search by name, email, phone number, or user ID..."
+                placeholder="Search CVs..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-background/50 border-border"
+                className="pl-8 sm:pl-10 bg-background/50 border-border text-sm"
               />
             </div>
           </div>
@@ -161,13 +162,13 @@ export default function Candidates() {
 
         {/* CVs Table */}
         <Card className="bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-3xl font-light font-work tracking-tight">
-              <User className="w-5 h-5" />
+          <CardHeader className="p-3 sm:p-4 lg:p-6">
+            <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl lg:text-3xl font-light font-work tracking-tight">
+              <User className="w-4 h-4 sm:w-5 sm:h-5" />
               CVs ({filteredCVs.length})
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0 sm:p-6">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
