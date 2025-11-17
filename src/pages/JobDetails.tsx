@@ -3067,40 +3067,38 @@ mainCandidate["linkedin_score_reason"] ? (
 
       {/* Detailed Information Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3 sm:space-y-4">
-        <div className="w-full overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
-          <TabsList className="inline-flex h-auto p-1 min-w-full sm:min-w-min">
-            <TabsTrigger value="overview" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 whitespace-nowrap flex-1 sm:flex-initial">
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="description" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 whitespace-nowrap flex-1 sm:flex-initial">
-              Description
-            </TabsTrigger>
-            <TabsTrigger value="requirements" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 whitespace-nowrap flex-1 sm:flex-initial">
-              AI Req
-            </TabsTrigger>
-            <TabsTrigger
-              value="applications"
-              className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 relative whitespace-nowrap flex-1 sm:flex-initial"
-              onClick={handleApplicationsTabClick}
-            >
-              <span className="hidden sm:inline">Applications</span>
-              <span className="sm:hidden">Apps</span>
-              {newApplicationsCount > 0 && (
-                <span className="absolute -top-0.5 sm:-top-1 -right-0.5 sm:-right-1 bg-red-500 text-white text-[8px] sm:text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center min-w-[16px] sm:min-w-[20px] z-10">
-                  {newApplicationsCount > 99 ? "99+" : newApplicationsCount}
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="boolean-search" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 whitespace-nowrap flex-1 sm:flex-initial">
-              <span className="hidden sm:inline">AI Longlist</span>
-              <span className="sm:hidden">Longlist</span>
-            </TabsTrigger>
-            <TabsTrigger value="shortlist" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 whitespace-nowrap flex-1 sm:flex-initial">
-              <span className="hidden sm:inline">AI Short List</span>
-              <span className="sm:hidden">Shortlist</span>
-            </TabsTrigger>
-          </TabsList>
-        </div>
+        <TabsList className="w-full flex flex-wrap items-stretch gap-1 p-1">
+          <TabsTrigger value="overview" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 flex-1 sm:flex-initial">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="description" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 flex-1 sm:flex-initial">
+            Description
+          </TabsTrigger>
+          <TabsTrigger value="requirements" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 flex-1 sm:flex-initial">
+            AI Req
+          </TabsTrigger>
+          <TabsTrigger
+            value="applications"
+            className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 relative flex-1 sm:flex-initial"
+            onClick={handleApplicationsTabClick}
+          >
+            <span className="hidden sm:inline">Applications</span>
+            <span className="sm:hidden">Apps</span>
+            {newApplicationsCount > 0 && (
+              <span className="absolute -top-0.5 sm:-top-1 -right-0.5 sm:-right-1 bg-red-500 text-white text-[8px] sm:text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center min-w-[16px] sm:min-w-[20px] z-10">
+                {newApplicationsCount > 99 ? "99+" : newApplicationsCount}
+              </span>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="boolean-search" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 flex-1 sm:flex-initial">
+            <span className="hidden sm:inline">AI Longlist</span>
+            <span className="sm:hidden">Longlist</span>
+          </TabsTrigger>
+          <TabsTrigger value="shortlist" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 flex-1 sm:flex-initial">
+            <span className="hidden sm:inline">AI Short List</span>
+            <span className="sm:hidden">Shortlist</span>
+          </TabsTrigger>
+        </TabsList>
 
         <TabsContent value="overview" className="space-y-3 sm:space-y-4 pb-20 sm:pb-32">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
@@ -4321,7 +4319,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-0 sm:pr-4">
                       {(() => {
                         // Group within budget candidates by user_id and sort by score
                         const groupedWithinBudget = withinBudgetCandidates.reduce(
@@ -4446,7 +4444,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-0 sm:pr-4">
                       {(() => {
                         // Group above budget candidates by user_id and sort by Overall Score
                         const groupedAboveBudget = aboveBudgetCandidates.reduce(
@@ -4570,7 +4568,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-0 sm:pr-4">
                       {(() => {
                         // Group nationality mismatch candidates by user_id and sort by Overall Score
                         const groupedNationalityMismatch = notInPreferredNationalityCandidates.reduce(
@@ -4695,7 +4693,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-0 sm:pr-4">
                       {(() => {
                         // Group rejected candidates by user_id and sort by Overall Score
                         const groupedRejected = filteredRejectedCandidates.reduce(
