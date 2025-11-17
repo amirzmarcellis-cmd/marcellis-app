@@ -177,39 +177,61 @@ export default function Clients() {
               Add Client
             </Button>
           </DialogTrigger>
-          <DialogContent className="w-[95vw] sm:w-full max-w-lg">
-            <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl font-semibold">
+          <DialogContent className="w-[95vw] sm:w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <DialogHeader className="space-y-2">
+              <DialogTitle className="text-xl sm:text-2xl font-semibold">
                 {editingClient ? "Edit Client" : "Add New Client"}
               </DialogTitle>
-              <DialogDescription className="text-xs sm:text-sm">
+              <DialogDescription className="text-sm sm:text-base">
                 {editingClient ? "Update client information" : "Add a new client to your database"}
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm">
+            <form onSubmit={handleSubmit} className="space-y-5 pt-2">
+              <div className="space-y-2.5">
+                <Label htmlFor="name" className="text-base font-medium">
                   Client Name *
                 </Label>
-                <Input id="name" value={formData.name} onChange={e => setFormData({
-                ...formData,
-                name: e.target.value
-              })} placeholder="Enter client name" required className="text-sm" />
+                <Input 
+                  id="name" 
+                  value={formData.name} 
+                  onChange={e => setFormData({
+                    ...formData,
+                    name: e.target.value
+                  })} 
+                  placeholder="Enter client name" 
+                  required 
+                  className="text-base h-12 rounded-lg" 
+                />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="description" className="text-sm">
+              <div className="space-y-2.5">
+                <Label htmlFor="description" className="text-base font-medium">
                   Description
                 </Label>
-                <Textarea id="description" value={formData.description} onChange={e => setFormData({
-                ...formData,
-                description: e.target.value
-              })} placeholder="Enter client description" rows={4} className="text-sm" />
+                <Textarea 
+                  id="description" 
+                  value={formData.description} 
+                  onChange={e => setFormData({
+                    ...formData,
+                    description: e.target.value
+                  })} 
+                  placeholder="Enter client description (optional)" 
+                  rows={5} 
+                  className="text-base rounded-lg min-h-[120px] resize-none" 
+                />
               </div>
-              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => handleDialogOpenChange(false)} className="text-sm">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => handleDialogOpenChange(false)} 
+                  className="text-base h-11 sm:h-10"
+                >
                   Cancel
                 </Button>
-                <Button type="submit" className="text-sm">
+                <Button 
+                  type="submit" 
+                  className="text-base h-11 sm:h-10 font-medium"
+                >
                   {editingClient ? "Update" : "Add"} Client
                 </Button>
               </div>
