@@ -337,21 +337,19 @@ export default function Candidates() {
                           <Button 
                             variant="outline" 
                             size="xs" 
-                            className="h-6 px-2 min-w-[72px] whitespace-nowrap text-[11px] gap-1 text-foreground font-medium bg-transparent"
+                            className="h-6 px-2 min-w-[72px] whitespace-nowrap text-xs text-foreground font-medium bg-transparent"
                             onClick={() => handleEditCandidate(cv)}
                             aria-label="Edit CV"
                           >
-                            <Edit className="w-3 h-3" />
                             Edit
                           </Button>
                           <Button 
                             variant="outline" 
                             size="xs" 
-                            className="h-6 px-2 min-w-[72px] whitespace-nowrap text-[11px] gap-1 text-foreground font-medium bg-transparent"
+                            className="h-6 px-2 min-w-[72px] whitespace-nowrap text-xs text-foreground font-medium bg-transparent"
                             onClick={() => handleDeleteCV(cv.user_id)}
                             aria-label="Delete CV"
                           >
-                            <Trash2 className="w-3 h-3" />
                             Delete
                           </Button>
                         </div>
