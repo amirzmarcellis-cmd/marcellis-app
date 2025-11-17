@@ -132,13 +132,13 @@ export default function Candidates() {
           subtitle="View and manage all uploaded CVs"
           actions={
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-              <Button onClick={() => setBulkUploadOpen(true)} variant="outline" className="gap-2 font-light font-inter text-xs sm:text-sm">
-                <Upload className="w-3 h-3 sm:w-4 sm:h-4" />
+              <Button onClick={() => setBulkUploadOpen(true)} variant="outline" size="sm" className="gap-1.5 font-light font-inter text-xs w-full sm:w-auto">
+                <Upload className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Add Multiple CVs</span>
                 <span className="sm:hidden">Bulk Upload</span>
               </Button>
-              <Button onClick={handleAddCandidate} className="gap-2 font-light font-inter text-xs sm:text-sm">
-                <UserPlus className="w-3 h-3 sm:w-4 sm:h-4" />
+              <Button onClick={handleAddCandidate} size="sm" className="gap-1.5 font-light font-inter text-xs w-full sm:w-auto">
+                <UserPlus className="w-3.5 h-3.5" />
                 Add CV
               </Button>
             </div>
@@ -282,7 +282,7 @@ export default function Candidates() {
             </div>
 
             {/* Mobile Card View */}
-            <div className="md:hidden p-3 space-y-3">
+            <div className="md:hidden px-2 space-y-2">
               {loading ? (
                 <div className="py-6 text-center text-muted-foreground text-sm">Loading CVs...</div>
               ) : filteredCVs.length === 0 ? (
@@ -293,34 +293,34 @@ export default function Candidates() {
                   const initials = `${cv.Firstname?.[0] || cv.name?.[0] || ""}${cv.Lastname?.[0] || ""}`
                   
                   return (
-                    <div key={cv.user_id} className="border border-border rounded-lg p-3 bg-card/50">
-                      <div className="flex items-center justify-between gap-2 mb-3">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <Avatar className="w-10 h-10 flex-shrink-0">
-                            <AvatarFallback className="bg-gradient-primary text-white text-sm font-light font-work">
+                    <div key={cv.user_id} className="border border-border rounded-lg p-2.5 bg-card/50">
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <Avatar className="w-8 h-8 flex-shrink-0">
+                            <AvatarFallback className="bg-gradient-primary text-white text-xs font-light font-work">
                               {initials}
                             </AvatarFallback>
                           </Avatar>
-                          <div className="min-w-0">
-                            <div className="text-sm font-light font-work truncate">{fullName || "N/A"}</div>
-                            <Badge variant="outline" className="text-[10px] font-mono mt-1">
+                          <div className="min-w-0 flex-1">
+                            <div className="text-xs font-light font-work truncate">{fullName || "N/A"}</div>
+                            <Badge variant="outline" className="text-[9px] font-mono mt-0.5 px-1 py-0">
                               {cv.user_id}
                             </Badge>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1 flex-shrink-0">
+                        <div className="flex items-center gap-0.5 flex-shrink-0">
                           <Button 
-                            variant="outline" 
+                            variant="ghost" 
                             size="sm" 
-                            className="h-7 w-7 p-0"
+                            className="h-6 w-6 p-0"
                             onClick={() => handleEditCandidate(cv)}
                           >
                             <Edit className="w-3 h-3" />
                           </Button>
                           <Button 
-                            variant="outline" 
+                            variant="ghost" 
                             size="sm" 
-                            className="h-7 w-7 p-0 text-destructive hover:text-destructive"
+                            className="h-6 w-6 p-0 text-destructive hover:text-destructive"
                             onClick={() => handleDeleteCV(cv.user_id)}
                           >
                             <Trash2 className="w-3 h-3" />
@@ -328,19 +328,19 @@ export default function Candidates() {
                         </div>
                       </div>
 
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-xs">
+                      <div className="space-y-1.5">
+                        <div className="flex items-center gap-1.5 text-[11px]">
                           <Mail className="w-3 h-3 text-muted-foreground flex-shrink-0" />
                           <span className="text-foreground/80 truncate">{cv.email || "N/A"}</span>
                         </div>
 
-                        <div className="flex items-center gap-2 text-xs">
+                        <div className="flex items-center gap-1.5 text-[11px]">
                           <Phone className="w-3 h-3 text-muted-foreground flex-shrink-0" />
                           <span className="text-foreground/80 truncate">{cv.phone_number || "N/A"}</span>
                         </div>
 
                         {cv.cv_link && (
-                          <div className="flex items-center gap-2 text-xs">
+                          <div className="flex items-center gap-1.5 text-[11px]">
                             <ExternalLink className="w-3 h-3 text-muted-foreground flex-shrink-0" />
                             <a 
                               href={cv.cv_link} 
@@ -354,8 +354,8 @@ export default function Candidates() {
                         )}
 
                         {cv.cv_text && (
-                          <div className="text-xs text-muted-foreground pt-2 border-t border-border/50">
-                            {cv.cv_text.substring(0, 80)}...
+                          <div className="text-[10px] text-muted-foreground pt-1.5 border-t border-border/50 line-clamp-2">
+                            {cv.cv_text}
                           </div>
                         )}
                       </div>
