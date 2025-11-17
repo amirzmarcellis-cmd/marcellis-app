@@ -149,6 +149,7 @@ export default function EditJob() {
   const [nationalityToInclude, setNationalityToInclude] = useState<string[]>([]);
   const [nationalityToExclude, setNationalityToExclude] = useState<string[]>([]);
   const [preferedNationality, setPreferedNationality] = useState<string[]>([]);
+  const [notPreferedNationality, setNotPreferedNationality] = useState<string[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<Array<{ id: string; file_name: string; file_url: string; file_type: string; file_size: number }>>([]);
   const [groups, setGroups] = useState<Array<{id: string, name: string, color: string | null}>>([]);
   const [recruiters, setRecruiters] = useState<Array<{user_id: string, name: string, email: string}>>([]);
@@ -295,6 +296,9 @@ export default function EditJob() {
         if (data.prefered_nationality) {
           setPreferedNationality(data.prefered_nationality.split(", ").filter(Boolean));
         }
+        if (data.not_prefered_nationality) {
+          setNotPreferedNationality(data.not_prefered_nationality.split(", ").filter(Boolean));
+        }
         
         // Parse industries and headhunting companies
         if (data.industry) {
@@ -338,6 +342,7 @@ export default function EditJob() {
         nationality_to_include: nationalityToInclude.join(", "),
         nationality_to_exclude: nationalityToExclude.join(", "),
         prefered_nationality: preferedNationality.length > 0 ? preferedNationality.join(", ") : null,
+        not_prefered_nationality: notPreferedNationality.length > 0 ? notPreferedNationality.join(", ") : null,
         industry: industries.join(", "),
         headhunting_companies: headhuntingCompanies.join(", "),
         contract_length: formData.Type === "Contract" ? formData.contract_length : null,
@@ -839,6 +844,61 @@ export default function EditJob() {
                                 setPreferedNationality(preferedNationality.filter((n) => n !== country));
                               }}
                               className="ml-1 text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-100"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Not Preferred Nationality</Label>
+                    <Select onValueChange={(value) => {
+                      if (value === "European Countries") {
+                        const newCountries = europeanCountries.filter(country => !notPreferedNationality.includes(country));
+                        setNotPreferedNationality([...notPreferedNationality, ...newCountries]);
+                      } else if (value === "Arabian Countries") {
+                        const newCountries = arabianCountries.filter(country => !notPreferedNationality.includes(country));
+                        setNotPreferedNationality([...notPreferedNationality, ...newCountries]);
+                      } else if (!notPreferedNationality.includes(value)) {
+                        setNotPreferedNationality([...notPreferedNationality, value]);
+                      }
+                    }}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select not preferred nationalities..." />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-60 z-[60] bg-popover">
+                        <SelectItem value="European Countries" className="font-semibold text-primary">
+                          🇪🇺 European Countries (Select All)
+                        </SelectItem>
+                        <SelectItem value="Arabian Countries" className="font-semibold text-primary">
+                          🕌 Arabian Countries (Select All)
+                        </SelectItem>
+                        {countries.filter(country => 
+                          !notPreferedNationality.includes(country)
+                        ).map((country) => (
+                          <SelectItem key={country} value={country}>
+                            {country}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {notPreferedNationality.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {notPreferedNationality.map((country) => (
+                          <span
+                            key={country}
+                            className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-500/20 text-red-700 dark:text-red-300 border border-red-500/30"
+                          >
+                            {country}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setNotPreferedNationality(notPreferedNationality.filter((n) => n !== country));
+                              }}
+                              className="ml-1 text-red-700 dark:text-red-300 hover:text-red-900 dark:hover:text-red-100"
                             >
                               ×
                             </button>
