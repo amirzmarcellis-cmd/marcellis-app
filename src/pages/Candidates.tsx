@@ -337,7 +337,7 @@ export default function Candidates() {
                           <Button 
                             variant="outline" 
                             size="xs" 
-                            className="h-6 px-2 whitespace-nowrap text-[11px] gap-1"
+                            className="h-6 px-2 whitespace-nowrap text-[11px] gap-1 text-foreground font-medium bg-transparent"
                             onClick={() => handleEditCandidate(cv)}
                             aria-label="Edit CV"
                           >
@@ -347,7 +347,7 @@ export default function Candidates() {
                           <Button 
                             variant="outline" 
                             size="xs" 
-                            className="h-6 px-2 whitespace-nowrap text-[11px] gap-1 text-destructive border-destructive/40"
+                            className="h-6 px-2 whitespace-nowrap text-[11px] gap-1 text-foreground font-medium bg-transparent"
                             onClick={() => handleDeleteCV(cv.user_id)}
                             aria-label="Delete CV"
                           >
@@ -397,7 +397,7 @@ export default function Candidates() {
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              className="h-7 px-2 text-[11px] w-full whitespace-nowrap gap-1" 
+                              className="h-7 px-2 text-[11px] w-full whitespace-nowrap gap-1 text-foreground font-medium bg-transparent" 
                               onClick={() => handleEditCandidate(cv)}
                               aria-label="Edit CV"
                             >
@@ -407,7 +407,7 @@ export default function Candidates() {
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              className="h-7 px-2 text-[11px] w-full whitespace-nowrap gap-1 text-destructive border-destructive/40" 
+                              className="h-7 px-2 text-[11px] w-full whitespace-nowrap gap-1 text-foreground font-medium bg-transparent" 
                               onClick={() => handleDeleteCV(cv.user_id)}
                               aria-label="Delete CV"
                             >
