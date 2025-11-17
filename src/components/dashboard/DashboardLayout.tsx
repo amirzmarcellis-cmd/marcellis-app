@@ -35,12 +35,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <MissionBackground>
             {/* Header */}
             <header className="sticky top-0 z-40 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl">
-              <div className="flex h-16 items-center gap-4 px-6">
-                <SidebarTrigger className="text-muted-foreground hover:text-foreground transition-colors" />
+              <div className="flex h-14 sm:h-16 items-center gap-2 sm:gap-4 px-3 sm:px-4 lg:px-6">
+                <SidebarTrigger className="text-muted-foreground hover:text-foreground transition-colors h-9 w-9 sm:h-10 sm:w-10" />
                 <div className="flex-1" />
-                <div className="flex items-center space-x-4">
-                  <div className="hidden sm:flex items-center space-x-2 text-sm font-light text-muted-foreground">
-                    <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+                <div className="flex items-center space-x-2 sm:space-x-4">
+                  <div className="hidden sm:flex items-center space-x-2 text-xs sm:text-sm font-light text-muted-foreground">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-success rounded-full animate-pulse"></div>
                     <span>Live Dashboard</span>
                   </div>
                 </div>
@@ -48,7 +48,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </header>
 
             {/* Main Content */}
-            <main className="flex-1 p-4 sm:p-6 lg:p-8 xl:p-12">
+            <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8">
               {children}
             </main>
           </MissionBackground>
