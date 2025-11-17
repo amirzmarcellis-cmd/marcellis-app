@@ -3050,12 +3050,14 @@ mainCandidate["linkedin_score_reason"] ? (
       </Card>
 
       {/* Job Funnel */}
-      <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
+      <div className="max-w-full overflow-x-hidden">
+        <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
+      </div>
 
       {/* Detailed Information Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <div className="w-full overflow-x-auto">
-          <TabsList className="w-full grid grid-cols-7 h-auto p-1">
+        <div className="w-full">
+          <TabsList className="w-full grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 h-auto p-1 gap-1">
             <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">
               Overview
             </TabsTrigger>
@@ -3092,7 +3094,7 @@ mainCandidate["linkedin_score_reason"] ? (
               <CardHeader>
                 <CardTitle>Job Information</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-2 sm:space-y-3 [&>div]:flex [&>div]:flex-col sm:[&>div]:flex-row sm:[&>div]:items-start sm:[&>div]:justify-between [&>div]:gap-1 sm:[&>div]:gap-2 [&>div>span:last-child]:break-words [&>div>span:last-child]:text-left sm:[&>div>span:last-child]:text-right [&>div>span:last-child]:max-w-full sm:[&>div>span:last-child]:max-w-[60%]">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Job ID:</span>
                   <span className="font-mono text-sm">{job.job_id}</span>
@@ -3161,7 +3163,7 @@ mainCandidate["linkedin_score_reason"] ? (
                           href={url.trim()}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-primary hover:underline flex items-center gap-1"
+                          className="text-primary hover:underline flex items-center gap-1 break-all"
                         >
                           {url.trim()}
                           <ExternalLink className="w-3 h-3" />
@@ -3190,7 +3192,7 @@ mainCandidate["linkedin_score_reason"] ? (
               <CardHeader>
                 <CardTitle>Job Requirements & Details</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-2 sm:space-y-3 [&>div]:flex [&>div]:flex-col sm:[&>div]:flex-row sm:[&>div]:items-start sm:[&>div]:justify-between [&>div]:gap-1 sm:[&>div]:gap-2 [&>div>span:last-child]:break-words [&>div>span:last-child]:text-left sm:[&>div>span:last-child]:text-right [&>div>span:last-child]:max-w-full sm:[&>div>span:last-child]:max-w-[60%]">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Countries to include:</span>
                   <span>{job.nationality_to_include || "N/A"}</span>
