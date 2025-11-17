@@ -2583,7 +2583,7 @@ mainCandidate["linkedin_score_reason"] ? (
                         variant="outline"
                         size="sm"
                         asChild
-                        className="flex-1 min-w-[100px]"
+                        className="flex-1 min-w-0 sm:min-w-[100px]"
                       >
                         <Link
                           to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid || latestContact.recordid || candidateId}&fromTab=shortlist`}
@@ -2608,7 +2608,7 @@ mainCandidate["linkedin_score_reason"] ? (
                       variant="outline"
                       size="sm"
                       asChild
-                      className="flex-1 min-w-[100px]"
+                      className="flex-1 min-w-0 sm:min-w-[100px]"
                     >
                       <Link
                         to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}&fromTab=shortlist`}
@@ -2619,7 +2619,7 @@ mainCandidate["linkedin_score_reason"] ? (
                     </Button>
                   );
                 })()}
-                <Button variant="ghost" size="sm" asChild className="flex-1 min-w-[100px]">
+                <Button variant="ghost" size="sm" asChild className="flex-1 min-w-0 sm:min-w-[100px]">
                   {typeof mainCandidate["Source"] === "string" &&
                   mainCandidate["Source"].toLowerCase().includes("linkedin") &&
                   getLinkedInUrl(mainCandidate) ? (
@@ -2643,12 +2643,12 @@ mainCandidate["linkedin_score_reason"] ? (
                 </Button>
               </div>
               {/* Action Buttons - CV Submitted and Reject */}
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {mainCandidate["Contacted"] === "Submitted" ? (
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1 min-w-[100px] bg-transparent border-2 border-blue-500 text-blue-600 cursor-default"
+                    className="flex-1 min-w-0 sm:min-w-[100px] bg-transparent border-2 border-blue-500 text-blue-600 cursor-default"
                     disabled
                   >
                     <FileCheck className="w-3 h-3 mr-1" />
@@ -2668,7 +2668,7 @@ mainCandidate["linkedin_score_reason"] ? (
                           : null;
                       handleCVSubmitted(candidateId, latestContact?.callid);
                     }}
-                    className="flex-1 min-w-[100px] bg-transparent border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-500 dark:hover:text-green-300 transition-all duration-200"
+                    className="flex-1 min-w-0 sm:min-w-[100px] bg-transparent border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-500 dark:hover:text-green-300 transition-all duration-200"
                   >
                     <FileCheck className="w-3 h-3 mr-1" />
                     Submit CV
@@ -2678,7 +2678,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1 min-w-[100px] bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed"
+                    className="flex-1 min-w-0 sm:min-w-[100px] bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed"
                     disabled
                   >
                     <X className="w-3 h-3 mr-1" />
@@ -2688,7 +2688,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1 min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200"
+                    className="flex-1 min-w-0 sm:min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200"
                     onClick={() => openRejectDialog(id!, candidateId, candidateContacts[0].callid)}
                   >
                     <X className="w-3 h-3 mr-1" />
