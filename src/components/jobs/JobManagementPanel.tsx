@@ -650,16 +650,22 @@ export function JobManagementPanel() {
                 </div>
               </CardContent>
             </Card>)}
-        </div> : <Tabs defaultValue="active" className="space-y-6">
-          <TabsList className="glass-card w-full max-w-full flex flex-wrap whitespace-normal overflow-x-hidden sm:flex-nowrap sm:whitespace-nowrap sm:overflow-visible">
-            <TabsTrigger value="active" className="data-[state=active]:bg-status-active data-[state=active]:text-white flex-shrink-0">
-              Active Jobs ({filteredJobs.activeJobs.length})
+        </div> : <Tabs defaultValue="active" className="space-y-4 sm:space-y-6">
+          <TabsList className="glass-card w-full grid grid-cols-3 gap-1 sm:flex sm:flex-nowrap h-auto p-1">
+            <TabsTrigger value="active" className="data-[state=active]:bg-status-active data-[state=active]:text-white text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap py-2 px-2 sm:px-4">
+              <span className="hidden sm:inline">Active Jobs</span>
+              <span className="sm:hidden">Active</span>
+              <span className="ml-1">({filteredJobs.activeJobs.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="paused" className="flex-shrink-0">
-              Paused Jobs ({filteredJobs.pausedJobs.length})
+            <TabsTrigger value="paused" className="text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap py-2 px-2 sm:px-4">
+              <span className="hidden sm:inline">Paused Jobs</span>
+              <span className="sm:hidden">Paused</span>
+              <span className="ml-1">({filteredJobs.pausedJobs.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="all" className="flex-shrink-0">
-              All Jobs ({filteredJobs.allJobs.length})
+            <TabsTrigger value="all" className="text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap py-2 px-2 sm:px-4">
+              <span className="hidden sm:inline">All Jobs</span>
+              <span className="sm:hidden">All</span>
+              <span className="ml-1">({filteredJobs.allJobs.length})</span>
             </TabsTrigger>
           </TabsList>
 
