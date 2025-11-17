@@ -335,14 +335,14 @@ export default function Candidates() {
                         </div>
                         <div className="flex md:hidden items-center gap-1 flex-shrink-0">
                           <Button 
-                            variant="outline" 
+                            variant="default" 
                             size="sm" 
                             className="h-7 px-2 whitespace-nowrap text-[11px]"
                             onClick={() => handleEditCandidate(cv)}
                             aria-label="Edit CV"
                           >
                             <Edit className="w-3 h-3" />
-                            Edit
+                            edit
                           </Button>
                           <Button 
                             variant="destructive" 
@@ -395,14 +395,14 @@ export default function Candidates() {
                           <div className="text-muted-foreground mb-1">Actions</div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 min-w-0">
                             <Button 
-                              variant="outline" 
+                              variant="default" 
                               size="sm" 
                               className="h-8 px-2 text-xs w-full whitespace-nowrap" 
                               onClick={() => handleEditCandidate(cv)}
                               aria-label="Edit CV"
                             >
                               <Edit className="w-3 h-3" />
-                              Edit
+                              edit
                             </Button>
                             <Button 
                               variant="destructive" 
