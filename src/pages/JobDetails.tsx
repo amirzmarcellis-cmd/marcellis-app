@@ -2983,12 +2983,12 @@ mainCandidate["linkedin_score_reason"] ? (
 
       {/* Job Header Card */}
       <Card>
-        <CardContent className="p-3 sm:p-4 md:p-6">
-          <div className="space-y-3 sm:space-y-4">
-            <div className="flex flex-col gap-3 sm:gap-4">
-              <div className="space-y-2 w-full">
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold break-words">{job.job_title}</h2>
-                <p className="text-sm sm:text-base md:text-lg text-muted-foreground break-words">
+        <CardContent className="p-2 sm:p-4 md:p-6">
+          <div className="space-y-1.5 sm:space-y-4">
+            <div className="flex flex-col gap-1.5 sm:gap-4">
+              <div className="space-y-0.5 sm:space-y-2 w-full">
+                <h2 className="text-sm sm:text-xl md:text-2xl font-bold break-words leading-tight">{job.job_title}</h2>
+                <p className="text-[11px] sm:text-base md:text-lg text-muted-foreground break-words leading-snug">
                   {job.client_description || "Client Description"}
                 </p>
               </div>
