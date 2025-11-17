@@ -169,7 +169,7 @@ export function StatusDropdown({
       onValueChange={handleStatusChange}
       disabled={isUpdating || loadingOptions}
     >
-      <SelectTrigger className="w-[200px] bg-background border-glass-border hover:bg-background/80 transition-colors">
+      <SelectTrigger className="w-full sm:w-[200px] bg-background border-glass-border hover:bg-background/80 transition-colors">
         <SelectValue>
           <Badge 
             variant={getStatusVariant(currentStatus || defaultStatus)} 

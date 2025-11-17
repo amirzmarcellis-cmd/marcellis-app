@@ -319,7 +319,7 @@ export default function CallLog() {
   })
 
   return (
-      <div className="space-y-4 sm:space-y-6">
+      <div className="space-y-4 sm:space-y-6 overflow-x-hidden">
         <div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-light font-work tracking-tight text-foreground">Call Log</h1>
           <p className="text-sm sm:text-base font-light font-inter text-muted-foreground mt-1 sm:mt-2">Track all recruitment calls and outcomes</p>
@@ -590,21 +590,23 @@ export default function CallLog() {
                       </div>
 
                       <div className="mt-3 grid grid-cols-1 gap-2">
-                        <div className="flex items-center justify-between">
+                        <div className="grid grid-cols-[auto,1fr] items-center gap-2">
                           <span className="text-xs text-muted-foreground">Status</span>
-                          <StatusDropdown
-                            currentStatus={log.contacted}
-                            candidateId={log.user_id?.toString() || ""}
-                            jobId={log.job_id}
-                            statusType="contacted"
-                            onStatusChange={(newStatus) => {
-                              setCallLogs(prev => prev.map(l => 
-                                l.recordid === log.recordid
-                                  ? { ...l, contacted: newStatus }
-                                  : l
-                              ))
-                            }}
-                          />
+                          <div className="min-w-0">
+                            <StatusDropdown
+                              currentStatus={log.contacted}
+                              candidateId={log.user_id?.toString() || ""}
+                              jobId={log.job_id}
+                              statusType="contacted"
+                              onStatusChange={(newStatus) => {
+                                setCallLogs(prev => prev.map(l => 
+                                  l.recordid === log.recordid
+                                    ? { ...l, contacted: newStatus }
+                                    : l
+                                ))
+                              }}
+                            />
+                          </div>
                         </div>
 
                         <div className="flex items-center justify-between">
