@@ -251,33 +251,35 @@ export default function LiveCandidateFeed() {
 
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4 sm:p-6 overflow-x-auto">
+    <div className="min-h-screen bg-background text-foreground p-3 sm:p-4 md:p-6 overflow-x-auto">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex items-center space-x-4">
-            <div className="relative">
-              <div className="w-16 h-16 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center animate-pulse shadow-2xl shadow-cyan-400/25">
-                <Activity className="w-8 h-8 text-white" />
+      <div className="mb-4 sm:mb-6 md:mb-8">
+        <div className="flex flex-col gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="relative shrink-0">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 rounded-xl sm:rounded-2xl flex items-center justify-center animate-pulse shadow-2xl shadow-cyan-400/25">
+                <Activity className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" />
               </div>
-              <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center animate-bounce">
-                <div className="w-2 h-2 bg-white rounded-full"></div>
+              <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center animate-bounce">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full"></div>
               </div>
             </div>
-            <div>
-            <h3 className="text-6xl sm:text-7xl font-light font-work tracking-tight">
-              LIVE CANDIDATE FEED
-            </h3>
-            <p className="text-base font-light font-inter text-muted-foreground">Call Done Candidates - Ready for Action</p>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-light font-work tracking-tight">
+                LIVE CANDIDATE FEED
+              </h3>
+              <p className="text-xs sm:text-sm md:text-base font-light font-inter text-muted-foreground">
+                Call Done Candidates - Ready for Action
+              </p>
             </div>
           </div>
           
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 bg-background/30 px-4 py-2 rounded-full border-2 border-primary/60">
-              <div className="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
-              <span className="text-primary font-light font-inter">LIVE</span>
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+            <div className="flex items-center gap-1.5 sm:gap-2 bg-background/30 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border-2 border-primary/60">
+              <div className="w-2 h-2 sm:w-3 sm:h-3 bg-primary rounded-full animate-pulse"></div>
+              <span className="text-primary font-light font-inter text-xs sm:text-sm">LIVE</span>
             </div>
-            <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-400/40 px-4 py-2 text-lg font-light font-inter">
+            <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-400/40 px-3 py-1 sm:px-4 sm:py-2 text-sm sm:text-base lg:text-lg font-light font-inter">
               {filteredCandidates.length} Active
             </Badge>
           </div>
@@ -285,32 +287,32 @@ export default function LiveCandidateFeed() {
       </div>
 
       {/* Filters */}
-      <Card className="mb-8 bg-card border-border dark:bg-gradient-to-r dark:from-white/10 dark:to-white/5 dark:backdrop-blur-xl dark:border-white/20 shadow-2xl shadow-purple-500/10">
-        <CardHeader>
-          <CardTitle className="text-3xl font-light font-work tracking-tight text-foreground flex items-center">
-            <Filter className="w-5 h-5 mr-2 text-cyan-400" />
-            Advanced Filtering System
+      <Card className="mb-4 sm:mb-6 md:mb-8 bg-card border-border dark:bg-gradient-to-r dark:from-white/10 dark:to-white/5 dark:backdrop-blur-xl dark:border-white/20 shadow-2xl shadow-purple-500/10">
+        <CardHeader className="p-3 sm:p-4 md:p-6">
+          <CardTitle className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light font-work tracking-tight text-foreground flex items-center">
+            <Filter className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-cyan-400" />
+            <span>Filters</span>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">Search Candidates</label>
+        <CardContent className="p-3 sm:p-4 md:p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
+            <div className="space-y-1.5 sm:space-y-2">
+              <label className="text-xs sm:text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">Search Candidates</label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <Input 
                   placeholder="Name or position..." 
                   value={searchTerm} 
                   onChange={e => setSearchTerm(e.target.value)} 
-                  className="pl-10 bg-black/20 border-cyan-400/30 text-foreground placeholder-muted-foreground focus:border-cyan-400 focus:ring-cyan-400/20 font-light font-inter" 
+                  className="pl-9 sm:pl-10 h-10 sm:h-11 text-sm sm:text-base bg-black/20 border-cyan-400/30 text-foreground placeholder-muted-foreground focus:border-cyan-400 focus:ring-cyan-400/20 font-light font-inter" 
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">Active Job</label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <label className="text-xs sm:text-sm font-light font-inter uppercase tracking-wide text-muted-foreground">Active Job</label>
               <Select value={selectedJob} onValueChange={setSelectedJob}>
-                <SelectTrigger className="bg-black/20 border-purple-400/30 text-foreground focus:border-purple-400">
+                <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base bg-black/20 border-purple-400/30 text-foreground focus:border-purple-400">
                   <SelectValue placeholder="All Jobs" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-purple-400/30 backdrop-blur-xl z-50">
@@ -329,30 +331,30 @@ export default function LiveCandidateFeed() {
 
       {/* Candidate Feed */}
       <Card className="bg-card border-border dark:bg-gradient-to-br dark:from-white/10 dark:to-white/5 dark:backdrop-blur-xl dark:border-white/20 shadow-2xl">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-3xl font-light font-work tracking-tight text-foreground flex items-center">
-              <Users className="w-6 h-6 mr-3 text-cyan-400" />
-              Call Done Candidates
-              <Badge className="ml-4 bg-gradient-to-r from-cyan-400/20 to-purple-400/20 text-cyan-300 border-cyan-400/40 font-light font-inter">
+        <CardHeader className="p-3 sm:p-4 md:p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <CardTitle className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light font-work tracking-tight text-foreground flex items-center flex-wrap gap-2">
+              <Users className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 shrink-0" />
+              <span>Call Done Candidates</span>
+              <Badge className="bg-gradient-to-r from-cyan-400/20 to-purple-400/20 text-cyan-300 border-cyan-400/40 font-light font-inter text-xs sm:text-sm">
                 {filteredCandidates.length} Candidates
               </Badge>
             </CardTitle>
-            <div className="flex items-center space-x-2">
-              <Zap className="w-5 h-5 text-yellow-400 animate-pulse" />
-              <span className="text-yellow-400 text-sm font-light font-inter">Real-time Updates</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 animate-pulse" />
+              <span className="text-yellow-400 text-xs sm:text-sm font-light font-inter">Real-time</span>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[600px] pr-4">
-            <div className="space-y-4">
+        <CardContent className="p-3 sm:p-4 md:p-6">
+          <ScrollArea className="h-[500px] sm:h-[600px] pr-2 sm:pr-4">
+            <div className="space-y-3 sm:space-y-4">
               {sortedCandidates.map((candidate, index) => {
                 const score = calculateOverallScore(candidate);
                 return (
                   <div 
                     key={index} 
-                    className={`group relative p-6 rounded-2xl border transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer
+                    className={`group relative p-3 sm:p-4 md:p-6 rounded-xl sm:rounded-2xl border transition-all duration-300 hover:scale-[1.01] sm:hover:scale-[1.02] hover:shadow-2xl cursor-pointer active:scale-[0.99]
                     bg-gradient-to-r ${index < 3 ? 'from-yellow-400/30 to-amber-500/50' : getScoreGradient(score)} 
                     ${index < 3 ? 'border-yellow-400/50 hover:border-yellow-400/60' : 'border-border hover:border-primary/40 dark:border-white/20'}
                     backdrop-blur-sm animate-fade-in`} 
@@ -360,49 +362,51 @@ export default function LiveCandidateFeed() {
                     onClick={() => window.location.href = `/call-log-details/${candidate.recordid || candidate.callid}`}
                   >
                     {/* Score Badge */}
-                    <div className="absolute top-4 right-4">
-                      <Badge className={`text-lg font-bold px-3 py-1 ${getScoreColor(score)} border`}>
+                    <div className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4">
+                      <Badge className={`text-sm sm:text-base md:text-lg font-bold px-2 py-0.5 sm:px-3 sm:py-1 ${getScoreColor(score)} border`}>
                         {score}
-                        <Star className="w-4 h-4 ml-1 fill-current" />
+                        <Star className="w-3 h-3 sm:w-4 sm:h-4 ml-1 fill-current" />
                       </Badge>
                     </div>
 
                     {/* Candidate Info */}
-                    <div className="flex items-start space-x-4 mb-4">
-                      <Avatar className="w-16 h-16 border-2 border-cyan-400/50">
-                        <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-purple-600 text-white text-lg font-bold">
+                    <div className="flex items-start gap-2 sm:gap-3 md:gap-4 mb-3 sm:mb-4 pr-14 sm:pr-16 md:pr-20">
+                      <Avatar className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 border-2 border-cyan-400/50 shrink-0">
+                        <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-purple-600 text-white text-sm sm:text-base md:text-lg font-bold">
                           {candidate.candidate_name?.charAt(0) || 'C'}
                         </AvatarFallback>
                       </Avatar>
                       
-                      <div className="flex-1">
-                        <div className="mb-3">
-                          <h3 className="text-3xl font-light font-work tracking-tight text-foreground">{candidate.candidate_name}</h3>
+                      <div className="flex-1 min-w-0">
+                        <div className="mb-2 sm:mb-3">
+                          <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light font-work tracking-tight text-foreground truncate">
+                            {candidate.candidate_name}
+                          </h3>
                         </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm font-light font-inter">
-                          <div className="flex items-center text-muted-foreground">
-                            <Zap className="w-4 h-4 mr-2 text-yellow-400" />
-                            <span>{candidate['Job Title']}</span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm font-light font-inter">
+                          <div className="flex items-center text-muted-foreground min-w-0">
+                            <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-yellow-400 shrink-0" />
+                            <span className="truncate">{candidate['Job Title']}</span>
                           </div>
-                          <div className="flex items-center text-muted-foreground">
-                            <Mail className="w-4 h-4 mr-2 text-cyan-400" />
-                            <span>{candidate.candidate_email}</span>
+                          <div className="flex items-center text-muted-foreground min-w-0">
+                            <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-cyan-400 shrink-0" />
+                            <span className="truncate">{candidate.candidate_email}</span>
                           </div>
-                          <div className="flex items-center text-muted-foreground">
-                            <Phone className="w-4 h-4 mr-2 text-green-400" />
-                            <span>{candidate.candidate_phone_number}</span>
+                          <div className="flex items-center text-muted-foreground min-w-0">
+                            <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-green-400 shrink-0" />
+                            <span className="truncate">{candidate.candidate_phone_number}</span>
                           </div>
-                          <div className="flex items-center text-muted-foreground">
-                            <Briefcase className="w-4 h-4 mr-2 text-orange-400" />
-                            <span>💰 {candidate['Salary Expectations'] || 'Negotiable'}</span>
+                          <div className="flex items-center text-muted-foreground min-w-0">
+                            <Briefcase className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-orange-400 shrink-0" />
+                            <span className="truncate">💰 {candidate['Salary Expectations'] || 'Negotiable'}</span>
                           </div>
                         </div>
 
                         {/* After Call Reason */}
                         {candidate.after_call_reason && (
-                          <div className="mt-3 p-3 bg-black/20 rounded-lg">
-                            <p className="text-sm text-gray-300 leading-relaxed">
+                          <div className="mt-2 sm:mt-3 p-2 sm:p-3 bg-black/20 rounded-lg">
+                            <p className="text-xs sm:text-sm text-gray-300 leading-relaxed line-clamp-3">
                               {candidate.after_call_reason.slice(0, 200)}...
                             </p>
                           </div>
@@ -411,9 +415,9 @@ export default function LiveCandidateFeed() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="mt-4 pt-4 border-t border-border/20">
+                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-border/20">
                       <div className="flex items-center justify-end">
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
                           <Button 
                             size="sm" 
                             variant="destructive" 
@@ -421,10 +425,10 @@ export default function LiveCandidateFeed() {
                               e.stopPropagation();
                               handleRejectCandidate(candidate.Candidate_ID || candidate.candidate_id || '', candidate.job_id || candidate['Job ID'] || '');
                             }} 
-                            className="bg-red-500 hover:bg-red-600 text-white border-2 border-red-400 hover:border-red-300"
+                            className="bg-red-500 hover:bg-red-600 text-white border-2 border-red-400 hover:border-red-300 h-9 sm:h-10 text-xs sm:text-sm px-2.5 sm:px-4"
                           >
-                            <XCircle className="w-4 h-4 mr-1" />
-                            Reject Candidate
+                            <XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-1" />
+                            <span className="hidden xs:inline">Reject</span>
                           </Button>
                           
                           <Button 
@@ -434,10 +438,10 @@ export default function LiveCandidateFeed() {
                               e.stopPropagation();
                               handleCVSubmitted(candidate.Candidate_ID || candidate.candidate_id || '', candidate.job_id || candidate['Job ID'] || '');
                             }} 
-                            className="bg-green-500 hover:bg-green-600 text-white border-2 border-green-400 hover:border-green-300"
+                            className="bg-green-500 hover:bg-green-600 text-white border-2 border-green-400 hover:border-green-300 h-9 sm:h-10 text-xs sm:text-sm px-2.5 sm:px-4"
                           >
-                            <CheckCircle className="w-4 h-4 mr-1" />
-                            Submit CV
+                            <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-1" />
+                            <span className="hidden xs:inline">Submit CV</span>
                           </Button>
                         </div>
                       </div>
@@ -447,10 +451,10 @@ export default function LiveCandidateFeed() {
               })}
               
               {filteredCandidates.length === 0 && (
-                <div className="text-center py-16">
-                  <Users className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-foreground mb-2">No candidates found</h3>
-                  <p className="text-gray-400">No candidates with "Call Done" status found. Try adjusting your filters.</p>
+                <div className="text-center py-12 sm:py-16">
+                  <Users className="w-12 h-12 sm:w-16 sm:h-16 text-gray-500 mx-auto mb-3 sm:mb-4" />
+                  <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">No candidates found</h3>
+                  <p className="text-sm sm:text-base text-gray-400 px-4">No candidates with "Call Done" status found. Try adjusting your filters.</p>
                 </div>
               )}
             </div>
