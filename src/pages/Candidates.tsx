@@ -333,11 +333,11 @@ export default function Candidates() {
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
-                        <div className="flex md:hidden items-center gap-1 flex-shrink-0">
+                        <div className="flex md:hidden items-center gap-1.5 flex-shrink-0">
                           <Button 
                             variant="outline" 
                             size="sm" 
-                            className="h-7 px-2 whitespace-nowrap text-[11px]"
+                            className="h-9 px-3 whitespace-nowrap text-sm font-medium"
                             onClick={() => handleEditCandidate(cv)}
                             aria-label="Edit CV"
                           >
@@ -347,7 +347,7 @@ export default function Candidates() {
                           <Button 
                             variant="destructive" 
                             size="sm" 
-                            className="h-7 px-2 whitespace-nowrap text-[11px]"
+                            className="h-9 px-3 whitespace-nowrap text-sm font-medium"
                             onClick={() => handleDeleteCV(cv.user_id)}
                             aria-label="Delete CV"
                           >
