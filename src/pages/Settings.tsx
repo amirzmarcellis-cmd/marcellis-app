@@ -57,44 +57,43 @@ export default function Settings() {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-        <SettingsIcon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-light font-work tracking-tight">Settings</h1>
+    <div className="space-y-4 px-4 sm:px-0">
+      <div className="flex items-center gap-2 sm:gap-3">
+        <SettingsIcon className="h-5 w-5 text-primary flex-shrink-0" />
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-light font-work tracking-tight">Settings</h1>
       </div>
 
       {/* Profile Settings */}
       <Card>
-        <CardHeader className="p-4 sm:p-6">
-          <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl lg:text-3xl font-light font-work tracking-tight">
-            <User className="h-4 w-4 sm:h-5 sm:w-5" />
+        <CardHeader className="p-3 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-2xl font-light font-work tracking-tight">
+            <User className="h-4 w-4 flex-shrink-0" />
             Profile Settings
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4 p-4 sm:p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="name" className="font-light font-inter text-sm">Display Name</Label>
+        <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-6">
+          <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="name" className="font-light text-sm">Display Name</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Enter your name"
-                className="text-sm"
               />
             </div>
-            <div>
-              <Label htmlFor="email" className="font-light font-inter text-sm">Email Address</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="font-light text-sm">Email Address</Label>
               <Input
                 id="email"
                 type="email"
                 value={formData.email}
                 disabled
-                className="bg-muted text-sm"
+                className="bg-muted"
               />
             </div>
           </div>
-          <div>
+          <div className="space-y-1.5">
             <Label htmlFor="slug" className="text-sm">Company Slug</Label>
             <Input
               id="slug"
@@ -102,13 +101,12 @@ export default function Settings() {
               onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
               placeholder="Enter company slug (e.g., 'me', 'acme')"
               pattern="[a-z0-9-]+"
-              className="text-sm"
             />
-            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               This slug will be used for job IDs. Example: if slug is "me", job IDs will be "me-j-0001"
             </p>
           </div>
-          <Button onClick={handleSave} disabled={loading} className="w-full sm:w-auto text-sm">
+          <Button onClick={handleSave} disabled={loading} className="w-full sm:w-auto">
             {loading ? 'Saving...' : 'Save Profile'}
           </Button>
         </CardContent>
@@ -122,17 +120,17 @@ export default function Settings() {
 
       {/* Notification Settings */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5" />
+        <CardHeader className="p-3 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-2xl font-light">
+            <Bell className="h-4 w-4 flex-shrink-0" />
             Notifications
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label>Email Notifications</Label>
-              <p className="text-sm text-muted-foreground">
+        <CardContent className="p-3 sm:p-6">
+          <div className="flex items-start sm:items-center justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <Label className="text-sm sm:text-base">Email Notifications</Label>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
                 Receive email notifications for important updates
               </p>
             </div>
@@ -141,6 +139,7 @@ export default function Settings() {
               onCheckedChange={(checked) =>
                 setFormData({ ...formData, notifications: checked })
               }
+              className="flex-shrink-0"
             />
           </div>
         </CardContent>
@@ -149,17 +148,17 @@ export default function Settings() {
       {/* System Settings (Admin Only) */}
       {profile?.is_admin && (
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
+          <CardHeader className="p-3 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-2xl font-light">
+              <Shield className="h-4 w-4 flex-shrink-0" />
               System Settings
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Automatic Dialing</Label>
-                <p className="text-sm text-muted-foreground">
+          <CardContent className="p-3 sm:p-6">
+            <div className="flex items-start sm:items-center justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <Label className="text-sm sm:text-base">Automatic Dialing</Label>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
                   Enable automatic dialing for candidates
                 </p>
               </div>
@@ -168,6 +167,7 @@ export default function Settings() {
                 onCheckedChange={(checked) =>
                   setFormData({ ...formData, automaticDial: checked })
                 }
+                className="flex-shrink-0"
               />
             </div>
           </CardContent>
