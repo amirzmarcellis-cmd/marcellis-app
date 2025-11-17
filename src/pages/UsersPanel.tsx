@@ -615,19 +615,15 @@ export default function UsersPanel() {
             </div>
           ) : (
             <>
-              {/* Mobile scroll hint */}
-              <div className="sm:hidden text-[10px] text-muted-foreground text-center mb-2 flex items-center justify-center gap-1">
-                <span>← Swipe to see all columns →</span>
-              </div>
               <div className="overflow-x-auto -mx-2 sm:mx-0 rounded-md border sm:border-0">
-                <div className="min-w-[700px]">
+                <div className="min-w-0">
                   <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead className="text-[10px] sm:text-sm py-2 sticky left-0 bg-background z-10">Name</TableHead>
                       <TableHead className="text-[10px] sm:text-sm py-2">Email</TableHead>
                       <TableHead className="text-[10px] sm:text-sm py-2">Role</TableHead>
-                      <TableHead className="text-[10px] sm:text-sm py-2">Created</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2 hidden sm:table-cell">Created</TableHead>
                       <TableHead className="text-[10px] sm:text-sm py-2 sticky right-0 bg-background z-10">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -637,13 +633,13 @@ export default function UsersPanel() {
                         <TableCell className="text-[10px] sm:text-sm py-2 sticky left-0 bg-background z-10">
                           <div className="flex items-center gap-1 sm:gap-2">
                             <User className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                            <span className="truncate max-w-[100px] sm:max-w-none">{user.name || 'No name'}</span>
+                            <span className="whitespace-normal break-words sm:whitespace-nowrap sm:break-normal">{user.name || 'No name'}</span>
                           </div>
                         </TableCell>
                         <TableCell className="text-[10px] sm:text-sm py-2">
                           <div className="flex items-center gap-1 sm:gap-2">
                             <Mail className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                            <span className="truncate max-w-[120px] sm:max-w-none">{user.email}</span>
+                            <span className="whitespace-normal break-words sm:whitespace-nowrap sm:break-normal">{user.email}</span>
                           </div>
                         </TableCell>
                         <TableCell className="text-[10px] sm:text-sm py-2">
@@ -661,7 +657,7 @@ export default function UsersPanel() {
                                 {userMemberships.length > 0 && orgRole === 'EMPLOYEE' && (
                                   <div className="text-[9px] sm:text-xs text-muted-foreground">
                                     {userMemberships.map((membership, idx) => (
-                                      <div key={idx} className="truncate max-w-[80px] sm:max-w-none">
+                                      <div key={idx} className="whitespace-normal break-words sm:whitespace-nowrap sm:break-normal">
                                         {membership.team_name} ({membership.role === 'TEAM_LEADER' ? 'Leader' : 'Member'})
                                       </div>
                                     ))}
@@ -671,7 +667,7 @@ export default function UsersPanel() {
                             );
                           })()}
                         </TableCell>
-                        <TableCell className="text-[10px] sm:text-sm py-2">
+                        <TableCell className="hidden sm:table-cell text-[10px] sm:text-sm py-2">
                           {new Date(user.created_at).toLocaleDateString()}
                         </TableCell>
                         <TableCell className="text-[10px] sm:text-sm py-2 sticky right-0 bg-background z-10">
@@ -710,6 +706,16 @@ export default function UsersPanel() {
           <Teams />
         </TabsContent>
       </Tabs>
+      {canAccessUsersPanel && (
+        <Button
+          className="sm:hidden fixed bottom-20 right-4 z-40 shadow-card"
+          size="icon"
+          onClick={() => setIsAddUserOpen(true)}
+          aria-label="Add user"
+        >
+          <Plus className="h-5 w-5" />
+        </Button>
+      )}
 
       {/* Edit User Dialog */}
       <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
