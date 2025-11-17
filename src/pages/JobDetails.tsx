@@ -2920,7 +2920,7 @@ mainCandidate["linkedin_score_reason"] ? (
     }),
   );
   return (
-    <div className={cn("space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden", isShaking && "animate-shake")}>
+    <div className={cn("space-y-3 sm:space-y-4 md:space-y-6 p-3 sm:p-4 md:p-6 max-w-full overflow-hidden", isShaking && "animate-shake")}>
       {/* Processing Animation Overlay */}
       {job?.status === 'Processing' && job?.Processed === 'Yes' && <ProcessingAnimation />}
       
@@ -2928,35 +2928,38 @@ mainCandidate["linkedin_score_reason"] ? (
       <AppleLoadingBar isLoading={loading} className="absolute top-0 left-0 right-0 z-50" />
       
       {/* Header */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 items-start">
-          <div className="flex items-center space-x-2 md:space-x-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/jobs")}>
-              <ArrowLeft className="w-4 h-4 mr-1 md:mr-2" />
-              <span className="hidden sm:inline">Back to Jobs</span>
-              <span className="sm:hidden">Back</span>
-            </Button>
-            <div className="h-6 w-px bg-border hidden sm:block" />
-            <h3 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h3>
+      <div className="flex flex-col gap-2 sm:gap-3">
+        <div className="flex flex-col gap-3 sm:gap-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center space-x-2 min-w-0">
+              <Button variant="ghost" size="xs" className="sm:h-9 px-2 sm:px-4" onClick={() => navigate("/jobs")}>
+                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                <span className="text-xs sm:text-sm">Back</span>
+              </Button>
+              <div className="h-4 sm:h-6 w-px bg-border" />
+              <h3 className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h3>
+            </div>
+            {/* Futuristic 3D Action Menu - hidden on mobile */}
+            <div className="hidden md:block">
+              <FuturisticActionButton
+                isExpanded={isActionMenuExpanded}
+                onToggle={() => setIsActionMenuExpanded(!isActionMenuExpanded)}
+              >
+                <ActionButton
+                  onClick={handlePauseJob}
+                  disabled={automaticDialSaving}
+                  icon={job?.Processed === "Yes" ? Pause : Play}
+                  label={job?.Processed === "Yes" ? "Pause Job" : "Run Job"}
+                  variant="danger"
+                />
+              </FuturisticActionButton>
+            </div>
           </div>
-          {/* Futuristic 3D Action Menu */}
-          <FuturisticActionButton
-            isExpanded={isActionMenuExpanded}
-            onToggle={() => setIsActionMenuExpanded(!isActionMenuExpanded)}
-          >
-            <ActionButton
-              onClick={handlePauseJob}
-              disabled={automaticDialSaving}
-              icon={job?.Processed === "Yes" ? Pause : Play}
-              label={job?.Processed === "Yes" ? "Pause Job" : "Run Job"}
-              variant="danger"
-            />
-          </FuturisticActionButton>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 items-center justify-center lg:justify-end">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Auto Dial</span>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
+            <div className="flex items-center gap-2 justify-between sm:justify-start bg-card/50 rounded-lg px-3 py-2 sm:bg-transparent sm:p-0">
+              <span className="text-xs sm:text-sm font-medium">Auto Dial</span>
               <ToggleSwitch
                 checked={job?.automatic_dial || false}
                 onChange={handleAutomaticDialToggle}
@@ -2966,29 +2969,39 @@ mainCandidate["linkedin_score_reason"] ? (
                 offLabel="OFF"
               />
             </div>
-            <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto">
-              <FileText className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Edit Job</span>
-              <span className="sm:hidden">Edit</span>
-            </Button>
-            <Button variant="outline" asChild size="sm" className="w-full sm:w-auto">
-              <Link to={`/job/${job.job_id}/apply`}>
-                <span className="hidden sm:inline">Apply Link</span>
-                <span className="sm:hidden">Apply</span>
-              </Link>
-            </Button>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="xs" className="sm:h-9 flex-1 sm:flex-initial text-xs sm:text-sm">
+                <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                Edit
+              </Button>
+              <Button variant="outline" asChild size="xs" className="sm:h-9 flex-1 sm:flex-initial text-xs sm:text-sm">
+                <Link to={`/job/${job.job_id}/apply`}>
+                  Apply Link
+                </Link>
+              </Button>
+              {/* Mobile pause/play button */}
+              <Button 
+                onClick={handlePauseJob}
+                disabled={automaticDialSaving}
+                size="xs" 
+                variant="outline"
+                className="md:hidden sm:h-9 flex-1 sm:flex-initial text-xs sm:text-sm"
+              >
+                {job?.Processed === "Yes" ? <Pause className="w-3 h-3 sm:w-4 sm:h-4" /> : <Play className="w-3 h-3 sm:w-4 sm:h-4" />}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Job Header Card */}
       <Card>
-        <CardContent className="p-4 md:p-6">
-          <div className="space-y-4">
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-              <div className="space-y-2 flex-1 min-w-0">
-                <h2 className="text-xl md:text-2xl font-bold break-words">{job.job_title}</h2>
-                <p className="text-base md:text-lg text-muted-foreground break-words">
+        <CardContent className="p-3 sm:p-4 md:p-6">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex flex-col gap-3">
+              <div className="space-y-1.5 sm:space-y-2 flex-1 min-w-0">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold break-words leading-tight">{job.job_title}</h2>
+                <p className="text-sm sm:text-base md:text-lg text-muted-foreground break-words line-clamp-2 sm:line-clamp-none">
                   {job.client_description || "Client Description"}
                 </p>
               </div>
@@ -3000,7 +3013,7 @@ mainCandidate["linkedin_score_reason"] ? (
                     ? "default"
                     : "destructive"
                 }
-                className={`text-xs md:text-sm px-2 md:px-3 py-1 whitespace-nowrap ${
+                className={`text-xs sm:text-sm px-2 sm:px-3 py-1 whitespace-nowrap self-start ${
                   job.Processed === "No"
                     ? "bg-purple-600 text-white border-0"
                     : job.Processed === true || job.Processed === "true" || job.Processed === "Yes"
@@ -3053,81 +3066,84 @@ mainCandidate["linkedin_score_reason"] ? (
       <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
 
       {/* Detailed Information Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <div className="w-full overflow-x-auto">
-          <TabsList className="w-full grid grid-cols-7 h-auto p-1">
-            <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3 sm:space-y-4">
+        <ScrollArea className="w-full">
+          <TabsList className="w-full inline-flex h-auto p-1 min-w-min">
+            <TabsTrigger value="overview" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 whitespace-nowrap">
               Overview
             </TabsTrigger>
-            <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2">
+            <TabsTrigger value="description" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 whitespace-nowrap">
               Description
             </TabsTrigger>
-            <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">
-              AI Requirements
+            <TabsTrigger value="requirements" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 whitespace-nowrap">
+              AI Req
             </TabsTrigger>
             <TabsTrigger
               value="applications"
-              className="text-xs md:text-sm px-2 py-2 relative"
+              className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 relative whitespace-nowrap"
               onClick={handleApplicationsTabClick}
             >
-              Applications
+              <span className="hidden sm:inline">Applications</span>
+              <span className="sm:hidden">Apps</span>
               {newApplicationsCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-[20px] z-10">
+                <span className="absolute -top-0.5 sm:-top-1 -right-0.5 sm:-right-1 bg-red-500 text-white text-[8px] sm:text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center min-w-[16px] sm:min-w-[20px] z-10">
                   {newApplicationsCount > 99 ? "99+" : newApplicationsCount}
                 </span>
               )}
             </TabsTrigger>
-            <TabsTrigger value="boolean-search" className="text-xs md:text-sm px-2 py-2">
-              AI Longlist
+            <TabsTrigger value="boolean-search" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 whitespace-nowrap">
+              <span className="hidden sm:inline">AI Longlist</span>
+              <span className="sm:hidden">Longlist</span>
             </TabsTrigger>
-            <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">
-              AI Short List
+            <TabsTrigger value="shortlist" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 whitespace-nowrap">
+              <span className="hidden sm:inline">AI Short List</span>
+              <span className="sm:hidden">Shortlist</span>
             </TabsTrigger>
           </TabsList>
-        </div>
+        </ScrollArea>
 
-        <TabsContent value="overview" className="space-y-4 pb-32">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <TabsContent value="overview" className="space-y-3 sm:space-y-4 pb-20 sm:pb-32">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
             <Card>
-              <CardHeader>
-                <CardTitle>Job Information</CardTitle>
+              <CardHeader className="p-3 sm:p-4 md:p-6">
+                <CardTitle className="text-base sm:text-lg md:text-xl">Job Information</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between">
+              <CardContent className="space-y-2 sm:space-y-3 p-3 sm:p-4 md:p-6 pt-0 text-xs sm:text-sm">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-muted-foreground">Job ID:</span>
-                  <span className="font-mono text-sm">{job.job_id}</span>
+                  <span className="font-mono text-xs sm:text-sm break-all">{job.job_id}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-muted-foreground">Itris ID:</span>
-                  <span className="font-mono text-sm">{job.itris_job_id || "N/A"}</span>
+                  <span className="font-mono text-xs sm:text-sm break-all">{job.itris_job_id || "N/A"}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-muted-foreground">Client Name:</span>
-                  <span>{job.client_name || "N/A"}</span>
+                  <span className="break-words">{job.client_name || "N/A"}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-muted-foreground">Client Description:</span>
-                  <span>{job.client_description || "N/A"}</span>
+                  <span className="break-words sm:text-right">{job.client_description || "N/A"}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-muted-foreground">Location:</span>
-                  <span>{job.job_location || "N/A"}</span>
+                  <span className="break-words">{job.job_location || "N/A"}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-muted-foreground">Salary Range:</span>
-                  <span className="font-medium">{formatCurrency(job.job_salary_range?.toString(), job.Currency)}</span>
+                  <span className="font-medium break-words">{formatCurrency(job.job_salary_range?.toString(), job.Currency)}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-muted-foreground">Assigned Recruiter:</span>
-                  <span>{recruiterName || job.recruiter_id || "N/A"}</span>
+                  <span className="break-words">{recruiterName || job.recruiter_id || "N/A"}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-muted-foreground">Notice Period:</span>
                   <span>{job.notice_period || "N/A"}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-muted-foreground">Preferred Nationality:</span>
-                  <span>{job.prefered_nationality || "N/A"}</span>
+                  <span className="break-words">{job.prefered_nationality || "N/A"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Group:</span>
@@ -3237,31 +3253,31 @@ mainCandidate["linkedin_score_reason"] ? (
           </div>
         </TabsContent>
 
-        <TabsContent value="description" className="space-y-4 pb-32">
+        <TabsContent value="description" className="space-y-3 sm:space-y-4 pb-20 sm:pb-32">
           <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center">
-                    <FileText className="w-5 h-5 mr-2" />
+            <CardHeader className="p-3 sm:p-4 md:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="min-w-0">
+                  <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2 shrink-0" />
                     Job Description
                   </CardTitle>
-                  <CardDescription>Detailed overview of the role and responsibilities</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm mt-1">Detailed overview of the role</CardDescription>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Button variant="outline" size="sm">
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload File
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <Button variant="outline" size="xs" className="sm:h-9 text-xs sm:text-sm">
+                    <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Upload</span>
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job.job_id}`)}>
-                    <FileText className="w-4 h-4 mr-2" />
-                    Edit Job
+                  <Button variant="outline" size="xs" className="sm:h-9 text-xs sm:text-sm" onClick={() => navigate(`/jobs/edit/${job.job_id}`)}>
+                    <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    Edit
                   </Button>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="prose prose-sm max-w-none">
+            <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
+              <div className="prose prose-sm max-w-none text-xs sm:text-sm">
                 <p className="leading-relaxed whitespace-pre-wrap">
                   {job.job_description || "No description available for this position."}
                 </p>
@@ -3271,20 +3287,20 @@ mainCandidate["linkedin_score_reason"] ? (
 
           {/* Job Documents Section */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <FileText className="w-5 h-5 mr-2" />
+            <CardHeader className="p-3 sm:p-4 md:p-6">
+              <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+                <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 Job Documents
               </CardTitle>
-              <CardDescription>Uploaded job description files and related documents</CardDescription>
+              <CardDescription className="text-xs sm:text-sm">Uploaded job description files</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No documents uploaded</h3>
-                <p className="text-muted-foreground">Upload job description files when creating or editing this job</p>
-                <Button variant="outline" className="mt-4" onClick={() => setIsEditDialogOpen(true)}>
-                  <Upload className="w-4 h-4 mr-2" />
+            <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
+              <div className="text-center py-6 sm:py-8">
+                <FileText className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground mx-auto mb-3 sm:mb-4" />
+                <h3 className="text-base sm:text-lg font-semibold mb-2">No documents uploaded</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground px-4">Upload job description files when creating or editing this job</p>
+                <Button variant="outline" size="xs" className="sm:h-9 mt-3 sm:mt-4 text-xs sm:text-sm" onClick={() => setIsEditDialogOpen(true)}>
+                  <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   Upload Documents
                 </Button>
               </div>
@@ -3292,33 +3308,33 @@ mainCandidate["linkedin_score_reason"] ? (
           </Card>
         </TabsContent>
 
-        <TabsContent value="requirements" className="space-y-4 pb-32">
+        <TabsContent value="requirements" className="space-y-3 sm:space-y-4 pb-20 sm:pb-32">
           <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center">
-                    <Target className="w-5 h-5 mr-2" />
+            <CardHeader className="p-3 sm:p-4 md:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="min-w-0">
+                  <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+                    <Target className="w-4 h-4 sm:w-5 sm:h-5 mr-2 shrink-0" />
                     AI Requirements
                   </CardTitle>
-                  <CardDescription>Skills, experience, and qualifications needed for this role</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm mt-1">Skills and qualifications needed</CardDescription>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job.job_id}`)}>
-                  <FileText className="w-4 h-4 mr-2" />
+                <Button variant="outline" size="xs" className="sm:h-9 text-xs sm:text-sm self-start sm:self-auto" onClick={() => navigate(`/jobs/edit/${job.job_id}`)}>
+                  <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   Amend
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="prose prose-sm max-w-none space-y-4">
+            <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
+              <div className="prose prose-sm max-w-none space-y-3 sm:space-y-4 text-xs sm:text-sm">
                 <div>
-                  <h4 className="font-semibold mb-2">Things to look for:</h4>
+                  <h4 className="font-semibold mb-1.5 sm:mb-2 text-sm sm:text-base">Things to look for:</h4>
                   <p className="leading-relaxed whitespace-pre-wrap">
                     {job.things_to_look_for || "No specific criteria listed."}
                   </p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-2">Must have:</h4>
+                  <h4 className="font-semibold mb-1.5 sm:mb-2 text-sm sm:text-base">Must have:</h4>
                   <p className="leading-relaxed whitespace-pre-wrap">
                     {job.musttohave || "No must-have requirements specified."}
                   </p>
