@@ -332,6 +332,7 @@ export type Database = {
           nationality_to_exclude: string | null
           nationality_to_include: string | null
           nicetohave: string | null
+          not_prefered_nationality: string | null
           notice_period: string | null
           prefered_nationality: string | null
           Processed: string | null
@@ -368,6 +369,7 @@ export type Database = {
           nationality_to_exclude?: string | null
           nationality_to_include?: string | null
           nicetohave?: string | null
+          not_prefered_nationality?: string | null
           notice_period?: string | null
           prefered_nationality?: string | null
           Processed?: string | null
@@ -404,6 +406,7 @@ export type Database = {
           nationality_to_exclude?: string | null
           nationality_to_include?: string | null
           nicetohave?: string | null
+          not_prefered_nationality?: string | null
           notice_period?: string | null
           prefered_nationality?: string | null
           Processed?: string | null
