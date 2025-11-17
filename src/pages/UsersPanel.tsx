@@ -616,15 +616,15 @@ export default function UsersPanel() {
           ) : (
             <>
               <div className="overflow-x-auto -mx-2 sm:mx-0 rounded-md border sm:border-0">
-                <div className="min-w-0">
-                  <Table>
+                <div className="min-w-[600px]">
+                  <Table className="table-fixed w-full">
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-[10px] sm:text-sm py-2 sticky left-0 bg-background z-10">Name</TableHead>
-                      <TableHead className="text-[10px] sm:text-sm py-2">Email</TableHead>
-                      <TableHead className="text-[10px] sm:text-sm py-2">Role</TableHead>
-                      <TableHead className="text-[10px] sm:text-sm py-2">Created</TableHead>
-                      <TableHead className="text-[10px] sm:text-sm py-2 sticky right-0 bg-background z-10">Actions</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2 sticky left-0 bg-background z-10 w-[20%]">Name</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2 w-[25%]">Email</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2 w-[20%]">Role</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2 w-[15%]">Created</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2 sticky right-0 bg-background z-10 w-[20%]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -633,13 +633,13 @@ export default function UsersPanel() {
                         <TableCell className="text-[10px] sm:text-sm py-2 sticky left-0 bg-background z-10">
                           <div className="flex items-center gap-1 sm:gap-2">
                             <User className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                            <span className="whitespace-normal break-words sm:whitespace-nowrap sm:break-normal">{user.name || 'No name'}</span>
+                            <span className="truncate">{user.name || 'No name'}</span>
                           </div>
                         </TableCell>
                         <TableCell className="text-[10px] sm:text-sm py-2">
                           <div className="flex items-center gap-1 sm:gap-2">
                             <Mail className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                            <span className="whitespace-normal break-words sm:whitespace-nowrap sm:break-normal">{user.email}</span>
+                            <span className="truncate">{user.email}</span>
                           </div>
                         </TableCell>
                         <TableCell className="text-[10px] sm:text-sm py-2">
@@ -657,7 +657,7 @@ export default function UsersPanel() {
                                 {userMemberships.length > 0 && orgRole === 'EMPLOYEE' && (
                                   <div className="text-[9px] sm:text-xs text-muted-foreground">
                                     {userMemberships.map((membership, idx) => (
-                                      <div key={idx} className="whitespace-normal break-words sm:whitespace-nowrap sm:break-normal">
+                                      <div key={idx} className="truncate">
                                         {membership.team_name} ({membership.role === 'TEAM_LEADER' ? 'Leader' : 'Member'})
                                       </div>
                                     ))}
