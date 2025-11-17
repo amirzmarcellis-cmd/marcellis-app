@@ -627,11 +627,18 @@ export default function Index() {
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-background text-foreground p-3 sm:p-4 lg:p-6 relative overflow-hidden mx-auto max-w-screen-2xl pb-24 sm:pb-20">
+  return <div className="min-h-screen bg-background text-foreground relative overflow-hidden mx-auto max-w-screen-2xl pb-20">
       
       <div className="mb-4 sm:mb-6 lg:mb-8 relative z-10">
-        <div className="rounded-xl sm:rounded-2xl border border-border/50 bg-gradient-card backdrop-blur-xl p-4 sm:p-6 shadow-card animate-fade-in">
-          <HeroHeader title="Mission Control" subtitle={`Welcome back, ${profile?.name || 'Commander'}. Your day at a glance.`} />
+        <div className="rounded-xl sm:rounded-2xl border border-border/50 bg-gradient-card backdrop-blur-xl p-4 sm:p-5 lg:p-6 shadow-card animate-fade-in">
+          <div className="mb-4">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-light text-foreground mb-1">
+              Mission Control
+            </h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              Welcome back, {profile?.name || 'Commander'}. Your day at a glance.
+            </p>
+          </div>
 
           <BentoKpis>
             <TiltCard>
@@ -721,39 +728,39 @@ export default function Index() {
         </div>
 
         {/* Right Side - Live Candidate Feed & Action Center - 60% width */}
-        <div className="space-y-4 sm:space-y-6 lg:col-span-2">
+        <div className="space-y-4 sm:space-y-5 lg:space-y-6 lg:col-span-2 order-1 lg:order-2">
           <ActivityTicker items={enrichedCandidates.slice(0, 10).map(c => `${c.candidate_name} • ${c.job_title} • ${parseFloat(c.success_score) || 0}`)} />
           {/* Live Candidate Feed */}
           <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20">
-            <CardHeader className="p-4 sm:p-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-                <CardTitle className="text-lg sm:text-xl text-cyan-300 flex items-center">
-                  <Activity className="h-5 w-5 mr-2 animate-pulse text-cyan-400" />
-                  Live Candidate Feed
-                  <Badge className="ml-3 bg-background/40 text-primary border-2 border-primary/60 glow-cyan animate-pulse">
+            <CardHeader className="p-3 sm:p-4 lg:p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
+                <CardTitle className="text-base sm:text-lg lg:text-xl text-cyan-300 flex items-center flex-wrap gap-2">
+                  <Activity className="h-4 w-4 sm:h-5 sm:w-5 animate-pulse text-cyan-400" />
+                  <span>Live Candidate Feed</span>
+                  <Badge className="bg-background/40 text-primary border-2 border-primary/60 glow-cyan animate-pulse text-xs">
                     LIVE
                   </Badge>
                 </CardTitle>
-                <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-between sm:justify-start">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse"></div>
-                    <span className="text-xs sm:text-sm text-emerald-300 font-medium">Active</span>
+                <div className="flex items-center space-x-2 w-full sm:w-auto justify-between sm:justify-start">
+                  <div className="flex items-center space-x-1.5">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-emerald-300 font-medium">Active</span>
                   </div>
-                  <Button size="sm" className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white border border-cyan-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-xs sm:text-sm" onClick={() => window.location.href = '/live-feed'}>
-                    <Activity className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
-                    <span className="hidden sm:inline">Open Live Feed</span>
+                  <Button size="sm" className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white border border-cyan-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-xs h-8 px-3" onClick={() => window.location.href = '/live-feed'}>
+                    <Activity className="w-3 h-3 sm:mr-1.5" />
+                    <span className="hidden sm:inline">Open Feed</span>
                   </Button>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-4 sm:p-6">
-              <ScrollArea className="h-[300px] sm:h-[350px] lg:h-[400px]">
-                <div className="space-y-3 sm:space-y-4">
+            <CardContent className="p-3 sm:p-4 lg:p-6">
+              <ScrollArea className="h-[400px] sm:h-[450px] lg:h-[500px]">
+                <div className="space-y-2 sm:space-y-3">
                   {enrichedCandidates.slice(0, 5).map((candidate, index) => {
                   const score = parseFloat(candidate.success_score) || 0;
                   const jobTitle = candidate.job_title || 'Unknown Position';
-                  return <div key={index} className={`bg-gradient-to-r rounded-xl p-3 sm:p-4 border ${index < 3 ? 'from-amber-400/20 to-yellow-500/20 border-yellow-400/40' : 'from-white/5 to-white/10 border-white/20'} hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group cursor-pointer`} onClick={() => handleCandidateClick(candidate.recordid, candidate.job_id)}>
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+                  return <div key={index} className={`bg-gradient-to-r rounded-lg sm:rounded-xl p-3 border ${index < 3 ? 'from-amber-400/20 to-yellow-500/20 border-yellow-400/40' : 'from-white/5 to-white/10 border-white/20'} hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group cursor-pointer active:scale-[0.98]`} onClick={() => handleCandidateClick(candidate.recordid, candidate.job_id)}>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
                           <div className="flex items-start sm:items-center space-x-3 min-w-0 flex-1">
                             <div className="relative flex-shrink-0">
                               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-base sm:text-lg shadow-lg">
