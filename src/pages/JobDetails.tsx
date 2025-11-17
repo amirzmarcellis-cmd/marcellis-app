@@ -2920,7 +2920,7 @@ mainCandidate["linkedin_score_reason"] ? (
     }),
   );
   return (
-    <div className={cn("space-y-3 sm:space-y-4 md:space-y-6 p-2 sm:p-4 md:p-6 max-w-full overflow-x-hidden", isShaking && "animate-shake")}>
+    <div className={cn("space-y-3 sm:space-y-4 md:space-y-6 p-3 sm:p-4 md:p-6 max-w-full overflow-x-hidden", isShaking && "animate-shake")}>
       {/* Processing Animation Overlay */}
       {job?.status === 'Processing' && job?.Processed === 'Yes' && <ProcessingAnimation />}
       
@@ -2928,16 +2928,16 @@ mainCandidate["linkedin_score_reason"] ? (
       <AppleLoadingBar isLoading={loading} className="absolute top-0 left-0 right-0 z-50" />
       
       {/* Header */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 items-start">
-          <div className="flex items-center space-x-2 md:space-x-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/jobs")}>
+      <div className="flex flex-col gap-3 sm:gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4 items-start">
+          <div className="flex items-center space-x-2 md:space-x-4 w-full lg:w-auto">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/jobs")} className="h-9 px-2 sm:px-4">
               <ArrowLeft className="w-4 h-4 mr-1 md:mr-2" />
               <span className="hidden sm:inline">Back to Jobs</span>
-              <span className="sm:hidden">Back</span>
+              <span className="sm:hidden text-xs">Back</span>
             </Button>
             <div className="h-6 w-px bg-border hidden sm:block" />
-            <h3 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h3>
+            <h3 className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h3>
           </div>
           {/* Futuristic 3D Action Menu */}
           <FuturisticActionButton
@@ -2954,9 +2954,9 @@ mainCandidate["linkedin_score_reason"] ? (
           </FuturisticActionButton>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 items-center justify-center lg:justify-end">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Auto Dial</span>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full lg:w-auto items-stretch sm:items-center justify-center lg:justify-end">
+            <div className="flex items-center gap-2 justify-center sm:justify-start">
+              <span className="text-xs sm:text-sm font-medium">Auto Dial</span>
               <ToggleSwitch
                 checked={job?.automatic_dial || false}
                 onChange={handleAutomaticDialToggle}
@@ -2966,12 +2966,12 @@ mainCandidate["linkedin_score_reason"] ? (
                 offLabel="OFF"
               />
             </div>
-            <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto">
+            <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto h-9 text-sm">
               <FileText className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Edit Job</span>
               <span className="sm:hidden">Edit</span>
             </Button>
-            <Button variant="outline" asChild size="sm" className="w-full sm:w-auto">
+            <Button variant="outline" asChild size="sm" className="w-full sm:w-auto h-9 text-sm">
               <Link to={`/job/${job.job_id}/apply`}>
                 <span className="hidden sm:inline">Apply Link</span>
                 <span className="sm:hidden">Apply</span>
@@ -2983,12 +2983,12 @@ mainCandidate["linkedin_score_reason"] ? (
 
       {/* Job Header Card */}
       <Card>
-        <CardContent className="p-2 sm:p-4 md:p-6">
-          <div className="space-y-1.5 sm:space-y-4">
-            <div className="flex flex-col gap-1.5 sm:gap-4">
-              <div className="space-y-0.5 sm:space-y-2 w-full">
-                <h2 className="text-sm sm:text-xl md:text-2xl font-bold break-words leading-tight">{job.job_title}</h2>
-                <p className="text-[11px] sm:text-base md:text-lg text-muted-foreground break-words leading-snug">
+        <CardContent className="p-3 sm:p-4 md:p-6">
+          <div className="space-y-2 sm:space-y-4">
+            <div className="flex flex-col gap-2 sm:gap-4">
+              <div className="space-y-1 sm:space-y-2 w-full">
+                <h2 className="text-base sm:text-xl md:text-2xl font-bold break-words leading-tight">{job.job_title}</h2>
+                <p className="text-xs sm:text-base md:text-lg text-muted-foreground break-words leading-snug">
                   {job.client_description || "Client Description"}
                 </p>
               </div>
@@ -3017,7 +3017,7 @@ mainCandidate["linkedin_score_reason"] ? (
             </div>
 
             {/* Progressive Status Bar */}
-            <div className="pt-6 pb-2">
+            <div className="pt-3 sm:pt-6 pb-2">
               <ProgressiveStatusBar 
                 status={
                   job.Processed === "No" 
@@ -3031,17 +3031,17 @@ mainCandidate["linkedin_score_reason"] ? (
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 pt-4 border-t">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4 pt-3 sm:pt-4 border-t">
               <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0">
-                <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground flex-shrink-0" />
                 <span className="truncate">{job.job_location}</span>
               </div>
               <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0">
-                <Banknote className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <Banknote className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground flex-shrink-0" />
                 <span className="truncate">{formatCurrency(job.job_salary_range?.toString(), job.Currency)}</span>
               </div>
               <div className="flex items-center space-x-2 text-xs md:text-sm min-w-0 sm:col-span-2 lg:col-span-1">
-                <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground flex-shrink-0" />
                 <span className="truncate">Posted: {formatDate(job.Timestamp)}</span>
               </div>
             </div>
