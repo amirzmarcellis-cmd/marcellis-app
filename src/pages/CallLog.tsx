@@ -319,26 +319,26 @@ export default function CallLog() {
   })
 
   return (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div>
-          <h1 className="text-6xl font-light font-work tracking-tight text-foreground">Call Log</h1>
-          <p className="text-base font-light font-inter text-muted-foreground">Track all recruitment calls and outcomes</p>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-light font-work tracking-tight text-foreground">Call Log</h1>
+          <p className="text-sm sm:text-base font-light font-inter text-muted-foreground mt-1 sm:mt-2">Track all recruitment calls and outcomes</p>
         </div>
 
         {/* Filters */}
-        <Card className="p-6 bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass">
-          <div className="flex flex-wrap gap-4">
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+        <Card className="p-3 sm:p-4 lg:p-6 bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4">
+            <div className="relative flex-1 min-w-full sm:min-w-[200px]">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-3 h-3 sm:w-4 sm:h-4" />
               <Input
                 placeholder="Search calls..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-background/50 border-border"
+                className="pl-8 sm:pl-10 bg-background/50 border-border text-sm"
               />
             </div>
             <Select value={jobFilter} onValueChange={setJobFilter}>
-              <SelectTrigger className="w-[200px] bg-background/50 border-border">
+              <SelectTrigger className="w-full sm:w-[200px] bg-background/50 border-border text-sm">
                 <SelectValue placeholder="Job" />
               </SelectTrigger>
               <SelectContent className="bg-background border-border z-50">
@@ -351,7 +351,7 @@ export default function CallLog() {
               </SelectContent>
             </Select>
             <Select value={contactedFilter} onValueChange={setContactedFilter}>
-              <SelectTrigger className="w-[150px] bg-background/50 border-border">
+              <SelectTrigger className="w-full sm:w-[150px] bg-background/50 border-border text-sm">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent className="bg-background border-border z-50">
@@ -368,7 +368,7 @@ export default function CallLog() {
               </SelectContent>
             </Select>
             <Select value={scoreFilter} onValueChange={setScoreFilter}>
-              <SelectTrigger className="w-[150px] bg-background/50 border-border">
+              <SelectTrigger className="w-full sm:w-[150px] bg-background/50 border-border text-sm">
                 <SelectValue placeholder="Score" />
               </SelectTrigger>
               <SelectContent className="bg-background border-border z-50">
@@ -379,7 +379,7 @@ export default function CallLog() {
               </SelectContent>
             </Select>
             <Select value={nationalityFilter} onValueChange={setNationalityFilter}>
-              <SelectTrigger className="w-[150px] bg-background/50 border-border">
+              <SelectTrigger className="w-full sm:w-[150px] bg-background/50 border-border text-sm">
                 <SelectValue placeholder="Nationality" />
               </SelectTrigger>
               <SelectContent className="bg-background border-border z-50">
@@ -396,7 +396,7 @@ export default function CallLog() {
 
         {/* Call Log Table */}
         <Card className="bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass shadow-card">
-          <CardHeader>
+          <CardHeader className="p-3 sm:p-4 lg:p-6">
             <CardTitle className="flex items-center gap-2 text-3xl font-light font-work tracking-tight">
               <Phone className="w-5 h-5" />
               Call History ({filteredCallLogs.length})

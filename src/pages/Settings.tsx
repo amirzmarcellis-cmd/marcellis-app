@@ -57,63 +57,65 @@ export default function Settings() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <SettingsIcon className="h-6 w-6 text-primary" />
-        <h1 className="text-6xl font-light font-work tracking-tight">Settings</h1>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+        <SettingsIcon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-light font-work tracking-tight">Settings</h1>
       </div>
 
       {/* Profile Settings */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-3xl font-light font-work tracking-tight">
-            <User className="h-5 w-5" />
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl lg:text-3xl font-light font-work tracking-tight">
+            <User className="h-4 w-4 sm:h-5 sm:w-5" />
             Profile Settings
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        <CardContent className="space-y-4 p-4 sm:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="name" className="font-light font-inter">Display Name</Label>
+              <Label htmlFor="name" className="font-light font-inter text-sm">Display Name</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Enter your name"
+                className="text-sm"
               />
             </div>
             <div>
-              <Label htmlFor="email" className="font-light font-inter">Email Address</Label>
+              <Label htmlFor="email" className="font-light font-inter text-sm">Email Address</Label>
               <Input
                 id="email"
                 type="email"
                 value={formData.email}
                 disabled
-                className="bg-muted"
+                className="bg-muted text-sm"
               />
             </div>
           </div>
           <div>
-            <Label htmlFor="slug">Company Slug</Label>
+            <Label htmlFor="slug" className="text-sm">Company Slug</Label>
             <Input
               id="slug"
               value={formData.slug}
               onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
               placeholder="Enter company slug (e.g., 'me', 'acme')"
               pattern="[a-z0-9-]+"
+              className="text-sm"
             />
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               This slug will be used for job IDs. Example: if slug is "me", job IDs will be "me-j-0001"
             </p>
           </div>
-          <Button onClick={handleSave} disabled={loading}>
+          <Button onClick={handleSave} disabled={loading} className="w-full sm:w-auto text-sm">
             {loading ? 'Saving...' : 'Save Profile'}
           </Button>
         </CardContent>
       </Card>
 
       {/* LinkedIn Integration */}
-      <LinkedInConnection 
+      <LinkedInConnection
         linkedinId={profile?.linkedin_id || null}
         onUpdate={refetch}
       />

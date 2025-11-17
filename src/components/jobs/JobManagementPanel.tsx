@@ -763,20 +763,20 @@ const JobGrid = memo(function JobGrid({
         </CardContent>
       </Card>;
   }
-  return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  return <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
       {jobs.map(job => <Card key={job.job_id} className="mission-card group">
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4 lg:p-6">
             <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h4 className="line-clamp-2 mb-2 text-xl font-normal">
+              <div className="flex-1 min-w-0">
+                <h4 className="line-clamp-2 mb-2 text-base sm:text-lg lg:text-xl font-normal">
                   {job.job_title || "Untitled Position"}
                 </h4>
-                <div className="flex items-center space-x-2 mb-2">
+                <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
                   {getStatusBadge(job.status, job.Processed)}
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-[10px] sm:text-xs">
                     ID: {job.job_id}
                   </Badge>
-                  {job.groups && <Badge variant="outline" className="text-xs border" style={{
+                  {job.groups && <Badge variant="outline" className="text-[10px] sm:text-xs border" style={{
                 borderColor: job.groups.color || "#3B82F6",
                 color: job.groups.color || "#3B82F6"
               }}>
@@ -787,8 +787,8 @@ const JobGrid = memo(function JobGrid({
             </div>
           </CardHeader>
           
-          <CardContent className="space-y-4">
-            <div className="space-y-2 text-sm">
+          <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-4 lg:p-6">
+            <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm">
               {job.recruiter_name && <div className="flex items-center text-muted-foreground">
                   <UserCircle className="h-4 w-4 mr-2 text-primary" />
                   <span className="font-medium">{job.recruiter_name}</span>

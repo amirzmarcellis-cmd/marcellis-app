@@ -50,36 +50,37 @@ export default function Reports() {
   const { isAdmin } = useUserRole();
 
   return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
           <div>
-            <h1 className="text-6xl font-light font-work tracking-tight text-foreground">Reports</h1>
-            <p className="text-base font-light font-inter text-muted-foreground">Generate and download performance reports</p>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-light font-work tracking-tight text-foreground">Reports</h1>
+            <p className="text-sm sm:text-base font-light font-inter text-muted-foreground">Generate and download performance reports</p>
           </div>
-          <Button className="font-light font-inter">
+          <Button className="font-light font-inter text-sm w-full sm:w-auto">
             <FileText className="w-4 h-4 mr-2" />
             Generate New Report
           </Button>
         </div>
 
-        <Tabs defaultValue="standard" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="standard">Standard Reports</TabsTrigger>
+        <Tabs defaultValue="standard" className="space-y-4 sm:space-y-6">
+          <TabsList className="w-full sm:w-auto">
+            <TabsTrigger value="standard" className="text-xs sm:text-sm">Standard Reports</TabsTrigger>
             {isAdmin && (
-              <TabsTrigger value="progression">
-                <Clock className="w-4 h-4 mr-2" />
-                Candidate Progression
+              <TabsTrigger value="progression" className="text-xs sm:text-sm">
+                <Clock className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                <span className="hidden sm:inline">Candidate Progression</span>
+                <span className="sm:hidden">Progression</span>
               </TabsTrigger>
             )}
           </TabsList>
 
-          <TabsContent value="standard" className="space-y-6">
-            <div className="grid gap-6">
+          <TabsContent value="standard" className="space-y-3 sm:space-y-4 lg:space-y-6">
+            <div className="grid gap-3 sm:gap-4 lg:gap-6">
               {reports.map((report) => (
                 <Card key={report.id} className="hover:shadow-medium transition-shadow">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0 pb-3 sm:pb-4 p-4 sm:p-6">
+                    <div className="flex items-start sm:items-center space-x-3 w-full sm:w-auto">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                         {report.type === "Performance" && <BarChart3 className="w-5 h-5 text-primary" />}
                         {report.type === "Analytics" && <BarChart3 className="w-5 h-5 text-primary" />}
                         {report.type === "Operations" && <FileText className="w-5 h-5 text-primary" />}
