@@ -2920,7 +2920,7 @@ mainCandidate["linkedin_score_reason"] ? (
     }),
   );
   return (
-    <div className={cn("space-y-2 sm:space-y-4 md:space-y-6 p-2 sm:p-4 md:p-6 max-w-full overflow-x-hidden", isShaking && "animate-shake")}>
+    <div className={cn("min-w-0 w-full space-y-2 sm:space-y-4 md:space-y-6 p-2 sm:p-4 md:p-6 overflow-x-hidden", isShaking && "animate-shake")}>
       {/* Processing Animation Overlay */}
       {job?.status === 'Processing' && job?.Processed === 'Yes' && <ProcessingAnimation />}
       
@@ -2928,16 +2928,16 @@ mainCandidate["linkedin_score_reason"] ? (
       <AppleLoadingBar isLoading={loading} className="absolute top-0 left-0 right-0 z-50" />
       
       {/* Header */}
-      <div className="flex flex-col gap-2 sm:gap-4">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 sm:gap-4 items-start">
-          <div className="flex items-center space-x-2 md:space-x-4 w-full lg:w-auto">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/jobs")} className="h-8 sm:h-9 px-2 sm:px-4 text-xs sm:text-sm">
+      <div className="flex flex-col gap-2 sm:gap-4 min-w-0 w-full">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 sm:gap-4 items-start min-w-0 w-full">
+          <div className="flex items-center space-x-2 md:space-x-4 min-w-0 w-full lg:w-auto">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/jobs")} className="h-8 sm:h-9 px-2 sm:px-4 text-xs sm:text-sm flex-shrink-0">
               <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 md:mr-2" />
               <span className="hidden sm:inline">Back to Jobs</span>
               <span className="sm:hidden">Back</span>
             </Button>
-            <div className="h-6 w-px bg-border hidden sm:block" />
-            <h3 className="text-sm sm:text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h3>
+            <div className="h-6 w-px bg-border hidden sm:block flex-shrink-0" />
+            <h3 className="text-sm sm:text-xl md:text-2xl lg:text-3xl font-bold truncate min-w-0">Job Details</h3>
           </div>
           {/* Futuristic 3D Action Menu */}
           <FuturisticActionButton
@@ -2954,9 +2954,9 @@ mainCandidate["linkedin_score_reason"] ? (
           </FuturisticActionButton>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-3 w-full lg:w-auto items-stretch sm:items-center justify-center lg:justify-end">
-            <div className="flex items-center gap-1.5 sm:gap-2 justify-center sm:justify-start">
-              <span className="text-[10px] sm:text-xs md:text-sm font-medium">Auto Dial</span>
+          <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-3 w-full lg:w-auto items-stretch sm:items-center justify-center lg:justify-end min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 justify-center sm:justify-start flex-shrink-0">
+              <span className="text-[10px] sm:text-xs md:text-sm font-medium whitespace-nowrap">Auto Dial</span>
               <ToggleSwitch
                 checked={job?.automatic_dial || false}
                 onChange={handleAutomaticDialToggle}
@@ -2966,12 +2966,12 @@ mainCandidate["linkedin_score_reason"] ? (
                 offLabel="OFF"
               />
             </div>
-            <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm">
-              <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+            <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm min-w-0">
+              <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
               <span className="hidden sm:inline">Edit Job</span>
               <span className="sm:hidden">Edit</span>
             </Button>
-            <Button variant="outline" asChild size="sm" className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm">
+            <Button variant="outline" asChild size="sm" className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm min-w-0">
               <Link to={`/job/${job.job_id}/apply`}>
                 <span className="hidden sm:inline">Apply Link</span>
                 <span className="sm:hidden">Apply</span>
@@ -2982,13 +2982,13 @@ mainCandidate["linkedin_score_reason"] ? (
       </div>
 
       {/* Job Header Card */}
-      <Card>
-        <CardContent className="p-2 sm:p-4 md:p-6">
-          <div className="space-y-2 sm:space-y-4">
-            <div className="flex flex-col gap-2 sm:gap-4">
-              <div className="space-y-1 sm:space-y-2 w-full">
-                <h2 className="text-sm sm:text-xl md:text-2xl font-bold break-words leading-tight">{job.job_title}</h2>
-                <p className="text-xs sm:text-base md:text-lg text-muted-foreground break-words leading-snug">
+      <Card className="min-w-0 w-full">
+        <CardContent className="p-2 sm:p-4 md:p-6 min-w-0">
+          <div className="space-y-2 sm:space-y-4 min-w-0">
+            <div className="flex flex-col gap-2 sm:gap-4 min-w-0">
+              <div className="space-y-1 sm:space-y-2 w-full min-w-0">
+                <h2 className="text-sm sm:text-xl md:text-2xl font-bold break-words leading-tight min-w-0">{job.job_title}</h2>
+                <p className="text-xs sm:text-base md:text-lg text-muted-foreground break-words leading-snug min-w-0">
                   {job.client_description || "Client Description"}
                 </p>
               </div>
@@ -3031,18 +3031,18 @@ mainCandidate["linkedin_score_reason"] ? (
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5 sm:gap-3 md:gap-4 pt-2 sm:pt-4 border-t">
+            <div className="grid grid-cols-1 gap-1.5 sm:gap-3 md:gap-4 pt-2 sm:pt-4 border-t min-w-0">
               <div className="flex items-center space-x-1.5 sm:space-x-2 text-xs md:text-sm min-w-0">
                 <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground flex-shrink-0" />
-                <span className="truncate">{job.job_location}</span>
+                <span className="truncate min-w-0">{job.job_location}</span>
               </div>
               <div className="flex items-center space-x-1.5 sm:space-x-2 text-xs md:text-sm min-w-0">
                 <Banknote className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground flex-shrink-0" />
-                <span className="truncate">{formatCurrency(job.job_salary_range?.toString(), job.Currency)}</span>
+                <span className="truncate min-w-0">{formatCurrency(job.job_salary_range?.toString(), job.Currency)}</span>
               </div>
-              <div className="flex items-center space-x-1.5 sm:space-x-2 text-xs md:text-sm min-w-0 sm:col-span-2 lg:col-span-1">
+              <div className="flex items-center space-x-1.5 sm:space-x-2 text-xs md:text-sm min-w-0">
                 <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground flex-shrink-0" />
-                <span className="truncate">Posted: {formatDate(job.Timestamp)}</span>
+                <span className="truncate min-w-0">Posted: {formatDate(job.Timestamp)}</span>
               </div>
             </div>
           </div>
@@ -3050,14 +3050,14 @@ mainCandidate["linkedin_score_reason"] ? (
       </Card>
 
       {/* Job Funnel */}
-      <div className="max-w-full overflow-x-hidden">
+      <div className="w-full min-w-0 overflow-x-auto">
         <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
       </div>
 
       {/* Detailed Information Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3 sm:space-y-4">
-        <div className="w-full px-0 md:px-0">
-          <TabsList className="w-full flex flex-col gap-0.5 md:grid md:grid-cols-7 h-auto p-0.5 md:p-1">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3 sm:space-y-4 min-w-0 w-full">
+        <div className="w-full min-w-0 px-0 md:px-0">
+          <TabsList className="w-full min-w-0 flex flex-col gap-0.5 md:grid md:grid-cols-7 h-auto p-0.5 md:p-1">
             <TabsTrigger value="overview" className="w-full justify-start text-left text-xs sm:text-sm md:text-sm px-1.5 sm:px-2 md:px-3 py-1.5 sm:py-2 h-auto whitespace-normal leading-tight md:whitespace-nowrap">
               Overview
             </TabsTrigger>
@@ -3675,45 +3675,45 @@ mainCandidate["linkedin_score_reason"] ? (
                   )}
 
                   {/* Filters */}
-                  <Card className="p-3 md:p-4 mb-4 bg-muted/50">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <Filter className="w-4 h-4" />
+                  <Card className="p-3 md:p-4 mb-4 bg-muted/50 min-w-0 w-full">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3 min-w-0">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Filter className="w-4 h-4 flex-shrink-0" />
                         <h4 className="font-medium text-sm md:text-base">Filters</h4>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm" onClick={selectAllCandidates} className="h-6 text-xs px-2">
+                        <Button variant="ghost" size="sm" onClick={selectAllCandidates} className="h-6 text-xs px-2 whitespace-nowrap">
                           Select All
                         </Button>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-2 sm:gap-3">
-                      <div className="relative">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-2 sm:gap-3 min-w-0">
+                      <div className="relative min-w-0">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                         <Input
                           placeholder="Name..."
                           value={nameFilter}
                           onChange={(e) => setNameFilter(e.target.value)}
-                          className="pl-10 h-9 text-sm"
+                          className="pl-10 h-9 text-sm min-w-0"
                         />
                       </div>
                       <Input
                         placeholder="Email..."
                         value={emailFilter}
                         onChange={(e) => setEmailFilter(e.target.value)}
-                        className="h-9 text-sm"
+                        className="h-9 text-sm min-w-0"
                       />
                       <Input
                         placeholder="Phone..."
                         value={phoneFilter}
                         onChange={(e) => setPhoneFilter(e.target.value)}
-                        className="h-9 text-sm"
+                        className="h-9 text-sm min-w-0"
                       />
                       <Input
                         placeholder="User ID..."
                         value={userIdFilter}
                         onChange={(e) => setUserIdFilter(e.target.value)}
-                        className="h-9 text-sm"
+                        className="h-9 text-sm min-w-0"
                       />
                       <Select value={longListSourceFilter} onValueChange={setLongListSourceFilter}>
                         <SelectTrigger className="h-9 text-sm">
@@ -4258,42 +4258,42 @@ mainCandidate["linkedin_score_reason"] ? (
                 </CardDescription>
 
                 {/* AI Short List Filters - Single Line */}
-                <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center">
-                  <div className="relative min-w-0 flex-1">
+                <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center min-w-0">
+                  <div className="relative min-w-0 w-full sm:w-auto sm:flex-1">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input
                       placeholder="Name..."
                       value={shortListNameFilter}
                       onChange={(e) => setShortListNameFilter(e.target.value)}
-                      className="pl-10 h-9 text-sm"
+                      className="pl-10 h-9 text-sm min-w-0"
                     />
                   </div>
                   <Input
                     placeholder="Email..."
                     value={shortListEmailFilter}
                     onChange={(e) => setShortListEmailFilter(e.target.value)}
-                    className="h-9 text-sm min-w-0 flex-1"
+                    className="h-9 text-sm min-w-0 w-full sm:w-auto sm:flex-1"
                   />
                   <Input
                     placeholder="Phone..."
                     value={shortListPhoneFilter}
                     onChange={(e) => setShortListPhoneFilter(e.target.value)}
-                    className="h-9 text-sm min-w-0 flex-1"
+                    className="h-9 text-sm min-w-0 w-full sm:w-auto sm:flex-1"
                   />
                   <Input
                     placeholder="User ID..."
                     value={shortListUserIdFilter}
                     onChange={(e) => setShortListUserIdFilter(e.target.value)}
-                    className="h-9 text-sm min-w-0 flex-1"
+                    className="h-9 text-sm min-w-0 w-full sm:w-auto sm:flex-1"
                   />
                   <Input
                     placeholder="Source..."
                     value={shortListSourceFilter}
                     onChange={(e) => setShortListSourceFilter(e.target.value)}
-                    className="h-9 text-sm min-w-0 flex-1"
+                    className="h-9 text-sm min-w-0 w-full sm:w-auto sm:flex-1"
                   />
                   <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
-                    <SelectTrigger className="h-9 text-sm w-32">
+                    <SelectTrigger className="h-9 text-sm w-full sm:w-32 min-w-0">
                       <SelectValue placeholder="Source" />
                     </SelectTrigger>
                     <SelectContent>
@@ -4303,7 +4303,7 @@ mainCandidate["linkedin_score_reason"] ? (
                     </SelectContent>
                   </Select>
                   <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
-                    <SelectTrigger className="h-9 text-sm w-32">
+                    <SelectTrigger className="h-9 text-sm w-full sm:w-32 min-w-0">
                       <SelectValue placeholder="Score" />
                     </SelectTrigger>
                     <SelectContent>
