@@ -337,7 +337,7 @@ export default function Candidates() {
                           <Button 
                             variant="secondary" 
                             size="sm" 
-                            className="h-9 px-3 min-w-[96px] whitespace-nowrap text-base font-semibold md:h-8 md:text-sm md:font-medium"
+                            className="h-9 px-3 min-w-[104px] whitespace-nowrap text-base font-semibold text-foreground md:h-8 md:text-sm md:font-medium"
                             onClick={() => handleEditCandidate(cv)}
                             aria-label="Edit CV"
                           >
@@ -347,7 +347,7 @@ export default function Candidates() {
                           <Button 
                             variant="secondary" 
                             size="sm" 
-                            className="h-9 px-3 min-w-[96px] whitespace-nowrap text-base font-semibold md:h-8 md:text-sm md:font-medium"
+                            className="h-9 px-3 min-w-[104px] whitespace-nowrap text-base font-semibold text-foreground md:h-8 md:text-sm md:font-medium"
                             onClick={() => handleDeleteCV(cv.user_id)}
                             aria-label="Delete CV"
                           >
@@ -397,7 +397,7 @@ export default function Candidates() {
                             <Button 
                               variant="secondary" 
                               size="sm" 
-                              className="h-10 px-4 text-base w-full min-w-[96px] whitespace-nowrap font-semibold md:h-8 md:text-sm md:font-medium"
+                              className="h-10 px-4 text-base w-full min-w-[104px] whitespace-nowrap font-semibold text-foreground md:h-8 md:text-sm md:font-medium"
                               onClick={() => handleEditCandidate(cv)}
                               aria-label="Edit CV"
                             >
@@ -407,7 +407,7 @@ export default function Candidates() {
                             <Button 
                               variant="secondary" 
                               size="sm" 
-                              className="h-10 px-4 text-base w-full min-w-[96px] whitespace-nowrap font-semibold md:h-8 md:text-sm md:font-medium" 
+                              className="h-10 px-4 text-base w-full min-w-[104px] whitespace-nowrap font-semibold text-foreground md:h-8 md:text-sm md:font-medium" 
                               onClick={() => handleDeleteCV(cv.user_id)}
                               aria-label="Delete CV"
                             >
