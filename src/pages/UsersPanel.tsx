@@ -606,7 +606,16 @@ export default function UsersPanel() {
             All Users {!loading && `(${filteredUsers.length})`}
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-2 sm:p-6 pb-24 sm:pb-6">
+        <CardContent className="p-2 sm:p-6">
+          {/* Mobile Add User Button */}
+          {canAccessUsersPanel && (
+            <div className="sm:hidden mb-4">
+              <Button className="w-full" onClick={() => setIsAddUserOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" /> Add User
+              </Button>
+            </div>
+          )}
+
           {loading ? (
             <div className="text-center py-4 text-sm">Loading users...</div>
           ) : filteredUsers.length === 0 ? (
@@ -615,7 +624,81 @@ export default function UsersPanel() {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto -mx-2 sm:mx-0 rounded-md border sm:border-0">
+              {/* Mobile Card List */}
+              <div className="sm:hidden space-y-3">
+                {filteredUsers.map((user) => {
+                  const userMemberships = userMembershipsMap[user.user_id] || [];
+                  const orgRole = userOrgRoles[user.user_id] || 'EMPLOYEE';
+                  const roleDisplay = getRoleDisplay(user, userMemberships, orgRole);
+                  const RoleIcon = roleDisplay.icon;
+                  
+                  return (
+                    <div key={user.id} className="rounded-lg border p-3 bg-background">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-sm mb-1">{user.name || 'No name'}</div>
+                          <div className="text-xs text-muted-foreground break-words mb-2">{user.email}</div>
+                        </div>
+                        <Badge variant={roleDisplay.variant} className="shrink-0 text-[10px] px-2 py-0.5">
+                          <RoleIcon className="h-3 w-3 mr-1" />
+                          {roleDisplay.label}
+                        </Badge>
+                      </div>
+
+                      {userMemberships.length > 0 && orgRole === 'EMPLOYEE' && (
+                        <div className="mt-2 pt-2 border-t text-xs">
+                          <div className="font-medium mb-1">Teams:</div>
+                          <div className="text-muted-foreground space-y-0.5">
+                            {userMemberships.map((membership, idx) => (
+                              <div key={idx}>
+                                {membership.team_name} ({membership.role === 'TEAM_LEADER' ? 'Leader' : 'Member'})
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="mt-3 pt-3 border-t flex items-center justify-between">
+                        <div className="text-xs text-muted-foreground">
+                          {new Date(user.created_at).toLocaleDateString()}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8"
+                            onClick={() => {
+                              setEditingUser(user);
+                              setEditUserData({
+                                name: user.name || '',
+                                email: user.email,
+                                role: (user.role || 'admin') as any,
+                                team: undefined
+                              });
+                              setIsEditUserOpen(true);
+                            }}
+                            aria-label="Edit user"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => handleDeleteUser(user.user_id)}
+                            aria-label="Delete user"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Desktop Table */}
+              <div className="hidden sm:block overflow-x-auto -mx-2 sm:mx-0 rounded-md border sm:border-0">
                 <Table className="min-w-[960px] sm:min-w-0 table-fixed">
                   <TableHeader>
                     <TableRow>
@@ -704,16 +787,6 @@ export default function UsersPanel() {
           <Teams />
         </TabsContent>
       </Tabs>
-      {canAccessUsersPanel && (
-        <Button
-          className="sm:hidden fixed bottom-6 right-4 z-50 shadow-card"
-          size="icon"
-          onClick={() => setIsAddUserOpen(true)}
-          aria-label="Add user"
-        >
-          <Plus className="h-5 w-5" />
-        </Button>
-      )}
 
       {/* Edit User Dialog */}
       <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
