@@ -3057,32 +3057,32 @@ mainCandidate["linkedin_score_reason"] ? (
       {/* Detailed Information Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <div className="w-full">
-          <TabsList className="w-full grid grid-cols-2 gap-1 sm:grid-cols-3 md:grid-cols-7 h-auto p-1">
-            <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2 h-auto whitespace-normal leading-tight">
+          <TabsList className="w-full flex flex-col gap-1 md:grid md:grid-cols-7 h-auto p-1">
+            <TabsTrigger value="overview" className="w-full justify-start text-left text-sm md:text-sm px-3 py-2 h-auto whitespace-normal leading-tight md:whitespace-nowrap">
               Overview
             </TabsTrigger>
-            <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2 h-auto whitespace-normal leading-tight">
+            <TabsTrigger value="description" className="w-full justify-start text-left text-sm md:text-sm px-3 py-2 h-auto whitespace-normal leading-tight md:whitespace-nowrap">
               Description
             </TabsTrigger>
-            <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2 h-auto whitespace-normal leading-tight">
+            <TabsTrigger value="requirements" className="w-full justify-start text-left text-sm md:text-sm px-3 py-2 h-auto whitespace-normal leading-tight md:whitespace-nowrap">
               AI Requirements
             </TabsTrigger>
             <TabsTrigger
               value="applications"
-              className="text-xs md:text-sm px-2 py-2 h-auto whitespace-normal leading-tight relative"
+              className="w-full justify-start text-left text-sm md:text-sm px-3 py-2 h-auto whitespace-normal leading-tight relative md:whitespace-nowrap"
               onClick={handleApplicationsTabClick}
             >
               Applications
               {newApplicationsCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center min-w-[16px] sm:min-w-[20px] z-10">
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 md:static md:translate-y-0 md:ml-2 bg-red-500 text-white text-[10px] rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center min-w-[16px] sm:min-w-[20px] z-10">
                   {newApplicationsCount > 99 ? "99+" : newApplicationsCount}
                 </span>
               )}
             </TabsTrigger>
-            <TabsTrigger value="boolean-search" className="text-xs md:text-sm px-2 py-2 h-auto whitespace-normal leading-tight">
+            <TabsTrigger value="boolean-search" className="w-full justify-start text-left text-sm md:text-sm px-3 py-2 h-auto whitespace-normal leading-tight md:whitespace-nowrap">
               AI Longlist
             </TabsTrigger>
-            <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2 h-auto whitespace-normal leading-tight">
+            <TabsTrigger value="shortlist" className="w-full justify-start text-left text-sm md:text-sm px-3 py-2 h-auto whitespace-normal leading-tight md:whitespace-nowrap">
               AI Short List
             </TabsTrigger>
           </TabsList>
