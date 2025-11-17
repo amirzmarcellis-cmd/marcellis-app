@@ -814,6 +814,10 @@ const JobGrid = memo(function JobGrid({
                 </div>}
             </div>
 
+            {job.jd_summary && <p className="text-sm text-muted-foreground line-clamp-3">
+                {job.jd_summary}
+              </p>}
+
             {/* Candidate Counts */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2 text-xs">
               <div className="flex flex-col items-center p-1.5 sm:p-2 rounded-md bg-blue/10 border border-blue/20">
@@ -846,11 +850,6 @@ const JobGrid = memo(function JobGrid({
               </div>
             </div>
 
-            {job.jd_summary && (
-              <p className="hidden sm:block text-sm text-muted-foreground line-clamp-3">
-                {job.jd_summary}
-              </p>
-            )}
             {/* Automatic Dial Toggle */}
             <div className="py-1 sm:py-2 border-t border-border/30 space-y-1 sm:space-y-2">
               <div className="flex items-center justify-between flex-wrap gap-2">
