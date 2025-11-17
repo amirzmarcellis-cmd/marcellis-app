@@ -282,7 +282,7 @@ export default function Candidates() {
             </div>
 
             {/* Mobile Card View */}
-            <div className="md:hidden px-2 space-y-2">
+            <div className="md:hidden px-2 space-y-2 pb-24">
               {loading ? (
                 <div className="py-6 text-center text-muted-foreground text-sm">Loading CVs...</div>
               ) : filteredCVs.length === 0 ? (
@@ -296,7 +296,7 @@ export default function Candidates() {
                     : cv.user_id;
                   
                   return (
-                    <div key={cv.user_id} className="border border-border rounded-lg p-2 bg-card/50 max-w-full overflow-x-hidden">
+                    <div key={cv.user_id} className="border border-border rounded-lg p-2 bg-card/50 max-w-full overflow-visible">
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <div className="flex items-center gap-2 min-w-0 flex-1">
                           <Avatar className="w-8 h-8 flex-shrink-0">
