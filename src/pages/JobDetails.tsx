@@ -3056,20 +3056,20 @@ mainCandidate["linkedin_score_reason"] ? (
 
       {/* Detailed Information Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <div className="w-full overflow-x-auto scrollbar-hide">
-          <TabsList className="w-full inline-flex md:grid md:grid-cols-7 h-auto p-1 gap-0.5 sm:gap-1 min-w-max md:min-w-0">
-            <TabsTrigger value="overview" className="text-xs md:text-sm px-3 py-2 h-auto whitespace-nowrap flex-shrink-0">
+        <div className="w-full">
+          <TabsList className="w-full grid grid-cols-2 gap-1 sm:grid-cols-3 md:grid-cols-7 h-auto p-1">
+            <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2 h-auto whitespace-normal leading-tight">
               Overview
             </TabsTrigger>
-            <TabsTrigger value="description" className="text-xs md:text-sm px-3 py-2 h-auto whitespace-nowrap flex-shrink-0">
+            <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2 h-auto whitespace-normal leading-tight">
               Description
             </TabsTrigger>
-            <TabsTrigger value="requirements" className="text-xs md:text-sm px-3 py-2 h-auto whitespace-nowrap flex-shrink-0">
+            <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2 h-auto whitespace-normal leading-tight">
               AI Requirements
             </TabsTrigger>
             <TabsTrigger
               value="applications"
-              className="text-xs md:text-sm px-3 py-2 h-auto whitespace-nowrap flex-shrink-0 relative"
+              className="text-xs md:text-sm px-2 py-2 h-auto whitespace-normal leading-tight relative"
               onClick={handleApplicationsTabClick}
             >
               Applications
@@ -3079,10 +3079,10 @@ mainCandidate["linkedin_score_reason"] ? (
                 </span>
               )}
             </TabsTrigger>
-            <TabsTrigger value="boolean-search" className="text-xs md:text-sm px-3 py-2 h-auto whitespace-nowrap flex-shrink-0">
+            <TabsTrigger value="boolean-search" className="text-xs md:text-sm px-2 py-2 h-auto whitespace-normal leading-tight">
               AI Longlist
             </TabsTrigger>
-            <TabsTrigger value="shortlist" className="text-xs md:text-sm px-3 py-2 h-auto whitespace-nowrap flex-shrink-0">
+            <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2 h-auto whitespace-normal leading-tight">
               AI Short List
             </TabsTrigger>
           </TabsList>
