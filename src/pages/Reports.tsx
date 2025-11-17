@@ -91,26 +91,26 @@ export default function Reports() {
                     <CardDescription className="font-light font-inter">{report.description}</CardDescription>
                   </div>
                     </div>
-                    <Badge variant={report.status === "ready" ? "default" : "secondary"}>
+                    <Badge variant={report.status === "ready" ? "default" : "secondary"} className="self-start sm:self-auto">
                       {report.status}
                     </Badge>
                   </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                        <div className="flex items-center space-x-1">
+                  <CardContent className="p-4 sm:p-6 pt-0">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
-                          <span>Generated: {report.lastGenerated}</span>
+                          <span className="text-xs sm:text-sm">Generated: {report.lastGenerated}</span>
                         </div>
-                        <Badge variant="outline">{report.type}</Badge>
-                        <Badge variant="outline">{report.format}</Badge>
+                        <Badge variant="outline" className="text-xs">{report.type}</Badge>
+                        <Badge variant="outline" className="text-xs">{report.format}</Badge>
                       </div>
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="sm" disabled={report.status !== "ready"}>
+                      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                        <Button variant="outline" size="sm" disabled={report.status !== "ready"} className="w-full sm:w-auto">
                           <Download className="w-4 h-4 mr-2" />
                           Download
                         </Button>
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" className="w-full sm:w-auto">
                           View Details
                         </Button>
                       </div>
