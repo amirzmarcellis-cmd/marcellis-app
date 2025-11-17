@@ -3057,44 +3057,48 @@ mainCandidate["linkedin_score_reason"] ? (
       {/* Detailed Information Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <div className="w-full">
-          <TabsList className="w-full grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 h-auto p-1 gap-1">
-            <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">
+          <TabsList className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 h-auto p-1 gap-0.5 sm:gap-1 overflow-x-hidden">
+            <TabsTrigger value="overview" className="text-[10px] sm:text-xs md:text-sm px-1 sm:px-2 py-2 h-auto whitespace-normal leading-tight">
               Overview
             </TabsTrigger>
-            <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2">
+            <TabsTrigger value="description" className="text-[10px] sm:text-xs md:text-sm px-1 sm:px-2 py-2 h-auto whitespace-normal leading-tight">
               Description
             </TabsTrigger>
-            <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">
-              AI Requirements
+            <TabsTrigger value="requirements" className="text-[10px] sm:text-xs md:text-sm px-1 sm:px-2 py-2 h-auto whitespace-normal leading-tight">
+              <span className="hidden sm:inline">AI Requirements</span>
+              <span className="sm:hidden">AI Req.</span>
             </TabsTrigger>
             <TabsTrigger
               value="applications"
-              className="text-xs md:text-sm px-2 py-2 relative"
+              className="text-[10px] sm:text-xs md:text-sm px-1 sm:px-2 py-2 h-auto whitespace-normal leading-tight relative"
               onClick={handleApplicationsTabClick}
             >
-              Applications
+              <span className="hidden sm:inline">Applications</span>
+              <span className="sm:hidden">Apps</span>
               {newApplicationsCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-[20px] z-10">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center min-w-[16px] sm:min-w-[20px] z-10">
                   {newApplicationsCount > 99 ? "99+" : newApplicationsCount}
                 </span>
               )}
             </TabsTrigger>
-            <TabsTrigger value="boolean-search" className="text-xs md:text-sm px-2 py-2">
-              AI Longlist
+            <TabsTrigger value="boolean-search" className="text-[10px] sm:text-xs md:text-sm px-1 sm:px-2 py-2 h-auto whitespace-normal leading-tight">
+              <span className="hidden sm:inline">AI Longlist</span>
+              <span className="sm:hidden">Longlist</span>
             </TabsTrigger>
-            <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">
-              AI Short List
+            <TabsTrigger value="shortlist" className="text-[10px] sm:text-xs md:text-sm px-1 sm:px-2 py-2 h-auto whitespace-normal leading-tight">
+              <span className="hidden sm:inline">AI Short List</span>
+              <span className="sm:hidden">Shortlist</span>
             </TabsTrigger>
           </TabsList>
         </div>
 
-        <TabsContent value="overview" className="space-y-4 pb-32">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <TabsContent value="overview" className="space-y-3 sm:space-y-4 pb-24 sm:pb-32">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
             <Card>
-              <CardHeader>
-                <CardTitle>Job Information</CardTitle>
+              <CardHeader className="pb-2 sm:pb-4 px-3 sm:px-6 pt-3 sm:pt-6">
+                <CardTitle className="text-base sm:text-lg">Job Information</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 sm:space-y-3 [&>div]:flex [&>div]:flex-col sm:[&>div]:flex-row sm:[&>div]:items-start sm:[&>div]:justify-between [&>div]:gap-1 sm:[&>div]:gap-2 [&>div>span:last-child]:break-words [&>div>span:last-child]:text-left sm:[&>div>span:last-child]:text-right [&>div>span:last-child]:max-w-full sm:[&>div>span:last-child]:max-w-[60%]">
+              <CardContent className="space-y-2 sm:space-y-3 px-3 sm:px-6 pb-3 sm:pb-6 text-xs sm:text-sm [&>div]:flex [&>div]:flex-col sm:[&>div]:flex-row sm:[&>div]:items-start sm:[&>div]:justify-between [&>div]:gap-1 sm:[&>div]:gap-2 [&>div>span:last-child]:break-words [&>div>span:last-child]:text-left sm:[&>div>span:last-child]:text-right [&>div>span:last-child]:max-w-full sm:[&>div>span:last-child]:max-w-[60%]">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Job ID:</span>
                   <span className="font-mono text-sm">{job.job_id}</span>
@@ -3353,7 +3357,7 @@ mainCandidate["linkedin_score_reason"] ? (
               {/* Application Filters */}
               <Card className="mb-4">
                 <CardContent className="pt-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Name</label>
                       <Input
@@ -3414,7 +3418,7 @@ mainCandidate["linkedin_score_reason"] ? (
                       <div className="mb-4 text-sm text-muted-foreground">
                         Showing {filteredApplications.length} of {applications.length} applications
                       </div>
-                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                         {filteredApplications.map((application) => (
                           <Card
                             key={application.candidate_id}
@@ -3687,7 +3691,7 @@ mainCandidate["linkedin_score_reason"] ? (
                         </Button>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-2 sm:gap-3">
                       <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                         <Input
@@ -3758,7 +3762,7 @@ mainCandidate["linkedin_score_reason"] ? (
                     </div>
                   </Card>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                     {(() => {
                       // Filter longlisted candidates based on filters (show all candidates in Jobs_CVs)
                       const filteredLonglistedCandidates = longlistedCandidates.filter((candidate) => {
@@ -4329,7 +4333,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4">
                       {(() => {
                         // Group within budget candidates by user_id and sort by score
                         const groupedWithinBudget = withinBudgetCandidates.reduce(
@@ -4454,7 +4458,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4">
                       {(() => {
                         // Group above budget candidates by user_id and sort by Overall Score
                         const groupedAboveBudget = aboveBudgetCandidates.reduce(
@@ -4578,7 +4582,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4">
                       {(() => {
                         // Group nationality mismatch candidates by user_id and sort by Overall Score
                         const groupedNationalityMismatch = notInPreferredNationalityCandidates.reduce(
@@ -4703,7 +4707,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pr-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4">
                       {(() => {
                         // Group rejected candidates by user_id and sort by Overall Score
                         const groupedRejected = filteredRejectedCandidates.reduce(
@@ -4820,7 +4824,7 @@ mainCandidate["linkedin_score_reason"] ? (
               <div key={index} className="space-y-4 p-4 border rounded-lg">
                 <h4 className="font-medium">Slot {index + 1}</h4>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                   {/* Date Picker */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Date</label>
@@ -4857,7 +4861,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   {/* Time Picker */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Time</label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
                       {/* Hours */}
                       <Select
                         value={slot.time.split(":")[0] || ""}
