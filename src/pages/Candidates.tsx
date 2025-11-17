@@ -371,11 +371,11 @@ export default function Candidates() {
 
                         <div className="text-[11px]">
                           <div className="text-muted-foreground mb-1">Actions</div>
-                          <div className="grid grid-cols-2 gap-2">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 min-w-0">
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              className="h-7 py-1 text-xs" 
+                              className="h-7 py-1 text-xs w-full" 
                               onClick={() => handleEditCandidate(cv)}
                               aria-label="Edit CV"
                             >
@@ -385,7 +385,7 @@ export default function Candidates() {
                             <Button 
                               variant="destructive" 
                               size="sm" 
-                              className="h-7 py-1 text-xs" 
+                              className="h-7 py-1 text-xs w-full" 
                               onClick={() => handleDeleteCV(cv.user_id)}
                               aria-label="Delete CV"
                             >
