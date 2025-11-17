@@ -2920,7 +2920,7 @@ mainCandidate["linkedin_score_reason"] ? (
     }),
   );
   return (
-    <div className={cn("space-y-3 sm:space-y-4 md:space-y-6 p-3 sm:p-4 md:p-6 max-w-full overflow-hidden", isShaking && "animate-shake")}>
+    <div className={cn("space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden", isShaking && "animate-shake")}>
       {/* Processing Animation Overlay */}
       {job?.status === 'Processing' && job?.Processed === 'Yes' && <ProcessingAnimation />}
       
@@ -2928,38 +2928,35 @@ mainCandidate["linkedin_score_reason"] ? (
       <AppleLoadingBar isLoading={loading} className="absolute top-0 left-0 right-0 z-50" />
       
       {/* Header */}
-      <div className="flex flex-col gap-2 sm:gap-3">
-        <div className="flex flex-col gap-3 sm:gap-4">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center space-x-2 min-w-0">
-              <Button variant="ghost" size="xs" className="sm:h-9 px-2 sm:px-4" onClick={() => navigate("/jobs")}>
-                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                <span className="text-xs sm:text-sm">Back</span>
-              </Button>
-              <div className="h-4 sm:h-6 w-px bg-border" />
-              <h3 className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h3>
-            </div>
-            {/* Futuristic 3D Action Menu - hidden on mobile */}
-            <div className="hidden md:block">
-              <FuturisticActionButton
-                isExpanded={isActionMenuExpanded}
-                onToggle={() => setIsActionMenuExpanded(!isActionMenuExpanded)}
-              >
-                <ActionButton
-                  onClick={handlePauseJob}
-                  disabled={automaticDialSaving}
-                  icon={job?.Processed === "Yes" ? Pause : Play}
-                  label={job?.Processed === "Yes" ? "Pause Job" : "Run Job"}
-                  variant="danger"
-                />
-              </FuturisticActionButton>
-            </div>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 items-start">
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/jobs")}>
+              <ArrowLeft className="w-4 h-4 mr-1 md:mr-2" />
+              <span className="hidden sm:inline">Back to Jobs</span>
+              <span className="sm:hidden">Back</span>
+            </Button>
+            <div className="h-6 w-px bg-border hidden sm:block" />
+            <h3 className="text-xl md:text-2xl lg:text-3xl font-bold truncate">Job Details</h3>
           </div>
+          {/* Futuristic 3D Action Menu */}
+          <FuturisticActionButton
+            isExpanded={isActionMenuExpanded}
+            onToggle={() => setIsActionMenuExpanded(!isActionMenuExpanded)}
+          >
+            <ActionButton
+              onClick={handlePauseJob}
+              disabled={automaticDialSaving}
+              icon={job?.Processed === "Yes" ? Pause : Play}
+              label={job?.Processed === "Yes" ? "Pause Job" : "Run Job"}
+              variant="danger"
+            />
+          </FuturisticActionButton>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
-            <div className="flex items-center gap-2 justify-between sm:justify-start bg-card/50 rounded-lg px-3 py-2 sm:bg-transparent sm:p-0">
-              <span className="text-xs sm:text-sm font-medium">Auto Dial</span>
+          <div className="flex flex-col sm:flex-row gap-3 items-center justify-center lg:justify-end">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">Auto Dial</span>
               <ToggleSwitch
                 checked={job?.automatic_dial || false}
                 onChange={handleAutomaticDialToggle}
@@ -2969,39 +2966,29 @@ mainCandidate["linkedin_score_reason"] ? (
                 offLabel="OFF"
               />
             </div>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="xs" className="sm:h-9 flex-1 sm:flex-initial text-xs sm:text-sm">
-                <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                Edit
-              </Button>
-              <Button variant="outline" asChild size="xs" className="sm:h-9 flex-1 sm:flex-initial text-xs sm:text-sm">
-                <Link to={`/job/${job.job_id}/apply`}>
-                  Apply Link
-                </Link>
-              </Button>
-              {/* Mobile pause/play button */}
-              <Button 
-                onClick={handlePauseJob}
-                disabled={automaticDialSaving}
-                size="xs" 
-                variant="outline"
-                className="md:hidden sm:h-9 flex-1 sm:flex-initial text-xs sm:text-sm"
-              >
-                {job?.Processed === "Yes" ? <Pause className="w-3 h-3 sm:w-4 sm:h-4" /> : <Play className="w-3 h-3 sm:w-4 sm:h-4" />}
-              </Button>
-            </div>
+            <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto">
+              <FileText className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Edit Job</span>
+              <span className="sm:hidden">Edit</span>
+            </Button>
+            <Button variant="outline" asChild size="sm" className="w-full sm:w-auto">
+              <Link to={`/job/${job.job_id}/apply`}>
+                <span className="hidden sm:inline">Apply Link</span>
+                <span className="sm:hidden">Apply</span>
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
 
       {/* Job Header Card */}
       <Card>
-        <CardContent className="p-3 sm:p-4 md:p-6">
-          <div className="space-y-3 sm:space-y-4">
-            <div className="flex flex-col gap-3">
-              <div className="space-y-1.5 sm:space-y-2 flex-1 min-w-0">
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold break-words leading-tight">{job.job_title}</h2>
-                <p className="text-sm sm:text-base md:text-lg text-muted-foreground break-words line-clamp-2 sm:line-clamp-none">
+        <CardContent className="p-4 md:p-6">
+          <div className="space-y-4">
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+              <div className="space-y-2 flex-1 min-w-0">
+                <h2 className="text-xl md:text-2xl font-bold break-words">{job.job_title}</h2>
+                <p className="text-base md:text-lg text-muted-foreground break-words">
                   {job.client_description || "Client Description"}
                 </p>
               </div>
@@ -3013,7 +3000,7 @@ mainCandidate["linkedin_score_reason"] ? (
                     ? "default"
                     : "destructive"
                 }
-                className={`text-xs sm:text-sm px-2 sm:px-3 py-1 whitespace-nowrap self-start ${
+                className={`text-xs md:text-sm px-2 md:px-3 py-1 whitespace-nowrap ${
                   job.Processed === "No"
                     ? "bg-purple-600 text-white border-0"
                     : job.Processed === true || job.Processed === "true" || job.Processed === "Yes"
@@ -3066,84 +3053,81 @@ mainCandidate["linkedin_score_reason"] ? (
       <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
 
       {/* Detailed Information Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3 sm:space-y-4">
-        <div className="w-full overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
-          <TabsList className="inline-flex h-auto p-1 min-w-full sm:min-w-min">
-            <TabsTrigger value="overview" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 whitespace-nowrap flex-1 sm:flex-initial">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <div className="w-full overflow-x-auto">
+          <TabsList className="w-full grid grid-cols-7 h-auto p-1">
+            <TabsTrigger value="overview" className="text-xs md:text-sm px-2 py-2">
               Overview
             </TabsTrigger>
-            <TabsTrigger value="description" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 whitespace-nowrap flex-1 sm:flex-initial">
+            <TabsTrigger value="description" className="text-xs md:text-sm px-2 py-2">
               Description
             </TabsTrigger>
-            <TabsTrigger value="requirements" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 whitespace-nowrap flex-1 sm:flex-initial">
-              AI Req
+            <TabsTrigger value="requirements" className="text-xs md:text-sm px-2 py-2">
+              AI Requirements
             </TabsTrigger>
             <TabsTrigger
               value="applications"
-              className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 relative whitespace-nowrap flex-1 sm:flex-initial"
+              className="text-xs md:text-sm px-2 py-2 relative"
               onClick={handleApplicationsTabClick}
             >
-              <span className="hidden sm:inline">Applications</span>
-              <span className="sm:hidden">Apps</span>
+              Applications
               {newApplicationsCount > 0 && (
-                <span className="absolute -top-0.5 sm:-top-1 -right-0.5 sm:-right-1 bg-red-500 text-white text-[8px] sm:text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center min-w-[16px] sm:min-w-[20px] z-10">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-[20px] z-10">
                   {newApplicationsCount > 99 ? "99+" : newApplicationsCount}
                 </span>
               )}
             </TabsTrigger>
-            <TabsTrigger value="boolean-search" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 whitespace-nowrap flex-1 sm:flex-initial">
-              <span className="hidden sm:inline">AI Longlist</span>
-              <span className="sm:hidden">Longlist</span>
+            <TabsTrigger value="boolean-search" className="text-xs md:text-sm px-2 py-2">
+              AI Longlist
             </TabsTrigger>
-            <TabsTrigger value="shortlist" className="text-[10px] sm:text-xs md:text-sm px-1.5 sm:px-2 py-1.5 sm:py-2 whitespace-nowrap flex-1 sm:flex-initial">
-              <span className="hidden sm:inline">AI Short List</span>
-              <span className="sm:hidden">Shortlist</span>
+            <TabsTrigger value="shortlist" className="text-xs md:text-sm px-2 py-2">
+              AI Short List
             </TabsTrigger>
           </TabsList>
         </div>
 
-        <TabsContent value="overview" className="space-y-3 sm:space-y-4 pb-20 sm:pb-32">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
+        <TabsContent value="overview" className="space-y-4 pb-32">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
-              <CardHeader className="p-3 sm:p-4 md:p-6">
-                <CardTitle className="text-base sm:text-lg md:text-xl">Job Information</CardTitle>
+              <CardHeader>
+                <CardTitle>Job Information</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 sm:space-y-3 p-3 sm:p-4 md:p-6 pt-0 text-xs sm:text-sm">
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+              <CardContent className="space-y-3">
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Job ID:</span>
-                  <span className="font-mono text-xs sm:text-sm break-all">{job.job_id}</span>
+                  <span className="font-mono text-sm">{job.job_id}</span>
                 </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Itris ID:</span>
-                  <span className="font-mono text-xs sm:text-sm break-all">{job.itris_job_id || "N/A"}</span>
+                  <span className="font-mono text-sm">{job.itris_job_id || "N/A"}</span>
                 </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Client Name:</span>
-                  <span className="break-words">{job.client_name || "N/A"}</span>
+                  <span>{job.client_name || "N/A"}</span>
                 </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Client Description:</span>
-                  <span className="break-words sm:text-right">{job.client_description || "N/A"}</span>
+                  <span>{job.client_description || "N/A"}</span>
                 </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Location:</span>
-                  <span className="break-words">{job.job_location || "N/A"}</span>
+                  <span>{job.job_location || "N/A"}</span>
                 </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Salary Range:</span>
-                  <span className="font-medium break-words">{formatCurrency(job.job_salary_range?.toString(), job.Currency)}</span>
+                  <span className="font-medium">{formatCurrency(job.job_salary_range?.toString(), job.Currency)}</span>
                 </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Assigned Recruiter:</span>
-                  <span className="break-words">{recruiterName || job.recruiter_id || "N/A"}</span>
+                  <span>{recruiterName || job.recruiter_id || "N/A"}</span>
                 </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Notice Period:</span>
                   <span>{job.notice_period || "N/A"}</span>
                 </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Preferred Nationality:</span>
-                  <span className="break-words">{job.prefered_nationality || "N/A"}</span>
+                  <span>{job.prefered_nationality || "N/A"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Group:</span>
@@ -3253,31 +3237,31 @@ mainCandidate["linkedin_score_reason"] ? (
           </div>
         </TabsContent>
 
-        <TabsContent value="description" className="space-y-3 sm:space-y-4 pb-20 sm:pb-32">
+        <TabsContent value="description" className="space-y-4 pb-32">
           <Card>
-            <CardHeader className="p-3 sm:p-4 md:p-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="min-w-0">
-                  <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
-                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2 shrink-0" />
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center">
+                    <FileText className="w-5 h-5 mr-2" />
                     Job Description
                   </CardTitle>
-                  <CardDescription className="text-xs sm:text-sm mt-1">Detailed overview of the role</CardDescription>
+                  <CardDescription>Detailed overview of the role and responsibilities</CardDescription>
                 </div>
-                <div className="flex items-center gap-2 self-start sm:self-auto">
-                  <Button variant="outline" size="xs" className="sm:h-9 text-xs sm:text-sm">
-                    <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                    <span className="hidden sm:inline">Upload</span>
+                <div className="flex items-center space-x-2">
+                  <Button variant="outline" size="sm">
+                    <Upload className="w-4 h-4 mr-2" />
+                    Upload File
                   </Button>
-                  <Button variant="outline" size="xs" className="sm:h-9 text-xs sm:text-sm" onClick={() => navigate(`/jobs/edit/${job.job_id}`)}>
-                    <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                    Edit
+                  <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job.job_id}`)}>
+                    <FileText className="w-4 h-4 mr-2" />
+                    Edit Job
                   </Button>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
-              <div className="prose prose-sm max-w-none text-xs sm:text-sm">
+            <CardContent>
+              <div className="prose prose-sm max-w-none">
                 <p className="leading-relaxed whitespace-pre-wrap">
                   {job.job_description || "No description available for this position."}
                 </p>
@@ -3287,20 +3271,20 @@ mainCandidate["linkedin_score_reason"] ? (
 
           {/* Job Documents Section */}
           <Card>
-            <CardHeader className="p-3 sm:p-4 md:p-6">
-              <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
-                <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <FileText className="w-5 h-5 mr-2" />
                 Job Documents
               </CardTitle>
-              <CardDescription className="text-xs sm:text-sm">Uploaded job description files</CardDescription>
+              <CardDescription>Uploaded job description files and related documents</CardDescription>
             </CardHeader>
-            <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
-              <div className="text-center py-6 sm:py-8">
-                <FileText className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground mx-auto mb-3 sm:mb-4" />
-                <h3 className="text-base sm:text-lg font-semibold mb-2">No documents uploaded</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground px-4">Upload job description files when creating or editing this job</p>
-                <Button variant="outline" size="xs" className="sm:h-9 mt-3 sm:mt-4 text-xs sm:text-sm" onClick={() => setIsEditDialogOpen(true)}>
-                  <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+            <CardContent>
+              <div className="text-center py-8">
+                <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No documents uploaded</h3>
+                <p className="text-muted-foreground">Upload job description files when creating or editing this job</p>
+                <Button variant="outline" className="mt-4" onClick={() => setIsEditDialogOpen(true)}>
+                  <Upload className="w-4 h-4 mr-2" />
                   Upload Documents
                 </Button>
               </div>
@@ -3308,33 +3292,33 @@ mainCandidate["linkedin_score_reason"] ? (
           </Card>
         </TabsContent>
 
-        <TabsContent value="requirements" className="space-y-3 sm:space-y-4 pb-20 sm:pb-32">
+        <TabsContent value="requirements" className="space-y-4 pb-32">
           <Card>
-            <CardHeader className="p-3 sm:p-4 md:p-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="min-w-0">
-                  <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
-                    <Target className="w-4 h-4 sm:w-5 sm:h-5 mr-2 shrink-0" />
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center">
+                    <Target className="w-5 h-5 mr-2" />
                     AI Requirements
                   </CardTitle>
-                  <CardDescription className="text-xs sm:text-sm mt-1">Skills and qualifications needed</CardDescription>
+                  <CardDescription>Skills, experience, and qualifications needed for this role</CardDescription>
                 </div>
-                <Button variant="outline" size="xs" className="sm:h-9 text-xs sm:text-sm self-start sm:self-auto" onClick={() => navigate(`/jobs/edit/${job.job_id}`)}>
-                  <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job.job_id}`)}>
+                  <FileText className="w-4 h-4 mr-2" />
                   Amend
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
-              <div className="prose prose-sm max-w-none space-y-3 sm:space-y-4 text-xs sm:text-sm">
+            <CardContent>
+              <div className="prose prose-sm max-w-none space-y-4">
                 <div>
-                  <h4 className="font-semibold mb-1.5 sm:mb-2 text-sm sm:text-base">Things to look for:</h4>
+                  <h4 className="font-semibold mb-2">Things to look for:</h4>
                   <p className="leading-relaxed whitespace-pre-wrap">
                     {job.things_to_look_for || "No specific criteria listed."}
                   </p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-1.5 sm:mb-2 text-sm sm:text-base">Must have:</h4>
+                  <h4 className="font-semibold mb-2">Must have:</h4>
                   <p className="leading-relaxed whitespace-pre-wrap">
                     {job.musttohave || "No must-have requirements specified."}
                   </p>
@@ -3350,42 +3334,51 @@ mainCandidate["linkedin_score_reason"] ? (
           </Card>
         </TabsContent>
 
-        <TabsContent value="applications" className="space-y-3 sm:space-y-4 pb-20 sm:pb-32">
+        <TabsContent value="applications" className="space-y-4 pb-32">
           <Card>
-            <CardHeader className="p-3 sm:p-4 md:p-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div className="min-w-0">
-                  <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
-                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2 shrink-0" />
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center">
+                    <FileText className="w-5 h-5 mr-2" />
                     Applications ({applications.length})
                   </CardTitle>
-                  <CardDescription className="text-xs sm:text-sm mt-1">Candidates who have applied</CardDescription>
+                  <CardDescription>Candidates who have applied for this position</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
+            <CardContent>
               {/* Application Filters */}
-              <Card className="mb-3 sm:mb-4">
-                <CardContent className="p-3 sm:pt-4">
-                  <div className="grid grid-cols-1 gap-2 sm:gap-3">
-                    <Input
-                      placeholder="Filter by name..."
-                      value={appNameFilter}
-                      onChange={(e) => setAppNameFilter(e.target.value)}
-                      className="h-8 sm:h-9 text-xs sm:text-sm"
-                    />
-                    <Input
-                      placeholder="Filter by email..."
-                      value={appEmailFilter}
-                      onChange={(e) => setAppEmailFilter(e.target.value)}
-                      className="h-8 sm:h-9 text-xs sm:text-sm"
-                    />
-                    <Input
-                      placeholder="Filter by phone..."
-                      value={appPhoneFilter}
-                      onChange={(e) => setAppPhoneFilter(e.target.value)}
-                      className="h-8 sm:h-9 text-xs sm:text-sm"
-                    />
+              <Card className="mb-4">
+                <CardContent className="pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Name</label>
+                      <Input
+                        placeholder="Filter by name..."
+                        value={appNameFilter}
+                        onChange={(e) => setAppNameFilter(e.target.value)}
+                        className="h-9"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Email</label>
+                      <Input
+                        placeholder="Filter by email..."
+                        value={appEmailFilter}
+                        onChange={(e) => setAppEmailFilter(e.target.value)}
+                        className="h-9"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Phone</label>
+                      <Input
+                        placeholder="Filter by phone..."
+                        value={appPhoneFilter}
+                        onChange={(e) => setAppPhoneFilter(e.target.value)}
+                        className="h-9"
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -3398,7 +3391,8 @@ mainCandidate["linkedin_score_reason"] ? (
                 <div className="text-center py-8 text-muted-foreground">No applications found for this job.</div>
               ) : (
                 (() => {
-                   const filteredApplications = applications.filter((application) => {
+                  // Filter applications based on name, email, and phone
+                  const filteredApplications = applications.filter((application) => {
                     const first = application.first_name || "";
                     const last = application.last_name || "";
                     // Filter out "Not found" values
@@ -3414,21 +3408,21 @@ mainCandidate["linkedin_score_reason"] ? (
                     return nameMatch && emailMatch && phoneMatch;
                   });
                   return (
-                    <div className="max-w-full overflow-hidden">
-                      <div className="mb-3 sm:mb-4 text-xs sm:text-sm text-muted-foreground">
+                    <div>
+                      <div className="mb-4 text-sm text-muted-foreground">
                         Showing {filteredApplications.length} of {applications.length} applications
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                         {filteredApplications.map((application) => (
                           <Card
                             key={application.candidate_id}
-                            className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg overflow-hidden"
+                            className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg"
                           >
-                            <CardContent className="p-3 sm:p-4">
-                              <div className="space-y-2 sm:space-y-3">
-                                 <div className="flex items-start justify-between gap-2">
+                            <CardContent className="p-3 md:p-4">
+                              <div className="space-y-3">
+                                 <div className="flex items-start justify-between">
                                   <div className="min-w-0 flex-1">
-                                    <h4 className="font-semibold text-xs sm:text-sm md:text-base truncate">
+                                    <h4 className="font-semibold text-sm md:text-base truncate">
                                       {(() => {
                                         const first = application.first_name || "";
                                         const last = application.last_name || "";
@@ -3447,40 +3441,40 @@ mainCandidate["linkedin_score_reason"] ? (
                                         }
                                       })()}
                                     </h4>
-                                    <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground truncate">
+                                    <p className="text-xs md:text-sm text-muted-foreground truncate">
                                       {application.candidate_id}
                                     </p>
                                   </div>
                                 </div>
 
-                                <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
+                                <div className="space-y-2 text-xs md:text-sm">
                                   {application.Email && (
                                     <div className="flex items-center text-muted-foreground min-w-0">
-                                      <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 flex-shrink-0" />
-                                      <span className="truncate text-[10px] sm:text-xs">{application.Email}</span>
+                                      <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+                                      <span className="truncate">{application.Email}</span>
                                     </div>
                                   )}
 
                                   {application.phone_number && (
                                     <div className="flex items-center text-muted-foreground min-w-0">
-                                      <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 flex-shrink-0" />
-                                      <span className="truncate text-[10px] sm:text-xs">{application.phone_number}</span>
+                                      <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
+                                      <span className="truncate">{application.phone_number}</span>
                                     </div>
                                   )}
                                 </div>
 
                                 {application.cv_summary && (
-                                  <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground line-clamp-2">
+                                  <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
                                     {application.cv_summary}
                                   </p>
                                 )}
 
-                                <div className="flex items-center justify-between pt-2 border-t gap-1.5 sm:gap-2">
-                                  <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                                <div className="flex items-center justify-between pt-2 border-t gap-2">
+                                  <div className="flex items-center gap-2">
                                     {application.CV_Link && (
-                                      <Button variant="outline" size="xs" className="sm:h-8 text-[10px] sm:text-xs" asChild>
-                                        <a href={application.CV_Link} target="_blank" rel="noopener noreferrer" className="flex items-center">
-                                          <FileText className="w-3 h-3 mr-0.5 sm:mr-1" />
+                                      <Button variant="outline" size="sm" asChild>
+                                        <a href={application.CV_Link} target="_blank" rel="noopener noreferrer">
+                                          <FileText className="w-4 h-4 mr-1" />
                                           CV
                                         </a>
                                       </Button>
@@ -4247,58 +4241,70 @@ mainCandidate["linkedin_score_reason"] ? (
           </Card>
         </TabsContent>
 
-        <TabsContent value="shortlist" className="space-y-3 sm:space-y-4 md:space-y-6 pb-20 sm:pb-32">
-          <div className="space-y-3 sm:space-y-4 md:space-y-6 max-w-full overflow-hidden">
+        <TabsContent value="shortlist" className="space-y-4 pb-32">
+          <div className="space-y-6">
             {/* Within Budget Section */}
             <Card>
-              <CardHeader className="p-3 sm:p-4 md:p-6">
-                <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
-                  <Star className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Star className="w-5 h-5 mr-2" />
                   Within Budget ({withinBudgetCandidates.length} candidates)
                 </CardTitle>
-                <CardDescription className="text-xs sm:text-sm">
-                  High-scoring candidates within budget (
+                <CardDescription>
+                  High-scoring candidates with salary expectations within 20% of budget (
                   {formatCurrency(jobBudget.toString(), job?.Currency)} + 20%)
                 </CardDescription>
 
-                {/* AI Short List Filters - Stack on Mobile */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t">
-                  <div className="relative lg:col-span-2">
-                    <Search className="absolute left-2.5 sm:left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-3 h-3 sm:w-4 sm:h-4" />
+                {/* AI Short List Filters - Single Line */}
+                <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center">
+                  <div className="relative min-w-0 flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input
                       placeholder="Name..."
                       value={shortListNameFilter}
                       onChange={(e) => setShortListNameFilter(e.target.value)}
-                      className="pl-8 sm:pl-10 h-8 sm:h-9 text-xs sm:text-sm"
+                      className="pl-10 h-9 text-sm"
                     />
                   </div>
                   <Input
                     placeholder="Email..."
                     value={shortListEmailFilter}
                     onChange={(e) => setShortListEmailFilter(e.target.value)}
-                    className="h-8 sm:h-9 text-xs sm:text-sm"
+                    className="h-9 text-sm min-w-0 flex-1"
                   />
                   <Input
                     placeholder="Phone..."
                     value={shortListPhoneFilter}
                     onChange={(e) => setShortListPhoneFilter(e.target.value)}
-                    className="h-8 sm:h-9 text-xs sm:text-sm"
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Input
+                    placeholder="User ID..."
+                    value={shortListUserIdFilter}
+                    onChange={(e) => setShortListUserIdFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
+                  />
+                  <Input
+                    placeholder="Source..."
+                    value={shortListSourceFilter}
+                    onChange={(e) => setShortListSourceFilter(e.target.value)}
+                    className="h-9 text-sm min-w-0 flex-1"
                   />
                   <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
-                    <SelectTrigger className="h-8 sm:h-9 text-xs sm:text-sm">
+                    <SelectTrigger className="h-9 text-sm w-32">
                       <SelectValue placeholder="Source" />
                     </SelectTrigger>
-                    <SelectContent className="z-[100] bg-popover">
+                    <SelectContent>
                       <SelectItem value="all">All Sources</SelectItem>
                       <SelectItem value="Itris">Itris</SelectItem>
                       <SelectItem value="Linkedin">LinkedIn</SelectItem>
-                     </SelectContent>
+                    </SelectContent>
                   </Select>
                   <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
-                    <SelectTrigger className="h-8 sm:h-9 text-xs sm:text-sm">
+                    <SelectTrigger className="h-9 text-sm w-32">
                       <SelectValue placeholder="Score" />
                     </SelectTrigger>
-                    <SelectContent className="z-[100] bg-popover">
+                    <SelectContent>
                       <SelectItem value="all">All Scores</SelectItem>
                       <SelectItem value="90+">90+</SelectItem>
                       <SelectItem value="85+">85+</SelectItem>
@@ -4312,7 +4318,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   </Select>
                 </div>
               </CardHeader>
-              <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
+              <CardContent>
                 {withinBudgetCandidates.length === 0 ? (
                   <div className="text-center py-8">
                     <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />

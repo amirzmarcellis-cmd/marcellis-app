@@ -521,114 +521,105 @@ export function JobManagementPanel() {
       allJobs: applyFilters(jobs)
     };
   }, [jobs, selectedGroupFilter, selectedRecruiterFilter, dateRange]);
-  return <div className="space-y-4 sm:space-y-6 w-full max-w-full overflow-x-hidden">
-      <div className="flex flex-col gap-3 sm:gap-0 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light font-work tracking-tight truncate">Job Management</h2>
-          <p className="text-sm sm:text-base font-light font-inter text-muted-foreground">Manage job postings and recruitment campaigns</p>
+  return <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-5xl font-light font-work tracking-tight">Job Management</h2>
+          <p className="text-base font-light font-inter text-muted-foreground">Manage job postings and recruitment campaigns</p>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
-          <Button onClick={() => navigate("/groups")} variant="outline" className="flex items-center gap-2 font-light font-inter h-9 sm:h-10 text-xs sm:text-sm flex-1 sm:flex-none">
-            <Building2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span className="hidden xs:inline">Manage Groups</span>
-            <span className="xs:hidden">Groups</span>
+        <div className="flex items-center gap-3">
+          <Button onClick={() => navigate("/groups")} variant="outline" className="flex items-center gap-2 font-light font-inter">
+            <Building2 className="h-4 w-4" />
+            Manage Groups
           </Button>
-          <Button onClick={() => navigate("/jobs/add")} className="action-button bg-gradient-primary hover:shadow-glow font-light font-inter h-9 sm:h-10 text-xs sm:text-sm flex-1 sm:flex-none">
-            <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-2" />
+          <Button onClick={() => navigate("/jobs/add")} className="action-button bg-gradient-primary hover:shadow-glow font-light font-inter">
+            <Plus className="h-4 w-4 mr-2" />
             Create Job
           </Button>
         </div>
       </div>
 
         {/* Filters */}
-        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3 md:gap-4 w-full">
+        <div className="flex flex-wrap items-center gap-4">
           {/* Group Filter */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-            <label className="text-xs sm:text-sm font-light font-inter shrink-0">Filter by Group:</label>
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <select value={selectedGroupFilter} onChange={e => setSelectedGroupFilter(e.target.value)} className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-md border border-border bg-background text-xs sm:text-sm font-light font-inter flex-1 sm:flex-none min-w-0">
-                <option value="">All Groups</option>
-                <option value="ungrouped">Ungrouped</option>
-                {groups.map(group => <option key={group.id} value={group.id}>
-                    {group.name}
-                  </option>)}
-              </select>
-              {selectedGroupFilter && <Button variant="ghost" size="sm" onClick={() => setSelectedGroupFilter("")} className="text-xs font-light font-inter h-7 sm:h-8 px-2 shrink-0">
-                <X className="h-3 w-3" />
-              </Button>}
-            </div>
-          </div>
-
-        {/* Recruiter Filter */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-          <label className="text-xs sm:text-sm font-light font-inter shrink-0">Filter by Recruiter:</label>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <select value={selectedRecruiterFilter} onChange={e => setSelectedRecruiterFilter(e.target.value)} className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-md border border-border bg-background text-xs sm:text-sm font-light font-inter flex-1 sm:flex-none min-w-0">
-              <option value="">All Recruiters</option>
-              {recruiters.map(recruiter => <option key={recruiter.id} value={recruiter.id}>
-                  {recruiter.name}
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-light font-inter">Filter by Group:</label>
+            <select value={selectedGroupFilter} onChange={e => setSelectedGroupFilter(e.target.value)} className="px-3 py-1 rounded-md border border-border bg-background text-sm font-light font-inter">
+              <option value="">All Groups</option>
+              <option value="ungrouped">Ungrouped</option>
+              {groups.map(group => <option key={group.id} value={group.id}>
+                  {group.name}
                 </option>)}
             </select>
-            {selectedRecruiterFilter && <Button variant="ghost" size="sm" onClick={() => setSelectedRecruiterFilter("")} className="text-xs font-light font-inter h-7 sm:h-8 px-2 shrink-0">
-              <X className="h-3 w-3" />
-            </Button>}
           </div>
+        {selectedGroupFilter && <Button variant="ghost" size="sm" onClick={() => setSelectedGroupFilter("")} className="text-xs font-light font-inter">
+            Clear Filter
+          </Button>}
+
+        {/* Recruiter Filter */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-light font-inter">Filter by Recruiter:</label>
+          <select value={selectedRecruiterFilter} onChange={e => setSelectedRecruiterFilter(e.target.value)} className="px-3 py-1 rounded-md border border-border bg-background text-sm font-light font-inter">
+            <option value="">All Recruiters</option>
+            {recruiters.map(recruiter => <option key={recruiter.id} value={recruiter.id}>
+                {recruiter.name}
+              </option>)}
+          </select>
         </div>
+        {selectedRecruiterFilter && <Button variant="ghost" size="sm" onClick={() => setSelectedRecruiterFilter("")} className="text-xs font-light font-inter">
+            Clear Filter
+          </Button>}
 
         {/* Date Range Filter */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-          <label className="text-xs sm:text-sm font-light font-inter shrink-0">Filter by Date:</label>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className={cn("justify-start text-left font-light font-inter h-8 sm:h-10 text-xs sm:text-sm flex-1 sm:flex-none sm:w-[280px] min-w-0", !dateRange.from && !dateRange.to && "text-muted-foreground")}>
-                  <Calendar className="mr-1.5 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-                  <span className="truncate">
-                    {dateRange.from ? dateRange.to ? <>
-                          {format(dateRange.from, "MMM dd, yyyy")} - {format(dateRange.to, "MMM dd, yyyy")}
-                        </> : format(dateRange.from, "MMM dd, yyyy") : <span>Pick a date range</span>}
-                  </span>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 z-[100]" align="start">
-                <div className="p-3 pointer-events-auto bg-card border-border">
-                  <div className="space-y-2">
-                    <div>
-                      <label className="text-xs font-medium mb-1 block">From:</label>
-                      <input type="date" value={dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : ''} onChange={e => {
-                      const newDate = e.target.value ? new Date(e.target.value) : undefined;
-                      setDateRange(prev => ({
-                        ...prev,
-                        from: newDate
-                      }));
-                    }} className="w-full px-2 py-1 text-sm border border-border rounded-md bg-background" />
-                    </div>
-                    <div>
-                      <label className="text-xs font-medium mb-1 block">To:</label>
-                      <input type="date" value={dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : ''} onChange={e => {
-                      const newDate = e.target.value ? new Date(e.target.value) : undefined;
-                      setDateRange(prev => ({
-                        ...prev,
-                        to: newDate
-                      }));
-                    }} className="w-full px-2 py-1 text-sm border border-border rounded-md bg-background" />
-                    </div>
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-light font-inter">Filter by Date:</label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className={cn("w-[280px] justify-start text-left font-light font-inter", !dateRange.from && !dateRange.to && "text-muted-foreground")}>
+                <Calendar className="mr-2 h-4 w-4" />
+                {dateRange.from ? dateRange.to ? <>
+                      {format(dateRange.from, "MMM dd, yyyy")} - {format(dateRange.to, "MMM dd, yyyy")}
+                    </> : format(dateRange.from, "MMM dd, yyyy") : <span>Pick a date range</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <div className="p-3 pointer-events-auto bg-background">
+                <div className="space-y-2">
+                  <div>
+                    <label className="text-xs font-medium mb-1 block">From:</label>
+                    <input type="date" value={dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : ''} onChange={e => {
+                    const newDate = e.target.value ? new Date(e.target.value) : undefined;
+                    setDateRange(prev => ({
+                      ...prev,
+                      from: newDate
+                    }));
+                  }} className="w-full px-2 py-1 text-sm border border-border rounded-md bg-background" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium mb-1 block">To:</label>
+                    <input type="date" value={dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : ''} onChange={e => {
+                    const newDate = e.target.value ? new Date(e.target.value) : undefined;
+                    setDateRange(prev => ({
+                      ...prev,
+                      to: newDate
+                    }));
+                  }} className="w-full px-2 py-1 text-sm border border-border rounded-md bg-background" />
                   </div>
                 </div>
-              </PopoverContent>
-            </Popover>
-            
-            {(dateRange.from || dateRange.to) && <Button variant="ghost" size="sm" onClick={() => setDateRange({
-            from: undefined,
-            to: undefined
-          })} className="h-7 sm:h-8 px-2 shrink-0">
-                <X className="h-3 w-3 sm:h-4 sm:w-4" />
-              </Button>}
-          </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+          
+          {(dateRange.from || dateRange.to) && <Button variant="ghost" size="sm" onClick={() => setDateRange({
+          from: undefined,
+          to: undefined
+        })} className="h-8 px-2">
+              <X className="h-4 w-4" />
+            </Button>}
         </div>
       </div>
 
-      {loading ? <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+      {loading ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({
         length: 6
       }).map((_, i) => <Card key={i} className="mission-card">
@@ -660,14 +651,14 @@ export function JobManagementPanel() {
               </CardContent>
             </Card>)}
         </div> : <Tabs defaultValue="active" className="space-y-6">
-          <TabsList className="glass-card flex-wrap justify-start sm:flex-nowrap whitespace-nowrap overflow-x-auto w-full">
-            <TabsTrigger value="active" className="data-[state=active]:bg-status-active data-[state=active]:text-white flex-shrink-0 text-xs sm:text-sm">
+          <TabsList className="glass-card flex-nowrap whitespace-nowrap overflow-x-auto">
+            <TabsTrigger value="active" className="data-[state=active]:bg-status-active data-[state=active]:text-white flex-shrink-0">
               Active Jobs ({filteredJobs.activeJobs.length})
             </TabsTrigger>
-            <TabsTrigger value="paused" className="flex-shrink-0 text-xs sm:text-sm">
+            <TabsTrigger value="paused" className="flex-shrink-0">
               Paused Jobs ({filteredJobs.pausedJobs.length})
             </TabsTrigger>
-            <TabsTrigger value="all" className="flex-shrink-0 text-xs sm:text-sm">
+            <TabsTrigger value="all" className="flex-shrink-0">
               All Jobs ({filteredJobs.allJobs.length})
             </TabsTrigger>
           </TabsList>
@@ -772,20 +763,20 @@ const JobGrid = memo(function JobGrid({
         </CardContent>
       </Card>;
   }
-  return <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 w-full">
-      {jobs.map(job => <Card key={job.job_id} className="mission-card group w-full max-w-full overflow-hidden">
-          <CardHeader className="pb-2 sm:pb-3 p-2.5 sm:p-3 md:p-4 lg:p-6">
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex-1 min-w-0 max-w-full">
-                <h4 className="line-clamp-2 mb-1.5 sm:mb-2 text-sm sm:text-base md:text-lg lg:text-xl font-normal break-words">
+  return <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+      {jobs.map(job => <Card key={job.job_id} className="mission-card group">
+          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4 lg:p-6">
+            <div className="flex items-start justify-between">
+              <div className="flex-1 min-w-0">
+                <h4 className="line-clamp-2 mb-2 text-base sm:text-lg lg:text-xl font-normal">
                   {job.job_title || "Untitled Position"}
                 </h4>
-                <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1.5 sm:mb-2">
+                <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
                   {getStatusBadge(job.status, job.Processed)}
-                  <Badge variant="outline" className="text-[9px] sm:text-[10px] md:text-xs truncate max-w-[80px] sm:max-w-none">
+                  <Badge variant="outline" className="text-[10px] sm:text-xs">
                     ID: {job.job_id}
                   </Badge>
-                  {job.groups && <Badge variant="outline" className="text-[9px] sm:text-[10px] md:text-xs border truncate max-w-[100px] sm:max-w-none" style={{
+                  {job.groups && <Badge variant="outline" className="text-[10px] sm:text-xs border" style={{
                 borderColor: job.groups.color || "#3B82F6",
                 color: job.groups.color || "#3B82F6"
               }}>
@@ -796,104 +787,101 @@ const JobGrid = memo(function JobGrid({
             </div>
           </CardHeader>
           
-          <CardContent className="space-y-2 sm:space-y-3 md:space-y-4 p-2.5 sm:p-3 md:p-4 lg:p-6">
-            <div className="space-y-1 sm:space-y-1.5 md:space-y-2 text-[10px] sm:text-xs md:text-sm">
-              {job.recruiter_name && <div className="flex items-center text-muted-foreground gap-1.5 sm:gap-2">
-                  <UserCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 shrink-0 text-primary" />
-                  <span className="font-medium truncate">{job.recruiter_name}</span>
+          <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-4 lg:p-6">
+            <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm">
+              {job.recruiter_name && <div className="flex items-center text-muted-foreground">
+                  <UserCircle className="h-4 w-4 mr-2 text-primary" />
+                  <span className="font-medium">{job.recruiter_name}</span>
                 </div>}
-              {job.job_location && <div className="flex items-center text-muted-foreground gap-1.5 sm:gap-2">
-                  <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 shrink-0 text-cyan" />
-                  <span className="truncate">{job.job_location}</span>
-                </div>}
-              
-              {job.job_salary_range && <div className="flex items-center text-muted-foreground gap-1.5 sm:gap-2">
-                  <Banknote className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 shrink-0 text-green" />
-                  <span className="truncate">{formatCurrency(job.job_salary_range, job["Currency"] as string | null)}</span>
+              {job.job_location && <div className="flex items-center text-muted-foreground">
+                  <MapPin className="h-4 w-4 mr-2 text-cyan" />
+                  {job.job_location}
                 </div>}
               
-              {job.contract_length && <div className="flex items-center text-muted-foreground gap-1.5 sm:gap-2">
-                  <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 shrink-0 text-primary" />
-                  <span className="truncate">{job.contract_length}</span>
+              {job.job_salary_range && <div className="flex items-center text-muted-foreground">
+                  <Banknote className="h-4 w-4 mr-2 text-green" />
+                  {formatCurrency(job.job_salary_range, job["Currency"] as string | null)}
                 </div>}
               
-              {job.Timestamp && <div className="flex items-center text-muted-foreground gap-1.5 sm:gap-2">
-                  <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 shrink-0 text-primary" />
-                  <span className="truncate">Created: {format(new Date(job.Timestamp), 'MMM dd, yyyy HH:mm')}</span>
+              {job.contract_length && <div className="flex items-center text-muted-foreground">
+                  <Clock className="h-4 w-4 mr-2 text-primary" />
+                  {job.contract_length}
+                </div>}
+              
+              {job.Timestamp && <div className="flex items-center text-muted-foreground">
+                  <Calendar className="h-4 w-4 mr-2 text-primary" />
+                  Created: {format(new Date(job.Timestamp), 'MMM dd, yyyy HH:mm')}
                 </div>}
             </div>
 
-            {job.jd_summary && <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground line-clamp-2 sm:line-clamp-3 break-words">
+            {job.jd_summary && <p className="text-sm text-muted-foreground line-clamp-3">
                 {job.jd_summary}
               </p>}
 
             {/* Candidate Counts */}
-            <div className="grid grid-cols-4 gap-1 sm:gap-1.5 md:gap-2 text-xs sm:text-sm">
-              <div className="flex flex-col items-center p-1 sm:p-1.5 md:p-2 rounded-md bg-blue/10 border border-blue/20">
-                <div className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 text-blue">
-                  <Users className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                  <span className="font-bold text-sm sm:text-base md:text-lg">{job.longlisted_count || 0}</span>
+            <div className="grid grid-cols-4 gap-2 text-sm">
+              <div className="flex flex-col items-center p-2 rounded-md bg-blue/10 border border-blue/20">
+                <div className="flex items-center gap-1 text-blue">
+                  <Users className="h-3 w-3" />
+                  <span className="font-bold text-lg">{job.longlisted_count || 0}</span>
                 </div>
-                <span className="text-[8px] sm:text-[9px] md:text-xs text-muted-foreground mt-0.5 sm:mt-1 text-center leading-tight">Longlisted</span>
+                <span className="text-xs text-muted-foreground mt-1">Longlisted</span>
               </div>
-              <div className="flex flex-col items-center p-1 sm:p-1.5 md:p-2 rounded-md bg-warning/10 border border-warning/20">
-                <div className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 text-warning">
-                  <Users className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                  <span className="font-bold text-sm sm:text-base md:text-lg">{job.shortlisted_count || 0}</span>
+              <div className="flex flex-col items-center p-2 rounded-md bg-warning/10 border border-warning/20">
+                <div className="flex items-center gap-1 text-warning">
+                  <Users className="h-3 w-3" />
+                  <span className="font-bold text-lg">{job.shortlisted_count || 0}</span>
                 </div>
-                <span className="text-[8px] sm:text-[9px] md:text-xs text-muted-foreground mt-0.5 sm:mt-1 text-center leading-tight">Shortlisted</span>
+                <span className="text-xs text-muted-foreground mt-1">Shortlisted</span>
               </div>
-              <div className="flex flex-col items-center p-1 sm:p-1.5 md:p-2 rounded-md bg-destructive/10 border border-destructive/20">
-                <div className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 text-destructive">
-                  <Users className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                  <span className="font-bold text-sm sm:text-base md:text-lg">{job.rejected_count || 0}</span>
+              <div className="flex flex-col items-center p-2 rounded-md bg-destructive/10 border border-destructive/20">
+                <div className="flex items-center gap-1 text-destructive">
+                  <Users className="h-3 w-3" />
+                  <span className="font-bold text-lg">{job.rejected_count || 0}</span>
                 </div>
-                <span className="text-[8px] sm:text-[9px] md:text-xs text-muted-foreground mt-0.5 sm:mt-1 text-center leading-tight">Rejected</span>
+                <span className="text-xs text-muted-foreground mt-1">Rejected</span>
               </div>
-              <div className="flex flex-col items-center p-1 sm:p-1.5 md:p-2 rounded-md bg-success/10 border border-success/20">
-                <div className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 text-success">
-                  <Users className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                  <span className="font-bold text-sm sm:text-base md:text-lg">{job.submitted_count || 0}</span>
+              <div className="flex flex-col items-center p-2 rounded-md bg-success/10 border border-success/20">
+                <div className="flex items-center gap-1 text-success">
+                  <Users className="h-3 w-3" />
+                  <span className="font-bold text-lg">{job.submitted_count || 0}</span>
                 </div>
-                <span className="text-[8px] sm:text-[9px] md:text-xs text-muted-foreground mt-0.5 sm:mt-1 text-center leading-tight">Submitted</span>
+                <span className="text-xs text-muted-foreground mt-1">Submitted</span>
               </div>
             </div>
 
             {/* Automatic Dial Toggle */}
-            <div className="py-1.5 sm:py-2 border-t border-border/30 space-y-1.5 sm:space-y-2">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm min-w-0">
-                  {job.automatic_dial ? <Phone className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-emerald-500 shrink-0" /> : <PhoneOff className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-muted-foreground shrink-0" />}
-                  <span className="text-muted-foreground truncate">Automatic Dial</span>
+            <div className="py-2 border-t border-border/30 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm">
+                  {job.automatic_dial ? <Phone className="h-4 w-4 text-emerald-500" /> : <PhoneOff className="h-4 w-4 text-muted-foreground" />}
+                  <span className="text-muted-foreground">Automatic Dial</span>
                 </div>
-                <Switch checked={job.automatic_dial || false} onCheckedChange={() => onAutomaticDialToggle(job.job_id, job.automatic_dial)} className="shrink-0" />
+                <Switch checked={job.automatic_dial || false} onCheckedChange={() => onAutomaticDialToggle(job.job_id, job.automatic_dial)} />
               </div>
               
               {/* Show status info */}
               {job.automatic_dial === true && (
-                <span className="text-[10px] sm:text-xs text-muted-foreground block">
+                <span className="text-xs text-muted-foreground">
                   Active • {job.shortlisted_count || 0} shortlisted
                 </span>
               )}
             </div>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-1.5 sm:pt-2">
-              <div className="flex items-center gap-1.5 sm:gap-2 justify-start">
-                <Button size="sm" variant="outline" onClick={() => navigate(`/jobs/edit/${job.job_id}`)} className="h-7 sm:h-8 px-2 flex-1 sm:flex-none">
+            <div className="flex items-center justify-between pt-2">
+              <div className="flex space-x-2">
+                <Button size="sm" variant="outline" onClick={() => navigate(`/jobs/edit/${job.job_id}`)} className="h-8 px-2">
                   <Edit className="h-3 w-3" />
-                  <span className="ml-1 text-[10px] sm:text-xs sm:hidden">Edit</span>
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => onStatusToggle(job.job_id, job.Processed)} className="h-7 sm:h-8 px-2 flex-1 sm:flex-none">
+                <Button size="sm" variant="outline" onClick={() => onStatusToggle(job.job_id, job.Processed)} className="h-8 px-2">
                   {job.Processed === "Yes" ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
-                  <span className="ml-1 text-[10px] sm:text-xs sm:hidden">{job.Processed === "Yes" ? "Pause" : "Play"}</span>
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => onDelete(job.job_id)} className="h-7 sm:h-8 px-2 hover:bg-destructive hover:text-destructive-foreground flex-1 sm:flex-none">
+                <Button size="sm" variant="outline" onClick={() => onDelete(job.job_id)} className="h-8 px-2 hover:bg-destructive hover:text-destructive-foreground">
                   <Trash2 className="h-3 w-3" />
-                  <span className="ml-1 text-[10px] sm:text-xs sm:hidden">Delete</span>
                 </Button>
               </div>
               
-              <Button size="sm" className="h-7 sm:h-8 text-[10px] sm:text-xs w-full sm:w-auto" onClick={() => navigate(`/job/${job.job_id}`)}>
+              <Button size="sm" className="h-8" onClick={() => navigate(`/job/${job.job_id}`)}>
                 <Users className="h-3 w-3 mr-1" />
                 Open Job
               </Button>
