@@ -606,7 +606,7 @@ export default function UsersPanel() {
             All Users {!loading && `(${filteredUsers.length})`}
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-2 sm:p-6">
+        <CardContent className="p-2 sm:p-6 pb-24 sm:pb-6">
           {loading ? (
             <div className="text-center py-4 text-sm">Loading users...</div>
           ) : filteredUsers.length === 0 ? (
@@ -615,22 +615,21 @@ export default function UsersPanel() {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto -mx-2 sm:mx-0 rounded-md border sm:border-0">
-                <div className="min-w-[600px]">
-                  <Table className="table-fixed w-full">
+              <div className="-mx-2 sm:mx-0 rounded-md border sm:border-0">
+                <Table className="min-w-[720px] sm:min-w-0 table-fixed">
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-[10px] sm:text-sm py-2 sticky left-0 bg-background z-10 w-[20%]">Name</TableHead>
-                      <TableHead className="text-[10px] sm:text-sm py-2 w-[25%]">Email</TableHead>
-                      <TableHead className="text-[10px] sm:text-sm py-2 w-[20%]">Role</TableHead>
-                      <TableHead className="text-[10px] sm:text-sm py-2 w-[15%]">Created</TableHead>
-                      <TableHead className="text-[10px] sm:text-sm py-2 sticky right-0 bg-background z-10 w-[20%]">Actions</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2 sm:sticky sm:left-0 sm:bg-background sm:z-10 w-[24%]">Name</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2 w-[28%]">Email</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2 w-[18%]">Role</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2 w-[12%]">Created</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2 sm:sticky sm:right-0 sm:bg-background sm:z-10 w-[18%]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredUsers.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell className="text-[10px] sm:text-sm py-2 sticky left-0 bg-background z-10">
+                       <TableRow key={user.id}>
+                        <TableCell className="text-[10px] sm:text-sm py-2 sm:sticky sm:left-0 sm:bg-background sm:z-10">
                           <div className="flex items-center gap-1 sm:gap-2">
                             <User className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                             <span className="truncate">{user.name || 'No name'}</span>
@@ -670,7 +669,7 @@ export default function UsersPanel() {
                         <TableCell className="text-[10px] sm:text-sm py-2">
                           {new Date(user.created_at).toLocaleDateString()}
                         </TableCell>
-                        <TableCell className="text-[10px] sm:text-sm py-2 sticky right-0 bg-background z-10">
+                        <TableCell className="text-[10px] sm:text-sm py-2 sm:sticky sm:right-0 sm:bg-background sm:z-10">
                           <div className="flex items-center gap-0.5 sm:gap-2 justify-end">
                             <Button
                               variant="outline"
@@ -695,7 +694,6 @@ export default function UsersPanel() {
                   </TableBody>
                 </Table>
               </div>
-            </div>
             </>
           )}
           </CardContent>
