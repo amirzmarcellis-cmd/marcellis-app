@@ -47,6 +47,48 @@ export type Database = {
         }
         Relationships: []
       }
+      call_sessions: {
+        Row: {
+          analysis_json: Json | null
+          candidate_name: string | null
+          created_at: string | null
+          fit_score: number | null
+          id: string
+          job_id: string | null
+          outcome: string | null
+          success_evaluation: number | null
+          summary: string | null
+          transcript: string | null
+          vapi_call_id: string | null
+        }
+        Insert: {
+          analysis_json?: Json | null
+          candidate_name?: string | null
+          created_at?: string | null
+          fit_score?: number | null
+          id?: string
+          job_id?: string | null
+          outcome?: string | null
+          success_evaluation?: number | null
+          summary?: string | null
+          transcript?: string | null
+          vapi_call_id?: string | null
+        }
+        Update: {
+          analysis_json?: Json | null
+          candidate_name?: string | null
+          created_at?: string | null
+          fit_score?: number | null
+          id?: string
+          job_id?: string | null
+          outcome?: string | null
+          success_evaluation?: number | null
+          summary?: string | null
+          transcript?: string | null
+          vapi_call_id?: string | null
+        }
+        Relationships: []
+      }
       candidates: {
         Row: {
           cv_text: string | null
@@ -172,6 +214,41 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      feedback: {
+        Row: {
+          call_session_id: string | null
+          category: string | null
+          created_at: string | null
+          detail: string | null
+          id: string
+          severity: number | null
+        }
+        Insert: {
+          call_session_id?: string | null
+          category?: string | null
+          created_at?: string | null
+          detail?: string | null
+          id?: string
+          severity?: number | null
+        }
+        Update: {
+          call_session_id?: string | null
+          category?: string | null
+          created_at?: string | null
+          detail?: string | null
+          id?: string
+          severity?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_call_session_id_fkey"
+            columns: ["call_session_id"]
+            isOneToOne: false
+            referencedRelation: "call_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       groups: {
         Row: {
@@ -680,6 +757,45 @@ export type Database = {
         }
         Relationships: []
       }
+      qa_knowledge: {
+        Row: {
+          answer: string
+          created_at: string | null
+          embedding: string | null
+          id: string
+          job_id: string | null
+          question: string
+          source: string | null
+          tags: string[] | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          answer: string
+          created_at?: string | null
+          embedding?: string | null
+          id?: string
+          job_id?: string | null
+          question: string
+          source?: string | null
+          tags?: string[] | null
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          answer?: string
+          created_at?: string | null
+          embedding?: string | null
+          id?: string
+          job_id?: string | null
+          question?: string
+          source?: string | null
+          tags?: string[] | null
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       "Rejection table": {
         Row: {
           itris_job_id: string | null
@@ -904,6 +1020,8 @@ export type Database = {
           similarity: number
         }[]
       }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       org_role: "ADMIN" | "MANAGEMENT" | "EMPLOYEE"
