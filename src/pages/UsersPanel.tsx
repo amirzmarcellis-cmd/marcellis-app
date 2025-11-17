@@ -576,10 +576,10 @@ export default function UsersPanel() {
 
         <TabsContent value="users">
           <Card>
-        <CardHeader className="p-3 sm:p-6">
-          <CardTitle className="text-lg sm:text-xl">All Users</CardTitle>
+        <CardHeader className="p-2 sm:p-6">
+          <CardTitle className="text-sm sm:text-xl">All Users</CardTitle>
         </CardHeader>
-        <CardContent className="p-3 sm:p-6">
+        <CardContent className="p-2 sm:p-6">
           {loading ? (
             <div className="text-center py-4 text-sm">Loading users...</div>
           ) : users.length === 0 ? (
@@ -587,34 +587,34 @@ export default function UsersPanel() {
               No users found
             </div>
           ) : (
-            <div className="overflow-x-auto -mx-3 sm:mx-0">
+            <div className="overflow-x-auto -mx-2 sm:mx-0">
               <div className="min-w-[640px]">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-xs sm:text-sm">Name</TableHead>
-                      <TableHead className="text-xs sm:text-sm">Email</TableHead>
-                      <TableHead className="text-xs sm:text-sm">Role</TableHead>
-                      <TableHead className="text-xs sm:text-sm">Created</TableHead>
-                      <TableHead className="text-xs sm:text-sm">Actions</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2">Name</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2">Email</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2">Role</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2">Created</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {users.map((user) => (
                       <TableRow key={user.id}>
-                        <TableCell className="text-xs sm:text-sm">
-                          <div className="flex items-center gap-1.5 sm:gap-2">
-                            <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
-                            <span className="truncate max-w-[120px] sm:max-w-none">{user.name || 'No name'}</span>
+                        <TableCell className="text-[10px] sm:text-sm py-2">
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <User className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                            <span className="truncate max-w-[100px] sm:max-w-none">{user.name || 'No name'}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-xs sm:text-sm">
-                          <div className="flex items-center gap-1.5 sm:gap-2">
-                            <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
-                            <span className="truncate max-w-[150px] sm:max-w-none">{user.email}</span>
+                        <TableCell className="text-[10px] sm:text-sm py-2">
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <Mail className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                            <span className="truncate max-w-[120px] sm:max-w-none">{user.email}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-xs sm:text-sm">
+                        <TableCell className="text-[10px] sm:text-sm py-2">
                           {(() => {
                             const orgRole = userOrgRoles[user.user_id] || 'EMPLOYEE';
                             const roleDisplay = getRoleDisplay(user, userMembershipsMap[user.user_id] || [], orgRole);
@@ -622,14 +622,14 @@ export default function UsersPanel() {
                             const userMemberships = userMembershipsMap[user.user_id] || [];
                             return (
                               <div className="space-y-0.5 sm:space-y-1">
-                                <Badge variant={roleDisplay.variant} className="text-[10px] sm:text-xs">
-                                  <Icon className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
+                                <Badge variant={roleDisplay.variant} className="text-[9px] sm:text-xs px-1 py-0">
+                                  <Icon className="h-2 w-2 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
                                   {roleDisplay.label}
                                 </Badge>
                                 {userMemberships.length > 0 && orgRole === 'EMPLOYEE' && (
-                                  <div className="text-[10px] sm:text-xs text-muted-foreground">
+                                  <div className="text-[9px] sm:text-xs text-muted-foreground">
                                     {userMemberships.map((membership, idx) => (
-                                      <div key={idx} className="truncate max-w-[100px] sm:max-w-none">
+                                      <div key={idx} className="truncate max-w-[80px] sm:max-w-none">
                                         {membership.team_name} ({membership.role === 'TEAM_LEADER' ? 'Leader' : 'Member'})
                                       </div>
                                     ))}
@@ -639,26 +639,26 @@ export default function UsersPanel() {
                             );
                           })()}
                         </TableCell>
-                        <TableCell className="text-xs sm:text-sm">
+                        <TableCell className="text-[10px] sm:text-sm py-2">
                           {new Date(user.created_at).toLocaleDateString()}
                         </TableCell>
-                         <TableCell>
-                           <div className="flex items-center gap-1 sm:gap-2">
+                         <TableCell className="py-2">
+                           <div className="flex items-center gap-0.5 sm:gap-2">
                              <Button
                                variant="outline"
                                size="sm"
                                onClick={() => openEditUserDialog(user)}
-                               className="h-8 w-8 p-0"
+                               className="h-7 w-7 p-0"
                              >
-                               <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                               <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                              </Button>
                              <Button
                                variant="outline"
                                size="sm"
                                onClick={() => handleDeleteUser(user.user_id)}
-                               className="text-destructive hover:text-destructive h-8 w-8 p-0"
+                               className="text-destructive hover:text-destructive h-7 w-7 p-0"
                              >
-                               <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                               <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                              </Button>
                            </div>
                          </TableCell>
