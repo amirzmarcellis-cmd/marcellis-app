@@ -521,19 +521,19 @@ export function JobManagementPanel() {
       allJobs: applyFilters(jobs)
     };
   }, [jobs, selectedGroupFilter, selectedRecruiterFilter, dateRange]);
-  return <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-5xl font-light font-work tracking-tight">Job Management</h2>
-          <p className="text-base font-light font-inter text-muted-foreground">Manage job postings and recruitment campaigns</p>
+  return <div className="space-y-4 sm:space-y-6 w-full">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+        <div className="w-full sm:w-auto">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-light font-work tracking-tight">Job Management</h2>
+          <p className="text-sm sm:text-base font-light font-inter text-muted-foreground">Manage job postings and recruitment campaigns</p>
         </div>
-        <div className="flex items-center gap-3">
-          <Button onClick={() => navigate("/groups")} variant="outline" className="flex items-center gap-2 font-light font-inter">
-            <Building2 className="h-4 w-4" />
-            Manage Groups
+        <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+          <Button onClick={() => navigate("/groups")} variant="outline" className="flex items-center gap-2 font-light font-inter text-xs sm:text-sm flex-1 sm:flex-none">
+            <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Manage</span> Groups
           </Button>
-          <Button onClick={() => navigate("/jobs/add")} className="action-button bg-gradient-primary hover:shadow-glow font-light font-inter">
-            <Plus className="h-4 w-4 mr-2" />
+          <Button onClick={() => navigate("/jobs/add")} className="action-button bg-gradient-primary hover:shadow-glow font-light font-inter text-xs sm:text-sm flex-1 sm:flex-none">
+            <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
             Create Job
           </Button>
         </div>
@@ -763,20 +763,20 @@ const JobGrid = memo(function JobGrid({
         </CardContent>
       </Card>;
   }
-  return <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 lg:gap-6">
-      {jobs.map(job => <Card key={job.job_id} className="mission-card group overflow-hidden max-w-full">
-          <CardHeader className="pb-2 sm:pb-3 p-2 sm:p-4 lg:p-6">
-            <div className="flex items-start justify-between min-w-0">
-              <div className="flex-1 min-w-0">
-                <h4 className="line-clamp-2 mb-2 text-sm sm:text-lg lg:text-xl font-normal">
+  return <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 px-2 sm:px-0">
+      {jobs.map(job => <Card key={job.job_id} className="mission-card group overflow-hidden w-full">
+          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4 lg:p-6">
+            <div className="flex items-start justify-between gap-2 min-w-0">
+              <div className="flex-1 min-w-0 overflow-hidden">
+                <h4 className="line-clamp-2 mb-2 text-base sm:text-lg lg:text-xl font-normal break-words">
                   {job.job_title || "Untitled Position"}
                 </h4>
-                <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
                   {getStatusBadge(job.status, job.Processed)}
-                  <Badge variant="outline" className="text-[10px] sm:text-xs break-all">
+                  <Badge variant="outline" className="text-[10px] sm:text-xs truncate max-w-[120px]">
                     ID: {job.job_id}
                   </Badge>
-                  {job.groups && <Badge variant="outline" className="text-[10px] sm:text-xs border" style={{
+                  {job.groups && <Badge variant="outline" className="text-[10px] sm:text-xs border truncate max-w-[120px]" style={{
                 borderColor: job.groups.color || "#3B82F6",
                 color: job.groups.color || "#3B82F6"
               }}>
@@ -787,7 +787,7 @@ const JobGrid = memo(function JobGrid({
             </div>
           </CardHeader>
           
-          <CardContent className="space-y-3 sm:space-y-4 p-2 sm:p-4 lg:p-6">
+          <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-4 lg:p-6 overflow-hidden">
             <div className="hidden sm:block space-y-1 sm:space-y-2 text-xs sm:text-sm">
               {job.recruiter_name && <div className="flex items-center text-muted-foreground min-w-0">
                   <UserCircle className="h-4 w-4 mr-2 text-primary flex-shrink-0" />
@@ -868,8 +868,8 @@ const JobGrid = memo(function JobGrid({
               )}
             </div>
 
-            <div className="flex items-center justify-between pt-2">
-              <div className="hidden sm:flex space-x-2">
+            <div className="flex items-center justify-between pt-2 gap-2">
+              <div className="hidden sm:flex space-x-2 flex-shrink-0">
                 <Button size="sm" variant="outline" onClick={() => navigate(`/jobs/edit/${job.job_id}`)} className="h-8 px-2">
                   <Edit className="h-3 w-3" />
                 </Button>
@@ -881,8 +881,8 @@ const JobGrid = memo(function JobGrid({
                 </Button>
               </div>
               
-              <Button size="sm" className="h-8 w-full sm:w-auto" onClick={() => navigate(`/job/${job.job_id}`)}>
-                <Users className="h-3 w-3 mr-1" />
+              <Button size="sm" className="h-9 sm:h-8 w-full sm:w-auto text-sm" onClick={() => navigate(`/job/${job.job_id}`)}>
+                <Users className="h-3 w-3 mr-1.5" />
                 Open Job
               </Button>
             </div>
