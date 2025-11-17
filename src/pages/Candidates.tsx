@@ -311,7 +311,26 @@ export default function Candidates() {
                             </Badge>
                           </div>
                         </div>
-                        <div className="hidden" />
+                        <div className="flex items-center gap-0.5 flex-shrink-0">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-6 w-6 p-0"
+                            onClick={() => handleEditCandidate(cv)}
+                            aria-label="Edit CV"
+                          >
+                            <Edit className="w-3 h-3" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                            onClick={() => handleDeleteCV(cv.user_id)}
+                            aria-label="Delete CV"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
                       </div>
 
                       <div className="space-y-2">
@@ -362,9 +381,9 @@ export default function Candidates() {
                               Edit
                             </Button>
                             <Button 
-                              variant="outline" 
+                              variant="destructive" 
                               size="sm" 
-                              className="h-7 py-1 text-xs text-destructive hover:text-destructive" 
+                              className="h-7 py-1 text-xs" 
                               onClick={() => handleDeleteCV(cv.user_id)}
                               aria-label="Delete CV"
                             >
