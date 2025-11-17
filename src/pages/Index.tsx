@@ -627,10 +627,10 @@ export default function Index() {
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-background text-foreground p-4 sm:p-6 relative overflow-hidden mx-auto max-w-screen-2xl">
+  return <div className="min-h-screen bg-background text-foreground p-3 sm:p-4 lg:p-6 relative overflow-hidden mx-auto max-w-screen-2xl pb-24 sm:pb-20">
       
-      <div className="mb-8 relative z-10">
-        <div className="rounded-2xl border border-border/50 bg-gradient-card backdrop-blur-xl p-6 shadow-card animate-fade-in">
+      <div className="mb-4 sm:mb-6 lg:mb-8 relative z-10">
+        <div className="rounded-xl sm:rounded-2xl border border-border/50 bg-gradient-card backdrop-blur-xl p-4 sm:p-6 shadow-card animate-fade-in">
           <HeroHeader title="Mission Control" subtitle={`Welcome back, ${profile?.name || 'Commander'}. Your day at a glance.`} />
 
           <BentoKpis>
@@ -664,14 +664,14 @@ export default function Index() {
       </div>
 
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 relative z-10">
         {/* Left Side - Job Control Panels - 30% width */}
-        <div className="space-y-4 lg:col-span-1">
-          <h2 className="text-lg font-bold font-work text-cyan-300 mb-4 flex items-center">
-            <Target className="h-5 w-5 mr-2" />
+        <div className="space-y-3 sm:space-y-4 lg:col-span-1">
+          <h2 className="text-base sm:text-lg font-bold font-work text-cyan-300 mb-3 sm:mb-4 flex items-center">
+            <Target className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
             Active Jobs Funnel
           </h2>
-          <ScrollArea className="h-[600px]">
+          <ScrollArea className="h-[400px] sm:h-[500px] lg:h-[600px]">
             <div className="space-y-3">
               {data?.activeJobs?.map(job => <Card key={job.job_id} className="bg-card border-border dark:bg-gradient-to-br dark:from-white/5 dark:via-white/3 dark:to-white/5 dark:backdrop-blur-lg dark:border-white/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 hover:scale-[1.02]">
                   <CardContent className="p-4">
@@ -721,34 +721,34 @@ export default function Index() {
         </div>
 
         {/* Right Side - Live Candidate Feed & Action Center - 60% width */}
-        <div className="space-y-6 lg:col-span-2 text-2xl">
+        <div className="space-y-4 sm:space-y-6 lg:col-span-2">
           <ActivityTicker items={enrichedCandidates.slice(0, 10).map(c => `${c.candidate_name} • ${c.job_title} • ${parseFloat(c.success_score) || 0}`)} />
           {/* Live Candidate Feed */}
           <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xl text-cyan-300 flex items-center">
+            <CardHeader className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+                <CardTitle className="text-lg sm:text-xl text-cyan-300 flex items-center">
                   <Activity className="h-5 w-5 mr-2 animate-pulse text-cyan-400" />
                   Live Candidate Feed
                   <Badge className="ml-3 bg-background/40 text-primary border-2 border-primary/60 glow-cyan animate-pulse">
                     LIVE
                   </Badge>
                 </CardTitle>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-between sm:justify-start">
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm text-emerald-300 font-medium">Active</span>
+                    <span className="text-xs sm:text-sm text-emerald-300 font-medium">Active</span>
                   </div>
-                  <Button size="sm" className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white border border-cyan-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" onClick={() => window.location.href = '/live-feed'}>
-                    <Activity className="w-4 h-4 mr-2" />
-                    Open Live Feed
+                  <Button size="sm" className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white border border-cyan-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-xs sm:text-sm" onClick={() => window.location.href = '/live-feed'}>
+                    <Activity className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Open Live Feed</span>
                   </Button>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-[400px]">
-                <div className="space-y-4">
+            <CardContent className="p-4 sm:p-6">
+              <ScrollArea className="h-[300px] sm:h-[350px] lg:h-[400px]">
+                <div className="space-y-3 sm:space-y-4">
                   {enrichedCandidates.slice(0, 5).map((candidate, index) => {
                   const score = parseFloat(candidate.success_score) || 0;
                   const jobTitle = candidate.job_title || 'Unknown Position';

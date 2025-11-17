@@ -8,7 +8,7 @@ interface BentoKpisProps {
 
 export function BentoKpis({ children, className }: BentoKpisProps) {
   return (
-    <div className={cn("grid grid-cols-1 lg:grid-cols-5 gap-4 overflow-x-auto", className)}>
+    <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4", className)}>
       {children}
     </div>
   )
