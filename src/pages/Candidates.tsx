@@ -126,7 +126,7 @@ export default function Candidates() {
   }
 
   return (
-      <div className="space-y-4 sm:space-y-6 overflow-x-hidden pb-16 md:pb-0">
+      <div className="space-y-4 sm:space-y-6 overflow-x-hidden pb-20 md:pb-0">
         <HeroHeader
           title="CVs Database"
           subtitle="View and manage all uploaded CVs"
@@ -313,22 +313,24 @@ export default function Candidates() {
                         </div>
                         <div className="flex items-center gap-0.5 flex-shrink-0">
                           <Button 
-                            variant="ghost" 
+                            variant="outline" 
                             size="sm" 
-                            className="h-6 w-6 p-0"
+                            className="h-7 w-7 p-0 text-foreground"
                             onClick={() => handleEditCandidate(cv)}
                             aria-label="Edit CV"
+                            title="Edit CV"
                           >
-                            <Edit className="w-3 h-3" />
+                            <Edit className="w-3.5 h-3.5" />
                           </Button>
                           <Button 
-                            variant="ghost" 
+                            variant="outline" 
                             size="sm" 
-                            className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                            className="h-7 w-7 p-0 text-destructive"
                             onClick={() => handleDeleteCV(cv.user_id)}
                             aria-label="Delete CV"
+                            title="Delete CV"
                           >
-                            <Trash2 className="w-3 h-3" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </Button>
                         </div>
                       </div>
