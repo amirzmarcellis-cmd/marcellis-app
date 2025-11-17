@@ -3088,20 +3088,20 @@ mainCandidate["linkedin_score_reason"] ? (
           </TabsList>
         </div>
 
-        <TabsContent value="overview" className="space-y-4 pb-32">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <TabsContent value="overview" className="space-y-2 sm:space-y-4 pb-32">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-6">
             <Card>
-              <CardHeader>
-                <CardTitle>Job Information</CardTitle>
+              <CardHeader className="p-2 sm:p-6">
+                <CardTitle className="text-sm sm:text-lg">Job Information</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 sm:space-y-3 [&>div]:flex [&>div]:flex-col sm:[&>div]:flex-row sm:[&>div]:items-start sm:[&>div]:justify-between [&>div]:gap-1 sm:[&>div]:gap-2 [&>div>span:last-child]:break-words [&>div>span:last-child]:text-left sm:[&>div>span:last-child]:text-right [&>div>span:last-child]:max-w-full sm:[&>div>span:last-child]:max-w-[60%]">
+              <CardContent className="p-2 sm:p-6 space-y-1 sm:space-y-3 text-[10px] sm:text-sm [&>div]:flex [&>div]:flex-col sm:[&>div]:flex-row sm:[&>div]:items-start sm:[&>div]:justify-between [&>div]:gap-0.5 sm:[&>div]:gap-2 [&>div>span:last-child]:break-words [&>div>span:last-child]:text-left sm:[&>div>span:last-child]:text-right [&>div>span:last-child]:max-w-full sm:[&>div>span:last-child]:max-w-[60%] [&>div>span:last-child]:leading-tight sm:[&>div>span:last-child]:leading-normal">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Job ID:</span>
-                  <span className="font-mono text-sm">{job.job_id}</span>
+                  <span className="font-mono text-[10px] sm:text-sm">{job.job_id}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Itris ID:</span>
-                  <span className="font-mono text-sm">{job.itris_job_id || "N/A"}</span>
+                  <span className="font-mono text-[10px] sm:text-sm">{job.itris_job_id || "N/A"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Client Name:</span>
@@ -3109,7 +3109,7 @@ mainCandidate["linkedin_score_reason"] ? (
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Client Description:</span>
-                  <span>{job.client_description || "N/A"}</span>
+                  <span className="line-clamp-2 sm:line-clamp-none">{job.client_description || "N/A"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Location:</span>
@@ -3121,7 +3121,7 @@ mainCandidate["linkedin_score_reason"] ? (
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Assigned Recruiter:</span>
-                  <span>{recruiterName || job.recruiter_id || "N/A"}</span>
+                  <span className="line-clamp-1">{recruiterName || job.recruiter_id || "N/A"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Notice Period:</span>
@@ -3129,20 +3129,20 @@ mainCandidate["linkedin_score_reason"] ? (
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Preferred Nationality:</span>
-                  <span>{job.prefered_nationality || "N/A"}</span>
+                  <span className="line-clamp-1">{job.prefered_nationality || "N/A"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Group:</span>
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-1 sm:gap-2">
                     {jobGroup ? (
                       <>
                         <div
-                          className="w-3 h-3 rounded-full"
+                          className="w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0"
                           style={{
                             backgroundColor: jobGroup.color,
                           }}
                         />
-                        {jobGroup.name}
+                        <span className="line-clamp-1">{jobGroup.name}</span>
                       </>
                     ) : (
                       "No Group"
@@ -3155,7 +3155,7 @@ mainCandidate["linkedin_score_reason"] ? (
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Headhunting Companies:</span>
-                  <div className="flex flex-col gap-1 items-end">
+                  <div className="flex flex-col gap-0.5 sm:gap-1 items-end">
                     {job.headhunting_companies ? (
                       job.headhunting_companies.split(",").map((url: string, index: number) => (
                         <a
@@ -3163,10 +3163,10 @@ mainCandidate["linkedin_score_reason"] ? (
                           href={url.trim()}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-primary hover:underline flex items-center gap-1 break-all"
+                          className="text-primary hover:underline flex items-center gap-0.5 sm:gap-1 break-all text-[9px] sm:text-sm"
                         >
-                          {url.trim()}
-                          <ExternalLink className="w-3 h-3" />
+                          <span className="line-clamp-1">{url.trim()}</span>
+                          <ExternalLink className="w-2 h-2 sm:w-3 sm:h-3 flex-shrink-0" />
                         </a>
                       ))
                     ) : (
@@ -3176,30 +3176,31 @@ mainCandidate["linkedin_score_reason"] ? (
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Automatic Dial:</span>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 sm:gap-2">
                     <Switch
                       checked={job.automatic_dial || false}
                       onCheckedChange={handleAutomaticDialToggle}
                       disabled={automaticDialSaving}
+                      className="scale-75 sm:scale-100"
                     />
-                    <span className="text-sm text-muted-foreground">{job.automatic_dial ? "ON" : "OFF"}</span>
+                    <span className="text-[10px] sm:text-sm text-muted-foreground">{job.automatic_dial ? "ON" : "OFF"}</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader>
-                <CardTitle>Job Requirements & Details</CardTitle>
+              <CardHeader className="p-2 sm:p-6">
+                <CardTitle className="text-sm sm:text-lg">Job Requirements & Details</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 sm:space-y-3 [&>div]:flex [&>div]:flex-col sm:[&>div]:flex-row sm:[&>div]:items-start sm:[&>div]:justify-between [&>div]:gap-1 sm:[&>div]:gap-2 [&>div>span:last-child]:break-words [&>div>span:last-child]:text-left sm:[&>div>span:last-child]:text-right [&>div>span:last-child]:max-w-full sm:[&>div>span:last-child]:max-w-[60%]">
+              <CardContent className="p-2 sm:p-6 space-y-1 sm:space-y-3 text-[10px] sm:text-sm [&>div]:flex [&>div]:flex-col sm:[&>div]:flex-row sm:[&>div]:items-start sm:[&>div]:justify-between [&>div]:gap-0.5 sm:[&>div]:gap-2 [&>div>span:last-child]:break-words [&>div>span:last-child]:text-left sm:[&>div>span:last-child]:text-right [&>div>span:last-child]:max-w-full sm:[&>div>span:last-child]:max-w-[60%] [&>div>span:last-child]:leading-tight sm:[&>div>span:last-child]:leading-normal">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Countries to include:</span>
-                  <span>{job.nationality_to_include || "N/A"}</span>
+                  <span className="line-clamp-1">{job.nationality_to_include || "N/A"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Countries to exclude:</span>
-                  <span>{job.nationality_to_exclude || "N/A"}</span>
+                  <span className="line-clamp-1">{job.nationality_to_exclude || "N/A"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Job Type:</span>
@@ -3220,7 +3221,7 @@ mainCandidate["linkedin_score_reason"] ? (
                       href={job["assignment"]}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary hover:underline break-all"
+                      className="text-primary hover:underline break-all text-[9px] sm:text-sm line-clamp-1"
                     >
                       View Assignment
                     </a>
@@ -3232,7 +3233,7 @@ mainCandidate["linkedin_score_reason"] ? (
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">JD Summary:</span>
-                  <span>{job.jd_summary || "N/A"}</span>
+                  <span className="line-clamp-2 sm:line-clamp-none">{job.jd_summary || "N/A"}</span>
                 </div>
               </CardContent>
             </Card>
