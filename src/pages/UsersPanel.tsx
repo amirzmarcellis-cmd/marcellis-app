@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Plus, Mail, User, Shield, Trash2, Crown, Briefcase, DollarSign, Truck, UserCheck, Users2, AlertTriangle, Edit, Linkedin } from 'lucide-react';
+import { Users, Plus, Mail, User, Shield, Trash2, Crown, Briefcase, DollarSign, Truck, UserCheck, Users2, AlertTriangle, Edit, Linkedin, Search } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -79,6 +79,7 @@ export default function UsersPanel() {
   const [userMembershipsMap, setUserMembershipsMap] = useState<Record<string, Array<{team_id: string, role: string, team_name: string}>>>({});
   const [userOrgRoles, setUserOrgRoles] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [newUser, setNewUser] = useState<NewUserData>({
     email: '',
@@ -99,6 +100,16 @@ export default function UsersPanel() {
   });
   const { toast } = useToast();
   const { session } = useAuth();
+  
+  // Filter users based on search term
+  const filteredUsers = users.filter(user => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    return (
+      user.name?.toLowerCase().includes(search) ||
+      user.email.toLowerCase().includes(search)
+    );
+  });
   const { canAccessUsersPanel, loading: roleLoading, isAdmin } = useUserRole();
 
   // Move all useEffect hooks to top level before any conditional returns
@@ -438,20 +449,21 @@ export default function UsersPanel() {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 px-4 sm:px-0">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <Users className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
-          <h1 className="text-xl sm:text-2xl font-bold">User Management</h1>
-        </div>
-        {canAccessUsersPanel && (
-          <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
-            <DialogTrigger asChild>
-              <Button className="w-full sm:w-auto" size="sm">
-                <Plus className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Add User</span>
-              </Button>
-            </DialogTrigger>
+    <div className="space-y-3 sm:space-y-6 px-3 sm:px-0">
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Users className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
+            <h1 className="text-lg sm:text-2xl font-bold">User Management</h1>
+          </div>
+          {canAccessUsersPanel && (
+            <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
+              <DialogTrigger asChild>
+                <Button className="w-full sm:w-auto" size="sm">
+                  <Plus className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Add User</span>
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-[95vw] sm:max-w-lg">
               <DialogHeader>
                 <DialogTitle className="text-lg sm:text-xl">Add New User</DialogTitle>
@@ -559,10 +571,23 @@ export default function UsersPanel() {
               </form>
             </DialogContent>
           </Dialog>
-        )}
+          )}
+        </div>
+        
+        {/* Search Bar */}
+        <div className="relative w-full">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search by name or email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full text-sm pl-9"
+          />
+        </div>
       </div>
 
-      <Tabs defaultValue="users" className="space-y-4 sm:space-y-6">
+      <Tabs defaultValue="users" className="space-y-3 sm:space-y-6">
         <TabsList className="w-full grid grid-cols-2 sm:w-auto sm:inline-flex">
           <TabsTrigger value="users" className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
             <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -577,14 +602,16 @@ export default function UsersPanel() {
         <TabsContent value="users">
           <Card>
         <CardHeader className="p-2 sm:p-6">
-          <CardTitle className="text-sm sm:text-xl">All Users</CardTitle>
+          <CardTitle className="text-sm sm:text-xl">
+            All Users {!loading && `(${filteredUsers.length})`}
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-2 sm:p-6">
           {loading ? (
             <div className="text-center py-4 text-sm">Loading users...</div>
-          ) : users.length === 0 ? (
+          ) : filteredUsers.length === 0 ? (
             <div className="text-center py-4 text-sm text-muted-foreground">
-              No users found
+              {searchTerm ? 'No users match your search' : 'No users found'}
             </div>
           ) : (
             <div className="overflow-x-auto -mx-2 sm:mx-0">
@@ -600,7 +627,7 @@ export default function UsersPanel() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {users.map((user) => (
+                    {filteredUsers.map((user) => (
                       <TableRow key={user.id}>
                         <TableCell className="text-[10px] sm:text-sm py-2">
                           <div className="flex items-center gap-1 sm:gap-2">
