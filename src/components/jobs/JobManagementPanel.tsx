@@ -763,12 +763,12 @@ const JobGrid = memo(function JobGrid({
         </CardContent>
       </Card>;
   }
-  return <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+  return <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 lg:gap-6">
       {jobs.map(job => <Card key={job.job_id} className="mission-card group overflow-hidden max-w-full">
-          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4 lg:p-6">
+          <CardHeader className="pb-2 sm:pb-3 p-2 sm:p-4 lg:p-6">
             <div className="flex items-start justify-between min-w-0">
               <div className="flex-1 min-w-0">
-                <h4 className="line-clamp-2 mb-2 text-base sm:text-lg lg:text-xl font-normal">
+                <h4 className="line-clamp-2 mb-2 text-sm sm:text-lg lg:text-xl font-normal">
                   {job.job_title || "Untitled Position"}
                 </h4>
                 <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
@@ -787,8 +787,8 @@ const JobGrid = memo(function JobGrid({
             </div>
           </CardHeader>
           
-          <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-4 lg:p-6">
-            <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm">
+          <CardContent className="space-y-3 sm:space-y-4 p-2 sm:p-4 lg:p-6">
+            <div className="hidden sm:block space-y-1 sm:space-y-2 text-xs sm:text-sm">
               {job.recruiter_name && <div className="flex items-center text-muted-foreground min-w-0">
                   <UserCircle className="h-4 w-4 mr-2 text-primary flex-shrink-0" />
                   <span className="font-medium truncate">{job.recruiter_name}</span>
@@ -819,7 +819,7 @@ const JobGrid = memo(function JobGrid({
               </p>}
 
             {/* Candidate Counts */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2 text-xs sm:text-sm">
               <div className="flex flex-col items-center p-2 rounded-md bg-blue/10 border border-blue/20">
                 <div className="flex items-center gap-1 text-blue">
                   <Users className="h-3 w-3" />
@@ -851,7 +851,7 @@ const JobGrid = memo(function JobGrid({
             </div>
 
             {/* Automatic Dial Toggle */}
-            <div className="py-2 border-t border-border/30 space-y-2">
+            <div className="py-1 sm:py-2 border-t border-border/30 space-y-1 sm:space-y-2">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2 text-sm">
                   {job.automatic_dial ? <Phone className="h-4 w-4 text-emerald-500" /> : <PhoneOff className="h-4 w-4 text-muted-foreground" />}
@@ -862,14 +862,14 @@ const JobGrid = memo(function JobGrid({
               
               {/* Show status info */}
               {job.automatic_dial === true && (
-                <span className="text-xs text-muted-foreground">
+                <span className="hidden sm:inline text-xs text-muted-foreground">
                   Active • {job.shortlisted_count || 0} shortlisted
                 </span>
               )}
             </div>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-0 pt-2">
-              <div className="flex space-x-2 flex-shrink-0">
+            <div className="flex items-center justify-between pt-2">
+              <div className="hidden sm:flex space-x-2">
                 <Button size="sm" variant="outline" onClick={() => navigate(`/jobs/edit/${job.job_id}`)} className="h-8 px-2">
                   <Edit className="h-3 w-3" />
                 </Button>
