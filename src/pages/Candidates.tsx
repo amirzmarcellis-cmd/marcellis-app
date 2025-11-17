@@ -311,7 +311,7 @@ export default function Candidates() {
                             </Badge>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1 flex-shrink-0">
+                        <div className="hidden md:flex items-center gap-1 flex-shrink-0">
                           <Button 
                             variant="outline" 
                             size="icon" 
@@ -331,6 +331,28 @@ export default function Candidates() {
                             title="Delete CV"
                           >
                             <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        <div className="flex md:hidden items-center gap-1 flex-shrink-0">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-7 px-2 whitespace-nowrap text-[11px]"
+                            onClick={() => handleEditCandidate(cv)}
+                            aria-label="Edit CV"
+                          >
+                            <Edit className="w-3 h-3" />
+                            Edit CV
+                          </Button>
+                          <Button 
+                            variant="destructive" 
+                            size="sm" 
+                            className="h-7 px-2 whitespace-nowrap text-[11px]"
+                            onClick={() => handleDeleteCV(cv.user_id)}
+                            aria-label="Delete CV"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            Delete CV
                           </Button>
                         </div>
                       </div>
@@ -380,7 +402,7 @@ export default function Candidates() {
                               aria-label="Edit CV"
                             >
                               <Edit className="w-3 h-3" />
-                              Edit
+                              Edit CV
                             </Button>
                             <Button 
                               variant="destructive" 
@@ -390,7 +412,7 @@ export default function Candidates() {
                               aria-label="Delete CV"
                             >
                               <Trash2 className="w-3 h-3" />
-                              Delete
+                              Delete CV
                             </Button>
                           </div>
                         </div>
