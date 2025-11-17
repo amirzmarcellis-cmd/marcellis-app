@@ -438,30 +438,30 @@ export default function UsersPanel() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Users className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-bold">User Management</h1>
+    <div className="space-y-4 sm:space-y-6 px-4 sm:px-0">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Users className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
+          <h1 className="text-xl sm:text-2xl font-bold">User Management</h1>
         </div>
         {canAccessUsersPanel && (
           <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add User
+              <Button className="w-full sm:w-auto" size="sm">
+                <Plus className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Add User</span>
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-[95vw] sm:max-w-lg">
               <DialogHeader>
-                <DialogTitle>Add New User</DialogTitle>
-                <DialogDescription>
+                <DialogTitle className="text-lg sm:text-xl">Add New User</DialogTitle>
+                <DialogDescription className="text-sm">
                   Create a new user account for the system.
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleAddUser} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+              <form onSubmit={handleAddUser} className="space-y-3 sm:space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="email" className="text-sm">Email</Label>
                   <Input
                     id="email"
                     type="email"
@@ -470,8 +470,8 @@ export default function UsersPanel() {
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="password" className="text-sm">Password</Label>
                   <Input
                     id="password"
                     type="password"
@@ -481,8 +481,8 @@ export default function UsersPanel() {
                     minLength={6}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="name" className="text-sm">Name</Label>
                   <Input
                     id="name"
                     type="text"
@@ -491,8 +491,8 @@ export default function UsersPanel() {
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="role">Role</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="role" className="text-sm">Role</Label>
                   <Select value={newUser.role} onValueChange={(value: UserRole) => setNewUser({ ...newUser, role: value, team: undefined })}>
                     <SelectTrigger className="bg-background border-input z-50">
                       <SelectValue placeholder="Select a role" />
@@ -548,11 +548,11 @@ export default function UsersPanel() {
                     </SelectContent>
                   </Select>
                 </div>
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setIsAddUserOpen(false)}>
+                <DialogFooter className="flex-col sm:flex-row gap-2">
+                  <Button type="button" variant="outline" onClick={() => setIsAddUserOpen(false)} className="w-full sm:w-auto">
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={submitting}>
+                  <Button type="submit" disabled={submitting} className="w-full sm:w-auto">
                     {submitting ? 'Creating...' : 'Create User'}
                   </Button>
                 </DialogFooter>
@@ -562,107 +562,112 @@ export default function UsersPanel() {
         )}
       </div>
 
-      <Tabs defaultValue="users" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="users" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
+      <Tabs defaultValue="users" className="space-y-4 sm:space-y-6">
+        <TabsList className="w-full grid grid-cols-2 sm:w-auto sm:inline-flex">
+          <TabsTrigger value="users" className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
+            <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             Users
           </TabsTrigger>
-          <TabsTrigger value="teams" className="flex items-center gap-2">
-            <Users2 className="h-4 w-4" />
+          <TabsTrigger value="teams" className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
+            <Users2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             Teams
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="users">
           <Card>
-        <CardHeader>
-          <CardTitle>All Users</CardTitle>
+        <CardHeader className="p-3 sm:p-6">
+          <CardTitle className="text-lg sm:text-xl">All Users</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 sm:p-6">
           {loading ? (
-            <div className="text-center py-4">Loading users...</div>
+            <div className="text-center py-4 text-sm">Loading users...</div>
           ) : users.length === 0 ? (
-            <div className="text-center py-4 text-muted-foreground">
+            <div className="text-center py-4 text-sm text-muted-foreground">
               No users found
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4" />
-                        {user.name || 'No name'}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4" />
-                        {user.email}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {(() => {
-                        const orgRole = userOrgRoles[user.user_id] || 'EMPLOYEE';
-                        const roleDisplay = getRoleDisplay(user, userMembershipsMap[user.user_id] || [], orgRole);
-                        const Icon = roleDisplay.icon;
-                        const userMemberships = userMembershipsMap[user.user_id] || [];
-                        return (
-                          <div className="space-y-1">
-                            <Badge variant={roleDisplay.variant}>
-                              <Icon className="h-3 w-3 mr-1" />
-                              {roleDisplay.label}
-                            </Badge>
-                            {userMemberships.length > 0 && orgRole === 'EMPLOYEE' && (
-                              <div className="text-xs text-muted-foreground">
-                                {userMemberships.map((membership, idx) => (
-                                  <div key={idx}>
-                                    {membership.team_name} ({membership.role === 'TEAM_LEADER' ? 'Leader' : 'Member'})
-                                  </div>
-                                ))}
-                              </div>
-                            )}
+            <div className="overflow-x-auto -mx-3 sm:mx-0">
+              <div className="min-w-[640px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs sm:text-sm">Name</TableHead>
+                      <TableHead className="text-xs sm:text-sm">Email</TableHead>
+                      <TableHead className="text-xs sm:text-sm">Role</TableHead>
+                      <TableHead className="text-xs sm:text-sm">Created</TableHead>
+                      <TableHead className="text-xs sm:text-sm">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {users.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell className="text-xs sm:text-sm">
+                          <div className="flex items-center gap-1.5 sm:gap-2">
+                            <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                            <span className="truncate max-w-[120px] sm:max-w-none">{user.name || 'No name'}</span>
                           </div>
-                        );
-                      })()}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(user.created_at).toLocaleDateString()}
-                    </TableCell>
-                     <TableCell>
-                       <div className="flex items-center gap-2">
-                         <Button
-                           variant="outline"
-                           size="sm"
-                           onClick={() => openEditUserDialog(user)}
-                         >
-                           <Edit className="h-4 w-4" />
-                         </Button>
-                         <Button
-                           variant="outline"
-                           size="sm"
-                           onClick={() => handleDeleteUser(user.user_id)}
-                           className="text-destructive hover:text-destructive"
-                         >
-                           <Trash2 className="h-4 w-4" />
-                         </Button>
-                       </div>
-                     </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                        </TableCell>
+                        <TableCell className="text-xs sm:text-sm">
+                          <div className="flex items-center gap-1.5 sm:gap-2">
+                            <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                            <span className="truncate max-w-[150px] sm:max-w-none">{user.email}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-xs sm:text-sm">
+                          {(() => {
+                            const orgRole = userOrgRoles[user.user_id] || 'EMPLOYEE';
+                            const roleDisplay = getRoleDisplay(user, userMembershipsMap[user.user_id] || [], orgRole);
+                            const Icon = roleDisplay.icon;
+                            const userMemberships = userMembershipsMap[user.user_id] || [];
+                            return (
+                              <div className="space-y-0.5 sm:space-y-1">
+                                <Badge variant={roleDisplay.variant} className="text-[10px] sm:text-xs">
+                                  <Icon className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
+                                  {roleDisplay.label}
+                                </Badge>
+                                {userMemberships.length > 0 && orgRole === 'EMPLOYEE' && (
+                                  <div className="text-[10px] sm:text-xs text-muted-foreground">
+                                    {userMemberships.map((membership, idx) => (
+                                      <div key={idx} className="truncate max-w-[100px] sm:max-w-none">
+                                        {membership.team_name} ({membership.role === 'TEAM_LEADER' ? 'Leader' : 'Member'})
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()}
+                        </TableCell>
+                        <TableCell className="text-xs sm:text-sm">
+                          {new Date(user.created_at).toLocaleDateString()}
+                        </TableCell>
+                         <TableCell>
+                           <div className="flex items-center gap-1 sm:gap-2">
+                             <Button
+                               variant="outline"
+                               size="sm"
+                               onClick={() => openEditUserDialog(user)}
+                               className="h-8 w-8 p-0"
+                             >
+                               <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                             </Button>
+                             <Button
+                               variant="outline"
+                               size="sm"
+                               onClick={() => handleDeleteUser(user.user_id)}
+                               className="text-destructive hover:text-destructive h-8 w-8 p-0"
+                             >
+                               <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                             </Button>
+                           </div>
+                         </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
             )}
           </CardContent>
         </Card>
@@ -675,16 +680,16 @@ export default function UsersPanel() {
 
       {/* Edit User Dialog */}
       <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-[95vw] sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-lg sm:text-xl">Edit User</DialogTitle>
+            <DialogDescription className="text-sm">
               Update user information and permissions.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleEditUser} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-name">Name</Label>
+          <form onSubmit={handleEditUser} className="space-y-3 sm:space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-name" className="text-sm">Name</Label>
               <Input
                 id="edit-name"
                 type="text"
@@ -693,8 +698,8 @@ export default function UsersPanel() {
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-email">Email</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-email" className="text-sm">Email</Label>
               <Input
                 id="edit-email"
                 type="email"
@@ -704,25 +709,25 @@ export default function UsersPanel() {
               />
             </div>
             {isAdmin && editingUser && (
-              <div className="space-y-2">
-                <Label>LinkedIn Connection</Label>
-                <div className="flex items-center gap-2 p-3 rounded-md border bg-muted/50">
-                  <Linkedin className="h-4 w-4" />
+              <div className="space-y-1.5">
+                <Label className="text-sm">LinkedIn Connection</Label>
+                <div className="flex items-center gap-2 p-2 sm:p-3 rounded-md border bg-muted/50">
+                  <Linkedin className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
                   {editingUser.linkedin_id ? (
-                    <Badge variant="default" className="bg-blue-600">Connected</Badge>
+                    <Badge variant="default" className="bg-blue-600 text-xs">Connected</Badge>
                   ) : (
-                    <Badge variant="secondary">Not Connected</Badge>
+                    <Badge variant="secondary" className="text-xs">Not Connected</Badge>
                   )}
                   {editingUser.linkedin_id && (
-                    <span className="text-xs text-muted-foreground ml-2">
+                    <span className="text-[10px] sm:text-xs text-muted-foreground ml-2 truncate">
                       ID: {editingUser.linkedin_id}
                     </span>
                   )}
                 </div>
               </div>
             )}
-            <div className="space-y-2">
-              <Label htmlFor="edit-role">Role</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-role" className="text-sm">Role</Label>
               <Select value={editUserData.role} onValueChange={(value: UserRole) => setEditUserData({ ...editUserData, role: value, team: undefined })}>
                 <SelectTrigger className="bg-background border-input z-50">
                   <SelectValue placeholder="Select a role" />
@@ -743,8 +748,8 @@ export default function UsersPanel() {
               </Select>
             </div>
             {(editUserData.role === 'team_member' || editUserData.role === 'team_leader') && (
-              <div className="space-y-2">
-                <Label htmlFor="edit-team">Team</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-team" className="text-sm">Team</Label>
                 <Select value={editUserData.team} onValueChange={(value: string) => setEditUserData({ ...editUserData, team: value })}>
                   <SelectTrigger className="bg-background border-input z-50">
                     <SelectValue placeholder="Select a team" />
@@ -766,11 +771,11 @@ export default function UsersPanel() {
                 </Select>
               </div>
             )}
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsEditUserOpen(false)}>
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button type="button" variant="outline" onClick={() => setIsEditUserOpen(false)} className="w-full sm:w-auto">
                 Cancel
               </Button>
-              <Button type="submit" disabled={submitting}>
+              <Button type="submit" disabled={submitting} className="w-full sm:w-auto">
                 {submitting ? 'Updating...' : 'Update User'}
               </Button>
             </DialogFooter>
