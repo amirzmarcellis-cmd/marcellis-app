@@ -3088,13 +3088,13 @@ mainCandidate["linkedin_score_reason"] ? (
           </TabsList>
         </div>
 
-        <TabsContent value="overview" className="space-y-2 sm:space-y-4 pb-24 sm:pb-32">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4 md:gap-6">
+        <TabsContent value="overview" className="space-y-3 sm:space-y-4 pb-24 sm:pb-32">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
             <Card>
-              <CardHeader className="pb-1.5 sm:pb-4 px-2.5 sm:px-6 pt-2.5 sm:pt-6">
-                <CardTitle className="text-sm sm:text-lg">Job Information</CardTitle>
+              <CardHeader className="pb-2 sm:pb-4 px-3 sm:px-6 pt-3 sm:pt-6">
+                <CardTitle className="text-base sm:text-lg">Job Information</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-1.5 sm:space-y-3 px-2.5 sm:px-6 pb-2.5 sm:pb-6 text-[11px] sm:text-sm [&>div]:flex [&>div]:flex-col sm:[&>div]:flex-row sm:[&>div]:items-start sm:[&>div]:justify-between [&>div]:gap-0.5 sm:[&>div]:gap-2 [&>div>span:last-child]:break-words [&>div>span:last-child]:text-left sm:[&>div>span:last-child]:text-right [&>div>span:last-child]:max-w-full sm:[&>div>span:last-child]:max-w-[60%]">
+              <CardContent className="space-y-2 sm:space-y-3 px-3 sm:px-6 pb-3 sm:pb-6 text-xs sm:text-sm [&>div]:flex [&>div]:flex-col sm:[&>div]:flex-row sm:[&>div]:items-start sm:[&>div]:justify-between [&>div]:gap-1 sm:[&>div]:gap-2 [&>div>span:last-child]:break-words [&>div>span:last-child]:text-left sm:[&>div>span:last-child]:text-right [&>div>span:last-child]:max-w-full sm:[&>div>span:last-child]:max-w-[60%]">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Job ID:</span>
                   <span className="font-mono text-sm">{job.job_id}</span>
@@ -3189,10 +3189,10 @@ mainCandidate["linkedin_score_reason"] ? (
             </Card>
 
             <Card>
-              <CardHeader className="pb-1.5 sm:pb-6 px-2.5 sm:px-6 pt-2.5 sm:pt-6">
-                <CardTitle className="text-sm sm:text-lg">Job Requirements & Details</CardTitle>
+              <CardHeader>
+                <CardTitle>Job Requirements & Details</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-1.5 sm:space-y-3 px-2.5 sm:px-6 pb-2.5 sm:pb-6 text-[11px] sm:text-sm [&>div]:flex [&>div]:flex-col sm:[&>div]:flex-row sm:[&>div]:items-start sm:[&>div]:justify-between [&>div]:gap-0.5 sm:[&>div]:gap-2 [&>div>span:last-child]:break-words [&>div>span:last-child]:text-left sm:[&>div>span:last-child]:text-right [&>div>span:last-child]:max-w-full sm:[&>div>span:last-child]:max-w-[60%]">
+              <CardContent className="space-y-2 sm:space-y-3 [&>div]:flex [&>div]:flex-col sm:[&>div]:flex-row sm:[&>div]:items-start sm:[&>div]:justify-between [&>div]:gap-1 sm:[&>div]:gap-2 [&>div>span:last-child]:break-words [&>div>span:last-child]:text-left sm:[&>div>span:last-child]:text-right [&>div>span:last-child]:max-w-full sm:[&>div>span:last-child]:max-w-[60%]">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Countries to include:</span>
                   <span>{job.nationality_to_include || "N/A"}</span>
