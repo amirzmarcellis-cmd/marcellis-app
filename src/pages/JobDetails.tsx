@@ -3063,7 +3063,9 @@ mainCandidate["linkedin_score_reason"] ? (
       </Card>
 
       {/* Job Funnel */}
-      <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
+      <div className="max-w-full overflow-hidden">
+        <JobFunnel candidates={candidates} jobAssignment={job?.assignment} />
+      </div>
 
       {/* Detailed Information Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3 sm:space-y-4">
