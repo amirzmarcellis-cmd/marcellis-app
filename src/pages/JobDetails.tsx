@@ -3056,38 +3056,34 @@ mainCandidate["linkedin_score_reason"] ? (
 
       {/* Detailed Information Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <div className="w-full">
-          <TabsList className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 h-auto p-1 gap-0.5 sm:gap-1 overflow-x-hidden">
-            <TabsTrigger value="overview" className="text-[10px] sm:text-xs md:text-sm px-1 sm:px-2 py-2 h-auto whitespace-normal leading-tight">
+        <div className="w-full overflow-x-auto scrollbar-hide">
+          <TabsList className="w-full inline-flex md:grid md:grid-cols-7 h-auto p-1 gap-0.5 sm:gap-1 min-w-max md:min-w-0">
+            <TabsTrigger value="overview" className="text-xs md:text-sm px-3 py-2 h-auto whitespace-nowrap flex-shrink-0">
               Overview
             </TabsTrigger>
-            <TabsTrigger value="description" className="text-[10px] sm:text-xs md:text-sm px-1 sm:px-2 py-2 h-auto whitespace-normal leading-tight">
+            <TabsTrigger value="description" className="text-xs md:text-sm px-3 py-2 h-auto whitespace-nowrap flex-shrink-0">
               Description
             </TabsTrigger>
-            <TabsTrigger value="requirements" className="text-[10px] sm:text-xs md:text-sm px-1 sm:px-2 py-2 h-auto whitespace-normal leading-tight">
-              <span className="hidden sm:inline">AI Requirements</span>
-              <span className="sm:hidden">AI Req.</span>
+            <TabsTrigger value="requirements" className="text-xs md:text-sm px-3 py-2 h-auto whitespace-nowrap flex-shrink-0">
+              AI Requirements
             </TabsTrigger>
             <TabsTrigger
               value="applications"
-              className="text-[10px] sm:text-xs md:text-sm px-1 sm:px-2 py-2 h-auto whitespace-normal leading-tight relative"
+              className="text-xs md:text-sm px-3 py-2 h-auto whitespace-nowrap flex-shrink-0 relative"
               onClick={handleApplicationsTabClick}
             >
-              <span className="hidden sm:inline">Applications</span>
-              <span className="sm:hidden">Apps</span>
+              Applications
               {newApplicationsCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center min-w-[16px] sm:min-w-[20px] z-10">
                   {newApplicationsCount > 99 ? "99+" : newApplicationsCount}
                 </span>
               )}
             </TabsTrigger>
-            <TabsTrigger value="boolean-search" className="text-[10px] sm:text-xs md:text-sm px-1 sm:px-2 py-2 h-auto whitespace-normal leading-tight">
-              <span className="hidden sm:inline">AI Longlist</span>
-              <span className="sm:hidden">Longlist</span>
+            <TabsTrigger value="boolean-search" className="text-xs md:text-sm px-3 py-2 h-auto whitespace-nowrap flex-shrink-0">
+              AI Longlist
             </TabsTrigger>
-            <TabsTrigger value="shortlist" className="text-[10px] sm:text-xs md:text-sm px-1 sm:px-2 py-2 h-auto whitespace-normal leading-tight">
-              <span className="hidden sm:inline">AI Short List</span>
-              <span className="sm:hidden">Shortlist</span>
+            <TabsTrigger value="shortlist" className="text-xs md:text-sm px-3 py-2 h-auto whitespace-nowrap flex-shrink-0">
+              AI Short List
             </TabsTrigger>
           </TabsList>
         </div>
