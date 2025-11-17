@@ -131,7 +131,7 @@ export default function Candidates() {
           title="CVs Database"
           subtitle="View and manage all uploaded CVs"
           actions={
-            <div className="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex sm:flex-row">
+            <div className="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex sm:flex-row mt-1 sm:mt-0">
               <Button onClick={() => setBulkUploadOpen(true)} variant="outline" size="sm" className="gap-1.5 font-light font-inter text-xs w-full">
                 <Upload className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Add Multiple CVs</span>
@@ -148,7 +148,7 @@ export default function Candidates() {
         {/* Filters */}
         <Card className="p-3 sm:p-4 lg:p-6 bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass">
           <div className="flex flex-wrap gap-3 sm:gap-4">
-            <div className="relative flex-1 min-w-[200px]">
+            <div className="relative flex-1 min-w-0 sm:min-w-[200px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-3 h-3 sm:w-4 sm:h-4" />
               <Input
                 placeholder="Search CVs..."
@@ -291,9 +291,12 @@ export default function Candidates() {
                 filteredCVs.map((cv) => {
                   const fullName = cv.name || `${cv.Firstname || ""} ${cv.Lastname || ""}`.trim()
                   const initials = `${cv.Firstname?.[0] || cv.name?.[0] || ""}${cv.Lastname?.[0] || ""}`
+                  const shortId = cv.user_id && cv.user_id.length > 10
+                    ? `${cv.user_id.slice(0,4)}…${cv.user_id.slice(-4)}`
+                    : cv.user_id;
                   
                   return (
-                    <div key={cv.user_id} className="border border-border rounded-lg p-2.5 bg-card/50">
+                    <div key={cv.user_id} className="border border-border rounded-lg p-2 bg-card/50 max-w-full overflow-hidden">
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <div className="flex items-center gap-2 min-w-0 flex-1">
                           <Avatar className="w-8 h-8 flex-shrink-0">
@@ -303,8 +306,8 @@ export default function Candidates() {
                           </Avatar>
                           <div className="min-w-0 flex-1">
                             <div className="text-xs font-light font-work truncate">{fullName || "N/A"}</div>
-                            <Badge variant="outline" className="text-[9px] font-mono mt-0.5 px-1 py-0">
-                              {cv.user_id}
+                            <Badge variant="outline" className="text-[10px] font-mono mt-0.5 px-1 py-0 max-w-[120px] truncate inline-block align-middle">
+                              {shortId}
                             </Badge>
                           </div>
                         </div>
@@ -329,18 +332,18 @@ export default function Candidates() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <div className="flex items-center gap-1.5 text-[11px]">
+                        <div className="flex items-center gap-1.5 text-[11px] min-w-0">
                           <Mail className="w-3 h-3 text-muted-foreground flex-shrink-0" />
                           <span className="text-foreground/80 truncate">{cv.email || "N/A"}</span>
                         </div>
 
-                        <div className="flex items-center gap-1.5 text-[11px]">
+                        <div className="flex items-center gap-1.5 text-[11px] min-w-0">
                           <Phone className="w-3 h-3 text-muted-foreground flex-shrink-0" />
                           <span className="text-foreground/80 truncate">{cv.phone_number || "N/A"}</span>
                         </div>
 
                         {cv.cv_link && (
-                          <div className="flex items-center gap-1.5 text-[11px]">
+                          <div className="flex items-center gap-1.5 text-[11px] min-w-0">
                             <ExternalLink className="w-3 h-3 text-muted-foreground flex-shrink-0" />
                             <a 
                               href={cv.cv_link} 
@@ -354,7 +357,7 @@ export default function Candidates() {
                         )}
 
                         {cv.cv_text && (
-                          <div className="text-[10px] text-muted-foreground pt-1.5 border-t border-border/50 line-clamp-2">
+                          <div className="text-[10px] text-muted-foreground pt-1.5 border-t border-border/50 line-clamp-2 break-words">
                             {cv.cv_text}
                           </div>
                         )}
