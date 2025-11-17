@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.redirect-webhook]
 verify_jwt = false
+
+[functions.update-formatted-cv]
+verify_jwt = false
