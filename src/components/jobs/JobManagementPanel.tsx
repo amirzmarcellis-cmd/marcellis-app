@@ -819,34 +819,34 @@ const JobGrid = memo(function JobGrid({
               </p>}
 
             {/* Candidate Counts */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2 text-xs sm:text-sm">
-              <div className="flex flex-col items-center p-2 rounded-md bg-blue/10 border border-blue/20">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2 text-xs">
+              <div className="flex flex-col items-center p-1.5 sm:p-2 rounded-md bg-blue/10 border border-blue/20">
                 <div className="flex items-center gap-1 text-blue">
                   <Users className="h-3 w-3" />
-                  <span className="font-bold text-lg">{job.longlisted_count || 0}</span>
+                  <span className="font-bold text-base sm:text-lg">{job.longlisted_count || 0}</span>
                 </div>
-                <span className="text-xs text-muted-foreground mt-1">Longlisted</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">Longlisted</span>
               </div>
-              <div className="flex flex-col items-center p-2 rounded-md bg-warning/10 border border-warning/20">
+              <div className="flex flex-col items-center p-1.5 sm:p-2 rounded-md bg-warning/10 border border-warning/20">
                 <div className="flex items-center gap-1 text-warning">
                   <Users className="h-3 w-3" />
-                  <span className="font-bold text-lg">{job.shortlisted_count || 0}</span>
+                  <span className="font-bold text-base sm:text-lg">{job.shortlisted_count || 0}</span>
                 </div>
-                <span className="text-xs text-muted-foreground mt-1">Shortlisted</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">Shortlisted</span>
               </div>
-              <div className="flex flex-col items-center p-2 rounded-md bg-destructive/10 border border-destructive/20">
+              <div className="flex flex-col items-center p-1.5 sm:p-2 rounded-md bg-destructive/10 border border-destructive/20">
                 <div className="flex items-center gap-1 text-destructive">
                   <Users className="h-3 w-3" />
-                  <span className="font-bold text-lg">{job.rejected_count || 0}</span>
+                  <span className="font-bold text-base sm:text-lg">{job.rejected_count || 0}</span>
                 </div>
-                <span className="text-xs text-muted-foreground mt-1">Rejected</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">Rejected</span>
               </div>
-              <div className="flex flex-col items-center p-2 rounded-md bg-success/10 border border-success/20">
+              <div className="flex flex-col items-center p-1.5 sm:p-2 rounded-md bg-success/10 border border-success/20">
                 <div className="flex items-center gap-1 text-success">
                   <Users className="h-3 w-3" />
-                  <span className="font-bold text-lg">{job.submitted_count || 0}</span>
+                  <span className="font-bold text-base sm:text-lg">{job.submitted_count || 0}</span>
                 </div>
-                <span className="text-xs text-muted-foreground mt-1">Submitted</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">Submitted</span>
               </div>
             </div>
 
