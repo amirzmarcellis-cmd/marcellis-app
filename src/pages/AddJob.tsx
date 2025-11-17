@@ -246,6 +246,7 @@ export default function AddJob() {
     nationalityToInclude: [] as string[],
     nationalityToExclude: [] as string[],
     preferedNationality: [] as string[],
+    notPreferedNationality: [] as string[],
     type: "",
     contractLength: "",
     currency: "",
@@ -409,7 +410,8 @@ export default function AddJob() {
       const fieldMap = {
         'nationalityToInclude': 'nationality_to_include',
         'nationalityToExclude': 'nationality_to_exclude',
-        'preferedNationality': 'prefered_nationality'
+        'preferedNationality': 'prefered_nationality',
+        'notPreferedNationality': 'not_prefered_nationality'
       };
 
       const dbField = fieldMap[field];
@@ -565,6 +567,7 @@ export default function AddJob() {
           nationality_to_include: formData.nationalityToInclude.length > 0 ? formData.nationalityToInclude.join(", ") : null,
           nationality_to_exclude: formData.nationalityToExclude.length > 0 ? formData.nationalityToExclude.join(", ") : null,
           prefered_nationality: formData.preferedNationality.length > 0 ? formData.preferedNationality.join(", ") : null,
+          not_prefered_nationality: formData.notPreferedNationality.length > 0 ? formData.notPreferedNationality.join(", ") : null,
           Type: formData.type,
           contract_length: formData.type === "Contract" && formData.contractLength ? formData.contractLength : null,
           Currency: formData.currency,
@@ -603,6 +606,7 @@ export default function AddJob() {
     { id: "locations_include", label: "Locations to Include" },
     { id: "locations_exclude", label: "Locations to Exclude" },
     { id: "preferred_nationality", label: "Preferred Nationality" },
+    { id: "not_preferred_nationality", label: "Not Preferred Nationality" },
     { id: "assignment", label: "Assignment Link" },
   ];
 
@@ -1251,6 +1255,70 @@ export default function AddJob() {
                               handleInputChange("preferedNationality", updated);
                             }}
                             className="ml-1 hover:bg-green-500/30 rounded-full w-4 h-4 flex items-center justify-center text-green-700 dark:text-green-300 font-bold transition-colors"
+                            aria-label={`Remove ${country}`}
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground italic mt-2">
+                    Note: This will affect the candidate longlist
+                  </p>
+                </div>
+              )}
+
+              {selectedOptionalFields.includes("not_preferred_nationality") && (
+                <div className="space-y-2 p-4 border border-border/50 rounded-lg bg-accent/5">
+                  <Label className="font-medium">Not Preferred Nationality</Label>
+                  <Select onValueChange={(value) => {
+                    const currentNotPrefered = formData.notPreferedNationality || [];
+                    if (value === "European Countries") {
+                      const newCountries = europeanCountries.filter(country => !currentNotPrefered.includes(country));
+                      handleInputChange("notPreferedNationality", [...currentNotPrefered, ...newCountries]);
+                    } else if (value === "Arabian Countries") {
+                      const newCountries = arabianCountries.filter(country => !currentNotPrefered.includes(country));
+                      handleInputChange("notPreferedNationality", [...currentNotPrefered, ...newCountries]);
+                    } else if (!currentNotPrefered.includes(value)) {
+                      handleInputChange("notPreferedNationality", [...currentNotPrefered, value]);
+                    }
+                  }}>
+                    <SelectTrigger className="h-11">
+                      <SelectValue placeholder="Select not preferred nationalities..." />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60">
+                      <SelectItem value="European Countries" className="font-semibold text-primary">
+                        🇪🇺 European Countries (Select All)
+                      </SelectItem>
+                      <SelectItem value="Arabian Countries" className="font-semibold text-primary">
+                        🕌 Arabian Countries (Select All)
+                      </SelectItem>
+                      {countries.filter(country => 
+                        !(formData.notPreferedNationality || []).includes(country)
+                      ).map((country) => (
+                        <SelectItem key={country} value={country}>
+                          {country}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {(formData.notPreferedNationality || []).length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {(formData.notPreferedNationality || []).map((country) => (
+                        <span
+                          key={country}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs bg-red-500/20 text-red-700 dark:text-red-300 border border-red-500/30"
+                        >
+                          {country}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const currentNotPrefered = formData.notPreferedNationality || [];
+                              const updated = currentNotPrefered.filter((n) => n !== country);
+                              handleInputChange("notPreferedNationality", updated);
+                            }}
+                            className="ml-1 hover:bg-red-500/30 rounded-full w-4 h-4 flex items-center justify-center text-red-700 dark:text-red-300 font-bold transition-colors"
                             aria-label={`Remove ${country}`}
                           >
                             ×
