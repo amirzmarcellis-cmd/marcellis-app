@@ -126,7 +126,7 @@ export default function Candidates() {
   }
 
   return (
-      <div className="space-y-4 sm:space-y-6">
+      <div className="space-y-4 sm:space-y-6 overflow-x-hidden">
         <HeroHeader
           title="CVs Database"
           subtitle="View and manage all uploaded CVs"
@@ -169,7 +169,8 @@ export default function Candidates() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0 sm:p-6">
-            <div className="overflow-x-auto">
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="border-border">
@@ -278,6 +279,90 @@ export default function Candidates() {
                   )}
                 </TableBody>
               </Table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden p-3 space-y-3">
+              {loading ? (
+                <div className="py-6 text-center text-muted-foreground text-sm">Loading CVs...</div>
+              ) : filteredCVs.length === 0 ? (
+                <div className="py-6 text-center text-muted-foreground text-sm">No CVs found</div>
+              ) : (
+                filteredCVs.map((cv) => {
+                  const fullName = cv.name || `${cv.Firstname || ""} ${cv.Lastname || ""}`.trim()
+                  const initials = `${cv.Firstname?.[0] || cv.name?.[0] || ""}${cv.Lastname?.[0] || ""}`
+                  
+                  return (
+                    <div key={cv.user_id} className="border border-border rounded-lg p-3 bg-card/50">
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Avatar className="w-10 h-10 flex-shrink-0">
+                            <AvatarFallback className="bg-gradient-primary text-white text-sm font-light font-work">
+                              {initials}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0">
+                            <div className="text-sm font-light font-work truncate">{fullName || "N/A"}</div>
+                            <Badge variant="outline" className="text-[10px] font-mono mt-1">
+                              {cv.user_id}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-7 w-7 p-0"
+                            onClick={() => handleEditCandidate(cv)}
+                          >
+                            <Edit className="w-3 h-3" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-7 w-7 p-0 text-destructive hover:text-destructive"
+                            onClick={() => handleDeleteCV(cv.user_id)}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-xs">
+                          <Mail className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                          <span className="text-foreground/80 truncate">{cv.email || "N/A"}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-xs">
+                          <Phone className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                          <span className="text-foreground/80 truncate">{cv.phone_number || "N/A"}</span>
+                        </div>
+
+                        {cv.cv_link && (
+                          <div className="flex items-center gap-2 text-xs">
+                            <ExternalLink className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                            <a 
+                              href={cv.cv_link} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline truncate"
+                            >
+                              View CV
+                            </a>
+                          </div>
+                        )}
+
+                        {cv.cv_text && (
+                          <div className="text-xs text-muted-foreground pt-2 border-t border-border/50">
+                            {cv.cv_text.substring(0, 80)}...
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })
+              )}
             </div>
           </CardContent>
         </Card>
