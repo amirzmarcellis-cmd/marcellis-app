@@ -763,7 +763,7 @@ const JobGrid = memo(function JobGrid({
         </CardContent>
       </Card>;
   }
-  return <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 lg:gap-6">
+  return <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 lg:gap-6">
       {jobs.map(job => <Card key={job.job_id} className="mission-card group overflow-hidden max-w-full">
           <CardHeader className="pb-2 sm:pb-3 p-2 sm:p-4 lg:p-6">
             <div className="flex items-start justify-between min-w-0">
