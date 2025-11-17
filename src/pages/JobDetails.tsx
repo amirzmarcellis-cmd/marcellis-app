@@ -3030,7 +3030,7 @@ mainCandidate["linkedin_score_reason"] ? (
             </div>
 
             {/* Progressive Status Bar */}
-            <div className="pt-6 pb-2">
+            <div className="pt-6 pb-2 max-w-full overflow-hidden">
               <ProgressiveStatusBar 
                 status={
                   job.Processed === "No" 
