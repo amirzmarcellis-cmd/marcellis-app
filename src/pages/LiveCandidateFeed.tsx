@@ -251,7 +251,7 @@ export default function LiveCandidateFeed() {
 
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-3 sm:p-4 md:p-6 overflow-x-auto">
+    <div className="min-h-screen bg-background text-foreground p-3 sm:p-4 md:p-6 w-full overflow-x-hidden">
       {/* Header */}
       <div className="mb-4 sm:mb-6 md:mb-8">
         <div className="flex flex-col gap-3 sm:gap-4">
@@ -354,7 +354,7 @@ export default function LiveCandidateFeed() {
                 return (
                   <div 
                     key={index} 
-                    className={`group relative p-3 sm:p-4 md:p-6 rounded-xl sm:rounded-2xl border transition-all duration-300 hover:scale-[1.01] sm:hover:scale-[1.02] hover:shadow-2xl cursor-pointer active:scale-[0.99]
+                    className={`group relative p-3 sm:p-4 md:p-6 rounded-xl sm:rounded-2xl border transition-all duration-300 hover:scale-[1.01] sm:hover:scale-[1.02] hover:shadow-2xl cursor-pointer active:scale-[0.99] w-full overflow-hidden
                     bg-gradient-to-r ${index < 3 ? 'from-yellow-400/30 to-amber-500/50' : getScoreGradient(score)} 
                     ${index < 3 ? 'border-yellow-400/50 hover:border-yellow-400/60' : 'border-border hover:border-primary/40 dark:border-white/20'}
                     backdrop-blur-sm animate-fade-in`} 
@@ -384,29 +384,29 @@ export default function LiveCandidateFeed() {
                           </h3>
                         </div>
                         
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm font-light font-inter">
-                          <div className="flex items-center text-muted-foreground min-w-0">
-                            <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-yellow-400 shrink-0" />
-                            <span className="truncate">{candidate['Job Title']}</span>
+                        <div className="grid grid-cols-1 gap-2 sm:gap-3 text-xs sm:text-sm font-light font-inter w-full">
+                          <div className="flex items-start text-muted-foreground min-w-0 w-full">
+                            <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-yellow-400 shrink-0 mt-0.5" />
+                            <span className="break-words flex-1">{candidate['Job Title']}</span>
                           </div>
-                          <div className="flex items-center text-muted-foreground min-w-0">
-                            <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-cyan-400 shrink-0" />
-                            <span className="truncate">{candidate.candidate_email}</span>
+                          <div className="flex items-start text-muted-foreground min-w-0 w-full">
+                            <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-cyan-400 shrink-0 mt-0.5" />
+                            <span className="break-all flex-1">{candidate.candidate_email}</span>
                           </div>
-                          <div className="flex items-center text-muted-foreground min-w-0">
-                            <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-green-400 shrink-0" />
-                            <span className="truncate">{candidate.candidate_phone_number}</span>
+                          <div className="flex items-start text-muted-foreground min-w-0 w-full">
+                            <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-green-400 shrink-0 mt-0.5" />
+                            <span className="break-words flex-1">{candidate.candidate_phone_number}</span>
                           </div>
-                          <div className="flex items-center text-muted-foreground min-w-0">
-                            <Briefcase className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-orange-400 shrink-0" />
-                            <span className="truncate">💰 {candidate['Salary Expectations'] || 'Negotiable'}</span>
+                          <div className="flex items-start text-muted-foreground min-w-0 w-full">
+                            <Briefcase className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-orange-400 shrink-0 mt-0.5" />
+                            <span className="break-words flex-1">💰 {candidate['Salary Expectations'] || 'Negotiable'}</span>
                           </div>
                         </div>
 
                         {/* After Call Reason */}
                         {candidate.after_call_reason && (
-                          <div className="mt-2 sm:mt-3 p-2 sm:p-3 bg-black/20 rounded-lg">
-                            <p className="text-xs sm:text-sm text-gray-300 leading-relaxed line-clamp-3">
+                          <div className="mt-2 sm:mt-3 p-2 sm:p-3 bg-black/20 rounded-lg w-full overflow-hidden">
+                            <p className="text-xs sm:text-sm text-gray-300 leading-relaxed line-clamp-3 break-words">
                               {candidate.after_call_reason.slice(0, 200)}...
                             </p>
                           </div>
@@ -415,9 +415,9 @@ export default function LiveCandidateFeed() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-border/20">
-                      <div className="flex items-center justify-end">
-                        <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
+                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-border/20 w-full overflow-hidden">
+                      <div className="flex items-center justify-end w-full">
+                        <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end w-full">
                           <Button 
                             size="sm" 
                             variant="destructive" 
