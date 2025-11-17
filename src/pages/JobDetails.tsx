@@ -2920,7 +2920,7 @@ mainCandidate["linkedin_score_reason"] ? (
     }),
   );
   return (
-    <div className={cn("space-y-4 md:space-y-6 p-4 md:p-6 max-w-full overflow-hidden", isShaking && "animate-shake")}>
+    <div className={cn("space-y-3 sm:space-y-4 md:space-y-6 p-2 sm:p-4 md:p-6 max-w-full overflow-x-hidden", isShaking && "animate-shake")}>
       {/* Processing Animation Overlay */}
       {job?.status === 'Processing' && job?.Processed === 'Yes' && <ProcessingAnimation />}
       
@@ -2983,12 +2983,12 @@ mainCandidate["linkedin_score_reason"] ? (
 
       {/* Job Header Card */}
       <Card>
-        <CardContent className="p-4 md:p-6">
-          <div className="space-y-4">
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-              <div className="space-y-2 flex-1 min-w-0">
-                <h2 className="text-xl md:text-2xl font-bold break-words">{job.job_title}</h2>
-                <p className="text-base md:text-lg text-muted-foreground break-words">
+        <CardContent className="p-3 sm:p-4 md:p-6">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex flex-col gap-3 sm:gap-4">
+              <div className="space-y-2 w-full">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold break-words">{job.job_title}</h2>
+                <p className="text-sm sm:text-base md:text-lg text-muted-foreground break-words">
                   {job.client_description || "Client Description"}
                 </p>
               </div>
@@ -3000,7 +3000,7 @@ mainCandidate["linkedin_score_reason"] ? (
                     ? "default"
                     : "destructive"
                 }
-                className={`text-xs md:text-sm px-2 md:px-3 py-1 whitespace-nowrap ${
+                className={`text-[10px] sm:text-xs md:text-sm px-2 py-1 whitespace-nowrap w-fit ${
                   job.Processed === "No"
                     ? "bg-purple-600 text-white border-0"
                     : job.Processed === true || job.Processed === "true" || job.Processed === "Yes"
@@ -3848,26 +3848,26 @@ mainCandidate["linkedin_score_reason"] ? (
                         // Use the first contact for display info
                         const mainCandidate = candidateContacts[0];
                         return (
-                          <Card
+                           <Card
                             key={candidateId}
                             id={`candidate-card-${candidateId}`}
                             className={cn(
-                              "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg",
+                              "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg max-w-full overflow-hidden",
                               selectedCandidates.has(candidateId) && "border-primary bg-primary/5",
                             )}
                           >
-                            <CardContent className="p-3 md:p-4">
-                              <div className="space-y-3">
-                                <div className="flex items-start justify-between">
-                                  <div className="flex items-start gap-3 min-w-0 flex-1">
+                            <CardContent className="p-2 sm:p-3 md:p-4">
+                              <div className="space-y-2 sm:space-y-3">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex items-start gap-2 sm:gap-3 min-w-0 flex-1">
                                     <input
                                       type="checkbox"
                                       checked={selectedCandidates.has(candidateId)}
                                       onChange={() => toggleCandidateSelection(candidateId)}
-                                      className="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                                      className="mt-1 h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary focus:ring-primary border-gray-300 rounded flex-shrink-0"
                                     />
                                     <div className="min-w-0 flex-1">
-                                      <h4 className="font-semibold text-sm md:text-base font-work truncate">
+                                      <h4 className="font-semibold text-xs sm:text-sm md:text-base font-work line-clamp-2">
                                         {mainCandidate["Candidate Name"] &&
                                         !/undefined/i.test(String(mainCandidate["Candidate Name"]))
                                           ? mainCandidate["Candidate Name"]
