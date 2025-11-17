@@ -19,6 +19,6 @@ export function HeroHeader({
         </h1>
         {subtitle && <p className="text-sm sm:text-base lg:text-lg font-light text-muted-foreground mt-2 sm:mt-4">{subtitle}</p>}
       </div>
-      {actions && <div className="flex items-center gap-2">{actions}</div>}
+      {actions && <div className="flex items-center gap-2 w-full sm:w-auto">{actions}</div>}
     </header>;
 }
