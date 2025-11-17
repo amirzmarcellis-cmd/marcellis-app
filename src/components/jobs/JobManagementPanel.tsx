@@ -542,7 +542,7 @@ export function JobManagementPanel() {
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-4">
           {/* Group Filter */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-2">
             <label className="text-sm font-light font-inter">Filter by Group:</label>
             <select value={selectedGroupFilter} onChange={e => setSelectedGroupFilter(e.target.value)} className="px-3 py-1 rounded-md border border-border bg-background text-sm font-light font-inter">
               <option value="">All Groups</option>
@@ -557,7 +557,7 @@ export function JobManagementPanel() {
           </Button>}
 
         {/* Recruiter Filter */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-2">
           <label className="text-sm font-light font-inter">Filter by Recruiter:</label>
           <select value={selectedRecruiterFilter} onChange={e => setSelectedRecruiterFilter(e.target.value)} className="px-3 py-1 rounded-md border border-border bg-background text-sm font-light font-inter">
             <option value="">All Recruiters</option>
@@ -571,11 +571,11 @@ export function JobManagementPanel() {
           </Button>}
 
         {/* Date Range Filter */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-2">
           <label className="text-sm font-light font-inter">Filter by Date:</label>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className={cn("w-[280px] justify-start text-left font-light font-inter", !dateRange.from && !dateRange.to && "text-muted-foreground")}>
+              <Button variant="outline" className={cn("w-full sm:w-[280px] justify-start text-left font-light font-inter", !dateRange.from && !dateRange.to && "text-muted-foreground")}>
                 <Calendar className="mr-2 h-4 w-4" />
                 {dateRange.from ? dateRange.to ? <>
                       {format(dateRange.from, "MMM dd, yyyy")} - {format(dateRange.to, "MMM dd, yyyy")}
@@ -651,7 +651,7 @@ export function JobManagementPanel() {
               </CardContent>
             </Card>)}
         </div> : <Tabs defaultValue="active" className="space-y-6">
-          <TabsList className="glass-card flex-nowrap whitespace-nowrap overflow-x-auto">
+          <TabsList className="glass-card w-full max-w-full flex flex-wrap whitespace-normal overflow-x-hidden sm:flex-nowrap sm:whitespace-nowrap sm:overflow-visible">
             <TabsTrigger value="active" className="data-[state=active]:bg-status-active data-[state=active]:text-white flex-shrink-0">
               Active Jobs ({filteredJobs.activeJobs.length})
             </TabsTrigger>
@@ -773,7 +773,7 @@ const JobGrid = memo(function JobGrid({
                 </h4>
                 <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
                   {getStatusBadge(job.status, job.Processed)}
-                  <Badge variant="outline" className="text-[10px] sm:text-xs">
+                  <Badge variant="outline" className="text-[10px] sm:text-xs break-all">
                     ID: {job.job_id}
                   </Badge>
                   {job.groups && <Badge variant="outline" className="text-[10px] sm:text-xs border" style={{
@@ -852,7 +852,7 @@ const JobGrid = memo(function JobGrid({
 
             {/* Automatic Dial Toggle */}
             <div className="py-2 border-t border-border/30 space-y-2">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2 text-sm">
                   {job.automatic_dial ? <Phone className="h-4 w-4 text-emerald-500" /> : <PhoneOff className="h-4 w-4 text-muted-foreground" />}
                   <span className="text-muted-foreground">Automatic Dial</span>
@@ -868,8 +868,8 @@ const JobGrid = memo(function JobGrid({
               )}
             </div>
 
-            <div className="flex items-center justify-between pt-2">
-              <div className="flex space-x-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-0 pt-2">
+              <div className="flex space-x-2 flex-shrink-0">
                 <Button size="sm" variant="outline" onClick={() => navigate(`/jobs/edit/${job.job_id}`)} className="h-8 px-2">
                   <Edit className="h-3 w-3" />
                 </Button>
@@ -881,7 +881,7 @@ const JobGrid = memo(function JobGrid({
                 </Button>
               </div>
               
-              <Button size="sm" className="h-8" onClick={() => navigate(`/job/${job.job_id}`)}>
+              <Button size="sm" className="h-8 w-full sm:w-auto" onClick={() => navigate(`/job/${job.job_id}`)}>
                 <Users className="h-3 w-3 mr-1" />
                 Open Job
               </Button>
