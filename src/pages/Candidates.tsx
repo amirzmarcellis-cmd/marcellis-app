@@ -311,7 +311,7 @@ export default function Candidates() {
                             </Badge>
                           </div>
                         </div>
-                        <div className="hidden lg:flex items-center gap-1 flex-shrink-0">
+                        <div className="hidden items-center gap-1 flex-shrink-0">
                           <Button 
                             variant="outline" 
                             size="icon" 
@@ -333,7 +333,7 @@ export default function Candidates() {
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
-                        <div className="flex lg:hidden items-center gap-1 flex-shrink-0">
+                        <div className="flex items-center gap-1 flex-shrink-0">
                           <Button 
                             variant="outline" 
                             size="xs" 
