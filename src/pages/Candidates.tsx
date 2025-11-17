@@ -335,24 +335,24 @@ export default function Candidates() {
                         </div>
                         <div className="flex md:hidden items-center gap-1 flex-shrink-0">
                           <Button 
-                            variant="default" 
-                            size="sm" 
-                            className="h-6 px-1.5 whitespace-nowrap text-[10px]"
+                            variant="outline" 
+                            size="xs" 
+                            className="h-6 px-2 whitespace-nowrap text-[11px] gap-1"
                             onClick={() => handleEditCandidate(cv)}
                             aria-label="Edit CV"
                           >
-                            <Edit className="w-2.5 h-2.5" />
-                            edit
+                            <Edit className="w-3 h-3" />
+                            Edit
                           </Button>
                           <Button 
-                            variant="destructive" 
-                            size="sm" 
-                            className="h-6 px-1.5 whitespace-nowrap text-[10px]"
+                            variant="outline" 
+                            size="xs" 
+                            className="h-6 px-2 whitespace-nowrap text-[11px] gap-1 text-destructive border-destructive/40"
                             onClick={() => handleDeleteCV(cv.user_id)}
                             aria-label="Delete CV"
                           >
-                            <Trash2 className="w-2.5 h-2.5" />
-                            delete
+                            <Trash2 className="w-3 h-3" />
+                            Delete
                           </Button>
                         </div>
                       </div>
@@ -395,24 +395,24 @@ export default function Candidates() {
                           <div className="text-muted-foreground mb-1">Actions</div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 min-w-0">
                             <Button 
-                              variant="default" 
+                              variant="outline" 
                               size="sm" 
-                              className="h-7 px-2 text-[10px] w-full whitespace-nowrap" 
+                              className="h-7 px-2 text-[11px] w-full whitespace-nowrap gap-1" 
                               onClick={() => handleEditCandidate(cv)}
                               aria-label="Edit CV"
                             >
-                              <Edit className="w-2.5 h-2.5" />
-                              edit
+                              <Edit className="w-3 h-3" />
+                              Edit
                             </Button>
                             <Button 
-                              variant="destructive" 
+                              variant="outline" 
                               size="sm" 
-                              className="h-7 px-2 text-[10px] w-full whitespace-nowrap" 
+                              className="h-7 px-2 text-[11px] w-full whitespace-nowrap gap-1 text-destructive border-destructive/40" 
                               onClick={() => handleDeleteCV(cv.user_id)}
                               aria-label="Delete CV"
                             >
-                              <Trash2 className="w-2.5 h-2.5" />
-                              delete
+                              <Trash2 className="w-3 h-3" />
+                              Delete
                             </Button>
                           </div>
                         </div>
