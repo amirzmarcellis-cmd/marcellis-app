@@ -337,22 +337,22 @@ export default function Candidates() {
                           <Button 
                             variant="default" 
                             size="sm" 
-                            className="h-7 px-2 whitespace-nowrap text-[11px]"
+                            className="h-6 px-1.5 whitespace-nowrap text-[10px]"
                             onClick={() => handleEditCandidate(cv)}
                             aria-label="Edit CV"
                           >
-                            <Edit className="w-3 h-3" />
+                            <Edit className="w-2.5 h-2.5" />
                             edit
                           </Button>
                           <Button 
                             variant="destructive" 
                             size="sm" 
-                            className="h-7 px-2 whitespace-nowrap text-[11px]"
+                            className="h-6 px-1.5 whitespace-nowrap text-[10px]"
                             onClick={() => handleDeleteCV(cv.user_id)}
                             aria-label="Delete CV"
                           >
-                            <Trash2 className="w-3 h-3" />
-                            Delete
+                            <Trash2 className="w-2.5 h-2.5" />
+                            delete
                           </Button>
                         </div>
                       </div>
@@ -397,22 +397,22 @@ export default function Candidates() {
                             <Button 
                               variant="default" 
                               size="sm" 
-                              className="h-8 px-2 text-xs w-full whitespace-nowrap" 
+                              className="h-7 px-2 text-[10px] w-full whitespace-nowrap" 
                               onClick={() => handleEditCandidate(cv)}
                               aria-label="Edit CV"
                             >
-                              <Edit className="w-3 h-3" />
+                              <Edit className="w-2.5 h-2.5" />
                               edit
                             </Button>
                             <Button 
                               variant="destructive" 
                               size="sm" 
-                              className="h-8 px-2 text-xs w-full whitespace-nowrap" 
+                              className="h-7 px-2 text-[10px] w-full whitespace-nowrap" 
                               onClick={() => handleDeleteCV(cv.user_id)}
                               aria-label="Delete CV"
                             >
-                              <Trash2 className="w-3 h-3" />
-                              Delete
+                              <Trash2 className="w-2.5 h-2.5" />
+                              delete
                             </Button>
                           </div>
                         </div>
