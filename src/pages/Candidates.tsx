@@ -126,7 +126,7 @@ export default function Candidates() {
   }
 
   return (
-      <div className="space-y-4 sm:space-y-6 overflow-x-hidden">
+      <div className="space-y-4 sm:space-y-6 overflow-x-hidden pb-16 md:pb-0">
         <HeroHeader
           title="CVs Database"
           subtitle="View and manage all uploaded CVs"
@@ -369,6 +369,20 @@ export default function Candidates() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Sticky mobile actions */}
+        <div className="md:hidden fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-3 pt-2 pb-[calc(env(safe-area-inset-bottom)+8px)]">
+          <div className="grid grid-cols-2 gap-2">
+            <Button onClick={() => setBulkUploadOpen(true)} variant="outline" size="sm" className="gap-1.5 text-xs">
+              <Upload className="w-3.5 h-3.5" />
+              Bulk Upload
+            </Button>
+            <Button onClick={handleAddCandidate} size="sm" className="gap-1.5 text-xs">
+              <UserPlus className="w-3.5 h-3.5" />
+              Add CV
+            </Button>
+          </div>
+        </div>
 
         <CandidateDialog
           candidate={selectedCandidate}
