@@ -616,29 +616,29 @@ export default function UsersPanel() {
           ) : (
             <>
               <div className="overflow-x-auto -mx-2 sm:mx-0 rounded-md border sm:border-0">
-                <Table className="min-w-[720px] sm:min-w-0 table-fixed">
+                <Table className="min-w-[960px] sm:min-w-0 table-fixed">
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-[10px] sm:text-sm py-2 sm:sticky sm:left-0 sm:bg-background sm:z-10 w-[24%]">Name</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2 sticky left-0 bg-background z-10 w-[24%]">Name</TableHead>
                       <TableHead className="text-[10px] sm:text-sm py-2 w-[28%]">Email</TableHead>
                       <TableHead className="text-[10px] sm:text-sm py-2 w-[18%]">Role</TableHead>
                       <TableHead className="text-[10px] sm:text-sm py-2 w-[12%]">Created</TableHead>
-                      <TableHead className="text-[10px] sm:text-sm py-2 sm:sticky sm:right-0 sm:bg-background sm:z-10 w-[18%]">Actions</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2 sticky right-0 bg-background z-10 w-[18%]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredUsers.map((user) => (
                        <TableRow key={user.id}>
-                        <TableCell className="text-[10px] sm:text-sm py-2 sm:sticky sm:left-0 sm:bg-background sm:z-10">
+                        <TableCell className="text-[10px] sm:text-sm py-2 sticky left-0 bg-background z-10">
                           <div className="flex items-center gap-1 sm:gap-2">
                             <User className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                            <span className="truncate">{user.name || 'No name'}</span>
+                            <span className="whitespace-normal break-words" title={user.name || "No name"}>{user.name || "No name"}</span>
                           </div>
                         </TableCell>
                         <TableCell className="text-[10px] sm:text-sm py-2">
                           <div className="flex items-center gap-1 sm:gap-2">
                             <Mail className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                            <span className="truncate">{user.email}</span>
+                            <span className="whitespace-normal break-words" title={user.email}>{user.email}</span>
                           </div>
                         </TableCell>
                         <TableCell className="text-[10px] sm:text-sm py-2">
@@ -656,7 +656,7 @@ export default function UsersPanel() {
                                 {userMemberships.length > 0 && orgRole === 'EMPLOYEE' && (
                                   <div className="text-[9px] sm:text-xs text-muted-foreground">
                                     {userMemberships.map((membership, idx) => (
-                                      <div key={idx} className="truncate">
+                                      <div key={idx} className="whitespace-normal break-words">
                                         {membership.team_name} ({membership.role === 'TEAM_LEADER' ? 'Leader' : 'Member'})
                                       </div>
                                     ))}
@@ -706,7 +706,7 @@ export default function UsersPanel() {
       </Tabs>
       {canAccessUsersPanel && (
         <Button
-          className="sm:hidden fixed bottom-20 right-4 z-40 shadow-card"
+          className="sm:hidden fixed bottom-6 right-4 z-50 shadow-card"
           size="icon"
           onClick={() => setIsAddUserOpen(true)}
           aria-label="Add user"
