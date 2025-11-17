@@ -3169,7 +3169,7 @@ mainCandidate["linkedin_score_reason"] ? (
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Headhunting Companies:</span>
-                  <div className="flex flex-col gap-1 items-end">
+                  <div className="flex flex-col gap-1 items-end max-w-full overflow-hidden">
                     {job.headhunting_companies ? (
                       job.headhunting_companies.split(",").map((url: string, index: number) => (
                         <a
@@ -3177,7 +3177,8 @@ mainCandidate["linkedin_score_reason"] ? (
                           href={url.trim()}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-primary hover:underline flex items-center gap-1"
+                          className="text-primary hover:underline flex items-center gap-1 break-all text-right"
+                        >
                         >
                           {url.trim()}
                           <ExternalLink className="w-3 h-3" />
