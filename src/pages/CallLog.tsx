@@ -403,7 +403,7 @@ export default function CallLog() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0 sm:p-6">
-            <div className="overflow-x-auto">
+            <div className="hidden sm:block overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="border-border">
@@ -542,6 +542,102 @@ export default function CallLog() {
                 )}
               </TableBody>
               </Table>
+            </div>
+            <div className="sm:hidden p-3 space-y-2">
+              {loading ? (
+                <div className="py-6 text-center text-muted-foreground text-sm">Loading call logs...</div>
+              ) : filteredCallLogs.length === 0 ? (
+                <div className="py-6 text-center text-muted-foreground text-sm">No call logs found</div>
+              ) : (
+                filteredCallLogs.map((log, index) => {
+                  const initials = (log.candidate_name || "")
+                    .split(' ')
+                    .map(n => n[0])
+                    .join('')
+                    .toUpperCase();
+                  // Determine score as in table
+                  const source = (log.source || "").toLowerCase();
+                  const isLinkedInSource = source.includes('linkedin');
+                  const secondScore = isLinkedInSource ? (log.linkedin_score || 0) : (log.cv_score || 0);
+                  const score = log.after_call_score ? Math.round((log.after_call_score + secondScore) / 2) : secondScore;
+
+                  return (
+                    <div key={index} className="border border-border rounded-lg p-3 bg-card/50">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="w-8 h-8">
+                            <AvatarFallback className="bg-gradient-primary text-white text-sm font-light font-work">
+                              {initials}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0">
+                            <div className="text-sm font-light font-work truncate">{log.candidate_name || "N/A"}</div>
+                            <div className="text-xs text-muted-foreground truncate">{log.candidate_email || "N/A"}</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button variant="outline" size="sm" asChild className="h-7 w-7 p-0">
+                            <Link to={`/call-log-details/${log.recordid}`}>
+                              <FileText className="w-3 h-3" />
+                            </Link>
+                          </Button>
+                          <Button variant="outline" size="sm" asChild className="h-7 w-7 p-0">
+                            <Link to={`/candidate/${log.user_id}`}>
+                              <Eye className="w-3 h-3" />
+                            </Link>
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 grid grid-cols-1 gap-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">Status</span>
+                          <StatusDropdown
+                            currentStatus={log.contacted}
+                            candidateId={log.user_id?.toString() || ""}
+                            jobId={log.job_id}
+                            statusType="contacted"
+                            onStatusChange={(newStatus) => {
+                              setCallLogs(prev => prev.map(l => 
+                                l.recordid === log.recordid
+                                  ? { ...l, contacted: newStatus }
+                                  : l
+                              ))
+                            }}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">Score</span>
+                          <Badge variant={getScoreBadgeVariant(score?.toString())} className="text-xs">
+                            {score ? `${score}/100` : "N/A"}
+                          </Badge>
+                        </div>
+
+                        <div className="text-xs text-muted-foreground">
+                          <span className="text-foreground/80">Job:</span> <span className="text-foreground">{log.job_title || "N/A"}</span>
+                          <Badge variant="outline" className="ml-1 text-[10px] align-middle">{(log.job_id || "N/A").substring(0, 8)}...</Badge>
+                        </div>
+
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground">Nationality</span>
+                          <Badge variant="outline" className="text-[10px]">{log.nationality || "N/A"}</Badge>
+                        </div>
+
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-1 text-muted-foreground"><Clock className="w-3 h-3" /> Notice</div>
+                          <span className="truncate">{log.notice_period || "N/A"}</span>
+                        </div>
+
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground">Salary</span>
+                          <span className="truncate">{log.salary_expectations || "N/A"}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </CardContent>
         </Card>
