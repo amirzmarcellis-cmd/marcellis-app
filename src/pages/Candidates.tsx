@@ -311,7 +311,7 @@ export default function Candidates() {
                             </Badge>
                           </div>
                         </div>
-                        <div className="hidden md:flex items-center gap-1 flex-shrink-0">
+                        <div className="hidden lg:flex items-center gap-1 flex-shrink-0">
                           <Button 
                             variant="outline" 
                             size="icon" 
@@ -333,11 +333,11 @@ export default function Candidates() {
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
-                        <div className="flex md:hidden items-center gap-1 flex-shrink-0">
+                        <div className="flex lg:hidden items-center gap-1 flex-shrink-0">
                           <Button 
                             variant="outline" 
                             size="xs" 
-                            className="h-6 px-2 whitespace-nowrap text-[11px] gap-1 text-foreground font-medium bg-transparent"
+                            className="h-6 px-2 min-w-[72px] whitespace-nowrap text-[11px] gap-1 text-foreground font-medium bg-transparent"
                             onClick={() => handleEditCandidate(cv)}
                             aria-label="Edit CV"
                           >
@@ -347,7 +347,7 @@ export default function Candidates() {
                           <Button 
                             variant="outline" 
                             size="xs" 
-                            className="h-6 px-2 whitespace-nowrap text-[11px] gap-1 text-foreground font-medium bg-transparent"
+                            className="h-6 px-2 min-w-[72px] whitespace-nowrap text-[11px] gap-1 text-foreground font-medium bg-transparent"
                             onClick={() => handleDeleteCV(cv.user_id)}
                             aria-label="Delete CV"
                           >
@@ -397,7 +397,7 @@ export default function Candidates() {
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              className="h-7 px-2 text-[11px] w-full whitespace-nowrap gap-1 text-foreground font-medium bg-transparent" 
+                              className="h-7 px-2 text-[11px] w-full min-w-[88px] whitespace-nowrap gap-1 text-foreground font-medium bg-transparent"
                               onClick={() => handleEditCandidate(cv)}
                               aria-label="Edit CV"
                             >
@@ -407,7 +407,7 @@ export default function Candidates() {
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              className="h-7 px-2 text-[11px] w-full whitespace-nowrap gap-1 text-foreground font-medium bg-transparent" 
+                              className="h-7 px-2 text-[11px] w-full min-w-[88px] whitespace-nowrap gap-1 text-foreground font-medium bg-transparent" 
                               onClick={() => handleDeleteCV(cv.user_id)}
                               aria-label="Delete CV"
                             >
