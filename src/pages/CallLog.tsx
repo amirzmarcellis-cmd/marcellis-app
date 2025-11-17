@@ -397,23 +397,23 @@ export default function CallLog() {
         {/* Call Log Table */}
         <Card className="bg-card border-border dark:bg-gradient-card dark:backdrop-blur-glass shadow-card">
           <CardHeader className="p-3 sm:p-4 lg:p-6">
-            <CardTitle className="flex items-center gap-2 text-3xl font-light font-work tracking-tight">
-              <Phone className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl lg:text-3xl font-light font-work tracking-tight">
+              <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
               Call History ({filteredCallLogs.length})
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0 sm:p-6">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="border-border">
                     <TableHead className="w-[200px]">Candidate</TableHead>
-                    <TableHead className="w-[150px]">Job</TableHead>
-                    <TableHead className="w-[120px]">Contacted</TableHead>
+                    <TableHead className="w-[150px] hidden lg:table-cell">Job</TableHead>
+                    <TableHead className="w-[120px]">Status</TableHead>
                     <TableHead className="w-[100px]">Score</TableHead>
-                    <TableHead className="w-[120px]">Nationality</TableHead>
-                    <TableHead className="w-[120px]">Notice Period</TableHead>
-                    <TableHead className="w-[140px]">Salary Expectations</TableHead>
+                    <TableHead className="w-[120px] hidden xl:table-cell">Nationality</TableHead>
+                    <TableHead className="w-[120px] hidden xl:table-cell">Notice Period</TableHead>
+                    <TableHead className="w-[140px] hidden xl:table-cell">Salary Expectations</TableHead>
                     <TableHead className="w-[200px] text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -441,19 +441,23 @@ export default function CallLog() {
                       return (
                         <TableRow key={index} className="border-border hover:bg-glass-primary transition-colors">
                            <TableCell className="max-w-[200px]">
-                            <div className="flex items-center space-x-3">
-                              <Avatar className="w-8 h-8 flex-shrink-0">
-                                <AvatarFallback className="bg-gradient-primary text-white text-sm font-light font-work">
+                            <div className="flex items-center space-x-2 sm:space-x-3">
+                              <Avatar className="w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0">
+                                <AvatarFallback className="bg-gradient-primary text-white text-xs sm:text-sm font-light font-work">
                                   {initials}
                                 </AvatarFallback>
                               </Avatar>
                               <div className="min-w-0 flex-1">
-                                <div className="font-light font-work truncate">{log.candidate_name || "N/A"}</div>
-                                <div className="text-sm font-light font-inter text-muted-foreground truncate">{log.candidate_email || "N/A"}</div>
+                                <div className="font-light font-work truncate text-xs sm:text-sm">{log.candidate_name || "N/A"}</div>
+                                <div className="text-[10px] sm:text-sm font-light font-inter text-muted-foreground truncate hidden sm:block">{log.candidate_email || "N/A"}</div>
+                                {/* Show job on mobile (hidden column on mobile) */}
+                                <div className="text-[10px] font-light font-inter text-muted-foreground truncate lg:hidden mt-0.5">
+                                  {log.job_title || "N/A"}
+                                </div>
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell className="max-w-[150px]">
+                          <TableCell className="max-w-[150px] hidden lg:table-cell">
                             <div className="min-w-0">
                               <div className="font-light font-work truncate">{log.job_title || "N/A"}</div>
                               <Badge variant="outline" className="font-mono text-xs font-light font-inter mt-1">
@@ -484,34 +488,34 @@ export default function CallLog() {
                               const secondScore = isLinkedInSource ? (log.linkedin_score || 0) : (log.cv_score || 0);
                               const score = log.after_call_score ? Math.round((log.after_call_score + secondScore) / 2) : secondScore;
                               return (
-                                <Badge variant={getScoreBadgeVariant(score?.toString())} className="whitespace-nowrap">
+                                <Badge variant={getScoreBadgeVariant(score?.toString())} className="whitespace-nowrap text-xs">
                                   {score ? `${score}/100` : "N/A"}
                                 </Badge>
                               );
                             })()}
                           </TableCell>
-                          <TableCell className="max-w-[120px]">
+                          <TableCell className="max-w-[120px] hidden xl:table-cell">
                             <Badge variant="outline" className="whitespace-nowrap">
                               {log.nationality || "N/A"}
                             </Badge>
                           </TableCell>
-                          <TableCell className="max-w-[120px]">
+                          <TableCell className="max-w-[120px] hidden xl:table-cell">
                             <div className="flex items-center space-x-2">
                               <Clock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                               <span className="truncate">{log.notice_period || "N/A"}</span>
                             </div>
                           </TableCell>
-                          <TableCell className="max-w-[140px]">
+                          <TableCell className="max-w-[140px] hidden xl:table-cell">
                             <span className="truncate">{log.salary_expectations || "N/A"}</span>
                           </TableCell>
                           <TableCell className="text-right max-w-[200px]">
-                            <div className="flex justify-end space-x-1">
-                              <Button variant="outline" size="sm" asChild className="h-8 px-2">
+                            <div className="flex justify-end gap-1">
+                              <Button variant="outline" size="sm" asChild className="h-7 w-7 sm:h-8 sm:w-8 p-0">
                                 <Link to={`/call-log-details/${log.recordid}`}> 
                                   <FileText className="w-3 h-3" />
                                 </Link>
                               </Button>
-                              <Button variant="outline" size="sm" asChild className="h-8 px-2">
+                              <Button variant="outline" size="sm" asChild className="h-7 w-7 sm:h-8 sm:w-8 p-0">
                                 <Link to={`/candidate/${log.user_id}`}>
                                   <Eye className="w-3 h-3" />
                                 </Link>
