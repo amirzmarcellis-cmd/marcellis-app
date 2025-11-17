@@ -296,7 +296,7 @@ export default function Candidates() {
                     : cv.user_id;
                   
                   return (
-                    <div key={cv.user_id} className="border border-border rounded-lg p-2 bg-card/50 max-w-full overflow-hidden">
+                    <div key={cv.user_id} className="border border-border rounded-lg p-2 bg-card/50 max-w-full overflow-x-hidden">
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <div className="flex items-center gap-2 min-w-0 flex-1">
                           <Avatar className="w-8 h-8 flex-shrink-0">
@@ -311,26 +311,26 @@ export default function Candidates() {
                             </Badge>
                           </div>
                         </div>
-                        <div className="flex items-center gap-0.5 flex-shrink-0">
+                        <div className="flex items-center gap-1 flex-shrink-0">
                           <Button 
                             variant="outline" 
-                            size="sm" 
-                            className="h-7 w-7 p-0 text-foreground"
+                            size="icon" 
+                            className="h-8 w-8"
                             onClick={() => handleEditCandidate(cv)}
                             aria-label="Edit CV"
                             title="Edit CV"
                           >
-                            <Edit className="w-3.5 h-3.5" />
+                            <Edit className="w-4 h-4" />
                           </Button>
                           <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="h-7 w-7 p-0 text-destructive"
+                            variant="destructive" 
+                            size="icon" 
+                            className="h-8 w-8"
                             onClick={() => handleDeleteCV(cv.user_id)}
                             aria-label="Delete CV"
                             title="Delete CV"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       </div>
