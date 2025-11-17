@@ -631,62 +631,70 @@ export default function Analytics() {
               </div>
             </CardContent>
           </Card>
+        </div>
+      </div>
 
+      {/* Additional Cards - Funnel Metrics */}
+      <div className="mb-6 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl font-light font-work text-foreground mb-3 sm:mb-4">
+          Candidate Pipeline Status
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-light font-work uppercase tracking-wide text-muted-foreground">Total Longlisted</p>
-                  <p className="text-5xl font-light font-work text-foreground mt-2">{data?.totalLonglisted || 0}</p>
-                  <p className="text-xs font-light font-work text-muted-foreground mt-1">Across all jobs</p>
+                  <p className="text-xs sm:text-sm font-light font-work uppercase tracking-wide text-muted-foreground">Total Longlisted</p>
+                  <p className="text-3xl sm:text-4xl lg:text-5xl font-light font-work text-foreground mt-1 sm:mt-2">{data?.totalLonglisted || 0}</p>
+                  <p className="text-[10px] sm:text-xs font-light font-work text-muted-foreground mt-1">Across all jobs</p>
                 </div>
-                <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center">
-                  <Users className="w-8 h-8 text-white" />
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Users className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-light font-work uppercase tracking-wide text-muted-foreground">Total Shortlisted</p>
-                  <p className="text-5xl font-light font-work text-foreground mt-2">{data?.totalShortlisted || 0}</p>
-                  <p className="text-xs font-light font-work text-muted-foreground mt-1">Across all jobs</p>
+                  <p className="text-xs sm:text-sm font-light font-work uppercase tracking-wide text-muted-foreground">Total Shortlisted</p>
+                  <p className="text-3xl sm:text-4xl lg:text-5xl font-light font-work text-foreground mt-1 sm:mt-2">{data?.totalShortlisted || 0}</p>
+                  <p className="text-[10px] sm:text-xs font-light font-work text-muted-foreground mt-1">Across all jobs</p>
                 </div>
-                <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
-                  <CheckCircle className="w-8 h-8 text-white" />
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-light font-work uppercase tracking-wide text-muted-foreground">Total Rejected</p>
-                  <p className="text-5xl font-light font-work text-foreground mt-2">{data?.totalRejected || 0}</p>
-                  <p className="text-xs font-light font-work text-muted-foreground mt-1">Across all jobs</p>
+                  <p className="text-xs sm:text-sm font-light font-work uppercase tracking-wide text-muted-foreground">Total Rejected</p>
+                  <p className="text-3xl sm:text-4xl lg:text-5xl font-light font-work text-foreground mt-1 sm:mt-2">{data?.totalRejected || 0}</p>
+                  <p className="text-[10px] sm:text-xs font-light font-work text-muted-foreground mt-1">Across all jobs</p>
                 </div>
-                <div className="w-16 h-16 bg-gradient-to-br from-red-400 to-pink-500 rounded-xl flex items-center justify-center">
-                  <Users className="w-8 h-8 text-white" />
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-red-400 to-pink-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Users className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 hover:border-primary/40 transition-all">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-light font-work uppercase tracking-wide text-muted-foreground">Total Submitted</p>
-                  <p className="text-5xl font-light font-work text-foreground mt-2">{data?.totalSubmitted || 0}</p>
-                  <p className="text-xs font-light font-work text-muted-foreground mt-1">Across all jobs</p>
+                  <p className="text-xs sm:text-sm font-light font-work uppercase tracking-wide text-muted-foreground">Total Submitted</p>
+                  <p className="text-3xl sm:text-4xl lg:text-5xl font-light font-work text-foreground mt-1 sm:mt-2">{data?.totalSubmitted || 0}</p>
+                  <p className="text-[10px] sm:text-xs font-light font-work text-muted-foreground mt-1">Across all jobs</p>
                 </div>
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-violet-500 rounded-xl flex items-center justify-center">
-                  <Star className="w-8 h-8 text-white" />
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-400 to-violet-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Star className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 </div>
               </div>
             </CardContent>
@@ -695,9 +703,9 @@ export default function Analytics() {
       </div>
 
       {/* Charts Section Header with Toggle */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-light font-work text-foreground">Analytics Charts</h2>
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-3 sm:mb-4">
+        <h2 className="text-xl sm:text-2xl font-light font-work text-foreground">Analytics Charts</h2>
+        <div className="flex items-center gap-2 hidden lg:flex">
           <span className="text-sm font-light font-work text-muted-foreground">Layout:</span>
           <div className="flex items-center gap-1 p-1 bg-card border border-border rounded-lg">
             <button
@@ -727,7 +735,7 @@ export default function Analytics() {
       </div>
 
       {/* Charts Section */}
-      <div className={`grid grid-cols-1 ${isGridLayout ? 'lg:grid-cols-2' : ''} gap-8 mb-8 transition-all duration-500 ease-in-out`}>
+      <div className={`grid grid-cols-1 ${isGridLayout ? 'lg:grid-cols-2' : ''} gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8 transition-all duration-500 ease-in-out`}>
         {/* Score Distribution */}
         <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20 transition-all duration-500 ease-in-out animate-fade-in">
           <CardHeader>
@@ -742,15 +750,15 @@ export default function Analytics() {
           <CardContent>
             <Suspense fallback={<Skeleton className="h-[350px] w-full" />}>
               {((data?.scoreDistribution.high || 0) + (data?.scoreDistribution.medium || 0) + (data?.scoreDistribution.low || 0)) > 0 ? (
-                <div className="flex items-center justify-center h-[350px]">
-                  <ResponsiveContainer width="100%" height="100%">
+                <div className="flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-0">
+                  <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
                       <Pie
                         data={scoreDistributionData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={70}
-                        outerRadius={130}
+                        innerRadius={60}
+                        outerRadius={110}
                         paddingAngle={5}
                         nameKey="name"
                         dataKey="value"
@@ -769,7 +777,7 @@ export default function Analytics() {
                       />
                     </PieChart>
                   </ResponsiveContainer>
-                  <div className="ml-8 space-y-3">
+                  <div className="w-full lg:w-auto lg:ml-8 space-y-3">
                     {scoreDistributionData.map((item, index) => (
                       <div key={index} className="flex items-center justify-between min-w-[140px]">
                         <div className="flex items-center">
@@ -807,15 +815,15 @@ export default function Analytics() {
           <CardContent>
             <Suspense fallback={<Skeleton className="h-[400px] w-full" />}>
               {contactStatusData.length > 0 ? (
-                <div className="flex items-center justify-center h-[400px]">
-                  <ResponsiveContainer width="100%" height="100%">
+                <div className="flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-0">
+                  <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
                       <Pie
                         data={contactStatusData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={70}
-                        outerRadius={130}
+                        innerRadius={60}
+                        outerRadius={110}
                         paddingAngle={3}
                         nameKey="name"
                         dataKey="value"
@@ -834,7 +842,7 @@ export default function Analytics() {
                       />
                     </PieChart>
                   </ResponsiveContainer>
-                  <ScrollArea className="ml-8 h-[380px]">
+                  <ScrollArea className="w-full lg:w-auto lg:ml-8 h-[300px] lg:h-[380px]">
                     <div className="space-y-3 pr-4">
                       {contactStatusData.map((item, index) => (
                         <div key={index} className="flex items-center justify-between min-w-[160px]">
@@ -1031,35 +1039,35 @@ export default function Analytics() {
       </div>
 
       {/* Bottom Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mt-6 sm:mt-8">
         <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
-          <CardContent className="p-6 text-center">
-            <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
-            <p className="text-green-400 text-sm font-light font-work">Call Success Rate</p>
-            <p className="text-4xl font-light font-work text-foreground mt-2">{data?.callSuccessRate || 0}%</p>
-            <p className="text-xs font-light font-work text-green-300 mt-1">
+          <CardContent className="p-4 sm:p-6 text-center">
+            <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 text-green-400 mx-auto mb-3 sm:mb-4" />
+            <p className="text-green-400 text-xs sm:text-sm font-light font-work">Call Success Rate</p>
+            <p className="text-3xl sm:text-4xl font-light font-work text-foreground mt-1 sm:mt-2">{data?.callSuccessRate || 0}%</p>
+            <p className="text-[10px] sm:text-xs font-light font-work text-green-300 mt-1">
               {data?.contactedCount || 0} contacted / {data?.totalCallLogs || 0} calls
             </p>
           </CardContent>
         </Card>
 
         <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
-          <CardContent className="p-6 text-center">
-            <Phone className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
-            <p className="text-cyan-400 text-sm font-light font-work">Contact Rate</p>
-            <p className="text-4xl font-light font-work text-foreground mt-2">{data?.contactRate || 0}%</p>
-            <p className="text-xs font-light font-work text-cyan-300 mt-1">
+          <CardContent className="p-4 sm:p-6 text-center">
+            <Phone className="w-10 h-10 sm:w-12 sm:h-12 text-cyan-400 mx-auto mb-3 sm:mb-4" />
+            <p className="text-cyan-400 text-xs sm:text-sm font-light font-work">Contact Rate</p>
+            <p className="text-3xl sm:text-4xl font-light font-work text-foreground mt-1 sm:mt-2">{data?.contactRate || 0}%</p>
+            <p className="text-[10px] sm:text-xs font-light font-work text-cyan-300 mt-1">
               {data?.contactedCount || 0} contacted / {data?.totalCandidates || 0} total
             </p>
           </CardContent>
         </Card>
 
         <Card className="bg-card border-border dark:bg-white/10 dark:border-white/20">
-          <CardContent className="p-6 text-center">
-            <Clock className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-            <p className="text-purple-400 text-sm font-light font-work">Avg Candidates/Job</p>
-            <p className="text-4xl font-light font-work text-foreground mt-2">{data?.avgCandidatesPerJob || 0}</p>
-            <p className="text-xs font-light font-work text-purple-300 mt-1">
+          <CardContent className="p-4 sm:p-6 text-center">
+            <Clock className="w-10 h-10 sm:w-12 sm:h-12 text-purple-400 mx-auto mb-3 sm:mb-4" />
+            <p className="text-purple-400 text-xs sm:text-sm font-light font-work">Avg Candidates/Job</p>
+            <p className="text-3xl sm:text-4xl font-light font-work text-foreground mt-1 sm:mt-2">{data?.avgCandidatesPerJob || 0}</p>
+            <p className="text-[10px] sm:text-xs font-light font-work text-purple-300 mt-1">
               {data?.totalCandidates || 0} candidates / {data?.activeJobs || 0} active jobs
             </p>
           </CardContent>
