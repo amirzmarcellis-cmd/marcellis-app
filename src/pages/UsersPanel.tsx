@@ -623,7 +623,7 @@ export default function UsersPanel() {
                       <TableHead className="text-[10px] sm:text-sm py-2 sticky left-0 bg-background z-10">Name</TableHead>
                       <TableHead className="text-[10px] sm:text-sm py-2">Email</TableHead>
                       <TableHead className="text-[10px] sm:text-sm py-2">Role</TableHead>
-                      <TableHead className="text-[10px] sm:text-sm py-2 hidden sm:table-cell">Created</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2">Created</TableHead>
                       <TableHead className="text-[10px] sm:text-sm py-2 sticky right-0 bg-background z-10">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -667,7 +667,7 @@ export default function UsersPanel() {
                             );
                           })()}
                         </TableCell>
-                        <TableCell className="hidden sm:table-cell text-[10px] sm:text-sm py-2">
+                        <TableCell className="text-[10px] sm:text-sm py-2">
                           {new Date(user.created_at).toLocaleDateString()}
                         </TableCell>
                         <TableCell className="text-[10px] sm:text-sm py-2 sticky right-0 bg-background z-10">
