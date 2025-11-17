@@ -460,8 +460,8 @@ export default function UsersPanel() {
             <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
               <DialogTrigger asChild>
                 <Button className="w-full sm:w-auto" size="sm">
-                  <Plus className="h-4 w-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Add User</span>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add User
                 </Button>
               </DialogTrigger>
             <DialogContent className="max-w-[95vw] sm:max-w-lg">
@@ -614,22 +614,27 @@ export default function UsersPanel() {
               {searchTerm ? 'No users match your search' : 'No users found'}
             </div>
           ) : (
-            <div className="overflow-x-auto -mx-2 sm:mx-0">
-              <div className="min-w-[640px]">
-                <Table>
+            <>
+              {/* Mobile scroll hint */}
+              <div className="sm:hidden text-[10px] text-muted-foreground text-center mb-2 flex items-center justify-center gap-1">
+                <span>← Swipe to see all columns →</span>
+              </div>
+              <div className="overflow-x-auto -mx-2 sm:mx-0 rounded-md border sm:border-0">
+                <div className="min-w-[700px]">
+                  <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-[10px] sm:text-sm py-2">Name</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2 sticky left-0 bg-background z-10">Name</TableHead>
                       <TableHead className="text-[10px] sm:text-sm py-2">Email</TableHead>
                       <TableHead className="text-[10px] sm:text-sm py-2">Role</TableHead>
                       <TableHead className="text-[10px] sm:text-sm py-2">Created</TableHead>
-                      <TableHead className="text-[10px] sm:text-sm py-2">Actions</TableHead>
+                      <TableHead className="text-[10px] sm:text-sm py-2 sticky right-0 bg-background z-10">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredUsers.map((user) => (
                       <TableRow key={user.id}>
-                        <TableCell className="text-[10px] sm:text-sm py-2">
+                        <TableCell className="text-[10px] sm:text-sm py-2 sticky left-0 bg-background z-10">
                           <div className="flex items-center gap-1 sm:gap-2">
                             <User className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                             <span className="truncate max-w-[100px] sm:max-w-none">{user.name || 'No name'}</span>
@@ -669,33 +674,34 @@ export default function UsersPanel() {
                         <TableCell className="text-[10px] sm:text-sm py-2">
                           {new Date(user.created_at).toLocaleDateString()}
                         </TableCell>
-                         <TableCell className="py-2">
-                           <div className="flex items-center gap-0.5 sm:gap-2">
-                             <Button
-                               variant="outline"
-                               size="sm"
-                               onClick={() => openEditUserDialog(user)}
-                               className="h-7 w-7 p-0"
-                             >
-                               <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
-                             </Button>
-                             <Button
-                               variant="outline"
-                               size="sm"
-                               onClick={() => handleDeleteUser(user.user_id)}
-                               className="text-destructive hover:text-destructive h-7 w-7 p-0"
-                             >
-                               <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                             </Button>
-                           </div>
-                         </TableCell>
+                        <TableCell className="text-[10px] sm:text-sm py-2 sticky right-0 bg-background z-10">
+                          <div className="flex items-center gap-0.5 sm:gap-2 justify-end">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openEditUserDialog(user)}
+                              className="h-7 w-7 p-0"
+                            >
+                              <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteUser(user.user_id)}
+                              className="text-destructive hover:text-destructive h-7 w-7 p-0"
+                            >
+                              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               </div>
             </div>
-            )}
+            </>
+          )}
           </CardContent>
         </Card>
         </TabsContent>
