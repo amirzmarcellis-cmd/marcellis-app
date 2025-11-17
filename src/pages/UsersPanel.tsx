@@ -615,7 +615,7 @@ export default function UsersPanel() {
             </div>
           ) : (
             <>
-              <div className="-mx-2 sm:mx-0 rounded-md border sm:border-0">
+              <div className="overflow-x-auto -mx-2 sm:mx-0 rounded-md border sm:border-0">
                 <Table className="min-w-[720px] sm:min-w-0 table-fixed">
                   <TableHeader>
                     <TableRow>
