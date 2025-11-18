@@ -42,48 +42,61 @@ export default function CandidateDetails() {
       const supabaseModule = await import('@/integrations/supabase/client');
       const supabase = supabaseModule.supabase;
       
-      // Query Jobs_CVs to get all job associations for this user
-      const { data, error } = await supabase
+      // First, fetch Jobs_CVs records for this user
+      const { data: jobsCvsData, error: jobsCvsError } = await supabase
         .from('Jobs_CVs')
-        .select(`
-          job_id,
-          contacted,
-          after_call_score,
-          Jobs!inner (
-            job_title
-          )
-        `)
+        .select('job_id, contacted, after_call_score')
         .eq('user_id', userId);
-      
-      if (error) {
-        console.error('Error fetching associated jobs:', error);
+
+      if (jobsCvsError) {
+        console.error('Error fetching Jobs_CVs:', jobsCvsError);
         setAssociatedJobs([]);
         return;
       }
-      
-      if (data) {
-        // Remove duplicates based on job_id and map to AssociatedJob interface
-        const uniqueJobs = Array.from(
-          new Map(
-            data.map((item: any) => [
-              item.job_id,
-              {
-                job_id: item.job_id,
-                job_title: item.Jobs?.job_title || 'Unknown Job',
-                contacted: item.contacted,
-                after_call_score: item.after_call_score
-              }
-            ])
-          ).values()
-        ) as AssociatedJob[];
-        
-        // Sort by job title alphabetically
-        uniqueJobs.sort((a, b) => a.job_title.localeCompare(b.job_title));
-        
-        setAssociatedJobs(uniqueJobs);
-      } else {
+
+      if (!jobsCvsData || jobsCvsData.length === 0) {
         setAssociatedJobs([]);
+        return;
       }
+
+      // Get unique job_ids
+      const uniqueJobIds = [...new Set(jobsCvsData.map(item => item.job_id))];
+
+      // Fetch job details for these job_ids
+      const { data: jobsData, error: jobsError } = await supabase
+        .from('Jobs')
+        .select('job_id, job_title')
+        .in('job_id', uniqueJobIds);
+
+      if (jobsError) {
+        console.error('Error fetching Jobs:', jobsError);
+        setAssociatedJobs([]);
+        return;
+      }
+
+      // Combine the data
+      const jobsMap = new Map(jobsData?.map(job => [job.job_id, job.job_title]) || []);
+      
+      const uniqueJobs: AssociatedJob[] = uniqueJobIds
+        .map(jobId => {
+          const jobCv = jobsCvsData.find(item => item.job_id === jobId);
+          const jobTitle = jobsMap.get(jobId);
+          
+          if (jobTitle && jobCv) {
+            return {
+              job_id: jobId,
+              job_title: jobTitle,
+              contacted: jobCv.contacted,
+              after_call_score: jobCv.after_call_score
+            };
+          }
+          return null;
+        })
+        .filter(job => job !== null) as AssociatedJob[];
+      
+      uniqueJobs.sort((a, b) => a.job_title.localeCompare(b.job_title));
+
+      setAssociatedJobs(uniqueJobs);
     } catch (error) {
       console.error('Error fetching associated jobs:', error);
       setAssociatedJobs([]);
