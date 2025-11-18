@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { User, Mail, Phone, FileText, Search, ArrowLeft, ExternalLink } from 'lucide-react';
+import { User, Mail, Phone, FileText, Search, ArrowLeft, ExternalLink, Briefcase } from 'lucide-react';
 
 interface Candidate {
   user_id: string;
@@ -14,6 +14,13 @@ interface Candidate {
   cv_link?: string | null;
 }
 
+interface AssociatedJob {
+  job_id: string;
+  job_title: string;
+  contacted?: string;
+  after_call_score?: number;
+}
+
 export default function CandidateDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -21,10 +28,69 @@ export default function CandidateDetails() {
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [associatedJobs, setAssociatedJobs] = useState<AssociatedJob[]>([]);
+  const [jobsLoading, setJobsLoading] = useState(false);
   
   const fromJob = location.state?.fromJob;
   const fromTab = location.state?.tab;
   const longListSourceFilter = location.state?.longListSourceFilter;
+
+  const fetchAssociatedJobs = async (userId: string) => {
+    try {
+      setJobsLoading(true);
+      
+      const supabaseModule = await import('@/integrations/supabase/client');
+      const supabase = supabaseModule.supabase;
+      
+      // Query Jobs_CVs to get all job associations for this user
+      const { data, error } = await supabase
+        .from('Jobs_CVs')
+        .select(`
+          job_id,
+          contacted,
+          after_call_score,
+          Jobs!inner (
+            job_title
+          )
+        `)
+        .eq('user_id', userId);
+      
+      if (error) {
+        console.error('Error fetching associated jobs:', error);
+        setAssociatedJobs([]);
+        return;
+      }
+      
+      if (data) {
+        // Remove duplicates based on job_id and map to AssociatedJob interface
+        const uniqueJobs = Array.from(
+          new Map(
+            data.map((item: any) => [
+              item.job_id,
+              {
+                job_id: item.job_id,
+                job_title: item.Jobs?.job_title || 'Unknown Job',
+                contacted: item.contacted,
+                after_call_score: item.after_call_score
+              }
+            ])
+          ).values()
+        ) as AssociatedJob[];
+        
+        // Sort by job title alphabetically
+        uniqueJobs.sort((a, b) => a.job_title.localeCompare(b.job_title));
+        
+        setAssociatedJobs(uniqueJobs);
+      } else {
+        setAssociatedJobs([]);
+      }
+    } catch (error) {
+      console.error('Error fetching associated jobs:', error);
+      setAssociatedJobs([]);
+    } finally {
+      setJobsLoading(false);
+    }
+  };
 
   const fetchCandidate = async (candidateId: string) => {
     try {
@@ -43,14 +109,18 @@ export default function CandidateDetails() {
       if (cvQueryResult.data && cvQueryResult.data.length > 0) {
         const candidateData = cvQueryResult.data[0];
         
+        const userId = candidateData.user_id?.toString() || candidateId;
         setCandidate({
-          user_id: candidateData.user_id?.toString() || candidateId,
+          user_id: userId,
           name: candidateData.name || `${candidateData.Firstname || ''} ${candidateData.Lastname || ''}`.trim() || 'Unknown Candidate',
           email: candidateData.email || '',
           phone_number: candidateData.phone_number || '',
           cv_text: candidateData.cv_text || '',
           cv_link: candidateData.cv_link || null
         });
+        
+        // Fetch associated jobs
+        await fetchAssociatedJobs(userId);
         return;
       }
       
@@ -86,14 +156,18 @@ export default function CandidateDetails() {
           }
         }
         
+        const userId = candidateData.user_id?.toString() || candidateId;
         setCandidate({
-          user_id: candidateData.user_id?.toString() || candidateId,
+          user_id: userId,
           name: candidateData.candidate_name || 'Unknown Candidate',
           email: candidateData.candidate_email || '',
           phone_number: candidateData.candidate_phone_number || '',
           cv_text: cvText,
           cv_link: cvLink
         });
+        
+        // Fetch associated jobs
+        await fetchAssociatedJobs(userId);
       } else {
         setCandidate(null);
       }
@@ -269,6 +343,48 @@ export default function CandidateDetails() {
               <ExternalLink className="h-4 w-4 mr-2" />
               View CV Link
             </Button>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Briefcase className="h-5 w-5" />
+            Associated Jobs
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {jobsLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : associatedJobs.length === 0 ? (
+            <p className="text-muted-foreground text-center py-4">
+              No jobs associated with this candidate
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {associatedJobs.map((job, index) => (
+                <div
+                  key={job.job_id}
+                  className={`${
+                    index !== 0 ? 'border-t border-border pt-2' : ''
+                  }`}
+                >
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-left h-auto py-2 px-3 hover:bg-accent"
+                    onClick={() => navigate(`/job/${job.job_id}`)}
+                  >
+                    <div className="flex items-center gap-2 flex-1">
+                      <Briefcase className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                      <span className="flex-1">{job.job_title}</span>
+                    </div>
+                  </Button>
+                </div>
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>
