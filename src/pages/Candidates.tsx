@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { User, MapPin, Briefcase, Mail, Phone, Search, Filter, Eye, Download, Calendar, Clock, ExternalLink, Edit, UserPlus, Upload, Trash2 } from "lucide-react"
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 import { formatDate } from "@/lib/utils"
@@ -30,6 +30,7 @@ interface CV {
 }
 
 export default function Candidates() {
+  const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState("")
   const [cvs, setCvs] = useState<CV[]>([])
   const [loading, setLoading] = useState(true)
@@ -256,20 +257,20 @@ export default function Candidates() {
                               <Button 
                                 variant="outline" 
                                 size="sm" 
+                                title="View Candidate" 
+                                className="h-8 px-2"
+                                onClick={() => navigate(`/candidate/${cv.user_id}`)}
+                              >
+                                <Eye className="w-3 h-3" />
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
                                 title="Edit CV" 
                                 className="h-8 px-2"
                                 onClick={() => handleEditCandidate(cv)}
                               >
                                 <Edit className="w-3 h-3" />
-                              </Button>
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                title="Delete CV" 
-                                className="h-8 px-2 text-destructive hover:text-destructive"
-                                onClick={() => handleDeleteCV(cv.user_id)}
-                              >
-                                <Trash2 className="w-3 h-3" />
                               </Button>
                             </div>
                           </TableCell>
