@@ -2563,7 +2563,7 @@ mainCandidate["linkedin_score_reason"] ? (
 
             {/* Call Log Buttons */}
             <div className="space-y-2 pt-2 border-t">
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 sm:gap-2">
                 {(() => {
                   const isLinkedInCandidate =
                     typeof mainCandidate["Source"] === "string" &&
@@ -2583,12 +2583,12 @@ mainCandidate["linkedin_score_reason"] ? (
                         variant="outline"
                         size="sm"
                         asChild
-                        className="flex-1 min-w-0 sm:min-w-[100px]"
+                        className="flex-1 min-w-0 sm:min-w-[120px] h-10"
                       >
                         <Link
                           to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid || latestContact.recordid || candidateId}&fromTab=shortlist`}
                         >
-                          <FileText className="w-3 h-3 mr-1" />
+                          <FileText className="w-4 h-4 mr-1.5" />
                           Call Log
                         </Link>
                       </Button>
@@ -2608,23 +2608,23 @@ mainCandidate["linkedin_score_reason"] ? (
                       variant="outline"
                       size="sm"
                       asChild
-                      className="flex-1 min-w-0 sm:min-w-[100px]"
+                      className="flex-1 min-w-0 sm:min-w-[120px] h-10"
                     >
                       <Link
                         to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}&fromTab=shortlist`}
                       >
-                        <FileText className="w-3 h-3 mr-1" />
+                        <FileText className="w-4 h-4 mr-1.5" />
                         Call Log
                       </Link>
                     </Button>
                   );
                 })()}
-                <Button variant="ghost" size="sm" asChild className="flex-1 min-w-0 sm:min-w-[100px]">
+                <Button variant="ghost" size="sm" asChild className="flex-1 min-w-0 sm:min-w-[120px] h-10">
                   {typeof mainCandidate["Source"] === "string" &&
                   mainCandidate["Source"].toLowerCase().includes("linkedin") &&
                   getLinkedInUrl(mainCandidate) ? (
                     <a href={getLinkedInUrl(mainCandidate)!} target="_blank" rel="noopener noreferrer">
-                      <Users className="w-3 h-3 mr-1" />
+                      <Users className="w-4 h-4 mr-1.5" />
                       View Profile
                     </a>
                   ) : (
@@ -2636,22 +2636,22 @@ mainCandidate["linkedin_score_reason"] ? (
                         focusCandidateId: mainCandidate["user_id"] || candidateId,
                       }}
                     >
-                      <Users className="w-3 h-3 mr-1" />
+                      <Users className="w-4 h-4 mr-1.5" />
                       View Profile
                     </Link>
                   )}
                 </Button>
               </div>
               {/* Action Buttons - CV Submitted and Reject */}
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 {mainCandidate["Contacted"] === "Submitted" ? (
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1 min-w-0 sm:min-w-[100px] bg-transparent border-2 border-blue-500 text-blue-600 cursor-default"
+                    className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-blue-500 text-blue-600 cursor-default"
                     disabled
                   >
-                    <FileCheck className="w-3 h-3 mr-1" />
+                    <FileCheck className="w-4 h-4 mr-1.5" />
                     CV Submitted
                   </Button>
                 ) : (
@@ -2668,9 +2668,9 @@ mainCandidate["linkedin_score_reason"] ? (
                           : null;
                       handleCVSubmitted(candidateId, latestContact?.callid);
                     }}
-                    className="flex-1 min-w-0 sm:min-w-[100px] bg-transparent border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-500 dark:hover:text-green-300 transition-all duration-200"
+                    className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-500 dark:hover:text-green-300 transition-all duration-200"
                   >
-                    <FileCheck className="w-3 h-3 mr-1" />
+                    <FileCheck className="w-4 h-4 mr-1.5" />
                     Submit CV
                   </Button>
                 )}
@@ -2678,20 +2678,20 @@ mainCandidate["linkedin_score_reason"] ? (
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1 min-w-0 sm:min-w-[100px] bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed"
+                    className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed"
                     disabled
                   >
-                    <X className="w-3 h-3 mr-1" />
+                    <X className="w-4 h-4 mr-1.5" />
                     Rejected
                   </Button>
                 ) : (
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1 min-w-0 sm:min-w-[100px] bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200"
+                    className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200"
                     onClick={() => openRejectDialog(id!, candidateId, candidateContacts[0].callid)}
                   >
-                    <X className="w-3 h-3 mr-1" />
+                    <X className="w-4 h-4 mr-1.5" />
                     Reject Candidate
                   </Button>
                 )}
@@ -2931,13 +2931,13 @@ mainCandidate["linkedin_score_reason"] ? (
       <div className="flex flex-col gap-2 sm:gap-4 min-w-0 w-full max-w-full">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 sm:gap-4 items-start min-w-0 w-full">
           <div className="flex items-center space-x-2 md:space-x-4 min-w-0 w-full lg:w-auto overflow-x-auto">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/jobs")} className="h-7 sm:h-9 px-1.5 sm:px-4 text-[10px] sm:text-sm flex-shrink-0">
-              <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-0.5 sm:mr-1 md:mr-2" />
+            <Button variant="ghost" size="sm" onClick={() => navigate("/jobs")} className="h-9 sm:h-10 px-3 sm:px-4 text-xs sm:text-sm flex-shrink-0">
+              <ArrowLeft className="w-4 h-4 mr-1 sm:mr-2" />
               <span className="hidden sm:inline">Back to Jobs</span>
-              <span className="sm:hidden text-[10px]">Back</span>
+              <span className="sm:hidden">Back</span>
             </Button>
             <div className="h-6 w-px bg-border hidden sm:block flex-shrink-0" />
-            <h3 className="text-xs sm:text-xl md:text-2xl lg:text-3xl font-bold truncate min-w-0">Job Details</h3>
+            <h3 className="text-sm sm:text-xl md:text-2xl lg:text-3xl font-bold truncate min-w-0">Job Details</h3>
           </div>
           {/* Futuristic 3D Action Menu */}
           <FuturisticActionButton
@@ -2966,15 +2966,15 @@ mainCandidate["linkedin_score_reason"] ? (
                 offLabel="OFF"
               />
             </div>
-            <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto h-7 sm:h-9 text-[10px] sm:text-sm min-w-0 px-2 sm:px-4">
-              <FileText className="w-2.5 h-2.5 sm:w-4 sm:h-4 mr-0.5 sm:mr-2 flex-shrink-0" />
+            <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto h-10 sm:h-10 text-xs sm:text-sm min-w-0 px-3 sm:px-4">
+              <FileText className="w-4 h-4 mr-1 sm:mr-2 flex-shrink-0" />
               <span className="hidden sm:inline">Edit Job</span>
-              <span className="sm:hidden text-[10px]">Edit</span>
+              <span className="sm:hidden">Edit</span>
             </Button>
-            <Button variant="outline" asChild size="sm" className="w-full sm:w-auto h-7 sm:h-9 text-[10px] sm:text-sm min-w-0 px-2 sm:px-4">
+            <Button variant="outline" asChild size="sm" className="w-full sm:w-auto h-10 sm:h-10 text-xs sm:text-sm min-w-0 px-3 sm:px-4">
               <Link to={`/job/${job.job_id}/apply`}>
                 <span className="hidden sm:inline">Apply Link</span>
-                <span className="sm:hidden text-[10px]">Apply</span>
+                <span className="sm:hidden">Apply</span>
               </Link>
             </Button>
           </div>
@@ -3057,14 +3057,14 @@ mainCandidate["linkedin_score_reason"] ? (
       {/* Detailed Information Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3 sm:space-y-4 min-w-0 w-full">
         <div className="w-full min-w-0 px-0 md:px-0 max-w-full overflow-x-auto">
-          <TabsList className="w-full min-w-0 flex flex-col gap-0.5 md:grid md:grid-cols-7 h-auto p-0.5 md:p-1">
-            <TabsTrigger value="overview" className="w-full justify-start text-left text-[10px] sm:text-sm md:text-sm px-1 sm:px-2 md:px-3 py-1 sm:py-2 h-auto whitespace-normal leading-tight md:whitespace-nowrap">
+          <TabsList className="w-full min-w-0 flex flex-col gap-1 md:grid md:grid-cols-7 h-auto p-1 md:p-1">
+            <TabsTrigger value="overview" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
               Overview
             </TabsTrigger>
-            <TabsTrigger value="description" className="w-full justify-start text-left text-xs sm:text-sm md:text-sm px-1.5 sm:px-2 md:px-3 py-1.5 sm:py-2 h-auto whitespace-normal leading-tight md:whitespace-nowrap">
+            <TabsTrigger value="description" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
               Description
             </TabsTrigger>
-            <TabsTrigger value="requirements" className="w-full justify-start text-left text-xs sm:text-sm md:text-sm px-1.5 sm:px-2 md:px-3 py-1.5 sm:py-2 h-auto whitespace-normal leading-tight md:whitespace-nowrap">
+            <TabsTrigger value="requirements" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
               AI Requirements
             </TabsTrigger>
             <TabsTrigger
@@ -3079,10 +3079,10 @@ mainCandidate["linkedin_score_reason"] ? (
                 </span>
               )}
             </TabsTrigger>
-            <TabsTrigger value="boolean-search" className="w-full justify-start text-left text-xs sm:text-sm md:text-sm px-1.5 sm:px-2 md:px-3 py-1.5 sm:py-2 h-auto whitespace-normal leading-tight md:whitespace-nowrap">
+            <TabsTrigger value="boolean-search" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
               AI Longlist
             </TabsTrigger>
-            <TabsTrigger value="shortlist" className="w-full justify-start text-left text-xs sm:text-sm md:text-sm px-1.5 sm:px-2 md:px-3 py-1.5 sm:py-2 h-auto whitespace-normal leading-tight md:whitespace-nowrap">
+            <TabsTrigger value="shortlist" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
               AI Short List
             </TabsTrigger>
           </TabsList>
@@ -3091,10 +3091,10 @@ mainCandidate["linkedin_score_reason"] ? (
         <TabsContent value="overview" className="space-y-2 sm:space-y-3 md:space-y-4 pb-20 sm:pb-24 md:pb-32 max-w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 md:gap-6 max-w-full">
             <Card className="max-w-full overflow-hidden">
-              <CardHeader className="pb-2 sm:pb-4 px-2 sm:px-4 md:px-6 pt-2 sm:pt-4 md:pt-6">
-                <CardTitle className="text-sm sm:text-base md:text-lg">Job Information</CardTitle>
+              <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-4 md:px-6 pt-3 sm:pt-4 md:pt-6">
+                <CardTitle className="text-base sm:text-lg md:text-xl">Job Information</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-1.5 sm:space-y-2 md:space-y-3 px-2 sm:px-4 md:px-6 pb-2 sm:pb-4 md:pb-6 text-xs sm:text-sm [&>div]:flex [&>div]:flex-col sm:[&>div]:flex-row sm:[&>div]:items-start sm:[&>div]:justify-between [&>div]:gap-1 sm:[&>div]:gap-2 [&>div>span:last-child]:break-words [&>div>span:last-child]:text-left sm:[&>div>span:last-child]:text-right [&>div>span:last-child]:max-w-full sm:[&>div>span:last-child]:max-w-[60%]">
+              <CardContent className="space-y-2 sm:space-y-2 md:space-y-3 px-3 sm:px-4 md:px-6 pb-3 sm:pb-4 md:pb-6 text-xs sm:text-sm [&>div]:flex [&>div]:flex-col sm:[&>div]:flex-row sm:[&>div]:items-start sm:[&>div]:justify-between [&>div]:gap-1 sm:[&>div]:gap-2 [&>div>span:last-child]:break-words [&>div>span:last-child]:text-left sm:[&>div>span:last-child]:text-right [&>div>span:last-child]:max-w-full sm:[&>div>span:last-child]:max-w-[60%]">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Job ID:</span>
                   <span className="font-mono text-sm">{job.job_id}</span>
