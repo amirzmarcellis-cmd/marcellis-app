@@ -2920,7 +2920,7 @@ mainCandidate["linkedin_score_reason"] ? (
     }),
   );
   return (
-    <div className={cn("min-w-0 w-full space-y-2 sm:space-y-4 md:space-y-6 p-2 sm:p-4 md:p-6 overflow-x-hidden", isShaking && "animate-shake")}>
+    <div className={cn("min-w-0 w-full space-y-2 sm:space-y-4 md:space-y-6 p-2 sm:p-4 md:p-6 overflow-x-hidden max-w-full", isShaking && "animate-shake")}>
       {/* Processing Animation Overlay */}
       {job?.status === 'Processing' && job?.Processed === 'Yes' && <ProcessingAnimation />}
       
@@ -2928,16 +2928,16 @@ mainCandidate["linkedin_score_reason"] ? (
       <AppleLoadingBar isLoading={loading} className="absolute top-0 left-0 right-0 z-50" />
       
       {/* Header */}
-      <div className="flex flex-col gap-2 sm:gap-4 min-w-0 w-full">
+      <div className="flex flex-col gap-2 sm:gap-4 min-w-0 w-full max-w-full">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 sm:gap-4 items-start min-w-0 w-full">
-          <div className="flex items-center space-x-2 md:space-x-4 min-w-0 w-full lg:w-auto">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/jobs")} className="h-8 sm:h-9 px-2 sm:px-4 text-xs sm:text-sm flex-shrink-0">
-              <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 md:mr-2" />
+          <div className="flex items-center space-x-2 md:space-x-4 min-w-0 w-full lg:w-auto overflow-x-auto">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/jobs")} className="h-7 sm:h-9 px-1.5 sm:px-4 text-[10px] sm:text-sm flex-shrink-0">
+              <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-0.5 sm:mr-1 md:mr-2" />
               <span className="hidden sm:inline">Back to Jobs</span>
-              <span className="sm:hidden">Back</span>
+              <span className="sm:hidden text-[10px]">Back</span>
             </Button>
             <div className="h-6 w-px bg-border hidden sm:block flex-shrink-0" />
-            <h3 className="text-sm sm:text-xl md:text-2xl lg:text-3xl font-bold truncate min-w-0">Job Details</h3>
+            <h3 className="text-xs sm:text-xl md:text-2xl lg:text-3xl font-bold truncate min-w-0">Job Details</h3>
           </div>
           {/* Futuristic 3D Action Menu */}
           <FuturisticActionButton
@@ -2956,7 +2956,7 @@ mainCandidate["linkedin_score_reason"] ? (
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-3 w-full lg:w-auto items-stretch sm:items-center justify-center lg:justify-end min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2 justify-center sm:justify-start flex-shrink-0">
-              <span className="text-[10px] sm:text-xs md:text-sm font-medium whitespace-nowrap">Auto Dial</span>
+              <span className="text-[9px] sm:text-xs md:text-sm font-medium whitespace-nowrap">Auto Dial</span>
               <ToggleSwitch
                 checked={job?.automatic_dial || false}
                 onChange={handleAutomaticDialToggle}
@@ -2966,15 +2966,15 @@ mainCandidate["linkedin_score_reason"] ? (
                 offLabel="OFF"
               />
             </div>
-            <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm min-w-0">
-              <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+            <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto h-7 sm:h-9 text-[10px] sm:text-sm min-w-0 px-2 sm:px-4">
+              <FileText className="w-2.5 h-2.5 sm:w-4 sm:h-4 mr-0.5 sm:mr-2 flex-shrink-0" />
               <span className="hidden sm:inline">Edit Job</span>
-              <span className="sm:hidden">Edit</span>
+              <span className="sm:hidden text-[10px]">Edit</span>
             </Button>
-            <Button variant="outline" asChild size="sm" className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm min-w-0">
+            <Button variant="outline" asChild size="sm" className="w-full sm:w-auto h-7 sm:h-9 text-[10px] sm:text-sm min-w-0 px-2 sm:px-4">
               <Link to={`/job/${job.job_id}/apply`}>
                 <span className="hidden sm:inline">Apply Link</span>
-                <span className="sm:hidden">Apply</span>
+                <span className="sm:hidden text-[10px]">Apply</span>
               </Link>
             </Button>
           </div>
@@ -2982,13 +2982,13 @@ mainCandidate["linkedin_score_reason"] ? (
       </div>
 
       {/* Job Header Card */}
-      <Card className="min-w-0 w-full">
+      <Card className="min-w-0 w-full max-w-full overflow-hidden">
         <CardContent className="p-2 sm:p-4 md:p-6 min-w-0">
           <div className="space-y-2 sm:space-y-4 min-w-0">
             <div className="flex flex-col gap-2 sm:gap-4 min-w-0">
               <div className="space-y-1 sm:space-y-2 w-full min-w-0">
-                <h2 className="text-sm sm:text-xl md:text-2xl font-bold break-words leading-tight min-w-0">{job.job_title}</h2>
-                <p className="text-xs sm:text-base md:text-lg text-muted-foreground break-words leading-snug min-w-0">
+                <h2 className="text-xs sm:text-xl md:text-2xl font-bold break-words leading-tight min-w-0">{job.job_title}</h2>
+                <p className="text-[10px] sm:text-base md:text-lg text-muted-foreground break-words leading-snug min-w-0">
                   {job.client_description || "Client Description"}
                 </p>
               </div>
@@ -3056,9 +3056,9 @@ mainCandidate["linkedin_score_reason"] ? (
 
       {/* Detailed Information Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3 sm:space-y-4 min-w-0 w-full">
-        <div className="w-full min-w-0 px-0 md:px-0">
+        <div className="w-full min-w-0 px-0 md:px-0 max-w-full overflow-x-auto">
           <TabsList className="w-full min-w-0 flex flex-col gap-0.5 md:grid md:grid-cols-7 h-auto p-0.5 md:p-1">
-            <TabsTrigger value="overview" className="w-full justify-start text-left text-xs sm:text-sm md:text-sm px-1.5 sm:px-2 md:px-3 py-1.5 sm:py-2 h-auto whitespace-normal leading-tight md:whitespace-nowrap">
+            <TabsTrigger value="overview" className="w-full justify-start text-left text-[10px] sm:text-sm md:text-sm px-1 sm:px-2 md:px-3 py-1 sm:py-2 h-auto whitespace-normal leading-tight md:whitespace-nowrap">
               Overview
             </TabsTrigger>
             <TabsTrigger value="description" className="w-full justify-start text-left text-xs sm:text-sm md:text-sm px-1.5 sm:px-2 md:px-3 py-1.5 sm:py-2 h-auto whitespace-normal leading-tight md:whitespace-nowrap">
@@ -3088,9 +3088,9 @@ mainCandidate["linkedin_score_reason"] ? (
           </TabsList>
         </div>
 
-        <TabsContent value="overview" className="space-y-2 sm:space-y-3 md:space-y-4 pb-20 sm:pb-24 md:pb-32">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 md:gap-6">
-            <Card>
+        <TabsContent value="overview" className="space-y-2 sm:space-y-3 md:space-y-4 pb-20 sm:pb-24 md:pb-32 max-w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 md:gap-6 max-w-full">
+            <Card className="max-w-full overflow-hidden">
               <CardHeader className="pb-2 sm:pb-4 px-2 sm:px-4 md:px-6 pt-2 sm:pt-4 md:pt-6">
                 <CardTitle className="text-sm sm:text-base md:text-lg">Job Information</CardTitle>
               </CardHeader>
