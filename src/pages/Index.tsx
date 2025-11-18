@@ -680,7 +680,11 @@ export default function Index() {
           </h2>
           <ScrollArea className="h-[400px] sm:h-[500px] lg:h-[600px]">
             <div className="space-y-3">
-              {data?.activeJobs?.map(job => <Card key={job.job_id} className="bg-card border-border dark:bg-gradient-to-br dark:from-white/5 dark:via-white/3 dark:to-white/5 dark:backdrop-blur-lg dark:border-white/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 hover:scale-[1.02]">
+              {data?.activeJobs?.sort((a, b) => {
+                const aShortlist = jobStats[a.job_id]?.shortlist || 0;
+                const bShortlist = jobStats[b.job_id]?.shortlist || 0;
+                return bShortlist - aShortlist;
+              }).map(job => <Card key={job.job_id} className="bg-card border-border dark:bg-gradient-to-br dark:from-white/5 dark:via-white/3 dark:to-white/5 dark:backdrop-blur-lg dark:border-white/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 hover:scale-[1.02]">
                   <CardContent className="p-4">
                     <div className="flex items-center mb-3">
                       <h3 className="font-work truncate text-sm font-normal">{job.job_title}</h3>
