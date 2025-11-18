@@ -3566,11 +3566,11 @@ mainCandidate["linkedin_score_reason"] ? (
         <TabsContent value="boolean-search" className="space-y-4 pb-32">
           <Card>
             <CardHeader>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
                   <div>
-                    <CardTitle className="flex items-center text-sm sm:text-base md:text-lg">
-                      <Users className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+                    <CardTitle className="flex items-center">
+                      <Users className="w-5 h-5 mr-2" />
                       AI Longlist (
                       {
                         longlistedCandidates.filter((c) => {
@@ -3580,7 +3580,7 @@ mainCandidate["linkedin_score_reason"] ? (
                       }{" "}
                       candidates)
                     </CardTitle>
-                    <CardDescription className="text-xs sm:text-sm">Candidates added to the longlist for this position</CardDescription>
+                    <CardDescription>Candidates added to the longlist for this position</CardDescription>
                   </div>
                   {job?.longlist && job.longlist > 0 ? (
                     <ExpandableSearchButton
@@ -3595,7 +3595,6 @@ mainCandidate["linkedin_score_reason"] ? (
                       onClick={handleGenerateLongList} 
                       disabled={job?.longlist === 3 || generateCooldown.isDisabled} 
                       size="sm"
-                      className="h-10 text-xs sm:text-sm"
                     >
                       <Zap className="w-4 h-4 mr-2" />
                       {generateCooldown.isDisabled 
@@ -3641,21 +3640,21 @@ mainCandidate["linkedin_score_reason"] ? (
                   {/* Bulk Actions */}
                   {selectedCandidates.size > 0 && (
                     <Card className="p-3 md:p-4 mb-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                      <div className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs sm:text-sm font-medium">
+                          <span className="text-sm font-medium">
                             {selectedCandidates.size} candidate{selectedCandidates.size > 1 ? "s" : ""} selected
                           </span>
-                          <Button variant="ghost" size="sm" onClick={clearAllSelection} className="h-8 text-xs px-2">
+                          <Button variant="ghost" size="sm" onClick={clearAllSelection} className="h-6 text-xs px-2">
                             Clear
                           </Button>
                         </div>
-                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+                        <div className="flex items-center gap-2">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={handleRemoveSelectedCandidates}
-                            className="h-10 w-full sm:w-auto text-xs sm:text-sm text-destructive hover:text-destructive border-destructive/50 hover:border-destructive"
+                            className="text-destructive hover:text-destructive border-destructive/50 hover:border-destructive"
                           >
                             <X className="w-4 h-4 mr-1" />
                             Remove Selected
@@ -3665,7 +3664,7 @@ mainCandidate["linkedin_score_reason"] ? (
                             size="sm"
                             onClick={handleCallSelectedCandidates}
                             disabled={isGeneratingShortList}
-                            className="h-10 w-full sm:w-auto text-xs sm:text-sm bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600"
+                            className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600"
                           >
                             <Phone className="w-4 h-4 mr-1" />
                             {isGeneratingShortList ? "Calling..." : "Call Selected"}
@@ -3759,7 +3758,7 @@ mainCandidate["linkedin_score_reason"] ? (
                     </div>
                   </Card>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                     {(() => {
                       // Filter longlisted candidates based on filters (show all candidates in Jobs_CVs)
                       const filteredLonglistedCandidates = longlistedCandidates.filter((candidate) => {
@@ -3859,7 +3858,7 @@ mainCandidate["linkedin_score_reason"] ? (
                               selectedCandidates.has(candidateId) && "border-primary bg-primary/5",
                             )}
                           >
-                          <CardContent className="p-3 sm:p-4 md:p-5 lg:p-6">
+                            <CardContent className="p-2 sm:p-3 md:p-4">
                               <div className="space-y-2 sm:space-y-3">
                                 <div className="flex items-start justify-between gap-2">
                                   <div className="flex items-start gap-2 sm:gap-3 min-w-0 flex-1">
@@ -3867,10 +3866,10 @@ mainCandidate["linkedin_score_reason"] ? (
                                       type="checkbox"
                                       checked={selectedCandidates.has(candidateId)}
                                       onChange={() => toggleCandidateSelection(candidateId)}
-                                      className="mt-1 h-4 w-4 sm:h-5 sm:w-5 text-primary focus:ring-primary border-gray-300 rounded flex-shrink-0"
+                                      className="mt-1 h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary focus:ring-primary border-gray-300 rounded flex-shrink-0"
                                     />
                                     <div className="min-w-0 flex-1">
-                                      <h4 className="font-semibold text-sm sm:text-base md:text-lg font-work line-clamp-2">
+                                      <h4 className="font-semibold text-xs sm:text-sm md:text-base font-work line-clamp-2">
                                         {mainCandidate["Candidate Name"] &&
                                         !/undefined/i.test(String(mainCandidate["Candidate Name"]))
                                           ? mainCandidate["Candidate Name"]
@@ -3884,8 +3883,8 @@ mainCandidate["linkedin_score_reason"] ? (
                                           mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
                                           mainCandidate["Contacted"]?.toLowerCase() === "tasked") &&
                                           mainCandidate["lastcalltime"] && (
-                                            <div className="text-xs sm:text-sm font-work text-muted-foreground flex items-center">
-                                              <Clock className="w-4 h-4 mr-1" />
+                                            <div className="text-xs font-work text-muted-foreground flex items-center">
+                                              <Clock className="w-3 h-3 mr-1" />
                                               {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
                                               <span className="ml-2">
                                                 {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], {
@@ -3951,7 +3950,7 @@ mainCandidate["linkedin_score_reason"] ? (
                                   )}
 
                                   {mainCandidate["Source"] && (
-                                    <div className="flex items-center text-xs sm:text-sm text-muted-foreground min-w-0">
+                                    <div className="flex items-center text-muted-foreground min-w-0">
                                       <Building className="w-4 h-4 mr-2 flex-shrink-0" />
                                       <span className="truncate">{mainCandidate["Source"]}</span>
                                     </div>
@@ -4118,9 +4117,9 @@ mainCandidate["linkedin_score_reason"] ? (
                                         handleCallCandidate(mainCandidate["Candidate_ID"], id!, mainCandidate["callid"])
                                       }
                                       disabled={callingCandidateId === candidateId}
-                                      className="h-10 sm:h-11 w-full sm:flex-1 bg-foreground hover:bg-foreground/90 text-background disabled:opacity-50 text-sm sm:text-base"
+                                      className="w-full sm:flex-1 bg-foreground hover:bg-foreground/90 text-background disabled:opacity-50 text-xs md:text-sm"
                                     >
-                                      <Phone className="w-4 h-4 mr-1" />
+                                      <Phone className="w-3 h-3 mr-1" />
                                       {callingCandidateId === candidateId ? "Calling..." : "Call Candidate"}
                                     </Button>
                                     {(() => {
@@ -4144,13 +4143,13 @@ mainCandidate["linkedin_score_reason"] ? (
                                             variant="outline"
                                             size="sm"
                                             asChild
-                                            className="h-10 sm:h-11 flex-1 min-w-0 text-sm sm:text-base"
+                                            className="flex-1 min-w-0 text-xs md:text-sm"
                                           >
                                             <Link
                                               to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid || latestContact.recordid || candidateId}&longListSourceFilter=${encodeURIComponent(longListSourceFilter)}&fromTab=boolean-search`}
                                               className="truncate"
                                             >
-                                              <FileText className="w-4 h-4 mr-1 flex-shrink-0" />
+                                              <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
                                               <span className="truncate">Call Log</span>
                                             </Link>
                                           </Button>
@@ -4170,13 +4169,13 @@ mainCandidate["linkedin_score_reason"] ? (
                                           variant="outline"
                                           size="sm"
                                           asChild
-                                          className="h-10 sm:h-11 flex-1 min-w-0 text-sm sm:text-base"
+                                          className="flex-1 min-w-0 text-xs md:text-sm"
                                         >
                                           <Link
                                             to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}&longListSourceFilter=${encodeURIComponent(longListSourceFilter)}&fromTab=boolean-search`}
                                             className="truncate"
                                           >
-                                            <FileText className="w-4 h-4 mr-1 flex-shrink-0" />
+                                            <FileText className="w-3 h-3 mr-1 flex-shrink-0" />
                                             <span className="truncate">Call Log</span>
                                           </Link>
                                         </Button>
@@ -4185,22 +4184,22 @@ mainCandidate["linkedin_score_reason"] ? (
                                   </div>
 
                                   {/* Show All Record Info Button */}
-                                  <div className="flex flex-col sm:flex-row gap-2">
+                                  <div className="flex gap-2">
                                     {typeof mainCandidate["Source"] === "string" &&
                                     mainCandidate["Source"].toLowerCase().includes("linkedin") &&
                                     getLinkedInUrl(mainCandidate) ? (
-                                      <Button variant="ghost" size="sm" asChild className="h-10 sm:h-11 flex-1 text-sm sm:text-base">
+                                      <Button variant="ghost" size="sm" asChild className="flex-1 text-xs md:text-sm">
                                         <a
                                           href={getLinkedInUrl(mainCandidate)!}
                                           target="_blank"
                                           rel="noopener noreferrer"
                                         >
-                                          <Users className="w-4 h-4 mr-1" />
+                                          <Users className="w-3 h-3 mr-1" />
                                           View Profile
                                         </a>
                                       </Button>
                                     ) : (
-                                      <Button variant="ghost" size="sm" asChild className="h-10 sm:h-11 flex-1 text-sm sm:text-base">
+                                      <Button variant="ghost" size="sm" asChild className="flex-1 text-xs md:text-sm">
                                         <Link
                                           to={`/candidate/${candidateId}`}
                                           state={{
@@ -4210,7 +4209,7 @@ mainCandidate["linkedin_score_reason"] ? (
                                             longListSourceFilter,
                                           }}
                                         >
-                                          <Users className="w-4 h-4 mr-1" />
+                                          <Users className="w-3 h-3 mr-1" />
                                           View Profile
                                         </Link>
                                       </Button>
@@ -4220,12 +4219,12 @@ mainCandidate["linkedin_score_reason"] ? (
                                         <Button
                                           variant="outline"
                                           size="sm"
-                                          className="h-10 sm:h-11 flex-1 text-sm sm:text-base"
+                                          className="flex-1 text-xs md:text-sm"
                                           onClick={() => {
                                             navigate(`/cv-viewer/${candidateId}/${id}`);
                                           }}
                                         >
-                                          <FileText className="w-4 h-4 mr-1" />
+                                          <FileText className="w-3 h-3 mr-1" />
                                           View CV
                                         </Button>
                                       )}
