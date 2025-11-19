@@ -539,12 +539,12 @@ export function JobManagementPanel() {
         </div>
       </div>
 
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-4">
+      {/* Filters */}
+        <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
           {/* Group Filter */}
-          <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-2">
-            <label className="text-sm font-light font-inter">Filter by Group:</label>
-            <select value={selectedGroupFilter} onChange={e => setSelectedGroupFilter(e.target.value)} className="px-3 py-1 rounded-md border border-border bg-background text-sm font-light font-inter">
+          <div className="flex flex-col gap-1.5 w-full sm:w-auto sm:flex-row sm:items-center sm:gap-2">
+            <label className="text-xs sm:text-sm font-light font-inter">Filter by Group:</label>
+            <select value={selectedGroupFilter} onChange={e => setSelectedGroupFilter(e.target.value)} className="h-10 px-3 py-2 rounded-md border border-border bg-background text-sm font-light font-inter w-full sm:w-auto">
               <option value="">All Groups</option>
               <option value="ungrouped">Ungrouped</option>
               {groups.map(group => <option key={group.id} value={group.id}>
@@ -552,34 +552,36 @@ export function JobManagementPanel() {
                 </option>)}
             </select>
           </div>
-        {selectedGroupFilter && <Button variant="ghost" size="sm" onClick={() => setSelectedGroupFilter("")} className="text-xs font-light font-inter">
+        {selectedGroupFilter && <Button variant="ghost" size="sm" onClick={() => setSelectedGroupFilter("")} className="text-xs font-light font-inter h-10 w-full sm:w-auto">
             Clear Filter
           </Button>}
 
         {/* Recruiter Filter */}
-        <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-2">
-          <label className="text-sm font-light font-inter">Filter by Recruiter:</label>
-          <select value={selectedRecruiterFilter} onChange={e => setSelectedRecruiterFilter(e.target.value)} className="px-3 py-1 rounded-md border border-border bg-background text-sm font-light font-inter">
+        <div className="flex flex-col gap-1.5 w-full sm:w-auto sm:flex-row sm:items-center sm:gap-2">
+          <label className="text-xs sm:text-sm font-light font-inter">Filter by Recruiter:</label>
+          <select value={selectedRecruiterFilter} onChange={e => setSelectedRecruiterFilter(e.target.value)} className="h-10 px-3 py-2 rounded-md border border-border bg-background text-sm font-light font-inter w-full sm:w-auto">
             <option value="">All Recruiters</option>
             {recruiters.map(recruiter => <option key={recruiter.id} value={recruiter.id}>
                 {recruiter.name}
               </option>)}
           </select>
         </div>
-        {selectedRecruiterFilter && <Button variant="ghost" size="sm" onClick={() => setSelectedRecruiterFilter("")} className="text-xs font-light font-inter">
+        {selectedRecruiterFilter && <Button variant="ghost" size="sm" onClick={() => setSelectedRecruiterFilter("")} className="text-xs font-light font-inter h-10 w-full sm:w-auto">
             Clear Filter
           </Button>}
 
         {/* Date Range Filter */}
-        <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-2">
-          <label className="text-sm font-light font-inter">Filter by Date:</label>
+        <div className="flex flex-col gap-1.5 w-full sm:w-auto sm:flex-row sm:items-center sm:gap-2">
+          <label className="text-xs sm:text-sm font-light font-inter whitespace-nowrap">Filter by Date:</label>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className={cn("w-full sm:w-[280px] justify-start text-left font-light font-inter", !dateRange.from && !dateRange.to && "text-muted-foreground")}>
-                <Calendar className="mr-2 h-4 w-4" />
-                {dateRange.from ? dateRange.to ? <>
-                      {format(dateRange.from, "MMM dd, yyyy")} - {format(dateRange.to, "MMM dd, yyyy")}
-                    </> : format(dateRange.from, "MMM dd, yyyy") : <span>Pick a date range</span>}
+              <Button variant="outline" className={cn("h-10 w-full sm:w-[280px] justify-start text-left font-light font-inter text-xs sm:text-sm", !dateRange.from && !dateRange.to && "text-muted-foreground")}>
+                <Calendar className="mr-2 h-4 w-4 flex-shrink-0" />
+                <span className="truncate">
+                  {dateRange.from ? dateRange.to ? <>
+                        {format(dateRange.from, "MMM dd, yyyy")} - {format(dateRange.to, "MMM dd, yyyy")}
+                      </> : format(dateRange.from, "MMM dd, yyyy") : "Pick a date range"}
+                </span>
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -652,20 +654,20 @@ export function JobManagementPanel() {
             </Card>)}
         </div> : <Tabs defaultValue="active" className="space-y-4 sm:space-y-6">
           <TabsList className="glass-card w-full grid grid-cols-3 gap-1 sm:flex sm:flex-nowrap h-auto p-1">
-            <TabsTrigger value="active" className="data-[state=active]:bg-status-active data-[state=active]:text-white text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap py-2 px-2 sm:px-4">
+            <TabsTrigger value="active" className="data-[state=active]:bg-status-active data-[state=active]:text-white text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap py-2.5 px-2 sm:px-4 min-h-[44px]">
               <span className="hidden sm:inline">Active Jobs</span>
               <span className="sm:hidden">Active</span>
-              <span className="ml-1">({filteredJobs.activeJobs.length})</span>
+              <span className="ml-0.5 sm:ml-1">({filteredJobs.activeJobs.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="paused" className="text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap py-2 px-2 sm:px-4">
+            <TabsTrigger value="paused" className="text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap py-2.5 px-2 sm:px-4 min-h-[44px]">
               <span className="hidden sm:inline">Paused Jobs</span>
               <span className="sm:hidden">Paused</span>
-              <span className="ml-1">({filteredJobs.pausedJobs.length})</span>
+              <span className="ml-0.5 sm:ml-1">({filteredJobs.pausedJobs.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="all" className="text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap py-2 px-2 sm:px-4">
+            <TabsTrigger value="all" className="text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap py-2.5 px-2 sm:px-4 min-h-[44px]">
               <span className="hidden sm:inline">All Jobs</span>
               <span className="sm:hidden">All</span>
-              <span className="ml-1">({filteredJobs.allJobs.length})</span>
+              <span className="ml-0.5 sm:ml-1">({filteredJobs.allJobs.length})</span>
             </TabsTrigger>
           </TabsList>
 
@@ -769,9 +771,9 @@ const JobGrid = memo(function JobGrid({
         </CardContent>
       </Card>;
   }
-  return <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 px-2 sm:px-0">
+  return <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 px-2 sm:px-0">
       {jobs.map(job => <Card key={job.job_id} className="mission-card group overflow-hidden w-full">
-          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-4 lg:p-6">
+          <CardHeader className="pb-2 sm:pb-3 p-4 sm:p-5 lg:p-6">
             <div className="flex items-start justify-between gap-2 min-w-0">
               <div className="flex-1 min-w-0 overflow-hidden">
                 <h4 className="line-clamp-2 mb-2 text-base sm:text-lg lg:text-xl font-normal break-words">
@@ -779,10 +781,10 @@ const JobGrid = memo(function JobGrid({
                 </h4>
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
                   {getStatusBadge(job.status, job.Processed)}
-                  <Badge variant="outline" className="text-[10px] sm:text-xs truncate max-w-[120px]">
+                  <Badge variant="outline" className="text-xs truncate max-w-[150px]">
                     ID: {job.job_id}
                   </Badge>
-                  {job.groups && <Badge variant="outline" className="text-[10px] sm:text-xs border truncate max-w-[120px]" style={{
+                  {job.groups && <Badge variant="outline" className="text-xs border truncate max-w-[150px]" style={{
                 borderColor: job.groups.color || "#3B82F6",
                 color: job.groups.color || "#3B82F6"
               }}>
@@ -793,7 +795,7 @@ const JobGrid = memo(function JobGrid({
             </div>
           </CardHeader>
           
-          <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-4 lg:p-6 overflow-hidden">
+          <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-5 lg:p-6 overflow-hidden">
             <div className="hidden sm:block space-y-1 sm:space-y-2 text-xs sm:text-sm">
               {job.recruiter_name && <div className="flex items-center text-muted-foreground min-w-0">
                   <UserCircle className="h-4 w-4 mr-2 text-primary flex-shrink-0" />
@@ -825,43 +827,43 @@ const JobGrid = memo(function JobGrid({
               </p>}
 
             {/* Candidate Counts */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2 text-xs">
-              <div className="flex flex-col items-center p-1.5 sm:p-2 rounded-md bg-blue/10 border border-blue/20">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+              <div className="flex flex-col items-center p-2 sm:p-2.5 rounded-md bg-blue/10 border border-blue/20">
                 <div className="flex items-center gap-1 text-blue">
-                  <Users className="h-3 w-3" />
-                  <span className="font-bold text-base sm:text-lg">{job.longlisted_count || 0}</span>
+                  <Users className="h-4 w-4 sm:h-3 sm:w-3" />
+                  <span className="font-bold text-lg sm:text-xl">{job.longlisted_count || 0}</span>
                 </div>
-                <span className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">Longlisted</span>
+                <span className="text-xs text-muted-foreground mt-1">Longlisted</span>
               </div>
-              <div className="flex flex-col items-center p-1.5 sm:p-2 rounded-md bg-warning/10 border border-warning/20">
+              <div className="flex flex-col items-center p-2 sm:p-2.5 rounded-md bg-warning/10 border border-warning/20">
                 <div className="flex items-center gap-1 text-warning">
-                  <Users className="h-3 w-3" />
-                  <span className="font-bold text-base sm:text-lg">{job.shortlisted_count || 0}</span>
+                  <Users className="h-4 w-4 sm:h-3 sm:w-3" />
+                  <span className="font-bold text-lg sm:text-xl">{job.shortlisted_count || 0}</span>
                 </div>
-                <span className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">Shortlisted</span>
+                <span className="text-xs text-muted-foreground mt-1">Shortlisted</span>
               </div>
-              <div className="flex flex-col items-center p-1.5 sm:p-2 rounded-md bg-destructive/10 border border-destructive/20">
+              <div className="flex flex-col items-center p-2 sm:p-2.5 rounded-md bg-destructive/10 border border-destructive/20">
                 <div className="flex items-center gap-1 text-destructive">
-                  <Users className="h-3 w-3" />
-                  <span className="font-bold text-base sm:text-lg">{job.rejected_count || 0}</span>
+                  <Users className="h-4 w-4 sm:h-3 sm:w-3" />
+                  <span className="font-bold text-lg sm:text-xl">{job.rejected_count || 0}</span>
                 </div>
-                <span className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">Rejected</span>
+                <span className="text-xs text-muted-foreground mt-1">Rejected</span>
               </div>
-              <div className="flex flex-col items-center p-1.5 sm:p-2 rounded-md bg-success/10 border border-success/20">
+              <div className="flex flex-col items-center p-2 sm:p-2.5 rounded-md bg-success/10 border border-success/20">
                 <div className="flex items-center gap-1 text-success">
-                  <Users className="h-3 w-3" />
-                  <span className="font-bold text-base sm:text-lg">{job.submitted_count || 0}</span>
+                  <Users className="h-4 w-4 sm:h-3 sm:w-3" />
+                  <span className="font-bold text-lg sm:text-xl">{job.submitted_count || 0}</span>
                 </div>
-                <span className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">Submitted</span>
+                <span className="text-xs text-muted-foreground mt-1">Submitted</span>
               </div>
             </div>
 
             {/* Automatic Dial Toggle */}
-            <div className="py-1 sm:py-2 border-t border-border/30 space-y-1 sm:space-y-2">
+            <div className="py-2 border-t border-border/30 space-y-1 sm:space-y-2">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2 text-sm">
                   {job.automatic_dial ? <Phone className="h-4 w-4 text-emerald-500" /> : <PhoneOff className="h-4 w-4 text-muted-foreground" />}
-                  <span className="text-muted-foreground">Automatic Dial</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">Automatic Dial</span>
                 </div>
                 <Switch checked={job.automatic_dial || false} onCheckedChange={() => onAutomaticDialToggle(job.job_id, job.automatic_dial)} />
               </div>
@@ -874,7 +876,25 @@ const JobGrid = memo(function JobGrid({
               )}
             </div>
 
-            <div className="flex items-center justify-between pt-2 gap-2">
+            {/* Action Buttons - Mobile and Desktop */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between pt-2 gap-2">
+              {/* Mobile: Show all actions in a grid */}
+              <div className="grid grid-cols-3 gap-2 sm:hidden">
+                <Button size="sm" variant="outline" onClick={() => navigate(`/jobs/edit/${job.job_id}`)} className="h-11 flex-col gap-1">
+                  <Edit className="h-4 w-4" />
+                  <span className="text-[10px]">Edit</span>
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => onStatusToggle(job.job_id, job.Processed)} className="h-11 flex-col gap-1">
+                  {job.Processed === "Yes" ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                  <span className="text-[10px]">{job.Processed === "Yes" ? "Pause" : "Resume"}</span>
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => onDelete(job.job_id)} className="h-11 flex-col gap-1 hover:bg-destructive hover:text-destructive-foreground">
+                  <Trash2 className="h-4 w-4" />
+                  <span className="text-[10px]">Delete</span>
+                </Button>
+              </div>
+
+              {/* Desktop: Icon-only buttons */}
               <div className="hidden sm:flex space-x-2 flex-shrink-0">
                 <Button size="sm" variant="outline" onClick={() => navigate(`/jobs/edit/${job.job_id}`)} className="h-8 px-2">
                   <Edit className="h-3 w-3" />
@@ -887,8 +907,9 @@ const JobGrid = memo(function JobGrid({
                 </Button>
               </div>
               
-              <Button size="sm" className="h-9 sm:h-8 w-full sm:w-auto text-sm" onClick={() => navigate(`/job/${job.job_id}`)}>
-                <Users className="h-3 w-3 mr-1.5" />
+              {/* Open Job Button - Full width on mobile */}
+              <Button size="sm" className="h-11 sm:h-8 w-full sm:w-auto text-sm" onClick={() => navigate(`/job/${job.job_id}`)}>
+                <Users className="h-4 w-4 sm:h-3 sm:w-3 mr-1.5" />
                 Open Job
               </Button>
             </div>
