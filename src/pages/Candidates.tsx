@@ -314,14 +314,15 @@ export default function Candidates() {
                         </div>
                         <div className="flex items-center gap-1.5 flex-shrink-0">
                           <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-11 w-11 min-h-[44px] min-w-[44px]"
+                            variant="outline" 
+                            size="sm" 
+                            className="h-11 px-3 min-h-[44px] font-medium text-sm"
                             onClick={() => navigate(`/candidate/${cv.user_id}`)}
                             aria-label="View Candidate"
                             title="View Candidate"
                           >
-                            <Eye className="w-4 h-4" />
+                            <Eye className="w-4 h-4 mr-1.5" />
+                            View
                           </Button>
                         </div>
                       </div>
@@ -360,26 +361,26 @@ export default function Candidates() {
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2 pt-3 border-t border-border/50 min-w-0">
+                        <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-border/50 min-w-0">
                           <Button 
                             variant="outline" 
                             size="sm" 
-                            className="h-11 px-3 text-sm w-full min-h-[44px] font-medium"
+                            className="h-12 px-3 text-sm w-full min-h-[48px] font-medium"
                             onClick={() => handleEditCandidate(cv)}
                             aria-label="Edit CV"
                           >
-                            <Edit className="w-4 h-4 mr-1.5" />
-                            Edit
+                            <Edit className="w-4 h-4 mr-2" />
+                            <span className="text-sm">Edit</span>
                           </Button>
                           <Button 
                             variant="outline" 
                             size="sm" 
-                            className="h-11 px-3 text-sm w-full min-h-[44px] font-medium text-destructive hover:bg-destructive hover:text-destructive-foreground" 
+                            className="h-12 px-3 text-sm w-full min-h-[48px] font-medium text-destructive hover:bg-destructive hover:text-destructive-foreground" 
                             onClick={() => handleDeleteCV(cv.user_id)}
                             aria-label="Delete CV"
                           >
-                            <Trash2 className="w-4 h-4 mr-1.5" />
-                            Delete
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            <span className="text-sm">Delete</span>
                           </Button>
                         </div>
                       </div>
@@ -394,13 +395,13 @@ export default function Candidates() {
         {/* Sticky mobile actions */}
         <div className="md:hidden fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-3 py-3 pb-[calc(env(safe-area-inset-bottom)+12px)] shadow-lg">
           <div className="grid grid-cols-2 gap-2.5 max-w-full">
-            <Button onClick={() => setBulkUploadOpen(true)} variant="outline" size="sm" className="gap-2 text-sm h-11 min-h-[44px] font-medium">
+            <Button onClick={() => setBulkUploadOpen(true)} variant="outline" size="sm" className="gap-2 text-sm h-12 min-h-[48px] font-medium">
               <Upload className="w-4 h-4" />
-              Bulk Upload
+              <span className="text-sm">Bulk Upload</span>
             </Button>
-            <Button onClick={handleAddCandidate} size="sm" className="gap-2 text-sm h-11 min-h-[44px] font-medium">
+            <Button onClick={handleAddCandidate} size="sm" className="gap-2 text-sm h-12 min-h-[48px] font-medium">
               <UserPlus className="w-4 h-4" />
-              Add CV
+              <span className="text-sm">Add CV</span>
             </Button>
           </div>
         </div>
