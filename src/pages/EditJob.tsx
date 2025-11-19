@@ -393,45 +393,45 @@ export default function EditJob() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+    <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
           <Button 
             variant="ghost" 
             onClick={() => navigate("/jobs")}
-            className="flex items-center space-x-2"
+            className="flex items-center gap-2 h-10 sm:h-9"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Back to Jobs</span>
+            <span className="text-sm sm:text-base">Back to Jobs</span>
           </Button>
           <div>
-            <h1 className="text-6xl font-light font-work tracking-tight">Edit Job</h1>
-            <p className="text-base font-light font-inter text-muted-foreground">Update job posting details</p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light font-work tracking-tight">Edit Job</h1>
+            <p className="text-sm sm:text-base font-light font-inter text-muted-foreground">Update job posting details</p>
           </div>
         </div>
       </div>
 
       <Card className="mission-card">
-        <CardHeader>
-          <CardTitle className="text-3xl font-light font-work tracking-tight">Edit Job Posting</CardTitle>
-          <CardDescription className="font-light font-inter">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-xl sm:text-2xl md:text-3xl font-light font-work tracking-tight">Edit Job Posting</CardTitle>
+          <CardDescription className="font-light font-inter text-sm sm:text-base">
             Update the job details and requirements
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <Tabs value={currentTab} onValueChange={setCurrentTab} className="space-y-6">
+        <CardContent className="p-4 sm:p-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+            <Tabs value={currentTab} onValueChange={setCurrentTab} className="space-y-4 sm:space-y-6">
               <TabsList className="glass-card">
-                <TabsTrigger value="details">Job Details</TabsTrigger>
-                <TabsTrigger value="documents">Documents</TabsTrigger>
-                <TabsTrigger value="amend">Ai Requirements</TabsTrigger>
+                <TabsTrigger value="details" className="min-h-[44px] text-xs sm:text-sm">Job Details</TabsTrigger>
+                <TabsTrigger value="documents" className="min-h-[44px] text-xs sm:text-sm">Documents</TabsTrigger>
+                <TabsTrigger value="amend" className="min-h-[44px] text-xs sm:text-sm">Ai Requirements</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="details" className="space-y-6">
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="job_title" className="font-light font-inter">Job Title *</Label>
+              <TabsContent value="details" className="space-y-4 sm:space-y-6">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                    <div className="space-y-2 sm:space-y-3">
+                      <Label htmlFor="job_title" className="font-light font-inter text-sm sm:text-base">Job Title *</Label>
                       <Input
                         id="job_title"
                         name="job_title"
@@ -441,8 +441,8 @@ export default function EditJob() {
                         required
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="itris_job_id" className="font-light font-inter">Itris ID</Label>
+                    <div className="space-y-2 sm:space-y-3">
+                      <Label htmlFor="itris_job_id" className="font-light font-inter text-sm sm:text-base">Itris ID</Label>
                       <Input
                         id="itris_job_id"
                         name="itris_job_id"
@@ -622,9 +622,9 @@ export default function EditJob() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="job_location">Job Location</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="space-y-2 sm:space-y-3">
+                    <Label htmlFor="job_location" className="text-sm sm:text-base">Job Location</Label>
                       <Input
                         id="job_location"
                         name="job_location"
@@ -650,9 +650,9 @@ export default function EditJob() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="notice_period">Notice Period</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="space-y-2 sm:space-y-3">
+                    <Label htmlFor="notice_period" className="text-sm sm:text-base">Notice Period</Label>
                       <Select value={formData.notice_period} onValueChange={(value) => setFormData(prev => ({ ...prev, notice_period: value }))}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select notice period" />
@@ -909,8 +909,8 @@ export default function EditJob() {
                   </div>
 
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="Type">Job Type</Label>
+                  <div className="space-y-2 sm:space-y-3">
+                    <Label htmlFor="Type" className="text-sm sm:text-base">Job Type</Label>
                       <Select value={formData.Type} onValueChange={(value) => setFormData(prev => ({ ...prev, Type: value }))}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select job type" />
@@ -923,8 +923,8 @@ export default function EditJob() {
                     </div>
                     
                     {formData.Type === "Contract" && (
-                      <div className="space-y-2">
-                        <Label htmlFor="contract_length">Contract Length</Label>
+                  <div className="space-y-2 sm:space-y-3">
+                    <Label htmlFor="contract_length" className="text-sm sm:text-base">Contract Length</Label>
                         <Select value={formData.contract_length || ""} onValueChange={(value) => setFormData(prev => ({ ...prev, contract_length: value }))}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select contract length" />
