@@ -3338,49 +3338,49 @@ mainCandidate["linkedin_score_reason"] ? (
           </Card>
         </TabsContent>
 
-        <TabsContent value="applications" className="space-y-4 pb-32">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center">
-                    <FileText className="w-5 h-5 mr-2" />
+        <TabsContent value="applications" className="space-y-3 sm:space-y-4 pb-20 sm:pb-32 max-w-full">
+          <Card className="max-w-full overflow-hidden">
+            <CardHeader className="p-3 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <div className="min-w-0">
+                  <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
                     Applications ({applications.length})
                   </CardTitle>
-                  <CardDescription>Candidates who have applied for this position</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm mt-1">Candidates who have applied for this position</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 sm:p-6">
               {/* Application Filters */}
-              <Card className="mb-4">
-                <CardContent className="pt-4">
+              <Card className="mb-3 sm:mb-4 max-w-full overflow-hidden">
+                <CardContent className="pt-3 sm:pt-4 p-3 sm:p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 w-full max-w-full">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Name</label>
+                    <div className="space-y-2 min-w-0">
+                      <label className="text-xs sm:text-sm font-medium">Name</label>
                       <Input
                         placeholder="Filter by name..."
                         value={appNameFilter}
                         onChange={(e) => setAppNameFilter(e.target.value)}
-                        className="h-9"
+                        className="h-11 sm:h-9 text-sm min-w-0 w-full"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Email</label>
+                    <div className="space-y-2 min-w-0">
+                      <label className="text-xs sm:text-sm font-medium">Email</label>
                       <Input
                         placeholder="Filter by email..."
                         value={appEmailFilter}
                         onChange={(e) => setAppEmailFilter(e.target.value)}
-                        className="h-9"
+                        className="h-11 sm:h-9 text-sm min-w-0 w-full"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Phone</label>
+                    <div className="space-y-2 min-w-0">
+                      <label className="text-xs sm:text-sm font-medium">Phone</label>
                       <Input
                         placeholder="Filter by phone..."
                         value={appPhoneFilter}
                         onChange={(e) => setAppPhoneFilter(e.target.value)}
-                        className="h-9"
+                        className="h-11 sm:h-9 text-sm min-w-0 w-full"
                       />
                     </div>
                   </div>
@@ -3413,20 +3413,20 @@ mainCandidate["linkedin_score_reason"] ? (
                   });
                   return (
                     <div>
-                      <div className="mb-4 text-sm text-muted-foreground">
+                      <div className="mb-3 sm:mb-4 text-xs sm:text-sm text-muted-foreground">
                         Showing {filteredApplications.length} of {applications.length} applications
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 w-full max-w-full">
                         {filteredApplications.map((application) => (
                           <Card
                             key={application.candidate_id}
-                            className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg"
+                            className="border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg max-w-full overflow-hidden"
                           >
-                            <CardContent className="p-3 md:p-4">
+                            <CardContent className="p-3 sm:p-4">
                               <div className="space-y-3">
-                                 <div className="flex items-start justify-between">
+                                 <div className="flex items-start justify-between min-w-0">
                                   <div className="min-w-0 flex-1">
-                                    <h4 className="font-semibold text-sm md:text-base truncate">
+                                    <h4 className="font-semibold text-sm sm:text-base truncate">
                                       {(() => {
                                         const first = application.first_name || "";
                                         const last = application.last_name || "";
@@ -3445,13 +3445,13 @@ mainCandidate["linkedin_score_reason"] ? (
                                         }
                                       })()}
                                     </h4>
-                                    <p className="text-xs md:text-sm text-muted-foreground truncate">
+                                    <p className="text-xs sm:text-sm text-muted-foreground truncate">
                                       {application.candidate_id}
                                     </p>
                                   </div>
                                 </div>
 
-                                <div className="space-y-2 text-xs md:text-sm">
+                                <div className="space-y-2 text-xs sm:text-sm">
                                   {application.Email && (
                                     <div className="flex items-center text-muted-foreground min-w-0">
                                       <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
@@ -3468,22 +3468,22 @@ mainCandidate["linkedin_score_reason"] ? (
                                 </div>
 
                                 {application.cv_summary && (
-                                  <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
+                                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
                                     {application.cv_summary}
                                   </p>
                                 )}
 
-                                <div className="flex items-center justify-between pt-2 border-t gap-2">
-                                  <div className="flex items-center gap-2">
+                                <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-between pt-2 border-t gap-2">
+                                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                                     {application.CV_Link && (
-                                      <Button variant="outline" size="sm" asChild>
+                                      <Button variant="outline" size="sm" asChild className="w-full sm:w-auto h-11 sm:h-9 text-sm min-h-[44px] sm:min-h-0">
                                         <a href={application.CV_Link} target="_blank" rel="noopener noreferrer">
-                                          <FileText className="w-4 h-4 mr-1" />
+                                          <FileText className="w-4 h-4 mr-1 flex-shrink-0" />
                                           CV
                                         </a>
                                       </Button>
                                     )}
-                                    <Button variant="outline" size="sm" asChild>
+                                    <Button variant="outline" size="sm" asChild className="w-full sm:w-auto h-11 sm:h-9 text-sm min-h-[44px] sm:min-h-0">
                                       <Link
                                         to={`/candidate/${application.candidate_id}`}
                                         state={{
@@ -3499,7 +3499,7 @@ mainCandidate["linkedin_score_reason"] ? (
                                   {!addedToLongList.has(application.candidate_id) && (
                                     <Button
                                       size="sm"
-                                      className="bg-primary text-primary-foreground hover:bg-primary/90"
+                                      className="bg-primary text-primary-foreground hover:bg-primary/90 w-full sm:w-auto h-11 sm:h-9 text-sm min-h-[44px] sm:min-h-0"
                                       onClick={async () => {
                                         try {
                                           // Disable the button immediately
