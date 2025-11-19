@@ -3239,32 +3239,34 @@ mainCandidate["linkedin_score_reason"] ? (
           </div>
         </TabsContent>
 
-        <TabsContent value="description" className="space-y-4 pb-32">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center">
-                    <FileText className="w-5 h-5 mr-2" />
+        <TabsContent value="description" className="space-y-3 sm:space-y-4 pb-20 sm:pb-32 max-w-full">
+          <Card className="max-w-full overflow-hidden">
+            <CardHeader className="p-3 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <div className="min-w-0">
+                  <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
                     Job Description
                   </CardTitle>
-                  <CardDescription>Detailed overview of the role and responsibilities</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm mt-1">Detailed overview of the role and responsibilities</CardDescription>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Button variant="outline" size="sm">
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload File
+                <div className="flex items-center gap-2 sm:gap-2 flex-shrink-0">
+                  <Button variant="outline" size="sm" className="w-full sm:w-auto h-11 sm:h-9 text-sm min-h-[44px] sm:min-h-0">
+                    <Upload className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span className="hidden sm:inline">Upload File</span>
+                    <span className="sm:hidden">Upload</span>
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job.job_id}`)}>
-                    <FileText className="w-4 h-4 mr-2" />
-                    Edit Job
+                  <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job.job_id}`)} className="w-full sm:w-auto h-11 sm:h-9 text-sm min-h-[44px] sm:min-h-0">
+                    <FileText className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span className="hidden sm:inline">Edit Job</span>
+                    <span className="sm:hidden">Edit</span>
                   </Button>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 sm:p-6">
               <div className="prose prose-sm max-w-none">
-                <p className="leading-relaxed whitespace-pre-wrap">
+                <p className="leading-relaxed whitespace-pre-wrap text-sm sm:text-base break-words">
                   {job.job_description || "No description available for this position."}
                 </p>
               </div>
@@ -3272,20 +3274,20 @@ mainCandidate["linkedin_score_reason"] ? (
           </Card>
 
           {/* Job Documents Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <FileText className="w-5 h-5 mr-2" />
+          <Card className="max-w-full overflow-hidden">
+            <CardHeader className="p-3 sm:p-6">
+              <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+                <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
                 Job Documents
               </CardTitle>
-              <CardDescription>Uploaded job description files and related documents</CardDescription>
+              <CardDescription className="text-xs sm:text-sm mt-1">Uploaded job description files and related documents</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No documents uploaded</h3>
-                <p className="text-muted-foreground">Upload job description files when creating or editing this job</p>
-                <Button variant="outline" className="mt-4" onClick={() => setIsEditDialogOpen(true)}>
+            <CardContent className="p-3 sm:p-6">
+              <div className="text-center py-6 sm:py-8">
+                <FileText className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground mx-auto mb-3 sm:mb-4" />
+                <h3 className="text-base sm:text-lg font-semibold mb-2">No documents uploaded</h3>
+                <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4 px-4">Upload job description files when creating or editing this job</p>
+                <Button variant="outline" className="w-full sm:w-auto h-11 sm:h-auto min-h-[44px] sm:min-h-0" onClick={() => setIsEditDialogOpen(true)}>
                   <Upload className="w-4 h-4 mr-2" />
                   Upload Documents
                 </Button>
