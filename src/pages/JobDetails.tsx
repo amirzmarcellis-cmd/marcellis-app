@@ -4246,70 +4246,64 @@ mainCandidate["linkedin_score_reason"] ? (
           </Card>
         </TabsContent>
 
-        <TabsContent value="shortlist" className="space-y-4 pb-32">
-          <div className="space-y-6">
+        <TabsContent value="shortlist" className="space-y-3 sm:space-y-6 pb-20 sm:pb-32 max-w-full">
+          <div className="space-y-4 sm:space-y-6">
             {/* Within Budget Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Star className="w-5 h-5 mr-2" />
+            <Card className="max-w-full overflow-hidden">
+              <CardHeader className="p-3 sm:p-6">
+                <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+                  <Star className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
                   Within Budget ({withinBudgetCandidates.length} candidates)
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm mt-1">
                   High-scoring candidates with salary expectations within 20% of budget (
                   {formatCurrency(jobBudget.toString(), job?.Currency)} + 20%)
                 </CardDescription>
 
                 {/* AI Short List Filters - Single Line */}
-                <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center min-w-0">
-                  <div className="relative min-w-0 w-full sm:w-auto sm:flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-2 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t min-w-0">
+                  <div className="relative min-w-0">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 flex-shrink-0" />
                     <Input
                       placeholder="Name..."
                       value={shortListNameFilter}
                       onChange={(e) => setShortListNameFilter(e.target.value)}
-                      className="pl-10 h-9 text-sm min-w-0"
+                      className="pl-10 h-11 sm:h-9 text-sm min-w-0 w-full"
                     />
                   </div>
                   <Input
                     placeholder="Email..."
                     value={shortListEmailFilter}
                     onChange={(e) => setShortListEmailFilter(e.target.value)}
-                    className="h-9 text-sm min-w-0 w-full sm:w-auto sm:flex-1"
+                    className="h-11 sm:h-9 text-sm min-w-0 w-full"
                   />
                   <Input
                     placeholder="Phone..."
                     value={shortListPhoneFilter}
                     onChange={(e) => setShortListPhoneFilter(e.target.value)}
-                    className="h-9 text-sm min-w-0 w-full sm:w-auto sm:flex-1"
+                    className="h-11 sm:h-9 text-sm min-w-0 w-full"
                   />
                   <Input
                     placeholder="User ID..."
                     value={shortListUserIdFilter}
                     onChange={(e) => setShortListUserIdFilter(e.target.value)}
-                    className="h-9 text-sm min-w-0 w-full sm:w-auto sm:flex-1"
-                  />
-                  <Input
-                    placeholder="Source..."
-                    value={shortListSourceFilter}
-                    onChange={(e) => setShortListSourceFilter(e.target.value)}
-                    className="h-9 text-sm min-w-0 w-full sm:w-auto sm:flex-1"
+                    className="h-11 sm:h-9 text-sm min-w-0 w-full"
                   />
                   <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
-                    <SelectTrigger className="h-9 text-sm w-full sm:w-32 min-w-0">
-                      <SelectValue placeholder="Source" />
+                    <SelectTrigger className="h-11 sm:h-9 text-sm min-w-0 w-full">
+                      <SelectValue placeholder="Source" className="truncate" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[60] bg-popover">
                       <SelectItem value="all">All Sources</SelectItem>
                       <SelectItem value="Itris">Itris</SelectItem>
                       <SelectItem value="Linkedin">LinkedIn</SelectItem>
                     </SelectContent>
                   </Select>
                   <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
-                    <SelectTrigger className="h-9 text-sm w-full sm:w-32 min-w-0">
-                      <SelectValue placeholder="Score" />
+                    <SelectTrigger className="h-11 sm:h-9 text-sm min-w-0 w-full">
+                      <SelectValue placeholder="Score" className="truncate" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[60] bg-popover">
                       <SelectItem value="all">All Scores</SelectItem>
                       <SelectItem value="90+">90+</SelectItem>
                       <SelectItem value="85+">85+</SelectItem>
@@ -4323,12 +4317,12 @@ mainCandidate["linkedin_score_reason"] ? (
                   </Select>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-3 sm:p-6">
                 {withinBudgetCandidates.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No within-budget candidates yet</h3>
-                    <p className="text-muted-foreground">High-scoring candidates within budget will appear here</p>
+                  <div className="text-center py-6 sm:py-8">
+                    <Star className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground mx-auto mb-3 sm:mb-4" />
+                    <h3 className="text-base sm:text-lg font-semibold mb-2">No within-budget candidates yet</h3>
+                    <p className="text-sm sm:text-base text-muted-foreground px-4">High-scoring candidates within budget will appear here</p>
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
@@ -4374,19 +4368,19 @@ mainCandidate["linkedin_score_reason"] ? (
             </Card>
 
             {/* Above Budget Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <AlertTriangle className="w-5 h-5 mr-2" />
+            <Card className="max-w-full overflow-hidden">
+              <CardHeader className="p-3 sm:p-6">
+                <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+                  <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
                   Above Budget ({aboveBudgetCandidates.length} candidates)
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm mt-1">
                   High-scoring candidates with salary expectations more than 20% above budget (
                   {formatCurrency(budgetThreshold.toString(), job?.Currency)}+)
                 </CardDescription>
 
                 {/* AI Short List Filters - Single Line */}
-                <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-2 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t min-w-0">
                   <div className="relative min-w-0 flex-1">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input
@@ -4496,19 +4490,19 @@ mainCandidate["linkedin_score_reason"] ? (
             </Card>
 
             {/* Not in Preferred Nationality Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <AlertTriangle className="w-5 h-5 mr-2" />
+            <Card className="max-w-full overflow-hidden">
+              <CardHeader className="p-3 sm:p-6">
+                <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+                  <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
                   Not in Preferred Nationality ({notInPreferredNationalityCandidates.length} candidates)
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm mt-1">
                   High-scoring candidates whose nationality doesn't match the preferred nationality:{" "}
                   {job?.prefered_nationality || "N/A"}
                 </CardDescription>
 
                 {/* AI Short List Filters */}
-                <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-2 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t min-w-0">
                   <div className="relative min-w-0 flex-1">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input
@@ -4622,66 +4616,60 @@ mainCandidate["linkedin_score_reason"] ? (
             </Card>
 
             {/* Rejected Candidates Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <X className="w-5 h-5 mr-2" />
+            <Card className="max-w-full overflow-hidden">
+              <CardHeader className="p-3 sm:p-6">
+                <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+                  <X className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
                   Rejected Candidates ({filteredRejectedCandidates.length} candidates)
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm mt-1">
                   High-scoring candidates who have been rejected from the shortlist
                 </CardDescription>
 
                 {/* AI Short List Filters */}
-                <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t items-center">
-                  <div className="relative min-w-0 flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-2 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t min-w-0">
+                  <div className="relative min-w-0">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 flex-shrink-0" />
                     <Input
                       placeholder="Name..."
                       value={shortListNameFilter}
                       onChange={(e) => setShortListNameFilter(e.target.value)}
-                      className="pl-10 h-9 text-sm"
+                      className="pl-10 h-11 sm:h-9 text-sm min-w-0 w-full"
                     />
                   </div>
                   <Input
                     placeholder="Email..."
                     value={shortListEmailFilter}
                     onChange={(e) => setShortListEmailFilter(e.target.value)}
-                    className="h-9 text-sm min-w-0 flex-1"
+                    className="h-11 sm:h-9 text-sm min-w-0 w-full"
                   />
                   <Input
                     placeholder="Phone..."
                     value={shortListPhoneFilter}
                     onChange={(e) => setShortListPhoneFilter(e.target.value)}
-                    className="h-9 text-sm min-w-0 flex-1"
+                    className="h-11 sm:h-9 text-sm min-w-0 w-full"
                   />
                   <Input
                     placeholder="User ID..."
                     value={shortListUserIdFilter}
                     onChange={(e) => setShortListUserIdFilter(e.target.value)}
-                    className="h-9 text-sm min-w-0 flex-1"
-                  />
-                  <Input
-                    placeholder="Source..."
-                    value={shortListSourceFilter}
-                    onChange={(e) => setShortListSourceFilter(e.target.value)}
-                    className="h-9 text-sm min-w-0 flex-1"
+                    className="h-11 sm:h-9 text-sm min-w-0 w-full"
                   />
                   <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
-                    <SelectTrigger className="h-9 text-sm w-32">
-                      <SelectValue placeholder="Source" />
+                    <SelectTrigger className="h-11 sm:h-9 text-sm min-w-0 w-full">
+                      <SelectValue placeholder="Source" className="truncate" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[60] bg-popover">
                       <SelectItem value="all">All Sources</SelectItem>
                       <SelectItem value="Itris">Itris</SelectItem>
                       <SelectItem value="Linkedin">LinkedIn</SelectItem>
                     </SelectContent>
                   </Select>
                   <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
-                    <SelectTrigger className="h-9 text-sm w-32">
-                      <SelectValue placeholder="Score" />
+                    <SelectTrigger className="h-11 sm:h-9 text-sm min-w-0 w-full">
+                      <SelectValue placeholder="Score" className="truncate" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[60] bg-popover">
                       <SelectItem value="all">All Scores</SelectItem>
                       <SelectItem value="90+">90+</SelectItem>
                       <SelectItem value="85+">85+</SelectItem>
