@@ -3565,14 +3565,14 @@ mainCandidate["linkedin_score_reason"] ? (
           </Card>
         </TabsContent>
 
-        <TabsContent value="boolean-search" className="space-y-4 pb-32">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div>
-                    <CardTitle className="flex items-center">
-                      <Users className="w-5 h-5 mr-2" />
+        <TabsContent value="boolean-search" className="space-y-3 sm:space-y-4 pb-20 sm:pb-32 max-w-full">
+          <Card className="max-w-full overflow-hidden">
+            <CardHeader className="p-3 sm:p-6">
+              <div className="flex flex-col gap-3 sm:gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                  <div className="min-w-0">
+                    <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+                      <Users className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
                       AI Longlist (
                       {
                         longlistedCandidates.filter((c) => {
@@ -3582,7 +3582,7 @@ mainCandidate["linkedin_score_reason"] ? (
                       }{" "}
                       candidates)
                     </CardTitle>
-                    <CardDescription>Candidates added to the longlist for this position</CardDescription>
+                    <CardDescription className="text-xs sm:text-sm mt-1">Candidates added to the longlist for this position</CardDescription>
                   </div>
                   {job?.longlist && job.longlist > 0 ? (
                     <ExpandableSearchButton
@@ -3597,8 +3597,9 @@ mainCandidate["linkedin_score_reason"] ? (
                       onClick={handleGenerateLongList} 
                       disabled={job?.longlist === 3 || generateCooldown.isDisabled} 
                       size="sm"
+                      className="w-full sm:w-auto h-11 sm:h-9 text-sm min-h-[44px] sm:min-h-0"
                     >
-                      <Zap className="w-4 h-4 mr-2" />
+                      <Zap className="w-4 h-4 mr-2 flex-shrink-0" />
                       {generateCooldown.isDisabled 
                         ? `Wait ${generateCooldown.formatTime()}` 
                         : "Generate AI"}
@@ -3607,7 +3608,7 @@ mainCandidate["linkedin_score_reason"] ? (
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 sm:p-6">
               {(() => {
                 const readyToContactCount = longlistedCandidates.filter(
                   (candidate) => candidate["Contacted"] === "Ready to Contact",
@@ -3641,24 +3642,24 @@ mainCandidate["linkedin_score_reason"] ? (
                 <>
                   {/* Bulk Actions */}
                   {selectedCandidates.size > 0 && (
-                    <Card className="p-3 md:p-4 mb-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
-                      <div className="flex items-center justify-between gap-4">
+                    <Card className="p-3 sm:p-4 mb-3 sm:mb-4 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800 max-w-full overflow-hidden">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">
+                          <span className="text-xs sm:text-sm font-medium">
                             {selectedCandidates.size} candidate{selectedCandidates.size > 1 ? "s" : ""} selected
                           </span>
-                          <Button variant="ghost" size="sm" onClick={clearAllSelection} className="h-6 text-xs px-2">
+                          <Button variant="ghost" size="sm" onClick={clearAllSelection} className="h-8 sm:h-6 text-xs px-2">
                             Clear
                           </Button>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={handleRemoveSelectedCandidates}
-                            className="text-destructive hover:text-destructive border-destructive/50 hover:border-destructive"
+                            className="text-destructive hover:text-destructive border-destructive/50 hover:border-destructive w-full sm:w-auto h-11 sm:h-9 text-sm min-h-[44px] sm:min-h-0"
                           >
-                            <X className="w-4 h-4 mr-1" />
+                            <X className="w-4 h-4 mr-1 flex-shrink-0" />
                             Remove Selected
                           </Button>
                           <Button
@@ -3666,9 +3667,9 @@ mainCandidate["linkedin_score_reason"] ? (
                             size="sm"
                             onClick={handleCallSelectedCandidates}
                             disabled={isGeneratingShortList}
-                            className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600"
+                            className="bg-slate-900 hover:bg-slate-800 text-white dark:bg-green-500 dark:hover:bg-green-600 w-full sm:w-auto h-11 sm:h-9 text-sm min-h-[44px] sm:min-h-0"
                           >
-                            <Phone className="w-4 h-4 mr-1" />
+                            <Phone className="w-4 h-4 mr-1 flex-shrink-0" />
                             {isGeneratingShortList ? "Calling..." : "Call Selected"}
                           </Button>
                         </div>
@@ -3677,14 +3678,14 @@ mainCandidate["linkedin_score_reason"] ? (
                   )}
 
                   {/* Filters */}
-                  <Card className="p-3 md:p-4 mb-4 bg-muted/50 min-w-0 w-full">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3 min-w-0">
+                  <Card className="p-3 sm:p-4 mb-3 sm:mb-4 bg-muted/50 min-w-0 w-full max-w-full overflow-hidden">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-2 mb-3 min-w-0">
                       <div className="flex items-center gap-2 min-w-0">
                         <Filter className="w-4 h-4 flex-shrink-0" />
-                        <h4 className="font-medium text-sm md:text-base">Filters</h4>
+                        <h4 className="font-medium text-xs sm:text-sm md:text-base">Filters</h4>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm" onClick={selectAllCandidates} className="h-6 text-xs px-2 whitespace-nowrap">
+                        <Button variant="ghost" size="sm" onClick={selectAllCandidates} className="h-8 sm:h-6 text-xs px-2 whitespace-nowrap">
                           Select All
                         </Button>
                       </div>
