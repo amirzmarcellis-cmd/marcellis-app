@@ -3296,40 +3296,40 @@ mainCandidate["linkedin_score_reason"] ? (
           </Card>
         </TabsContent>
 
-        <TabsContent value="requirements" className="space-y-4 pb-32">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center">
-                    <Target className="w-5 h-5 mr-2" />
+        <TabsContent value="requirements" className="space-y-3 sm:space-y-4 pb-20 sm:pb-32 max-w-full">
+          <Card className="max-w-full overflow-hidden">
+            <CardHeader className="p-3 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <div className="min-w-0">
+                  <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+                    <Target className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
                     AI Requirements
                   </CardTitle>
-                  <CardDescription>Skills, experience, and qualifications needed for this role</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm mt-1">Skills, experience, and qualifications needed for this role</CardDescription>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job.job_id}`)}>
-                  <FileText className="w-4 h-4 mr-2" />
+                <Button variant="outline" size="sm" onClick={() => navigate(`/jobs/edit/${job.job_id}`)} className="w-full sm:w-auto h-11 sm:h-9 text-sm min-h-[44px] sm:min-h-0 flex-shrink-0">
+                  <FileText className="w-4 h-4 mr-2 flex-shrink-0" />
                   Amend
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="prose prose-sm max-w-none space-y-4">
+            <CardContent className="p-3 sm:p-6">
+              <div className="prose prose-sm max-w-none space-y-3 sm:space-y-4">
                 <div>
-                  <h4 className="font-semibold mb-2">Things to look for:</h4>
-                  <p className="leading-relaxed whitespace-pre-wrap">
+                  <h4 className="font-semibold mb-2 text-sm sm:text-base">Things to look for:</h4>
+                  <p className="leading-relaxed whitespace-pre-wrap text-sm sm:text-base break-words">
                     {job.things_to_look_for || "No specific criteria listed."}
                   </p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-2">Must have:</h4>
-                  <p className="leading-relaxed whitespace-pre-wrap">
+                  <h4 className="font-semibold mb-2 text-sm sm:text-base">Must have:</h4>
+                  <p className="leading-relaxed whitespace-pre-wrap text-sm sm:text-base break-words">
                     {job.musttohave || "No must-have requirements specified."}
                   </p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-2">Nice to Have:</h4>
-                  <p className="leading-relaxed whitespace-pre-wrap">
+                  <h4 className="font-semibold mb-2 text-sm sm:text-base">Nice to Have:</h4>
+                  <p className="leading-relaxed whitespace-pre-wrap text-sm sm:text-base break-words">
                     {job.nicetohave || "No nice-to-have requirements specified."}
                   </p>
                 </div>
