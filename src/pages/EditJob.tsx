@@ -386,52 +386,52 @@ export default function EditJob() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="text-center">Loading job details...</div>
+      <div className="container mx-auto p-3 sm:p-4 md:p-6 pb-20 sm:pb-24 max-w-full overflow-x-hidden">
+        <div className="text-center text-sm sm:text-base">Loading job details...</div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6 overflow-x-hidden">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+    <div className="container mx-auto max-w-7xl px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6 space-y-3 sm:space-y-4 md:space-y-6 overflow-x-hidden pb-20 sm:pb-24">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 md:gap-4 min-w-0">
+        <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 w-full min-w-0">
           <Button 
             variant="ghost" 
             onClick={() => navigate("/jobs")}
-            className="flex items-center gap-2 h-10 sm:h-9"
+            className="flex items-center gap-2 h-11 sm:h-10 md:h-9 w-full sm:w-auto justify-start sm:justify-center min-h-[44px] sm:min-h-0"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4 flex-shrink-0" />
             <span className="text-sm sm:text-base">Back to Jobs</span>
           </Button>
-          <div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light font-work tracking-tight">Edit Job</h1>
-            <p className="text-sm sm:text-base font-light font-inter text-muted-foreground">Update job posting details</p>
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light font-work tracking-tight break-words">Edit Job</h1>
+            <p className="text-xs sm:text-sm md:text-base font-light font-inter text-muted-foreground mt-1">Update job posting details</p>
           </div>
         </div>
       </div>
 
       <Card className="mission-card w-full max-w-full overflow-hidden">
-        <CardHeader className="p-4 sm:p-6">
-          <CardTitle className="text-xl sm:text-2xl md:text-3xl font-light font-work tracking-tight">Edit Job Posting</CardTitle>
-          <CardDescription className="font-light font-inter text-sm sm:text-base">
+        <CardHeader className="p-3 sm:p-4 md:p-6">
+          <CardTitle className="text-lg sm:text-xl md:text-2xl font-light font-work tracking-tight break-words">Edit Job Posting</CardTitle>
+          <CardDescription className="font-light font-inter text-xs sm:text-sm md:text-base mt-1">
             Update the job details and requirements
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-4 sm:p-6">
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full min-w-0">
-            <Tabs value={currentTab} onValueChange={setCurrentTab} className="space-y-4 sm:space-y-6">
-              <TabsList className="glass-card p-1 sm:p-1.5 w-full flex flex-wrap gap-1">
-                <TabsTrigger value="details" className="min-h=[44px] text-xs sm:text-sm">Job Details</TabsTrigger>
-                <TabsTrigger value="documents" className="min-h=[44px] text-xs sm:text-sm">Documents</TabsTrigger>
-                <TabsTrigger value="amend" className="min-h=[44px] text-xs sm:text-sm">Ai Requirements</TabsTrigger>
+        <CardContent className="p-3 sm:p-4 md:p-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 md:space-y-6 w-full min-w-0">
+            <Tabs value={currentTab} onValueChange={setCurrentTab} className="space-y-4 sm:space-y-5 md:space-y-6">
+              <TabsList className="glass-card p-1 sm:p-1.5 w-full grid grid-cols-3 gap-1 h-auto">
+                <TabsTrigger value="details" className="min-h-[44px] sm:min-h-[36px] text-xs sm:text-sm py-2.5">Job Details</TabsTrigger>
+                <TabsTrigger value="documents" className="min-h-[44px] sm:min-h-[36px] text-xs sm:text-sm py-2.5">Documents</TabsTrigger>
+                <TabsTrigger value="amend" className="min-h-[44px] sm:min-h-[36px] text-xs sm:text-sm py-2.5">Ai Requirements</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="details" className="space-y-4 sm:space-y-6">
-                <div className="space-y-4 sm:space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                    <div className="space-y-2 sm:space-y-3">
-                      <Label htmlFor="job_title" className="font-light font-inter text-sm sm:text-base">Job Title *</Label>
+              <TabsContent value="details" className="space-y-3 sm:space-y-4 md:space-y-6">
+                <div className="space-y-3 sm:space-y-4 md:space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 min-w-0">
+                    <div className="space-y-1.5 sm:space-y-2 min-w-0">
+                      <Label htmlFor="job_title" className="font-light font-inter text-xs sm:text-sm">Job Title *</Label>
                       <Input
                         id="job_title"
                         name="job_title"
@@ -439,24 +439,26 @@ export default function EditJob() {
                         onChange={handleInputChange}
                         placeholder="e.g., Senior Software Engineer"
                         required
+                        className="h-11 sm:h-10 text-sm min-w-0 w-full"
                       />
                     </div>
-                    <div className="space-y-2 sm:space-y-3">
-                      <Label htmlFor="itris_job_id" className="font-light font-inter text-sm sm:text-base">Itris ID</Label>
+                    <div className="space-y-1.5 sm:space-y-2 min-w-0">
+                      <Label htmlFor="itris_job_id" className="font-light font-inter text-xs sm:text-sm">Itris ID</Label>
                       <Input
                         id="itris_job_id"
                         name="itris_job_id"
                         value={formData.itris_job_id || ""}
                         onChange={handleInputChange}
                         placeholder="Enter Itris ID"
+                        className="h-11 sm:h-10 text-sm min-w-0 w-full"
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="group">Group</Label>
+                  <div className="space-y-1.5 sm:space-y-2 min-w-0">
+                    <Label htmlFor="group" className="text-xs sm:text-sm">Group</Label>
                     <Select value={formData.group_id || "none"} onValueChange={(value) => setFormData(prev => ({ ...prev, group_id: value === "none" ? "" : value }))}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-11 sm:h-10 text-sm min-w-0 w-full">
                         <SelectValue placeholder="Select a group (optional)" className="truncate" />
                       </SelectTrigger>
                       <SelectContent className="z-[60] bg-popover">
@@ -465,10 +467,10 @@ export default function EditJob() {
                           <SelectItem key={group.id} value={group.id}>
                             <div className="flex items-center gap-2">
                               <div 
-                                className="w-3 h-3 rounded-full"
+                                className="w-3 h-3 rounded-full flex-shrink-0"
                                 style={{ backgroundColor: group.color || "#3B82F6" }}
                               />
-                              {group.name}
+                              <span className="truncate">{group.name}</span>
                             </div>
                           </SelectItem>
                         ))}
@@ -476,19 +478,19 @@ export default function EditJob() {
                     </Select>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="recruiter">Assigned Recruiter</Label>
+                  <div className="space-y-1.5 sm:space-y-2 min-w-0">
+                    <Label htmlFor="recruiter" className="text-xs sm:text-sm">Assigned Recruiter</Label>
                     <Select value={formData.recruiter_id || "none"} onValueChange={(value) => setFormData(prev => ({ ...prev, recruiter_id: value === "none" ? "" : value }))}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-11 sm:h-10 text-sm min-w-0 w-full">
                         <SelectValue placeholder="Select a recruiter (optional)" className="truncate" />
                       </SelectTrigger>
                       <SelectContent className="z-[60] bg-popover">
                         <SelectItem value="none">No Recruiter</SelectItem>
                         {recruiters.map((recruiter) => (
                           <SelectItem key={recruiter.user_id} value={recruiter.user_id}>
-                            <div className="flex items-center gap-2">
-                              <div className="w-2 h-2 rounded-full bg-primary"/>
-                              {recruiter.name || recruiter.email}
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0"/>
+                              <span className="truncate">{recruiter.name || recruiter.email}</span>
                             </div>
                           </SelectItem>
                         ))}
@@ -498,18 +500,18 @@ export default function EditJob() {
 
                   {/* LinkedIn Search Toggle - Prominent Feature */}
                   {formData.recruiter_id && (
-                    <div className="space-y-3 p-5 border-2 border-primary/30 rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 shadow-sm">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1.5 flex-1">
-                          <div className="flex items-center gap-2">
-                            <Label className="font-semibold text-base">🔍 LinkedIn Search</Label>
+                    <div className="space-y-2 sm:space-y-3 p-3 sm:p-4 md:p-5 border-2 border-primary/30 rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 shadow-sm min-w-0 max-w-full overflow-hidden">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 min-w-0">
+                        <div className="space-y-1 sm:space-y-1.5 flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Label className="font-semibold text-sm sm:text-base">🔍 LinkedIn Search</Label>
                             {linkedInSearchEnabled && (
-                              <span className="px-2 py-0.5 text-xs font-medium bg-green-500/20 text-green-700 dark:text-green-400 rounded-full border border-green-500/30">
+                              <span className="px-2 py-0.5 text-xs font-medium bg-green-500/20 text-green-700 dark:text-green-400 rounded-full border border-green-500/30 flex-shrink-0">
                                 Active
                               </span>
                             )}
                           </div>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
+                          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed break-words">
                             Automatically search and find candidates on LinkedIn for this position
                           </p>
                         </div>
@@ -517,7 +519,7 @@ export default function EditJob() {
                           <Switch
                             checked={linkedInSearchEnabled}
                             onCheckedChange={setLinkedInSearchEnabled}
-                            className="ml-4"
+                            className="sm:ml-4 flex-shrink-0"
                           />
                         ) : (
                           <Button
@@ -525,16 +527,16 @@ export default function EditJob() {
                             variant="default"
                             size="sm"
                             onClick={() => navigate("/settings")}
-                            className="ml-4 font-medium"
+                            className="sm:ml-4 font-medium w-full sm:w-auto h-11 sm:h-9 min-h-[44px] sm:min-h-0"
                           >
                             Connect LinkedIn
                           </Button>
                         )}
                       </div>
                       {!recruiterLinkedInId && (
-                        <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
-                          <span className="text-amber-600 dark:text-amber-400 text-sm">⚠️</span>
-                          <p className="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">
+                        <div className="flex items-start gap-2 p-2.5 sm:p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+                          <span className="text-amber-600 dark:text-amber-400 text-sm flex-shrink-0">⚠️</span>
+                          <p className="text-xs text-amber-700 dark:text-amber-300 leading-relaxed break-words">
                             The assigned recruiter needs to connect their LinkedIn account first. Click "Connect LinkedIn" to set it up.
                           </p>
                         </div>
@@ -998,17 +1000,17 @@ export default function EditJob() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="amend" className="space-y-6">
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold">Edit Job Requirements</h3>
-                      <p className="text-sm text-muted-foreground">
+              <TabsContent value="amend" className="space-y-4 sm:space-y-5 md:space-y-6">
+                <div className="space-y-4 sm:space-y-5 md:space-y-6">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 min-w-0">
+                    <div className="min-w-0">
+                      <h3 className="text-base sm:text-lg font-semibold break-words">Edit Job Requirements</h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-1 break-words">
                         Edit all job requirements and descriptions. Changes will be reflected in AI Requirements.
                       </p>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Label htmlFor="amendMode">Enable Editing</Label>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <Label htmlFor="amendMode" className="text-xs sm:text-sm">Enable Editing</Label>
                       <Switch
                         id="amendMode"
                         checked={isAmendMode}
@@ -1017,14 +1019,14 @@ export default function EditJob() {
                     </div>
                   </div>
 
-                  <div className="space-y-6 p-6 border border-primary/20 rounded-lg bg-gradient-to-br from-primary/5 to-primary/10">
-                    <div className="mb-4 p-3 bg-primary/10 rounded-md border border-primary/20">
-                      <h4 className="font-semibold text-primary mb-1">✏️ Editing Mode Active</h4>
-                      <p className="text-sm text-muted-foreground">Edit the specific job requirements below and click 'Update Job Requirements' to save.</p>
+                  <div className="space-y-4 sm:space-y-5 md:space-y-6 p-3 sm:p-4 md:p-6 border border-primary/20 rounded-lg bg-gradient-to-br from-primary/5 to-primary/10 min-w-0 max-w-full overflow-hidden">
+                    <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 bg-primary/10 rounded-md border border-primary/20">
+                      <h4 className="font-semibold text-primary mb-1 text-sm sm:text-base">✏️ Editing Mode Active</h4>
+                      <p className="text-xs sm:text-sm text-muted-foreground break-words">Edit the specific job requirements below and click 'Update Job Requirements' to save.</p>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="things_to_look_for" className="text-base font-semibold">🔍 Things to Look For</Label>
+                    <div className="space-y-1.5 sm:space-y-2 min-w-0">
+                      <Label htmlFor="things_to_look_for" className="text-sm sm:text-base font-semibold">🔍 Things to Look For</Label>
                       <Textarea
                         id="things_to_look_for"
                         name="things_to_look_for"
@@ -1032,12 +1034,12 @@ export default function EditJob() {
                         onChange={handleInputChange}
                         placeholder="Enter specific things to look for in candidates..."
                         rows={4}
-                        className="bg-background border-2 border-blue-300 focus:border-blue-500 transition-colors"
+                        className="bg-background border-2 border-blue-300 focus:border-blue-500 transition-colors text-sm min-w-0 w-full resize-y"
                       />
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="musttohave" className="text-base font-semibold">⭐ Must Have Requirements</Label>
+                    <div className="space-y-1.5 sm:space-y-2 min-w-0">
+                      <Label htmlFor="musttohave" className="text-sm sm:text-base font-semibold">⭐ Must Have Requirements</Label>
                       <Textarea
                         id="musttohave"
                         name="musttohave"
@@ -1045,12 +1047,12 @@ export default function EditJob() {
                         onChange={handleInputChange}
                         placeholder="Enter critical skills and requirements..."
                         rows={4}
-                        className="bg-background border-2 border-red-300 focus:border-red-500 transition-colors"
+                        className="bg-background border-2 border-red-300 focus:border-red-500 transition-colors text-sm min-w-0 w-full resize-y"
                       />
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="nicetohave" className="text-base font-semibold">💫 Nice to Have Requirements</Label>
+                    <div className="space-y-1.5 sm:space-y-2 min-w-0">
+                      <Label htmlFor="nicetohave" className="text-sm sm:text-base font-semibold">💫 Nice to Have Requirements</Label>
                       <Textarea
                         id="nicetohave"
                         name="nicetohave"
@@ -1058,15 +1060,15 @@ export default function EditJob() {
                         onChange={handleInputChange}
                         placeholder="Enter preferred skills and bonuses..."
                         rows={4}
-                        className="bg-background border-2 border-green-300 focus:border-green-500 transition-colors"
+                        className="bg-background border-2 border-green-300 focus:border-green-500 transition-colors text-sm min-w-0 w-full resize-y"
                       />
                     </div>
 
-                    <div className="flex justify-end pt-4 border-t border-primary/20">
+                    <div className="flex justify-end pt-3 sm:pt-4 border-t border-primary/20">
                       <Button 
                         type="submit" 
                         disabled={saving}
-                        className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white px-8 py-2 font-semibold"
+                        className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white px-6 sm:px-8 py-2 font-semibold w-full sm:w-auto h-11 sm:h-10 text-sm min-h-[44px] sm:min-h-0"
                       >
                         <Save className="h-4 w-4 mr-2" />
                         {saving ? "Updating..." : "Update Job Requirements"}
@@ -1078,11 +1080,12 @@ export default function EditJob() {
               </TabsContent>
             </Tabs>
 
-            <div className="flex justify-end space-x-4 pt-6 border-t border-border/30">
+            <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 md:gap-4 pt-4 sm:pt-6 border-t border-border/30 min-w-0">
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={() => navigate("/jobs")}
+                className="w-full sm:w-auto h-11 sm:h-10 text-sm min-h-[44px] sm:min-h-0"
               >
                 <X className="h-4 w-4 mr-2" />
                 Cancel
@@ -1090,7 +1093,7 @@ export default function EditJob() {
               <Button 
                 type="submit" 
                 disabled={saving}
-                className="action-button bg-gradient-primary hover:shadow-glow"
+                className="action-button bg-gradient-primary hover:shadow-glow w-full sm:w-auto h-11 sm:h-10 text-sm min-h-[44px] sm:min-h-0"
               >
                 <Save className="h-4 w-4 mr-2" />
                 {saving ? "Updating..." : "Update Job"}
