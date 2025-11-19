@@ -423,9 +423,9 @@ export default function CallLogDetails() {
   const scoreColorClass = score >= 80 ? "text-primary" : score >= 50 ? "text-foreground" : "text-destructive"
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 space-y-6 overflow-x-auto">
+    <div className="container mx-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
         <Button variant="outline" onClick={() => {
           if (jobId && candidateId) {
             const fromTabParam = searchParams.get('fromTab');
@@ -443,28 +443,28 @@ export default function CallLogDetails() {
           } else {
             navigate(-1);
           }
-        }}>
-          <ArrowLeft className="w-4 h-4 mr-2" />
+        }} className="h-11 sm:h-10 text-sm sm:text-base min-h-[44px] sm:min-h-0">
+          <ArrowLeft className="w-4 h-4 mr-2 flex-shrink-0" />
           Back
         </Button>
-        <h1 className="text-5xl sm:text-6xl font-light font-work tracking-tight">Call Details</h1>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light font-work tracking-tight">Call Details</h1>
       </div>
 
       {/* Candidate Header */}
-      <Card className="bg-gradient-card">
-        <CardContent className="p-6">
-          <div className="flex items-center space-x-6">
-            <Avatar className="w-20 h-20">
-              <AvatarFallback className="bg-gradient-primary text-white text-xl font-light font-work">
+      <Card className="bg-gradient-card max-w-full overflow-hidden">
+        <CardContent className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 min-w-0">
+            <Avatar className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
+              <AvatarFallback className="bg-gradient-primary text-white text-lg sm:text-xl font-light font-work">
                 {callLog.candidate_name?.charAt(0) || 'C'}
               </AvatarFallback>
             </Avatar>
-            <div className="flex-1">
-              <h2 className="text-4xl font-light font-work tracking-tight">{callLog.candidate_name}</h2>
-              <p className="text-base font-light font-inter text-muted-foreground">{callLog.candidate_email}</p>
-              <p className="text-sm font-light font-inter">{callLog.job_title}</p>
+            <div className="flex-1 min-w-0 w-full">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-light font-work tracking-tight break-words">{callLog.candidate_name}</h2>
+              <p className="text-sm sm:text-base font-light font-inter text-muted-foreground break-words">{callLog.candidate_email}</p>
+              <p className="text-xs sm:text-sm font-light font-inter">{callLog.job_title}</p>
               {callLog.nationality && (
-                <p className="text-sm font-light font-inter text-muted-foreground">Nationality: {callLog.nationality}</p>
+                <p className="text-xs sm:text-sm font-light font-inter text-muted-foreground">Nationality: {callLog.nationality}</p>
               )}
               {hasCvLink && (
                 <Button
@@ -640,33 +640,33 @@ export default function CallLogDetails() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 max-w-full">
         {/* Call Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Phone className="w-5 h-5 mr-2" />
+        <Card className="max-w-full overflow-hidden">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+              <Phone className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
               Call Information
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
+          <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Duration</label>
-                <p className="text-lg">{callLog.duration || 'N/A'}</p>
+                <label className="text-xs sm:text-sm font-medium text-muted-foreground">Duration</label>
+                <p className="text-base sm:text-lg break-words">{callLog.duration || 'N/A'}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Last Call Time</label>
-                <p className="text-lg">{callLog.lastcalltime ? new Date(callLog.lastcalltime).toLocaleString() : 'N/A'}</p>
+                <label className="text-xs sm:text-sm font-medium text-muted-foreground">Last Call Time</label>
+                <p className="text-base sm:text-lg break-words">{callLog.lastcalltime ? new Date(callLog.lastcalltime).toLocaleString() : 'N/A'}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Call Count</label>
-                <p className="text-lg">{callLog.callcount || 0}</p>
+                <label className="text-xs sm:text-sm font-medium text-muted-foreground">Call Count</label>
+                <p className="text-base sm:text-lg">{callLog.callcount || 0}</p>
               </div>
             </div>
             {callLog.recording && (
               <div className="pt-2">
-                <label className="text-sm font-medium text-muted-foreground">Playback</label>
+                <label className="text-xs sm:text-sm font-medium text-muted-foreground">Playback</label>
                 <div className="mt-2">
                   <WaveformPlayer url={callLog.recording!} />
                 </div>
@@ -676,21 +676,21 @@ export default function CallLogDetails() {
         </Card>
 
         {/* Salary Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Banknote className="w-5 h-5 mr-2" />
+        <Card className="max-w-full overflow-hidden">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+              <Banknote className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
               Salary & Notice
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
             <div>
-              <label className="text-sm font-medium text-muted-foreground">Notice Period</label>
-              <p className="text-lg">{callLog.notice_period || 'N/A'}</p>
+              <label className="text-xs sm:text-sm font-medium text-muted-foreground">Notice Period</label>
+              <p className="text-base sm:text-lg break-words">{callLog.notice_period || 'N/A'}</p>
             </div>
             <div>
-              <label className="text-sm font-medium text-muted-foreground">Current Salary</label>
-              <p className="text-lg">
+              <label className="text-xs sm:text-sm font-medium text-muted-foreground">Current Salary</label>
+              <p className="text-base sm:text-lg break-words">
                 {callLog.current_salary
                   ? (() => {
                       const amt = parseInt(String(callLog.current_salary), 10);
@@ -702,8 +702,8 @@ export default function CallLogDetails() {
               </p>
             </div>
             <div>
-              <label className="text-sm font-medium text-muted-foreground">Expected Salary</label>
-              <p className="text-lg">
+              <label className="text-xs sm:text-sm font-medium text-muted-foreground">Expected Salary</label>
+              <p className="text-base sm:text-lg break-words">
                 {callLog.salary_expectations
                   ? (() => {
                       const str = String(callLog.salary_expectations);
@@ -734,17 +734,17 @@ export default function CallLogDetails() {
         </Card>
 
         {/* Scores Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Candidate Scores</CardTitle>
+        <Card className="max-w-full overflow-hidden">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-base sm:text-lg md:text-xl">Candidate Scores</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
             {/* Overall Score - Only show when status is Call Done */}
             {callLog.contacted?.toLowerCase() === "call done" && (
               <div className="p-3 bg-gradient-subtle rounded-lg border border-border/50">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Overall Score</span>
-                  <span className={`text-xl font-semibold ${scoreColorClass}`}>
+                  <span className="text-xs sm:text-sm font-medium">Overall Score</span>
+                  <span className={`text-lg sm:text-xl font-semibold ${scoreColorClass}`}>
                     {(() => {
                       // Calculate overall score based on source
                       const afterCallScore = parseInt(callLog.after_call_score || "0")
@@ -788,12 +788,12 @@ export default function CallLogDetails() {
             {/* After Call Score */}
             <div className="p-3 bg-gradient-subtle rounded-lg border border-border/50">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">After Call Score</span>
-                <span className={`text-xl font-semibold ${scoreColorClass}`}>{score}/100</span>
+                <span className="text-xs sm:text-sm font-medium">After Call Score</span>
+                <span className={`text-lg sm:text-xl font-semibold ${scoreColorClass}`}>{score}/100</span>
               </div>
               <RulerScore value={score} />
               {callLog.after_call_reason && (
-                <p className="text-sm text-muted-foreground mt-2">{callLog.after_call_reason}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-2 break-words">{callLog.after_call_reason}</p>
               )}
             </div>
 
@@ -801,12 +801,12 @@ export default function CallLogDetails() {
             {callLog.cv_score && (
               <div className="p-3 bg-gradient-subtle rounded-lg border border-border/50">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">CV Score</span>
-                  <span className="text-xl font-semibold text-primary">{callLog.cv_score}/100</span>
+                  <span className="text-xs sm:text-sm font-medium">CV Score</span>
+                  <span className="text-lg sm:text-xl font-semibold text-primary">{callLog.cv_score}/100</span>
                 </div>
                 <RulerScore value={parseInt(callLog.cv_score)} />
                 {callLog.cv_score_reason && (
-                  <p className="text-sm text-muted-foreground mt-2">{callLog.cv_score_reason}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-2 break-words">{callLog.cv_score_reason}</p>
                 )}
               </div>
             )}
@@ -815,12 +815,12 @@ export default function CallLogDetails() {
             {callLog.linkedin_score && (
               <div className="p-3 bg-gradient-subtle rounded-lg border border-border/50">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">LinkedIn Score</span>
-                  <span className="text-xl font-semibold text-primary">{callLog.linkedin_score}/100</span>
+                  <span className="text-xs sm:text-sm font-medium">LinkedIn Score</span>
+                  <span className="text-lg sm:text-xl font-semibold text-primary">{callLog.linkedin_score}/100</span>
                 </div>
                 <RulerScore value={parseInt(callLog.linkedin_score)} />
                 {callLog.linkedin_score_reason && (
-                  <p className="text-sm text-muted-foreground mt-2">{callLog.linkedin_score_reason}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-2 break-words">{callLog.linkedin_score_reason}</p>
                 )}
               </div>
             )}
@@ -828,9 +828,9 @@ export default function CallLogDetails() {
             {/* Source */}
             {callLog.source && (
               <div className="p-3 bg-gradient-subtle rounded-lg border border-border/50">
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium">Source:</span>
-                  <Badge variant="outline">{callLog.source}</Badge>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs sm:text-sm font-medium">Source:</span>
+                  <Badge variant="outline" className="text-xs sm:text-sm">{callLog.source}</Badge>
                 </div>
               </div>
             )}
@@ -838,16 +838,16 @@ export default function CallLogDetails() {
         </Card>
 
         {/* Notes */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Notes</CardTitle>
+        <Card className="max-w-full overflow-hidden">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-base sm:text-lg md:text-xl">Notes</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
             <Textarea
               placeholder="Add your notes..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="min-h-[100px]"
+              className="min-h-[100px] text-sm sm:text-base"
             />
             {notesUpdatedByName && callLog?.notes && (
               <p className="text-xs text-muted-foreground">
@@ -857,8 +857,8 @@ export default function CallLogDetails() {
                 )}
               </p>
             )}
-            <Button onClick={saveNotes} disabled={saving} className="w-full">
-              <Save className="w-4 h-4 mr-2" />
+            <Button onClick={saveNotes} disabled={saving} className="w-full h-11 sm:h-10 text-sm sm:text-base min-h-[44px] sm:min-h-0">
+              <Save className="w-4 h-4 mr-2 flex-shrink-0" />
               {saving ? "Saving..." : "Save Notes"}
             </Button>
           </CardContent>
@@ -866,32 +866,32 @@ export default function CallLogDetails() {
       </div>
 
       {/* Pros & Cons */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-green-600">Pros</CardTitle>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 max-w-full">
+        <Card className="max-w-full overflow-hidden">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-green-600 text-base sm:text-lg md:text-xl">Pros</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="whitespace-pre-wrap break-words">{callLog.after_call_pros || 'No pros available'}</p>
+          <CardContent className="p-4 sm:p-6">
+            <p className="whitespace-pre-wrap break-words text-sm sm:text-base">{callLog.after_call_pros || 'No pros available'}</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-red-600">Cons</CardTitle>
+        <Card className="max-w-full overflow-hidden">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-red-600 text-base sm:text-lg md:text-xl">Cons</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="whitespace-pre-wrap break-words">{callLog.after_call_cons || 'No cons available'}</p>
+          <CardContent className="p-4 sm:p-6">
+            <p className="whitespace-pre-wrap break-words text-sm sm:text-base">{callLog.after_call_cons || 'No cons available'}</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Communication Skills */}
       {(callLog?.comm_summary || callLog?.comm_score) && (
-        <Card className="overflow-hidden animate-fade-in">
-          <CardHeader className="bg-gradient-primary/10">
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
+        <Card className="overflow-hidden animate-fade-in max-w-full">
+          <CardHeader className="bg-gradient-primary/10 p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
+              <User className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
               Communication Skills Assessment
             </CardTitle>
           </CardHeader>
@@ -900,24 +900,24 @@ export default function CallLogDetails() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border bg-muted/50">
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-semibold text-foreground">
                       Communication Skill Summary
                     </th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-foreground w-48">
-                      Communication Skill Score
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-center text-xs sm:text-sm font-semibold text-foreground w-32 sm:w-48">
+                      Score
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="border-b border-border/50 hover:bg-accent/50 transition-colors duration-200">
-                    <td className="px-6 py-4">
-                      <div className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
+                      <div className="text-xs sm:text-sm leading-relaxed text-foreground whitespace-pre-wrap break-words">
                         {callLog.comm_summary || 'No summary available'}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-center">
                       <div className="flex flex-col items-center gap-2">
-                        <div className={`text-3xl font-bold ${
+                        <div className={`text-2xl sm:text-3xl font-bold ${
                           callLog.comm_score && parseInt(callLog.comm_score) >= 8 
                             ? 'text-green-600 dark:text-green-400' 
                             : callLog.comm_score && parseInt(callLog.comm_score) >= 5 
@@ -928,7 +928,7 @@ export default function CallLogDetails() {
                           {callLog.comm_score && '/10'}
                         </div>
                         {callLog.comm_score && (
-                          <div className="w-full max-w-[120px]">
+                          <div className="w-full max-w-[100px] sm:max-w-[120px]">
                             <div className="h-2 bg-muted rounded-full overflow-hidden">
                               <div 
                                 className={`h-full transition-all duration-1000 ease-out ${
@@ -954,33 +954,33 @@ export default function CallLogDetails() {
       )}
 
       {/* Rejection & Hiring Reasons */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-600">
-              <XCircle className="h-5 w-5" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 max-w-full">
+        <Card className="max-w-full overflow-hidden">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-red-600 text-base sm:text-lg md:text-xl">
+              <XCircle className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
               Rejection Reason
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-900">
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">
+          <CardContent className="p-4 sm:p-6">
+            <div className="p-3 sm:p-4 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-900">
+              <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words">
                 {callLog.Reason_to_reject || 'No rejection reason recorded'}
               </p>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-600">
-              <ThumbsUp className="h-5 w-5" />
+        <Card className="max-w-full overflow-hidden">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-green-600 text-base sm:text-lg md:text-xl">
+              <ThumbsUp className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
               Hired Reason
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-900">
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">
+          <CardContent className="p-4 sm:p-6">
+            <div className="p-3 sm:p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-900">
+              <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words">
                 {callLog.Reason_to_Hire || 'No hiring reason recorded'}
               </p>
             </div>
@@ -990,38 +990,38 @@ export default function CallLogDetails() {
 
       {/* Qualifications */}
       {callLog?.qualifications && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
+        <Card className="max-w-full overflow-hidden">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
+              <FileText className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
               Qualifications
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="p-4 bg-secondary/50 rounded-lg border">
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">{callLog.qualifications}</p>
+          <CardContent className="p-4 sm:p-6">
+            <div className="p-3 sm:p-4 bg-secondary/50 rounded-lg border">
+              <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words">{callLog.qualifications}</p>
             </div>
           </CardContent>
         </Card>
       )}
 
       {/* Transcript */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Transcript</CardTitle>
+      <Card className="max-w-full overflow-hidden">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-base sm:text-lg md:text-xl">Transcript</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6">
           <div className="space-y-3">
             <div className="relative">
-              <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 flex-shrink-0" />
               <Input
                 placeholder="Search transcript keywords..."
-                className="pl-9"
+                className="pl-10 h-11 sm:h-9 text-sm min-w-0 w-full"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            <div className="max-h-60 overflow-y-auto text-sm leading-relaxed">
+            <div className="max-h-60 overflow-y-auto text-xs sm:text-sm leading-relaxed">
               {callLog?.transcript ? (
                 <div className="whitespace-pre-wrap break-words">{highlightedTranscript}</div>
               ) : (
