@@ -132,14 +132,13 @@ export default function Candidates() {
           title="CVs Database"
           subtitle="View and manage all uploaded CVs"
           actions={
-            <div className="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex sm:flex-row mt-2 sm:mt-0">
-              <Button onClick={() => setBulkUploadOpen(true)} variant="outline" size="sm" className="gap-1.5 font-light font-inter text-xs h-11 sm:h-9 w-full min-h-[44px] sm:min-h-0">
-                <Upload className="w-3.5 h-3.5 sm:w-3.5 sm:h-3.5" />
-                <span className="hidden sm:inline">Add Multiple CVs</span>
-                <span className="sm:hidden">Bulk Upload</span>
+            <div className="hidden md:flex flex-row gap-2">
+              <Button onClick={() => setBulkUploadOpen(true)} variant="outline" size="sm" className="gap-1.5 font-light font-inter text-xs h-9">
+                <Upload className="w-3.5 h-3.5" />
+                Add Multiple CVs
               </Button>
-              <Button onClick={handleAddCandidate} size="sm" className="gap-1.5 font-light font-inter text-xs h-11 sm:h-9 w-full min-h-[44px] sm:min-h-0">
-                <UserPlus className="w-3.5 h-3.5 sm:w-3.5 sm:h-3.5" />
+              <Button onClick={handleAddCandidate} size="sm" className="gap-1.5 font-light font-inter text-xs h-9">
+                <UserPlus className="w-3.5 h-3.5" />
                 Add CV
               </Button>
             </div>
