@@ -2930,14 +2930,14 @@ mainCandidate["linkedin_score_reason"] ? (
       {/* Header */}
       <div className="flex flex-col gap-2 sm:gap-4 min-w-0 w-full max-w-full">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 sm:gap-4 items-start min-w-0 w-full">
-          <div className="flex items-center space-x-2 md:space-x-4 min-w-0 w-full lg:w-auto overflow-x-auto">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/jobs")} className="h-9 sm:h-10 px-3 sm:px-4 text-xs sm:text-sm flex-shrink-0">
-              <ArrowLeft className="w-4 h-4 mr-1 sm:mr-2" />
+        <div className="flex items-center space-x-2 md:space-x-4 min-w-0 w-full lg:w-auto">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/jobs")} className="h-11 sm:h-10 px-3 sm:px-4 text-sm sm:text-sm flex-shrink-0 min-h-[44px]">
+              <ArrowLeft className="w-4 h-4 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
               <span className="hidden sm:inline">Back to Jobs</span>
               <span className="sm:hidden">Back</span>
             </Button>
             <div className="h-6 w-px bg-border hidden sm:block flex-shrink-0" />
-            <h3 className="text-sm sm:text-xl md:text-2xl lg:text-3xl font-bold truncate min-w-0">Job Details</h3>
+            <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold truncate min-w-0">Job Details</h3>
           </div>
           {/* Futuristic 3D Action Menu */}
           <FuturisticActionButton
@@ -2954,9 +2954,9 @@ mainCandidate["linkedin_score_reason"] ? (
           </FuturisticActionButton>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-3 w-full lg:w-auto items-stretch sm:items-center justify-center lg:justify-end min-w-0">
-            <div className="flex items-center gap-1.5 sm:gap-2 justify-center sm:justify-start flex-shrink-0">
-              <span className="text-[9px] sm:text-xs md:text-sm font-medium whitespace-nowrap">Auto Dial</span>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full lg:w-auto items-stretch sm:items-center justify-center lg:justify-end min-w-0">
+            <div className="flex items-center gap-2 sm:gap-2 justify-center sm:justify-start flex-shrink-0 min-h-[44px]">
+              <span className="text-xs sm:text-xs md:text-sm font-medium whitespace-nowrap">Auto Dial</span>
               <ToggleSwitch
                 checked={job?.automatic_dial || false}
                 onChange={handleAutomaticDialToggle}
@@ -2966,12 +2966,12 @@ mainCandidate["linkedin_score_reason"] ? (
                 offLabel="OFF"
               />
             </div>
-            <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto h-10 sm:h-10 text-xs sm:text-sm min-w-0 px-3 sm:px-4">
-              <FileText className="w-4 h-4 mr-1 sm:mr-2 flex-shrink-0" />
+            <Button onClick={() => navigate(`/jobs/edit/${job.job_id}`)} size="sm" className="w-full sm:w-auto h-11 sm:h-10 text-sm sm:text-sm min-w-0 px-4 sm:px-4 min-h-[44px]">
+              <FileText className="w-4 h-4 sm:w-4 sm:h-4 mr-2 sm:mr-2 flex-shrink-0" />
               <span className="hidden sm:inline">Edit Job</span>
               <span className="sm:hidden">Edit</span>
             </Button>
-            <Button variant="outline" asChild size="sm" className="w-full sm:w-auto h-10 sm:h-10 text-xs sm:text-sm min-w-0 px-3 sm:px-4">
+            <Button variant="outline" asChild size="sm" className="w-full sm:w-auto h-11 sm:h-10 text-sm sm:text-sm min-w-0 px-4 sm:px-4 min-h-[44px]">
               <Link to={`/job/${job.job_id}/apply`}>
                 <span className="hidden sm:inline">Apply Link</span>
                 <span className="sm:hidden">Apply</span>
@@ -3353,7 +3353,7 @@ mainCandidate["linkedin_score_reason"] ? (
               {/* Application Filters */}
               <Card className="mb-4">
                 <CardContent className="pt-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 w-full max-w-full">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Name</label>
                       <Input
@@ -3414,7 +3414,7 @@ mainCandidate["linkedin_score_reason"] ? (
                       <div className="mb-4 text-sm text-muted-foreground">
                         Showing {filteredApplications.length} of {applications.length} applications
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 w-full max-w-full">
                         {filteredApplications.map((application) => (
                           <Card
                             key={application.candidate_id}
@@ -3687,49 +3687,49 @@ mainCandidate["linkedin_score_reason"] ? (
                         </Button>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-2 sm:gap-3 min-w-0">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 min-w-0 w-full">
                       <div className="relative min-w-0">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 flex-shrink-0" />
                         <Input
                           placeholder="Name..."
                           value={nameFilter}
                           onChange={(e) => setNameFilter(e.target.value)}
-                          className="pl-10 h-9 text-sm min-w-0"
+                          className="pl-10 h-11 text-sm min-w-0 w-full"
                         />
                       </div>
                       <Input
                         placeholder="Email..."
                         value={emailFilter}
                         onChange={(e) => setEmailFilter(e.target.value)}
-                        className="h-9 text-sm min-w-0"
+                        className="h-11 text-sm min-w-0 w-full"
                       />
                       <Input
                         placeholder="Phone..."
                         value={phoneFilter}
                         onChange={(e) => setPhoneFilter(e.target.value)}
-                        className="h-9 text-sm min-w-0"
+                        className="h-11 text-sm min-w-0 w-full"
                       />
                       <Input
                         placeholder="User ID..."
                         value={userIdFilter}
                         onChange={(e) => setUserIdFilter(e.target.value)}
-                        className="h-9 text-sm min-w-0"
+                        className="h-11 text-sm min-w-0 w-full"
                       />
                       <Select value={longListSourceFilter} onValueChange={setLongListSourceFilter}>
-                        <SelectTrigger className="h-9 text-sm">
-                          <SelectValue placeholder="Source" />
+                        <SelectTrigger className="h-11 text-sm min-w-0">
+                          <SelectValue placeholder="Source" className="truncate" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="z-[60] bg-popover">
                           <SelectItem value="all">All Sources</SelectItem>
                           <SelectItem value="Itris">Itris</SelectItem>
                           <SelectItem value="Linkedin">LinkedIn</SelectItem>
                         </SelectContent>
                       </Select>
                       <Select value={scoreFilter} onValueChange={setScoreFilter}>
-                        <SelectTrigger className="h-9 text-sm">
-                          <SelectValue placeholder="Score" />
+                        <SelectTrigger className="h-11 text-sm min-w-0">
+                          <SelectValue placeholder="Score" className="truncate" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="z-[60] bg-popover">
                           <SelectItem value="all">All Scores</SelectItem>
                           <SelectItem value="high">High (75+)</SelectItem>
                           <SelectItem value="moderate">Moderate (50-74)</SelectItem>
@@ -3738,10 +3738,10 @@ mainCandidate["linkedin_score_reason"] ? (
                         </SelectContent>
                       </Select>
                       <Select value={contactedFilter} onValueChange={setContactedFilter}>
-                        <SelectTrigger className="h-9 text-sm">
-                          <SelectValue placeholder="Status" />
+                        <SelectTrigger className="h-11 text-sm min-w-0">
+                          <SelectValue placeholder="Status" className="truncate" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="z-[60] bg-popover">
                           <SelectItem value="all">All Status</SelectItem>
                           <SelectItem value="Not Contacted">Not Contacted</SelectItem>
                           <SelectItem value="Ready to Call">Ready to Contact</SelectItem>
@@ -3758,7 +3758,7 @@ mainCandidate["linkedin_score_reason"] ? (
                     </div>
                   </Card>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 w-full max-w-full">
                     {(() => {
                       // Filter longlisted candidates based on filters (show all candidates in Jobs_CVs)
                       const filteredLonglistedCandidates = longlistedCandidates.filter((candidate) => {
@@ -4329,7 +4329,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4 w-full max-w-full">
                       {(() => {
                         // Group within budget candidates by user_id and sort by score
                         const groupedWithinBudget = withinBudgetCandidates.reduce(
@@ -4454,7 +4454,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4 w-full max-w-full">
                       {(() => {
                         // Group above budget candidates by user_id and sort by Overall Score
                         const groupedAboveBudget = aboveBudgetCandidates.reduce(
@@ -4578,7 +4578,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4 w-full max-w-full">
                       {(() => {
                         // Group nationality mismatch candidates by user_id and sort by Overall Score
                         const groupedNationalityMismatch = notInPreferredNationalityCandidates.reduce(
@@ -4703,7 +4703,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4 w-full max-w-full">
                       {(() => {
                         // Group rejected candidates by user_id and sort by Overall Score
                         const groupedRejected = filteredRejectedCandidates.reduce(

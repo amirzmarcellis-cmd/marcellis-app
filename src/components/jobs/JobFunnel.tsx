@@ -96,19 +96,19 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
       </CardHeader>
       <CardContent className="pt-0">
         {/* Horizontal funnel layout */}
-        <div className="flex items-center justify-between space-x-2 mb-4">
+        <div className="flex flex-wrap md:flex-nowrap items-center justify-start md:justify-between gap-3 md:gap-2 mb-4 w-full">
           {stages.map((stage, index) => (
-            <div key={stage.name} className="flex items-center space-x-2">
-              <div className="flex flex-col items-center space-y-1 min-w-0 flex-1">
-                <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold", stage.bgColor, stage.textColor)}>
+            <div key={stage.name} className="flex items-center gap-2 sm:gap-2">
+              <div className="flex flex-col items-center gap-1 min-w-[60px] sm:min-w-0 flex-1">
+                <div className={cn("w-10 h-10 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold", stage.bgColor, stage.textColor)}>
                   {stage.count}
                 </div>
-                <span className="text-xs text-center text-muted-foreground truncate w-full">
+                <span className="text-[10px] sm:text-xs text-center text-muted-foreground line-clamp-2 w-full leading-tight">
                   {stage.name}
                 </span>
               </div>
               {index < stages.length - 1 && (
-                <ChevronRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                <ChevronRight className="w-3 h-3 text-muted-foreground flex-shrink-0 hidden md:block" />
               )}
             </div>
           ))}
