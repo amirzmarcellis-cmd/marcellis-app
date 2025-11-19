@@ -411,7 +411,7 @@ export default function EditJob() {
         </div>
       </div>
 
-      <Card className="mission-card">
+      <Card className="mission-card w-full max-w-full overflow-hidden">
         <CardHeader className="p-4 sm:p-6">
           <CardTitle className="text-xl sm:text-2xl md:text-3xl font-light font-work tracking-tight">Edit Job Posting</CardTitle>
           <CardDescription className="font-light font-inter text-sm sm:text-base">
@@ -419,9 +419,9 @@ export default function EditJob() {
           </CardDescription>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full min-w-0">
             <Tabs value={currentTab} onValueChange={setCurrentTab} className="space-y-4 sm:space-y-6">
-              <TabsList className="glass-card">
+              <TabsList className="glass-card p-1 sm:p-1.5 w-full overflow-x-auto">
                 <TabsTrigger value="details" className="min-h-[44px] text-xs sm:text-sm">Job Details</TabsTrigger>
                 <TabsTrigger value="documents" className="min-h-[44px] text-xs sm:text-sm">Documents</TabsTrigger>
                 <TabsTrigger value="amend" className="min-h-[44px] text-xs sm:text-sm">Ai Requirements</TabsTrigger>
@@ -457,7 +457,7 @@ export default function EditJob() {
                     <Label htmlFor="group">Group</Label>
                     <Select value={formData.group_id || "none"} onValueChange={(value) => setFormData(prev => ({ ...prev, group_id: value === "none" ? "" : value }))}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a group (optional)" />
+                        <SelectValue placeholder="Select a group (optional)" className="truncate" />
                       </SelectTrigger>
                       <SelectContent className="z-[60] bg-popover">
                         <SelectItem value="none">No Group</SelectItem>
@@ -655,7 +655,7 @@ export default function EditJob() {
                     <Label htmlFor="notice_period" className="text-sm sm:text-base">Notice Period</Label>
                       <Select value={formData.notice_period} onValueChange={(value) => setFormData(prev => ({ ...prev, notice_period: value }))}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select notice period" />
+                          <SelectValue placeholder="Select notice period" className="truncate" />
                         </SelectTrigger>
                         <SelectContent className="z-[60] bg-popover">
                           {noticePeriods.map((period) => (
@@ -670,7 +670,7 @@ export default function EditJob() {
                       <Label htmlFor="Currency">Currency</Label>
                       <Select value={formData.Currency} onValueChange={(value) => setFormData(prev => ({ ...prev, Currency: value }))}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select currency" />
+                          <SelectValue placeholder="Select currency" className="truncate" />
                         </SelectTrigger>
                         <SelectContent className="z-[60] bg-popover">
                           <SelectItem value="AED">AED</SelectItem>
@@ -700,7 +700,7 @@ export default function EditJob() {
                         }
                       }}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select countries to include..." />
+                          <SelectValue placeholder="Select countries to include..." className="truncate" />
                         </SelectTrigger>
                         <SelectContent className="max-h-60 z-[60] bg-popover">
                           <SelectItem value="European Countries" className="font-semibold text-primary">
@@ -719,11 +719,11 @@ export default function EditJob() {
                         </SelectContent>
                       </Select>
                       {nationalityToInclude.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
+                        <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2 max-w-full overflow-x-hidden">
                           {nationalityToInclude.map((country) => (
                             <span
                               key={country}
-                              className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary"
+                              className="inline-flex items-center px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-full text-xs sm:text-sm bg-primary/10 text-primary"
                             >
                               {country}
                               <button
@@ -731,7 +731,7 @@ export default function EditJob() {
                                 onClick={() => {
                                   setNationalityToInclude(nationalityToInclude.filter((n) => n !== country));
                                 }}
-                                className="ml-1 text-primary/60 hover:text-primary"
+                                className="ml-1 h-4 w-4 p-0.5 text-primary/60 hover:text-primary"
                               >
                                 ×
                               </button>
@@ -756,7 +756,7 @@ export default function EditJob() {
                         }
                       }}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select countries to exclude..." />
+                          <SelectValue placeholder="Select countries to exclude..." className="truncate" />
                         </SelectTrigger>
                         <SelectContent className="max-h-60 z-[60] bg-popover">
                           <SelectItem value="European Countries" className="font-semibold text-destructive">
@@ -775,11 +775,11 @@ export default function EditJob() {
                         </SelectContent>
                       </Select>
                       {nationalityToExclude.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
+                        <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2 max-w-full overflow-x-hidden">
                           {nationalityToExclude.map((country) => (
                             <span
                               key={country}
-                              className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-destructive/10 text-destructive"
+                              className="inline-flex items-center px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-full text-xs sm:text-sm bg-destructive/10 text-destructive"
                             >
                               {country}
                               <button
@@ -787,7 +787,7 @@ export default function EditJob() {
                                 onClick={() => {
                                   setNationalityToExclude(nationalityToExclude.filter((n) => n !== country));
                                 }}
-                                className="ml-1 text-destructive/60 hover:text-destructive"
+                                className="ml-1 h-4 w-4 p-0.5 text-destructive/60 hover:text-destructive"
                               >
                                 ×
                               </button>
@@ -812,7 +812,7 @@ export default function EditJob() {
                       }
                     }}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select preferred nationalities..." />
+                        <SelectValue placeholder="Select preferred nationalities..." className="truncate" />
                       </SelectTrigger>
                       <SelectContent className="max-h-60 z-[60] bg-popover">
                         <SelectItem value="European Countries" className="font-semibold text-primary">
@@ -831,11 +831,11 @@ export default function EditJob() {
                       </SelectContent>
                     </Select>
                     {preferedNationality.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2 max-w-full overflow-x-hidden">
                         {preferedNationality.map((country) => (
                           <span
                             key={country}
-                            className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-500/20 text-green-700 dark:text-green-300 border border-green-500/30"
+                            className="inline-flex items-center px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-full text-xs sm:text-sm bg-green-500/20 text-green-700 dark:text-green-300 border border-green-500/30"
                           >
                             {country}
                             <button
@@ -843,7 +843,7 @@ export default function EditJob() {
                               onClick={() => {
                                 setPreferedNationality(preferedNationality.filter((n) => n !== country));
                               }}
-                              className="ml-1 text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-100"
+                              className="ml-1 h-4 w-4 p-0.5 text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-100"
                             >
                               ×
                             </button>
@@ -867,7 +867,7 @@ export default function EditJob() {
                       }
                     }}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select not preferred nationalities..." />
+                        <SelectValue placeholder="Select not preferred nationalities..." className="truncate" />
                       </SelectTrigger>
                       <SelectContent className="max-h-60 z-[60] bg-popover">
                         <SelectItem value="European Countries" className="font-semibold text-primary">
@@ -886,11 +886,11 @@ export default function EditJob() {
                       </SelectContent>
                     </Select>
                     {notPreferedNationality.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2 max-w-full overflow-x-hidden">
                         {notPreferedNationality.map((country) => (
                           <span
                             key={country}
-                            className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-500/20 text-red-700 dark:text-red-300 border border-red-500/30"
+                            className="inline-flex items-center px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-full text-xs sm:text-sm bg-red-500/20 text-red-700 dark:text-red-300 border border-red-500/30"
                           >
                             {country}
                             <button
@@ -898,7 +898,7 @@ export default function EditJob() {
                               onClick={() => {
                                 setNotPreferedNationality(notPreferedNationality.filter((n) => n !== country));
                               }}
-                              className="ml-1 text-red-700 dark:text-red-300 hover:text-red-900 dark:hover:text-red-100"
+                              className="ml-1 h-4 w-4 p-0.5 text-red-700 dark:text-red-300 hover:text-red-900 dark:hover:text-red-100"
                             >
                               ×
                             </button>
@@ -913,7 +913,7 @@ export default function EditJob() {
                     <Label htmlFor="Type" className="text-sm sm:text-base">Job Type</Label>
                       <Select value={formData.Type} onValueChange={(value) => setFormData(prev => ({ ...prev, Type: value }))}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select job type" />
+                          <SelectValue placeholder="Select job type" className="truncate" />
                         </SelectTrigger>
                         <SelectContent className="z-[60] bg-popover">
                           <SelectItem value="Permanent">Permanent</SelectItem>
