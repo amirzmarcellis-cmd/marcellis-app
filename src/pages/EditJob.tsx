@@ -421,10 +421,10 @@ export default function EditJob() {
         <CardContent className="p-4 sm:p-6">
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full min-w-0">
             <Tabs value={currentTab} onValueChange={setCurrentTab} className="space-y-4 sm:space-y-6">
-              <TabsList className="glass-card p-1 sm:p-1.5 w-full overflow-x-auto">
-                <TabsTrigger value="details" className="min-h-[44px] text-xs sm:text-sm">Job Details</TabsTrigger>
-                <TabsTrigger value="documents" className="min-h-[44px] text-xs sm:text-sm">Documents</TabsTrigger>
-                <TabsTrigger value="amend" className="min-h-[44px] text-xs sm:text-sm">Ai Requirements</TabsTrigger>
+              <TabsList className="glass-card p-1 sm:p-1.5 w-full flex flex-wrap gap-1">
+                <TabsTrigger value="details" className="min-h=[44px] text-xs sm:text-sm">Job Details</TabsTrigger>
+                <TabsTrigger value="documents" className="min-h=[44px] text-xs sm:text-sm">Documents</TabsTrigger>
+                <TabsTrigger value="amend" className="min-h=[44px] text-xs sm:text-sm">Ai Requirements</TabsTrigger>
               </TabsList>
 
               <TabsContent value="details" className="space-y-4 sm:space-y-6">
@@ -480,7 +480,7 @@ export default function EditJob() {
                     <Label htmlFor="recruiter">Assigned Recruiter</Label>
                     <Select value={formData.recruiter_id || "none"} onValueChange={(value) => setFormData(prev => ({ ...prev, recruiter_id: value === "none" ? "" : value }))}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a recruiter (optional)" />
+                        <SelectValue placeholder="Select a recruiter (optional)" className="truncate" />
                       </SelectTrigger>
                       <SelectContent className="z-[60] bg-popover">
                         <SelectItem value="none">No Recruiter</SelectItem>
