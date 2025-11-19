@@ -220,8 +220,8 @@ export default function CandidateDetails() {
 
   if (loading) {
     return (
-      <div className="space-y-6 p-6">
-        <div className="flex items-center gap-3">
+      <div className="space-y-4 sm:space-y-6 p-3 sm:p-4 md:p-6 pb-20 sm:pb-24 max-w-full overflow-x-hidden">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Button
             variant="ghost"
             size="sm"
@@ -238,19 +238,19 @@ export default function CandidateDetails() {
                 navigate('/candidates');
               }
             }}
-            className="h-8 w-8 p-0"
+            className="h-10 w-10 sm:h-8 sm:w-8 p-0 flex-shrink-0 min-h-[44px] sm:min-h-0"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4 sm:h-4 sm:w-4" />
           </Button>
-          <User className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-bold">Candidate Details</h1>
+          <User className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold break-words min-w-0">Candidate Details</h1>
         </div>
-        <Card>
-          <CardContent className="p-6">
+        <Card className="max-w-full overflow-hidden">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
-            <p className="text-muted-foreground text-center">Loading candidate...</p>
+            <p className="text-muted-foreground text-center text-sm sm:text-base">Loading candidate...</p>
           </CardContent>
         </Card>
       </div>
@@ -259,8 +259,8 @@ export default function CandidateDetails() {
 
   if (!candidate) {
     return (
-      <div className="space-y-6 p-6">
-        <div className="flex items-center gap-3">
+      <div className="space-y-4 sm:space-y-6 p-3 sm:p-4 md:p-6 pb-20 sm:pb-24 max-w-full overflow-x-hidden">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Button
             variant="ghost"
             size="sm"
@@ -277,16 +277,16 @@ export default function CandidateDetails() {
                 navigate('/candidates');
               }
             }}
-            className="h-8 w-8 p-0"
+            className="h-10 w-10 sm:h-8 sm:w-8 p-0 flex-shrink-0 min-h-[44px] sm:min-h-0"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4 sm:h-4 sm:w-4" />
           </Button>
-          <User className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-bold">Candidate Details</h1>
+          <User className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold break-words min-w-0">Candidate Details</h1>
         </div>
-        <Card>
-          <CardContent className="p-6">
-            <p className="text-muted-foreground text-center">Candidate not found</p>
+        <Card className="max-w-full overflow-hidden">
+          <CardContent className="p-4 sm:p-6">
+            <p className="text-muted-foreground text-center text-sm sm:text-base">Candidate not found</p>
           </CardContent>
         </Card>
       </div>
@@ -294,8 +294,8 @@ export default function CandidateDetails() {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex items-center gap-3">
+    <div className="space-y-4 sm:space-y-6 p-3 sm:p-4 md:p-6 pb-20 sm:pb-24 max-w-full overflow-x-hidden">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
         <Button
           variant="ghost"
           size="sm"
@@ -312,46 +312,46 @@ export default function CandidateDetails() {
               navigate('/candidates');
             }
           }}
-          className="h-8 w-8 p-0"
+          className="h-10 w-10 sm:h-8 sm:w-8 p-0 flex-shrink-0 min-h-[44px] sm:min-h-0"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-4 w-4 sm:h-4 sm:w-4" />
         </Button>
-        <User className="h-6 w-6 text-primary" />
-        <h1 className="text-2xl font-bold">
+        <User className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold break-words min-w-0">
           {candidate.name}
         </h1>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
+      <Card className="max-w-full overflow-hidden">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
+            <User className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
             Contact Information
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
           {candidate.email && (
-            <div className="flex items-center gap-3">
-              <Mail className="h-4 w-4 text-muted-foreground" />
-              <span>{candidate.email}</span>
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="text-sm sm:text-base break-all">{candidate.email}</span>
             </div>
           )}
           {candidate.phone_number && (
-            <div className="flex items-center gap-3">
-              <Phone className="h-4 w-4 text-muted-foreground" />
-              <span>{candidate.phone_number}</span>
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="text-sm sm:text-base">{candidate.phone_number}</span>
             </div>
           )}
-          <div className="flex items-center gap-3">
-            <User className="h-4 w-4 text-muted-foreground" />
-            <span>User ID: {candidate.user_id}</span>
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <span className="text-sm sm:text-base break-all">User ID: {candidate.user_id}</span>
           </div>
           {candidate.cv_link && (
             <Button
               variant="outline"
               size="sm"
               onClick={() => window.open(candidate.cv_link!, '_blank')}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto h-11 sm:h-9 text-sm min-h-[44px] sm:min-h-0"
             >
               <ExternalLink className="h-4 w-4 mr-2" />
               View CV Link
@@ -360,20 +360,20 @@ export default function CandidateDetails() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Briefcase className="h-5 w-5" />
+      <Card className="max-w-full overflow-hidden">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
+            <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
             Associated Jobs
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6">
           {jobsLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : associatedJobs.length === 0 ? (
-            <p className="text-muted-foreground text-center py-4">
+            <p className="text-muted-foreground text-center py-4 text-sm sm:text-base">
               No jobs associated with this candidate
             </p>
           ) : (
@@ -387,12 +387,12 @@ export default function CandidateDetails() {
                 >
                   <Button
                     variant="ghost"
-                    className="w-full justify-start text-left h-auto py-2 px-3 hover:bg-accent"
+                    className="w-full justify-start text-left h-auto py-3 px-3 hover:bg-accent min-h-[44px]"
                     onClick={() => navigate(`/job/${job.job_id}`)}
                   >
-                    <div className="flex items-center gap-2 flex-1">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
                       <Briefcase className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                      <span className="flex-1">{job.job_title}</span>
+                      <span className="flex-1 text-sm sm:text-base break-words">{job.job_title}</span>
                     </div>
                   </Button>
                 </div>
@@ -402,42 +402,42 @@ export default function CandidateDetails() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
+      <Card className="max-w-full overflow-hidden">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
+            <FileText className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
             CV Content
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
           {candidate.cv_text ? (
             <>
-              <div className="flex items-center gap-3">
-                <div className="relative flex-1">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 min-w-0">
+                <div className="relative flex-1 min-w-0">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Search in CV content..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 h-11 sm:h-10 text-sm min-w-0 w-full"
                   />
                 </div>
                 {searchTerm && (
-                  <div className="text-sm text-muted-foreground whitespace-nowrap">
+                  <div className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap text-center sm:text-left">
                     {getSearchResultsCount(candidate.cv_text, searchTerm)} results
                   </div>
                 )}
               </div>
               <div 
-                className="whitespace-pre-wrap text-sm leading-relaxed bg-muted/30 p-4 rounded-lg border max-h-96 overflow-y-auto"
+                className="whitespace-pre-wrap text-xs sm:text-sm leading-relaxed bg-muted/30 p-3 sm:p-4 rounded-lg border max-h-96 overflow-y-auto break-words"
                 dangerouslySetInnerHTML={{
                   __html: highlightText(candidate.cv_text, searchTerm)
                 }}
               />
             </>
           ) : (
-            <div className="text-muted-foreground text-sm p-4 text-center bg-muted/20 rounded-lg border border-dashed">
-              <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            <div className="text-muted-foreground text-xs sm:text-sm p-4 text-center bg-muted/20 rounded-lg border border-dashed">
+              <FileText className="h-6 w-6 sm:h-8 sm:w-8 mx-auto mb-2 opacity-50" />
               <p>No CV content available for this candidate</p>
             </div>
           )}
