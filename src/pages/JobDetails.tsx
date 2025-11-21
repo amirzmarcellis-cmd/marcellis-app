@@ -4476,7 +4476,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4 w-full max-w-full">
+                    <div className="grid grid-cols-1 gap-3 sm:gap-4 pr-2 sm:pr-4 w-full max-w-full">
                       {(() => {
                         // Group within budget candidates by user_id and sort by score
                         const groupedWithinBudget = withinBudgetCandidates.reduce(
@@ -4601,7 +4601,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4 w-full max-w-full">
+                    <div className="grid grid-cols-1 gap-3 sm:gap-4 pr-2 sm:pr-4 w-full max-w-full">
                       {(() => {
                         // Group above budget candidates by user_id and sort by Overall Score
                         const groupedAboveBudget = aboveBudgetCandidates.reduce(
@@ -4725,7 +4725,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4 w-full max-w-full">
+                    <div className="grid grid-cols-1 gap-3 sm:gap-4 pr-2 sm:pr-4 w-full max-w-full">
                       {(() => {
                         // Group nationality mismatch candidates by user_id and sort by Overall Score
                         const groupedNationalityMismatch = notInPreferredNationalityCandidates.reduce(
@@ -4893,7 +4893,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4 w-full max-w-full">
+                    <div className="grid grid-cols-1 gap-3 sm:gap-4 pr-2 sm:pr-4 w-full max-w-full">
                       {(() => {
                         // Group rejected candidates by user_id and sort by Overall Score
                         const groupedRejected = filteredRejectedCandidates.reduce(
