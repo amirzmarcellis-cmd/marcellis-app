@@ -373,7 +373,7 @@ export default function JobDetails() {
         setActiveTab(isMobile ? "shortlist" : "overview");
       }
     }
-  }, [id, location.state]);
+  }, [id, location.state, isMobile]);
 
   // Check if auto dial should be turned off after 48 hours
   useEffect(() => {
