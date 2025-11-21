@@ -3062,35 +3062,61 @@ mainCandidate["linkedin_score_reason"] ? (
       {/* Detailed Information Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3 sm:space-y-4 min-w-0 w-full">
         <div className="w-full min-w-0 px-0 md:px-0 max-w-full overflow-x-auto">
-          <TabsList className="w-full min-w-0 flex flex-col gap-1 md:grid md:grid-cols-7 h-auto p-1 md:p-1">
-            <TabsTrigger value="overview" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="description" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
-              Description
-            </TabsTrigger>
-            <TabsTrigger value="requirements" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
-              AI Requirements
-            </TabsTrigger>
-            <TabsTrigger
-              value="applications"
-              className="w-full justify-start text-left text-xs sm:text-sm md:text-sm px-1.5 sm:px-2 md:px-3 py-1.5 sm:py-2 h-auto whitespace-normal leading-tight relative md:whitespace-nowrap"
-              onClick={handleApplicationsTabClick}
+          {isMobile ? (
+            <Select 
+              value={activeTab} 
+              onValueChange={(value) => {
+                if (value === "applications") {
+                  handleApplicationsTabClick();
+                }
+                setActiveTab(value);
+              }}
             >
-              Applications
-              {newApplicationsCount > 0 && (
-                <span className="absolute right-1.5 md:right-3 top-1/2 -translate-y-1/2 md:static md:translate-y-0 md:ml-2 bg-red-500 text-white text-[9px] sm:text-[10px] rounded-full h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 flex items-center justify-center min-w-[14px] sm:min-w-[16px] md:min-w-[20px] z-10">
-                  {newApplicationsCount > 99 ? "99+" : newApplicationsCount}
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="boolean-search" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
-              AI Longlist
-            </TabsTrigger>
-            <TabsTrigger value="shortlist" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
-              AI Short List
-            </TabsTrigger>
-          </TabsList>
+              <SelectTrigger className="w-full h-12 bg-background/95 backdrop-blur border-2">
+                <SelectValue placeholder="Select a tab" />
+              </SelectTrigger>
+              <SelectContent className="bg-background z-50">
+                <SelectItem value="overview">Overview</SelectItem>
+                <SelectItem value="description">Description</SelectItem>
+                <SelectItem value="requirements">AI Requirements</SelectItem>
+                <SelectItem value="applications">
+                  Applications {newApplicationsCount > 0 && `(${newApplicationsCount})`}
+                </SelectItem>
+                <SelectItem value="boolean-search">AI Longlist</SelectItem>
+                <SelectItem value="shortlist">AI Short List</SelectItem>
+              </SelectContent>
+            </Select>
+          ) : (
+            <TabsList className="w-full min-w-0 flex flex-col gap-1 md:grid md:grid-cols-7 h-auto p-1 md:p-1">
+              <TabsTrigger value="overview" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
+                Overview
+              </TabsTrigger>
+              <TabsTrigger value="description" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
+                Description
+              </TabsTrigger>
+              <TabsTrigger value="requirements" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
+                AI Requirements
+              </TabsTrigger>
+              <TabsTrigger
+                value="applications"
+                className="w-full justify-start text-left text-xs sm:text-sm md:text-sm px-1.5 sm:px-2 md:px-3 py-1.5 sm:py-2 h-auto whitespace-normal leading-tight relative md:whitespace-nowrap"
+                onClick={handleApplicationsTabClick}
+              >
+                Applications
+                {newApplicationsCount > 0 && (
+                  <span className="absolute right-1.5 md:right-3 top-1/2 -translate-y-1/2 md:static md:translate-y-0 md:ml-2 bg-red-500 text-white text-[9px] sm:text-[10px] rounded-full h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 flex items-center justify-center min-w-[14px] sm:min-w-[16px] md:min-w-[20px] z-10">
+                    {newApplicationsCount > 99 ? "99+" : newApplicationsCount}
+                  </span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="boolean-search" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
+                AI Longlist
+              </TabsTrigger>
+              <TabsTrigger value="shortlist" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
+                AI Short List
+              </TabsTrigger>
+            </TabsList>
+          )}
         </div>
 
         <TabsContent value="overview" className="space-y-2 sm:space-y-3 md:space-y-4 pb-20 sm:pb-24 md:pb-32 max-w-full">
