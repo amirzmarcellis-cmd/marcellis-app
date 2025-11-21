@@ -2267,8 +2267,8 @@ export default function JobDetails() {
     isTopCandidate: boolean = false,
   ) => {
     const cardClassName = isTopCandidate
-      ? "relative border-2 border-yellow-400 hover:border-yellow-500 transition-all duration-300 hover:shadow-2xl bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 dark:from-yellow-950/50 dark:via-amber-950/50 dark:to-orange-950/50 shadow-xl shadow-yellow-200/50 dark:shadow-yellow-900/30 ring-2 ring-yellow-300/60 dark:ring-yellow-600/40 before:absolute before:inset-0 before:bg-gradient-to-r before:from-yellow-300/10 before:via-amber-300/10 before:to-orange-300/10 before:rounded-lg before:animate-pulse"
-      : "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20";
+      ? "relative border-2 border-yellow-400 hover:border-yellow-500 transition-all duration-300 hover:shadow-2xl bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 dark:from-yellow-950/50 dark:via-amber-950/50 dark:to-orange-950/50 shadow-xl shadow-yellow-200/50 dark:shadow-yellow-900/30 ring-2 ring-yellow-300/60 dark:ring-yellow-600/40 before:absolute before:inset-0 before:bg-gradient-to-r before:from-yellow-300/10 before:via-amber-300/10 before:to-orange-300/10 before:rounded-lg before:animate-pulse min-h-screen md:min-h-0"
+      : "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20 min-h-screen md:min-h-0";
     return (
       <Card key={candidateId} id={`candidate-card-${candidateId}`} className={cardClassName}>
         <CardContent className="p-4 relative">
