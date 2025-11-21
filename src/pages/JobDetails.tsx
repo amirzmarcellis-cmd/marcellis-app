@@ -3132,6 +3132,10 @@ mainCandidate["linkedin_score_reason"] ? (
                   <span>{job.prefered_nationality || "N/A"}</span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-muted-foreground">Not Preferred Nationality:</span>
+                  <span className="text-destructive">{job.not_prefered_nationality || "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Group:</span>
                   <span className="flex items-center gap-2">
                     {jobGroup ? (
