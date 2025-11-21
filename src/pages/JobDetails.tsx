@@ -63,6 +63,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { formatDate } from "@/lib/utils";
 import { useProfile } from "@/hooks/useProfile";
 import { useButtonCooldown } from "@/hooks/useButtonCooldown";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -85,6 +86,7 @@ export default function JobDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState("overview");
   const [isShaking, setIsShaking] = useState(false);
   const { profile } = useProfile();
@@ -366,6 +368,9 @@ export default function JobDetails() {
       if (hash.startsWith("#tab=")) {
         const tab = hash.substring(5);
         setActiveTab(tab);
+      } else {
+        // No tab specified - set default based on device
+        setActiveTab(isMobile ? "shortlist" : "overview");
       }
     }
   }, [id, location.state]);
