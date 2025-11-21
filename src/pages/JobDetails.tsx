@@ -4453,7 +4453,7 @@ mainCandidate["linkedin_score_reason"] ? (
                     <SelectTrigger className="h-9 text-sm w-32">
                       <SelectValue placeholder="Source" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[70] bg-background">
                       <SelectItem value="all">All Sources</SelectItem>
                       <SelectItem value="Itris">Itris</SelectItem>
                       <SelectItem value="Linkedin">LinkedIn</SelectItem>
@@ -4463,7 +4463,7 @@ mainCandidate["linkedin_score_reason"] ? (
                     <SelectTrigger className="h-9 text-sm w-32">
                       <SelectValue placeholder="Score" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[70] bg-background">
                       <SelectItem value="all">All Scores</SelectItem>
                       <SelectItem value="90+">90+</SelectItem>
                       <SelectItem value="85+">85+</SelectItem>
@@ -4575,7 +4575,7 @@ mainCandidate["linkedin_score_reason"] ? (
                     <SelectTrigger className="h-9 text-sm w-32">
                       <SelectValue placeholder="Source" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[70] bg-background">
                       <SelectItem value="all">All Sources</SelectItem>
                       <SelectItem value="Itris">Itris</SelectItem>
                       <SelectItem value="Linkedin">LinkedIn</SelectItem>
@@ -4585,7 +4585,7 @@ mainCandidate["linkedin_score_reason"] ? (
                     <SelectTrigger className="h-9 text-sm w-32">
                       <SelectValue placeholder="Score" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[70] bg-background">
                       <SelectItem value="all">All Scores</SelectItem>
                       <SelectItem value="90+">90+</SelectItem>
                       <SelectItem value="85+">85+</SelectItem>
