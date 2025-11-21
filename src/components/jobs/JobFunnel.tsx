@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface JobFunnelProps {
   candidates: any[];
@@ -10,6 +11,8 @@ interface JobFunnelProps {
 }
 
 export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
+  const isMobile = useIsMobile();
+  
   // Memoize the counts calculation to avoid recalculating on every render
   const counts = useMemo(() => {
     // Only count Itris and LinkedIn candidates (matching AI Longlist tab logic)
@@ -73,7 +76,7 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
   }, [candidates]);
 
   // Memoize stages array
-  const stages = useMemo(() => [
+  const allStages = useMemo(() => [
     { name: "Longlist", count: counts.longlist, bgColor: "bg-blue-600", textColor: "text-black dark:text-white" },
     { name: "1st No Answer", count: counts.firstNoAnswer, bgColor: "bg-orange-500", textColor: "text-black dark:text-white" },
     { name: "2nd No Answer", count: counts.secondNoAnswer, bgColor: "bg-orange-600", textColor: "text-black dark:text-white" },
@@ -83,6 +86,15 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
     { name: "Shortlist", count: counts.shortlist, bgColor: "bg-emerald-600", textColor: "text-black dark:text-white" },
     { name: "Submitted", count: counts.submitted, bgColor: "bg-purple-600", textColor: "text-black dark:text-white" }
   ], [counts]);
+
+  // Mobile view shows only key stages
+  const mobileStages = useMemo(() => [
+    { name: "Longlist", count: counts.longlist, bgColor: "bg-blue-600", textColor: "text-black dark:text-white" },
+    { name: "Shortlist", count: counts.shortlist, bgColor: "bg-emerald-600", textColor: "text-black dark:text-white" },
+    { name: "Submitted", count: counts.submitted, bgColor: "bg-purple-600", textColor: "text-black dark:text-white" }
+  ], [counts]);
+
+  const stages = isMobile ? mobileStages : allStages;
 
   return (
     <Card className="w-full">
