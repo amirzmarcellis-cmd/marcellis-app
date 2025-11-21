@@ -3753,46 +3753,112 @@ mainCandidate["linkedin_score_reason"] ? (
                         onChange={(e) => setUserIdFilter(e.target.value)}
                         className="h-11 text-sm min-w-0 w-full"
                       />
-                      <Select value={longListSourceFilter} onValueChange={setLongListSourceFilter}>
-                        <SelectTrigger className="h-11 text-sm min-w-0">
-                          <SelectValue placeholder="Source" className="truncate" />
-                        </SelectTrigger>
-                        <SelectContent className="z-[60] bg-popover">
-                          <SelectItem value="all">All Sources</SelectItem>
-                          <SelectItem value="Itris">Itris</SelectItem>
-                          <SelectItem value="Linkedin">LinkedIn</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Select value={scoreFilter} onValueChange={setScoreFilter}>
-                        <SelectTrigger className="h-11 text-sm min-w-0">
-                          <SelectValue placeholder="Score" className="truncate" />
-                        </SelectTrigger>
-                        <SelectContent className="z-[60] bg-popover">
-                          <SelectItem value="all">All Scores</SelectItem>
-                          <SelectItem value="high">High (75+)</SelectItem>
-                          <SelectItem value="moderate">Moderate (50-74)</SelectItem>
-                          <SelectItem value="poor">Poor (1-49)</SelectItem>
-                          <SelectItem value="none">No Score</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Select value={contactedFilter} onValueChange={setContactedFilter}>
-                        <SelectTrigger className="h-11 text-sm min-w-0">
-                          <SelectValue placeholder="Status" className="truncate" />
-                        </SelectTrigger>
-                        <SelectContent className="z-[60] bg-popover">
-                          <SelectItem value="all">All Status</SelectItem>
-                          <SelectItem value="Not Contacted">Not Contacted</SelectItem>
-                          <SelectItem value="Ready to Call">Ready to Contact</SelectItem>
-                          <SelectItem value="Contacted">Contacted</SelectItem>
-                          <SelectItem value="Call Done">Call Done</SelectItem>
-                          <SelectItem value="1st No Answer">1st No Answer</SelectItem>
-                          <SelectItem value="2nd No Answer">2nd No Answer</SelectItem>
-                          <SelectItem value="3rd No Answer">3rd No Answer</SelectItem>
-                          <SelectItem value="Low Scored">Low Scored</SelectItem>
-                          <SelectItem value="Tasked">Tasked</SelectItem>
-                          <SelectItem value="Rejected">Rejected</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {isMobile ? (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" className="h-11 text-sm justify-between w-full">
+                              <span className="truncate">Source & Score Filters</span>
+                              <Filter className="h-4 w-4 ml-2 flex-shrink-0" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-full p-3 bg-background z-[70]" align="start">
+                            <div className="space-y-3">
+                              <div>
+                                <label className="text-xs font-medium mb-1.5 block">Source</label>
+                                <Select value={longListSourceFilter} onValueChange={setLongListSourceFilter}>
+                                  <SelectTrigger className="h-9 text-sm">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="z-[80] bg-background">
+                                    <SelectItem value="all">All Sources</SelectItem>
+                                    <SelectItem value="Itris">Itris</SelectItem>
+                                    <SelectItem value="Linkedin">LinkedIn</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <label className="text-xs font-medium mb-1.5 block">Score</label>
+                                <Select value={scoreFilter} onValueChange={setScoreFilter}>
+                                  <SelectTrigger className="h-9 text-sm">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="z-[80] bg-background">
+                                    <SelectItem value="all">All Scores</SelectItem>
+                                    <SelectItem value="high">High (75+)</SelectItem>
+                                    <SelectItem value="moderate">Moderate (50-74)</SelectItem>
+                                    <SelectItem value="poor">Poor (1-49)</SelectItem>
+                                    <SelectItem value="none">No Score</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <label className="text-xs font-medium mb-1.5 block">Status</label>
+                                <Select value={contactedFilter} onValueChange={setContactedFilter}>
+                                  <SelectTrigger className="h-9 text-sm">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="z-[80] bg-background">
+                                    <SelectItem value="all">All Status</SelectItem>
+                                    <SelectItem value="Not Contacted">Not Contacted</SelectItem>
+                                    <SelectItem value="Ready to Call">Ready to Contact</SelectItem>
+                                    <SelectItem value="Contacted">Contacted</SelectItem>
+                                    <SelectItem value="Call Done">Call Done</SelectItem>
+                                    <SelectItem value="1st No Answer">1st No Answer</SelectItem>
+                                    <SelectItem value="2nd No Answer">2nd No Answer</SelectItem>
+                                    <SelectItem value="3rd No Answer">3rd No Answer</SelectItem>
+                                    <SelectItem value="Low Scored">Low Scored</SelectItem>
+                                    <SelectItem value="Tasked">Tasked</SelectItem>
+                                    <SelectItem value="Rejected">Rejected</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      ) : (
+                        <>
+                          <Select value={longListSourceFilter} onValueChange={setLongListSourceFilter}>
+                            <SelectTrigger className="h-11 text-sm min-w-0">
+                              <SelectValue placeholder="Source" className="truncate" />
+                            </SelectTrigger>
+                            <SelectContent className="z-[60] bg-popover">
+                              <SelectItem value="all">All Sources</SelectItem>
+                              <SelectItem value="Itris">Itris</SelectItem>
+                              <SelectItem value="Linkedin">LinkedIn</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Select value={scoreFilter} onValueChange={setScoreFilter}>
+                            <SelectTrigger className="h-11 text-sm min-w-0">
+                              <SelectValue placeholder="Score" className="truncate" />
+                            </SelectTrigger>
+                            <SelectContent className="z-[60] bg-popover">
+                              <SelectItem value="all">All Scores</SelectItem>
+                              <SelectItem value="high">High (75+)</SelectItem>
+                              <SelectItem value="moderate">Moderate (50-74)</SelectItem>
+                              <SelectItem value="poor">Poor (1-49)</SelectItem>
+                              <SelectItem value="none">No Score</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Select value={contactedFilter} onValueChange={setContactedFilter}>
+                            <SelectTrigger className="h-11 text-sm min-w-0">
+                              <SelectValue placeholder="Status" className="truncate" />
+                            </SelectTrigger>
+                            <SelectContent className="z-[60] bg-popover">
+                              <SelectItem value="all">All Status</SelectItem>
+                              <SelectItem value="Not Contacted">Not Contacted</SelectItem>
+                              <SelectItem value="Ready to Call">Ready to Contact</SelectItem>
+                              <SelectItem value="Contacted">Contacted</SelectItem>
+                              <SelectItem value="Call Done">Call Done</SelectItem>
+                              <SelectItem value="1st No Answer">1st No Answer</SelectItem>
+                              <SelectItem value="2nd No Answer">2nd No Answer</SelectItem>
+                              <SelectItem value="3rd No Answer">3rd No Answer</SelectItem>
+                              <SelectItem value="Low Scored">Low Scored</SelectItem>
+                              <SelectItem value="Tasked">Tasked</SelectItem>
+                              <SelectItem value="Rejected">Rejected</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </>
+                      )}
                     </div>
                   </Card>
 
@@ -4324,32 +4390,81 @@ mainCandidate["linkedin_score_reason"] ? (
                     onChange={(e) => setShortListUserIdFilter(e.target.value)}
                     className="h-11 sm:h-9 text-sm min-w-0 w-full"
                   />
-                  <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
-                    <SelectTrigger className="h-11 sm:h-9 text-sm min-w-0 w-full">
-                      <SelectValue placeholder="Source" className="truncate" />
-                    </SelectTrigger>
-                    <SelectContent className="z-[60] bg-popover">
-                      <SelectItem value="all">All Sources</SelectItem>
-                      <SelectItem value="Itris">Itris</SelectItem>
-                      <SelectItem value="Linkedin">LinkedIn</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
-                    <SelectTrigger className="h-11 sm:h-9 text-sm min-w-0 w-full">
-                      <SelectValue placeholder="Score" className="truncate" />
-                    </SelectTrigger>
-                    <SelectContent className="z-[60] bg-popover">
-                      <SelectItem value="all">All Scores</SelectItem>
-                      <SelectItem value="90+">90+</SelectItem>
-                      <SelectItem value="85+">85+</SelectItem>
-                      <SelectItem value="80+">80+</SelectItem>
-                      <SelectItem value="75+">75+</SelectItem>
-                      <SelectItem value="70+">70+</SelectItem>
-                      <SelectItem value="high">High (85+)</SelectItem>
-                      <SelectItem value="medium">Medium (70-84)</SelectItem>
-                      <SelectItem value="low">Low (&lt;70)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {isMobile ? (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="h-11 text-sm justify-between w-full">
+                          <span className="truncate">Source & Score Filters</span>
+                          <Filter className="h-4 w-4 ml-2 flex-shrink-0" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-3 bg-background z-[70]" align="start">
+                        <div className="space-y-3">
+                          <div>
+                            <label className="text-xs font-medium mb-1.5 block">Source</label>
+                            <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
+                              <SelectTrigger className="h-9 text-sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="z-[80] bg-background">
+                                <SelectItem value="all">All Sources</SelectItem>
+                                <SelectItem value="Itris">Itris</SelectItem>
+                                <SelectItem value="Linkedin">LinkedIn</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium mb-1.5 block">Score</label>
+                            <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
+                              <SelectTrigger className="h-9 text-sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="z-[80] bg-background">
+                                <SelectItem value="all">All Scores</SelectItem>
+                                <SelectItem value="90+">90+</SelectItem>
+                                <SelectItem value="85+">85+</SelectItem>
+                                <SelectItem value="80+">80+</SelectItem>
+                                <SelectItem value="75+">75+</SelectItem>
+                                <SelectItem value="70+">70+</SelectItem>
+                                <SelectItem value="high">High (85+)</SelectItem>
+                                <SelectItem value="medium">Medium (70-84)</SelectItem>
+                                <SelectItem value="low">Low (&lt;70)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  ) : (
+                    <>
+                      <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
+                        <SelectTrigger className="h-11 sm:h-9 text-sm min-w-0 w-full">
+                          <SelectValue placeholder="Source" className="truncate" />
+                        </SelectTrigger>
+                        <SelectContent className="z-[60] bg-popover">
+                          <SelectItem value="all">All Sources</SelectItem>
+                          <SelectItem value="Itris">Itris</SelectItem>
+                          <SelectItem value="Linkedin">LinkedIn</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
+                        <SelectTrigger className="h-11 sm:h-9 text-sm min-w-0 w-full">
+                          <SelectValue placeholder="Score" className="truncate" />
+                        </SelectTrigger>
+                        <SelectContent className="z-[60] bg-popover">
+                          <SelectItem value="all">All Scores</SelectItem>
+                          <SelectItem value="90+">90+</SelectItem>
+                          <SelectItem value="85+">85+</SelectItem>
+                          <SelectItem value="80+">80+</SelectItem>
+                          <SelectItem value="75+">75+</SelectItem>
+                          <SelectItem value="70+">70+</SelectItem>
+                          <SelectItem value="high">High (85+)</SelectItem>
+                          <SelectItem value="medium">Medium (70-84)</SelectItem>
+                          <SelectItem value="low">Low (&lt;70)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </>
+                  )}
                 </div>
               </CardHeader>
               <CardContent className="p-3 sm:p-6">
@@ -4690,32 +4805,81 @@ mainCandidate["linkedin_score_reason"] ? (
                     onChange={(e) => setShortListUserIdFilter(e.target.value)}
                     className="h-11 sm:h-9 text-sm min-w-0 w-full"
                   />
-                  <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
-                    <SelectTrigger className="h-11 sm:h-9 text-sm min-w-0 w-full">
-                      <SelectValue placeholder="Source" className="truncate" />
-                    </SelectTrigger>
-                    <SelectContent className="z-[60] bg-popover">
-                      <SelectItem value="all">All Sources</SelectItem>
-                      <SelectItem value="Itris">Itris</SelectItem>
-                      <SelectItem value="Linkedin">LinkedIn</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
-                    <SelectTrigger className="h-11 sm:h-9 text-sm min-w-0 w-full">
-                      <SelectValue placeholder="Score" className="truncate" />
-                    </SelectTrigger>
-                    <SelectContent className="z-[60] bg-popover">
-                      <SelectItem value="all">All Scores</SelectItem>
-                      <SelectItem value="90+">90+</SelectItem>
-                      <SelectItem value="85+">85+</SelectItem>
-                      <SelectItem value="80+">80+</SelectItem>
-                      <SelectItem value="75+">75+</SelectItem>
-                      <SelectItem value="70+">70+</SelectItem>
-                      <SelectItem value="high">High (85+)</SelectItem>
-                      <SelectItem value="medium">Medium (70-84)</SelectItem>
-                      <SelectItem value="low">Low (&lt;70)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {isMobile ? (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="h-11 text-sm justify-between w-full">
+                          <span className="truncate">Source & Score Filters</span>
+                          <Filter className="h-4 w-4 ml-2 flex-shrink-0" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-3 bg-background z-[70]" align="start">
+                        <div className="space-y-3">
+                          <div>
+                            <label className="text-xs font-medium mb-1.5 block">Source</label>
+                            <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
+                              <SelectTrigger className="h-9 text-sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="z-[80] bg-background">
+                                <SelectItem value="all">All Sources</SelectItem>
+                                <SelectItem value="Itris">Itris</SelectItem>
+                                <SelectItem value="Linkedin">LinkedIn</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium mb-1.5 block">Score</label>
+                            <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
+                              <SelectTrigger className="h-9 text-sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="z-[80] bg-background">
+                                <SelectItem value="all">All Scores</SelectItem>
+                                <SelectItem value="90+">90+</SelectItem>
+                                <SelectItem value="85+">85+</SelectItem>
+                                <SelectItem value="80+">80+</SelectItem>
+                                <SelectItem value="75+">75+</SelectItem>
+                                <SelectItem value="70+">70+</SelectItem>
+                                <SelectItem value="high">High (85+)</SelectItem>
+                                <SelectItem value="medium">Medium (70-84)</SelectItem>
+                                <SelectItem value="low">Low (&lt;70)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  ) : (
+                    <>
+                      <Select value={shortListSourceFilter} onValueChange={setShortListSourceFilter}>
+                        <SelectTrigger className="h-11 sm:h-9 text-sm min-w-0 w-full">
+                          <SelectValue placeholder="Source" className="truncate" />
+                        </SelectTrigger>
+                        <SelectContent className="z-[60] bg-popover">
+                          <SelectItem value="all">All Sources</SelectItem>
+                          <SelectItem value="Itris">Itris</SelectItem>
+                          <SelectItem value="Linkedin">LinkedIn</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={shortListScoreFilter} onValueChange={setShortListScoreFilter}>
+                        <SelectTrigger className="h-11 sm:h-9 text-sm min-w-0 w-full">
+                          <SelectValue placeholder="Score" className="truncate" />
+                        </SelectTrigger>
+                        <SelectContent className="z-[60] bg-popover">
+                          <SelectItem value="all">All Scores</SelectItem>
+                          <SelectItem value="90+">90+</SelectItem>
+                          <SelectItem value="85+">85+</SelectItem>
+                          <SelectItem value="80+">80+</SelectItem>
+                          <SelectItem value="75+">75+</SelectItem>
+                          <SelectItem value="70+">70+</SelectItem>
+                          <SelectItem value="high">High (85+)</SelectItem>
+                          <SelectItem value="medium">Medium (70-84)</SelectItem>
+                          <SelectItem value="low">Low (&lt;70)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </>
+                  )}
                 </div>
               </CardHeader>
               <CardContent>
