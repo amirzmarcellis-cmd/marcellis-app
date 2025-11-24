@@ -5109,9 +5109,11 @@ mainCandidate["linkedin_score_reason"] ? (
                             : "No longlisted candidates yet"}
                         </p>
                         {analyticsData.timeToLonglist !== null && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Time taken: {formatDuration(analyticsData.timeToLonglist)}
-                          </p>
+                          <div className="mt-2 p-2 rounded-md bg-primary/10 border border-primary/20">
+                            <p className="text-sm font-semibold text-primary">
+                              Time taken: {formatDuration(analyticsData.timeToLonglist)}
+                            </p>
+                          </div>
                         )}
                       </div>
 
@@ -5126,9 +5128,11 @@ mainCandidate["linkedin_score_reason"] ? (
                             : "No shortlisted candidates yet"}
                         </p>
                         {analyticsData.timeToShortlist !== null && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Time from longlist: {formatDuration(analyticsData.timeToShortlist)}
-                          </p>
+                          <div className="mt-2 p-2 rounded-md bg-primary/10 border border-primary/20">
+                            <p className="text-sm font-semibold text-primary">
+                              Time from longlist: {formatDuration(analyticsData.timeToShortlist)}
+                            </p>
+                          </div>
                         )}
                       </div>
                     </div>
