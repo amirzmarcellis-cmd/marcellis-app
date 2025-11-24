@@ -133,6 +133,7 @@ export default function JobDetails() {
     firstShortlistedDate: string | null;
     timeToLonglist: number | null;
     timeToShortlist: number | null;
+    averageTimeToShortlist: number | null;
     sourceCounts: Record<string, number>;
     totalCandidates: number;
     shortlistedCandidates: Array<{
@@ -146,6 +147,7 @@ export default function JobDetails() {
     firstShortlistedDate: null,
     timeToLonglist: null,
     timeToShortlist: null,
+    averageTimeToShortlist: null,
     sourceCounts: {},
     totalCandidates: 0,
     shortlistedCandidates: [],
@@ -2173,12 +2175,27 @@ export default function JobDetails() {
           };
         });
 
+      // Calculate average time to shortlist across all shortlisted candidates
+      let averageTimeToShortlist = null;
+      if (firstLonglistedDate && shortlistedCandidates.length > 0) {
+        const longlistDate = new Date(firstLonglistedDate);
+        const totalTime = shortlistedCandidates.reduce((sum, candidate) => {
+          if (candidate.shortlisted_at) {
+            const shortlistDate = new Date(candidate.shortlisted_at);
+            return sum + (shortlistDate.getTime() - longlistDate.getTime()) / (1000 * 60 * 60);
+          }
+          return sum;
+        }, 0);
+        averageTimeToShortlist = totalTime / shortlistedCandidates.length;
+      }
+
       setAnalyticsData({
         jobAddedDate: jobData?.Timestamp || null,
         firstLonglistedDate,
         firstShortlistedDate,
         timeToLonglist,
         timeToShortlist,
+        averageTimeToShortlist,
         sourceCounts,
         totalCandidates: candidatesData?.length || 0,
         shortlistedCandidates: shortlistedWithTimes,
@@ -5147,19 +5164,21 @@ mainCandidate["linkedin_score_reason"] ? (
                       <div className="p-4 rounded-lg bg-muted/50">
                         <div className="flex items-center mb-2">
                           <Star className="w-4 h-4 mr-2 text-muted-foreground" />
-                          <span className="text-sm font-medium">First Shortlisted</span>
+                          <span className="text-sm font-medium">Average Time to Shortlist</span>
                         </div>
-                        <p className="text-lg font-semibold">
-                          {analyticsData.firstShortlistedDate
-                            ? format(new Date(analyticsData.firstShortlistedDate), "dd MMM yyyy, HH:mm")
-                            : "No shortlisted candidates yet"}
-                        </p>
-                        {analyticsData.timeToShortlist !== null && (
+                        {analyticsData.averageTimeToShortlist !== null ? (
                           <div className="mt-2 p-2 rounded-md bg-primary/10 border border-primary/20">
-                            <p className="text-sm font-semibold text-primary">
-                              Time from longlist: {formatDuration(analyticsData.timeToShortlist)}
+                            <p className="text-lg font-semibold text-primary">
+                              {formatDuration(analyticsData.averageTimeToShortlist)}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              From first longlist to shortlist
                             </p>
                           </div>
+                        ) : (
+                          <p className="text-lg font-semibold">
+                            No shortlisted candidates yet
+                          </p>
                         )}
                       </div>
                     </div>
