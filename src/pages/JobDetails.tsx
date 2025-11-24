@@ -5145,19 +5145,21 @@ mainCandidate["linkedin_score_reason"] ? (
                       <div className="p-4 rounded-lg bg-muted/50">
                         <div className="flex items-center mb-2">
                           <Users className="w-4 h-4 mr-2 text-muted-foreground" />
-                          <span className="text-sm font-medium">First Longlisted</span>
+                          <span className="text-sm font-medium">Time to Longlist</span>
                         </div>
-                        <p className="text-lg font-semibold">
-                          {analyticsData.firstLonglistedDate
-                            ? format(new Date(analyticsData.firstLonglistedDate), "dd MMM yyyy, HH:mm")
-                            : "No longlisted candidates yet"}
-                        </p>
-                        {analyticsData.timeToLonglist !== null && (
+                        {analyticsData.timeToLonglist !== null ? (
                           <div className="mt-2 p-2 rounded-md bg-primary/10 border border-primary/20">
-                            <p className="text-sm font-semibold text-primary">
-                              Time taken: {formatDuration(analyticsData.timeToLonglist)}
+                            <p className="text-lg font-semibold text-primary">
+                              {formatDuration(analyticsData.timeToLonglist)}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              From job creation to first longlist
                             </p>
                           </div>
+                        ) : (
+                          <p className="text-lg font-semibold">
+                            No longlisted candidates yet
+                          </p>
                         )}
                       </div>
 
