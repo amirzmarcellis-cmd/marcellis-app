@@ -135,6 +135,11 @@ export default function JobDetails() {
     timeToShortlist: number | null;
     sourceCounts: Record<string, number>;
     totalCandidates: number;
+    shortlistedCandidates: Array<{
+      candidate_name: string | null;
+      shortlisted_at: string;
+      timeFromLonglist: number;
+    }>;
   }>({
     jobAddedDate: null,
     firstLonglistedDate: null,
@@ -143,6 +148,7 @@ export default function JobDetails() {
     timeToShortlist: null,
     sourceCounts: {},
     totalCandidates: 0,
+    shortlistedCandidates: [],
   });
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   
@@ -2107,7 +2113,7 @@ export default function JobDetails() {
       // Fetch all candidates for this job
       const { data: candidatesData, error: candidatesError } = await supabase
         .from("Jobs_CVs")
-        .select("longlisted_at, shortlisted_at, source")
+        .select("longlisted_at, shortlisted_at, source, candidate_name")
         .eq("job_id", jobId)
         .order("longlisted_at", { ascending: true, nullsLast: true });
 
@@ -2147,6 +2153,26 @@ export default function JobDetails() {
         sourceCounts[source] = (sourceCounts[source] || 0) + 1;
       });
 
+      // Get first 6 shortlisted candidates with their time from longlist
+      const shortlistedWithTimes = shortlistedCandidates
+        .sort((a, b) => 
+          new Date(a.shortlisted_at!).getTime() - new Date(b.shortlisted_at!).getTime()
+        )
+        .slice(0, 6)
+        .map(candidate => {
+          let timeFromLonglist = 0;
+          if (firstLonglistedDate && candidate.shortlisted_at) {
+            const longlistDate = new Date(firstLonglistedDate);
+            const shortlistDate = new Date(candidate.shortlisted_at);
+            timeFromLonglist = (shortlistDate.getTime() - longlistDate.getTime()) / (1000 * 60 * 60); // hours
+          }
+          return {
+            candidate_name: candidate.candidate_name,
+            shortlisted_at: candidate.shortlisted_at!,
+            timeFromLonglist,
+          };
+        });
+
       setAnalyticsData({
         jobAddedDate: jobData?.Timestamp || null,
         firstLonglistedDate,
@@ -2155,6 +2181,7 @@ export default function JobDetails() {
         timeToShortlist,
         sourceCounts,
         totalCandidates: candidatesData?.length || 0,
+        shortlistedCandidates: shortlistedWithTimes,
       });
     } catch (error) {
       console.error("Error fetching analytics data:", error);
@@ -5138,6 +5165,47 @@ mainCandidate["linkedin_score_reason"] ? (
                     </div>
                   </CardContent>
                 </Card>
+
+                {/* Time to Shortlist First 6 Candidates Card */}
+                {analyticsData.shortlistedCandidates.length > 0 && (
+                  <Card className="max-w-full overflow-hidden">
+                    <CardHeader className="p-3 sm:p-6">
+                      <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+                        <Clock className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
+                        Time to Shortlist (First 6 Candidates)
+                      </CardTitle>
+                      <CardDescription className="text-xs sm:text-sm mt-1">
+                        Time taken to shortlist each of the first 6 candidates from first longlist
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-3 sm:p-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                        {analyticsData.shortlistedCandidates.map((candidate, index) => (
+                          <div key={index} className="p-4 rounded-lg bg-muted/50 border border-border">
+                            <div className="flex items-center justify-between mb-2">
+                              <Badge variant="outline" className="text-xs">
+                                #{index + 1}
+                              </Badge>
+                              <UserCheck className="w-4 h-4 text-muted-foreground" />
+                            </div>
+                            <p className="text-sm font-medium mb-1 truncate" title={candidate.candidate_name || "Unknown"}>
+                              {candidate.candidate_name || "Unknown"}
+                            </p>
+                            <p className="text-xs text-muted-foreground mb-2">
+                              {format(new Date(candidate.shortlisted_at), "dd MMM, HH:mm")}
+                            </p>
+                            <div className="p-2 rounded-md bg-primary/10 border border-primary/20">
+                              <p className="text-xs font-semibold text-primary">
+                                {formatDuration(candidate.timeFromLonglist)}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
 
                 {/* Source Statistics Card */}
                 <Card className="max-w-full overflow-hidden">
