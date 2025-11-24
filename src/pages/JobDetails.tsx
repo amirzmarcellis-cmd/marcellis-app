@@ -125,6 +125,27 @@ export default function JobDetails() {
 
   // AI Long List filters
   const [longListSourceFilter, setLongListSourceFilter] = useState("all");
+  
+  // Analytics data
+  const [analyticsData, setAnalyticsData] = useState<{
+    jobAddedDate: string | null;
+    firstLonglistedDate: string | null;
+    firstShortlistedDate: string | null;
+    timeToLonglist: number | null;
+    timeToShortlist: number | null;
+    sourceCounts: Record<string, number>;
+    totalCandidates: number;
+  }>({
+    jobAddedDate: null,
+    firstLonglistedDate: null,
+    firstShortlistedDate: null,
+    timeToLonglist: null,
+    timeToShortlist: null,
+    sourceCounts: {},
+    totalCandidates: 0,
+  });
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isGeneratingShortList, setIsGeneratingShortList] = useState(false);
@@ -2063,6 +2084,109 @@ export default function JobDetails() {
     });
   };
   const timeOptions = ["00", "15", "30", "45"];
+  
+  // Fetch analytics data when analytics tab is selected
+  useEffect(() => {
+    if (activeTab === "analytics" && id) {
+      fetchAnalyticsData(id);
+    }
+  }, [activeTab, id]);
+
+  const fetchAnalyticsData = async (jobId: string) => {
+    setAnalyticsLoading(true);
+    try {
+      // Fetch job data for job added date
+      const { data: jobData, error: jobError } = await supabase
+        .from("Jobs")
+        .select("Timestamp")
+        .eq("job_id", jobId)
+        .single();
+
+      if (jobError) throw jobError;
+
+      // Fetch all candidates for this job
+      const { data: candidatesData, error: candidatesError } = await supabase
+        .from("Jobs_CVs")
+        .select("longlisted_at, shortlisted_at, source")
+        .eq("job_id", jobId)
+        .order("longlisted_at", { ascending: true, nullsLast: true });
+
+      if (candidatesError) throw candidatesError;
+
+      // Calculate first longlisted and first shortlisted
+      const longlistedCandidates = candidatesData?.filter(c => c.longlisted_at) || [];
+      const shortlistedCandidates = candidatesData?.filter(c => c.shortlisted_at) || [];
+
+      const firstLonglistedDate = longlistedCandidates.length > 0 ? longlistedCandidates[0].longlisted_at : null;
+      const firstShortlistedDate = shortlistedCandidates.length > 0 
+        ? shortlistedCandidates.sort((a, b) => 
+            new Date(a.shortlisted_at!).getTime() - new Date(b.shortlisted_at!).getTime()
+          )[0].shortlisted_at 
+        : null;
+
+      // Calculate time differences in hours
+      let timeToLonglist = null;
+      let timeToShortlist = null;
+
+      if (jobData?.Timestamp && firstLonglistedDate) {
+        const jobDate = new Date(jobData.Timestamp);
+        const longlistDate = new Date(firstLonglistedDate);
+        timeToLonglist = (longlistDate.getTime() - jobDate.getTime()) / (1000 * 60 * 60); // hours
+      }
+
+      if (firstLonglistedDate && firstShortlistedDate) {
+        const longlistDate = new Date(firstLonglistedDate);
+        const shortlistDate = new Date(firstShortlistedDate);
+        timeToShortlist = (shortlistDate.getTime() - longlistDate.getTime()) / (1000 * 60 * 60); // hours
+      }
+
+      // Count candidates by source
+      const sourceCounts: Record<string, number> = {};
+      candidatesData?.forEach(candidate => {
+        const source = candidate.source || "Unknown";
+        sourceCounts[source] = (sourceCounts[source] || 0) + 1;
+      });
+
+      setAnalyticsData({
+        jobAddedDate: jobData?.Timestamp || null,
+        firstLonglistedDate,
+        firstShortlistedDate,
+        timeToLonglist,
+        timeToShortlist,
+        sourceCounts,
+        totalCandidates: candidatesData?.length || 0,
+      });
+    } catch (error) {
+      console.error("Error fetching analytics data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load analytics data",
+        variant: "destructive",
+      });
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
+
+  // Helper function to format duration in hours to human-readable format
+  const formatDuration = (hours: number | null): string => {
+    if (hours === null) return "N/A";
+    
+    if (hours < 1) {
+      const minutes = Math.round(hours * 60);
+      return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+    } else if (hours < 24) {
+      return `${Math.round(hours)} hour${Math.round(hours) !== 1 ? 's' : ''}`;
+    } else {
+      const days = Math.floor(hours / 24);
+      const remainingHours = Math.round(hours % 24);
+      if (remainingHours === 0) {
+        return `${days} day${days !== 1 ? 's' : ''}`;
+      }
+      return `${days} day${days !== 1 ? 's' : ''} ${remainingHours} hour${remainingHours !== 1 ? 's' : ''}`;
+    }
+  };
+  
   const handleApplicationsTabClick = () => {
     // Reset notification count and update last viewed timestamp
     if (id) {
@@ -3084,10 +3208,11 @@ mainCandidate["linkedin_score_reason"] ? (
                 </SelectItem>
                 <SelectItem value="boolean-search">AI Longlist</SelectItem>
                 <SelectItem value="shortlist">AI Short List</SelectItem>
+                <SelectItem value="analytics">Job Analytics</SelectItem>
               </SelectContent>
             </Select>
           ) : (
-            <TabsList className="w-full min-w-0 flex flex-col gap-1 md:grid md:grid-cols-7 h-auto p-1 md:p-1">
+            <TabsList className="w-full min-w-0 flex flex-col gap-1 md:grid md:grid-cols-8 h-auto p-1 md:p-1">
               <TabsTrigger value="overview" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
                 Overview
               </TabsTrigger>
@@ -3114,6 +3239,9 @@ mainCandidate["linkedin_score_reason"] ? (
               </TabsTrigger>
               <TabsTrigger value="shortlist" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
                 AI Short List
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
+                Job Analytics
               </TabsTrigger>
             </TabsList>
           )}
@@ -4932,6 +5060,126 @@ mainCandidate["linkedin_score_reason"] ? (
                 )}
               </CardContent>
             </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="analytics" className="space-y-3 sm:space-y-6 pb-20 sm:pb-32 max-w-full">
+          <div className="space-y-4 sm:space-y-6">
+            {analyticsLoading ? (
+              <Card className="max-w-full overflow-hidden">
+                <CardContent className="p-6 text-center">
+                  <p>Loading analytics...</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <>
+                {/* Job Timeline Card */}
+                <Card className="max-w-full overflow-hidden">
+                  <CardHeader className="p-3 sm:p-6">
+                    <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+                      <Clock className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
+                      Job Timeline
+                    </CardTitle>
+                    <CardDescription className="text-xs sm:text-sm mt-1">
+                      Key milestones and time taken for recruitment stages
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-3 sm:p-6 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="p-4 rounded-lg bg-muted/50">
+                        <div className="flex items-center mb-2">
+                          <Calendar className="w-4 h-4 mr-2 text-muted-foreground" />
+                          <span className="text-sm font-medium">Job Added</span>
+                        </div>
+                        <p className="text-lg font-semibold">
+                          {analyticsData.jobAddedDate
+                            ? format(new Date(analyticsData.jobAddedDate), "dd MMM yyyy, HH:mm")
+                            : "N/A"}
+                        </p>
+                      </div>
+
+                      <div className="p-4 rounded-lg bg-muted/50">
+                        <div className="flex items-center mb-2">
+                          <Users className="w-4 h-4 mr-2 text-muted-foreground" />
+                          <span className="text-sm font-medium">First Longlisted</span>
+                        </div>
+                        <p className="text-lg font-semibold">
+                          {analyticsData.firstLonglistedDate
+                            ? format(new Date(analyticsData.firstLonglistedDate), "dd MMM yyyy, HH:mm")
+                            : "No longlisted candidates yet"}
+                        </p>
+                        {analyticsData.timeToLonglist !== null && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Time taken: {formatDuration(analyticsData.timeToLonglist)}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="p-4 rounded-lg bg-muted/50">
+                        <div className="flex items-center mb-2">
+                          <Star className="w-4 h-4 mr-2 text-muted-foreground" />
+                          <span className="text-sm font-medium">First Shortlisted</span>
+                        </div>
+                        <p className="text-lg font-semibold">
+                          {analyticsData.firstShortlistedDate
+                            ? format(new Date(analyticsData.firstShortlistedDate), "dd MMM yyyy, HH:mm")
+                            : "No shortlisted candidates yet"}
+                        </p>
+                        {analyticsData.timeToShortlist !== null && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Time from longlist: {formatDuration(analyticsData.timeToShortlist)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Source Statistics Card */}
+                <Card className="max-w-full overflow-hidden">
+                  <CardHeader className="p-3 sm:p-6">
+                    <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+                      <Target className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0" />
+                      Source Statistics
+                    </CardTitle>
+                    <CardDescription className="text-xs sm:text-sm mt-1">
+                      Breakdown of candidates by source ({analyticsData.totalCandidates} total candidates)
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-3 sm:p-6">
+                    {Object.keys(analyticsData.sourceCounts).length > 0 ? (
+                      <div className="space-y-4">
+                        {Object.entries(analyticsData.sourceCounts)
+                          .sort(([, a], [, b]) => b - a)
+                          .map(([source, count]) => (
+                            <div key={source} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                              <div className="flex items-center gap-3 flex-1">
+                                <div className="w-2 h-2 rounded-full bg-primary" />
+                                <span className="font-medium">{source || "Unknown"}</span>
+                              </div>
+                              <div className="flex items-center gap-4">
+                                <div className="w-32 sm:w-48 h-2 bg-muted rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full bg-primary rounded-full transition-all"
+                                    style={{
+                                      width: `${(count / analyticsData.totalCandidates) * 100}%`,
+                                    }}
+                                  />
+                                </div>
+                                <span className="text-lg font-semibold w-12 text-right">{count}</span>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    ) : (
+                      <p className="text-center text-muted-foreground py-8">
+                        No candidate data available yet
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </div>
         </TabsContent>
       </Tabs>
