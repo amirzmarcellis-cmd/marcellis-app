@@ -991,19 +991,27 @@ export default function AddJob() {
             {/* Contract Length (conditional) */}
             {formData.type === "Contract" && (
               <div className="space-y-2">
-                <Label htmlFor="contractLength" className="font-medium">Contract Length</Label>
-                <Select value={formData.contractLength} onValueChange={(value) => handleInputChange("contractLength", value)}>
-                  <SelectTrigger className="h-11">
-                    <SelectValue placeholder="Select contract length" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {contractLengths.map((length) => (
-                      <SelectItem key={length} value={length}>
-                        {length}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="contractLength" className="font-medium">
+                  Contract Length: {(() => {
+                    const months = parseInt(formData.contractLength) || 6;
+                    return `${months} ${months === 1 ? 'Month' : 'Months'}`;
+                  })()}
+                </Label>
+                <Slider
+                  value={[parseInt(formData.contractLength) || 6]}
+                  onValueChange={(value) => {
+                    const months = value[0];
+                    handleInputChange("contractLength", `${months} ${months === 1 ? 'Month' : 'Months'}`);
+                  }}
+                  max={24}
+                  min={1}
+                  step={1}
+                  className="w-full mt-4"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>1 month</span>
+                  <span>24 months</span>
+                </div>
               </div>
             )}
           </CardContent>
