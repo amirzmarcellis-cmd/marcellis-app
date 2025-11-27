@@ -655,18 +655,35 @@ export default function EditJob() {
                     </div>
                     <div className="space-y-4">
                       <Label>Salary: {salaryRange[0].toLocaleString()}</Label>
-                      <Slider
-                        value={salaryRange}
-                        onValueChange={setSalaryRange}
-                        max={formData.Currency === "INR" ? 10000000 : 100000}
-                        min={1000}
-                        step={formData.Currency === "INR" ? 10000 : 500}
-                        className="w-full"
-                      />
-                      <div className="flex justify-between text-sm text-muted-foreground">
-                        <span>1,000</span>
-                        <span>{formData.Currency === "INR" ? "10,000,000" : "100,000"}</span>
-                      </div>
+                      
+                      {formData.Currency === "INR" ? (
+                        <Input
+                          type="number"
+                          value={salaryRange[0]}
+                          onChange={(e) => {
+                            const value = Math.min(Math.max(Number(e.target.value) || 0, 1000), 10000000);
+                            setSalaryRange([value]);
+                          }}
+                          placeholder="Enter salary amount"
+                          min={1000}
+                          max={10000000}
+                        />
+                      ) : (
+                        <>
+                          <Slider
+                            value={salaryRange}
+                            onValueChange={setSalaryRange}
+                            max={100000}
+                            min={1000}
+                            step={500}
+                            className="w-full"
+                          />
+                          <div className="flex justify-between text-sm text-muted-foreground">
+                            <span>1,000</span>
+                            <span>100,000</span>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
 
