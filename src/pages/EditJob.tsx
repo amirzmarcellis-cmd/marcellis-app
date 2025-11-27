@@ -962,20 +962,31 @@ export default function EditJob() {
                     
                     {formData.Type === "Contract" && (
                   <div className="space-y-2 sm:space-y-3">
-                    <Label htmlFor="contract_length" className="text-sm sm:text-base">Contract Length</Label>
-                        <Select value={formData.contract_length || ""} onValueChange={(value) => setFormData(prev => ({ ...prev, contract_length: value }))}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select contract length" />
-                          </SelectTrigger>
-                          <SelectContent className="z-[60] bg-popover">
-                            {contractLengths.map((length) => (
-                              <SelectItem key={length} value={length}>
-                                {length}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                    <Label htmlFor="contract_length" className="text-sm sm:text-base">
+                      Contract Length: {(() => {
+                        const months = parseInt(formData.contract_length || "6") || 6;
+                        return `${months} ${months === 1 ? 'Month' : 'Months'}`;
+                      })()}
+                    </Label>
+                    <Slider
+                      value={[parseInt(formData.contract_length || "6") || 6]}
+                      onValueChange={(value) => {
+                        const months = value[0];
+                        setFormData(prev => ({ 
+                          ...prev, 
+                          contract_length: `${months} ${months === 1 ? 'Month' : 'Months'}`
+                        }));
+                      }}
+                      max={24}
+                      min={1}
+                      step={1}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>1 month</span>
+                      <span>24 months</span>
+                    </div>
+                  </div>
                     )}
                   </div>
                 </div>
