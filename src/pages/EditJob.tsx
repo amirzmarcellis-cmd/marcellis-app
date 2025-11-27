@@ -225,6 +225,24 @@ export default function EditJob() {
     fetchRecruiterLinkedInId();
   }, [formData.recruiter_id]);
 
+  // Reset salary when currency changes to/from INR
+  useEffect(() => {
+    const currentSalary = salaryRange[0];
+    
+    if (formData.Currency === 'INR' && currentSalary > 100000) {
+      // Already in INR range, no need to reset
+      return;
+    }
+    
+    if (formData.Currency !== 'INR' && currentSalary > 100000) {
+      // Switching from INR to other currency with INR-range value
+      setSalaryRange([10000]);
+    } else if (formData.Currency === 'INR' && currentSalary <= 100000) {
+      // Switching to INR from other currency
+      setSalaryRange([100000]);
+    }
+  }, [formData.Currency]);
+
   const fetchGroups = async () => {
     try {
       const { data, error } = await supabase
@@ -640,14 +658,14 @@ export default function EditJob() {
                       <Slider
                         value={salaryRange}
                         onValueChange={setSalaryRange}
-                        max={100000}
+                        max={formData.Currency === "INR" ? 10000000 : 100000}
                         min={1000}
-                        step={500}
+                        step={formData.Currency === "INR" ? 10000 : 500}
                         className="w-full"
                       />
                       <div className="flex justify-between text-sm text-muted-foreground">
                         <span>1,000</span>
-                        <span>100,000</span>
+                        <span>{formData.Currency === "INR" ? "10,000,000" : "100,000"}</span>
                       </div>
                     </div>
                   </div>
@@ -680,6 +698,7 @@ export default function EditJob() {
                           <SelectItem value="QAR">QAR</SelectItem>
                           <SelectItem value="USD">USD</SelectItem>
                           <SelectItem value="EUR">EUR</SelectItem>
+                          <SelectItem value="INR">INR</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
