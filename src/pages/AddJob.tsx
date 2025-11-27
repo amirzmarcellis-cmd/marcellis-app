@@ -436,7 +436,28 @@ export default function AddJob() {
   }, [currentJobId]);
 
   const handleInputChange = (field: string, value: string | boolean | number[] | string[]) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+      const newData = { ...prev, [field]: value };
+      
+      // Reset salary when currency changes to/from INR
+      if (field === 'currency') {
+        const oldCurrency = prev.currency;
+        const newCurrency = value as string;
+        
+        if (oldCurrency !== newCurrency) {
+          // If switching to INR, reset to a reasonable INR default
+          if (newCurrency === 'INR') {
+            newData.jobSalaryRange = [100000];
+          } 
+          // If switching from INR to other currencies, reset to standard default
+          else if (oldCurrency === 'INR') {
+            newData.jobSalaryRange = [10000];
+          }
+        }
+      }
+      
+      return newData;
+    });
 
     // Auto-save nationality fields with debounce
     if (['nationalityToInclude', 'nationalityToExclude', 'preferedNationality'].includes(field)) {
@@ -884,14 +905,14 @@ export default function AddJob() {
                 <Slider
                   value={formData.jobSalaryRange}
                   onValueChange={(value) => handleInputChange("jobSalaryRange", value)}
-                  max={100000}
+                  max={formData.currency === "INR" ? 10000000 : 100000}
                   min={1000}
-                  step={500}
+                  step={formData.currency === "INR" ? 10000 : 500}
                   className="w-full mt-4"
                 />
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>1,000</span>
-                  <span>100,000</span>
+                  <span>{formData.currency === "INR" ? "10,000,000" : "100,000"}</span>
                 </div>
               </div>
             </div>
@@ -929,6 +950,7 @@ export default function AddJob() {
                     <SelectItem value="QAR">QAR</SelectItem>
                     <SelectItem value="USD">USD</SelectItem>
                     <SelectItem value="EUR">EUR</SelectItem>
+                    <SelectItem value="INR">INR</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
