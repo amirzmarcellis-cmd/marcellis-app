@@ -820,9 +820,9 @@ export default function Index() {
                       </div>;
                 })}
                   {enrichedCandidates.length > 5 && <div className="text-center pt-4">
-                      <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border border-purple-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" onClick={() => window.location.href = '/live-feed'}>
-                        View All {enrichedCandidates.length} Candidates
-                        <Activity className="w-4 h-4 ml-2" />
+                      <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 border border-purple-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 [&]:text-white" onClick={() => window.location.href = '/live-feed'}>
+                        <span className="text-white">View All {enrichedCandidates.length} Candidates</span>
+                        <Activity className="w-4 h-4 ml-2 text-white" />
                       </Button>
                     </div>}
                 </div>
