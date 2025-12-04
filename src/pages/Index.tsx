@@ -629,13 +629,13 @@ export default function Index() {
   }
   return <div className="min-h-screen bg-background text-foreground relative overflow-hidden mx-auto max-w-screen-2xl pb-20">
       
-      <div className="mb-4 sm:mb-6 lg:mb-8 relative z-10">
-        <div className="rounded-xl sm:rounded-2xl border border-border/50 bg-gradient-card backdrop-blur-xl p-4 sm:p-5 lg:p-6 shadow-card animate-fade-in">
-          <div className="mb-4">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-light text-foreground mb-1">
+      <div className="mb-3 sm:mb-6 lg:mb-8 relative z-10 px-1 sm:px-0">
+        <div className="rounded-lg sm:rounded-2xl border border-border/50 bg-gradient-card backdrop-blur-xl p-3 sm:p-5 lg:p-6 shadow-card animate-fade-in">
+          <div className="mb-3 sm:mb-4">
+            <h1 className="text-xl sm:text-3xl lg:text-4xl font-light text-foreground mb-0.5 sm:mb-1">
               Mission Control
             </h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
+            <p className="text-xs sm:text-base text-muted-foreground">
               Welcome back, {profile?.name || 'Commander'}. Your day at a glance.
             </p>
           </div>
@@ -671,14 +671,14 @@ export default function Index() {
       </div>
 
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 relative z-10">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-6 relative z-10 px-1 sm:px-0">
         {/* Left Side - Job Control Panels - 30% width */}
-        <div className="space-y-3 sm:space-y-4 lg:col-span-1">
-          <h2 className="text-base sm:text-lg font-bold font-work text-cyan-300 mb-3 sm:mb-4 flex items-center">
+        <div className="space-y-2 sm:space-y-4 lg:col-span-1 order-2 lg:order-1">
+          <h2 className="text-sm sm:text-lg font-bold font-work text-cyan-300 mb-2 sm:mb-4 flex items-center">
             <Target className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
             Active Jobs Funnel
           </h2>
-          <ScrollArea className="h-[400px] sm:h-[500px] lg:h-[600px]">
+          <ScrollArea className="h-[280px] sm:h-[500px] lg:h-[600px]">
             <div className="space-y-3">
               {data?.activeJobs?.sort((a, b) => {
                 const aShortlist = jobStats[a.job_id]?.shortlist || 0;
@@ -732,98 +732,90 @@ export default function Index() {
         </div>
 
         {/* Right Side - Live Candidate Feed & Action Center - 60% width */}
-        <div className="space-y-4 sm:space-y-5 lg:space-y-6 lg:col-span-2 order-1 lg:order-2">
+        <div className="space-y-3 sm:space-y-5 lg:space-y-6 lg:col-span-2 order-1 lg:order-2">
           <ActivityTicker items={enrichedCandidates.slice(0, 10).map(c => `${c.candidate_name} • ${c.job_title} • ${parseFloat(c.success_score) || 0}`)} />
           {/* Live Candidate Feed */}
           <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20">
-            <CardHeader className="p-3 sm:p-4 lg:p-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
-                <CardTitle className="text-base sm:text-lg lg:text-xl text-cyan-300 flex items-center flex-wrap gap-2">
-                  <Activity className="h-4 w-4 sm:h-5 sm:w-5 animate-pulse text-cyan-400" />
-                  <span>Live Candidate Feed</span>
-                  <Badge className="bg-background/40 text-primary border-2 border-primary/60 glow-cyan animate-pulse text-xs">
+            <CardHeader className="p-2.5 sm:p-4 lg:p-6">
+              <div className="flex items-center justify-between gap-2">
+                <CardTitle className="text-sm sm:text-lg lg:text-xl text-cyan-300 flex items-center gap-1.5 sm:gap-2">
+                  <Activity className="h-3.5 w-3.5 sm:h-5 sm:w-5 animate-pulse text-cyan-400" />
+                  <span className="truncate">Live Candidate Feed</span>
+                  <Badge className="bg-background/40 text-primary border border-primary/60 glow-cyan animate-pulse text-[10px] sm:text-xs px-1.5 py-0.5">
                     LIVE
                   </Badge>
                 </CardTitle>
-                <div className="flex items-center space-x-2 w-full sm:w-auto justify-between sm:justify-start">
-                  <div className="flex items-center space-x-1.5">
-                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse"></div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="hidden sm:flex items-center space-x-1.5">
+                    <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse"></div>
                     <span className="text-xs text-emerald-300 font-medium">Active</span>
                   </div>
-                  <Button size="sm" className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white border border-cyan-400/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-xs h-8 px-3" onClick={() => window.location.href = '/live-feed'}>
+                  <Button size="sm" className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white border border-cyan-400/50 shadow-lg hover:shadow-xl transition-all duration-300 text-[10px] sm:text-xs h-7 sm:h-8 px-2 sm:px-3" onClick={() => window.location.href = '/live-feed'}>
                     <Activity className="w-3 h-3 sm:mr-1.5" />
                     <span className="hidden sm:inline">Open Feed</span>
                   </Button>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-3 sm:p-4 lg:p-6">
-              <ScrollArea className="h-[400px] sm:h-[450px] lg:h-[500px]">
+            <CardContent className="p-2 sm:p-4 lg:p-6">
+              <ScrollArea className="h-[320px] sm:h-[450px] lg:h-[500px]">
                 <div className="space-y-2 sm:space-y-3">
                   {enrichedCandidates.slice(0, 5).map((candidate, index) => {
                   const score = parseFloat(candidate.success_score) || 0;
                   const jobTitle = candidate.job_title || 'Unknown Position';
-                  return <div key={index} className={`bg-gradient-to-r rounded-lg sm:rounded-xl p-3 border ${index < 3 ? 'from-amber-400/20 to-yellow-500/20 border-yellow-400/40' : 'from-white/5 to-white/10 border-white/20'} hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group cursor-pointer active:scale-[0.98]`} onClick={() => handleCandidateClick(candidate.recordid, candidate.job_id)}>
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
-                          <div className="flex items-start sm:items-center space-x-3 min-w-0 flex-1">
+                  return <div key={index} className={`bg-gradient-to-r rounded-lg sm:rounded-xl p-2.5 sm:p-3 border ${index < 3 ? 'from-amber-400/20 to-yellow-500/20 border-yellow-400/40' : 'from-white/5 to-white/10 border-white/20'} hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group cursor-pointer active:scale-[0.98]`} onClick={() => handleCandidateClick(candidate.recordid, candidate.job_id)}>
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex items-start space-x-2 sm:space-x-3 min-w-0 flex-1">
                             <div className="relative flex-shrink-0">
-                              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-base sm:text-lg shadow-lg">
+                              <div className="w-9 h-9 sm:w-12 sm:h-12 bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-lg shadow-lg">
                                 {candidate.candidate_name?.charAt(0) || 'C'}
                               </div>
-                              <div className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border-2 border-white animate-pulse"></div>
+                              <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-4 sm:h-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border-2 border-white animate-pulse"></div>
                             </div>
                              <div className="min-w-0 flex-1">
-                               <h4 className="font-work text-foreground group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors text-base sm:text-lg font-normal truncate">{candidate.candidate_name}</h4>
-                               <p className="text-purple-300 text-xs sm:text-sm font-normal truncate">{jobTitle} - ({candidate.recruiter})</p>
-                               <div className="flex flex-wrap gap-1 sm:gap-2 mt-1">
-                                 <Badge variant="outline" className="text-[10px] sm:text-xs border-cyan-400/50 text-cyan-400 bg-cyan-400/10 px-1.5 py-0.5">
-                                   User ID: {candidate.user_id}
-                                 </Badge>
-                                 <Badge variant="outline" className="text-[10px] sm:text-xs border-purple-400/50 text-purple-400 bg-purple-400/10 px-1.5 py-0.5">
-                                   Job ID: {candidate.job_id}
+                               <h4 className="font-work text-foreground group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors text-sm sm:text-lg font-normal truncate">{candidate.candidate_name}</h4>
+                               <p className="text-purple-300 text-[11px] sm:text-sm font-normal truncate">{jobTitle}</p>
+                               <div className="flex flex-wrap gap-1 mt-1">
+                                 <Badge variant="outline" className="text-[9px] sm:text-xs border-cyan-400/50 text-cyan-400 bg-cyan-400/10 px-1 sm:px-1.5 py-0">
+                                   {candidate.user_id}
                                  </Badge>
                                  {candidate.salary_expectations && (
-                                   <Badge variant="outline" className="text-[10px] sm:text-xs border-emerald-400/50 text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5">
-                                     Expected: {String(candidate.salary_expectations)}
+                                   <Badge variant="outline" className="text-[9px] sm:text-xs border-emerald-400/50 text-emerald-400 bg-emerald-400/10 px-1 sm:px-1.5 py-0">
+                                     {String(candidate.salary_expectations)}
                                    </Badge>
                                  )}
                                </div>
                              </div>
                           </div>
-                          <div className="flex sm:flex-col items-center sm:items-end gap-3 sm:gap-2 flex-shrink-0">
-                            <div className={`text-xl sm:text-2xl font-bold ${getScoreColor(score)}`}>
+                          <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                            <div className={`text-lg sm:text-2xl font-bold ${getScoreColor(score)}`}>
                               {score}
-                            </div>
-                            <div className="flex sm:flex-col gap-2 flex-1 sm:flex-initial w-full sm:w-auto">
-                              <Button size="xs" variant="outline" onClick={e => {
-                            e.stopPropagation();
-                            handleRejectCandidate(candidate.Candidate_ID, candidate.job_id);
-                          }} className="bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200 text-[10px] sm:text-xs px-2 py-1 flex-1 sm:flex-initial whitespace-nowrap">
-                                <XCircle className="w-3 h-3 sm:mr-1" />
-                                <span className="hidden sm:inline">Reject Candidate</span>
-                                <span className="sm:hidden">Reject</span>
-                              </Button>
-                              <Button size="xs" variant="outline" onClick={e => {
-                            e.stopPropagation();
-                            handleCVSubmitted(candidate.Candidate_ID, candidate.job_id);
-                          }} className="bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200 text-[10px] sm:text-xs px-2 py-1 flex-1 sm:flex-initial whitespace-nowrap">
-                                <CheckCircle className="w-3 h-3 sm:mr-1" />
-                                <span className="hidden sm:inline">Submit CV</span>
-                                <span className="sm:hidden">Submit</span>
-                              </Button>
                             </div>
                           </div>
                         </div>
-                        <p className="text-xs sm:text-sm text-gray-300 mb-3 sm:mb-4 leading-relaxed bg-black/20 p-2 sm:p-3 rounded-lg line-clamp-3">
-                          {candidate.after_call_reason ? candidate.after_call_reason.slice(0, 200) + "..." : "No after call reason available"}
+                        <p className="text-[11px] sm:text-sm text-gray-300 mb-2 sm:mb-4 leading-relaxed bg-black/20 p-2 rounded-lg line-clamp-2 sm:line-clamp-3">
+                          {candidate.after_call_reason ? candidate.after_call_reason.slice(0, 150) + "..." : "No after call reason available"}
                         </p>
-                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                          <div className="text-xs sm:text-sm text-gray-400">
-                            Updated: {new Date(candidate.lastcalltime || Date.now()).toLocaleDateString()}
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex gap-1.5 sm:gap-2">
+                            <Button size="xs" variant="outline" onClick={e => {
+                              e.stopPropagation();
+                              handleRejectCandidate(candidate.Candidate_ID, candidate.job_id);
+                            }} className="bg-transparent border border-red-500 text-red-500 hover:bg-red-500/10 text-[10px] sm:text-xs px-2 py-1 h-7 sm:h-8">
+                              <XCircle className="w-3 h-3" />
+                              <span className="hidden sm:inline ml-1">Reject</span>
+                            </Button>
+                            <Button size="xs" variant="outline" onClick={e => {
+                              e.stopPropagation();
+                              handleCVSubmitted(candidate.Candidate_ID, candidate.job_id);
+                            }} className="bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 text-[10px] sm:text-xs px-2 py-1 h-7 sm:h-8">
+                              <CheckCircle className="w-3 h-3" />
+                              <span className="hidden sm:inline ml-1">Submit</span>
+                            </Button>
                           </div>
-                           <Badge className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 border-blue-400/40 animate-pulse text-xs">
-                             📞 Call Done
-                           </Badge>
+                          <Badge className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 border-blue-400/40 text-[10px] sm:text-xs px-1.5 py-0.5">
+                            📞 Done
+                          </Badge>
                         </div>
                       </div>;
                 })}
