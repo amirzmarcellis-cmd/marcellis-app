@@ -784,9 +784,10 @@ const JobGrid = memo(function JobGrid({
                   <Badge variant="outline" className="text-xs truncate max-w-[150px]">
                     ID: {job.job_id}
                   </Badge>
-                  {job.groups && <Badge variant="outline" className="text-xs border truncate max-w-[150px]" style={{
+                  {job.groups && <Badge variant="outline" className="text-xs border truncate max-w-[150px] font-medium" style={{
                 borderColor: job.groups.color || "#3B82F6",
-                color: job.groups.color || "#3B82F6"
+                color: job.groups.color || "#3B82F6",
+                backgroundColor: `${job.groups.color || "#3B82F6"}20`
               }}>
                       {job.groups.name}
                     </Badge>}
