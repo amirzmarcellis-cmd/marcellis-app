@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { savePushToken } from '@/lib/pushToken';
 
 interface AuthContextType {
   user: User | null;
@@ -23,6 +24,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Save push token on sign in (deferred to avoid blocking auth flow)
+        if (event === 'SIGNED_IN' && session?.user?.id) {
+          setTimeout(() => {
+            savePushToken(session.user.id);
+          }, 0);
+        }
       }
     );
 
