@@ -16,8 +16,12 @@ import candidate2 from '@/assets/candidate-2.jpg';
 import candidate3 from '@/assets/candidate-3.jpg';
 import { savePushToken } from '@/lib/pushToken';
 export default function Auth() {
-  const { settings } = useAppSettings();
-  const { theme } = useTheme();
+  const {
+    settings
+  } = useAppSettings();
+  const {
+    theme
+  } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
@@ -33,56 +37,50 @@ export default function Auth() {
 
   // Minimum swipe distance (in px)
   const minSwipeDistance = 50;
-
   useEffect(() => {
     // Small delay to ensure sign-out has fully processed
     const timer = setTimeout(async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: {
+          session
+        }
+      } = await supabase.auth.getSession();
       if (session) {
         navigate('/');
       }
     }, 100);
-
     return () => clearTimeout(timer);
   }, [navigate]);
 
   // Auto-rotate slides every 5 seconds
   useEffect(() => {
     if (isPaused) return;
-
     const interval = setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % 4);
+      setActiveSlide(prev => (prev + 1) % 4);
     }, 5000);
-
     return () => clearInterval(interval);
   }, [isPaused]);
-
   const onTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
   };
-
   const onTouchMove = (e: React.TouchEvent) => {
     setTouchEnd(e.targetTouches[0].clientX);
   };
-
   const onTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
-    
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
-    
     if (isLeftSwipe) {
       // Swipe left - go to next slide
-      setActiveSlide((prev) => (prev + 1) % 4);
+      setActiveSlide(prev => (prev + 1) % 4);
     }
     if (isRightSwipe) {
       // Swipe right - go to previous slide
-      setActiveSlide((prev) => (prev - 1 + 4) % 4);
+      setActiveSlide(prev => (prev - 1 + 4) % 4);
     }
   };
-
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
@@ -90,37 +88,39 @@ export default function Auth() {
     setMouseX(x);
     setMouseY(y);
   };
-
   const toggleMode = () => {
     setIsLogin(!isLogin);
     setError(null);
   };
-
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
     try {
       // Validate email domain
       const emailDomain = email.split('@')[1];
       if (emailDomain !== 'marc-ellis.com') {
         throw new Error('Only @marc-ellis.com email addresses are allowed to access this platform');
       }
-
       if (isLogin) {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const {
+          data,
+          error
+        } = await supabase.auth.signInWithPassword({
           email,
-          password,
+          password
         });
         if (error) throw error;
-        
+
         // Save push token for mobile users after login
         if (data.session?.user?.id) {
           savePushToken(data.session.user.id);
         }
       } else {
-        const { data, error } = await supabase.auth.signUp({
+        const {
+          data,
+          error
+        } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -128,7 +128,7 @@ export default function Auth() {
           }
         });
         if (error) throw error;
-        
+
         // Save push token for mobile users after signup
         if (data.session?.user?.id) {
           savePushToken(data.session.user.id);
@@ -141,11 +141,11 @@ export default function Auth() {
       setLoading(false);
     }
   };
-
-  return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row overflow-x-hidden snap-y snap-mandatory lg:snap-none overflow-y-auto">
+  return <div className="min-h-screen w-full flex flex-col lg:flex-row overflow-x-hidden snap-y snap-mandatory lg:snap-none overflow-y-auto">
       {/* Left Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-8 relative overflow-hidden min-h-screen shrink-0 snap-start lg:snap-align-none" style={{ backgroundColor: '#1a1d23' }}>
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-8 relative overflow-hidden min-h-screen shrink-0 snap-start lg:snap-align-none" style={{
+      backgroundColor: '#1a1d23'
+    }}>
         <MissionBackground className="absolute inset-0" />
         
         
@@ -153,84 +153,45 @@ export default function Auth() {
           <div className="mb-6 sm:mb-8">
             <div className="flex items-center justify-center mb-4 sm:mb-6">
               <div className="w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center">
-                <img 
-                  src={theme === 'dark' 
-                    ? (settings.logoLight || settings.logo || defaultLogo)
-                    : (settings.logoDark || settings.logo || defaultLogo)} 
-                  alt="Company Logo" 
-                  className="w-full h-full object-contain"
-                  fetchPriority="high"
-                />
+                <img src={theme === 'dark' ? settings.logoLight || settings.logo || defaultLogo : settings.logoDark || settings.logo || defaultLogo} alt="Company Logo" className="w-full h-full object-contain" fetchPriority="high" />
               </div>
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-light text-foreground text-center mb-2">
               {isLogin ? 'Welcome back!' : 'Create your account'}
             </h1>
-            <p className="text-center text-muted-foreground text-sm sm:text-base">
-              {isLogin 
-                ? 'Log in now and save time on employee administration.'
-                : 'Sign up to get started with your recruitment platform.'}
-            </p>
+            
           </div>
 
           <form onSubmit={handleAuth} className="space-y-5 sm:space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-foreground text-sm sm:text-base">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="bg-input/50 border-border/50 backdrop-blur-sm h-12 sm:h-11 text-base"
-              />
+              <Input id="email" type="email" placeholder="Your email" value={email} onChange={e => setEmail(e.target.value)} required className="bg-input/50 border-border/50 backdrop-blur-sm h-12 sm:h-11 text-base" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password" className="text-foreground text-sm sm:text-base">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="bg-input/50 border-border/50 backdrop-blur-sm h-12 sm:h-11 text-base"
-              />
-              {isLogin && (
-                <div className="flex justify-end pt-1">
+              <Input id="password" type="password" placeholder="Enter your password" value={password} onChange={e => setPassword(e.target.value)} required className="bg-input/50 border-border/50 backdrop-blur-sm h-12 sm:h-11 text-base" />
+              {isLogin && <div className="flex justify-end pt-1">
                   <button type="button" className="text-sm sm:text-sm text-muted-foreground hover:text-foreground transition-colors py-1">
                     Forgot password
                   </button>
-                </div>
-              )}
+                </div>}
             </div>
-            {error && (
-              <Alert variant="destructive">
+            {error && <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            <Button 
-              id="sign-in-btn"
-              type="submit" 
-              className="w-full h-14 sm:h-12 rounded-full font-medium text-black transition-all duration-200 text-base"
-              style={{ backgroundColor: '#00d9ff' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#00b8d4'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#00d9ff'}
-              disabled={loading}
-            >
+              </Alert>}
+            <Button id="sign-in-btn" type="submit" className="w-full h-14 sm:h-12 rounded-full font-medium text-black transition-all duration-200 text-base" style={{
+            backgroundColor: '#00d9ff'
+          }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#00b8d4'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#00d9ff'} disabled={loading}>
               {loading && <Loader2 className="mr-2 h-5 w-5 sm:h-4 sm:w-4 animate-spin" />}
               {isLogin ? 'Sign in' : 'Sign Up'}
             </Button>
             
             <div className="text-center pt-2">
-              <button 
-                type="button" 
-                onClick={toggleMode}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
+              <button type="button" onClick={toggleMode} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 {isLogin ? "Don't have an account? " : "Already have an account? "}
-                <span className="font-medium" style={{ color: '#00d9ff' }}>
+                <span className="font-medium" style={{
+                color: '#00d9ff'
+              }}>
                   {isLogin ? 'Sign up' : 'Sign in'}
                 </span>
               </button>
@@ -240,47 +201,34 @@ export default function Auth() {
       </div>
 
       {/* Right Side - Visual Content */}
-      <div 
-        className="w-full lg:w-1/2 flex relative overflow-hidden items-center justify-center p-4 md:p-8 pt-16 md:pt-8 min-h-screen shrink-0 snap-start lg:snap-align-none"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-        onMouseMove={handleMouseMove}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-      >
+      <div className="w-full lg:w-1/2 flex relative overflow-hidden items-center justify-center p-4 md:p-8 pt-16 md:pt-8 min-h-screen shrink-0 snap-start lg:snap-align-none" onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)} onMouseMove={handleMouseMove} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
         {/* Animated Background Pattern */}
-        <div 
-          className="absolute inset-0 animate-rotate-pattern"
-          style={{
-            backgroundColor: '#1a1d23',
-            backgroundImage: 'url(/auth-bg-pattern.png)',
-            backgroundSize: '400px 400px',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'repeat',
-          }}
-        ></div>
+        <div className="absolute inset-0 animate-rotate-pattern" style={{
+        backgroundColor: '#1a1d23',
+        backgroundImage: 'url(/auth-bg-pattern.png)',
+        backgroundSize: '400px 400px',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'repeat'
+      }}></div>
         
         {/* Subtle overlay to control pattern visibility */}
-        <div className="absolute inset-0 bg-black/20" style={{ mixBlendMode: 'overlay' }}></div>
+        <div className="absolute inset-0 bg-black/20" style={{
+        mixBlendMode: 'overlay'
+      }}></div>
         {/* Subtle Geometric Background Patterns with Parallax */}
         <div className="absolute inset-0 overflow-hidden">
-          <div 
-            className="absolute top-20 left-10 w-64 h-64 bg-gray-800/10 rounded-3xl rotate-12 blur-xl transition-transform duration-300 ease-out"
-            style={{ transform: `translate(${mouseX * 30}px, ${mouseY * 30}px)` }}
-          ></div>
-          <div 
-            className="absolute bottom-32 right-16 w-80 h-80 bg-gray-700/10 rounded-3xl -rotate-12 blur-2xl transition-transform duration-300 ease-out"
-            style={{ transform: `translate(${mouseX * -40}px, ${mouseY * -40}px)` }}
-          ></div>
-          <div 
-            className="absolute top-1/3 right-1/4 w-48 h-48 bg-gray-800/10 rounded-3xl rotate-45 blur-xl transition-transform duration-300 ease-out"
-            style={{ transform: `translate(${mouseX * 20}px, ${mouseY * 20}px)` }}
-          ></div>
-          <div 
-            className="absolute bottom-1/4 left-1/4 w-56 h-56 bg-gray-700/10 rounded-3xl -rotate-45 blur-2xl transition-transform duration-300 ease-out"
-            style={{ transform: `translate(${mouseX * -25}px, ${mouseY * -25}px)` }}
-          ></div>
+          <div className="absolute top-20 left-10 w-64 h-64 bg-gray-800/10 rounded-3xl rotate-12 blur-xl transition-transform duration-300 ease-out" style={{
+          transform: `translate(${mouseX * 30}px, ${mouseY * 30}px)`
+        }}></div>
+          <div className="absolute bottom-32 right-16 w-80 h-80 bg-gray-700/10 rounded-3xl -rotate-12 blur-2xl transition-transform duration-300 ease-out" style={{
+          transform: `translate(${mouseX * -40}px, ${mouseY * -40}px)`
+        }}></div>
+          <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-gray-800/10 rounded-3xl rotate-45 blur-xl transition-transform duration-300 ease-out" style={{
+          transform: `translate(${mouseX * 20}px, ${mouseY * 20}px)`
+        }}></div>
+          <div className="absolute bottom-1/4 left-1/4 w-56 h-56 bg-gray-700/10 rounded-3xl -rotate-45 blur-2xl transition-transform duration-300 ease-out" style={{
+          transform: `translate(${mouseX * -25}px, ${mouseY * -25}px)`
+        }}></div>
         </div>
 
         {/* Slide 0 - Candidate Management */}
@@ -309,11 +257,7 @@ export default function Auth() {
               {/* Candidate List */}
               <div className="space-y-1.5 sm:space-y-2">
                 <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 bg-gray-800/40 rounded-lg border border-gray-700/30 hover:bg-gray-800/60 transition-colors">
-                  <img 
-                    src={candidate1} 
-                    alt="Sarah Johnson" 
-                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full ring-2 ring-blue-500/30 object-cover"
-                  />
+                  <img src={candidate1} alt="Sarah Johnson" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full ring-2 ring-blue-500/30 object-cover" />
                   <div className="flex-1 min-w-0">
                     <p className="text-white text-xs sm:text-sm font-medium truncate">Sarah Johnson</p>
                     <p className="text-gray-400 text-[10px] sm:text-xs truncate">Product Designer</p>
@@ -325,11 +269,7 @@ export default function Auth() {
                 </div>
                 
                 <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20">
-                  <img 
-                    src={candidate2} 
-                    alt="Michael Chen" 
-                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full ring-1 ring-gray-700/40 object-cover"
-                  />
+                  <img src={candidate2} alt="Michael Chen" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full ring-1 ring-gray-700/40 object-cover" />
                   <div className="flex-1 min-w-0">
                     <p className="text-white text-xs sm:text-sm font-medium truncate">Michael Chen</p>
                     <p className="text-gray-400 text-[10px] sm:text-xs truncate">Senior Developer</p>
@@ -341,11 +281,7 @@ export default function Auth() {
                 </div>
                 
                 <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 bg-gray-800/30 rounded-lg border border-gray-700/20">
-                  <img 
-                    src={candidate3} 
-                    alt="Emma Martinez" 
-                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full ring-1 ring-gray-700/40 object-cover"
-                  />
+                  <img src={candidate3} alt="Emma Martinez" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full ring-1 ring-gray-700/40 object-cover" />
                   <div className="flex-1 min-w-0">
                     <p className="text-white text-xs sm:text-sm font-medium truncate">Emma Martinez</p>
                     <p className="text-gray-400 text-[10px] sm:text-xs truncate">Product Manager</p>
@@ -483,29 +419,17 @@ export default function Auth() {
               <div className="space-y-2">
                 {/* Calendar Grid */}
                 <div className="grid grid-cols-7 gap-1 mb-2">
-                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
-                    <div key={i} className="text-gray-500 text-[10px] text-center font-medium">{day}</div>
-                  ))}
+                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => <div key={i} className="text-gray-500 text-[10px] text-center font-medium">{day}</div>)}
                 </div>
                 <div className="grid grid-cols-7 gap-1">
                   {[...Array(35)].map((_, i) => {
-                    const dayNum = i - 2;
-                    const isToday = dayNum === 15;
-                    const hasInterview = [5, 9, 18, 22].includes(dayNum);
-                    return (
-                      <div 
-                        key={i}
-                        className={`aspect-square rounded text-[10px] flex items-center justify-center ${
-                          dayNum < 1 || dayNum > 31 ? 'text-gray-700' :
-                          isToday ? 'bg-cyan-500/80 text-white font-bold shadow-[0_0_10px_rgba(6,182,212,0.5)]' : 
-                          hasInterview ? 'bg-cyan-500/30 text-cyan-300 border border-cyan-500/40' : 
-                          'text-gray-400 hover:bg-gray-800/30'
-                        }`}
-                      >
+                  const dayNum = i - 2;
+                  const isToday = dayNum === 15;
+                  const hasInterview = [5, 9, 18, 22].includes(dayNum);
+                  return <div key={i} className={`aspect-square rounded text-[10px] flex items-center justify-center ${dayNum < 1 || dayNum > 31 ? 'text-gray-700' : isToday ? 'bg-cyan-500/80 text-white font-bold shadow-[0_0_10px_rgba(6,182,212,0.5)]' : hasInterview ? 'bg-cyan-500/30 text-cyan-300 border border-cyan-500/40' : 'text-gray-400 hover:bg-gray-800/30'}`}>
                         {dayNum > 0 && dayNum <= 31 ? dayNum : ''}
-                      </div>
-                    );
-                  })}
+                      </div>;
+                })}
                 </div>
                 
                 {/* Upcoming Interviews */}
@@ -632,16 +556,7 @@ export default function Auth() {
           
           {/* Navigation Dots */}
           <div className="flex gap-2 justify-center mt-6">
-            {[0, 1, 2, 3].map((index) => (
-              <button
-                key={index}
-                onClick={() => setActiveSlide(index)}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  activeSlide === index ? 'w-8 bg-white' : 'w-2 bg-gray-600 hover:bg-gray-500'
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
+            {[0, 1, 2, 3].map(index => <button key={index} onClick={() => setActiveSlide(index)} className={`h-2 rounded-full transition-all duration-300 ${activeSlide === index ? 'w-8 bg-white' : 'w-2 bg-gray-600 hover:bg-gray-500'}`} aria-label={`Go to slide ${index + 1}`} />)}
           </div>
         </div>
       </div>
@@ -698,6 +613,5 @@ export default function Auth() {
           pointer-events: none;
         }
       `}</style>
-    </div>
-  );
+    </div>;
 }
