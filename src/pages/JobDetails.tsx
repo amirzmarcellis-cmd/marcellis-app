@@ -1570,7 +1570,10 @@ export default function JobDetails() {
         setRejectReason("");
         setRejectCandidateData(null);
         // Refresh data
-        fetchCandidates();
+        if (id) {
+          fetchCandidates(id);
+          fetchLonglistedCandidates(id);
+        }
       } else {
         throw new Error("Failed to reject candidate");
       }
