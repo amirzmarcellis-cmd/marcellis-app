@@ -622,6 +622,135 @@ export type Database = {
         }
         Relationships: []
       }
+      linkedin_campaigns: {
+        Row: {
+          campaign_created_by: string | null
+          campaign_id: string | null
+          campaign_name: string | null
+          companies: string | null
+          created_time: string
+          document_url: string | null
+          enable_followups: boolean | null
+          followup_days: number | null
+          followup_messages: string[] | null
+          id: number
+          industries: string | null
+          keywords: string | null
+          last_updated_by: string | null
+          locations: string | null
+          opener_message: string | null
+          status: string
+          updated_time: string
+        }
+        Insert: {
+          campaign_created_by?: string | null
+          campaign_id?: string | null
+          campaign_name?: string | null
+          companies?: string | null
+          created_time?: string
+          document_url?: string | null
+          enable_followups?: boolean | null
+          followup_days?: number | null
+          followup_messages?: string[] | null
+          id?: number
+          industries?: string | null
+          keywords?: string | null
+          last_updated_by?: string | null
+          locations?: string | null
+          opener_message?: string | null
+          status?: string
+          updated_time: string
+        }
+        Update: {
+          campaign_created_by?: string | null
+          campaign_id?: string | null
+          campaign_name?: string | null
+          companies?: string | null
+          created_time?: string
+          document_url?: string | null
+          enable_followups?: boolean | null
+          followup_days?: number | null
+          followup_messages?: string[] | null
+          id?: number
+          industries?: string | null
+          keywords?: string | null
+          last_updated_by?: string | null
+          locations?: string | null
+          opener_message?: string | null
+          status?: string
+          updated_time?: string
+        }
+        Relationships: []
+      }
+      linkedin_campaigns_leads: {
+        Row: {
+          action_date: string | null
+          call_recording: string | null
+          campaign_name: string | null
+          chat_id: string | null
+          company_name: string | null
+          company_size: string | null
+          created_by: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          invitation_id: string | null
+          lead_type: string | null
+          linkedin_id: string | null
+          notes: string | null
+          phone_number: string | null
+          service: string | null
+          source: string | null
+          status: string | null
+          thread_id: string | null
+          unipile_user_id: string | null
+        }
+        Insert: {
+          action_date?: string | null
+          call_recording?: string | null
+          campaign_name?: string | null
+          chat_id?: string | null
+          company_name?: string | null
+          company_size?: string | null
+          created_by?: string | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+          invitation_id?: string | null
+          lead_type?: string | null
+          linkedin_id?: string | null
+          notes?: string | null
+          phone_number?: string | null
+          service?: string | null
+          source?: string | null
+          status?: string | null
+          thread_id?: string | null
+          unipile_user_id?: string | null
+        }
+        Update: {
+          action_date?: string | null
+          call_recording?: string | null
+          campaign_name?: string | null
+          chat_id?: string | null
+          company_name?: string | null
+          company_size?: string | null
+          created_by?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          invitation_id?: string | null
+          lead_type?: string | null
+          linkedin_id?: string | null
+          notes?: string | null
+          phone_number?: string | null
+          service?: string | null
+          source?: string | null
+          status?: string | null
+          thread_id?: string | null
+          unipile_user_id?: string | null
+        }
+        Relationships: []
+      }
       linkedin_connection_attempts: {
         Row: {
           account_id: string | null
