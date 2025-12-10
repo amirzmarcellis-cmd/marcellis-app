@@ -14,6 +14,7 @@ import { useTheme } from 'next-themes';
 import candidate1 from '@/assets/candidate-1.jpg';
 import candidate2 from '@/assets/candidate-2.jpg';
 import candidate3 from '@/assets/candidate-3.jpg';
+import { savePushToken } from '@/lib/pushToken';
 export default function Auth() {
   const { settings } = useAppSettings();
   const { theme } = useTheme();
@@ -108,13 +109,18 @@ export default function Auth() {
       }
 
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
+        
+        // Save push token for mobile users after login
+        if (data.session?.user?.id) {
+          savePushToken(data.session.user.id);
+        }
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -122,6 +128,11 @@ export default function Auth() {
           }
         });
         if (error) throw error;
+        
+        // Save push token for mobile users after signup
+        if (data.session?.user?.id) {
+          savePushToken(data.session.user.id);
+        }
       }
       navigate('/');
     } catch (error: any) {
