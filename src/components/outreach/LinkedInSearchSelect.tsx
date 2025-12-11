@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
-import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
+import { Check, ChevronsUpDown, Loader2, X, LucideIcon, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface SearchSelectItem {
@@ -18,13 +18,17 @@ interface LinkedInSearchSelectProps {
   value: SearchSelectItem[];
   onChange: (value: SearchSelectItem[]) => void;
   placeholder?: string;
+  icon?: LucideIcon;
+  label?: string;
 }
 
 export function LinkedInSearchSelect({ 
   type, 
   value, 
   onChange, 
-  placeholder = 'Search...' 
+  placeholder = 'Search...',
+  icon: Icon,
+  label
 }: LinkedInSearchSelectProps) {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -69,42 +73,59 @@ export function LinkedInSearchSelect({
 
   return (
     <div className="space-y-2">
+      {label && (
+        <label className="text-sm font-medium text-foreground/80">{label}</label>
+      )}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between font-normal"
+            className={cn(
+              "w-full justify-between font-normal h-11 bg-background/50 border-border/50",
+              "hover:bg-background/80 hover:border-primary/30 transition-all",
+              "focus:ring-2 focus:ring-primary/20 focus:border-primary/50"
+            )}
           >
-            <span className="text-muted-foreground truncate">
-              {value.length > 0 ? `${value.length} selected` : placeholder}
+            <span className="flex items-center gap-2 text-muted-foreground truncate">
+              {Icon ? (
+                <Icon className="h-4 w-4 shrink-0 text-muted-foreground/70" />
+              ) : (
+                <Search className="h-4 w-4 shrink-0 text-muted-foreground/70" />
+              )}
+              {value.length > 0 ? (
+                <span className="text-foreground">{value.length} selected</span>
+              ) : (
+                placeholder
+              )}
             </span>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0" align="start">
+        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-card border-border/50" align="start">
           <Command shouldFilter={false}>
-            <div className="flex items-center border-b px-3">
+            <div className="flex items-center border-b border-border/50 px-3">
+              <Search className="h-4 w-4 text-muted-foreground mr-2" />
               <Input
                 placeholder={`Search ${type.toLowerCase()}...`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
               />
-              {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+              {isLoading && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
             </div>
-            <CommandList>
+            <CommandList className="max-h-[200px]">
               {error && (
-                <div className="p-2 text-sm text-destructive text-center">
+                <div className="p-3 text-sm text-destructive text-center">
                   {error}
                 </div>
               )}
               {!isLoading && searchTerm.length >= 2 && results.length === 0 && !error && (
-                <CommandEmpty>No results found.</CommandEmpty>
+                <CommandEmpty className="py-6 text-sm text-muted-foreground">No results found.</CommandEmpty>
               )}
               {searchTerm.length < 2 && (
-                <div className="p-2 text-sm text-muted-foreground text-center">
+                <div className="p-4 text-sm text-muted-foreground text-center">
                   Type at least 2 characters to search
                 </div>
               )}
@@ -115,15 +136,15 @@ export function LinkedInSearchSelect({
                       key={item.id}
                       value={item.id}
                       onSelect={() => handleSelect(item)}
-                      className="cursor-pointer"
+                      className="cursor-pointer px-3 py-2.5 hover:bg-primary/10"
                     >
                       <Check
                         className={cn(
-                          "mr-2 h-4 w-4",
+                          "mr-2 h-4 w-4 text-primary",
                           isSelected(item.id) ? "opacity-100" : "opacity-0"
                         )}
                       />
-                      {item.title}
+                      <span className="truncate">{item.title}</span>
                     </CommandItem>
                   ))}
                 </CommandGroup>
@@ -133,20 +154,23 @@ export function LinkedInSearchSelect({
         </PopoverContent>
       </Popover>
 
-      {/* Selected items as badges */}
+      {/* Selected items as badges with animation */}
       {value.length > 0 && (
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1.5">
           {value.map((item) => (
             <Badge
               key={item.id}
               variant="secondary"
-              className="flex items-center gap-1"
+              className={cn(
+                "flex items-center gap-1 pr-1 bg-primary/10 text-primary border border-primary/20",
+                "hover:bg-primary/15 transition-all animate-scale-in"
+              )}
             >
-              {item.label}
+              <span className="max-w-[150px] truncate">{item.label}</span>
               <button
                 type="button"
                 onClick={() => handleRemove(item.id)}
-                className="ml-1 hover:bg-muted-foreground/20 rounded-full p-0.5"
+                className="ml-1 hover:bg-primary/20 rounded-full p-0.5 transition-colors"
               >
                 <X className="h-3 w-3" />
               </button>

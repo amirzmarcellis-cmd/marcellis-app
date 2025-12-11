@@ -1,14 +1,23 @@
-import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { useState, useEffect, useRef } from 'react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { FormSection } from '@/components/ui/form-section';
+import { DragDropUpload } from '@/components/ui/drag-drop-upload';
+import { VariableHint } from '@/components/ui/variable-hint';
 import { Campaign } from '@/hooks/outreach/useCampaigns';
-import { Plus, X, Upload } from 'lucide-react';
+import { 
+  Plus, X, Megaphone, Target, MessageSquare, 
+  ChevronDown, MapPin, Building2, Building, Search,
+  Loader2, Sparkles, Clock
+} from 'lucide-react';
 import { LinkedInSearchSelect, SearchSelectItem } from './LinkedInSearchSelect';
+import { cn } from '@/lib/utils';
 
 interface FormData {
   campaign_name: string;
@@ -35,7 +44,7 @@ interface CampaignDialogProps {
 const parseToItems = (str: string | null | undefined): SearchSelectItem[] => {
   if (!str) return [];
   return str.split(',').map(s => s.trim()).filter(Boolean).map(label => ({
-    id: label, // Use label as id for backward compatibility
+    id: label,
     label
   }));
 };
@@ -54,6 +63,9 @@ export function CampaignDialog({ open, onOpenChange, campaign, onSave, isLoading
     followup_messages: [],
   });
 
+  const [followupsOpen, setFollowupsOpen] = useState(false);
+  const openerRef = useRef<HTMLTextAreaElement>(null);
+
   useEffect(() => {
     if (campaign) {
       setFormData({
@@ -68,6 +80,7 @@ export function CampaignDialog({ open, onOpenChange, campaign, onSave, isLoading
         followup_days: campaign.followup_days || 3,
         followup_messages: campaign.followup_messages || [],
       });
+      setFollowupsOpen(campaign.enable_followups || false);
     } else {
       setFormData({
         campaign_name: '',
@@ -81,13 +94,13 @@ export function CampaignDialog({ open, onOpenChange, campaign, onSave, isLoading
         followup_days: 3,
         followup_messages: [],
       });
+      setFollowupsOpen(false);
     }
   }, [campaign, open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Transform arrays to the expected format for saving
     const transformedData = {
       campaign_name: formData.campaign_name,
       keywords: formData.keywords,
@@ -125,183 +138,302 @@ export function CampaignDialog({ open, onOpenChange, campaign, onSave, isLoading
     }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFormData(prev => ({ ...prev, document: file }));
+  const insertVariable = (variable: string) => {
+    if (openerRef.current) {
+      const textarea = openerRef.current;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const newValue = 
+        formData.opener_message.substring(0, start) + 
+        variable + 
+        formData.opener_message.substring(end);
+      setFormData(prev => ({ ...prev, opener_message: newValue }));
+      // Focus and set cursor position after the inserted variable
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(start + variable.length, start + variable.length);
+      }, 0);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{campaign ? 'Edit Campaign' : 'Create Campaign'}</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="campaign_name">Campaign Name *</Label>
-            <Input
-              id="campaign_name"
-              value={formData.campaign_name}
-              onChange={(e) => setFormData(prev => ({ ...prev, campaign_name: e.target.value }))}
-              placeholder="Enter campaign name"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="keywords">Keywords</Label>
-            <Input
-              id="keywords"
-              value={formData.keywords}
-              onChange={(e) => setFormData(prev => ({ ...prev, keywords: e.target.value }))}
-              placeholder="e.g., Sales Manager, VP Sales"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Locations</Label>
-            <LinkedInSearchSelect
-              type="LOCATION"
-              value={formData.locations}
-              onChange={(locations) => setFormData(prev => ({ ...prev, locations }))}
-              placeholder="Search locations..."
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Industries</Label>
-            <LinkedInSearchSelect
-              type="INDUSTRY"
-              value={formData.industries}
-              onChange={(industries) => setFormData(prev => ({ ...prev, industries }))}
-              placeholder="Search industries..."
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Companies</Label>
-            <LinkedInSearchSelect
-              type="COMPANY"
-              value={formData.companies}
-              onChange={(companies) => setFormData(prev => ({ ...prev, companies }))}
-              placeholder="Search companies..."
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="opener_message">Opener Message *</Label>
-            <Textarea
-              id="opener_message"
-              value={formData.opener_message}
-              onChange={(e) => setFormData(prev => ({ ...prev, opener_message: e.target.value }))}
-              placeholder="Hi {first_name}, I noticed your experience in..."
-              rows={4}
-              required
-            />
-            <p className="text-xs text-muted-foreground">
-              Use {'{first_name}'}, {'{last_name}'}, {'{company}'} as placeholders
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Document (Optional)</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                type="file"
-                onChange={handleFileChange}
-                accept=".pdf,.doc,.docx"
-                className="hidden"
-                id="document-upload"
-              />
-              <label 
-                htmlFor="document-upload"
-                className="flex items-center gap-2 px-4 py-2 border border-border rounded-md cursor-pointer hover:bg-muted transition-colors"
-              >
-                <Upload className="h-4 w-4" />
-                {formData.document ? formData.document.name : 'Choose file'}
-              </label>
-              {formData.document && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setFormData(prev => ({ ...prev, document: null }))}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="w-full sm:max-w-2xl overflow-hidden flex flex-col p-0 gap-0 bg-background border-l border-border/50">
+        {/* Sticky Header */}
+        <SheetHeader className="flex-shrink-0 px-6 py-4 border-b border-border/50 bg-card/30">
+          <SheetTitle className="flex items-center gap-3 text-xl font-light">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Megaphone className="h-5 w-5" />
             </div>
-          </div>
+            <span>{campaign ? 'Edit Campaign' : 'Create Campaign'}</span>
+          </SheetTitle>
+        </SheetHeader>
 
-          <div className="space-y-4 p-4 rounded-lg border border-border bg-muted/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Enable Follow-ups</Label>
-                <p className="text-xs text-muted-foreground">Automatically send follow-up messages</p>
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          <form id="campaign-form" onSubmit={handleSubmit} className="space-y-6 p-6">
+            
+            {/* Section 1: Campaign Details */}
+            <FormSection icon={Sparkles} title="Campaign Details">
+              {/* Hero Input for Campaign Name */}
+              <div className="space-y-2">
+                <Label htmlFor="campaign_name" className="text-sm font-medium text-foreground/80">
+                  Campaign Name *
+                </Label>
+                <Input
+                  id="campaign_name"
+                  value={formData.campaign_name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, campaign_name: e.target.value }))}
+                  placeholder="Give your campaign a memorable name"
+                  required
+                  className={cn(
+                    "h-12 text-lg font-light bg-background/50 border-border/50",
+                    "focus:ring-2 focus:ring-primary/20 focus:border-primary/50",
+                    "placeholder:text-muted-foreground/50"
+                  )}
+                />
               </div>
-              <Switch
-                checked={formData.enable_followups}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, enable_followups: checked }))}
-              />
-            </div>
 
-            {formData.enable_followups && (
-              <>
-                <div className="space-y-2">
-                  <Label>Days between follow-ups: {formData.followup_days}</Label>
-                  <Slider
-                    value={[formData.followup_days]}
-                    onValueChange={([value]) => setFormData(prev => ({ ...prev, followup_days: value }))}
-                    min={1}
-                    max={14}
-                    step={1}
+              <div className="space-y-2">
+                <Label htmlFor="keywords" className="text-sm font-medium text-foreground/80">
+                  Keywords
+                </Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
+                  <Input
+                    id="keywords"
+                    value={formData.keywords}
+                    onChange={(e) => setFormData(prev => ({ ...prev, keywords: e.target.value }))}
+                    placeholder="e.g., Sales Manager, VP Sales, Business Development"
+                    className="pl-10 h-11 bg-background/50 border-border/50 focus:ring-2 focus:ring-primary/20 focus:border-primary/50"
                   />
                 </div>
+              </div>
+            </FormSection>
 
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label>Follow-up Messages</Label>
-                    <Button type="button" variant="outline" size="sm" onClick={addFollowupMessage}>
-                      <Plus className="h-4 w-4 mr-1" />
-                      Add
-                    </Button>
-                  </div>
-                  {formData.followup_messages.map((msg, index) => (
-                    <div key={index} className="flex gap-2">
-                      <Textarea
-                        value={msg}
-                        onChange={(e) => updateFollowupMessage(index, e.target.value)}
-                        placeholder={`Follow-up message ${index + 1}`}
-                        rows={2}
-                        className="flex-1"
+            {/* Section 2: Targeting Criteria */}
+            <FormSection icon={Target} title="Targeting Criteria" description="Define your ideal audience">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <LinkedInSearchSelect
+                  type="LOCATION"
+                  value={formData.locations}
+                  onChange={(locations) => setFormData(prev => ({ ...prev, locations }))}
+                  placeholder="Search locations..."
+                  icon={MapPin}
+                  label="Locations"
+                />
+                <LinkedInSearchSelect
+                  type="INDUSTRY"
+                  value={formData.industries}
+                  onChange={(industries) => setFormData(prev => ({ ...prev, industries }))}
+                  placeholder="Search industries..."
+                  icon={Building2}
+                  label="Industries"
+                />
+              </div>
+              <LinkedInSearchSelect
+                type="COMPANY"
+                value={formData.companies}
+                onChange={(companies) => setFormData(prev => ({ ...prev, companies }))}
+                placeholder="Search companies..."
+                icon={Building}
+                label="Companies"
+              />
+            </FormSection>
+
+            {/* Section 3: Messaging */}
+            <FormSection icon={MessageSquare} title="Messaging" description="Craft your outreach message">
+              <div className="space-y-3">
+                <Label htmlFor="opener_message" className="text-sm font-medium text-foreground/80">
+                  Opener Message *
+                </Label>
+                <Textarea
+                  ref={openerRef}
+                  id="opener_message"
+                  value={formData.opener_message}
+                  onChange={(e) => setFormData(prev => ({ ...prev, opener_message: e.target.value }))}
+                  placeholder="Hi {first_name}, I noticed your experience at {company}..."
+                  rows={5}
+                  required
+                  className={cn(
+                    "bg-background/50 border-border/50 resize-none",
+                    "focus:ring-2 focus:ring-primary/20 focus:border-primary/50",
+                    "placeholder:text-muted-foreground/50"
+                  )}
+                />
+                <VariableHint 
+                  variables={['first_name', 'last_name', 'company']}
+                  onInsert={insertVariable}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-foreground/80">
+                  Attachment (Optional)
+                </Label>
+                <DragDropUpload
+                  accept=".pdf,.doc,.docx"
+                  value={formData.document}
+                  onChange={(file) => setFormData(prev => ({ ...prev, document: file }))}
+                />
+              </div>
+
+              {/* Follow-ups Collapsible */}
+              <Collapsible 
+                open={followupsOpen} 
+                onOpenChange={(open) => {
+                  setFollowupsOpen(open);
+                  setFormData(prev => ({ ...prev, enable_followups: open }));
+                }}
+                className="rounded-lg border border-border/50 bg-background/30"
+              >
+                <CollapsibleTrigger asChild>
+                  <button
+                    type="button"
+                    className={cn(
+                      "flex w-full items-center justify-between p-4 text-left transition-colors",
+                      "hover:bg-primary/5 rounded-lg"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
+                        followupsOpen ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
+                      )}>
+                        <Clock className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Follow-up Messages</p>
+                        <p className="text-xs text-muted-foreground">Automatically send follow-ups</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Switch
+                        checked={followupsOpen}
+                        onCheckedChange={(checked) => {
+                          setFollowupsOpen(checked);
+                          setFormData(prev => ({ ...prev, enable_followups: checked }));
+                        }}
+                        onClick={(e) => e.stopPropagation()}
                       />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeFollowupMessage(index)}
+                      <ChevronDown className={cn(
+                        "h-4 w-4 text-muted-foreground transition-transform duration-200",
+                        followupsOpen && "rotate-180"
+                      )} />
+                    </div>
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="px-4 pb-4 space-y-4">
+                  <div className="h-px bg-border/50" />
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium text-foreground/80">
+                        Days between follow-ups
+                      </Label>
+                      <span className="text-sm font-mono text-primary bg-primary/10 px-2 py-0.5 rounded">
+                        {formData.followup_days} days
+                      </span>
+                    </div>
+                    <Slider
+                      value={[formData.followup_days]}
+                      onValueChange={([value]) => setFormData(prev => ({ ...prev, followup_days: value }))}
+                      min={1}
+                      max={14}
+                      step={1}
+                      className="py-2"
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium text-foreground/80">Messages</Label>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={addFollowupMessage}
+                        className="h-8 gap-1.5 text-xs"
                       >
-                        <X className="h-4 w-4" />
+                        <Plus className="h-3.5 w-3.5" />
+                        Add Message
                       </Button>
                     </div>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
+                    
+                    {formData.followup_messages.length === 0 && (
+                      <div className="text-center py-6 border border-dashed border-border/50 rounded-lg">
+                        <p className="text-sm text-muted-foreground">No follow-up messages yet</p>
+                        <p className="text-xs text-muted-foreground/70 mt-1">Click "Add Message" to create one</p>
+                      </div>
+                    )}
+                    
+                    {formData.followup_messages.map((msg, index) => (
+                      <div key={index} className="flex gap-2 animate-fade-in">
+                        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary mt-2">
+                          {index + 1}
+                        </div>
+                        <Textarea
+                          value={msg}
+                          onChange={(e) => updateFollowupMessage(index, e.target.value)}
+                          placeholder={`Follow-up message ${index + 1}`}
+                          rows={2}
+                          className="flex-1 bg-background/50 border-border/50 resize-none focus:ring-2 focus:ring-primary/20"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeFollowupMessage(index)}
+                          className="h-8 w-8 shrink-0 mt-1 text-muted-foreground hover:text-destructive"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            </FormSection>
+          </form>
+        </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Saving...' : campaign ? 'Update Campaign' : 'Create Campaign'}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        {/* Sticky Footer */}
+        <SheetFooter className="flex-shrink-0 px-6 py-4 border-t border-border/50 bg-card/30">
+          <div className="flex w-full items-center justify-between gap-3">
+            <p className="hidden sm:block text-xs text-muted-foreground">
+              Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[10px]">⌘</kbd> + <kbd className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[10px]">Enter</kbd> to save
+            </p>
+            <div className="flex gap-3 ml-auto">
+              <Button 
+                type="button" 
+                variant="ghost" 
+                onClick={() => onOpenChange(false)}
+                className="px-6"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                form="campaign-form"
+                disabled={isLoading}
+                className="px-6 gap-2"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4" />
+                    {campaign ? 'Update Campaign' : 'Create Campaign'}
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }
