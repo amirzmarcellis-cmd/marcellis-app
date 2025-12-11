@@ -394,11 +394,7 @@ export function CampaignDialog({ open, onOpenChange, campaign, onSave, isLoading
 
         {/* Sticky Footer */}
         <SheetFooter className="flex-shrink-0 px-6 py-4 border-t border-border/50 bg-card/30">
-          <div className="flex w-full items-center justify-between gap-3">
-            <p className="hidden sm:block text-xs text-muted-foreground">
-              Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[10px]">⌘</kbd> + <kbd className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono text-[10px]">Enter</kbd> to save
-            </p>
-            <div className="flex gap-3 ml-auto">
+          <div className="flex w-full items-center justify-end gap-3">
               <Button 
                 type="button" 
                 variant="ghost" 
@@ -425,7 +421,6 @@ export function CampaignDialog({ open, onOpenChange, campaign, onSave, isLoading
                   </>
                 )}
               </Button>
-            </div>
           </div>
         </SheetFooter>
       </SheetContent>
