@@ -41,6 +41,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const CompanySettings = lazy(() => import("./pages/CompanySettings"));
 const PlatformAdmin = lazy(() => import("./pages/PlatformAdmin"));
 const LinkedInCallback = lazy(() => import("./pages/LinkedInCallback"));
+const AIOutreach = lazy(() => import("./pages/AIOutreach"));
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient({
@@ -99,6 +100,7 @@ const App = () => (
                       <DashboardLayout><Reports /></DashboardLayout>
                     </ProtectedRoute>
                   } />
+                  <Route path="/ai-outreach" element={<AIOutreach />} />
                   <Route path="/settings" element={<DashboardLayout><Settings /></DashboardLayout>} />
                   <Route path="/users-panel" element={
                     <ProtectedRoute requiresUsersPanel={true}>
