@@ -1,17 +1,24 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { CampaignList, LeadTable, LeadPipeline, LeadDetailPanel, CampaignMetricsDisplay } from '@/components/outreach';
 import { Campaign } from '@/hooks/outreach/useCampaigns';
 import { useLinkedInCampaignLeads, LinkedInLead } from '@/hooks/outreach/useLinkedInCampaignLeads';
 import { useUpdateLinkedInCampaignLead } from '@/hooks/outreach/useUpdateLinkedInCampaignLead';
 import { useDeleteLinkedInCampaignLead } from '@/hooks/outreach/useDeleteLinkedInCampaignLead';
+import { useLinkedInConnection } from '@/hooks/outreach/useLinkedInConnection';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { ArrowLeft, LayoutGrid, Table, Kanban } from 'lucide-react';
+import { ArrowLeft, LayoutGrid, Table, Kanban, Linkedin } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AIOutreach() {
+  const navigate = useNavigate();
+  const { isConnected, isLoading: connectionLoading } = useLinkedInConnection();
+  
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [selectedLead, setSelectedLead] = useState<LinkedInLead | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'pipeline'>('table');
@@ -69,6 +76,62 @@ export default function AIOutreach() {
       toast({ title: 'Error deleting lead', variant: 'destructive' });
     }
   };
+
+  // Loading state while checking connection
+  if (connectionLoading) {
+    return (
+      <DashboardLayout>
+        <div className="space-y-6">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-64" />
+          <div className="flex justify-center items-center min-h-[400px]">
+            <Skeleton className="h-64 w-full max-w-md rounded-xl" />
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // Show connection prompt if not connected
+  if (!isConnected) {
+    return (
+      <DashboardLayout>
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-2xl font-bold">AI Outreach</h1>
+            <p className="text-sm text-muted-foreground">
+              Manage your LinkedIn outreach campaigns
+            </p>
+          </div>
+          
+          <div className="flex justify-center items-center min-h-[400px]">
+            <Card className="w-full max-w-md bg-card/50 backdrop-blur border-border/50">
+              <CardContent className="flex flex-col items-center text-center p-8 space-y-6">
+                <div className="w-16 h-16 rounded-full bg-[#0A66C2]/10 flex items-center justify-center">
+                  <Linkedin className="h-8 w-8 text-[#0A66C2]" />
+                </div>
+                
+                <div className="space-y-2">
+                  <h2 className="text-xl font-semibold">Connect Your LinkedIn Account</h2>
+                  <p className="text-muted-foreground text-sm">
+                    To use AI Outreach, you need to connect your LinkedIn account. This allows you to search for candidates, send messages, and manage your outreach campaigns.
+                  </p>
+                </div>
+                
+                <Button 
+                  onClick={() => navigate('/settings')}
+                  className="bg-[#0A66C2] hover:bg-[#004182] text-white"
+                >
+                  <Linkedin className="h-4 w-4 mr-2" />
+                  Connect LinkedIn Account
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
