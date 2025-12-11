@@ -65,6 +65,17 @@ export function useCampaigns() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      // Check for duplicate campaign name
+      const { data: existingCampaign } = await supabase
+        .from('linkedin_campaigns')
+        .select('id')
+        .eq('campaign_name', input.campaign_name)
+        .maybeSingle();
+
+      if (existingCampaign) {
+        throw new Error('A campaign with this name already exists. Please choose a different name.');
+      }
+
       let documentUrl: string | null = null;
 
       // Upload document if provided
@@ -113,6 +124,10 @@ export function useCampaigns() {
 
       if (error) {
         console.error('Error creating campaign:', error);
+        // Check for unique constraint violation
+        if (error.code === '23505') {
+          throw new Error('A campaign with this name already exists. Please choose a different name.');
+        }
         throw error;
       }
 
@@ -133,6 +148,20 @@ export function useCampaigns() {
     mutationFn: async ({ id, updates }: { id: number; updates: Partial<Campaign> }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
+
+      // Check for duplicate campaign name (excluding current campaign)
+      if (updates.campaign_name) {
+        const { data: existingCampaign } = await supabase
+          .from('linkedin_campaigns')
+          .select('id')
+          .eq('campaign_name', updates.campaign_name)
+          .neq('id', id)
+          .maybeSingle();
+
+        if (existingCampaign) {
+          throw new Error('A campaign with this name already exists. Please choose a different name.');
+        }
+      }
 
       // Build update object with only valid fields
       const updatePayload: Record<string, any> = {
@@ -162,6 +191,10 @@ export function useCampaigns() {
 
       if (error) {
         console.error('Error updating campaign:', error);
+        // Check for unique constraint violation
+        if (error.code === '23505') {
+          throw new Error('A campaign with this name already exists. Please choose a different name.');
+        }
         throw error;
       }
 
@@ -173,7 +206,7 @@ export function useCampaigns() {
     },
     onError: (error: Error) => {
       console.error('Error updating campaign:', error);
-      toast.error('Failed to update campaign');
+      toast.error(error.message || 'Failed to update campaign');
     },
   });
 
