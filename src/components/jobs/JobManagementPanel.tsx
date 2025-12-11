@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useState, useEffect, useMemo, useCallback, memo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -909,9 +909,11 @@ const JobGrid = memo(function JobGrid({
               </div>
               
               {/* Open Job Button - Full width on mobile */}
-              <Button size="sm" className="h-11 sm:h-8 w-full sm:w-auto text-sm" onClick={() => navigate(`/job/${job.job_id}`)}>
-                <Users className="h-4 w-4 sm:h-3 sm:w-3 mr-1.5" />
-                Open Job
+              <Button size="sm" className="h-11 sm:h-8 w-full sm:w-auto text-sm" asChild>
+                <Link to={`/job/${job.job_id}`}>
+                  <Users className="h-4 w-4 sm:h-3 sm:w-3 mr-1.5" />
+                  Open Job
+                </Link>
               </Button>
             </div>
           </CardContent>

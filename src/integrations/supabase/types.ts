@@ -715,7 +715,7 @@ export type Database = {
           created_by?: string | null
           email?: string | null
           full_name?: string | null
-          id: string
+          id?: string
           invitation_id?: string | null
           lead_type?: string | null
           linkedin_id?: string | null
