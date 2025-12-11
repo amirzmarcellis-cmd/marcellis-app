@@ -659,7 +659,7 @@ export type Database = {
           locations?: string | null
           opener_message?: string | null
           status?: string
-          updated_time: string
+          updated_time?: string
         }
         Update: {
           campaign_created_by?: string | null
