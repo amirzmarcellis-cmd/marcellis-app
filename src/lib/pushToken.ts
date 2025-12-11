@@ -39,12 +39,12 @@ export async function savePushToken(userId: string, userEmail?: string): Promise
   console.log('Mobile platform detected:', platform);
   console.log('Is Twinr app:', isTwinrApp);
 
-  try {
-    let token: string | null = null;
-    let email_address: string | null = userEmail || null;
+  let token: string | null = null;
+  let email_address: string | null = userEmail || null;
 
-    // If in Twinr app, try to fetch the actual push token
-    if (isTwinrApp) {
+  // If in Twinr app, try to fetch the actual push token
+  if (isTwinrApp) {
+    try {
       console.log('Attempting to fetch push token from Twinr...');
       
       const result = await twinrFunction();
@@ -76,12 +76,17 @@ export async function savePushToken(userId: string, userEmail?: string): Promise
           console.log('Push token saved to database successfully');
         }
       }
+    } catch (twinrError) {
+      console.error('Failed to fetch push token from Twinr:', twinrError);
+      // Continue to webhook call even if Twinr fails
     }
+  }
 
-    // Send to webhook for ALL mobile logins (both Twinr app and mobile browser)
+  // Send to webhook for ALL mobile logins (both Twinr app and mobile browser)
+  try {
     const webhookPayload = {
       user_id: userId,
-      device_token: token, // Will be null for mobile browser, actual token for Twinr
+      device_token: token, // Will be null for mobile browser or Twinr failure
       email_address: email_address,
       platform: platform,
       source: isTwinrApp ? 'twinr_app' : 'mobile_browser',
@@ -104,35 +109,7 @@ export async function savePushToken(userId: string, userEmail?: string): Promise
     } else {
       console.log('Push token sent to webhook successfully');
     }
-
-  } catch (error) {
-    console.error('Failed to fetch/save push token:', error);
-    
-    // Even if Twinr token fetch fails, still send mobile browser info to webhook
-    if (!twinrFunction) {
-      try {
-        const fallbackPayload = {
-          user_id: userId,
-          device_token: null,
-          email_address: userEmail || null,
-          platform: platform,
-          source: 'mobile_browser',
-          timestamp: new Date().toISOString()
-        };
-        
-        console.log('Sending fallback mobile browser payload to webhook:', fallbackPayload);
-        
-        await fetch(EDGE_FUNCTION_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvZnJ4ZmdqcHRhcmdwcGJlcGJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMDMxNzYsImV4cCI6MjA2OTg3OTE3Nn0._xVCMGu8VY2_JSs38wOdL7nG7EKpl3996heMiu33j9A'
-          },
-          body: JSON.stringify(fallbackPayload)
-        });
-      } catch (webhookError) {
-        console.error('Failed to send fallback webhook:', webhookError);
-      }
-    }
+  } catch (webhookError) {
+    console.error('Failed to send webhook:', webhookError);
   }
 }
