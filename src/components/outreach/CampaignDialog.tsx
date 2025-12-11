@@ -342,12 +342,15 @@ export function CampaignDialog({ open, onOpenChange, campaign, onSave, isLoading
 
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <Label className="text-sm font-medium text-foreground/80">Messages</Label>
+                      <Label className="text-sm font-medium text-foreground/80">
+                        Messages ({formData.followup_messages.length}/5)
+                      </Label>
                       <Button 
                         type="button" 
                         variant="outline" 
                         size="sm" 
                         onClick={addFollowupMessage}
+                        disabled={formData.followup_messages.length >= 5}
                         className="h-8 gap-1.5 text-xs"
                       >
                         <Plus className="h-3.5 w-3.5" />
