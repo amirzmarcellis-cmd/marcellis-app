@@ -295,13 +295,8 @@ export function CampaignDialog({ open, onOpenChange, campaign, onSave, isLoading
                       "hover:bg-primary/5 rounded-lg"
                     )}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
-                        followupsOpen ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
-                      )}>
-                        <Clock className="h-4 w-4" />
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
                       <div>
                         <p className="text-sm font-medium text-foreground">Follow-up Messages</p>
                         <p className="text-xs text-muted-foreground">Automatically send follow-ups</p>
