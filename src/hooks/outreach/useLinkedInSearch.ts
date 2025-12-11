@@ -28,18 +28,23 @@ export function useLinkedInSearch(type: SearchType) {
       
       const { data: { session } } = await supabase.auth.getSession();
       
+      if (!session?.access_token) {
+        throw new Error('No active session');
+      }
+
       const response = await fetch(searchUrl, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${session?.access_token}`,
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvZnJ4ZmdqcHRhcmdwcGJlcGJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMDMxNzYsImV4cCI6MjA2OTg3OTE3Nn0._xVCMGu8VY2_JSs38wOdL7nG7EKpl3996heMiu33j9A',
           'Content-Type': 'application/json',
         },
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('LinkedIn search error:', errorText);
-        throw new Error('Search failed');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('LinkedIn search error:', errorData);
+        throw new Error(errorData.error || 'Search failed');
       }
 
       const result = await response.json();
