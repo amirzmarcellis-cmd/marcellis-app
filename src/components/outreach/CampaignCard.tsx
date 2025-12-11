@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { MoreVertical, Edit, Trash2, Play, Pause, Users, MapPin, Building2, MessageSquare } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, Play, Pause, Users, MapPin, Building2, MessageSquare, User } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface CampaignCardProps {
@@ -34,6 +34,12 @@ export function CampaignCard({ campaign, leadCount = 0, onEdit, onDelete, onTogg
             <CardTitle className="text-lg truncate">{campaign.campaign_name}</CardTitle>
             <p className="text-xs text-muted-foreground">
               Created {format(new Date(campaign.created_time), 'MMM d, yyyy')}
+              {campaign.owner_name && (
+                <span className="ml-2 inline-flex items-center gap-1">
+                  <User className="h-3 w-3" />
+                  {campaign.owner_name}
+                </span>
+              )}
             </p>
           </div>
           <div className="flex items-center gap-2">

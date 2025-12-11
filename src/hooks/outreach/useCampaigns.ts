@@ -20,6 +20,7 @@ export interface Campaign {
   last_updated_by: string | null;
   created_time: string;
   updated_time: string;
+  owner_name?: string | null;
 }
 
 export interface CreateCampaignInput {
@@ -55,7 +56,19 @@ export function useCampaigns() {
         throw error;
       }
 
-      return data as Campaign[];
+      // Fetch owner profiles for all campaigns
+      const ownerIds = [...new Set(data?.map(c => c.campaign_created_by).filter(Boolean))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, name, email')
+        .in('user_id', ownerIds);
+
+      const profileMap = new Map(profiles?.map(p => [p.user_id, p.name || p.email]) || []);
+
+      return (data || []).map(campaign => ({
+        ...campaign,
+        owner_name: campaign.campaign_created_by ? profileMap.get(campaign.campaign_created_by) || null : null,
+      })) as Campaign[];
     },
   });
 
