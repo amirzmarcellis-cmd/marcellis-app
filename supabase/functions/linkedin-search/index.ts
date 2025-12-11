@@ -73,17 +73,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Map type to Unipile parameter type
-    const parameterTypeMap: Record<string, string> = {
-      'INDUSTRY': 'INDUSTRY',
-      'LOCATION': 'REGION', // Unipile uses REGION for locations
-      'COMPANY': 'COMPANY',
-    };
-
-    const parameterType = parameterTypeMap[type] || 'INDUSTRY';
-
     // Search LinkedIn via Unipile API
-    const searchUrl = `https://${UNIPILE_DSN}/api/v1/linkedin/search/parameters?account_id=${profile.linkedin_id}&q=${encodeURIComponent(keywords)}&parameter_type=${parameterType}`;
+    const searchUrl = `https://${UNIPILE_DSN}/api/v1/linkedin/search/parameters?keywords=${encodeURIComponent(keywords)}&type=${type}&account_id=${profile.linkedin_id}`;
     
     console.log('Searching LinkedIn:', searchUrl);
 
