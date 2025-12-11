@@ -14,7 +14,7 @@ import { Campaign } from '@/hooks/outreach/useCampaigns';
 import { 
   Plus, X, Megaphone, Target, MessageSquare, 
   ChevronDown, MapPin, Building2, Building, Search,
-  Loader2, Sparkles, Clock
+  Loader2, Clock, PenLine, Send
 } from 'lucide-react';
 import { LinkedInSearchSelect, SearchSelectItem } from './LinkedInSearchSelect';
 import { cn } from '@/lib/utils';
@@ -174,7 +174,7 @@ export function CampaignDialog({ open, onOpenChange, campaign, onSave, isLoading
           <form id="campaign-form" onSubmit={handleSubmit} className="space-y-6 p-6">
             
             {/* Section 1: Campaign Details */}
-            <FormSection icon={Sparkles} title="Campaign Details">
+            <FormSection icon={PenLine} title="Campaign Details">
               {/* Hero Input for Campaign Name */}
               <div className="space-y-2">
                 <Label htmlFor="campaign_name" className="text-sm font-medium text-foreground/80">
@@ -425,7 +425,7 @@ export function CampaignDialog({ open, onOpenChange, campaign, onSave, isLoading
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-4 w-4" />
+                    <Send className="h-4 w-4" />
                     {campaign ? 'Update Campaign' : 'Create Campaign'}
                   </>
                 )}

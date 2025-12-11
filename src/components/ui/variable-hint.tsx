@@ -1,6 +1,5 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { Sparkles } from "lucide-react";
 
 interface VariableHintProps {
   variables: string[];
@@ -15,9 +14,8 @@ export function VariableHint({
 }: VariableHintProps) {
   return (
     <div className={cn("flex flex-wrap items-center gap-2", className)}>
-      <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <Sparkles className="h-3 w-3" />
-        Variables:
+      <span className="text-xs text-muted-foreground">
+        Click to insert:
       </span>
       {variables.map((variable) => (
         <button
