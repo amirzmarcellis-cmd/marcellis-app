@@ -114,7 +114,7 @@ export default function Auth() {
 
         // Save push token for mobile users after login
         if (data.session?.user?.id) {
-          savePushToken(data.session.user.id);
+          savePushToken(data.session.user.id, email);
         }
       } else {
         const {
@@ -131,7 +131,7 @@ export default function Auth() {
 
         // Save push token for mobile users after signup
         if (data.session?.user?.id) {
-          savePushToken(data.session.user.id);
+          savePushToken(data.session.user.id, email);
         }
       }
       navigate('/');

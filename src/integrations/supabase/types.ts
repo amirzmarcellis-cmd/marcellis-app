@@ -859,6 +859,7 @@ export type Database = {
           email: string
           id: string
           is_admin: boolean
+          linkedin_campaign: boolean
           linkedin_id: string | null
           name: string | null
           slug: string | null
@@ -870,6 +871,7 @@ export type Database = {
           email: string
           id?: string
           is_admin?: boolean
+          linkedin_campaign?: boolean
           linkedin_id?: string | null
           name?: string | null
           slug?: string | null
@@ -881,6 +883,7 @@ export type Database = {
           email?: string
           id?: string
           is_admin?: boolean
+          linkedin_campaign?: boolean
           linkedin_id?: string | null
           name?: string | null
           slug?: string | null

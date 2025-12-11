@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Save push token on sign in (deferred to avoid blocking auth flow)
         if (event === 'SIGNED_IN' && session?.user?.id) {
           setTimeout(() => {
-            savePushToken(session.user.id);
+            savePushToken(session.user.id, session.user.email);
           }, 0);
         }
       }
