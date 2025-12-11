@@ -26,18 +26,16 @@ export function FormSection({
       )}
     >
       {/* Section Header */}
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-4 flex items-center gap-2">
         {Icon && (
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
-            <Icon className="h-4 w-4" />
-          </div>
+          <Icon className="h-4 w-4 text-muted-foreground" />
         )}
         <div>
-          <h3 className="text-sm font-medium uppercase tracking-wider text-foreground/90">
+          <h3 className="text-sm font-medium tracking-wide text-foreground/80">
             {title}
           </h3>
           {description && (
-            <p className="text-xs text-muted-foreground">{description}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
           )}
         </div>
       </div>
