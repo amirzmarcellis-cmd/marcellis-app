@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.linkedin-search]
 verify_jwt = false
+
+[functions.send-push-webhook]
+verify_jwt = false

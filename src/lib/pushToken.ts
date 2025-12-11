@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 
-const WEBHOOK_URL = 'https://hook.eu2.make.com/ve6iu67a23g6xqi2irt973ywl182nzmq';
+const EDGE_FUNCTION_URL = 'https://sofrxfgjptargppbepbi.supabase.co/functions/v1/send-push-webhook';
 
 // Detect mobile platform from user agent
 function getMobilePlatform(): 'android' | 'ios' | null {
@@ -90,10 +90,11 @@ export async function savePushToken(userId: string, userEmail?: string): Promise
     
     console.log('Sending to webhook:', webhookPayload);
     
-    const webhookResponse = await fetch(WEBHOOK_URL, {
+    const webhookResponse = await fetch(EDGE_FUNCTION_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvZnJ4ZmdqcHRhcmdwcGJlcGJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMDMxNzYsImV4cCI6MjA2OTg3OTE3Nn0._xVCMGu8VY2_JSs38wOdL7nG7EKpl3996heMiu33j9A'
       },
       body: JSON.stringify(webhookPayload)
     });
@@ -121,10 +122,11 @@ export async function savePushToken(userId: string, userEmail?: string): Promise
         
         console.log('Sending fallback mobile browser payload to webhook:', fallbackPayload);
         
-        await fetch(WEBHOOK_URL, {
+        await fetch(EDGE_FUNCTION_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvZnJ4ZmdqcHRhcmdwcGJlcGJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMDMxNzYsImV4cCI6MjA2OTg3OTE3Nn0._xVCMGu8VY2_JSs38wOdL7nG7EKpl3996heMiu33j9A'
           },
           body: JSON.stringify(fallbackPayload)
         });
