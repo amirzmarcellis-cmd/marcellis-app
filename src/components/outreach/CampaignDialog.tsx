@@ -8,13 +8,14 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Campaign } from '@/hooks/outreach/useCampaigns';
 import { Plus, X, Upload } from 'lucide-react';
+import { LinkedInSearchSelect, SearchSelectItem } from './LinkedInSearchSelect';
 
 interface FormData {
   campaign_name: string;
   keywords: string;
-  locations: string;
-  industries: string;
-  companies: string;
+  locations: SearchSelectItem[];
+  industries: SearchSelectItem[];
+  companies: SearchSelectItem[];
   opener_message: string;
   document: File | null;
   enable_followups: boolean;
@@ -30,13 +31,22 @@ interface CampaignDialogProps {
   isLoading?: boolean;
 }
 
+// Helper to parse comma-separated string to SearchSelectItem array
+const parseToItems = (str: string | null | undefined): SearchSelectItem[] => {
+  if (!str) return [];
+  return str.split(',').map(s => s.trim()).filter(Boolean).map(label => ({
+    id: label, // Use label as id for backward compatibility
+    label
+  }));
+};
+
 export function CampaignDialog({ open, onOpenChange, campaign, onSave, isLoading }: CampaignDialogProps) {
   const [formData, setFormData] = useState<FormData>({
     campaign_name: '',
     keywords: '',
-    locations: '',
-    industries: '',
-    companies: '',
+    locations: [],
+    industries: [],
+    companies: [],
     opener_message: '',
     document: null,
     enable_followups: false,
@@ -49,9 +59,9 @@ export function CampaignDialog({ open, onOpenChange, campaign, onSave, isLoading
       setFormData({
         campaign_name: campaign.campaign_name || '',
         keywords: campaign.keywords || '',
-        locations: campaign.locations || '',
-        industries: campaign.industries || '',
-        companies: campaign.companies || '',
+        locations: parseToItems(campaign.locations),
+        industries: parseToItems(campaign.industries),
+        companies: parseToItems(campaign.companies),
         opener_message: campaign.opener_message || '',
         document: null,
         enable_followups: campaign.enable_followups || false,
@@ -62,9 +72,9 @@ export function CampaignDialog({ open, onOpenChange, campaign, onSave, isLoading
       setFormData({
         campaign_name: '',
         keywords: '',
-        locations: '',
-        industries: '',
-        companies: '',
+        locations: [],
+        industries: [],
+        companies: [],
         opener_message: '',
         document: null,
         enable_followups: false,
@@ -77,13 +87,13 @@ export function CampaignDialog({ open, onOpenChange, campaign, onSave, isLoading
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Transform string fields to the expected format
+    // Transform arrays to the expected format for saving
     const transformedData = {
       campaign_name: formData.campaign_name,
       keywords: formData.keywords,
-      locations: formData.locations ? formData.locations.split(',').map(l => ({ id: l.trim(), label: l.trim() })) : [],
-      industries: formData.industries ? formData.industries.split(',').map(i => ({ id: i.trim(), label: i.trim() })) : [],
-      companies: formData.companies ? formData.companies.split(',').map(c => ({ id: c.trim(), label: c.trim() })) : [],
+      locations: formData.locations,
+      industries: formData.industries,
+      companies: formData.companies,
       opener_message: formData.opener_message,
       document: formData.document || undefined,
       enable_followups: formData.enable_followups,
@@ -140,46 +150,44 @@ export function CampaignDialog({ open, onOpenChange, campaign, onSave, isLoading
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="keywords">Keywords</Label>
-              <Input
-                id="keywords"
-                value={formData.keywords}
-                onChange={(e) => setFormData(prev => ({ ...prev, keywords: e.target.value }))}
-                placeholder="e.g., Sales Manager, VP Sales"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="locations">Locations</Label>
-              <Input
-                id="locations"
-                value={formData.locations}
-                onChange={(e) => setFormData(prev => ({ ...prev, locations: e.target.value }))}
-                placeholder="e.g., Dubai, Saudi Arabia"
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="keywords">Keywords</Label>
+            <Input
+              id="keywords"
+              value={formData.keywords}
+              onChange={(e) => setFormData(prev => ({ ...prev, keywords: e.target.value }))}
+              placeholder="e.g., Sales Manager, VP Sales"
+            />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="industries">Industries</Label>
-              <Input
-                id="industries"
-                value={formData.industries}
-                onChange={(e) => setFormData(prev => ({ ...prev, industries: e.target.value }))}
-                placeholder="e.g., Technology, Finance"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="companies">Companies</Label>
-              <Input
-                id="companies"
-                value={formData.companies}
-                onChange={(e) => setFormData(prev => ({ ...prev, companies: e.target.value }))}
-                placeholder="e.g., Google, Microsoft"
-              />
-            </div>
+          <div className="space-y-2">
+            <Label>Locations</Label>
+            <LinkedInSearchSelect
+              type="LOCATION"
+              value={formData.locations}
+              onChange={(locations) => setFormData(prev => ({ ...prev, locations }))}
+              placeholder="Search locations..."
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Industries</Label>
+            <LinkedInSearchSelect
+              type="INDUSTRY"
+              value={formData.industries}
+              onChange={(industries) => setFormData(prev => ({ ...prev, industries }))}
+              placeholder="Search industries..."
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Companies</Label>
+            <LinkedInSearchSelect
+              type="COMPANY"
+              value={formData.companies}
+              onChange={(companies) => setFormData(prev => ({ ...prev, companies }))}
+              placeholder="Search companies..."
+            />
           </div>
 
           <div className="space-y-2">

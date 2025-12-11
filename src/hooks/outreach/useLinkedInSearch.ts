@@ -14,7 +14,8 @@ export function useLinkedInSearch(type: SearchType) {
   const [error, setError] = useState<string | null>(null);
 
   const search = useCallback(async (keywords: string) => {
-    if (!keywords.trim()) {
+    // Minimum 2 characters required
+    if (!keywords.trim() || keywords.trim().length < 2) {
       setResults([]);
       return;
     }
@@ -23,12 +24,6 @@ export function useLinkedInSearch(type: SearchType) {
     setError(null);
 
     try {
-      const { data, error: fnError } = await supabase.functions.invoke('linkedin-search', {
-        body: null,
-        headers: {},
-      });
-
-      // Use query params approach via URL
       const searchUrl = `https://sofrxfgjptargppbepbi.supabase.co/functions/v1/linkedin-search?keywords=${encodeURIComponent(keywords)}&type=${type}`;
       
       const { data: { session } } = await supabase.auth.getSession();
