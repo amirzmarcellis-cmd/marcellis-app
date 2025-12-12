@@ -24,10 +24,12 @@ export default function AIOutreach() {
   const [viewMode, setViewMode] = useState<'table' | 'pipeline'>('table');
   const [deletingLead, setDeletingLead] = useState<LinkedInLead | null>(null);
 
-  // Get all leads and filter by campaign if one is selected
+  // Get all leads and filter by campaign if one is selected (case-insensitive)
   const { leads: allLeads, isLoading: leadsLoading } = useLinkedInCampaignLeads();
   const leads = selectedCampaign 
-    ? allLeads.filter(lead => lead.campaign_name === selectedCampaign.campaign_name)
+    ? allLeads.filter(lead => 
+        lead.campaign_name?.toLowerCase().trim() === selectedCampaign.campaign_name?.toLowerCase().trim()
+      )
     : allLeads;
   const { updateLead, isUpdating } = useUpdateLinkedInCampaignLead();
   const { deleteLead, isDeleting } = useDeleteLinkedInCampaignLead();

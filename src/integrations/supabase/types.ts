@@ -696,7 +696,7 @@ export type Database = {
           id: string
           invitation_id: string | null
           lead_type: string | null
-          linkedin_id: string | null
+          linkedin_id: string
           notes: string | null
           phone_number: string | null
           service: string | null
@@ -718,7 +718,7 @@ export type Database = {
           id?: string
           invitation_id?: string | null
           lead_type?: string | null
-          linkedin_id?: string | null
+          linkedin_id: string
           notes?: string | null
           phone_number?: string | null
           service?: string | null
@@ -740,7 +740,7 @@ export type Database = {
           id?: string
           invitation_id?: string | null
           lead_type?: string | null
-          linkedin_id?: string | null
+          linkedin_id?: string
           notes?: string | null
           phone_number?: string | null
           service?: string | null

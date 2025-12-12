@@ -1,9 +1,10 @@
 import { LinkedInLead } from '@/hooks/outreach/useLinkedInCampaignLeads';
 import { useLinkedInLeadPipeline, PipelineStage } from '@/hooks/outreach/useLinkedInLeadPipeline';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { Users } from 'lucide-react';
 
 interface LeadPipelineProps {
   leads: LinkedInLead[];
@@ -12,9 +13,11 @@ interface LeadPipelineProps {
 
 export function LeadPipeline({ leads, onSelectLead }: LeadPipelineProps) {
   const stages = useLinkedInLeadPipeline(leads);
+  const activeStages = stages.filter(s => s.count > 0);
+  const totalLeads = leads.length;
 
   const getLeadsByStatus = (status: string) => {
-    return leads.filter(lead => (lead.status?.toLowerCase() || 'new') === status);
+    return leads.filter(lead => (lead.status?.toLowerCase().trim() || 'new') === status);
   };
 
   const getInitials = (name: string | null) => {
@@ -23,44 +26,51 @@ export function LeadPipeline({ leads, onSelectLead }: LeadPipelineProps) {
   };
 
   return (
-    <div className="space-y-4">
-      {/* Pipeline Overview */}
-      <Card className="bg-card/50 backdrop-blur-sm">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Pipeline Overview</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-1 h-8 rounded-lg overflow-hidden">
-            {stages.map((stage, index) => (
-              <div
-                key={stage.status}
-                className={cn(
-                  stage.color,
-                  'flex items-center justify-center text-xs font-medium transition-all',
-                  stage.percentage > 0 ? 'min-w-[40px]' : 'w-0'
-                )}
-                style={{ width: `${Math.max(stage.percentage, stage.count > 0 ? 10 : 0)}%` }}
-                title={`${stage.label}: ${stage.count} (${stage.percentage}%)`}
-              >
-                {stage.percentage >= 15 && stage.count}
-              </div>
-            ))}
+    <div className="space-y-6">
+      {/* Pipeline Overview Bar */}
+      <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+        <CardHeader className="pb-3 pt-4 px-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium">Lead Journey</span>
+            </div>
+            <span className="text-sm text-muted-foreground">{totalLeads} leads total</span>
           </div>
-          <div className="flex flex-wrap gap-4 mt-4">
-            {stages.map(stage => (
+        </CardHeader>
+        <CardContent className="px-4 pb-4">
+          {/* Progress Bar */}
+          {totalLeads > 0 ? (
+            <div className="flex gap-1 h-3 rounded-full overflow-hidden bg-muted/30">
+              {activeStages.map((stage) => (
+                <div
+                  key={stage.status}
+                  className={cn(stage.color, 'transition-all duration-300')}
+                  style={{ width: `${Math.max(stage.percentage, 5)}%` }}
+                  title={`${stage.label}: ${stage.count} (${stage.percentage}%)`}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="h-3 rounded-full bg-muted/30" />
+          )}
+          
+          {/* Legend */}
+          <div className="flex flex-wrap gap-x-4 gap-y-2 mt-4">
+            {stages.filter(s => s.count > 0).map(stage => (
               <div key={stage.status} className="flex items-center gap-2 text-sm">
-                <div className={cn('w-3 h-3 rounded-full', stage.color)} />
-                <span className="text-muted-foreground">{stage.label}:</span>
-                <span className="font-medium">{stage.count}</span>
+                <div className={cn('w-2.5 h-2.5 rounded-full', stage.color)} />
+                <span className="text-muted-foreground">{stage.label}</span>
+                <span className="font-semibold">{stage.count}</span>
               </div>
             ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Kanban View */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {stages.map(stage => (
+      {/* Kanban Columns */}
+      <div className="flex gap-4 overflow-x-auto pb-4">
+        {stages.filter(s => s.count > 0).map(stage => (
           <PipelineColumn
             key={stage.status}
             stage={stage}
@@ -69,6 +79,14 @@ export function LeadPipeline({ leads, onSelectLead }: LeadPipelineProps) {
             getInitials={getInitials}
           />
         ))}
+        {totalLeads === 0 && (
+          <div className="flex-1 flex items-center justify-center min-h-[300px] text-muted-foreground">
+            <div className="text-center space-y-2">
+              <Users className="h-10 w-10 mx-auto opacity-50" />
+              <p>No leads in this campaign yet</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -83,49 +101,56 @@ interface PipelineColumnProps {
 
 function PipelineColumn({ stage, leads, onSelectLead, getInitials }: PipelineColumnProps) {
   return (
-    <Card className="bg-card/50 backdrop-blur-sm min-h-[300px]">
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
+    <div className="flex-shrink-0 w-[260px]">
+      <Card className="bg-card/50 backdrop-blur-sm border-border/50 h-full">
+        {/* Column Header */}
+        <CardHeader className="p-3 pb-2">
           <div className="flex items-center gap-2">
-            <div className={cn('w-3 h-3 rounded-full', stage.color)} />
-            <CardTitle className="text-sm font-medium">{stage.label}</CardTitle>
+            <div className={cn('w-1 h-5 rounded-full', stage.color)} />
+            <span className="text-sm font-medium flex-1 text-left">{stage.label}</span>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+              {stage.count}
+            </span>
           </div>
-          <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
-            {stage.count}
-          </span>
-        </div>
-      </CardHeader>
-      <CardContent className="p-2">
-        <ScrollArea className="h-[250px]">
-          <div className="space-y-2">
-            {leads.length === 0 ? (
-              <p className="text-xs text-muted-foreground text-center py-4">No leads</p>
-            ) : (
-              leads.map(lead => (
-                <div
-                  key={lead.id}
-                  onClick={() => onSelectLead(lead)}
-                  className="p-2 rounded-lg border border-border bg-background/50 hover:bg-muted/50 cursor-pointer transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-7 w-7">
-                      <AvatarFallback className="bg-primary/10 text-primary text-[10px]">
-                        {getInitials(lead.full_name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{lead.full_name || 'Unknown'}</p>
-                      <p className="text-[10px] text-muted-foreground truncate">
-                        {lead.company_name || 'No company'}
-                      </p>
+        </CardHeader>
+        
+        {/* Lead Cards */}
+        <CardContent className="p-2 pt-0">
+          <ScrollArea className="h-[320px]">
+            <div className="space-y-2 pr-2">
+              {leads.length === 0 ? (
+                <p className="text-xs text-muted-foreground text-center py-6">
+                  No leads in this stage yet
+                </p>
+              ) : (
+                leads.map(lead => (
+                  <div
+                    key={lead.id}
+                    onClick={() => onSelectLead(lead)}
+                    className="p-3 rounded-lg border border-border/50 bg-background/60 hover:bg-muted/50 hover:border-border cursor-pointer transition-all group"
+                  >
+                    <div className="flex items-start gap-3">
+                      <Avatar className="h-9 w-9 shrink-0">
+                        <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
+                          {getInitials(lead.full_name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0 space-y-1 text-left">
+                        <p className="text-sm font-medium leading-tight truncate group-hover:text-primary transition-colors">
+                          {lead.full_name || 'Unknown'}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {lead.company_name || 'No company'}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
-            )}
-          </div>
-        </ScrollArea>
-      </CardContent>
-    </Card>
+                ))
+              )}
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
