@@ -49,7 +49,17 @@ export async function savePushToken(userId: string, userEmail?: string): Promise
       
       // Twinr function is synchronous and returns { token, platform }
       const result = twinrFunction();
-      console.log('Push token result:', result);
+      
+      // Enhanced debug logging
+      console.log('=== TWINR DEBUG START ===');
+      console.log('Raw result:', result);
+      console.log('Result type:', typeof result);
+      console.log('Result keys:', result ? Object.keys(result) : 'null/undefined');
+      console.log('Token value:', result?.token);
+      console.log('Token type:', typeof result?.token);
+      console.log('Token length:', result?.token?.length);
+      console.log('Platform value:', result?.platform);
+      console.log('=== TWINR DEBUG END ===');
       
       token = result.token || null;
       // Use platform from Twinr response (more accurate than user agent detection)
