@@ -47,15 +47,17 @@ export async function savePushToken(userId: string, userEmail?: string): Promise
     try {
       console.log('Attempting to fetch push token from Twinr...');
       
-      const result = await twinrFunction();
+      // Twinr function is synchronous and returns { token, platform }
+      const result = twinrFunction();
       console.log('Push token result:', result);
       
       token = result.token || null;
-      email_address = result.email_address || userEmail || null;
+      // Use platform from Twinr response (more accurate than user agent detection)
+      const twinrPlatform = result.platform || platform;
       
       // Validate the token before saving to database
-      if (token && platform) {
-        console.log('Push token fetched successfully:', { platform, email_address, tokenLength: token?.length });
+      if (token && twinrPlatform) {
+        console.log('Push token fetched successfully:', { platform: twinrPlatform, email_address, tokenLength: token?.length });
 
         // Save to database (only for Twinr app with actual token)
         const { error: dbError } = await supabase
@@ -63,7 +65,7 @@ export async function savePushToken(userId: string, userEmail?: string): Promise
           .upsert({
             user_id: userId,
             device_token: token,
-            platform: platform,
+            platform: twinrPlatform,
             email_address: email_address,
             updated_at: new Date().toISOString()
           }, {
