@@ -19,12 +19,18 @@ export function CampaignList({ onSelectCampaign }: CampaignListProps) {
   const { campaigns, isLoading, createCampaign, updateCampaign, deleteCampaign, isCreating, isUpdating, isDeleting } = useCampaigns();
   const { leads } = useLinkedInCampaignLeads();
   
-  // Calculate lead counts per campaign
+  // Calculate lead counts per campaign (case-insensitive)
   const leadCounts = leads.reduce((acc, lead) => {
-    const campaignName = lead.campaign_name || '';
+    const campaignName = (lead.campaign_name || '').toLowerCase().trim();
     acc[campaignName] = (acc[campaignName] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
+  
+  // Helper to get lead count with case-insensitive matching
+  const getLeadCount = (campaignName: string | null) => {
+    const key = (campaignName || '').toLowerCase().trim();
+    return leadCounts[key] || 0;
+  };
   
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
@@ -146,7 +152,7 @@ export function CampaignList({ onSelectCampaign }: CampaignListProps) {
             <CampaignCard
               key={campaign.id}
               campaign={campaign}
-              leadCount={leadCounts[campaign.campaign_name || ''] || 0}
+              leadCount={getLeadCount(campaign.campaign_name)}
               onEdit={handleEdit}
               onDelete={setDeletingCampaign}
               onToggleStatus={handleToggleStatus}
