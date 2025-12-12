@@ -10,16 +10,11 @@ export interface PipelineStage {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; order: number }> = {
-  'new': { label: 'New', color: 'bg-slate-500', order: 1 },
-  'post liked': { label: 'Post Liked', color: 'bg-sky-500', order: 2 },
-  'profile viewed': { label: 'Profile Viewed', color: 'bg-indigo-500', order: 3 },
-  'connection sent': { label: 'Connection Sent', color: 'bg-cyan-500', order: 4 },
-  'connection accepted': { label: 'Connected', color: 'bg-teal-500', order: 5 },
-  'conversation initiated': { label: 'In Conversation', color: 'bg-blue-500', order: 6 },
-  'manual takeover': { label: 'Needs Attention', color: 'bg-purple-500', order: 7 },
-  'qualified': { label: 'Qualified', color: 'bg-amber-500', order: 8 },
-  'won': { label: 'Won', color: 'bg-emerald-500', order: 9 },
-  'lost': { label: 'Lost', color: 'bg-red-500', order: 10 },
+  'post liked': { label: 'Post Liked', color: 'bg-sky-500', order: 1 },
+  'connection requested': { label: 'Connection Requested', color: 'bg-cyan-500', order: 2 },
+  'conversation initiated': { label: 'Conversation Initiated', color: 'bg-blue-500', order: 3 },
+  'not interested': { label: 'Not Interested', color: 'bg-red-500', order: 4 },
+  'ready to schedule': { label: 'Ready to Schedule', color: 'bg-emerald-500', order: 5 },
 };
 
 // Get config for a status, with fallback for unknown statuses
