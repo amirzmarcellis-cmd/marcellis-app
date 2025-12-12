@@ -20,16 +20,11 @@ interface LeadTableProps {
 }
 
 const STATUS_OPTIONS = [
-  { value: 'new', label: 'New', color: 'bg-slate-500/20 text-slate-400' },
   { value: 'post liked', label: 'Post Liked', color: 'bg-sky-500/20 text-sky-400' },
-  { value: 'profile viewed', label: 'Profile Viewed', color: 'bg-indigo-500/20 text-indigo-400' },
-  { value: 'connection sent', label: 'Connection Sent', color: 'bg-cyan-500/20 text-cyan-400' },
-  { value: 'connection accepted', label: 'Connected', color: 'bg-teal-500/20 text-teal-400' },
-  { value: 'conversation initiated', label: 'In Conversation', color: 'bg-blue-500/20 text-blue-400' },
-  { value: 'manual takeover', label: 'Needs Attention', color: 'bg-purple-500/20 text-purple-400' },
-  { value: 'qualified', label: 'Qualified', color: 'bg-amber-500/20 text-amber-400' },
-  { value: 'won', label: 'Won', color: 'bg-emerald-500/20 text-emerald-400' },
-  { value: 'lost', label: 'Lost', color: 'bg-red-500/20 text-red-400' },
+  { value: 'connection requested', label: 'Connection Requested', color: 'bg-cyan-500/20 text-cyan-400' },
+  { value: 'conversation initiated', label: 'Conversation Initiated', color: 'bg-blue-500/20 text-blue-400' },
+  { value: 'not interested', label: 'Not Interested', color: 'bg-red-500/20 text-red-400' },
+  { value: 'ready to schedule', label: 'Ready to Schedule', color: 'bg-emerald-500/20 text-emerald-400' },
 ];
 
 export function LeadTable({ leads, isLoading, onSelectLead, onUpdateStatus, onDelete }: LeadTableProps) {

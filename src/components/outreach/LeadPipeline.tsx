@@ -69,8 +69,8 @@ export function LeadPipeline({ leads, onSelectLead }: LeadPipelineProps) {
       </Card>
 
       {/* Kanban Columns */}
-      <div className="flex gap-4 overflow-x-auto pb-4">
-        {stages.filter(s => s.count > 0).map(stage => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 pb-4">
+        {stages.map(stage => (
           <PipelineColumn
             key={stage.status}
             stage={stage}
@@ -79,15 +79,15 @@ export function LeadPipeline({ leads, onSelectLead }: LeadPipelineProps) {
             getInitials={getInitials}
           />
         ))}
-        {totalLeads === 0 && (
-          <div className="flex-1 flex items-center justify-center min-h-[300px] text-muted-foreground">
-            <div className="text-center space-y-2">
-              <Users className="h-10 w-10 mx-auto opacity-50" />
-              <p>No leads in this campaign yet</p>
-            </div>
-          </div>
-        )}
       </div>
+      {totalLeads === 0 && (
+        <div className="flex items-center justify-center min-h-[200px] text-muted-foreground">
+          <div className="text-center space-y-2">
+            <Users className="h-10 w-10 mx-auto opacity-50" />
+            <p>No leads in this campaign yet</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -101,7 +101,7 @@ interface PipelineColumnProps {
 
 function PipelineColumn({ stage, leads, onSelectLead, getInitials }: PipelineColumnProps) {
   return (
-    <div className="flex-shrink-0 w-[260px]">
+    <div className="w-full">
       <Card className="bg-card/50 backdrop-blur-sm border-border/50 h-full">
         {/* Column Header */}
         <CardHeader className="p-3 pb-2">
