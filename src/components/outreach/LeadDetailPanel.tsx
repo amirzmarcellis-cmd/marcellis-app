@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { LinkedInLead } from '@/hooks/outreach/useLinkedInCampaignLeads';
-import { ChatPanel } from './ChatPanel';
+import { ChatPanel, ChatPanelRef } from './ChatPanel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { X, Building2, Mail, Phone, Linkedin, Save, MessageSquare, User, FileText, ExternalLink } from 'lucide-react';
+import { X, Building2, Mail, Phone, Linkedin, Save, MessageSquare, User, FileText, ExternalLink, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface LeadDetailPanelProps {
@@ -31,6 +31,11 @@ export function LeadDetailPanel({ lead, onClose, onUpdateLead, isUpdating }: Lea
   const [notes, setNotes] = useState(lead?.notes || '');
   const [status, setStatus] = useState(lead?.status || 'new');
   const [hasChanges, setHasChanges] = useState(false);
+  const chatPanelRef = useRef<ChatPanelRef>(null);
+
+  const handleRefreshMessages = () => {
+    chatPanelRef.current?.refetch();
+  };
 
   const handleStatusChange = (newStatus: string) => {
     setStatus(newStatus);
@@ -77,11 +82,20 @@ export function LeadDetailPanel({ lead, onClose, onUpdateLead, isUpdating }: Lea
             </div>
           </div>
           <div className="flex items-center gap-1">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={handleRefreshMessages}
+              title="Refresh messages"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
             {lead.linkedin_id && (
               <Button 
                 variant="ghost" 
                 size="icon"
                 onClick={() => window.open(`https://linkedin.com/in/${lead.linkedin_id}`, '_blank')}
+                title="View LinkedIn profile"
               >
                 <ExternalLink className="h-4 w-4" />
               </Button>
@@ -209,7 +223,7 @@ export function LeadDetailPanel({ lead, onClose, onUpdateLead, isUpdating }: Lea
 
           <TabsContent value="messages" className="flex-1 overflow-hidden mt-0">
             <div className="h-full">
-              <ChatPanel lead={lead} />
+              <ChatPanel ref={chatPanelRef} lead={lead} />
             </div>
           </TabsContent>
 
