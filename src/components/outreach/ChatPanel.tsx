@@ -67,20 +67,6 @@ export function ChatPanel({ lead }: ChatPanelProps) {
 
   return (
     <Card className="h-full flex flex-col bg-transparent border-0 shadow-none">
-      <div className="flex items-center justify-end gap-2 p-2 border-b border-border">
-        <Button variant="ghost" size="icon" onClick={() => refetch()}>
-          <RefreshCw className="h-4 w-4" />
-        </Button>
-        {lead.linkedin_id && (
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => window.open(`https://linkedin.com/in/${lead.linkedin_id}`, '_blank')}
-          >
-            <ExternalLink className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
       
       <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
         <ScrollArea className="flex-1 p-4" ref={scrollRef}>
