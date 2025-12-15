@@ -146,7 +146,9 @@ export function LeadTable({ leads, isLoading, onSelectLead, onUpdateStatus, onDe
                     </Badge>
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">
-                    {lead.action_date ? format(new Date(lead.action_date), 'MMM d') : '-'}
+                    {lead.action_date && !isNaN(new Date(lead.action_date).getTime()) 
+                      ? format(new Date(lead.action_date), 'MMM d') 
+                      : '-'}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
