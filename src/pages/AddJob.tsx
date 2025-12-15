@@ -312,17 +312,22 @@ export default function AddJob() {
 
         const jobIds = recruiterJobs.map(j => j.job_id);
 
-        // Count shortlisted candidates for these jobs (contacted = 'Call Done' AND after_call_score >= 75)
-        const { count, error: countError } = await supabase
+        // Fetch all shortlisted candidates for these jobs (after_call_score >= 75)
+        const { data: candidates, error: candidatesError } = await supabase
           .from('Jobs_CVs')
-          .select('*', { count: 'exact', head: true })
+          .select('contacted')
           .in('job_id', jobIds)
-          .ilike('contacted', 'Call Done')
           .gte('after_call_score', 75);
 
-        if (countError) throw countError;
+        if (candidatesError) throw candidatesError;
 
-        setShortlistedCount(count || 0);
+        // Filter out rejected and submitted candidates
+        const activeShortlisted = (candidates || []).filter(c => {
+          const contacted = (c.contacted || '').trim().toLowerCase();
+          return contacted !== 'rejected' && contacted !== 'submitted';
+        });
+
+        setShortlistedCount(activeShortlisted.length);
       } catch (error) {
         console.error('Error checking shortlisted count:', error);
         setShortlistedCount(0);
