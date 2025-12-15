@@ -125,33 +125,28 @@ export function ChatPanel({ lead }: ChatPanelProps) {
           )}
         </ScrollArea>
 
-        <div className="p-4 border-t border-border">
+        <div className="p-4 border-t border-border opacity-50">
           <div className="flex gap-2">
-            <Button variant="ghost" size="icon" className="shrink-0">
+            <Button variant="ghost" size="icon" className="shrink-0" disabled>
               <Paperclip className="h-4 w-4" />
             </Button>
             <Textarea
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Type a message..."
+              disabled
+              placeholder="Messaging coming soon..."
               rows={1}
-              className="min-h-[40px] resize-none"
+              className="min-h-[40px] resize-none cursor-not-allowed"
             />
             <Button 
-              onClick={handleSend} 
-              disabled={!newMessage.trim() || isSending || !chatId}
+              disabled
               size="icon"
               className="shrink-0"
             >
               <Send className="h-4 w-4" />
             </Button>
           </div>
-          {!chatId && (
-            <p className="text-xs text-amber-500 mt-2">
-              No chat session available. Send a connection request first.
-            </p>
-          )}
+          <p className="text-xs text-muted-foreground mt-2">
+            This feature is currently disabled.
+          </p>
         </div>
       </CardContent>
     </Card>
