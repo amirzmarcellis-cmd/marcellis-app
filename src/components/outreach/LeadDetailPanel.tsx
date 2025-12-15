@@ -62,7 +62,7 @@ export function LeadDetailPanel({ lead, onClose, onUpdateLead, isUpdating }: Lea
   }
 
   return (
-    <Card className="h-full flex flex-col bg-card/50 backdrop-blur-sm overflow-hidden">
+    <Card className="h-full flex flex-col bg-card backdrop-blur-sm overflow-hidden border-l border-border shadow-2xl">
       <CardHeader className="pb-2 border-b border-border shrink-0">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
