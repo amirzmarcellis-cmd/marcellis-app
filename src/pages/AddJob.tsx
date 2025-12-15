@@ -755,7 +755,9 @@ export default function AddJob() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="itrisId" className="font-medium">Itris ID</Label>
+                <Label htmlFor="itrisId" className="font-medium flex items-center gap-1">
+                  Itris ID <span className="text-primary">*</span>
+                </Label>
                 <Input
                   id="itrisId"
                   value={formData.itrisId}
