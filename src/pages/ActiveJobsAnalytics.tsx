@@ -103,12 +103,19 @@ export default function ActiveJobsAnalytics() {
     const jobCandidates = candidates.filter(c => c.job_id === jobId);
     
     return {
-      longlisted: jobCandidates.filter(c => 
-        c.contacted?.toLowerCase() === 'call done' && (c.after_call_score || 0) < 75
-      ).length,
-      shortlisted: jobCandidates.filter(c => 
-        c.contacted?.toLowerCase() === 'call done' && (c.after_call_score || 0) >= 75
-      ).length,
+      // Longlisted: Call Done with score < 75 (non-null) OR Low Scored status
+      longlisted: jobCandidates.filter(c => {
+        const status = c.contacted?.toLowerCase();
+        return (status === 'call done' && c.after_call_score !== null && c.after_call_score < 75) ||
+               (status === 'low scored');
+      }).length,
+      // Shortlisted: Call Done OR Submitted with score >= 75
+      shortlisted: jobCandidates.filter(c => {
+        const status = c.contacted?.toLowerCase();
+        const hasHighScore = c.after_call_score !== null && c.after_call_score >= 75;
+        return (status === 'call done' && hasHighScore) || 
+               (status === 'submitted' && hasHighScore);
+      }).length,
       rejected: jobCandidates.filter(c => 
         c.contacted?.toLowerCase() === 'rejected'
       ).length,
