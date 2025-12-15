@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { BarChart3, Phone, Users, Settings, Home, TrendingUp, FileText, Briefcase, LogOut, PhoneCall, Activity, Sun, Moon, Building2, FolderOpen, User, Crown, Megaphone } from "lucide-react";
+import { BarChart3, Phone, Users, Settings, Home, TrendingUp, FileText, Briefcase, LogOut, PhoneCall, Activity, Sun, Moon, Building2, FolderOpen, User, Crown, Megaphone, PieChart } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -78,6 +78,10 @@ export function DashboardSidebar() {
     url: "/reports",
     icon: FileText
   }, {
+    title: "Active Jobs Analytics",
+    url: "/active-jobs-analytics",
+    icon: PieChart
+  }, {
     title: "AI Outreach",
     url: "/ai-outreach",
     icon: Megaphone
@@ -140,8 +144,8 @@ export function DashboardSidebar() {
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2">
               {navigationItems.filter(item => {
-              // Filter out Analytics and Reports for recruiters
-              if ((item.title === 'Analytics' || item.title === 'Reports') && !canAccessAnalytics) {
+              // Filter out Analytics, Reports, and Active Jobs Analytics for recruiters
+              if ((item.title === 'Analytics' || item.title === 'Reports' || item.title === 'Active Jobs Analytics') && !canAccessAnalytics) {
                 return false;
               }
               return true;

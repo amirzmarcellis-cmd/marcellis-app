@@ -42,6 +42,7 @@ const CompanySettings = lazy(() => import("./pages/CompanySettings"));
 const PlatformAdmin = lazy(() => import("./pages/PlatformAdmin"));
 const LinkedInCallback = lazy(() => import("./pages/LinkedInCallback"));
 const AIOutreach = lazy(() => import("./pages/AIOutreach"));
+const ActiveJobsAnalytics = lazy(() => import("./pages/ActiveJobsAnalytics"));
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient({
@@ -98,6 +99,11 @@ const App = () => (
                   <Route path="/reports" element={
                     <ProtectedRoute requiresAnalytics={true}>
                       <DashboardLayout><Reports /></DashboardLayout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/active-jobs-analytics" element={
+                    <ProtectedRoute requiresAnalytics={true}>
+                      <DashboardLayout><ActiveJobsAnalytics /></DashboardLayout>
                     </ProtectedRoute>
                   } />
                   <Route path="/ai-outreach" element={<AIOutreach />} />
