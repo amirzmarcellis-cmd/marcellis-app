@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { useUnipileMessages, UnipileMessage } from '@/hooks/outreach/useUnipileMessages';
 import { useSendUnipileMessage } from '@/hooks/outreach/useSendUnipileMessage';
 import { LinkedInLead } from '@/hooks/outreach/useLinkedInCampaignLeads';
@@ -16,13 +16,21 @@ interface ChatPanelProps {
   lead: LinkedInLead | null;
 }
 
-export function ChatPanel({ lead }: ChatPanelProps) {
+export interface ChatPanelRef {
+  refetch: () => void;
+}
+
+export const ChatPanel = forwardRef<ChatPanelRef, ChatPanelProps>(({ lead }, ref) => {
   const chatId = lead?.chat_id || null;
   const { messages, isLoading, refetch } = useUnipileMessages(chatId);
   const { sendMessage, isSending } = useSendUnipileMessage();
   
   const [newMessage, setNewMessage] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    refetch: () => refetch()
+  }), [refetch]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -67,12 +75,6 @@ export function ChatPanel({ lead }: ChatPanelProps) {
 
   return (
     <Card className="h-full flex flex-col bg-transparent border-0 shadow-none">
-      <div className="flex items-center justify-end p-2 border-b border-border">
-        <Button variant="ghost" size="sm" onClick={() => refetch()} className="gap-1 text-xs">
-          <RefreshCw className="h-3 w-3" />
-          Refresh
-        </Button>
-      </div>
       
       <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
         <ScrollArea className="flex-1 p-4" ref={scrollRef}>
@@ -128,7 +130,7 @@ export function ChatPanel({ lead }: ChatPanelProps) {
       </CardContent>
     </Card>
   );
-}
+});
 
 interface MessageBubbleProps {
   message: UnipileMessage;
