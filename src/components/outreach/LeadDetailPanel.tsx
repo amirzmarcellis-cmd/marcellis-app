@@ -31,10 +31,14 @@ export function LeadDetailPanel({ lead, onClose, onUpdateLead, isUpdating }: Lea
   const [notes, setNotes] = useState(lead?.notes || '');
   const [status, setStatus] = useState(lead?.status || 'new');
   const [hasChanges, setHasChanges] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const chatPanelRef = useRef<ChatPanelRef>(null);
 
   const handleRefreshMessages = () => {
+    setIsRefreshing(true);
     chatPanelRef.current?.refetch();
+    // Reset after a short delay since refetch is async
+    setTimeout(() => setIsRefreshing(false), 1000);
   };
 
   const handleStatusChange = (newStatus: string) => {
@@ -86,9 +90,10 @@ export function LeadDetailPanel({ lead, onClose, onUpdateLead, isUpdating }: Lea
               variant="ghost" 
               size="icon"
               onClick={handleRefreshMessages}
+              disabled={isRefreshing}
               title="Refresh messages"
             >
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             </Button>
             {lead.linkedin_id && (
               <Button 
