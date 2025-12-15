@@ -190,28 +190,34 @@ export default function AIOutreach() {
             <CampaignMetricsDisplay leads={leads} />
 
             {/* Main Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div>
               {/* Lead List/Pipeline */}
-              <div className={selectedLead ? 'lg:col-span-2' : 'lg:col-span-3'}>
-                {viewMode === 'table' ? (
-                  <LeadTable
-                    leads={leads}
-                    isLoading={leadsLoading}
-                    onSelectLead={handleSelectLead}
-                    onUpdateStatus={handleUpdateStatus}
-                    onDelete={setDeletingLead}
-                  />
-                ) : (
-                  <LeadPipeline
-                    leads={leads}
-                    onSelectLead={handleSelectLead}
-                  />
-                )}
-              </div>
+              {viewMode === 'table' ? (
+                <LeadTable
+                  leads={leads}
+                  isLoading={leadsLoading}
+                  onSelectLead={handleSelectLead}
+                  onUpdateStatus={handleUpdateStatus}
+                  onDelete={setDeletingLead}
+                />
+              ) : (
+                <LeadPipeline
+                  leads={leads}
+                  onSelectLead={handleSelectLead}
+                />
+              )}
+            </div>
 
-              {/* Lead Detail Panel */}
-              {selectedLead && (
-                <div className="lg:col-span-1 h-[600px]">
+            {/* Lead Detail Panel - Full Screen Overlay */}
+            {selectedLead && (
+              <>
+                {/* Backdrop */}
+                <div 
+                  className="fixed inset-0 bg-black/50 z-40 animate-fade-in"
+                  onClick={handleCloseLead}
+                />
+                {/* Panel */}
+                <div className="fixed right-0 top-0 bottom-0 w-full max-w-md z-50 animate-slide-in-right">
                   <LeadDetailPanel
                     lead={selectedLead}
                     onClose={handleCloseLead}
@@ -219,8 +225,8 @@ export default function AIOutreach() {
                     isUpdating={isUpdating}
                   />
                 </div>
-              )}
-            </div>
+              </>
+            )}
           </div>
         )}
 
