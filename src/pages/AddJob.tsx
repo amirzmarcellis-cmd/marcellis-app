@@ -10,7 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { ArrowLeft, Check, ChevronsUpDown, Plus, ChevronDown } from "lucide-react";
+import { ArrowLeft, Check, ChevronsUpDown, Plus, ChevronDown, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { useProfile } from "@/hooks/useProfile";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -269,6 +270,8 @@ export default function AddJob() {
   const [selectedOptionalFields, setSelectedOptionalFields] = useState<string[]>([]);
   const [linkedInSearchEnabled, setLinkedInSearchEnabled] = useState(false);
   const [recruiterLinkedInId, setRecruiterLinkedInId] = useState<string | null>(null);
+  const [shortlistedCount, setShortlistedCount] = useState<number>(0);
+  const [isCheckingShortlisted, setIsCheckingShortlisted] = useState(true);
 
   useEffect(() => {
     // Auto-assign recruiter to current user for team members if not selected
@@ -283,6 +286,53 @@ export default function AddJob() {
     fetchRecruiters();
     fetchClients();
   }, [profile?.user_id]);
+
+  // Check if recruiter has 3+ shortlisted candidates
+  useEffect(() => {
+    const checkShortlistedCount = async () => {
+      if (!profile?.user_id) {
+        setIsCheckingShortlisted(false);
+        return;
+      }
+
+      try {
+        // Get all job_ids for this recruiter
+        const { data: recruiterJobs, error: jobsError } = await supabase
+          .from('Jobs')
+          .select('job_id')
+          .or(`recruiter_id.eq.${profile.user_id},assignment.eq.${profile.email}`);
+
+        if (jobsError) throw jobsError;
+
+        if (!recruiterJobs || recruiterJobs.length === 0) {
+          setShortlistedCount(0);
+          setIsCheckingShortlisted(false);
+          return;
+        }
+
+        const jobIds = recruiterJobs.map(j => j.job_id);
+
+        // Count shortlisted candidates for these jobs (contacted = 'Call Done' AND after_call_score >= 75)
+        const { count, error: countError } = await supabase
+          .from('Jobs_CVs')
+          .select('*', { count: 'exact', head: true })
+          .in('job_id', jobIds)
+          .ilike('contacted', 'Call Done')
+          .gte('after_call_score', 75);
+
+        if (countError) throw countError;
+
+        setShortlistedCount(count || 0);
+      } catch (error) {
+        console.error('Error checking shortlisted count:', error);
+        setShortlistedCount(0);
+      } finally {
+        setIsCheckingShortlisted(false);
+      }
+    };
+
+    checkShortlistedCount();
+  }, [profile?.user_id, profile?.email]);
 
   // Fetch recruiter's LinkedIn ID when recruiter changes
   useEffect(() => {
@@ -518,6 +568,12 @@ export default function AddJob() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Check shortlisted count first
+    if (shortlistedCount >= 3) {
+      toast.error("You have 3 or more shortlisted candidates. Please check them first before adding a new job.");
+      return;
+    }
+    
     // Validate all mandatory fields
     if (!formData.jobTitle.trim()) {
       toast.error("Job Title is required");
@@ -655,6 +711,17 @@ export default function AddJob() {
         </Button>
         <h1 className="text-5xl font-light font-work tracking-tight">Add New Job</h1>
       </div>
+
+      {/* Alert Banner for Shortlisted Candidates */}
+      {shortlistedCount >= 3 && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Action Required</AlertTitle>
+          <AlertDescription>
+            You have {shortlistedCount} shortlisted candidates. Please check them first before adding a new job.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Mandatory Fields Section */}
@@ -1445,8 +1512,8 @@ export default function AddJob() {
 
         {/* Submit Buttons */}
         <div className="flex gap-4 pb-6">
-          <Button type="submit" disabled={isSubmitting} size="lg" className="px-8">
-            {isSubmitting ? "Creating..." : "Create Job"}
+          <Button type="submit" disabled={isSubmitting || isCheckingShortlisted || shortlistedCount >= 3} size="lg" className="px-8">
+            {isCheckingShortlisted ? "Checking..." : isSubmitting ? "Creating..." : "Create Job"}
           </Button>
           <Button type="button" variant="outline" onClick={() => navigate("/jobs")} size="lg" className="px-8">
             Cancel
