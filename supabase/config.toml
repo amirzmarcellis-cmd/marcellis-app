@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.send-push-webhook]
 verify_jwt = false
+
+[functions.fetch-unipile-messages]
+verify_jwt = true
