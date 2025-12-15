@@ -559,7 +559,10 @@ export default function AddJob() {
       toast.error("Contract Length is required for contract positions");
       return;
     }
-
+    if (!formData.itrisId.trim()) {
+      toast.error("Itris ID is required");
+      return;
+    }
 
     setIsSubmitting(true);
     
