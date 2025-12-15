@@ -178,7 +178,7 @@ export function LeadDetailPanel({ lead, onClose, onUpdateLead, isUpdating }: Lea
                       <span className="ml-2">{lead.service}</span>
                     </div>
                   )}
-                  {lead.action_date && (
+                  {lead.action_date && !isNaN(new Date(lead.action_date).getTime()) && (
                     <div className="col-span-2">
                       <span className="text-muted-foreground">Added:</span>
                       <span className="ml-2">{format(new Date(lead.action_date), 'MMM d, yyyy')}</span>
