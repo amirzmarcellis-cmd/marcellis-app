@@ -99,7 +99,7 @@ export function LeadTable({ leads, isLoading, onSelectLead, onUpdateStatus, onDe
               <TableHead>Lead</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Source</TableHead>
-              <TableHead>Added</TableHead>
+              <TableHead>Conversations</TableHead>
               <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
@@ -138,10 +138,22 @@ export function LeadTable({ leads, isLoading, onSelectLead, onUpdateStatus, onDe
                       {lead.source || 'LinkedIn'}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-muted-foreground text-sm">
-                    {lead.action_date && !isNaN(new Date(lead.action_date).getTime()) 
-                      ? format(new Date(lead.action_date), 'MMM d') 
-                      : '-'}
+                  <TableCell>
+                    {lead.chat_id ? (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectLead(lead);
+                        }}
+                      >
+                        <MessageSquare className="h-4 w-4 text-primary" />
+                      </Button>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">-</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
