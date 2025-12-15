@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { X, Building2, Mail, Phone, Linkedin, Save, MessageSquare, User, FileText } from 'lucide-react';
+import { X, Building2, Mail, Phone, Linkedin, Save, MessageSquare, User, FileText, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface LeadDetailPanelProps {
@@ -76,9 +76,20 @@ export function LeadDetailPanel({ lead, onClose, onUpdateLead, isUpdating }: Lea
               <p className="text-sm text-muted-foreground">{lead.company_name || 'No company'}</p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-1">
+            {lead.linkedin_id && (
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => window.open(`https://linkedin.com/in/${lead.linkedin_id}`, '_blank')}
+              >
+                <ExternalLink className="h-4 w-4" />
+              </Button>
+            )}
+            <Button variant="ghost" size="icon" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </CardHeader>
 
