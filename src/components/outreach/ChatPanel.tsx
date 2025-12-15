@@ -67,6 +67,12 @@ export function ChatPanel({ lead }: ChatPanelProps) {
 
   return (
     <Card className="h-full flex flex-col bg-transparent border-0 shadow-none">
+      <div className="flex items-center justify-end p-2 border-b border-border">
+        <Button variant="ghost" size="sm" onClick={() => refetch()} className="gap-1 text-xs">
+          <RefreshCw className="h-3 w-3" />
+          Refresh
+        </Button>
+      </div>
       
       <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
         <ScrollArea className="flex-1 p-4" ref={scrollRef}>
