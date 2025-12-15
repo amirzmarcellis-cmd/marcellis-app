@@ -5499,15 +5499,21 @@ mainCandidate["linkedin_score_reason"] ? (
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Reject Candidate</DialogTitle>
-            <DialogDescription>Please provide a reason for rejecting this candidate.</DialogDescription>
+            <DialogDescription>Please select a reason for rejecting this candidate.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <Textarea
-              placeholder="Enter rejection reason..."
-              value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
-              className="min-h-[100px]"
-            />
+            <Select value={rejectReason} onValueChange={setRejectReason}>
+              <SelectTrigger className="w-full bg-background">
+                <SelectValue placeholder="Select rejection reason..." />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                <SelectItem value="Overbudget">Overbudget</SelectItem>
+                <SelectItem value="Notice Period">Notice Period</SelectItem>
+                <SelectItem value="Lack Mandatory Skills">Lack Mandatory Skills</SelectItem>
+                <SelectItem value="Not Cultural Fit">Not Cultural Fit</SelectItem>
+                <SelectItem value="Communication Skills">Communication Skills</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <DialogFooter>
             <Button
@@ -5523,7 +5529,7 @@ mainCandidate["linkedin_score_reason"] ? (
             <Button
               variant="destructive"
               onClick={() => handleRejectCandidate(rejectReason)}
-              disabled={!rejectReason.trim()}
+              disabled={!rejectReason}
             >
               Reject
             </Button>
@@ -5545,19 +5551,21 @@ mainCandidate["linkedin_score_reason"] ? (
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Submit CV - Hiring Reason Required</DialogTitle>
+            <DialogTitle>Submit CV - Select Reason</DialogTitle>
             <DialogDescription>
-              Please provide a reason for hiring this candidate. The CV will be marked as "Submitted" once you save this
-              reason.
+              Please select a reason for submitting this candidate. The CV will be marked as "Submitted" once you save.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <Textarea
-              placeholder="Enter hire reason (required)..."
-              value={hireReason}
-              onChange={(e) => setHireReason(e.target.value)}
-              className="min-h-[100px]"
-            />
+            <Select value={hireReason} onValueChange={setHireReason}>
+              <SelectTrigger className="w-full bg-background">
+                <SelectValue placeholder="Select submit reason..." />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                <SelectItem value="Perfect Fit">Perfect Fit</SelectItem>
+                <SelectItem value="Backup Option">Backup Option</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <DialogFooter>
             <Button
@@ -5572,7 +5580,7 @@ mainCandidate["linkedin_score_reason"] ? (
             </Button>
             <Button
               onClick={handleHireCandidate}
-              disabled={!hireReason.trim()}
+              disabled={!hireReason}
               className="bg-emerald-600 hover:bg-emerald-700"
             >
               Save & Submit CV
