@@ -95,11 +95,12 @@ export function JobManagementPanel() {
       }
 
       try {
-        // Get all job_ids for this recruiter
+        // Get all ACTIVE job_ids for this recruiter (only Processed = 'Yes')
         const { data: recruiterJobs, error: jobsError } = await supabase
           .from('Jobs')
           .select('job_id')
-          .or(`recruiter_id.eq.${profile.user_id},assignment.eq.${profile.email}`);
+          .eq('Processed', 'Yes')
+          .or(`recruiter_id.eq.${profile.user_id},recruiter_id.eq.${profile.linkedin_id || ''},assignment.eq.${profile.email}`);
 
         if (jobsError) throw jobsError;
 
@@ -136,7 +137,7 @@ export function JobManagementPanel() {
     };
 
     checkShortlistedCount();
-  }, [profile?.user_id, profile?.email]);
+  }, [profile?.user_id, profile?.email, profile?.linkedin_id]);
   
   useEffect(() => {
     // Wait for both profile and roles to be fully loaded before fetching
