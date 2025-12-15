@@ -18,6 +18,7 @@ interface ChatPanelProps {
 
 export interface ChatPanelRef {
   refetch: () => void;
+  isLoading: boolean;
 }
 
 export const ChatPanel = forwardRef<ChatPanelRef, ChatPanelProps>(({ lead }, ref) => {
@@ -29,8 +30,9 @@ export const ChatPanel = forwardRef<ChatPanelRef, ChatPanelProps>(({ lead }, ref
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useImperativeHandle(ref, () => ({
-    refetch: () => refetch()
-  }), [refetch]);
+    refetch: () => refetch(),
+    isLoading
+  }), [refetch, isLoading]);
 
   useEffect(() => {
     if (scrollRef.current) {
