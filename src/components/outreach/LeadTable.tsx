@@ -97,7 +97,6 @@ export function LeadTable({ leads, isLoading, onSelectLead, onUpdateStatus, onDe
           <TableHeader>
             <TableRow className="bg-muted/50">
               <TableHead>Lead</TableHead>
-              <TableHead>Company</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Source</TableHead>
               <TableHead>Added</TableHead>
@@ -107,7 +106,7 @@ export function LeadTable({ leads, isLoading, onSelectLead, onUpdateStatus, onDe
           <TableBody>
             {filteredLeads.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                   No leads found
                 </TableCell>
               </TableRow>
@@ -131,12 +130,6 @@ export function LeadTable({ leads, isLoading, onSelectLead, onUpdateStatus, onDe
                           <p className="text-xs text-muted-foreground">{lead.email}</p>
                         )}
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Building2 className="h-4 w-4 text-muted-foreground" />
-                      <span>{lead.company_name || '-'}</span>
                     </div>
                   </TableCell>
                   <TableCell>{getStatusBadge(lead.status)}</TableCell>
