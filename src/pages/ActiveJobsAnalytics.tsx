@@ -459,36 +459,65 @@ export default function ActiveJobsAnalytics() {
                             </TableCell>
                           </TableRow>
                         ) : (
-                          filteredJobs.map((job) => (
-                            <TableRow key={job.job_id} className="border-border/50">
-                              <TableCell className="font-medium max-w-[200px] truncate">
-                                {job.job_title}
+                          <>
+                            {filteredJobs.map((job) => (
+                              <TableRow key={job.job_id} className="border-border/50">
+                                <TableCell className="font-medium max-w-[200px] truncate">
+                                  {job.job_title}
+                                </TableCell>
+                                <TableCell className="text-muted-foreground max-w-[150px] truncate">
+                                  {job.recruiter_name}
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/30">
+                                    {job.longlisted}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">
+                                    {job.shortlisted}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/30">
+                                    {job.rejected}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Badge variant="outline" className="bg-purple-500/10 text-purple-500 border-purple-500/30">
+                                    {job.submitted}
+                                  </Badge>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                            {/* Total Row - Database-level counts for consistency with summary cards */}
+                            <TableRow className="bg-muted/30 border-t-2 border-primary/30 font-semibold">
+                              <TableCell className="font-semibold">
+                                Total ({summaryTotals?.jobs ?? filteredJobs.length} jobs)
                               </TableCell>
-                              <TableCell className="text-muted-foreground max-w-[150px] truncate">
-                                {job.recruiter_name}
-                              </TableCell>
+                              <TableCell></TableCell>
                               <TableCell className="text-center">
-                                <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/30">
-                                  {job.longlisted}
+                                <Badge className="bg-blue-500 text-white border-0">
+                                  {summaryTotals?.longlisted ?? 0}
                                 </Badge>
                               </TableCell>
                               <TableCell className="text-center">
-                                <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">
-                                  {job.shortlisted}
+                                <Badge className="bg-green-500 text-white border-0">
+                                  {summaryTotals?.shortlisted ?? 0}
                                 </Badge>
                               </TableCell>
                               <TableCell className="text-center">
-                                <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/30">
-                                  {job.rejected}
+                                <Badge className="bg-red-500 text-white border-0">
+                                  {summaryTotals?.rejected ?? 0}
                                 </Badge>
                               </TableCell>
                               <TableCell className="text-center">
-                                <Badge variant="outline" className="bg-purple-500/10 text-purple-500 border-purple-500/30">
-                                  {job.submitted}
+                                <Badge className="bg-purple-500 text-white border-0">
+                                  {summaryTotals?.submitted ?? 0}
                                 </Badge>
                               </TableCell>
                             </TableRow>
-                          ))
+                          </>
                         )}
                       </TableBody>
                     </Table>
@@ -536,43 +565,76 @@ export default function ActiveJobsAnalytics() {
                             </TableCell>
                           </TableRow>
                         ) : (
-                          filteredRecruiters.map((recruiter) => (
-                            <TableRow key={recruiter.recruiter_id} className="border-border/50">
-                              <TableCell className="max-w-[200px]">
-                                <div className="truncate font-medium">{recruiter.recruiter_name}</div>
-                                {recruiter.recruiter_email && (
-                                  <div className="text-xs text-muted-foreground truncate">
-                                    {recruiter.recruiter_email}
-                                  </div>
-                                )}
+                          <>
+                            {filteredRecruiters.map((recruiter) => (
+                              <TableRow key={recruiter.recruiter_id} className="border-border/50">
+                                <TableCell className="max-w-[200px]">
+                                  <div className="truncate font-medium">{recruiter.recruiter_name}</div>
+                                  {recruiter.recruiter_email && (
+                                    <div className="text-xs text-muted-foreground truncate">
+                                      {recruiter.recruiter_email}
+                                    </div>
+                                  )}
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                                    {recruiter.active_jobs}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/30">
+                                    {recruiter.longlisted}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">
+                                    {recruiter.shortlisted}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/30">
+                                    {recruiter.rejected}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Badge variant="outline" className="bg-purple-500/10 text-purple-500 border-purple-500/30">
+                                    {recruiter.submitted}
+                                  </Badge>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                            {/* Total Row - Database-level counts for consistency with summary cards */}
+                            <TableRow className="bg-muted/30 border-t-2 border-primary/30 font-semibold">
+                              <TableCell className="font-semibold">
+                                Total ({filteredRecruiters.length} recruiters)
                               </TableCell>
                               <TableCell className="text-center">
-                                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
-                                  {recruiter.active_jobs}
+                                <Badge className="bg-primary text-primary-foreground border-0">
+                                  {summaryTotals?.jobs ?? 0}
                                 </Badge>
                               </TableCell>
                               <TableCell className="text-center">
-                                <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/30">
-                                  {recruiter.longlisted}
+                                <Badge className="bg-blue-500 text-white border-0">
+                                  {summaryTotals?.longlisted ?? 0}
                                 </Badge>
                               </TableCell>
                               <TableCell className="text-center">
-                                <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">
-                                  {recruiter.shortlisted}
+                                <Badge className="bg-green-500 text-white border-0">
+                                  {summaryTotals?.shortlisted ?? 0}
                                 </Badge>
                               </TableCell>
                               <TableCell className="text-center">
-                                <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/30">
-                                  {recruiter.rejected}
+                                <Badge className="bg-red-500 text-white border-0">
+                                  {summaryTotals?.rejected ?? 0}
                                 </Badge>
                               </TableCell>
                               <TableCell className="text-center">
-                                <Badge variant="outline" className="bg-purple-500/10 text-purple-500 border-purple-500/30">
-                                  {recruiter.submitted}
+                                <Badge className="bg-purple-500 text-white border-0">
+                                  {summaryTotals?.submitted ?? 0}
                                 </Badge>
                               </TableCell>
                             </TableRow>
-                          ))
+                          </>
                         )}
                       </TableBody>
                     </Table>
