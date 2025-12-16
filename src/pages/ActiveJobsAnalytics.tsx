@@ -14,6 +14,7 @@ interface JobWithMetrics {
   job_title: string;
   recruiter_name: string;
   recruiter_email: string;
+  timestamp: string | null;
   longlisted: number;
   shortlisted: number;
   rejected: number;
@@ -41,7 +42,7 @@ export default function ActiveJobsAnalytics() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('Jobs')
-        .select('job_id, job_title, recruiter_id, assignment')
+        .select('job_id, job_title, recruiter_id, assignment, Timestamp')
         .eq('Processed', 'Yes');
       
       if (error) throw error;
@@ -121,22 +122,30 @@ export default function ActiveJobsAnalytics() {
     };
   };
 
-  // Compute jobs with metrics
+  // Compute jobs with metrics (sorted by most recent first)
   const jobsWithMetrics: JobWithMetrics[] = useMemo(() => {
     if (!jobs) return [];
     
-    return jobs.map(job => {
-      const recruiter = getRecruiterInfo(job.recruiter_id, job.assignment);
-      const metrics = calculateJobMetrics(job.job_id);
-      
-      return {
-        job_id: job.job_id,
-        job_title: job.job_title || 'Untitled Job',
-        recruiter_name: recruiter.name,
-        recruiter_email: recruiter.email,
-        ...metrics
-      };
-    });
+    return jobs
+      .map(job => {
+        const recruiter = getRecruiterInfo(job.recruiter_id, job.assignment);
+        const metrics = calculateJobMetrics(job.job_id);
+        
+        return {
+          job_id: job.job_id,
+          job_title: job.job_title || 'Untitled Job',
+          recruiter_name: recruiter.name,
+          recruiter_email: recruiter.email,
+          timestamp: job.Timestamp,
+          ...metrics
+        };
+      })
+      .sort((a, b) => {
+        // Sort by timestamp descending (most recent first)
+        if (!a.timestamp) return 1;
+        if (!b.timestamp) return -1;
+        return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+      });
   }, [jobs, candidates, profiles]);
 
   // Compute recruiters with aggregated metrics
