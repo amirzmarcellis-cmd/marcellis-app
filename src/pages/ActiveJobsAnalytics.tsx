@@ -57,6 +57,21 @@ export default function ActiveJobsAnalytics() {
     }
   });
 
+  // Fetch job counts for toggle badges
+  const { data: jobCounts } = useQuery({
+    queryKey: ['job-counts'],
+    queryFn: async () => {
+      const [activeResult, allResult] = await Promise.all([
+        supabase.from('Jobs').select('job_id', { count: 'exact', head: true }).eq('Processed', 'Yes'),
+        supabase.from('Jobs').select('job_id', { count: 'exact', head: true })
+      ]);
+      return {
+        active: activeResult.count || 0,
+        all: allResult.count || 0
+      };
+    }
+  });
+
   // Fetch all candidates for jobs
   const { data: candidates, isLoading: candidatesLoading } = useQuery({
     queryKey: ['jobs-candidates', jobScope, jobs?.map(j => j.job_id)],
@@ -67,7 +82,8 @@ export default function ActiveJobsAnalytics() {
       const { data, error } = await supabase
         .from('Jobs_CVs')
         .select('job_id, contacted, after_call_score, submitted_at')
-        .in('job_id', jobIds);
+        .in('job_id', jobIds)
+        .limit(10000); // Ensure we get all candidates, not default 1000
       
       if (error) throw error;
       return data || [];
@@ -232,31 +248,48 @@ export default function ActiveJobsAnalytics() {
         </p>
       </div>
 
-      {/* Job Scope Selector */}
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">View:</span>
-        <div className="flex bg-card/50 border border-border/50 rounded-lg p-1">
+      {/* Job Scope Selector - Improved Design */}
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-1 bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl p-1.5 shadow-lg">
           <button
             onClick={() => setJobScope("active")}
             className={cn(
-              "px-3 py-1.5 text-sm rounded-md transition-colors",
-              jobScope === "active" 
-                ? "bg-primary text-primary-foreground" 
-                : "text-muted-foreground hover:text-foreground"
+              "flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
+              jobScope === "active"
+                ? "bg-primary text-primary-foreground shadow-md"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
             )}
           >
-            Active Jobs
+            <Briefcase className="w-4 h-4" />
+            <span>Active Jobs</span>
+            <span className={cn(
+              "ml-1 px-2 py-0.5 text-xs rounded-full",
+              jobScope === "active"
+                ? "bg-primary-foreground/20 text-primary-foreground"
+                : "bg-muted text-muted-foreground"
+            )}>
+              {jobCounts?.active ?? '-'}
+            </span>
           </button>
           <button
             onClick={() => setJobScope("all")}
             className={cn(
-              "px-3 py-1.5 text-sm rounded-md transition-colors",
-              jobScope === "all" 
-                ? "bg-primary text-primary-foreground" 
-                : "text-muted-foreground hover:text-foreground"
+              "flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
+              jobScope === "all"
+                ? "bg-primary text-primary-foreground shadow-md"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
             )}
           >
-            All Jobs
+            <ListChecks className="w-4 h-4" />
+            <span>All Jobs</span>
+            <span className={cn(
+              "ml-1 px-2 py-0.5 text-xs rounded-full",
+              jobScope === "all"
+                ? "bg-primary-foreground/20 text-primary-foreground"
+                : "bg-muted text-muted-foreground"
+            )}>
+              {jobCounts?.all ?? '-'}
+            </span>
           </button>
         </div>
       </div>
