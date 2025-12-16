@@ -42,7 +42,63 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
 
-    // Generate unique user_id server-side
+    // Normalize email for lookup
+    const normalizedEmail = clean(body.email).toLowerCase();
+
+    // Check if email already exists
+    const { data: existingCV, error: existingError } = await supabase
+      .from("CVs")
+      .select("user_id, cv_link, cv_text")
+      .eq("email", normalizedEmail)
+      .maybeSingle();
+
+    if (existingError) {
+      console.error("Error checking existing CV:", existingError);
+    }
+
+    // If email already exists, update the record and return existing user_id
+    if (existingCV) {
+      console.log("Existing applicant found:", existingCV.user_id);
+      
+      const newCvLink = Array.isArray(body.cv_links) 
+        ? body.cv_links.map((x: string) => clean(x)).join(", ") 
+        : clean(body.cv_link || "");
+      const newCvText = clean(body.cv_text || "");
+      
+      const updatePayload: Record<string, string> = {};
+      
+      if (newCvLink) {
+        // Append new CV links to existing
+        updatePayload.cv_link = existingCV.cv_link 
+          ? `${existingCV.cv_link}, ${newCvLink}` 
+          : newCvLink;
+      }
+      if (newCvText && newCvText !== existingCV.cv_text) {
+        updatePayload.cv_text = newCvText;
+      }
+      
+      if (Object.keys(updatePayload).length > 0) {
+        const { error: updateError } = await supabase
+          .from("CVs")
+          .update(updatePayload)
+          .eq("user_id", existingCV.user_id);
+        
+        if (updateError) {
+          console.error("Error updating existing CV:", updateError);
+        }
+      }
+      
+      return new Response(JSON.stringify({ 
+        ok: true, 
+        user_id: existingCV.user_id,
+        existing: true
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    // Generate unique user_id server-side for new applicants
     const { data: existingCVs, error: queryError } = await supabase
       .from("CVs")
       .select("user_id")
@@ -73,7 +129,7 @@ serve(async (req) => {
       Firstname: clean(body.Firstname),
       Lastname: clean(body.Lastname) || null,
       name: clean(body.name),
-      email: clean(body.email),
+      email: normalizedEmail,
       phone_number: clean(body.phone_number),
       notes: "",
       job_id: clean(body.job_id),
