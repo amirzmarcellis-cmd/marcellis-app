@@ -72,6 +72,60 @@ export default function ActiveJobsAnalytics() {
     }
   });
 
+  // Fetch summary totals directly from database for accuracy
+  const { data: summaryTotals, isLoading: summaryLoading } = useQuery({
+    queryKey: ['analytics-summary-totals', jobScope],
+    queryFn: async () => {
+      // Get job_ids for the current scope
+      let jobsQuery = supabase.from('Jobs').select('job_id');
+      if (jobScope === 'active') {
+        jobsQuery = jobsQuery.eq('Processed', 'Yes');
+      }
+      
+      const { data: scopedJobs } = await jobsQuery;
+      if (!scopedJobs || scopedJobs.length === 0) {
+        return { jobs: 0, longlisted: 0, shortlisted: 0, rejected: 0, submitted: 0 };
+      }
+      
+      const jobIds = scopedJobs.map(j => j.job_id);
+      
+      // Execute all count queries in parallel for performance
+      const [longlistedResult, shortlistedResult, rejectedResult, submittedResult] = await Promise.all([
+        // Total candidates (longlisted)
+        supabase
+          .from('Jobs_CVs')
+          .select('*', { count: 'exact', head: true })
+          .in('job_id', jobIds),
+        // Shortlisted (after_call_score >= 74)
+        supabase
+          .from('Jobs_CVs')
+          .select('*', { count: 'exact', head: true })
+          .in('job_id', jobIds)
+          .gte('after_call_score', 74),
+        // Rejected
+        supabase
+          .from('Jobs_CVs')
+          .select('*', { count: 'exact', head: true })
+          .in('job_id', jobIds)
+          .eq('contacted', 'Rejected'),
+        // Submitted
+        supabase
+          .from('Jobs_CVs')
+          .select('*', { count: 'exact', head: true })
+          .in('job_id', jobIds)
+          .eq('contacted', 'Submitted')
+      ]);
+      
+      return {
+        jobs: scopedJobs.length,
+        longlisted: longlistedResult.count || 0,
+        shortlisted: shortlistedResult.count || 0,
+        rejected: rejectedResult.count || 0,
+        submitted: submittedResult.count || 0
+      };
+    }
+  });
+
   // Fetch all candidates for jobs
   const { data: candidates, isLoading: candidatesLoading } = useQuery({
     queryKey: ['jobs-candidates', jobScope, jobs?.map(j => j.job_id)],
@@ -294,7 +348,7 @@ export default function ActiveJobsAnalytics() {
         </div>
       </div>
 
-      {/* Summary Cards */}
+      {/* Summary Cards - Using database-level counts for accuracy */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
         <Card className="bg-card/50 backdrop-blur-xl border-border/50">
           <CardContent className="p-4">
@@ -304,7 +358,7 @@ export default function ActiveJobsAnalytics() {
                 {jobScope === 'active' ? 'Active Jobs' : 'All Jobs'}
               </span>
             </div>
-            <p className="text-2xl font-light mt-1">{isLoading ? '-' : totals.jobs}</p>
+            <p className="text-2xl font-light mt-1">{summaryLoading ? '-' : summaryTotals?.jobs ?? 0}</p>
           </CardContent>
         </Card>
         <Card className="bg-card/50 backdrop-blur-xl border-border/50">
@@ -313,7 +367,7 @@ export default function ActiveJobsAnalytics() {
               <ListChecks className="w-4 h-4 text-blue-500" />
               <span className="text-xs text-muted-foreground">Longlisted</span>
             </div>
-            <p className="text-2xl font-light mt-1">{isLoading ? '-' : totals.longlisted}</p>
+            <p className="text-2xl font-light mt-1">{summaryLoading ? '-' : summaryTotals?.longlisted ?? 0}</p>
           </CardContent>
         </Card>
         <Card className="bg-card/50 backdrop-blur-xl border-border/50">
@@ -322,7 +376,7 @@ export default function ActiveJobsAnalytics() {
               <CheckCircle className="w-4 h-4 text-green-500" />
               <span className="text-xs text-muted-foreground">Shortlisted</span>
             </div>
-            <p className="text-2xl font-light mt-1">{isLoading ? '-' : totals.shortlisted}</p>
+            <p className="text-2xl font-light mt-1">{summaryLoading ? '-' : summaryTotals?.shortlisted ?? 0}</p>
           </CardContent>
         </Card>
         <Card className="bg-card/50 backdrop-blur-xl border-border/50">
@@ -331,7 +385,7 @@ export default function ActiveJobsAnalytics() {
               <XCircle className="w-4 h-4 text-red-500" />
               <span className="text-xs text-muted-foreground">Rejected</span>
             </div>
-            <p className="text-2xl font-light mt-1">{isLoading ? '-' : totals.rejected}</p>
+            <p className="text-2xl font-light mt-1">{summaryLoading ? '-' : summaryTotals?.rejected ?? 0}</p>
           </CardContent>
         </Card>
         <Card className="bg-card/50 backdrop-blur-xl border-border/50 col-span-2 md:col-span-1">
@@ -340,7 +394,7 @@ export default function ActiveJobsAnalytics() {
               <Send className="w-4 h-4 text-purple-500" />
               <span className="text-xs text-muted-foreground">Submitted</span>
             </div>
-            <p className="text-2xl font-light mt-1">{isLoading ? '-' : totals.submitted}</p>
+            <p className="text-2xl font-light mt-1">{summaryLoading ? '-' : summaryTotals?.submitted ?? 0}</p>
           </CardContent>
         </Card>
       </div>
