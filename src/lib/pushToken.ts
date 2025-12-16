@@ -94,6 +94,9 @@ export async function savePushToken(userId: string, userEmail?: string): Promise
     }
   }
 
+  // DISABLED: Login webhook to Make.com (disabled on 2025-12-16)
+  // To re-enable, uncomment the section below:
+  /*
   // Send to webhook for ALL mobile logins (both Twinr app and mobile browser)
   try {
     const webhookPayload = {
@@ -124,4 +127,5 @@ export async function savePushToken(userId: string, userEmail?: string): Promise
   } catch (webhookError) {
     console.error('Failed to send webhook:', webhookError);
   }
+  */
 }
