@@ -50,8 +50,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(null);
       setUser(null);
       
-      // Sign out from Supabase with global scope to revoke all tokens
-      const { error } = await supabase.auth.signOut({ scope: 'global' });
+      // Sign out from Supabase with local scope to only log out current device
+      const { error } = await supabase.auth.signOut({ scope: 'local' });
       
       // Don't treat "session missing" as an error - it's expected if session expired
       if (error && error.message !== 'Auth session missing!') {
