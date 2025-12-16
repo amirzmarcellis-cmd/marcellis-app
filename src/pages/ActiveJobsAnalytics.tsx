@@ -96,30 +96,28 @@ export default function ActiveJobsAnalytics() {
     };
   };
 
-  // Helper to calculate metrics for a job
+  // Helper to calculate metrics for a job (same logic as JobManagementPanel)
   const calculateJobMetrics = (jobId: string) => {
     if (!candidates) return { longlisted: 0, shortlisted: 0, rejected: 0, submitted: 0 };
     
     const jobCandidates = candidates.filter(c => c.job_id === jobId);
     
     return {
-      // Longlisted: Call Done with score < 75 (non-null) OR Low Scored status
-      longlisted: jobCandidates.filter(c => {
-        const status = c.contacted?.toLowerCase();
-        return (status === 'call done' && c.after_call_score !== null && c.after_call_score < 75) ||
-               (status === 'low scored');
-      }).length,
-      // Shortlisted: Call Done OR Submitted with score >= 75
+      // Longlisted: ALL candidates in Jobs_CVs (AI Long List)
+      longlisted: jobCandidates.length,
+      // Shortlisted: candidates with score >= 74
       shortlisted: jobCandidates.filter(c => {
-        const status = c.contacted?.toLowerCase();
-        const hasHighScore = c.after_call_score !== null && c.after_call_score >= 75;
-        return (status === 'call done' && hasHighScore) || 
-               (status === 'submitted' && hasHighScore);
+        const score = parseInt(String(c.after_call_score || "0"));
+        return score >= 74;
       }).length,
+      // Rejected: candidates with contacted = 'Rejected'
       rejected: jobCandidates.filter(c => 
-        c.contacted?.toLowerCase() === 'rejected'
+        (c.contacted || "").trim() === 'Rejected'
       ).length,
-      submitted: jobCandidates.filter(c => c.submitted_at !== null).length
+      // Submitted: candidates with contacted = 'Submitted'
+      submitted: jobCandidates.filter(c => 
+        (c.contacted || "").trim() === 'Submitted'
+      ).length
     };
   };
 
