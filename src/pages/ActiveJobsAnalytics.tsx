@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Briefcase, Users, Search, TrendingUp, CheckCircle, XCircle, Send, ListChecks } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 interface JobWithMetrics {
   job_id: string;
@@ -35,24 +36,30 @@ interface RecruiterWithMetrics {
 export default function ActiveJobsAnalytics() {
   const [activeTab, setActiveTab] = useState("jobs");
   const [searchTerm, setSearchTerm] = useState("");
+  const [jobScope, setJobScope] = useState<"active" | "all">("active");
 
-  // Fetch active jobs
+  // Fetch jobs based on selected scope
   const { data: jobs, isLoading: jobsLoading } = useQuery({
-    queryKey: ['active-jobs-analytics'],
+    queryKey: ['jobs-analytics', jobScope],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('Jobs')
-        .select('job_id, job_title, recruiter_id, assignment, Timestamp')
-        .eq('Processed', 'Yes');
+        .select('job_id, job_title, recruiter_id, assignment, Timestamp');
       
+      // Only filter by Processed='Yes' if viewing active jobs
+      if (jobScope === 'active') {
+        query = query.eq('Processed', 'Yes');
+      }
+      
+      const { data, error } = await query;
       if (error) throw error;
       return data || [];
     }
   });
 
-  // Fetch all candidates for active jobs
+  // Fetch all candidates for jobs
   const { data: candidates, isLoading: candidatesLoading } = useQuery({
-    queryKey: ['active-jobs-candidates', jobs?.map(j => j.job_id)],
+    queryKey: ['jobs-candidates', jobScope, jobs?.map(j => j.job_id)],
     queryFn: async () => {
       if (!jobs || jobs.length === 0) return [];
       
@@ -217,8 +224,41 @@ export default function ActiveJobsAnalytics() {
     <div className="min-h-screen p-4 md:p-6 space-y-6">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-2xl md:text-3xl font-light text-foreground">Active Jobs Analytics</h1>
-        <p className="text-muted-foreground font-light">Track performance metrics for active jobs and recruiters</p>
+        <h1 className="text-2xl md:text-3xl font-light text-foreground">
+          {jobScope === 'active' ? 'Active' : 'All'} Jobs Analytics
+        </h1>
+        <p className="text-muted-foreground font-light">
+          Track performance metrics for {jobScope === 'active' ? 'active' : 'all'} jobs and recruiters
+        </p>
+      </div>
+
+      {/* Job Scope Selector */}
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-muted-foreground">View:</span>
+        <div className="flex bg-card/50 border border-border/50 rounded-lg p-1">
+          <button
+            onClick={() => setJobScope("active")}
+            className={cn(
+              "px-3 py-1.5 text-sm rounded-md transition-colors",
+              jobScope === "active" 
+                ? "bg-primary text-primary-foreground" 
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            Active Jobs
+          </button>
+          <button
+            onClick={() => setJobScope("all")}
+            className={cn(
+              "px-3 py-1.5 text-sm rounded-md transition-colors",
+              jobScope === "all" 
+                ? "bg-primary text-primary-foreground" 
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            All Jobs
+          </button>
+        </div>
       </div>
 
       {/* Summary Cards */}
@@ -227,7 +267,9 @@ export default function ActiveJobsAnalytics() {
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
               <Briefcase className="w-4 h-4 text-primary" />
-              <span className="text-xs text-muted-foreground">Active Jobs</span>
+              <span className="text-xs text-muted-foreground">
+                {jobScope === 'active' ? 'Active Jobs' : 'All Jobs'}
+              </span>
             </div>
             <p className="text-2xl font-light mt-1">{isLoading ? '-' : totals.jobs}</p>
           </CardContent>
@@ -326,7 +368,7 @@ export default function ActiveJobsAnalytics() {
                         {filteredJobs.length === 0 ? (
                           <TableRow>
                             <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                              No active jobs found
+                              No {jobScope === 'active' ? 'active ' : ''}jobs found
                             </TableCell>
                           </TableRow>
                         ) : (
@@ -390,7 +432,9 @@ export default function ActiveJobsAnalytics() {
                       <TableHeader>
                         <TableRow className="border-border/50">
                           <TableHead className="text-muted-foreground">Recruiter</TableHead>
-                          <TableHead className="text-muted-foreground text-center">Active Jobs</TableHead>
+                          <TableHead className="text-muted-foreground text-center">
+                            {jobScope === 'active' ? 'Active Jobs' : 'Total Jobs'}
+                          </TableHead>
                           <TableHead className="text-muted-foreground text-center">Longlisted</TableHead>
                           <TableHead className="text-muted-foreground text-center">Shortlisted</TableHead>
                           <TableHead className="text-muted-foreground text-center">Rejected</TableHead>
