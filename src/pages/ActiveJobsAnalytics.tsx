@@ -126,21 +126,40 @@ export default function ActiveJobsAnalytics() {
     }
   });
 
-  // Fetch all candidates for jobs
-  const { data: candidates, isLoading: candidatesLoading } = useQuery({
-    queryKey: ['jobs-candidates', jobScope, jobs?.map(j => j.job_id)],
+  // Fetch per-job metrics directly from database for accuracy
+  const { data: jobMetrics, isLoading: metricsLoading } = useQuery({
+    queryKey: ['jobs-metrics-db', jobScope, jobs?.map(j => j.job_id)],
     queryFn: async () => {
-      if (!jobs || jobs.length === 0) return [];
+      if (!jobs || jobs.length === 0) return new Map<string, { longlisted: number; shortlisted: number; rejected: number; submitted: number }>();
       
-      const jobIds = jobs.map(j => j.job_id);
-      const { data, error } = await supabase
-        .from('Jobs_CVs')
-        .select('job_id, contacted, after_call_score, submitted_at')
-        .in('job_id', jobIds)
-        .limit(10000); // Ensure we get all candidates, not default 1000
+      // Execute count queries for each job in parallel
+      const metricsPromises = jobs.map(async (job) => {
+        const [longlistedRes, shortlistedRes, rejectedRes, submittedRes] = await Promise.all([
+          supabase.from('Jobs_CVs').select('*', { count: 'exact', head: true }).eq('job_id', job.job_id),
+          supabase.from('Jobs_CVs').select('*', { count: 'exact', head: true }).eq('job_id', job.job_id).gte('after_call_score', 74),
+          supabase.from('Jobs_CVs').select('*', { count: 'exact', head: true }).eq('job_id', job.job_id).eq('contacted', 'Rejected'),
+          supabase.from('Jobs_CVs').select('*', { count: 'exact', head: true }).eq('job_id', job.job_id).eq('contacted', 'Submitted')
+        ]);
+        
+        return {
+          job_id: job.job_id,
+          longlisted: longlistedRes.count || 0,
+          shortlisted: shortlistedRes.count || 0,
+          rejected: rejectedRes.count || 0,
+          submitted: submittedRes.count || 0
+        };
+      });
       
-      if (error) throw error;
-      return data || [];
+      const results = await Promise.all(metricsPromises);
+      const metricsMap = new Map<string, { longlisted: number; shortlisted: number; rejected: number; submitted: number }>();
+      results.forEach(r => metricsMap.set(r.job_id, {
+        longlisted: r.longlisted,
+        shortlisted: r.shortlisted,
+        rejected: r.rejected,
+        submitted: r.submitted
+      }));
+      
+      return metricsMap;
     },
     enabled: !!jobs && jobs.length > 0
   });
@@ -174,39 +193,14 @@ export default function ActiveJobsAnalytics() {
     };
   };
 
-  // Helper to calculate metrics for a job (same logic as JobManagementPanel)
-  const calculateJobMetrics = (jobId: string) => {
-    if (!candidates) return { longlisted: 0, shortlisted: 0, rejected: 0, submitted: 0 };
-    
-    const jobCandidates = candidates.filter(c => c.job_id === jobId);
-    
-    return {
-      // Longlisted: ALL candidates in Jobs_CVs (AI Long List)
-      longlisted: jobCandidates.length,
-      // Shortlisted: candidates with score >= 74
-      shortlisted: jobCandidates.filter(c => {
-        const score = parseInt(String(c.after_call_score || "0"));
-        return score >= 74;
-      }).length,
-      // Rejected: candidates with contacted = 'Rejected'
-      rejected: jobCandidates.filter(c => 
-        (c.contacted || "").trim() === 'Rejected'
-      ).length,
-      // Submitted: candidates with contacted = 'Submitted'
-      submitted: jobCandidates.filter(c => 
-        (c.contacted || "").trim() === 'Submitted'
-      ).length
-    };
-  };
-
   // Compute jobs with metrics (sorted by most recent first)
   const jobsWithMetrics: JobWithMetrics[] = useMemo(() => {
-    if (!jobs) return [];
+    if (!jobs || !jobMetrics) return [];
     
     return jobs
       .map(job => {
         const recruiter = getRecruiterInfo(job.recruiter_id, job.assignment);
-        const metrics = calculateJobMetrics(job.job_id);
+        const metrics = jobMetrics.get(job.job_id) || { longlisted: 0, shortlisted: 0, rejected: 0, submitted: 0 };
         
         return {
           job_id: job.job_id,
@@ -223,7 +217,7 @@ export default function ActiveJobsAnalytics() {
         if (!b.timestamp) return -1;
         return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
       });
-  }, [jobs, candidates, profiles]);
+  }, [jobs, jobMetrics, profiles]);
 
   // Compute recruiters with aggregated metrics
   const recruitersWithMetrics: RecruiterWithMetrics[] = useMemo(() => {
@@ -288,7 +282,7 @@ export default function ActiveJobsAnalytics() {
     }), { jobs: 0, longlisted: 0, shortlisted: 0, rejected: 0, submitted: 0 });
   }, [jobsWithMetrics]);
 
-  const isLoading = jobsLoading || candidatesLoading || profilesLoading;
+  const isLoading = jobsLoading || metricsLoading || profilesLoading;
 
   return (
     <div className="min-h-screen p-4 md:p-6 space-y-6">
