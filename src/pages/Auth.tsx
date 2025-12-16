@@ -16,12 +16,8 @@ import candidate2 from '@/assets/candidate-2.jpg';
 import candidate3 from '@/assets/candidate-3.jpg';
 import { savePushToken } from '@/lib/pushToken';
 export default function Auth() {
-  const {
-    settings
-  } = useAppSettings();
-  const {
-    theme
-  } = useTheme();
+  const { settings } = useAppSettings();
+  const { theme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
