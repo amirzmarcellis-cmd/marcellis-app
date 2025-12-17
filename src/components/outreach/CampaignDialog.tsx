@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+
 import { FormSection } from '@/components/ui/form-section';
 import { DragDropUpload } from '@/components/ui/drag-drop-upload';
 import { VariableHint } from '@/components/ui/variable-hint';
@@ -281,119 +281,116 @@ export function CampaignDialog({ open, onOpenChange, campaign, onSave, isLoading
                 />
               </div>
 
-              {/* Follow-ups Collapsible */}
-              <Collapsible 
-                open={followupsOpen} 
-                onOpenChange={(open) => {
-                  setFollowupsOpen(open);
-                  setFormData(prev => ({ ...prev, enable_followups: open }));
-                }}
-                className="rounded-lg border border-border/50 bg-background/30"
-              >
-                <CollapsibleTrigger asChild>
-                  <button
-                    type="button"
-                    className={cn(
-                      "flex w-full items-center justify-between p-4 text-left transition-colors",
-                      "hover:bg-primary/5 rounded-lg"
-                    )}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm font-medium text-foreground">Follow-up Messages</p>
-                        <p className="text-xs text-muted-foreground">Automatically send follow-ups</p>
-                      </div>
+              {/* Follow-ups Section */}
+              <div className="rounded-lg border border-border/50 bg-background/30">
+                <div
+                  className={cn(
+                    "flex w-full items-center justify-between p-4 text-left transition-colors",
+                    "hover:bg-primary/5 rounded-lg"
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Follow-up Messages</p>
+                      <p className="text-xs text-muted-foreground">Automatically send follow-ups</p>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Switch
-                        checked={followupsOpen}
-                        onCheckedChange={(checked) => {
-                          setFollowupsOpen(checked);
-                          setFormData(prev => ({ ...prev, enable_followups: checked }));
-                        }}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                      <ChevronDown className={cn(
-                        "h-4 w-4 text-muted-foreground transition-transform duration-200",
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Switch
+                      checked={followupsOpen}
+                      onCheckedChange={(checked) => {
+                        setFollowupsOpen(checked);
+                        setFormData(prev => ({ ...prev, enable_followups: checked }));
+                      }}
+                    />
+                    <ChevronDown 
+                      className={cn(
+                        "h-4 w-4 text-muted-foreground transition-transform duration-200 cursor-pointer",
                         followupsOpen && "rotate-180"
-                      )} />
-                    </div>
-                  </button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="px-4 pb-4 space-y-4">
-                  <div className="h-px bg-border/50" />
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-sm font-medium text-foreground/80">
-                        Days between follow-ups
-                      </Label>
-                      <span className="text-sm font-mono text-primary bg-primary/10 px-2 py-0.5 rounded">
-                        {formData.followup_days} days
-                      </span>
-                    </div>
-                    <Slider
-                      value={[formData.followup_days]}
-                      onValueChange={([value]) => setFormData(prev => ({ ...prev, followup_days: value }))}
-                      min={1}
-                      max={14}
-                      step={1}
-                      className="py-2"
+                      )}
+                      onClick={() => {
+                        setFollowupsOpen(!followupsOpen);
+                        setFormData(prev => ({ ...prev, enable_followups: !followupsOpen }));
+                      }}
                     />
                   </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-sm font-medium text-foreground/80">
-                        Messages ({formData.followup_messages.length}/5)
-                      </Label>
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={addFollowupMessage}
-                        disabled={formData.followup_messages.length >= 5}
-                        className="h-8 gap-1.5 text-xs"
-                      >
-                        <Plus className="h-3.5 w-3.5" />
-                        Add Message
-                      </Button>
-                    </div>
+                </div>
+                {followupsOpen && (
+                  <div className="px-4 pb-4 space-y-4">
+                    <div className="h-px bg-border/50" />
                     
-                    {formData.followup_messages.length === 0 && (
-                      <div className="text-center py-6 border border-dashed border-border/50 rounded-lg">
-                        <p className="text-sm text-muted-foreground">No follow-up messages yet</p>
-                        <p className="text-xs text-muted-foreground/70 mt-1">Click "Add Message" to create one</p>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-sm font-medium text-foreground/80">
+                          Days between follow-ups
+                        </Label>
+                        <span className="text-sm font-mono text-primary bg-primary/10 px-2 py-0.5 rounded">
+                          {formData.followup_days} days
+                        </span>
                       </div>
-                    )}
-                    
-                    {formData.followup_messages.map((msg, index) => (
-                      <div key={index} className="flex gap-2 animate-fade-in">
-                        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary mt-2">
-                          {index + 1}
-                        </div>
-                        <Textarea
-                          value={msg}
-                          onChange={(e) => updateFollowupMessage(index, e.target.value)}
-                          placeholder={`Follow-up message ${index + 1}`}
-                          rows={2}
-                          className="flex-1 bg-background/50 border-border/50 resize-none focus:ring-2 focus:ring-primary/20"
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeFollowupMessage(index)}
-                          className="h-8 w-8 shrink-0 mt-1 text-muted-foreground hover:text-destructive"
+                      <Slider
+                        value={[formData.followup_days]}
+                        onValueChange={([value]) => setFormData(prev => ({ ...prev, followup_days: value }))}
+                        min={1}
+                        max={14}
+                        step={1}
+                        className="py-2"
+                      />
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-sm font-medium text-foreground/80">
+                          Messages ({formData.followup_messages.length}/5)
+                        </Label>
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={addFollowupMessage}
+                          disabled={formData.followup_messages.length >= 5}
+                          className="h-8 gap-1.5 text-xs"
                         >
-                          <X className="h-4 w-4" />
+                          <Plus className="h-3.5 w-3.5" />
+                          Add Message
                         </Button>
                       </div>
-                    ))}
+                      
+                      {formData.followup_messages.length === 0 && (
+                        <div className="text-center py-6 border border-dashed border-border/50 rounded-lg">
+                          <p className="text-sm text-muted-foreground">No follow-up messages yet</p>
+                          <p className="text-xs text-muted-foreground/70 mt-1">Click "Add Message" to create one</p>
+                        </div>
+                      )}
+                      
+                      {formData.followup_messages.map((msg, index) => (
+                        <div key={index} className="flex gap-2 animate-fade-in">
+                          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary mt-2">
+                            {index + 1}
+                          </div>
+                          <Textarea
+                            value={msg}
+                            onChange={(e) => updateFollowupMessage(index, e.target.value)}
+                            placeholder={`Follow-up message ${index + 1}`}
+                            rows={2}
+                            className="flex-1 bg-background/50 border-border/50 resize-none focus:ring-2 focus:ring-primary/20"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeFollowupMessage(index)}
+                            className="h-8 w-8 shrink-0 mt-1 text-muted-foreground hover:text-destructive"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </CollapsibleContent>
-              </Collapsible>
+                )}
+              </div>
             </FormSection>
           </form>
         </div>
