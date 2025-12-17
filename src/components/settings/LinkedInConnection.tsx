@@ -78,9 +78,14 @@ export function LinkedInConnection({ linkedinId, onUpdate }: LinkedInConnectionP
         if (fetchError || fetchResult?.wrongAccountType) {
           clearInterval(poll);
           setIsPolling(false);
+          
+          const errorMessage = fetchResult?.detectedType === 'FACEBOOK' 
+            ? 'A Facebook page was connected instead of LinkedIn. Please contact support for assistance.'
+            : fetchResult?.error || 'Unable to connect LinkedIn account. A different account type was detected. Please contact support for assistance.';
+          
           toast({
             title: 'Connection Failed',
-            description: fetchResult?.error || 'Unable to connect LinkedIn account. A different account type was detected. Please contact support for assistance.',
+            description: errorMessage,
             variant: 'destructive',
           });
           return;
