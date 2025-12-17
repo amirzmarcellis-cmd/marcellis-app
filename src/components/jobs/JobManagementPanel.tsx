@@ -321,31 +321,33 @@ export function JobManagementPanel() {
     }
   }, []);
 
-  // Real-time subscription for auto-dial changes
+  // Real-time subscription for all Jobs table changes
   useEffect(() => {
     const channel = supabase
-      .channel('jobs-auto-dial-changes')
+      .channel('jobs-realtime-updates')
       .on(
         'postgres_changes',
         {
-          event: 'UPDATE',
+          event: '*',
           schema: 'public',
-          table: 'Jobs',
-          filter: 'automatic_dial=eq.false'
+          table: 'Jobs'
         },
         (payload) => {
-          const updatedJob = payload.new as any;
+          console.log('Jobs table changed:', payload.eventType, payload);
           
-          // Check if this job was just disabled due to reaching threshold
-          if (updatedJob.automatic_dial === false && !updatedJob.auto_dial_enabled_at) {
-            toast({
-              title: "Auto-dial disabled",
-              description: `Job "${updatedJob.job_title}" has reached 6 shortlisted candidates. Auto-dial has been automatically disabled.`,
-              duration: 8000,
-            });
-            
-            // Refresh jobs list
-            fetchJobs();
+          // Refresh jobs list for any change
+          fetchJobs();
+          
+          // Show toast for auto-dial disabled
+          if (payload.eventType === 'UPDATE') {
+            const updatedJob = payload.new as any;
+            if (updatedJob.automatic_dial === false && !updatedJob.auto_dial_enabled_at) {
+              toast({
+                title: "Auto-dial disabled",
+                description: `Job "${updatedJob.job_title}" has reached 6 shortlisted candidates. Auto-dial has been automatically disabled.`,
+                duration: 8000,
+              });
+            }
           }
         }
       )
