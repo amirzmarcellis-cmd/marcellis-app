@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -167,6 +167,9 @@ export function CampaignDialog({ open, onOpenChange, campaign, onSave, isLoading
             </div>
             <span>{campaign ? 'Edit Campaign' : 'Create Campaign'}</span>
           </SheetTitle>
+          <SheetDescription className="sr-only">
+            {campaign ? 'Edit your LinkedIn outreach campaign settings' : 'Create a new LinkedIn outreach campaign'}
+          </SheetDescription>
         </SheetHeader>
 
         {/* Scrollable Content */}
