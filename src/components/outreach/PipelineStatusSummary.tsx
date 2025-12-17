@@ -22,8 +22,9 @@ export function PipelineStatusSummary({ leads }: PipelineStatusSummaryProps) {
   const definedStatuses = ['post liked', 'connection requested', 'conversation initiated', 'not interested', 'ready to schedule'];
   const filteredStages = stages.filter(stage => definedStatuses.includes(stage.status));
 
+  // Hide on mobile - the pipeline view already shows counts
   return (
-    <div className="flex flex-wrap gap-2 sm:gap-3">
+    <div className="hidden sm:flex flex-wrap gap-2 sm:gap-3">
       {filteredStages.map((stage) => {
         const Icon = STATUS_ICONS[stage.status] || MessageCircle;
         return (
@@ -32,7 +33,7 @@ export function PipelineStatusSummary({ leads }: PipelineStatusSummaryProps) {
             className={cn(
               "flex items-center gap-2 px-3 py-2 rounded-lg border transition-all",
               "bg-card/50 backdrop-blur-sm border-border/50 hover:border-border",
-              "min-w-[120px] sm:min-w-[140px]"
+              "min-w-[140px]"
             )}
           >
             <div className={cn("p-1.5 rounded-md", stage.color.replace('bg-', 'bg-').replace('500', '500/20'))}>
