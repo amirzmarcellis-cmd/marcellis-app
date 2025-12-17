@@ -29,7 +29,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   }
   return (
     <SidebarProvider defaultOpen={!isMobile}>
-      <div className="min-h-screen flex w-full bg-gradient-hero overflow-x-auto">
+      <div className="min-h-screen flex w-full bg-gradient-hero overflow-x-hidden">
         <DashboardSidebar />
         <SidebarInset className="flex-1 relative">
           <MissionBackground>
@@ -48,7 +48,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </header>
 
             {/* Main Content */}
-            <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8">
+            <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden">
               {children}
             </main>
           </MissionBackground>
