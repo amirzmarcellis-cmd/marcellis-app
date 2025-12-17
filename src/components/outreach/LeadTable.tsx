@@ -152,14 +152,16 @@ export function LeadTable({ leads, isLoading, onSelectLead, onUpdateStatus, onDe
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-              <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/50">
-                {getStatusBadge(lead.status)}
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="text-xs">
+              <div className="flex items-center justify-between gap-2 mt-3 pt-3 border-t border-border/50 overflow-hidden">
+                <div className="shrink-0">
+                  {getStatusBadge(lead.status)}
+                </div>
+                <div className="flex items-center gap-2 min-w-0 shrink-0">
+                  <Badge variant="secondary" className="text-xs truncate max-w-[80px]">
                     {lead.source || 'LinkedIn'}
                   </Badge>
                   {lead.chat_id && (
-                    <MessageSquare className="h-4 w-4 text-primary" />
+                    <MessageSquare className="h-4 w-4 text-primary shrink-0" />
                   )}
                 </div>
               </div>
