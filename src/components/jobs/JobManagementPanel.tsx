@@ -174,7 +174,7 @@ export function JobManagementPanel() {
 
       // Optimize: Build query with proper conditions
       let query = supabase.from('Jobs').select(`
-          job_id, job_title, job_location, job_salary_range, Currency, Processed, status, Timestamp, group_id, automatic_dial, jd_summary, recruiter_id, contract_length,
+          job_id, job_title, job_description, job_location, job_salary_range, Currency, Processed, status, Timestamp, group_id, automatic_dial, jd_summary, recruiter_id, contract_length,
           groups ( id, name, color )
         `);
 
@@ -896,8 +896,8 @@ const JobGrid = memo(function JobGrid({
                 </div>}
             </div>
 
-            {job.jd_summary && <p className="text-sm text-muted-foreground line-clamp-3">
-                {job.jd_summary}
+            {job.job_description && <p className="text-sm text-muted-foreground line-clamp-3">
+                {job.job_description}
               </p>}
 
             {/* Candidate Counts */}
