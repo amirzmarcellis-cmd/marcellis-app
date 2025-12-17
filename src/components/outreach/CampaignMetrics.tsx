@@ -1,7 +1,7 @@
 import { useCampaignMetrics } from '@/hooks/outreach/useCampaignMetrics';
 import { LinkedInLead } from '@/hooks/outreach/useLinkedInCampaignLeads';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, MessageSquare, UserCheck, Trophy, XCircle, TrendingUp, Target } from 'lucide-react';
+import { Users, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface CampaignMetricsProps {
@@ -21,38 +21,6 @@ export function CampaignMetricsDisplay({ leads }: CampaignMetricsProps) {
       borderColor: 'border-blue-500/20',
     },
     {
-      title: 'In Conversation',
-      value: metrics.conversationsInitiated,
-      icon: MessageSquare,
-      color: 'text-purple-400',
-      bg: 'bg-purple-500/10',
-      borderColor: 'border-purple-500/20',
-    },
-    {
-      title: 'Qualified',
-      value: metrics.qualified,
-      icon: UserCheck,
-      color: 'text-amber-400',
-      bg: 'bg-amber-500/10',
-      borderColor: 'border-amber-500/20',
-    },
-    {
-      title: 'Won',
-      value: metrics.won,
-      icon: Trophy,
-      color: 'text-emerald-400',
-      bg: 'bg-emerald-500/10',
-      borderColor: 'border-emerald-500/20',
-    },
-    {
-      title: 'Lost',
-      value: metrics.lost,
-      icon: XCircle,
-      color: 'text-red-400',
-      bg: 'bg-red-500/10',
-      borderColor: 'border-red-500/20',
-    },
-    {
       title: 'Reply Rate',
       value: `${metrics.replyRate}%`,
       icon: TrendingUp,
@@ -60,18 +28,10 @@ export function CampaignMetricsDisplay({ leads }: CampaignMetricsProps) {
       bg: 'bg-cyan-500/10',
       borderColor: 'border-cyan-500/20',
     },
-    {
-      title: 'Conversion',
-      value: `${metrics.conversionRate}%`,
-      icon: Target,
-      color: 'text-green-400',
-      bg: 'bg-green-500/10',
-      borderColor: 'border-green-500/20',
-    },
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3">
+    <div className="grid grid-cols-2 gap-2 sm:gap-3">
       {metricCards.map((metric) => (
         <Card 
           key={metric.title} 
