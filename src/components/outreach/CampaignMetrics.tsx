@@ -71,22 +71,22 @@ export function CampaignMetricsDisplay({ leads }: CampaignMetricsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 w-full">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3">
       {metricCards.map((metric) => (
         <Card 
           key={metric.title} 
           className={cn(
-            "bg-card/50 backdrop-blur-sm border",
+            "bg-card/50 backdrop-blur-sm border min-w-0",
             metric.borderColor
           )}
         >
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex flex-col gap-2 sm:gap-3">
-              <div className={cn("p-1.5 sm:p-2 rounded-lg w-fit", metric.bg)}>
+          <CardContent className="p-2.5 sm:p-4">
+            <div className="flex flex-col gap-1.5 sm:gap-3">
+              <div className={cn("p-1.5 rounded-lg w-fit", metric.bg)}>
                 <metric.icon className={cn("h-3.5 w-3.5 sm:h-4 sm:w-4", metric.color)} />
               </div>
-              <div>
-                <p className="text-xl sm:text-2xl font-bold tracking-tight">{metric.value}</p>
+              <div className="min-w-0">
+                <p className="text-lg sm:text-2xl font-bold tracking-tight">{metric.value}</p>
                 <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 truncate">{metric.title}</p>
               </div>
             </div>
