@@ -31,21 +31,21 @@ export function CampaignMetricsDisplay({ leads }: CampaignMetricsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 gap-2">
       {metricCards.map((metric) => (
         <div
           key={metric.title}
           className={cn(
-            "flex items-center gap-2 px-3 py-2 rounded-lg border transition-all",
+            "flex items-center gap-2 px-2 sm:px-3 py-2 rounded-lg border transition-all",
             "bg-card/50 backdrop-blur-sm border-border/50 hover:border-border"
           )}
         >
-          <div className={cn("p-1.5 rounded-md shrink-0", metric.bg)}>
-            <metric.icon className={cn("h-3.5 w-3.5", metric.color)} />
+          <div className={cn("p-1 sm:p-1.5 rounded-md shrink-0", metric.bg)}>
+            <metric.icon className={cn("h-3 w-3 sm:h-3.5 sm:w-3.5", metric.color)} />
           </div>
           <div className="min-w-0">
             <p className="text-base sm:text-lg font-bold leading-none">{metric.value}</p>
-            <p className="text-[10px] text-muted-foreground truncate mt-0.5">{metric.title}</p>
+            <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate mt-0.5">{metric.title}</p>
           </div>
         </div>
       ))}
