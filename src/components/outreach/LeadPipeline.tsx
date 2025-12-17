@@ -68,17 +68,19 @@ export function LeadPipeline({ leads, onSelectLead }: LeadPipelineProps) {
         </CardContent>
       </Card>
 
-      {/* Kanban Columns */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 pb-4">
-        {stages.map(stage => (
-          <PipelineColumn
-            key={stage.status}
-            stage={stage}
-            leads={getLeadsByStatus(stage.status)}
-            onSelectLead={onSelectLead}
-            getInitials={getInitials}
-          />
-        ))}
+      {/* Kanban Columns - Horizontal scroll on mobile, grid on desktop */}
+      <div className="overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:overflow-visible">
+        <div className="flex gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 min-w-max sm:min-w-0">
+          {stages.map(stage => (
+            <PipelineColumn
+              key={stage.status}
+              stage={stage}
+              leads={getLeadsByStatus(stage.status)}
+              onSelectLead={onSelectLead}
+              getInitials={getInitials}
+            />
+          ))}
+        </div>
       </div>
       {totalLeads === 0 && (
         <div className="flex items-center justify-center min-h-[200px] text-muted-foreground">
@@ -101,7 +103,7 @@ interface PipelineColumnProps {
 
 function PipelineColumn({ stage, leads, onSelectLead, getInitials }: PipelineColumnProps) {
   return (
-    <div className="w-full">
+    <div className="w-[260px] sm:w-full shrink-0">
       <Card className="bg-card/50 backdrop-blur-sm border-border/50 h-full">
         {/* Column Header */}
         <CardHeader className="p-3 pb-2">

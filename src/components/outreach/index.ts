@@ -7,3 +7,4 @@ export { LeadDetailPanel } from './LeadDetailPanel';
 export { ChatPanel } from './ChatPanel';
 export { CampaignMetricsDisplay } from './CampaignMetrics';
 export { LinkedInSearchSelect } from './LinkedInSearchSelect';
+export { PipelineStatusSummary } from './PipelineStatusSummary';
