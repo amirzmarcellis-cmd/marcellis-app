@@ -170,14 +170,14 @@ export function LeadTable({ leads, isLoading, onSelectLead, onUpdateStatus, onDe
 
       {/* Desktop Table View */}
       <div className="hidden sm:block rounded-md border border-border overflow-hidden">
-        <Table>
+        <Table className="table-fixed w-full">
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead>Lead</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Source</TableHead>
-              <TableHead>Conversations</TableHead>
-              <TableHead className="w-12"></TableHead>
+              <TableHead className="w-[40%]">Lead</TableHead>
+              <TableHead className="w-[20%]">Status</TableHead>
+              <TableHead className="w-[15%]">Source</TableHead>
+              <TableHead className="w-[15%]">Conversations</TableHead>
+              <TableHead className="w-[10%]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
