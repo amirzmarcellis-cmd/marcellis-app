@@ -69,7 +69,7 @@ export function LeadTable({ leads, isLoading, onSelectLead, onUpdateStatus, onDe
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-2">
-        <div className="relative flex-1 max-w-xs">
+        <div className="relative flex-1 sm:max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search leads..."
@@ -79,7 +79,7 @@ export function LeadTable({ leads, isLoading, onSelectLead, onUpdateStatus, onDe
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-44">
+          <SelectTrigger className="w-full sm:w-44">
             <Filter className="h-4 w-4 mr-2" />
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
@@ -92,7 +92,84 @@ export function LeadTable({ leads, isLoading, onSelectLead, onUpdateStatus, onDe
         </Select>
       </div>
 
-      <div className="rounded-md border border-border overflow-hidden">
+      {/* Mobile Card View */}
+      <div className="block sm:hidden space-y-3">
+        {filteredLeads.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            No leads found
+          </div>
+        ) : (
+          filteredLeads.map(lead => (
+            <div
+              key={lead.id}
+              className="p-4 rounded-lg border border-border bg-card/50 backdrop-blur-sm cursor-pointer hover:bg-muted/50 transition-colors"
+              onClick={() => onSelectLead(lead)}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <Avatar className="h-10 w-10 shrink-0">
+                    <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                      {getInitials(lead.full_name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium truncate">{lead.full_name || 'Unknown'}</p>
+                    {lead.company_name && (
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Building2 className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{lead.company_name}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onSelectLead(lead); }}>
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      View Messages
+                    </DropdownMenuItem>
+                    {lead.linkedin_id && (
+                      <DropdownMenuItem onClick={(e) => { 
+                        e.stopPropagation(); 
+                        window.open(`https://linkedin.com/in/${lead.linkedin_id}`, '_blank');
+                      }}>
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        View LinkedIn
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem 
+                      onClick={(e) => { e.stopPropagation(); onDelete(lead); }}
+                      className="text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/50">
+                {getStatusBadge(lead.status)}
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="text-xs">
+                    {lead.source || 'LinkedIn'}
+                  </Badge>
+                  {lead.chat_id && (
+                    <MessageSquare className="h-4 w-4 text-primary" />
+                  )}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden sm:block rounded-md border border-border overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">

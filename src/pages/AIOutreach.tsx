@@ -2,15 +2,15 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { CampaignList, LeadTable, LeadPipeline, LeadDetailPanel, CampaignMetricsDisplay } from '@/components/outreach';
+import { PipelineStatusSummary } from '@/components/outreach/PipelineStatusSummary';
 import { Campaign } from '@/hooks/outreach/useCampaigns';
 import { useLinkedInCampaignLeads, LinkedInLead } from '@/hooks/outreach/useLinkedInCampaignLeads';
 import { useUpdateLinkedInCampaignLead } from '@/hooks/outreach/useUpdateLinkedInCampaignLead';
 import { useDeleteLinkedInCampaignLead } from '@/hooks/outreach/useDeleteLinkedInCampaignLead';
 import { useLinkedInConnection } from '@/hooks/outreach/useLinkedInConnection';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { ArrowLeft, LayoutGrid, Table, Kanban, Linkedin } from 'lucide-react';
+import { ArrowLeft, Table, Kanban, Linkedin } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -139,18 +139,18 @@ export default function AIOutreach() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3 sm:gap-4">
             {selectedCampaign && (
-              <Button variant="ghost" size="icon" onClick={handleBackToCampaigns}>
+              <Button variant="ghost" size="icon" onClick={handleBackToCampaigns} className="shrink-0">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             )}
-            <div>
-              <h1 className="text-2xl font-bold">
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-2xl font-bold truncate">
                 {selectedCampaign ? selectedCampaign.campaign_name : 'AI Outreach'}
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">
                 {selectedCampaign 
                   ? `Manage leads for ${selectedCampaign.campaign_name}`
                   : 'Manage your LinkedIn outreach campaigns'
@@ -160,11 +160,12 @@ export default function AIOutreach() {
           </div>
           
           {selectedCampaign && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <Button
                 variant={viewMode === 'table' ? 'secondary' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('table')}
+                className="flex-1 sm:flex-none"
               >
                 <Table className="h-4 w-4 mr-1" />
                 Table
@@ -173,6 +174,7 @@ export default function AIOutreach() {
                 variant={viewMode === 'pipeline' ? 'secondary' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('pipeline')}
+                className="flex-1 sm:flex-none"
               >
                 <Kanban className="h-4 w-4 mr-1" />
                 Pipeline
@@ -186,6 +188,9 @@ export default function AIOutreach() {
           <CampaignList onSelectCampaign={handleSelectCampaign} />
         ) : (
           <div className="space-y-4">
+            {/* Pipeline Status Counts */}
+            <PipelineStatusSummary leads={leads} />
+
             {/* Metrics */}
             <CampaignMetricsDisplay leads={leads} />
 
