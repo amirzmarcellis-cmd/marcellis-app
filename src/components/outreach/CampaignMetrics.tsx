@@ -31,27 +31,24 @@ export function CampaignMetricsDisplay({ leads }: CampaignMetricsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+    <div className="flex flex-wrap gap-2 sm:gap-3">
       {metricCards.map((metric) => (
-        <Card 
-          key={metric.title} 
+        <div
+          key={metric.title}
           className={cn(
-            "bg-card/50 backdrop-blur-sm border min-w-0",
-            metric.borderColor
+            "flex items-center gap-2 px-3 py-2 rounded-lg border transition-all",
+            "bg-card/50 backdrop-blur-sm border-border/50 hover:border-border",
+            "min-w-[140px]"
           )}
         >
-          <CardContent className="p-2.5 sm:p-4">
-            <div className="flex flex-col gap-1.5 sm:gap-3">
-              <div className={cn("p-1.5 rounded-lg w-fit", metric.bg)}>
-                <metric.icon className={cn("h-3.5 w-3.5 sm:h-4 sm:w-4", metric.color)} />
-              </div>
-              <div className="min-w-0">
-                <p className="text-lg sm:text-2xl font-bold tracking-tight">{metric.value}</p>
-                <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 truncate">{metric.title}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          <div className={cn("p-1.5 rounded-md", metric.bg)}>
+            <metric.icon className={cn("h-3.5 w-3.5", metric.color)} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-lg font-bold leading-none">{metric.value}</p>
+            <p className="text-[10px] text-muted-foreground truncate mt-0.5">{metric.title}</p>
+          </div>
+        </div>
       ))}
     </div>
   );
