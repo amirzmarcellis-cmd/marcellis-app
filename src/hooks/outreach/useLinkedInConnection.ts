@@ -8,11 +8,11 @@ export function useLinkedInConnection() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   // Fetch connection status from profile
-  const { data: connectionData, isLoading, refetch: refetchConnection } = useQuery({
+  const { data: connectionData, isLoading, isFetching, refetch: refetchConnection } = useQuery({
     queryKey: ['linkedin-connection'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return { isConnected: false, linkedInId: null };
+      if (!user) return { isConnected: false, linkedInId: null, name: null };
 
       const { data: profile, error } = await supabase
         .from('profiles')
@@ -22,7 +22,7 @@ export function useLinkedInConnection() {
 
       if (error) {
         console.error('Error fetching profile:', error);
-        return { isConnected: false, linkedInId: null };
+        return { isConnected: false, linkedInId: null, name: null };
       }
 
       return {
@@ -31,6 +31,7 @@ export function useLinkedInConnection() {
         name: profile?.name || null,
       };
     },
+    staleTime: 30000, // Cache for 30 seconds to prevent unnecessary refetches
   });
 
   // Initiate LinkedIn connection - get auth URL
@@ -103,10 +104,14 @@ export function useLinkedInConnection() {
     },
   });
 
+  // Only show "not connected" if we have loaded data and it's explicitly not connected
+  // During loading/fetching, preserve previous state or show loading
+  const isActuallyConnected = connectionData?.isConnected ?? false;
+
   return {
-    isConnected: connectionData?.isConnected ?? false,
+    isConnected: isActuallyConnected,
     linkedInId: connectionData?.linkedInId ?? null,
-    isLoading,
+    isLoading: isLoading || (isFetching && !connectionData), // Show loading during initial fetch
     isAuthenticating,
     isDisconnecting: disconnectMutation.isPending,
     initiateConnection,
