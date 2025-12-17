@@ -71,6 +71,24 @@ export function LinkedInConnection({ linkedinId, onUpdate }: LinkedInConnectionP
         return;
       }
 
+      // First, call fetch-linkedin-account to check if the right account type was connected
+      try {
+        const { data: fetchResult, error: fetchError } = await supabase.functions.invoke('fetch-linkedin-account');
+        
+        if (fetchError || fetchResult?.wrongAccountType) {
+          clearInterval(poll);
+          setIsPolling(false);
+          toast({
+            title: 'Connection Failed',
+            description: fetchResult?.error || 'Unable to connect LinkedIn account. A different account type was detected. Please contact support for assistance.',
+            variant: 'destructive',
+          });
+          return;
+        }
+      } catch (fetchErr) {
+        console.error('Error checking account type:', fetchErr);
+      }
+
       const { data: profile } = await supabase
         .from('profiles')
         .select('linkedin_id')
