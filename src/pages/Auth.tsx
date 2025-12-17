@@ -52,12 +52,12 @@ export default function Auth() {
     return () => clearTimeout(timer);
   }, [navigate]);
 
-  // Auto-rotate slides every 5 seconds
+  // Auto-rotate slides every 2 seconds
   useEffect(() => {
     if (isPaused) return;
     const interval = setInterval(() => {
       setActiveSlide(prev => (prev + 1) % 5);
-    }, 5000);
+    }, 2000);
     return () => clearInterval(interval);
   }, [isPaused]);
 
@@ -271,7 +271,7 @@ export default function Auth() {
             <img 
               src={slide.src} 
               alt={slide.alt} 
-              className="max-w-[85%] max-h-[70vh] object-contain rounded-2xl shadow-2xl transition-all duration-300 hover:scale-105"
+              className="max-w-[85%] max-h-[70vh] object-contain rounded-2xl shadow-2xl transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-[0_25px_60px_-15px_rgba(0,217,255,0.3)] hover:brightness-105 cursor-pointer"
             />
           </div>
         ))}
