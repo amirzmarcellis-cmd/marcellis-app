@@ -71,7 +71,7 @@ export function CampaignMetricsDisplay({ leads }: CampaignMetricsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 overflow-hidden">
       {metricCards.map((metric) => (
         <Card 
           key={metric.title} 
