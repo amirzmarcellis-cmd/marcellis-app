@@ -72,8 +72,29 @@ Deno.serve(async (req) => {
     const accountsData = await accountsResponse.json();
     console.log('Unipile accounts response:', JSON.stringify(accountsData, null, 2));
 
-    // Find LinkedIn account - look in items array
+    // Find accounts - look in items array
     const accounts = accountsData.items || accountsData;
+    
+    // Check if any non-LinkedIn account was connected (e.g., Facebook profile instead of LinkedIn)
+    if (Array.isArray(accounts) && accounts.length > 0) {
+      const nonLinkedInAccount = accounts.find((acc: any) => 
+        acc.type !== 'LINKEDIN' && acc.provider !== 'LINKEDIN'
+      );
+      
+      if (nonLinkedInAccount && !accounts.find((acc: any) => acc.type === 'LINKEDIN' || acc.provider === 'LINKEDIN')) {
+        console.log('Wrong account type connected:', nonLinkedInAccount.type || nonLinkedInAccount.provider);
+        return new Response(
+          JSON.stringify({ 
+            error: 'Unable to connect LinkedIn account. A different account type was detected. Please contact support for assistance.',
+            connected: false,
+            wrongAccountType: true,
+            detectedType: nonLinkedInAccount.type || nonLinkedInAccount.provider
+          }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+    
     const linkedInAccount = Array.isArray(accounts) 
       ? accounts.find((acc: any) => acc.type === 'LINKEDIN' || acc.provider === 'LINKEDIN')
       : null;
