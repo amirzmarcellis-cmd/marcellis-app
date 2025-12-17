@@ -75,13 +75,37 @@ Deno.serve(async (req) => {
     // Find accounts - look in items array
     const accounts = accountsData.items || accountsData;
     
-    // Check if any non-LinkedIn account was connected (e.g., Facebook profile instead of LinkedIn)
+    // Check if Facebook was connected instead of LinkedIn
     if (Array.isArray(accounts) && accounts.length > 0) {
+      const facebookAccount = accounts.find((acc: any) => 
+        acc.type === 'FACEBOOK' || acc.provider === 'FACEBOOK' ||
+        acc.type?.toLowerCase?.().includes('facebook') || 
+        acc.provider?.toLowerCase?.().includes('facebook')
+      );
+      
+      const hasLinkedIn = accounts.find((acc: any) => 
+        acc.type === 'LINKEDIN' || acc.provider === 'LINKEDIN'
+      );
+      
+      if (facebookAccount && !hasLinkedIn) {
+        console.log('Facebook account connected instead of LinkedIn:', facebookAccount.type || facebookAccount.provider);
+        return new Response(
+          JSON.stringify({ 
+            error: 'Unable to connect LinkedIn account. A Facebook page was connected instead. Please contact support for assistance.',
+            connected: false,
+            wrongAccountType: true,
+            detectedType: 'FACEBOOK'
+          }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      // Check for other non-LinkedIn accounts
       const nonLinkedInAccount = accounts.find((acc: any) => 
         acc.type !== 'LINKEDIN' && acc.provider !== 'LINKEDIN'
       );
       
-      if (nonLinkedInAccount && !accounts.find((acc: any) => acc.type === 'LINKEDIN' || acc.provider === 'LINKEDIN')) {
+      if (nonLinkedInAccount && !hasLinkedIn) {
         console.log('Wrong account type connected:', nonLinkedInAccount.type || nonLinkedInAccount.provider);
         return new Response(
           JSON.stringify({ 
