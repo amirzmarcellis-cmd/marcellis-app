@@ -102,24 +102,24 @@ export function LeadTable({ leads, isLoading, onSelectLead, onUpdateStatus, onDe
           filteredLeads.map(lead => (
             <div
               key={lead.id}
-              className="p-4 rounded-lg border border-border bg-card/50 backdrop-blur-sm cursor-pointer hover:bg-muted/50 transition-colors"
+              className="p-3 rounded-lg border border-border/50 bg-background/60 hover:bg-muted/50 hover:border-border cursor-pointer transition-all group"
               onClick={() => onSelectLead(lead)}
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <Avatar className="h-10 w-10 shrink-0">
-                    <AvatarFallback className="bg-primary/10 text-primary text-sm">
-                      {getInitials(lead.full_name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium truncate">{lead.full_name || 'Unknown'}</p>
-                    {lead.company_name && (
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Building2 className="h-3 w-3 shrink-0" />
-                        <span className="truncate">{lead.company_name}</span>
-                      </div>
-                    )}
+              <div className="flex items-start gap-3">
+                <Avatar className="h-9 w-9 shrink-0">
+                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
+                    {getInitials(lead.full_name)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0 space-y-1 text-left">
+                  <p className="text-sm font-medium leading-tight truncate group-hover:text-primary transition-colors">
+                    {lead.full_name || 'Unknown'}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {lead.company_name || 'No company'}
+                  </p>
+                  <div className="pt-1">
+                    {getStatusBadge(lead.status)}
                   </div>
                 </div>
                 <DropdownMenu>
@@ -151,19 +151,6 @@ export function LeadTable({ leads, isLoading, onSelectLead, onUpdateStatus, onDe
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </div>
-              <div className="flex items-center justify-between gap-2 mt-3 pt-3 border-t border-border/50 overflow-hidden">
-                <div className="shrink-0">
-                  {getStatusBadge(lead.status)}
-                </div>
-                <div className="flex items-center gap-2 min-w-0 shrink-0">
-                  <Badge variant="secondary" className="text-xs truncate max-w-[80px]">
-                    {lead.source || 'LinkedIn'}
-                  </Badge>
-                  {lead.chat_id && (
-                    <MessageSquare className="h-4 w-4 text-primary shrink-0" />
-                  )}
-                </div>
               </div>
             </div>
           ))
