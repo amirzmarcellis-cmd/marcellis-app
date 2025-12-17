@@ -48,7 +48,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </header>
 
             {/* Main Content */}
-            <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 max-w-full overflow-x-hidden">
+            <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 w-full min-w-0">
               {children}
             </main>
           </MissionBackground>

@@ -67,7 +67,7 @@ export function LeadTable({ leads, isLoading, onSelectLead, onUpdateStatus, onDe
   }
 
   return (
-    <div className="space-y-4 overflow-x-hidden">
+    <div className="space-y-4 w-full max-w-full">
       <div className="flex flex-col sm:flex-row gap-2">
         <div className="relative flex-1 sm:max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
