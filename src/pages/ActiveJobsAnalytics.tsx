@@ -35,6 +35,12 @@ interface RecruiterWithMetrics {
   submitted: number;
 }
 
+// Helper function to calculate percentage
+const calculatePercentage = (numerator: number, denominator: number): string => {
+  if (denominator === 0) return '0%';
+  return ((numerator / denominator) * 100).toFixed(1) + '%';
+};
+
 export default function ActiveJobsAnalytics() {
   const [activeTab, setActiveTab] = useState("jobs");
   const [searchTerm, setSearchTerm] = useState("");
@@ -536,6 +542,24 @@ export default function ActiveJobsAnalytics() {
                               </Badge>
                             </TableCell>
                           </TableRow>
+                          <TableRow className="bg-muted/20 text-xs">
+                            <TableCell className="font-medium italic text-muted-foreground" colSpan={2}>
+                              Conversion Rates
+                            </TableCell>
+                            <TableCell className="text-center text-muted-foreground">-</TableCell>
+                            <TableCell className="text-center text-green-400 font-medium">
+                              {calculatePercentage(summaryTotals?.shortlisted ?? 0, summaryTotals?.longlisted ?? 0)}
+                            </TableCell>
+                            <TableCell className="text-center text-amber-400 font-medium">
+                              {calculatePercentage(summaryTotals?.pending_action ?? 0, summaryTotals?.shortlisted ?? 0)}
+                            </TableCell>
+                            <TableCell className="text-center text-red-400 font-medium">
+                              {calculatePercentage(summaryTotals?.rejected ?? 0, summaryTotals?.shortlisted ?? 0)}
+                            </TableCell>
+                            <TableCell className="text-center text-purple-400 font-medium">
+                              {calculatePercentage(summaryTotals?.submitted ?? 0, summaryTotals?.shortlisted ?? 0)}
+                            </TableCell>
+                          </TableRow>
                         </tfoot>
                       )}
                     </Table>
@@ -665,6 +689,24 @@ export default function ActiveJobsAnalytics() {
                               <Badge className="bg-purple-500 text-white border-0">
                                 {summaryTotals?.submitted ?? 0}
                               </Badge>
+                            </TableCell>
+                          </TableRow>
+                          <TableRow className="bg-muted/20 text-xs">
+                            <TableCell className="font-medium italic text-muted-foreground" colSpan={2}>
+                              Conversion Rates
+                            </TableCell>
+                            <TableCell className="text-center text-muted-foreground">-</TableCell>
+                            <TableCell className="text-center text-green-400 font-medium">
+                              {calculatePercentage(summaryTotals?.shortlisted ?? 0, summaryTotals?.longlisted ?? 0)}
+                            </TableCell>
+                            <TableCell className="text-center text-amber-400 font-medium">
+                              {calculatePercentage(summaryTotals?.pending_action ?? 0, summaryTotals?.shortlisted ?? 0)}
+                            </TableCell>
+                            <TableCell className="text-center text-red-400 font-medium">
+                              {calculatePercentage(summaryTotals?.rejected ?? 0, summaryTotals?.shortlisted ?? 0)}
+                            </TableCell>
+                            <TableCell className="text-center text-purple-400 font-medium">
+                              {calculatePercentage(summaryTotals?.submitted ?? 0, summaryTotals?.shortlisted ?? 0)}
                             </TableCell>
                           </TableRow>
                         </tfoot>
