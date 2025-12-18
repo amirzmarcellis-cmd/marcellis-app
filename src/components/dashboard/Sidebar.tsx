@@ -78,7 +78,7 @@ export function DashboardSidebar() {
     url: "/reports",
     icon: FileText
   }, {
-    title: "Active Jobs Analytics",
+  title: "Jobs Analysis",
     url: "/active-jobs-analytics",
     icon: PieChart
   }, {
@@ -143,9 +143,9 @@ export function DashboardSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2">
-              {navigationItems.filter(item => {
-              // Filter out Analytics, Reports, and Active Jobs Analytics for recruiters
-              if ((item.title === 'Analytics' || item.title === 'Reports' || item.title === 'Active Jobs Analytics') && !canAccessAnalytics) {
+            {navigationItems.filter(item => {
+              // Filter out Analytics, Reports, and Jobs Analysis for recruiters
+              if ((item.title === 'Analytics' || item.title === 'Reports' || item.title === 'Jobs Analysis') && !canAccessAnalytics) {
                 return false;
               }
               return true;
