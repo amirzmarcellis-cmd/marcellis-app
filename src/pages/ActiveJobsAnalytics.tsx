@@ -18,6 +18,7 @@ interface JobWithMetrics {
   timestamp: string | null;
   longlisted: number;
   shortlisted: number;
+  pending_action: number;
   rejected: number;
   submitted: number;
 }
@@ -29,6 +30,7 @@ interface RecruiterWithMetrics {
   active_jobs: number;
   longlisted: number;
   shortlisted: number;
+  pending_action: number;
   rejected: number;
   submitted: number;
 }
@@ -116,12 +118,17 @@ export default function ActiveJobsAnalytics() {
           .eq('contacted', 'Submitted')
       ]);
       
+      const shortlisted = shortlistedResult.count || 0;
+      const rejected = rejectedResult.count || 0;
+      const submitted = submittedResult.count || 0;
+      
       return {
         jobs: scopedJobs.length,
         longlisted: longlistedResult.count || 0,
-        shortlisted: shortlistedResult.count || 0,
-        rejected: rejectedResult.count || 0,
-        submitted: submittedResult.count || 0
+        shortlisted,
+        pending_action: shortlisted - (rejected + submitted),
+        rejected,
+        submitted
       };
     }
   });
@@ -208,7 +215,8 @@ export default function ActiveJobsAnalytics() {
           recruiter_name: recruiter.name,
           recruiter_email: recruiter.email,
           timestamp: job.Timestamp,
-          ...metrics
+          ...metrics,
+          pending_action: metrics.shortlisted - (metrics.rejected + metrics.submitted)
         };
       })
       .sort((a, b) => {
@@ -233,6 +241,7 @@ export default function ActiveJobsAnalytics() {
         existing.active_jobs += 1;
         existing.longlisted += job.longlisted;
         existing.shortlisted += job.shortlisted;
+        existing.pending_action += job.pending_action;
         existing.rejected += job.rejected;
         existing.submitted += job.submitted;
       } else {
@@ -243,6 +252,7 @@ export default function ActiveJobsAnalytics() {
           active_jobs: 1,
           longlisted: job.longlisted,
           shortlisted: job.shortlisted,
+          pending_action: job.pending_action,
           rejected: job.rejected,
           submitted: job.submitted
         });
@@ -433,14 +443,15 @@ export default function ActiveJobsAnalytics() {
                     ))}
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x-auto max-h-[500px] overflow-y-auto relative">
                     <Table>
-                      <TableHeader>
+                      <TableHeader className="sticky top-0 bg-card z-10">
                         <TableRow className="border-border/50">
                           <TableHead className="text-muted-foreground">Job Title</TableHead>
                           <TableHead className="text-muted-foreground">Recruiter</TableHead>
                           <TableHead className="text-muted-foreground text-center">Longlisted</TableHead>
                           <TableHead className="text-muted-foreground text-center">Shortlisted</TableHead>
+                          <TableHead className="text-muted-foreground text-center">Pending Action</TableHead>
                           <TableHead className="text-muted-foreground text-center">Rejected</TableHead>
                           <TableHead className="text-muted-foreground text-center">Submitted</TableHead>
                         </TableRow>
@@ -448,7 +459,7 @@ export default function ActiveJobsAnalytics() {
                       <TableBody>
                         {filteredJobs.length === 0 ? (
                           <TableRow>
-                            <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                            <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                               No {jobScope === 'active' ? 'active ' : ''}jobs found
                             </TableCell>
                           </TableRow>
@@ -473,6 +484,11 @@ export default function ActiveJobsAnalytics() {
                                   </Badge>
                                 </TableCell>
                                 <TableCell className="text-center">
+                                  <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/30">
+                                    {job.pending_action}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-center">
                                   <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/30">
                                     {job.rejected}
                                   </Badge>
@@ -484,36 +500,44 @@ export default function ActiveJobsAnalytics() {
                                 </TableCell>
                               </TableRow>
                             ))}
-                            {/* Total Row - Database-level counts for consistency with summary cards */}
-                            <TableRow className="bg-muted/30 border-t-2 border-primary/30 font-semibold">
-                              <TableCell className="font-semibold">
-                                Total ({summaryTotals?.jobs ?? filteredJobs.length} jobs)
-                              </TableCell>
-                              <TableCell></TableCell>
-                              <TableCell className="text-center">
-                                <Badge className="bg-blue-500 text-white border-0">
-                                  {summaryTotals?.longlisted ?? 0}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-center">
-                                <Badge className="bg-green-500 text-white border-0">
-                                  {summaryTotals?.shortlisted ?? 0}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-center">
-                                <Badge className="bg-red-500 text-white border-0">
-                                  {summaryTotals?.rejected ?? 0}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-center">
-                                <Badge className="bg-purple-500 text-white border-0">
-                                  {summaryTotals?.submitted ?? 0}
-                                </Badge>
-                              </TableCell>
-                            </TableRow>
                           </>
                         )}
                       </TableBody>
+                      {filteredJobs.length > 0 && (
+                        <tfoot className="sticky bottom-0 bg-card z-10">
+                          <TableRow className="bg-muted/30 border-t-2 border-primary/30 font-semibold">
+                            <TableCell className="font-semibold">
+                              Total ({summaryTotals?.jobs ?? filteredJobs.length} jobs)
+                            </TableCell>
+                            <TableCell></TableCell>
+                            <TableCell className="text-center">
+                              <Badge className="bg-blue-500 text-white border-0">
+                                {summaryTotals?.longlisted ?? 0}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Badge className="bg-green-500 text-white border-0">
+                                {summaryTotals?.shortlisted ?? 0}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Badge className="bg-amber-500 text-white border-0">
+                                {summaryTotals?.pending_action ?? 0}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Badge className="bg-red-500 text-white border-0">
+                                {summaryTotals?.rejected ?? 0}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Badge className="bg-purple-500 text-white border-0">
+                                {summaryTotals?.submitted ?? 0}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        </tfoot>
+                      )}
                     </Table>
                   </div>
                 )}
@@ -537,9 +561,9 @@ export default function ActiveJobsAnalytics() {
                     ))}
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x-auto max-h-[500px] overflow-y-auto relative">
                     <Table>
-                      <TableHeader>
+                      <TableHeader className="sticky top-0 bg-card z-10">
                         <TableRow className="border-border/50">
                           <TableHead className="text-muted-foreground">Recruiter</TableHead>
                           <TableHead className="text-muted-foreground text-center">
@@ -547,6 +571,7 @@ export default function ActiveJobsAnalytics() {
                           </TableHead>
                           <TableHead className="text-muted-foreground text-center">Longlisted</TableHead>
                           <TableHead className="text-muted-foreground text-center">Shortlisted</TableHead>
+                          <TableHead className="text-muted-foreground text-center">Pending Action</TableHead>
                           <TableHead className="text-muted-foreground text-center">Rejected</TableHead>
                           <TableHead className="text-muted-foreground text-center">Submitted</TableHead>
                         </TableRow>
@@ -554,7 +579,7 @@ export default function ActiveJobsAnalytics() {
                       <TableBody>
                         {filteredRecruiters.length === 0 ? (
                           <TableRow>
-                            <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                            <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                               No recruiters found
                             </TableCell>
                           </TableRow>
@@ -586,6 +611,11 @@ export default function ActiveJobsAnalytics() {
                                   </Badge>
                                 </TableCell>
                                 <TableCell className="text-center">
+                                  <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/30">
+                                    {recruiter.pending_action}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-center">
                                   <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/30">
                                     {recruiter.rejected}
                                   </Badge>
@@ -597,40 +627,48 @@ export default function ActiveJobsAnalytics() {
                                 </TableCell>
                               </TableRow>
                             ))}
-                            {/* Total Row - Database-level counts for consistency with summary cards */}
-                            <TableRow className="bg-muted/30 border-t-2 border-primary/30 font-semibold">
-                              <TableCell className="font-semibold">
-                                Total ({filteredRecruiters.length} recruiters)
-                              </TableCell>
-                              <TableCell className="text-center">
-                                <Badge className="bg-primary text-primary-foreground border-0">
-                                  {summaryTotals?.jobs ?? 0}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-center">
-                                <Badge className="bg-blue-500 text-white border-0">
-                                  {summaryTotals?.longlisted ?? 0}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-center">
-                                <Badge className="bg-green-500 text-white border-0">
-                                  {summaryTotals?.shortlisted ?? 0}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-center">
-                                <Badge className="bg-red-500 text-white border-0">
-                                  {summaryTotals?.rejected ?? 0}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-center">
-                                <Badge className="bg-purple-500 text-white border-0">
-                                  {summaryTotals?.submitted ?? 0}
-                                </Badge>
-                              </TableCell>
-                            </TableRow>
                           </>
                         )}
                       </TableBody>
+                      {filteredRecruiters.length > 0 && (
+                        <tfoot className="sticky bottom-0 bg-card z-10">
+                          <TableRow className="bg-muted/30 border-t-2 border-primary/30 font-semibold">
+                            <TableCell className="font-semibold">
+                              Total ({filteredRecruiters.length} recruiters)
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Badge className="bg-primary text-primary-foreground border-0">
+                                {summaryTotals?.jobs ?? 0}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Badge className="bg-blue-500 text-white border-0">
+                                {summaryTotals?.longlisted ?? 0}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Badge className="bg-green-500 text-white border-0">
+                                {summaryTotals?.shortlisted ?? 0}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Badge className="bg-amber-500 text-white border-0">
+                                {summaryTotals?.pending_action ?? 0}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Badge className="bg-red-500 text-white border-0">
+                                {summaryTotals?.rejected ?? 0}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Badge className="bg-purple-500 text-white border-0">
+                                {summaryTotals?.submitted ?? 0}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        </tfoot>
+                      )}
                     </Table>
                   </div>
                 )}
