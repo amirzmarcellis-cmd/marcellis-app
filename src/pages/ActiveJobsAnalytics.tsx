@@ -1,12 +1,16 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Briefcase, Users, Search, TrendingUp, CheckCircle, XCircle, Send, ListChecks } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Briefcase, Users, Search, TrendingUp, CheckCircle, XCircle, Send, ListChecks, CalendarIcon, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -45,10 +49,17 @@ export default function ActiveJobsAnalytics() {
   const [activeTab, setActiveTab] = useState("jobs");
   const [searchTerm, setSearchTerm] = useState("");
   const [jobScope, setJobScope] = useState<"active" | "all">("active");
+  const [dateRange, setDateRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
+    from: undefined,
+    to: undefined
+  });
 
-  // Fetch jobs based on selected scope
+  // Fetch jobs based on selected scope and date range
   const { data: jobs, isLoading: jobsLoading } = useQuery({
-    queryKey: ['jobs-analytics', jobScope],
+    queryKey: ['jobs-analytics', jobScope, dateRange.from?.toISOString(), dateRange.to?.toISOString()],
     queryFn: async () => {
       let query = supabase
         .from('Jobs')
@@ -57,6 +68,14 @@ export default function ActiveJobsAnalytics() {
       // Only filter by Processed='Yes' if viewing active jobs
       if (jobScope === 'active') {
         query = query.eq('Processed', 'Yes');
+      }
+      
+      // Apply date range filter
+      if (dateRange.from) {
+        query = query.gte('Timestamp', format(dateRange.from, 'yyyy-MM-dd'));
+      }
+      if (dateRange.to) {
+        query = query.lte('Timestamp', format(dateRange.to, 'yyyy-MM-dd') + ' 23:59:59');
       }
       
       const { data, error } = await query;
@@ -82,12 +101,20 @@ export default function ActiveJobsAnalytics() {
 
   // Fetch summary totals directly from database for accuracy
   const { data: summaryTotals, isLoading: summaryLoading } = useQuery({
-    queryKey: ['analytics-summary-totals', jobScope],
+    queryKey: ['analytics-summary-totals', jobScope, dateRange.from?.toISOString(), dateRange.to?.toISOString()],
     queryFn: async () => {
       // Get job_ids for the current scope
       let jobsQuery = supabase.from('Jobs').select('job_id');
       if (jobScope === 'active') {
         jobsQuery = jobsQuery.eq('Processed', 'Yes');
+      }
+      
+      // Apply date range filter
+      if (dateRange.from) {
+        jobsQuery = jobsQuery.gte('Timestamp', format(dateRange.from, 'yyyy-MM-dd'));
+      }
+      if (dateRange.to) {
+        jobsQuery = jobsQuery.lte('Timestamp', format(dateRange.to, 'yyyy-MM-dd') + ' 23:59:59');
       }
       
       const { data: scopedJobs } = await jobsQuery;
@@ -411,14 +438,66 @@ export default function ActiveJobsAnalytics() {
 
       {/* Search and Tabs */}
       <div className="space-y-4">
-        <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search jobs or recruiters..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 bg-card/50 border-border/50"
-          />
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+          {/* Search Input */}
+          <div className="relative w-full sm:max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search jobs or recruiters..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 bg-card/50 border-border/50"
+            />
+          </div>
+          
+          {/* Date Range Picker */}
+          <div className="flex items-center gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "justify-start text-left font-normal bg-card/50 border-border/50",
+                    !dateRange.from && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateRange.from ? (
+                    dateRange.to ? (
+                      <>
+                        {format(dateRange.from, "MMM dd, yyyy")} - {format(dateRange.to, "MMM dd, yyyy")}
+                      </>
+                    ) : (
+                      format(dateRange.from, "MMM dd, yyyy")
+                    )
+                  ) : (
+                    <span>Filter by date range</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="range"
+                  selected={{ from: dateRange.from, to: dateRange.to }}
+                  onSelect={(range) => setDateRange({ from: range?.from, to: range?.to })}
+                  numberOfMonths={2}
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+            
+            {/* Clear Date Filter Button */}
+            {(dateRange.from || dateRange.to) && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setDateRange({ from: undefined, to: undefined })}
+                className="h-9 w-9"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
