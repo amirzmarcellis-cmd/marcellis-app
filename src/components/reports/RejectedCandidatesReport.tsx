@@ -388,7 +388,7 @@ export function RejectedCandidatesReport() {
                         {candidate.recruiter_name}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="destructive" className="text-xs truncate max-w-[150px]">
+                        <Badge variant="destructive" className="text-sm font-medium max-w-[200px] whitespace-normal">
                           {candidate.rejection_reason || "Not specified"}
                         </Badge>
                       </TableCell>
