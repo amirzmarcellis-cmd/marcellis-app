@@ -547,17 +547,37 @@ export default function ActiveJobsAnalytics() {
                               Conversion Rates
                             </TableCell>
                             <TableCell className="text-center text-muted-foreground">-</TableCell>
-                            <TableCell className="text-center text-green-400 font-medium">
-                              {calculatePercentage(summaryTotals?.shortlisted ?? 0, summaryTotals?.longlisted ?? 0)}
+                            <TableCell className="text-center">
+                              <div className="flex flex-col items-center">
+                                <span className="text-green-400 font-medium">
+                                  {calculatePercentage(summaryTotals?.shortlisted ?? 0, summaryTotals?.longlisted ?? 0)}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">of Longlisted</span>
+                              </div>
                             </TableCell>
-                            <TableCell className="text-center text-amber-400 font-medium">
-                              {calculatePercentage(summaryTotals?.pending_action ?? 0, summaryTotals?.shortlisted ?? 0)}
+                            <TableCell className="text-center">
+                              <div className="flex flex-col items-center">
+                                <span className="text-amber-400 font-medium">
+                                  {calculatePercentage(summaryTotals?.pending_action ?? 0, summaryTotals?.shortlisted ?? 0)}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">of Shortlisted</span>
+                              </div>
                             </TableCell>
-                            <TableCell className="text-center text-red-400 font-medium">
-                              {calculatePercentage(summaryTotals?.rejected ?? 0, summaryTotals?.shortlisted ?? 0)}
+                            <TableCell className="text-center">
+                              <div className="flex flex-col items-center">
+                                <span className="text-red-400 font-medium">
+                                  {calculatePercentage(summaryTotals?.rejected ?? 0, summaryTotals?.shortlisted ?? 0)}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">of Shortlisted</span>
+                              </div>
                             </TableCell>
-                            <TableCell className="text-center text-purple-400 font-medium">
-                              {calculatePercentage(summaryTotals?.submitted ?? 0, summaryTotals?.shortlisted ?? 0)}
+                            <TableCell className="text-center">
+                              <div className="flex flex-col items-center">
+                                <span className="text-purple-400 font-medium">
+                                  {calculatePercentage(summaryTotals?.submitted ?? 0, summaryTotals?.shortlisted ?? 0)}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">of Shortlisted</span>
+                              </div>
                             </TableCell>
                           </TableRow>
                         </tfoot>
@@ -696,17 +716,37 @@ export default function ActiveJobsAnalytics() {
                               Conversion Rates
                             </TableCell>
                             <TableCell className="text-center text-muted-foreground">-</TableCell>
-                            <TableCell className="text-center text-green-400 font-medium">
-                              {calculatePercentage(summaryTotals?.shortlisted ?? 0, summaryTotals?.longlisted ?? 0)}
+                            <TableCell className="text-center">
+                              <div className="flex flex-col items-center">
+                                <span className="text-green-400 font-medium">
+                                  {calculatePercentage(summaryTotals?.shortlisted ?? 0, summaryTotals?.longlisted ?? 0)}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">of Longlisted</span>
+                              </div>
                             </TableCell>
-                            <TableCell className="text-center text-amber-400 font-medium">
-                              {calculatePercentage(summaryTotals?.pending_action ?? 0, summaryTotals?.shortlisted ?? 0)}
+                            <TableCell className="text-center">
+                              <div className="flex flex-col items-center">
+                                <span className="text-amber-400 font-medium">
+                                  {calculatePercentage(summaryTotals?.pending_action ?? 0, summaryTotals?.shortlisted ?? 0)}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">of Shortlisted</span>
+                              </div>
                             </TableCell>
-                            <TableCell className="text-center text-red-400 font-medium">
-                              {calculatePercentage(summaryTotals?.rejected ?? 0, summaryTotals?.shortlisted ?? 0)}
+                            <TableCell className="text-center">
+                              <div className="flex flex-col items-center">
+                                <span className="text-red-400 font-medium">
+                                  {calculatePercentage(summaryTotals?.rejected ?? 0, summaryTotals?.shortlisted ?? 0)}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">of Shortlisted</span>
+                              </div>
                             </TableCell>
-                            <TableCell className="text-center text-purple-400 font-medium">
-                              {calculatePercentage(summaryTotals?.submitted ?? 0, summaryTotals?.shortlisted ?? 0)}
+                            <TableCell className="text-center">
+                              <div className="flex flex-col items-center">
+                                <span className="text-purple-400 font-medium">
+                                  {calculatePercentage(summaryTotals?.submitted ?? 0, summaryTotals?.shortlisted ?? 0)}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">of Shortlisted</span>
+                              </div>
                             </TableCell>
                           </TableRow>
                         </tfoot>
