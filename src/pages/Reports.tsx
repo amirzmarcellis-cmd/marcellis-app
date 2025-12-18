@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Download, FileText, Calendar, BarChart3, Clock } from "lucide-react"
+import { Download, FileText, Calendar, BarChart3, Clock, Ban } from "lucide-react"
 import { CandidateProgressionReport } from "@/components/reports/CandidateProgressionReport"
+import { RejectedCandidatesReport } from "@/components/reports/RejectedCandidatesReport"
 import { useUserRole } from "@/hooks/useUserRole"
 import { useState } from "react"
 
@@ -67,13 +68,20 @@ export default function Reports() {
         </div>
 
         <Tabs defaultValue="standard" className="space-y-4 sm:space-y-6">
-          <TabsList className="w-full sm:w-auto">
+          <TabsList className="w-full sm:w-auto flex-wrap">
             <TabsTrigger value="standard" className="text-xs sm:text-sm">Standard Reports</TabsTrigger>
             {isAdmin && (
               <TabsTrigger value="progression" className="text-xs sm:text-sm">
                 <Clock className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                 <span className="hidden sm:inline">Candidate Progression</span>
                 <span className="sm:hidden">Progression</span>
+              </TabsTrigger>
+            )}
+            {isAdmin && (
+              <TabsTrigger value="rejected" className="text-xs sm:text-sm">
+                <Ban className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                <span className="hidden sm:inline">Rejected Candidates</span>
+                <span className="sm:hidden">Rejected</span>
               </TabsTrigger>
             )}
           </TabsList>
@@ -153,6 +161,12 @@ export default function Reports() {
           {isAdmin && (
             <TabsContent value="progression">
               <CandidateProgressionReport />
+            </TabsContent>
+          )}
+
+          {isAdmin && (
+            <TabsContent value="rejected">
+              <RejectedCandidatesReport />
             </TabsContent>
           )}
         </Tabs>
