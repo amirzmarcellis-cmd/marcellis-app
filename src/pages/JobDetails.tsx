@@ -5405,13 +5405,13 @@ mainCandidate["linkedin_score_reason"] ? (
                                 {format(new Date(candidate.submitted_at), "dd MMM yyyy, HH:mm")}
                               </p>
                             )}
-                            {candidate.timeToSubmit !== null && (
-                              <div className="mt-2 p-2 rounded-md bg-emerald-500/20 border border-emerald-500/30">
-                                <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                                  ⏱️ {formatDuration(candidate.timeToSubmit)} from shortlist
-                                </p>
-                              </div>
-                            )}
+                            <div className="mt-2 p-2 rounded-md bg-emerald-500/20 border border-emerald-500/30">
+                              <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                                {candidate.timeToSubmit !== null 
+                                  ? `⏱️ ${formatDuration(candidate.timeToSubmit)} from shortlist`
+                                  : "⏱️ Duration unavailable"}
+                              </p>
+                            </div>
                             {candidate.reason && (
                               <p className="text-xs mt-2 text-emerald-600 dark:text-emerald-400 line-clamp-2">{candidate.reason}</p>
                             )}
@@ -5445,13 +5445,13 @@ mainCandidate["linkedin_score_reason"] ? (
                                 {format(new Date(candidate.rejected_at), "dd MMM yyyy, HH:mm")}
                               </p>
                             )}
-                            {candidate.timeToReject !== null && (
-                              <div className="mt-2 p-2 rounded-md bg-red-500/20 border border-red-500/30">
-                                <p className="text-xs font-semibold text-red-600 dark:text-red-400">
-                                  ⏱️ {formatDuration(candidate.timeToReject)} from shortlist
-                                </p>
-                              </div>
-                            )}
+                            <div className="mt-2 p-2 rounded-md bg-red-500/20 border border-red-500/30">
+                              <p className="text-xs font-semibold text-red-600 dark:text-red-400">
+                                {candidate.timeToReject !== null 
+                                  ? `⏱️ ${formatDuration(candidate.timeToReject)} from shortlist`
+                                  : "⏱️ Duration unavailable"}
+                              </p>
+                            </div>
                             {candidate.reason && (
                               <p className="text-xs mt-2 text-red-600 dark:text-red-400 line-clamp-2">{candidate.reason}</p>
                             )}
