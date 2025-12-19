@@ -10,9 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Briefcase, Users, Search, TrendingUp, CheckCircle, XCircle, Send, ListChecks, CalendarIcon, X } from "lucide-react";
+import { Briefcase, Users, Search, TrendingUp, CheckCircle, XCircle, Send, ListChecks, CalendarIcon, X, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+
+type SortDirection = 'asc' | 'desc' | null;
+type JobSortField = 'job_title' | 'recruiter_name' | 'longlisted' | 'shortlisted' | 'pending_action' | 'rejected' | 'submitted';
+type RecruiterSortField = 'recruiter_name' | 'active_jobs' | 'longlisted' | 'shortlisted' | 'pending_action' | 'rejected' | 'submitted';
 
 interface JobWithMetrics {
   job_id: string;
@@ -56,6 +60,70 @@ export default function ActiveJobsAnalytics() {
     from: undefined,
     to: undefined
   });
+  
+  // Sorting state
+  const [jobSort, setJobSort] = useState<{ field: JobSortField | null; direction: SortDirection }>({
+    field: null,
+    direction: null
+  });
+  const [recruiterSort, setRecruiterSort] = useState<{ field: RecruiterSortField | null; direction: SortDirection }>({
+    field: null,
+    direction: null
+  });
+
+  // Sort handlers
+  const handleJobSort = (field: JobSortField) => {
+    setJobSort(prev => ({
+      field,
+      direction: prev.field === field 
+        ? prev.direction === 'asc' ? 'desc' : prev.direction === 'desc' ? null : 'asc'
+        : 'asc'
+    }));
+  };
+
+  const handleRecruiterSort = (field: RecruiterSortField) => {
+    setRecruiterSort(prev => ({
+      field,
+      direction: prev.field === field 
+        ? prev.direction === 'asc' ? 'desc' : prev.direction === 'desc' ? null : 'asc'
+        : 'asc'
+    }));
+  };
+
+  // Sortable header component
+  const SortableHeader = ({ 
+    label, 
+    field, 
+    currentSort, 
+    onSort, 
+    className 
+  }: { 
+    label: string; 
+    field: string; 
+    currentSort: { field: string | null; direction: SortDirection }; 
+    onSort: (field: any) => void; 
+    className?: string;
+  }) => (
+    <TableHead 
+      className={cn("text-muted-foreground cursor-pointer hover:text-foreground select-none transition-colors", className)}
+      onClick={() => onSort(field)}
+    >
+      <div className="flex items-center gap-1">
+        {label}
+        {currentSort.field === field ? (
+          currentSort.direction === 'asc' ? (
+            <ArrowUp className="w-3 h-3" />
+          ) : currentSort.direction === 'desc' ? (
+            <ArrowDown className="w-3 h-3" />
+          ) : (
+            <ArrowUpDown className="w-3 h-3 opacity-50" />
+          )
+        ) : (
+          <ArrowUpDown className="w-3 h-3 opacity-30" />
+        )}
+      </div>
+    </TableHead>
+  );
 
   // Fetch jobs based on selected scope and date range
   const { data: jobs, isLoading: jobsLoading } = useQuery({
@@ -314,6 +382,46 @@ export default function ActiveJobsAnalytics() {
     );
   }, [recruitersWithMetrics, searchTerm]);
 
+  // Sorted jobs
+  const sortedJobs = useMemo(() => {
+    if (!jobSort.field || !jobSort.direction) return filteredJobs;
+    
+    return [...filteredJobs].sort((a, b) => {
+      const aVal = a[jobSort.field!];
+      const bVal = b[jobSort.field!];
+      
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return jobSort.direction === 'asc' 
+          ? aVal.localeCompare(bVal) 
+          : bVal.localeCompare(aVal);
+      }
+      
+      return jobSort.direction === 'asc' 
+        ? (aVal as number) - (bVal as number) 
+        : (bVal as number) - (aVal as number);
+    });
+  }, [filteredJobs, jobSort]);
+
+  // Sorted recruiters
+  const sortedRecruiters = useMemo(() => {
+    if (!recruiterSort.field || !recruiterSort.direction) return filteredRecruiters;
+    
+    return [...filteredRecruiters].sort((a, b) => {
+      const aVal = a[recruiterSort.field!];
+      const bVal = b[recruiterSort.field!];
+      
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return recruiterSort.direction === 'asc' 
+          ? aVal.localeCompare(bVal) 
+          : bVal.localeCompare(aVal);
+      }
+      
+      return recruiterSort.direction === 'asc' 
+        ? (aVal as number) - (bVal as number) 
+        : (bVal as number) - (aVal as number);
+    });
+  }, [filteredRecruiters, recruiterSort]);
+
   // Summary totals
   const totals = useMemo(() => {
     return jobsWithMetrics.reduce((acc, job) => ({
@@ -532,17 +640,17 @@ export default function ActiveJobsAnalytics() {
                     <Table>
                       <TableHeader className="sticky top-0 bg-card z-10">
                         <TableRow className="border-border/50">
-                          <TableHead className="text-muted-foreground">Job Title</TableHead>
-                          <TableHead className="text-muted-foreground">Recruiter</TableHead>
-                          <TableHead className="text-muted-foreground text-center">Longlisted</TableHead>
-                          <TableHead className="text-muted-foreground text-center">Shortlisted</TableHead>
-                          <TableHead className="text-muted-foreground text-center">Pending Action</TableHead>
-                          <TableHead className="text-muted-foreground text-center">Rejected</TableHead>
-                          <TableHead className="text-muted-foreground text-center">Submitted</TableHead>
+                          <SortableHeader label="Job Title" field="job_title" currentSort={jobSort} onSort={handleJobSort} />
+                          <SortableHeader label="Recruiter" field="recruiter_name" currentSort={jobSort} onSort={handleJobSort} />
+                          <SortableHeader label="Longlisted" field="longlisted" currentSort={jobSort} onSort={handleJobSort} className="text-center justify-center" />
+                          <SortableHeader label="Shortlisted" field="shortlisted" currentSort={jobSort} onSort={handleJobSort} className="text-center justify-center" />
+                          <SortableHeader label="Pending Action" field="pending_action" currentSort={jobSort} onSort={handleJobSort} className="text-center justify-center" />
+                          <SortableHeader label="Rejected" field="rejected" currentSort={jobSort} onSort={handleJobSort} className="text-center justify-center" />
+                          <SortableHeader label="Submitted" field="submitted" currentSort={jobSort} onSort={handleJobSort} className="text-center justify-center" />
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {filteredJobs.length === 0 ? (
+                        {sortedJobs.length === 0 ? (
                           <TableRow>
                             <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                               No {jobScope === 'active' ? 'active ' : ''}jobs found
@@ -550,7 +658,7 @@ export default function ActiveJobsAnalytics() {
                           </TableRow>
                         ) : (
                           <>
-                            {filteredJobs.map((job) => (
+                            {sortedJobs.map((job) => (
                               <TableRow key={job.job_id} className="border-border/50">
                                 <TableCell className="font-medium max-w-[200px] truncate">
                                   {job.job_title}
@@ -688,19 +796,17 @@ export default function ActiveJobsAnalytics() {
                     <Table>
                       <TableHeader className="sticky top-0 bg-card z-10">
                         <TableRow className="border-border/50">
-                          <TableHead className="text-muted-foreground">Recruiter</TableHead>
-                          <TableHead className="text-muted-foreground text-center">
-                            {jobScope === 'active' ? 'Active Jobs' : 'Total Jobs'}
-                          </TableHead>
-                          <TableHead className="text-muted-foreground text-center">Longlisted</TableHead>
-                          <TableHead className="text-muted-foreground text-center">Shortlisted</TableHead>
-                          <TableHead className="text-muted-foreground text-center">Pending Action</TableHead>
-                          <TableHead className="text-muted-foreground text-center">Rejected</TableHead>
-                          <TableHead className="text-muted-foreground text-center">Submitted</TableHead>
+                          <SortableHeader label="Recruiter" field="recruiter_name" currentSort={recruiterSort} onSort={handleRecruiterSort} />
+                          <SortableHeader label={jobScope === 'active' ? 'Active Jobs' : 'Total Jobs'} field="active_jobs" currentSort={recruiterSort} onSort={handleRecruiterSort} className="text-center justify-center" />
+                          <SortableHeader label="Longlisted" field="longlisted" currentSort={recruiterSort} onSort={handleRecruiterSort} className="text-center justify-center" />
+                          <SortableHeader label="Shortlisted" field="shortlisted" currentSort={recruiterSort} onSort={handleRecruiterSort} className="text-center justify-center" />
+                          <SortableHeader label="Pending Action" field="pending_action" currentSort={recruiterSort} onSort={handleRecruiterSort} className="text-center justify-center" />
+                          <SortableHeader label="Rejected" field="rejected" currentSort={recruiterSort} onSort={handleRecruiterSort} className="text-center justify-center" />
+                          <SortableHeader label="Submitted" field="submitted" currentSort={recruiterSort} onSort={handleRecruiterSort} className="text-center justify-center" />
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {filteredRecruiters.length === 0 ? (
+                        {sortedRecruiters.length === 0 ? (
                           <TableRow>
                             <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                               No recruiters found
@@ -708,7 +814,7 @@ export default function ActiveJobsAnalytics() {
                           </TableRow>
                         ) : (
                           <>
-                            {filteredRecruiters.map((recruiter) => (
+                            {sortedRecruiters.map((recruiter) => (
                               <TableRow key={recruiter.recruiter_id} className="border-border/50">
                                 <TableCell className="max-w-[200px]">
                                   <div className="truncate font-medium">{recruiter.recruiter_name}</div>
