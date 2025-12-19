@@ -1,0 +1,1 @@
+ALTER TABLE "Jobs_CVs" ADD COLUMN "rejected_at" timestamp with time zone;

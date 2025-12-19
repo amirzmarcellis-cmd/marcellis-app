@@ -141,6 +141,16 @@ export default function JobDetails() {
       shortlisted_at: string;
       timeFromLonglist: number;
     }>;
+    rejectedCandidates: Array<{
+      candidate_name: string | null;
+      rejected_at: string | null;
+      reason: string | null;
+    }>;
+    submittedCandidates: Array<{
+      candidate_name: string | null;
+      submitted_at: string | null;
+      reason: string | null;
+    }>;
   }>({
     jobAddedDate: null,
     firstLonglistedDate: null,
@@ -151,6 +161,8 @@ export default function JobDetails() {
     sourceCounts: {},
     totalCandidates: 0,
     shortlistedCandidates: [],
+    rejectedCandidates: [],
+    submittedCandidates: [],
   });
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   
@@ -829,6 +841,9 @@ export default function JobDetails() {
           // Keep legacy "Score" alias used elsewhere for sorting/analytics
           Score: effectiveCvScore != null ? String(effectiveCvScore) : "0",
           lastcalltime: row.lastcalltime,
+          // Add timestamp fields for status highlighting
+          rejected_at: row.rejected_at,
+          submitted_at: row.submitted_at,
         };
       });
       setCandidates(mapped);
@@ -1044,6 +1059,9 @@ export default function JobDetails() {
           linkedin_id: mappedLinkedInId,
           longlisted_at: row.longlisted_at,
           cv_score_reason: mergedReason || "",
+          // Add timestamp fields for status highlighting
+          rejected_at: row.rejected_at,
+          submitted_at: row.submitted_at,
         };
       });
       setLonglistedCandidates(mappedLonglisted);
@@ -1540,12 +1558,13 @@ export default function JobDetails() {
         return;
       }
 
-      // Update the database with the rejection reason
+      // Update the database with the rejection reason and timestamp
       const { error: updateError } = await supabase
         .from("Jobs_CVs")
         .update({
           contacted: "Rejected",
           Reason_to_reject: `${reason}: ${rejectAdditionalInfo}`,
+          rejected_at: new Date().toISOString(),
         })
         .eq("recordid", candidate.recordid);
       if (updateError) {
@@ -1615,6 +1634,7 @@ export default function JobDetails() {
         .update({
           Reason_to_Hire: `${hireReason}: ${hireAdditionalInfo}`,
           contacted: "Submitted",
+          submitted_at: new Date().toISOString(),
         })
         .eq("recordid", hireCandidateData.callid)
         .eq("job_id", hireCandidateData.jobId);
@@ -2119,10 +2139,10 @@ export default function JobDetails() {
 
       if (jobError) throw jobError;
 
-      // Fetch all candidates for this job
+      // Fetch all candidates for this job including rejected/submitted data
       const { data: candidatesData, error: candidatesError } = await supabase
         .from("Jobs_CVs")
-        .select("longlisted_at, shortlisted_at, source, candidate_name")
+        .select("longlisted_at, shortlisted_at, source, candidate_name, contacted, rejected_at, submitted_at, Reason_to_reject, Reason_to_Hire")
         .eq("job_id", jobId)
         .order("longlisted_at", { ascending: true, nullsLast: true });
 
@@ -2196,6 +2216,23 @@ export default function JobDetails() {
         averageTimeToShortlist = totalTime / shortlistedCandidates.length;
       }
 
+      // Filter rejected and submitted candidates
+      const rejectedCandidates = (candidatesData || [])
+        .filter(c => c.contacted === "Rejected")
+        .map(c => ({
+          candidate_name: c.candidate_name,
+          rejected_at: c.rejected_at,
+          reason: c.Reason_to_reject,
+        }));
+
+      const submittedCandidates = (candidatesData || [])
+        .filter(c => c.contacted === "Submitted")
+        .map(c => ({
+          candidate_name: c.candidate_name,
+          submitted_at: c.submitted_at,
+          reason: c.Reason_to_Hire,
+        }));
+
       setAnalyticsData({
         jobAddedDate: jobData?.Timestamp || null,
         firstLonglistedDate,
@@ -2206,6 +2243,8 @@ export default function JobDetails() {
         sourceCounts,
         totalCandidates: candidatesData?.length || 0,
         shortlistedCandidates: shortlistedWithTimes,
+        rejectedCandidates,
+        submittedCandidates,
       });
     } catch (error) {
       console.error("Error fetching analytics data:", error);
@@ -2441,11 +2480,36 @@ export default function JobDetails() {
     mainCandidate: any,
     isTopCandidate: boolean = false,
   ) => {
-    const cardClassName = isTopCandidate
+    // Determine status-based styling
+    const isRejected = mainCandidate["Contacted"] === "Rejected";
+    const isSubmitted = mainCandidate["Contacted"] === "Submitted";
+    
+    let cardClassName = isTopCandidate
       ? "relative border-2 border-yellow-400 hover:border-yellow-500 transition-all duration-300 hover:shadow-2xl bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 dark:from-yellow-950/50 dark:via-amber-950/50 dark:to-orange-950/50 shadow-xl shadow-yellow-200/50 dark:shadow-yellow-900/30 ring-2 ring-yellow-300/60 dark:ring-yellow-600/40 before:absolute before:inset-0 before:bg-gradient-to-r before:from-yellow-300/10 before:via-amber-300/10 before:to-orange-300/10 before:rounded-lg before:animate-pulse"
       : "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg bg-green-50/50 dark:bg-green-950/20";
+    
+    // Override with status styling if rejected or submitted
+    if (isRejected) {
+      cardClassName = "border-2 border-red-500/50 hover:border-red-500 transition-colors hover:shadow-lg bg-red-50/50 dark:bg-red-950/20";
+    } else if (isSubmitted) {
+      cardClassName = "border-2 border-emerald-500/50 hover:border-emerald-500 transition-colors hover:shadow-lg bg-emerald-50/50 dark:bg-emerald-950/20";
+    }
+    
     return (
       <Card key={candidateId} id={`candidate-card-${candidateId}`} className={cardClassName}>
+        {/* Status timestamp banner for Rejected/Submitted */}
+        {isRejected && mainCandidate["rejected_at"] && (
+          <div className="bg-red-500/20 px-3 py-1.5 text-xs text-red-600 dark:text-red-400 flex items-center gap-1 border-b border-red-500/30 rounded-t-lg">
+            <X className="w-3 h-3" />
+            Rejected on {format(new Date(mainCandidate["rejected_at"]), "dd MMM yyyy, HH:mm")}
+          </div>
+        )}
+        {isSubmitted && mainCandidate["submitted_at"] && (
+          <div className="bg-emerald-500/20 px-3 py-1.5 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1 border-b border-emerald-500/30 rounded-t-lg">
+            <CheckCircle className="w-3 h-3" />
+            Submitted on {format(new Date(mainCandidate["submitted_at"]), "dd MMM yyyy, HH:mm")}
+          </div>
+        )}
         <CardContent className="p-4 relative">
           {isTopCandidate && (
             <Badge className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-gradient-to-br from-amber-300 via-yellow-300 to-amber-400 hover:from-amber-400 hover:via-yellow-400 hover:to-amber-500 border-2 border-amber-200 shadow-lg hover:shadow-xl transition-all duration-200 w-8 h-8 rounded-full p-0 flex items-center justify-center group z-10">
@@ -4139,8 +4203,23 @@ mainCandidate["linkedin_score_reason"] ? (
                             className={cn(
                               "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg max-w-full overflow-hidden",
                               selectedCandidates.has(candidateId) && "border-primary bg-primary/5",
+                              mainCandidate["Contacted"] === "Rejected" && "border-red-500/50 bg-red-500/5",
+                              mainCandidate["Contacted"] === "Submitted" && "border-emerald-500/50 bg-emerald-500/5",
                             )}
                           >
+                            {/* Status timestamp banner for Rejected/Submitted */}
+                            {mainCandidate["Contacted"] === "Rejected" && mainCandidate["rejected_at"] && (
+                              <div className="bg-red-500/20 px-3 py-1.5 text-xs text-red-600 dark:text-red-400 flex items-center gap-1 border-b border-red-500/30">
+                                <X className="w-3 h-3" />
+                                Rejected on {format(new Date(mainCandidate["rejected_at"]), "dd MMM yyyy, HH:mm")}
+                              </div>
+                            )}
+                            {mainCandidate["Contacted"] === "Submitted" && mainCandidate["submitted_at"] && (
+                              <div className="bg-emerald-500/20 px-3 py-1.5 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1 border-b border-emerald-500/30">
+                                <CheckCircle className="w-3 h-3" />
+                                Submitted on {format(new Date(mainCandidate["submitted_at"]), "dd MMM yyyy, HH:mm")}
+                              </div>
+                            )}
                             <CardContent className="p-2 sm:p-3 md:p-4">
                               <div className="space-y-2 sm:space-y-3">
                                 <div className="flex items-start justify-between gap-2">
@@ -5278,6 +5357,72 @@ mainCandidate["linkedin_score_reason"] ? (
                     )}
                   </CardContent>
                 </Card>
+
+                {/* Submitted Candidates Card */}
+                {analyticsData.submittedCandidates.length > 0 && (
+                  <Card className="max-w-full overflow-hidden border-emerald-500/30">
+                    <CardHeader className="p-3 sm:p-6 bg-emerald-500/10">
+                      <CardTitle className="flex items-center text-base sm:text-lg md:text-xl text-emerald-600 dark:text-emerald-400">
+                        <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                        Submitted Candidates ({analyticsData.submittedCandidates.length})
+                      </CardTitle>
+                      <CardDescription className="text-xs sm:text-sm mt-1">
+                        Candidates whose CVs have been submitted to the client
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-3 sm:p-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {analyticsData.submittedCandidates.map((candidate, index) => (
+                          <div key={index} className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+                            <Badge className="text-xs mb-2 bg-emerald-600 text-white">Submitted</Badge>
+                            <p className="text-sm font-medium truncate">{candidate.candidate_name || "Unknown"}</p>
+                            {candidate.submitted_at && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {format(new Date(candidate.submitted_at), "dd MMM yyyy, HH:mm")}
+                              </p>
+                            )}
+                            {candidate.reason && (
+                              <p className="text-xs mt-2 text-emerald-600 dark:text-emerald-400 line-clamp-2">{candidate.reason}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Rejected Candidates Card */}
+                {analyticsData.rejectedCandidates.length > 0 && (
+                  <Card className="max-w-full overflow-hidden border-red-500/30">
+                    <CardHeader className="p-3 sm:p-6 bg-red-500/10">
+                      <CardTitle className="flex items-center text-base sm:text-lg md:text-xl text-red-600 dark:text-red-400">
+                        <X className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                        Rejected Candidates ({analyticsData.rejectedCandidates.length})
+                      </CardTitle>
+                      <CardDescription className="text-xs sm:text-sm mt-1">
+                        Candidates who have been rejected from this job
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-3 sm:p-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {analyticsData.rejectedCandidates.map((candidate, index) => (
+                          <div key={index} className="p-4 rounded-lg bg-red-500/10 border border-red-500/30">
+                            <Badge variant="destructive" className="text-xs mb-2">Rejected</Badge>
+                            <p className="text-sm font-medium truncate">{candidate.candidate_name || "Unknown"}</p>
+                            {candidate.rejected_at && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {format(new Date(candidate.rejected_at), "dd MMM yyyy, HH:mm")}
+                              </p>
+                            )}
+                            {candidate.reason && (
+                              <p className="text-xs mt-2 text-red-600 dark:text-red-400 line-clamp-2">{candidate.reason}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </>
             )}
           </div>

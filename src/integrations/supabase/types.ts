@@ -473,6 +473,7 @@ export type Database = {
           recordid: number
           recording: string | null
           recruiter_id: string | null
+          rejected_at: string | null
           salary_expectations: string | null
           shortlisted_at: string | null
           source: string | null
@@ -520,6 +521,7 @@ export type Database = {
           recordid?: number
           recording?: string | null
           recruiter_id?: string | null
+          rejected_at?: string | null
           salary_expectations?: string | null
           shortlisted_at?: string | null
           source?: string | null
@@ -567,6 +569,7 @@ export type Database = {
           recordid?: number
           recording?: string | null
           recruiter_id?: string | null
+          rejected_at?: string | null
           salary_expectations?: string | null
           shortlisted_at?: string | null
           source?: string | null
