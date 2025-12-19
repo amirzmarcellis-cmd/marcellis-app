@@ -145,11 +145,15 @@ export default function JobDetails() {
       candidate_name: string | null;
       rejected_at: string | null;
       reason: string | null;
+      shortlisted_at: string | null;
+      timeToReject: number | null;
     }>;
     submittedCandidates: Array<{
       candidate_name: string | null;
       submitted_at: string | null;
       reason: string | null;
+      shortlisted_at: string | null;
+      timeToSubmit: number | null;
     }>;
   }>({
     jobAddedDate: null,
@@ -2216,22 +2220,42 @@ export default function JobDetails() {
         averageTimeToShortlist = totalTime / shortlistedCandidates.length;
       }
 
-      // Filter rejected and submitted candidates
+      // Filter rejected and submitted candidates with duration calculations
       const rejectedCandidates = (candidatesData || [])
         .filter(c => c.contacted === "Rejected")
-        .map(c => ({
-          candidate_name: c.candidate_name,
-          rejected_at: c.rejected_at,
-          reason: c.Reason_to_reject,
-        }));
+        .map(c => {
+          let timeToReject = null;
+          if (c.shortlisted_at && c.rejected_at) {
+            const shortlistDate = new Date(c.shortlisted_at);
+            const rejectDate = new Date(c.rejected_at);
+            timeToReject = (rejectDate.getTime() - shortlistDate.getTime()) / (1000 * 60 * 60);
+          }
+          return {
+            candidate_name: c.candidate_name,
+            rejected_at: c.rejected_at,
+            reason: c.Reason_to_reject,
+            shortlisted_at: c.shortlisted_at,
+            timeToReject,
+          };
+        });
 
       const submittedCandidates = (candidatesData || [])
         .filter(c => c.contacted === "Submitted")
-        .map(c => ({
-          candidate_name: c.candidate_name,
-          submitted_at: c.submitted_at,
-          reason: c.Reason_to_Hire,
-        }));
+        .map(c => {
+          let timeToSubmit = null;
+          if (c.shortlisted_at && c.submitted_at) {
+            const shortlistDate = new Date(c.shortlisted_at);
+            const submitDate = new Date(c.submitted_at);
+            timeToSubmit = (submitDate.getTime() - shortlistDate.getTime()) / (1000 * 60 * 60);
+          }
+          return {
+            candidate_name: c.candidate_name,
+            submitted_at: c.submitted_at,
+            reason: c.Reason_to_Hire,
+            shortlisted_at: c.shortlisted_at,
+            timeToSubmit,
+          };
+        });
 
       setAnalyticsData({
         jobAddedDate: jobData?.Timestamp || null,
@@ -5381,6 +5405,13 @@ mainCandidate["linkedin_score_reason"] ? (
                                 {format(new Date(candidate.submitted_at), "dd MMM yyyy, HH:mm")}
                               </p>
                             )}
+                            {candidate.timeToSubmit !== null && (
+                              <div className="mt-2 p-2 rounded-md bg-emerald-500/20 border border-emerald-500/30">
+                                <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                                  ⏱️ {formatDuration(candidate.timeToSubmit)} from shortlist
+                                </p>
+                              </div>
+                            )}
                             {candidate.reason && (
                               <p className="text-xs mt-2 text-emerald-600 dark:text-emerald-400 line-clamp-2">{candidate.reason}</p>
                             )}
@@ -5413,6 +5444,13 @@ mainCandidate["linkedin_score_reason"] ? (
                               <p className="text-xs text-muted-foreground mt-1">
                                 {format(new Date(candidate.rejected_at), "dd MMM yyyy, HH:mm")}
                               </p>
+                            )}
+                            {candidate.timeToReject !== null && (
+                              <div className="mt-2 p-2 rounded-md bg-red-500/20 border border-red-500/30">
+                                <p className="text-xs font-semibold text-red-600 dark:text-red-400">
+                                  ⏱️ {formatDuration(candidate.timeToReject)} from shortlist
+                                </p>
+                              </div>
                             )}
                             {candidate.reason && (
                               <p className="text-xs mt-2 text-red-600 dark:text-red-400 line-clamp-2">{candidate.reason}</p>
