@@ -165,6 +165,7 @@ export default function JobDetails() {
   } | null>(null);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  const [rejectAdditionalInfo, setRejectAdditionalInfo] = useState("");
   const [rejectCandidateData, setRejectCandidateData] = useState<{
     jobId: string;
     candidateId: string;
@@ -172,6 +173,7 @@ export default function JobDetails() {
   } | null>(null);
   const [showHireDialog, setShowHireDialog] = useState(false);
   const [hireReason, setHireReason] = useState("");
+  const [hireAdditionalInfo, setHireAdditionalInfo] = useState("");
   const [hireCandidateData, setHireCandidateData] = useState<{
     jobId: string;
     candidateId: string;
@@ -1543,7 +1545,7 @@ export default function JobDetails() {
         .from("Jobs_CVs")
         .update({
           contacted: "Rejected",
-          Reason_to_reject: reason,
+          Reason_to_reject: `${reason}: ${rejectAdditionalInfo}`,
         })
         .eq("recordid", candidate.recordid);
       if (updateError) {
@@ -1568,6 +1570,7 @@ export default function JobDetails() {
         });
         setShowRejectDialog(false);
         setRejectReason("");
+        setRejectAdditionalInfo("");
         setRejectCandidateData(null);
         // Refresh data
         if (id) {
@@ -1610,7 +1613,7 @@ export default function JobDetails() {
       const { error } = await supabase
         .from("Jobs_CVs")
         .update({
-          Reason_to_Hire: hireReason,
+          Reason_to_Hire: `${hireReason}: ${hireAdditionalInfo}`,
           contacted: "Submitted",
         })
         .eq("recordid", hireCandidateData.callid)
@@ -1640,6 +1643,7 @@ export default function JobDetails() {
 
       setShowHireDialog(false);
       setHireReason("");
+      setHireAdditionalInfo("");
       setHireCandidateData(null);
     } catch (error) {
       console.error("Error saving hire reason:", error);
@@ -5502,18 +5506,30 @@ mainCandidate["linkedin_score_reason"] ? (
             <DialogDescription>Please select a reason for rejecting this candidate.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <Select value={rejectReason} onValueChange={setRejectReason}>
-              <SelectTrigger className="w-full bg-background">
-                <SelectValue placeholder="Select rejection reason..." />
-              </SelectTrigger>
-              <SelectContent className="bg-popover z-50">
-                <SelectItem value="Overbudget">Overbudget</SelectItem>
-                <SelectItem value="Notice Period">Notice Period</SelectItem>
-                <SelectItem value="Lack Mandatory Skills">Lack Mandatory Skills</SelectItem>
-                <SelectItem value="Not Cultural Fit">Not Cultural Fit</SelectItem>
-                <SelectItem value="Communication Skills">Communication Skills</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Rejection Reason *</label>
+              <Select value={rejectReason} onValueChange={setRejectReason}>
+                <SelectTrigger className="w-full bg-background">
+                  <SelectValue placeholder="Select rejection reason..." />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="Overbudget">Overbudget</SelectItem>
+                  <SelectItem value="Notice Period">Notice Period</SelectItem>
+                  <SelectItem value="Lack Mandatory Skills">Lack Mandatory Skills</SelectItem>
+                  <SelectItem value="Not Cultural Fit">Not Cultural Fit</SelectItem>
+                  <SelectItem value="Communication Skills">Communication Skills</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Additional Information *</label>
+              <Textarea
+                placeholder="Please provide additional details about this rejection..."
+                value={rejectAdditionalInfo}
+                onChange={(e) => setRejectAdditionalInfo(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button
@@ -5521,6 +5537,7 @@ mainCandidate["linkedin_score_reason"] ? (
               onClick={() => {
                 setShowRejectDialog(false);
                 setRejectReason("");
+                setRejectAdditionalInfo("");
                 setRejectCandidateData(null);
               }}
             >
@@ -5529,7 +5546,7 @@ mainCandidate["linkedin_score_reason"] ? (
             <Button
               variant="destructive"
               onClick={() => handleRejectCandidate(rejectReason)}
-              disabled={!rejectReason}
+              disabled={!rejectReason || !rejectAdditionalInfo.trim()}
             >
               Reject
             </Button>
@@ -5545,6 +5562,7 @@ mainCandidate["linkedin_score_reason"] ? (
             // If closing, reset state
             setShowHireDialog(false);
             setHireReason("");
+            setHireAdditionalInfo("");
             setHireCandidateData(null);
           }
         }}
@@ -5557,15 +5575,27 @@ mainCandidate["linkedin_score_reason"] ? (
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <Select value={hireReason} onValueChange={setHireReason}>
-              <SelectTrigger className="w-full bg-background">
-                <SelectValue placeholder="Select submit reason..." />
-              </SelectTrigger>
-              <SelectContent className="bg-popover z-50">
-                <SelectItem value="Perfect Fit">Perfect Fit</SelectItem>
-                <SelectItem value="Backup Option">Backup Option</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Submit Reason *</label>
+              <Select value={hireReason} onValueChange={setHireReason}>
+                <SelectTrigger className="w-full bg-background">
+                  <SelectValue placeholder="Select submit reason..." />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="Perfect Fit">Perfect Fit</SelectItem>
+                  <SelectItem value="Backup Option">Backup Option</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Additional Information *</label>
+              <Textarea
+                placeholder="Please provide additional details about this submission..."
+                value={hireAdditionalInfo}
+                onChange={(e) => setHireAdditionalInfo(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button
@@ -5573,6 +5603,7 @@ mainCandidate["linkedin_score_reason"] ? (
               onClick={() => {
                 setShowHireDialog(false);
                 setHireReason("");
+                setHireAdditionalInfo("");
                 setHireCandidateData(null);
               }}
             >
@@ -5580,7 +5611,7 @@ mainCandidate["linkedin_score_reason"] ? (
             </Button>
             <Button
               onClick={handleHireCandidate}
-              disabled={!hireReason}
+              disabled={!hireReason || !hireAdditionalInfo.trim()}
               className="bg-emerald-600 hover:bg-emerald-700"
             >
               Save & Submit CV
