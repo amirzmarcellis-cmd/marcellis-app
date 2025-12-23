@@ -315,8 +315,8 @@ export default function CallLog() {
     const matchesNationality = nationalityFilter === "all" || 
                                normalizeNationality(log.nationality) === normalizeNationality(nationalityFilter)
     
-    // URL parameter filtering
-    const matchesCandidate = !candidateParam || log.user_id?.toString() === candidateParam
+    // URL parameter filtering - ensure string comparison works correctly
+    const matchesCandidate = !candidateParam || String(log.user_id || '') === String(candidateParam)
     const matchesJobParam = !jobParam || log.job_id === jobParam
     
     return matchesSearch && matchesContacted && matchesScore && matchesJob && matchesNationality && matchesCandidate && matchesJobParam
