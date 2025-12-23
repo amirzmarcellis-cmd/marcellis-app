@@ -3,7 +3,8 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { User, Mail, Phone, FileText, Search, ArrowLeft, ExternalLink, Briefcase, Linkedin } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { User, Mail, Phone, FileText, Search, ArrowLeft, ExternalLink, Briefcase, Linkedin, History } from 'lucide-react';
 
 interface Candidate {
   user_id: string;
@@ -21,6 +22,15 @@ interface AssociatedJob {
   after_call_score?: number;
 }
 
+interface CandidateHistory {
+  totalJobs: number;
+  longlistedCount: number;
+  shortlistedCount: number;
+  rejectedCount: number;
+  submittedCount: number;
+  totalCalls: number;
+}
+
 export default function CandidateDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -30,11 +40,48 @@ export default function CandidateDetails() {
   const [searchTerm, setSearchTerm] = useState('');
   const [associatedJobs, setAssociatedJobs] = useState<AssociatedJob[]>([]);
   const [jobsLoading, setJobsLoading] = useState(false);
+  const [candidateHistory, setCandidateHistory] = useState<CandidateHistory | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
   
   const fromJob = location.state?.fromJob;
   const fromTab = location.state?.tab;
   const longListSourceFilter = location.state?.longListSourceFilter;
   const linkedInUrl = location.state?.linkedInUrl;
+
+  const fetchCandidateHistory = async (userId: string) => {
+    try {
+      setHistoryLoading(true);
+      const supabaseModule = await import('@/integrations/supabase/client');
+      const supabase = supabaseModule.supabase;
+      
+      const { data, error } = await supabase
+        .from('Jobs_CVs')
+        .select('job_id, longlisted_at, shortlisted_at, contacted, rejected_at, submitted_at, callcount')
+        .eq('user_id', userId);
+      
+      if (error) {
+        console.error('Error fetching candidate history:', error);
+        setCandidateHistory(null);
+        return;
+      }
+
+      if (data) {
+        setCandidateHistory({
+          totalJobs: new Set(data.map(d => d.job_id)).size,
+          longlistedCount: data.filter(d => d.longlisted_at).length,
+          shortlistedCount: data.filter(d => d.shortlisted_at).length,
+          rejectedCount: data.filter(d => d.contacted?.toLowerCase() === 'rejected' || d.rejected_at).length,
+          submittedCount: data.filter(d => d.contacted?.toLowerCase() === 'submitted' || d.submitted_at).length,
+          totalCalls: data.reduce((sum, d) => sum + (d.callcount || 0), 0)
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching candidate history:', error);
+      setCandidateHistory(null);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
 
   const fetchAssociatedJobs = async (userId: string) => {
     try {
@@ -133,8 +180,9 @@ export default function CandidateDetails() {
           cv_link: candidateData.cv_link || null
         });
         
-        // Fetch associated jobs
+        // Fetch associated jobs and history
         await fetchAssociatedJobs(userId);
+        await fetchCandidateHistory(userId);
         return;
       }
       
@@ -180,8 +228,9 @@ export default function CandidateDetails() {
           cv_link: cvLink
         });
         
-        // Fetch associated jobs
+        // Fetch associated jobs and history
         await fetchAssociatedJobs(userId);
+        await fetchCandidateHistory(userId);
       } else {
         setCandidate(null);
       }
@@ -410,6 +459,73 @@ export default function CandidateDetails() {
                 </div>
               ))}
             </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Candidate History Section */}
+      <Card className="max-w-full overflow-hidden">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
+            <History className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+            Candidate History
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-4 sm:p-6">
+          {historyLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : candidateHistory ? (
+            <div className="space-y-4">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Metric</TableHead>
+                      <TableHead className="text-right">Count</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell className="text-sm sm:text-base">Total Jobs Applied</TableCell>
+                      <TableCell className="text-right font-medium text-sm sm:text-base">{candidateHistory.totalJobs}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-sm sm:text-base">Jobs Longlisted</TableCell>
+                      <TableCell className="text-right font-medium text-sm sm:text-base">{candidateHistory.longlistedCount}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-sm sm:text-base">Jobs Shortlisted</TableCell>
+                      <TableCell className="text-right font-medium text-sm sm:text-base">{candidateHistory.shortlistedCount}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-sm sm:text-base">Times Rejected</TableCell>
+                      <TableCell className="text-right font-medium text-sm sm:text-base">{candidateHistory.rejectedCount}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-sm sm:text-base">Times CV Submitted</TableCell>
+                      <TableCell className="text-right font-medium text-sm sm:text-base">{candidateHistory.submittedCount}</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+              
+              {candidateHistory.totalCalls > 0 && (
+                <Button
+                  variant="outline"
+                  className="w-full sm:w-auto h-11 sm:h-9 text-sm min-h-[44px] sm:min-h-0"
+                  onClick={() => navigate(`/call-log?candidate=${candidate.user_id}`)}
+                >
+                  <Phone className="h-4 w-4 mr-2" />
+                  View Call History ({candidateHistory.totalCalls} calls)
+                </Button>
+              )}
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-center py-4 text-sm sm:text-base">
+              No history available for this candidate
+            </p>
           )}
         </CardContent>
       </Card>
