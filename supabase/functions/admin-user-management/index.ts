@@ -240,9 +240,10 @@ serve(async (req) => {
           }
 
           // Organization role is automatically created by trigger, but update if needed
-          const roleMapping = {
+          const roleMapping: Record<string, string> = {
             'admin': 'ADMIN',
             'management': 'MANAGEMENT',
+            'viewer': 'VIEWER',
             'team_leader': 'EMPLOYEE', // team_leader is team-based, not org-level
             'team_member': 'EMPLOYEE'
           };
@@ -311,9 +312,10 @@ serve(async (req) => {
         }
 
         // Update organization role
-        const roleMapping = {
+        const roleMapping: Record<string, string> = {
           'admin': 'ADMIN',
           'management': 'MANAGEMENT',
+          'viewer': 'VIEWER',
           'team_leader': 'EMPLOYEE', // team_leader is team-based, not org-level
           'team_member': 'EMPLOYEE'
         };

@@ -1196,7 +1196,7 @@ export type Database = {
       show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
-      org_role: "ADMIN" | "MANAGEMENT" | "EMPLOYEE"
+      org_role: "ADMIN" | "MANAGEMENT" | "EMPLOYEE" | "VIEWER"
       task_status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED"
       user_role: "TEAM_LEADER" | "EMPLOYEE"
     }
@@ -1326,7 +1326,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      org_role: ["ADMIN", "MANAGEMENT", "EMPLOYEE"],
+      org_role: ["ADMIN", "MANAGEMENT", "EMPLOYEE", "VIEWER"],
       task_status: ["NOT_STARTED", "IN_PROGRESS", "COMPLETED"],
       user_role: ["TEAM_LEADER", "EMPLOYEE"],
     },

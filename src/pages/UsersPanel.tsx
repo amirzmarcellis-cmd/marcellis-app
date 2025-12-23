@@ -8,14 +8,14 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Plus, Mail, User, Shield, Trash2, Crown, Briefcase, DollarSign, Truck, UserCheck, Users2, AlertTriangle, Edit, Linkedin, Search } from 'lucide-react';
+import { Users, Plus, Mail, User, Shield, Trash2, Crown, Briefcase, DollarSign, Truck, UserCheck, Users2, AlertTriangle, Edit, Linkedin, Search, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import Teams from './Teams';
 
-type UserRole = 'admin' | 'management' | 'team_member' | 'team_leader';
+type UserRole = 'admin' | 'management' | 'team_member' | 'team_leader' | 'viewer';
 
 interface Profile {
   id: string;
@@ -47,6 +47,7 @@ const roleOptions: { value: UserRole; label: string; icon: any }[] = [
   { value: 'management', label: 'Management', icon: Briefcase },
   { value: 'team_member', label: 'Team Member', icon: Users },
   { value: 'team_leader', label: 'Team Leader', icon: UserCheck },
+  { value: 'viewer', label: 'Viewer', icon: Eye },
 ];
 
 const getRoleDisplay = (user: Profile, userMemberships: Array<{team_id: string, role: string, team_name: string}>, orgRole?: string) => {
@@ -57,6 +58,10 @@ const getRoleDisplay = (user: Profile, userMemberships: Array<{team_id: string, 
   
   if (orgRole === 'MANAGEMENT') {
     return { label: 'Management', icon: Briefcase, variant: 'default' as const };
+  }
+
+  if (orgRole === 'VIEWER') {
+    return { label: 'Viewer', icon: Eye, variant: 'outline' as const };
   }
   
   // Check if user has team roles (from memberships table)
@@ -370,6 +375,8 @@ export default function UsersPanel() {
       role = 'admin';
     } else if (orgRole === 'MANAGEMENT') {
       role = 'management';
+    } else if (orgRole === 'VIEWER') {
+      role = 'viewer';
     } else if (userMemberships.length > 0) {
       const membership = userMemberships[0];
       role = membership.role === 'TEAM_LEADER' ? 'team_leader' : 'team_member';
