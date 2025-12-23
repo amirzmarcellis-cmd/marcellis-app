@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { User, Mail, Phone, FileText, Search, ArrowLeft, ExternalLink, Briefcase } from 'lucide-react';
+import { User, Mail, Phone, FileText, Search, ArrowLeft, ExternalLink, Briefcase, Linkedin } from 'lucide-react';
 
 interface Candidate {
   user_id: string;
@@ -34,6 +34,7 @@ export default function CandidateDetails() {
   const fromJob = location.state?.fromJob;
   const fromTab = location.state?.tab;
   const longListSourceFilter = location.state?.longListSourceFilter;
+  const linkedInUrl = location.state?.linkedInUrl;
 
   const fetchAssociatedJobs = async (userId: string) => {
     try {
@@ -355,6 +356,17 @@ export default function CandidateDetails() {
             >
               <ExternalLink className="h-4 w-4 mr-2" />
               View CV Link
+            </Button>
+          )}
+          {linkedInUrl && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open(linkedInUrl, '_blank')}
+              className="w-full sm:w-auto h-11 sm:h-9 text-sm min-h-[44px] sm:min-h-0"
+            >
+              <Linkedin className="h-4 w-4 mr-2" />
+              LinkedIn
             </Button>
           )}
         </CardContent>

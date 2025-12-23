@@ -2888,26 +2888,21 @@ mainCandidate["linkedin_score_reason"] ? (
                   );
                 })()}
                 <Button variant="ghost" size="sm" asChild className="flex-1 min-w-0 sm:min-w-[120px] h-10">
-                  {typeof mainCandidate["Source"] === "string" &&
-                  mainCandidate["Source"].toLowerCase().includes("linkedin") &&
-                  getLinkedInUrl(mainCandidate) ? (
-                    <a href={getLinkedInUrl(mainCandidate)!} target="_blank" rel="noopener noreferrer">
-                      <Users className="w-4 h-4 mr-1.5" />
-                      View Profile
-                    </a>
-                  ) : (
-                    <Link
-                      to={`/candidate/${mainCandidate["user_id"] || candidateId}`}
-                      state={{
-                        fromJob: id,
-                        tab: "shortlist",
-                        focusCandidateId: mainCandidate["user_id"] || candidateId,
-                      }}
-                    >
-                      <Users className="w-4 h-4 mr-1.5" />
-                      View Profile
-                    </Link>
-                  )}
+                  <Link
+                    to={`/candidate/${mainCandidate["user_id"] || candidateId}`}
+                    state={{
+                      fromJob: id,
+                      tab: "shortlist",
+                      focusCandidateId: mainCandidate["user_id"] || candidateId,
+                      linkedInUrl: typeof mainCandidate["Source"] === "string" &&
+                        mainCandidate["Source"].toLowerCase().includes("linkedin")
+                        ? getLinkedInUrl(mainCandidate)
+                        : undefined,
+                    }}
+                  >
+                    <Users className="w-4 h-4 mr-1.5" />
+                    View Profile
+                  </Link>
                 </Button>
               </div>
               {/* Action Buttons - CV Submitted and Reject */}
@@ -4571,35 +4566,24 @@ mainCandidate["linkedin_score_reason"] ? (
 
                                   {/* Show All Record Info Button */}
                                   <div className="flex gap-2">
-                                    {typeof mainCandidate["Source"] === "string" &&
-                                    mainCandidate["Source"].toLowerCase().includes("linkedin") &&
-                                    getLinkedInUrl(mainCandidate) ? (
-                                      <Button variant="ghost" size="sm" asChild className="flex-1 text-xs md:text-sm">
-                                        <a
-                                          href={getLinkedInUrl(mainCandidate)!}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                        >
-                                          <Users className="w-3 h-3 mr-1" />
-                                          View Profile
-                                        </a>
-                                      </Button>
-                                    ) : (
-                                      <Button variant="ghost" size="sm" asChild className="flex-1 text-xs md:text-sm">
-                                        <Link
-                                          to={`/candidate/${candidateId}`}
-                                          state={{
-                                            fromJob: id,
-                                            tab: "boolean-search",
-                                            focusCandidateId: candidateId,
-                                            longListSourceFilter,
-                                          }}
-                                        >
-                                          <Users className="w-3 h-3 mr-1" />
-                                          View Profile
-                                        </Link>
-                                      </Button>
-                                    )}
+                                    <Button variant="ghost" size="sm" asChild className="flex-1 text-xs md:text-sm">
+                                      <Link
+                                        to={`/candidate/${candidateId}`}
+                                        state={{
+                                          fromJob: id,
+                                          tab: "boolean-search",
+                                          focusCandidateId: candidateId,
+                                          longListSourceFilter,
+                                          linkedInUrl: typeof mainCandidate["Source"] === "string" &&
+                                            mainCandidate["Source"].toLowerCase().includes("linkedin")
+                                            ? getLinkedInUrl(mainCandidate)
+                                            : undefined,
+                                        }}
+                                      >
+                                        <Users className="w-3 h-3 mr-1" />
+                                        View Profile
+                                      </Link>
+                                    </Button>
                                     {typeof mainCandidate["Source"] === "string" &&
                                       mainCandidate["Source"].toLowerCase().includes("itris") && (
                                         <Button
