@@ -160,6 +160,9 @@ export default function CallLog() {
   const location = useLocation();
   const fromCandidate = location.state?.fromCandidate;
   const candidateName = location.state?.candidateName;
+  const fromJob = location.state?.fromJob;
+  const fromTab = location.state?.fromTab;
+  const longListSourceFilter = location.state?.longListSourceFilter;
   
   const [searchParams] = useSearchParams()
   const [searchTerm, setSearchTerm] = useState("")
@@ -343,7 +346,13 @@ export default function CallLog() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate(`/candidate/${fromCandidate}`)}
+            onClick={() => navigate(`/candidate/${fromCandidate}`, {
+              state: {
+                fromJob: fromJob,
+                tab: fromTab,
+                longListSourceFilter: longListSourceFilter
+              }
+            })}
             className="mb-2"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />

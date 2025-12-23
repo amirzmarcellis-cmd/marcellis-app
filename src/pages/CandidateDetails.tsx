@@ -565,7 +565,10 @@ export default function CandidateDetails() {
                 onClick={() => navigate(`/call-log?candidate=${candidate.user_id}`, {
                   state: {
                     fromCandidate: candidate.user_id,
-                    candidateName: candidate.name
+                    candidateName: candidate.name,
+                    fromJob: fromJob,
+                    fromTab: fromTab,
+                    longListSourceFilter: longListSourceFilter
                   }
                 })}
               >
@@ -665,7 +668,10 @@ export default function CandidateDetails() {
                               navigate(`/call-log?candidate=${candidate.user_id}&job=${job.job_id}`, {
                                 state: {
                                   fromCandidate: candidate.user_id,
-                                  candidateName: candidate.name
+                                  candidateName: candidate.name,
+                                  fromJob: fromJob,
+                                  fromTab: fromTab,
+                                  longListSourceFilter: longListSourceFilter
                                 }
                               });
                             }
