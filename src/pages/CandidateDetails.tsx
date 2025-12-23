@@ -583,7 +583,7 @@ export default function CandidateDetails() {
           ) : candidateHistory && candidateHistory.jobDetails.length > 0 ? (
             <div className="space-y-4">
               {/* Summary Stats */}
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
                 <div className="bg-muted/30 rounded-lg p-3 text-center">
                   <div className="text-2xl font-bold text-foreground">{candidateHistory.totalJobs}</div>
                   <div className="text-xs text-muted-foreground">Jobs Applied</div>
@@ -600,9 +600,13 @@ export default function CandidateDetails() {
                   <div className="text-2xl font-bold text-red-600 dark:text-red-400">{candidateHistory.rejectedCount}</div>
                   <div className="text-xs text-muted-foreground">Rejected</div>
                 </div>
-                <div className="bg-purple-500/10 rounded-lg p-3 text-center col-span-2 sm:col-span-1">
+                <div className="bg-purple-500/10 rounded-lg p-3 text-center">
                   <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{candidateHistory.submittedCount}</div>
                   <div className="text-xs text-muted-foreground">Submitted</div>
+                </div>
+                <div className="bg-orange-500/10 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{candidateHistory.totalCalls}</div>
+                  <div className="text-xs text-muted-foreground">Total Calls</div>
                 </div>
               </div>
 
@@ -653,9 +657,25 @@ export default function CandidateDetails() {
                             {job.after_call_score !== null ? job.after_call_score : '-'}
                           </span>
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell 
+                          className="text-center"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (job.callcount > 0) {
+                              navigate(`/call-log?candidate=${candidate.user_id}&job=${job.job_id}`, {
+                                state: {
+                                  fromCandidate: candidate.user_id,
+                                  candidateName: candidate.name
+                                }
+                              });
+                            }
+                          }}
+                        >
                           {job.callcount > 0 ? (
-                            <Badge variant="secondary" className="text-xs">
+                            <Badge 
+                              variant="secondary" 
+                              className="text-xs cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                            >
                               <Phone className="h-3 w-3 mr-1" />
                               {job.callcount}
                             </Badge>
