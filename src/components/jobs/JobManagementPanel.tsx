@@ -83,6 +83,7 @@ export function JobManagementPanel() {
     isAdmin,
     isManager,
     isTeamLeader,
+    isViewer,
     canCreateJobs,
     loading: rolesLoading
   } = useUserRole();
@@ -179,8 +180,8 @@ export function JobManagementPanel() {
           groups ( id, name, color )
         `);
 
-      // Admins, Managers, and Team Leaders can view all jobs
-      const canViewAllJobs = isAdmin || isManager || isTeamLeader;
+      // Admins, Managers, Team Leaders, and Viewers can view all jobs
+      const canViewAllJobs = isAdmin || isManager || isTeamLeader || isViewer;
       if (!canViewAllJobs) {
         // Regular employees only see jobs assigned to them (support both new and legacy fields)
         const userId = profile.user_id;
