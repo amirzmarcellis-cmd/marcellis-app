@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useEffect, useState } from "react"
-import { useSearchParams } from "react-router-dom"
+import { useSearchParams, useNavigate, useLocation } from "react-router-dom"
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Phone, Search, Eye, FileText, Clock } from "lucide-react"
+import { Phone, Search, Eye, FileText, Clock, ArrowLeft } from "lucide-react"
 import { Link } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
@@ -156,6 +156,10 @@ const getContactedBadgeVariant = (contacted: string | null) => {
 }
 
 export default function CallLog() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const fromCandidate = location.state?.fromCandidate;
+  const candidateName = location.state?.candidateName;
   
   const [searchParams] = useSearchParams()
   const [searchTerm, setSearchTerm] = useState("")
@@ -320,6 +324,17 @@ export default function CallLog() {
 
   return (
       <div className="space-y-4 sm:space-y-6 overflow-x-hidden">
+        {fromCandidate && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/candidate/${fromCandidate}`)}
+            className="mb-2"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to {candidateName ? `${candidateName}'s Profile` : 'Candidate Profile'}
+          </Button>
+        )}
         <div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-light font-work tracking-tight text-foreground">Call Log</h1>
           <p className="text-sm sm:text-base font-light font-inter text-muted-foreground mt-1 sm:mt-2">Track all recruitment calls and outcomes</p>

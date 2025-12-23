@@ -515,7 +515,12 @@ export default function CandidateDetails() {
                 <Button
                   variant="outline"
                   className="w-full sm:w-auto h-11 sm:h-9 text-sm min-h-[44px] sm:min-h-0"
-                  onClick={() => navigate(`/call-log?candidate=${candidate.user_id}`)}
+                    onClick={() => navigate(`/call-log?candidate=${candidate.user_id}`, {
+                      state: {
+                        fromCandidate: candidate.user_id,
+                        candidateName: candidate.name
+                      }
+                    })}
                 >
                   <Phone className="h-4 w-4 mr-2" />
                   View Call History ({candidateHistory.totalCalls} calls)
