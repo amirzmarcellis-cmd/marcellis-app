@@ -3,8 +3,9 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { User, Mail, Phone, FileText, Search, ArrowLeft, ExternalLink, Briefcase, Linkedin, History } from 'lucide-react';
+import { User, Mail, Phone, FileText, Search, ArrowLeft, ExternalLink, Briefcase, Linkedin, History, CheckCircle, XCircle, Clock, Send, PhoneCall } from 'lucide-react';
 
 interface Candidate {
   user_id: string;
@@ -22,6 +23,21 @@ interface AssociatedJob {
   after_call_score?: number;
 }
 
+interface JobHistoryDetail {
+  job_id: string;
+  job_title: string;
+  status: string;
+  longlisted_at: string | null;
+  shortlisted_at: string | null;
+  rejected_at: string | null;
+  submitted_at: string | null;
+  contacted: string | null;
+  callcount: number;
+  cv_score: number | null;
+  after_call_score: number | null;
+  lastcalltime: string | null;
+}
+
 interface CandidateHistory {
   totalJobs: number;
   longlistedCount: number;
@@ -29,6 +45,7 @@ interface CandidateHistory {
   rejectedCount: number;
   submittedCount: number;
   totalCalls: number;
+  jobDetails: JobHistoryDetail[];
 }
 
 export default function CandidateDetails() {
@@ -48,32 +65,101 @@ export default function CandidateDetails() {
   const longListSourceFilter = location.state?.longListSourceFilter;
   const linkedInUrl = location.state?.linkedInUrl;
 
+  // Helper function to get status from job data
+  const getJobStatus = (job: any): string => {
+    if (job.contacted?.toLowerCase() === 'submitted' || job.submitted_at) return 'Submitted';
+    if (job.contacted?.toLowerCase() === 'rejected' || job.rejected_at) return 'Rejected';
+    if (job.shortlisted_at) return 'Shortlisted';
+    if (job.longlisted_at) return 'Longlisted';
+    if (job.contacted) return job.contacted;
+    return 'Applied';
+  };
+
+  // Helper function to get status badge variant
+  const getStatusBadgeVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+    const lowerStatus = status.toLowerCase();
+    if (lowerStatus === 'submitted' || lowerStatus === 'hired') return 'default';
+    if (lowerStatus === 'shortlisted' || lowerStatus === 'interview') return 'default';
+    if (lowerStatus === 'rejected') return 'destructive';
+    if (lowerStatus === 'longlisted') return 'secondary';
+    return 'outline';
+  };
+
+  // Helper function to get score color
+  const getScoreColor = (score: number | null): string => {
+    if (score === null) return 'text-muted-foreground';
+    if (score >= 75) return 'text-green-600 dark:text-green-400';
+    if (score >= 50) return 'text-yellow-600 dark:text-yellow-400';
+    return 'text-red-600 dark:text-red-400';
+  };
+
   const fetchCandidateHistory = async (userId: string) => {
     try {
       setHistoryLoading(true);
       const supabaseModule = await import('@/integrations/supabase/client');
       const supabase = supabaseModule.supabase;
       
-      const { data, error } = await supabase
+      // Fetch detailed job history
+      const { data: jobsCvsData, error: jobsCvsError } = await supabase
         .from('Jobs_CVs')
-        .select('job_id, longlisted_at, shortlisted_at, contacted, rejected_at, submitted_at, callcount')
+        .select('job_id, longlisted_at, shortlisted_at, contacted, rejected_at, submitted_at, callcount, cv_score, after_call_score, lastcalltime')
         .eq('user_id', userId);
       
-      if (error) {
-        console.error('Error fetching candidate history:', error);
+      if (jobsCvsError) {
+        console.error('Error fetching candidate history:', jobsCvsError);
         setCandidateHistory(null);
         return;
       }
 
-      if (data) {
-        setCandidateHistory({
-          totalJobs: new Set(data.map(d => d.job_id)).size,
-          longlistedCount: data.filter(d => d.longlisted_at).length,
-          shortlistedCount: data.filter(d => d.shortlisted_at).length,
-          rejectedCount: data.filter(d => d.contacted?.toLowerCase() === 'rejected' || d.rejected_at).length,
-          submittedCount: data.filter(d => d.contacted?.toLowerCase() === 'submitted' || d.submitted_at).length,
-          totalCalls: data.reduce((sum, d) => sum + (d.callcount || 0), 0)
+      if (jobsCvsData && jobsCvsData.length > 0) {
+        // Get unique job IDs and fetch job titles
+        const uniqueJobIds = [...new Set(jobsCvsData.map(item => item.job_id))];
+        
+        const { data: jobsData, error: jobsError } = await supabase
+          .from('Jobs')
+          .select('job_id, job_title')
+          .in('job_id', uniqueJobIds);
+        
+        if (jobsError) {
+          console.error('Error fetching job titles:', jobsError);
+        }
+        
+        const jobsMap = new Map(jobsData?.map(job => [job.job_id, job.job_title]) || []);
+        
+        // Build detailed job history
+        const jobDetails: JobHistoryDetail[] = jobsCvsData.map(job => ({
+          job_id: job.job_id,
+          job_title: jobsMap.get(job.job_id) || job.job_id,
+          status: getJobStatus(job),
+          longlisted_at: job.longlisted_at,
+          shortlisted_at: job.shortlisted_at,
+          rejected_at: job.rejected_at,
+          submitted_at: job.submitted_at,
+          contacted: job.contacted,
+          callcount: job.callcount || 0,
+          cv_score: job.cv_score,
+          after_call_score: job.after_call_score,
+          lastcalltime: job.lastcalltime
+        }));
+
+        // Sort by most recent activity
+        jobDetails.sort((a, b) => {
+          const dateA = a.lastcalltime || a.submitted_at || a.shortlisted_at || a.longlisted_at || '';
+          const dateB = b.lastcalltime || b.submitted_at || b.shortlisted_at || b.longlisted_at || '';
+          return dateB.localeCompare(dateA);
         });
+
+        setCandidateHistory({
+          totalJobs: uniqueJobIds.length,
+          longlistedCount: jobsCvsData.filter(d => d.longlisted_at).length,
+          shortlistedCount: jobsCvsData.filter(d => d.shortlisted_at).length,
+          rejectedCount: jobsCvsData.filter(d => d.contacted?.toLowerCase() === 'rejected' || d.rejected_at).length,
+          submittedCount: jobsCvsData.filter(d => d.contacted?.toLowerCase() === 'submitted' || d.submitted_at).length,
+          totalCalls: jobsCvsData.reduce((sum, d) => sum + (d.callcount || 0), 0),
+          jobDetails
+        });
+      } else {
+        setCandidateHistory(null);
       }
     } catch (error) {
       console.error('Error fetching candidate history:', error);
@@ -464,73 +550,133 @@ export default function CandidateDetails() {
       </Card>
 
       {/* Candidate History Section */}
-      <Card className="max-w-full overflow-hidden">
-        <CardHeader className="p-4 sm:p-6">
-          <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
-            <History className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-            Candidate History
-          </CardTitle>
+      <Card className="max-w-full overflow-hidden border-primary/20">
+        <CardHeader className="p-4 sm:p-6 bg-gradient-to-r from-primary/5 to-transparent">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
+              <History className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-primary" />
+              Candidate History
+            </CardTitle>
+            {candidateHistory && candidateHistory.totalCalls > 0 && (
+              <Button
+                variant="default"
+                size="sm"
+                className="w-full sm:w-auto h-10 sm:h-9 text-sm"
+                onClick={() => navigate(`/call-log?candidate=${candidate.user_id}`, {
+                  state: {
+                    fromCandidate: candidate.user_id,
+                    candidateName: candidate.name
+                  }
+                })}
+              >
+                <PhoneCall className="h-4 w-4 mr-2" />
+                View Call History ({candidateHistory.totalCalls} calls)
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
           {historyLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
-          ) : candidateHistory ? (
+          ) : candidateHistory && candidateHistory.jobDetails.length > 0 ? (
             <div className="space-y-4">
-              <div className="overflow-x-auto">
+              {/* Summary Stats */}
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-4">
+                <div className="bg-muted/30 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-foreground">{candidateHistory.totalJobs}</div>
+                  <div className="text-xs text-muted-foreground">Jobs Applied</div>
+                </div>
+                <div className="bg-blue-500/10 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{candidateHistory.longlistedCount}</div>
+                  <div className="text-xs text-muted-foreground">Longlisted</div>
+                </div>
+                <div className="bg-green-500/10 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">{candidateHistory.shortlistedCount}</div>
+                  <div className="text-xs text-muted-foreground">Shortlisted</div>
+                </div>
+                <div className="bg-red-500/10 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-red-600 dark:text-red-400">{candidateHistory.rejectedCount}</div>
+                  <div className="text-xs text-muted-foreground">Rejected</div>
+                </div>
+                <div className="bg-purple-500/10 rounded-lg p-3 text-center col-span-2 sm:col-span-1">
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{candidateHistory.submittedCount}</div>
+                  <div className="text-xs text-muted-foreground">Submitted</div>
+                </div>
+              </div>
+
+              {/* Jobs Table */}
+              <div className="overflow-x-auto rounded-lg border">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Metric</TableHead>
-                      <TableHead className="text-right">Count</TableHead>
+                    <TableRow className="bg-muted/50">
+                      <TableHead className="font-semibold">Job Title</TableHead>
+                      <TableHead className="font-semibold">Status</TableHead>
+                      <TableHead className="font-semibold text-center hidden sm:table-cell">CV Score</TableHead>
+                      <TableHead className="font-semibold text-center hidden sm:table-cell">Call Score</TableHead>
+                      <TableHead className="font-semibold text-center">Calls</TableHead>
+                      <TableHead className="font-semibold hidden md:table-cell">Last Call</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRow>
-                      <TableCell className="text-sm sm:text-base">Total Jobs Applied</TableCell>
-                      <TableCell className="text-right font-medium text-sm sm:text-base">{candidateHistory.totalJobs}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="text-sm sm:text-base">Jobs Longlisted</TableCell>
-                      <TableCell className="text-right font-medium text-sm sm:text-base">{candidateHistory.longlistedCount}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="text-sm sm:text-base">Jobs Shortlisted</TableCell>
-                      <TableCell className="text-right font-medium text-sm sm:text-base">{candidateHistory.shortlistedCount}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="text-sm sm:text-base">Times Rejected</TableCell>
-                      <TableCell className="text-right font-medium text-sm sm:text-base">{candidateHistory.rejectedCount}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="text-sm sm:text-base">Times CV Submitted</TableCell>
-                      <TableCell className="text-right font-medium text-sm sm:text-base">{candidateHistory.submittedCount}</TableCell>
-                    </TableRow>
+                    {candidateHistory.jobDetails.map((job, index) => (
+                      <TableRow 
+                        key={`${job.job_id}-${index}`}
+                        className="cursor-pointer hover:bg-muted/50 transition-colors"
+                        onClick={() => navigate(`/job/${job.job_id}`)}
+                      >
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
+                            <Briefcase className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                            <span className="text-sm truncate max-w-[200px]" title={job.job_title}>
+                              {job.job_title}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={getStatusBadgeVariant(job.status)} className="text-xs">
+                            {job.status === 'Submitted' && <Send className="h-3 w-3 mr-1" />}
+                            {job.status === 'Shortlisted' && <CheckCircle className="h-3 w-3 mr-1" />}
+                            {job.status === 'Rejected' && <XCircle className="h-3 w-3 mr-1" />}
+                            {job.status === 'Longlisted' && <Clock className="h-3 w-3 mr-1" />}
+                            {job.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-center hidden sm:table-cell">
+                          <span className={`font-medium ${getScoreColor(job.cv_score)}`}>
+                            {job.cv_score !== null ? job.cv_score : '-'}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center hidden sm:table-cell">
+                          <span className={`font-medium ${getScoreColor(job.after_call_score)}`}>
+                            {job.after_call_score !== null ? job.after_call_score : '-'}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {job.callcount > 0 ? (
+                            <Badge variant="secondary" className="text-xs">
+                              <Phone className="h-3 w-3 mr-1" />
+                              {job.callcount}
+                            </Badge>
+                          ) : (
+                            <span className="text-muted-foreground text-xs">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground hidden md:table-cell">
+                          {job.lastcalltime ? new Date(job.lastcalltime).toLocaleDateString() : '-'}
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </div>
-              
-              {candidateHistory.totalCalls > 0 && (
-                <Button
-                  variant="outline"
-                  className="w-full sm:w-auto h-11 sm:h-9 text-sm min-h-[44px] sm:min-h-0"
-                    onClick={() => navigate(`/call-log?candidate=${candidate.user_id}`, {
-                      state: {
-                        fromCandidate: candidate.user_id,
-                        candidateName: candidate.name
-                      }
-                    })}
-                >
-                  <Phone className="h-4 w-4 mr-2" />
-                  View Call History ({candidateHistory.totalCalls} calls)
-                </Button>
-              )}
             </div>
           ) : (
-            <p className="text-muted-foreground text-center py-4 text-sm sm:text-base">
-              No history available for this candidate
-            </p>
+            <div className="text-center py-8">
+              <History className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
+              <p className="text-muted-foreground text-sm">No job application history for this candidate</p>
+            </div>
           )}
         </CardContent>
       </Card>
