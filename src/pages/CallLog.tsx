@@ -179,22 +179,37 @@ export default function CallLog() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [candidateParam, jobParam]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       
+      // Build the call logs query
+      let callLogsQuery = supabase
+        .from('Jobs_CVs')
+        .select('recordid, job_id, user_id, recruiter_id, contacted, transcript, cv_score, after_call_score, linkedin_score, source, candidate_name, candidate_email, candidate_phone_number, notice_period, salary_expectations, current_salary, notes, callcount, lastcalltime, duration, recording, longlisted_at, shortlisted_at, nationality')
+        .not('callcount', 'is', null)
+        .gt('callcount', 0);
+      
+      // Apply filters at database level when URL params are present
+      if (candidateParam) {
+        callLogsQuery = callLogsQuery.eq('user_id', candidateParam);
+      }
+      if (jobParam) {
+        callLogsQuery = callLogsQuery.eq('job_id', jobParam);
+      }
+      
+      callLogsQuery = callLogsQuery.order('recordid', { ascending: false });
+      
+      // Only apply limit when not filtering by specific candidate or job
+      if (!candidateParam && !jobParam) {
+        callLogsQuery = callLogsQuery.limit(200);
+      }
+      
       // Parallel fetch for faster loading
       const [callLogsResult, jobsResult] = await Promise.all([
-        supabase
-          .from('Jobs_CVs')
-          .select('recordid, job_id, user_id, recruiter_id, contacted, transcript, cv_score, after_call_score, linkedin_score, source, candidate_name, candidate_email, candidate_phone_number, notice_period, salary_expectations, current_salary, notes, callcount, lastcalltime, duration, recording, longlisted_at, shortlisted_at, nationality')
-          .not('callcount', 'is', null)
-          .gt('callcount', 0)
-          .order('recordid', { ascending: false })
-          .limit(200), // Limit to 200 most recent call logs
-        
+        callLogsQuery,
         supabase
           .from('Jobs')
           .select('job_id, job_title')
