@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
-export type UserRole = 'admin' | 'management' | 'team_leader' | 'employee';
+export type UserRole = 'admin' | 'management' | 'team_leader' | 'employee' | 'viewer';
 
 export function useUserRole() {
   const { user } = useAuth();
@@ -10,6 +10,7 @@ export function useUserRole() {
   const [loading, setLoading] = useState(true);
   const [isTeamLeader, setIsTeamLeader] = useState(false);
   const [isManagement, setIsManagement] = useState(false);
+  const [isViewer, setIsViewer] = useState(false);
 
   useEffect(() => {
     async function fetchUserRoles() {
@@ -18,6 +19,7 @@ export function useUserRole() {
         setLoading(false);
         setIsTeamLeader(false);
         setIsManagement(false);
+        setIsViewer(false);
         return;
       }
 
@@ -35,7 +37,7 @@ export function useUserRole() {
             .eq('user_id', user.id)
         ]);
 
-        // Get organization role (ADMIN, MANAGEMENT, or EMPLOYEE)
+        // Get organization role (ADMIN, MANAGEMENT, VIEWER, or EMPLOYEE)
         const orgRole = userRoleResult.data?.role || 'EMPLOYEE';
         
         // Check if user is team leader in any team
@@ -44,12 +46,15 @@ export function useUserRole() {
         
         setIsTeamLeader(isLeader);
         setIsManagement(orgRole === 'MANAGEMENT');
+        setIsViewer(orgRole === 'VIEWER');
 
-        // Set roles based on hierarchy: Admin > Management > Team Leader > Employee
+        // Set roles based on hierarchy: Admin > Management > Viewer > Team Leader > Employee
         if (orgRole === 'ADMIN') {
           setRoles(['admin']);
         } else if (orgRole === 'MANAGEMENT') {
           setRoles(['management']);
+        } else if (orgRole === 'VIEWER') {
+          setRoles(['viewer']);
         } else if (isLeader) {
           setRoles(['team_leader']);
         } else {
@@ -60,6 +65,7 @@ export function useUserRole() {
         setRoles([]);
         setIsTeamLeader(false);
         setIsManagement(false);
+        setIsViewer(false);
       } finally {
         setLoading(false);
       }
@@ -74,6 +80,7 @@ export function useUserRole() {
   const canAccessAnalytics = isAdmin || isManagement;
   const canAccessUsersPanel = isAdmin || isManagement;
   const canManageTeamMembers = isAdmin || isManagement || isTeamLeader;
+  const canCreateJobs = !isViewer;
 
   return {
     roles,
@@ -84,11 +91,13 @@ export function useUserRole() {
     isManager: hasRole('management'), // For backwards compatibility
     isTeamLeader,
     isRecruiter: hasRole('employee'),
+    isViewer,
     canManageUsers,
     canDeleteUsers: isAdmin || isManagement,
     canAccessAnalytics,
     canAccessUsersPanel,
     canManageTeamMembers,
+    canCreateJobs,
     loading
   };
 }

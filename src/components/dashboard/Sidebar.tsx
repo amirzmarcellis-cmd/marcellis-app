@@ -26,7 +26,8 @@ export function DashboardSidebar() {
     canAccessAnalytics,
     canManageUsers,
     isTeamLeader,
-    canManageTeamMembers
+    canManageTeamMembers,
+    isViewer
   } = useUserRole();
   const {
     profile
@@ -144,6 +145,10 @@ export function DashboardSidebar() {
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2">
             {navigationItems.filter(item => {
+              // Viewers can only access Dashboard, Jobs, and Settings
+              if (isViewer) {
+                return ['/', '/jobs', '/settings'].includes(item.url);
+              }
               // Filter out Analytics, Reports, and Jobs Analysis for recruiters
               if ((item.title === 'Analytics' || item.title === 'Reports' || item.title === 'Jobs Analysis') && !canAccessAnalytics) {
                 return false;
