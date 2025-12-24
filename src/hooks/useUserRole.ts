@@ -78,6 +78,7 @@ export function useUserRole() {
   const isAdmin = hasRole('admin');
   const canManageUsers = isAdmin || isManagement;
   const canAccessAnalytics = isAdmin || isManagement;
+  const canAccessJobsAnalytics = isAdmin || isManagement || isTeamLeader;
   const canAccessUsersPanel = isAdmin || isManagement;
   const canManageTeamMembers = isAdmin || isManagement || isTeamLeader;
   const canCreateJobs = !isViewer;
@@ -95,6 +96,7 @@ export function useUserRole() {
     canManageUsers,
     canDeleteUsers: isAdmin || isManagement,
     canAccessAnalytics,
+    canAccessJobsAnalytics,
     canAccessUsersPanel,
     canManageTeamMembers,
     canCreateJobs,
