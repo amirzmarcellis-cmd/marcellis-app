@@ -24,6 +24,7 @@ export function DashboardSidebar() {
   } = useAppSettings();
   const {
     canAccessAnalytics,
+    canAccessJobsAnalytics,
     canManageUsers,
     isTeamLeader,
     canManageTeamMembers,
@@ -149,8 +150,12 @@ export function DashboardSidebar() {
               if (isViewer) {
                 return ['/', '/jobs', '/settings'].includes(item.url);
               }
-              // Filter out Analytics, Reports, and Jobs Analysis for recruiters
-              if ((item.title === 'Analytics' || item.title === 'Reports' || item.title === 'Jobs Analysis') && !canAccessAnalytics) {
+              // Filter out Analytics and Reports for non-admins/non-management
+              if ((item.title === 'Analytics' || item.title === 'Reports') && !canAccessAnalytics) {
+                return false;
+              }
+              // Jobs Analysis is accessible by admins, management, AND team leaders
+              if (item.title === 'Jobs Analysis' && !canAccessJobsAnalytics) {
                 return false;
               }
               return true;
