@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Briefcase, Phone, PhoneOff, UserCircle, Calendar, Clock, X, Info, AlertCircle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Briefcase, Phone, PhoneOff, UserCircle, Calendar, Clock, X, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
@@ -69,8 +68,6 @@ export function JobManagementPanel() {
     id: string;
     name: string;
   }>>([]);
-  const [shortlistedCount, setShortlistedCount] = useState<number>(0);
-  const [isCheckingShortlisted, setIsCheckingShortlisted] = useState(true);
   const navigate = useNavigate();
   const {
     toast
@@ -88,58 +85,6 @@ export function JobManagementPanel() {
     loading: rolesLoading
   } = useUserRole();
 
-  // Check if recruiter has 3+ active shortlisted candidates (not rejected/submitted)
-  useEffect(() => {
-    const checkShortlistedCount = async () => {
-      if (!profile?.user_id) {
-        setIsCheckingShortlisted(false);
-        return;
-      }
-
-      try {
-        // Get all ACTIVE job_ids for this recruiter (only Processed = 'Yes')
-        const { data: recruiterJobs, error: jobsError } = await supabase
-          .from('Jobs')
-          .select('job_id')
-          .eq('Processed', 'Yes')
-          .or(`recruiter_id.eq.${profile.user_id},recruiter_id.eq.${profile.linkedin_id || ''},assignment.eq.${profile.email}`);
-
-        if (jobsError) throw jobsError;
-
-        if (!recruiterJobs || recruiterJobs.length === 0) {
-          setShortlistedCount(0);
-          setIsCheckingShortlisted(false);
-          return;
-        }
-
-        const jobIds = recruiterJobs.map(j => j.job_id);
-
-        // Fetch all shortlisted candidates for these jobs
-        const { data: candidates, error: candidatesError } = await supabase
-          .from('Jobs_CVs')
-          .select('contacted')
-          .in('job_id', jobIds)
-          .gte('after_call_score', 75);
-
-        if (candidatesError) throw candidatesError;
-
-        // Filter out rejected and submitted candidates
-        const activeShortlisted = (candidates || []).filter(c => {
-          const contacted = (c.contacted || '').trim().toLowerCase();
-          return contacted !== 'rejected' && contacted !== 'submitted';
-        });
-
-        setShortlistedCount(activeShortlisted.length);
-      } catch (error) {
-        console.error('Error checking shortlisted count:', error);
-        setShortlistedCount(0);
-      } finally {
-        setIsCheckingShortlisted(false);
-      }
-    };
-
-    checkShortlistedCount();
-  }, [profile?.user_id, profile?.email, profile?.linkedin_id]);
   
   useEffect(() => {
     // Wait for both profile and roles to be fully loaded before fetching
@@ -582,17 +527,6 @@ export function JobManagementPanel() {
     };
   }, [jobs, selectedGroupFilter, selectedRecruiterFilter, dateRange]);
   return <div className="space-y-4 sm:space-y-6 w-full">
-      {/* Alert Banner for Shortlisted Candidates */}
-      {shortlistedCount >= 3 && (
-        <Alert variant="destructive" className="mb-2">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Action Required</AlertTitle>
-          <AlertDescription>
-            You have {shortlistedCount} shortlisted candidates. Please check them first before adding a new job.
-          </AlertDescription>
-        </Alert>
-      )}
-
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
         <div className="w-full sm:w-auto">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-light font-work tracking-tight">Job Management</h2>
@@ -607,10 +541,9 @@ export function JobManagementPanel() {
             <Button 
               onClick={() => navigate("/jobs/add")} 
               className="action-button bg-gradient-primary hover:shadow-glow font-light font-inter text-xs sm:text-sm flex-1 sm:flex-none"
-              disabled={isCheckingShortlisted || shortlistedCount >= 3}
             >
               <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              {isCheckingShortlisted ? "Checking..." : "Create Job"}
+              Create Job
             </Button>
           )}
         </div>
