@@ -59,6 +59,7 @@ export default function CandidateDetails() {
   const [jobsLoading, setJobsLoading] = useState(false);
   const [candidateHistory, setCandidateHistory] = useState<CandidateHistory | null>(null);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [storedLinkedInUrl, setStoredLinkedInUrl] = useState<string | null>(null);
   
   const fromJob = location.state?.fromJob;
   const fromTab = location.state?.tab;
@@ -242,12 +243,28 @@ export default function CandidateDetails() {
   const fetchCandidate = async (candidateId: string) => {
     try {
       setLoading(true);
+      setStoredLinkedInUrl(null);
       
       // Use a dynamic import to avoid TypeScript issues
       const supabaseModule = await import('@/integrations/supabase/client');
       const supabase = supabaseModule.supabase;
       
-      // First try to find candidate in CVs table using user_id (for Applications tab)
+      // Helper function to fetch LinkedIn URL for LinkedIn candidates
+      const fetchLinkedInUrl = async (userId: string) => {
+        if (userId.startsWith('Lin-')) {
+          const { data: linkedInData } = await supabase
+            .from('linkedin_boolean_search')
+            .select('linkedin_id')
+            .eq('user_id', userId)
+            .limit(1);
+          
+          if (linkedInData && linkedInData.length > 0 && linkedInData[0].linkedin_id) {
+            setStoredLinkedInUrl(`https://www.linkedin.com/in/${linkedInData[0].linkedin_id}/`);
+          }
+        }
+      };
+      
+      // Step 1: Try CVs table by user_id
       const cvQueryResult: any = await (supabase as any)
         .from('CVs')
         .select('*')
@@ -266,42 +283,34 @@ export default function CandidateDetails() {
           cv_link: candidateData.cv_link || null
         });
         
-        // Fetch associated jobs and history
+        // Fetch LinkedIn URL, associated jobs and history
+        await fetchLinkedInUrl(userId);
         await fetchAssociatedJobs(userId);
         await fetchCandidateHistory(userId);
         return;
       }
       
-      // Fallback: Query the Jobs_CVs table using recordid (for other tabs)
-      const queryResult: any = await (supabase as any)
+      // Step 2: Try Jobs_CVs by user_id (for LinkedIn candidates like "Lin-XXXXX")
+      const jobsCvsByUserIdResult: any = await (supabase as any)
         .from('Jobs_CVs')
         .select('*')
-        .eq('recordid', parseInt(candidateId));
+        .eq('user_id', candidateId)
+        .limit(1);
       
-      const { data, error } = queryResult;
-
-      if (error) {
-        console.error('Error fetching candidate:', error);
-        setCandidate(null);
-        return;
-      }
-
-      if (data && data.length > 0) {
-        const candidateData = data[0];
+      if (jobsCvsByUserIdResult.data && jobsCvsByUserIdResult.data.length > 0) {
+        const candidateData = jobsCvsByUserIdResult.data[0];
         
-        // Try to get CV text and cv_link from CVs table using user_id
+        // Try to get CV text from CVs table
         let cvText = '';
         let cvLink = null;
-        if (candidateData.user_id) {
-          const cvTextQueryResult: any = await (supabase as any)
-            .from('CVs')
-            .select('cv_text, cv_link')
-            .eq('user_id', candidateData.user_id.toString());
-          
-          if (cvTextQueryResult.data && cvTextQueryResult.data.length > 0) {
-            cvText = cvTextQueryResult.data[0].cv_text || '';
-            cvLink = cvTextQueryResult.data[0].cv_link || null;
-          }
+        const cvTextQueryResult: any = await (supabase as any)
+          .from('CVs')
+          .select('cv_text, cv_link')
+          .eq('user_id', candidateId);
+        
+        if (cvTextQueryResult.data && cvTextQueryResult.data.length > 0) {
+          cvText = cvTextQueryResult.data[0].cv_text || '';
+          cvLink = cvTextQueryResult.data[0].cv_link || null;
         }
         
         const userId = candidateData.user_id?.toString() || candidateId;
@@ -314,12 +323,67 @@ export default function CandidateDetails() {
           cv_link: cvLink
         });
         
-        // Fetch associated jobs and history
+        // Fetch LinkedIn URL, associated jobs and history
+        await fetchLinkedInUrl(userId);
         await fetchAssociatedJobs(userId);
         await fetchCandidateHistory(userId);
-      } else {
-        setCandidate(null);
+        return;
       }
+      
+      // Step 3: Fallback - try Jobs_CVs by recordid (only if ID is numeric)
+      const recordId = parseInt(candidateId);
+      if (!isNaN(recordId)) {
+        const queryResult: any = await (supabase as any)
+          .from('Jobs_CVs')
+          .select('*')
+          .eq('recordid', recordId);
+        
+        const { data, error } = queryResult;
+
+        if (error) {
+          console.error('Error fetching candidate:', error);
+          setCandidate(null);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          const candidateData = data[0];
+          
+          // Try to get CV text and cv_link from CVs table using user_id
+          let cvText = '';
+          let cvLink = null;
+          if (candidateData.user_id) {
+            const cvTextQueryResult: any = await (supabase as any)
+              .from('CVs')
+              .select('cv_text, cv_link')
+              .eq('user_id', candidateData.user_id.toString());
+            
+            if (cvTextQueryResult.data && cvTextQueryResult.data.length > 0) {
+              cvText = cvTextQueryResult.data[0].cv_text || '';
+              cvLink = cvTextQueryResult.data[0].cv_link || null;
+            }
+          }
+          
+          const userId = candidateData.user_id?.toString() || candidateId;
+          setCandidate({
+            user_id: userId,
+            name: candidateData.candidate_name || 'Unknown Candidate',
+            email: candidateData.candidate_email || '',
+            phone_number: candidateData.candidate_phone_number || '',
+            cv_text: cvText,
+            cv_link: cvLink
+          });
+          
+          // Fetch LinkedIn URL, associated jobs and history
+          await fetchLinkedInUrl(userId);
+          await fetchAssociatedJobs(userId);
+          await fetchCandidateHistory(userId);
+          return;
+        }
+      }
+      
+      // Candidate not found
+      setCandidate(null);
     } catch (error) {
       console.error('Error fetching candidate:', error);
       setCandidate(null);
@@ -493,11 +557,11 @@ export default function CandidateDetails() {
               View CV Link
             </Button>
           )}
-          {linkedInUrl && (
+          {(linkedInUrl || storedLinkedInUrl) && (
             <Button
               variant="outline"
               size="sm"
-              onClick={() => window.open(linkedInUrl, '_blank')}
+              onClick={() => window.open(linkedInUrl || storedLinkedInUrl!, '_blank')}
               className="w-full sm:w-auto h-11 sm:h-9 text-sm min-h-[44px] sm:min-h-0"
             >
               <Linkedin className="h-4 w-4 mr-2" />
