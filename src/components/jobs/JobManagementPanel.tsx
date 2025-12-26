@@ -15,6 +15,8 @@ import { cn } from "@/lib/utils";
 import { JobDialog } from "./JobDialog";
 import { useProfile } from "@/hooks/useProfile";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useAdminSettings } from "@/hooks/useAdminSettings";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 interface Job {
   job_id: string;
   job_title: string | null;
@@ -84,6 +86,7 @@ export function JobManagementPanel() {
     canCreateJobs,
     loading: rolesLoading
   } = useUserRole();
+  const { isAutomaticDialPaused, isJobCreationPaused } = useAdminSettings();
 
   
   useEffect(() => {
@@ -685,21 +688,21 @@ export function JobManagementPanel() {
             <JobGrid jobs={filteredJobs.activeJobs} loading={false} onEdit={job => {
           setSelectedJob(job);
           setIsDialogOpen(true);
-        }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} onAutomaticDialToggle={handleAutomaticDialToggle} navigate={navigate} />
+        }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} onAutomaticDialToggle={handleAutomaticDialToggle} navigate={navigate} isAutomaticDialPaused={isAutomaticDialPaused} isAdmin={isAdmin} />
           </TabsContent>
           
           <TabsContent value="paused">
             <JobGrid jobs={filteredJobs.pausedJobs} loading={false} onEdit={job => {
           setSelectedJob(job);
           setIsDialogOpen(true);
-        }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} onAutomaticDialToggle={handleAutomaticDialToggle} navigate={navigate} />
+        }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} onAutomaticDialToggle={handleAutomaticDialToggle} navigate={navigate} isAutomaticDialPaused={isAutomaticDialPaused} isAdmin={isAdmin} />
           </TabsContent>
           
           <TabsContent value="all">
             <JobGrid jobs={filteredJobs.allJobs} loading={false} onEdit={job => {
           setSelectedJob(job);
           setIsDialogOpen(true);
-        }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} onAutomaticDialToggle={handleAutomaticDialToggle} navigate={navigate} />
+        }} onDelete={handleDelete} onStatusToggle={handleStatusToggle} onAutomaticDialToggle={handleAutomaticDialToggle} navigate={navigate} isAutomaticDialPaused={isAutomaticDialPaused} isAdmin={isAdmin} />
           </TabsContent>
         </Tabs>}
 
@@ -723,6 +726,8 @@ interface JobGridProps {
   onStatusToggle: (jobId: string, currentStatus: string | null) => void;
   onAutomaticDialToggle: (jobId: string, currentValue: boolean | null) => void;
   navigate: (path: string) => void;
+  isAutomaticDialPaused: boolean;
+  isAdmin: boolean;
 }
 const JobGrid = memo(function JobGrid({
   jobs,
@@ -731,7 +736,9 @@ const JobGrid = memo(function JobGrid({
   onDelete,
   onStatusToggle,
   onAutomaticDialToggle,
-  navigate
+  navigate,
+  isAutomaticDialPaused,
+  isAdmin
 }: JobGridProps) {
   const formatCurrency = (amountStr: string | null | undefined, currency?: string | null) => {
     const amount = parseFloat((amountStr || "").toString().replace(/[^0-9.]/g, ""));
@@ -875,8 +882,37 @@ const JobGrid = memo(function JobGrid({
                 <div className="flex items-center gap-2 text-sm">
                   {job.automatic_dial ? <Phone className="h-4 w-4 text-emerald-500" /> : <PhoneOff className="h-4 w-4 text-muted-foreground" />}
                   <span className="text-muted-foreground text-xs sm:text-sm">Automatic Dial</span>
+                  {isAutomaticDialPaused && !isAdmin && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Info className="h-3 w-3 text-amber-500" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-xs">Automatic dialing is currently disabled by an administrator</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
                 </div>
-                <Switch checked={job.automatic_dial || false} onCheckedChange={() => onAutomaticDialToggle(job.job_id, job.automatic_dial)} />
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span>
+                        <Switch 
+                          checked={job.automatic_dial || false} 
+                          onCheckedChange={() => onAutomaticDialToggle(job.job_id, job.automatic_dial)}
+                          disabled={isAutomaticDialPaused && !isAdmin && !job.automatic_dial}
+                        />
+                      </span>
+                    </TooltipTrigger>
+                    {isAutomaticDialPaused && !isAdmin && !job.automatic_dial && (
+                      <TooltipContent>
+                        <p className="text-xs">Enabling automatic dial is currently disabled by an administrator</p>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </TooltipProvider>
               </div>
               
               {/* Show status info */}
