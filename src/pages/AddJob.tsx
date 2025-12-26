@@ -14,6 +14,7 @@ import { ArrowLeft, Check, ChevronsUpDown, Plus, ChevronDown } from "lucide-reac
 import { useToast } from "@/hooks/use-toast";
 import { useProfile } from "@/hooks/useProfile";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useAdminSettings } from "@/hooks/useAdminSettings";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -229,6 +230,7 @@ export default function AddJob() {
   const navigate = useNavigate();
   const { profile } = useProfile();
   const { isAdmin, isManager, isTeamLeader } = useUserRole();
+  const { isJobCreationPaused, loading: adminSettingsLoading } = useAdminSettings();
   const [formData, setFormData] = useState({
     jobTitle: "",
     jobDescription: "",
@@ -1446,9 +1448,29 @@ export default function AddJob() {
           </DialogContent>
         </Dialog>
 
+        {/* Job Creation Lock Warning */}
+        {isJobCreationPaused && !isAdmin && (
+          <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-500/10 border border-amber-500/30">
+            <svg className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+              <h4 className="text-sm font-medium text-amber-500">Job Creation Temporarily Paused</h4>
+              <p className="text-sm text-muted-foreground mt-1">
+                An administrator has temporarily paused job creation. Please contact your admin if you need to create a new job.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Submit Buttons */}
         <div className="flex gap-4 pb-6">
-          <Button type="submit" disabled={isSubmitting} size="lg" className="px-8">
+          <Button 
+            type="submit" 
+            disabled={isSubmitting || (isJobCreationPaused && !isAdmin)} 
+            size="lg" 
+            className="px-8"
+          >
             {isSubmitting ? "Creating..." : "Create Job"}
           </Button>
           <Button type="button" variant="outline" onClick={() => navigate("/jobs")} size="lg" className="px-8">

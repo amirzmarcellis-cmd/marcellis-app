@@ -5,9 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { Settings as SettingsIcon, User, Bell, Shield } from 'lucide-react';
+import { Settings as SettingsIcon, User, Bell, Shield, AlertTriangle, Lock } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
 import { LinkedInConnection } from '@/components/settings/LinkedInConnection';
+import { useAdminSettings } from '@/hooks/useAdminSettings';
+import { Badge } from '@/components/ui/badge';
 
 export default function Settings() {
   const { profile, updateProfile, refetch } = useProfile();
@@ -152,33 +154,99 @@ export default function Settings() {
       </Card>
 
       {/* System Settings (Admin Only) */}
-      {profile?.is_admin && (
-        <Card className="max-w-full overflow-hidden">
-          <CardHeader className="p-4 sm:p-6">
-            <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl font-light">
-              <Shield className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-              System Settings
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-start sm:items-center justify-between gap-3 min-w-0">
-              <div className="flex-1 min-w-0">
-                <Label className="text-sm sm:text-base font-light">Automatic Dialing</Label>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 break-words">
-                  Enable automatic dialing for candidates
-                </p>
-              </div>
-              <Switch
-                checked={formData.automaticDial}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, automaticDial: checked })
-                }
-                className="flex-shrink-0"
-              />
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <AdminSystemSettings />
     </div>
+  );
+}
+
+function AdminSystemSettings() {
+  const { profile } = useProfile();
+  const { 
+    isJobCreationPaused, 
+    isAutomaticDialPaused, 
+    updateSetting, 
+    loading 
+  } = useAdminSettings();
+
+  // Only show for admins
+  if (!profile?.is_admin) {
+    return null;
+  }
+
+  return (
+    <Card className="max-w-full overflow-hidden border-amber-500/30">
+      <CardHeader className="p-4 sm:p-6">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl font-light">
+          <Shield className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+          Admin Controls
+          <Badge variant="outline" className="ml-2 text-xs border-amber-500/50 text-amber-500">
+            Admin Only
+          </Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-4 sm:p-6 space-y-4">
+        {/* Pause Job Creation */}
+        <div className="flex items-start sm:items-center justify-between gap-3 min-w-0 p-3 rounded-lg bg-muted/50">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <Lock className="h-4 w-4 text-amber-500 flex-shrink-0" />
+              <Label className="text-sm sm:text-base font-light">Pause Job Creation</Label>
+              {isJobCreationPaused && (
+                <Badge className="bg-amber-500/20 text-amber-500 border-amber-500/30">
+                  Active
+                </Badge>
+              )}
+            </div>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 break-words">
+              When enabled, non-admin users cannot create new jobs
+            </p>
+          </div>
+          <Switch
+            checked={isJobCreationPaused}
+            onCheckedChange={(checked) => updateSetting('pause_job_creation', checked)}
+            disabled={loading}
+            className="flex-shrink-0"
+          />
+        </div>
+
+        {/* Pause Automatic Dialing */}
+        <div className="flex items-start sm:items-center justify-between gap-3 min-w-0 p-3 rounded-lg bg-muted/50">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <Lock className="h-4 w-4 text-amber-500 flex-shrink-0" />
+              <Label className="text-sm sm:text-base font-light">Pause Automatic Dialing</Label>
+              {isAutomaticDialPaused && (
+                <Badge className="bg-amber-500/20 text-amber-500 border-amber-500/30">
+                  Active
+                </Badge>
+              )}
+            </div>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 break-words">
+              When enabled, non-admin users cannot enable automatic dial on jobs
+            </p>
+          </div>
+          <Switch
+            checked={isAutomaticDialPaused}
+            onCheckedChange={(checked) => updateSetting('pause_automatic_dial', checked)}
+            disabled={loading}
+            className="flex-shrink-0"
+          />
+        </div>
+
+        {/* Warning when locks are active */}
+        {(isJobCreationPaused || isAutomaticDialPaused) && (
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
+            <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
+            <p className="text-xs sm:text-sm text-amber-500">
+              {isJobCreationPaused && isAutomaticDialPaused
+                ? 'Both job creation and automatic dialing are currently locked for all non-admin users.'
+                : isJobCreationPaused
+                ? 'Job creation is currently locked for all non-admin users.'
+                : 'Automatic dialing is currently locked for all non-admin users.'}
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
