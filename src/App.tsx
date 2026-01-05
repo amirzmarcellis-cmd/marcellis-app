@@ -102,7 +102,7 @@ const App = () => (
                     </ProtectedRoute>
                   } />
                   <Route path="/active-jobs-analytics" element={
-                    <ProtectedRoute requiresAnalytics={true}>
+                    <ProtectedRoute requiresJobsAnalytics={true}>
                       <DashboardLayout><ActiveJobsAnalytics /></DashboardLayout>
                     </ProtectedRoute>
                   } />
