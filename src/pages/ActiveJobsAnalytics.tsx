@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Briefcase, Users, Search, TrendingUp, CheckCircle, XCircle, Send, ListChecks, CalendarIcon, X, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Briefcase, Users, Search, TrendingUp, CheckCircle, XCircle, Send, ListChecks, CalendarIcon, X, ArrowUpDown, ArrowUp, ArrowDown, Download } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -435,6 +435,61 @@ export default function ActiveJobsAnalytics() {
 
   const isLoading = jobsLoading || metricsLoading || profilesLoading;
 
+  // Export to CSV function
+  const exportToCSV = () => {
+    let headers: string[];
+    let rows: string[][];
+    let filename: string;
+
+    if (activeTab === 'jobs') {
+      headers = ['Job Title', 'Recruiter', 'Longlisted', 'Shortlisted', 'Pending Action', 'Rejected', 'Submitted'];
+      rows = sortedJobs.map(job => [
+        job.job_title,
+        job.recruiter_name,
+        job.longlisted.toString(),
+        job.shortlisted.toString(),
+        job.pending_action.toString(),
+        job.rejected.toString(),
+        job.submitted.toString()
+      ]);
+      filename = 'jobs-analytics';
+    } else {
+      headers = ['Recruiter', 'Active Jobs', 'Longlisted', 'Shortlisted', 'Pending Action', 'Rejected', 'Submitted'];
+      rows = sortedRecruiters.map(r => [
+        r.recruiter_name,
+        r.active_jobs.toString(),
+        r.longlisted.toString(),
+        r.shortlisted.toString(),
+        r.pending_action.toString(),
+        r.rejected.toString(),
+        r.submitted.toString()
+      ]);
+      filename = 'recruiters-analytics';
+    }
+
+    // Add date range to filename if filtered
+    if (dateRange.from) {
+      filename += `_${format(dateRange.from, 'yyyy-MM-dd')}`;
+      if (dateRange.to) {
+        filename += `_to_${format(dateRange.to, 'yyyy-MM-dd')}`;
+      }
+    }
+
+    // Build CSV content with proper escaping
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+
+    // Trigger download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${filename}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
+
   return (
     <div className="min-h-screen p-4 md:p-6 space-y-6">
       {/* Header */}
@@ -606,6 +661,17 @@ export default function ActiveJobsAnalytics() {
               </Button>
             )}
           </div>
+
+          {/* Export CSV Button */}
+          <Button
+            variant="outline"
+            onClick={exportToCSV}
+            disabled={isLoading || (activeTab === 'jobs' ? sortedJobs.length === 0 : sortedRecruiters.length === 0)}
+            className="bg-card/50 border-border/50"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Export CSV
+          </Button>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
