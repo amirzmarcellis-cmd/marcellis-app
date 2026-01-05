@@ -9,6 +9,7 @@ interface ProtectedRouteProps {
   children: ReactNode;
   requiredRole?: UserRole;
   requiresAnalytics?: boolean;
+  requiresJobsAnalytics?: boolean;
   requiresUsersPanel?: boolean;
   fallbackPath?: string;
 }
@@ -17,12 +18,14 @@ export function ProtectedRoute({
   children, 
   requiredRole, 
   requiresAnalytics = false,
+  requiresJobsAnalytics = false,
   requiresUsersPanel = false,
   fallbackPath = '/' 
 }: ProtectedRouteProps) {
   const { 
     hasRole, 
-    canAccessAnalytics, 
+    canAccessAnalytics,
+    canAccessJobsAnalytics,
     canAccessUsersPanel, 
     loading 
   } = useUserRole();
@@ -41,6 +44,10 @@ export function ProtectedRoute({
       hasAccess = hasAccess && canAccessAnalytics;
     }
 
+    if (requiresJobsAnalytics) {
+      hasAccess = hasAccess && canAccessJobsAnalytics;
+    }
+
     if (requiresUsersPanel) {
       hasAccess = hasAccess && canAccessUsersPanel;
     }
@@ -50,10 +57,12 @@ export function ProtectedRoute({
     }
   }, [
     hasRole, 
-    canAccessAnalytics, 
+    canAccessAnalytics,
+    canAccessJobsAnalytics,
     canAccessUsersPanel, 
     requiredRole, 
-    requiresAnalytics, 
+    requiresAnalytics,
+    requiresJobsAnalytics,
     requiresUsersPanel, 
     loading, 
     navigate, 
@@ -80,6 +89,10 @@ export function ProtectedRoute({
 
   if (requiresAnalytics) {
     hasAccess = hasAccess && canAccessAnalytics;
+  }
+
+  if (requiresJobsAnalytics) {
+    hasAccess = hasAccess && canAccessJobsAnalytics;
   }
 
   if (requiresUsersPanel) {
