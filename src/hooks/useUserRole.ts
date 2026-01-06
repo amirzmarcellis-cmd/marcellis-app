@@ -81,7 +81,7 @@ export function useUserRole() {
   const canAccessJobsAnalytics = isAdmin || isManagement || isTeamLeader;
   const canAccessUsersPanel = isAdmin || isManagement;
   const canManageTeamMembers = isAdmin || isManagement || isTeamLeader;
-  const canCreateJobs = !isViewer;
+  const canCreateJobs = true; // All users can create jobs
 
   return {
     roles,

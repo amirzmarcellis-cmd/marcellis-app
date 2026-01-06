@@ -540,15 +540,13 @@ export function JobManagementPanel() {
             <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">Manage</span> Groups
           </Button>
-          {canCreateJobs && (
-            <Button 
-              onClick={() => navigate("/jobs/add")} 
-              className="action-button bg-gradient-primary hover:shadow-glow font-light font-inter text-xs sm:text-sm flex-1 sm:flex-none"
-            >
-              <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              Create Job
-            </Button>
-          )}
+          <Button 
+            onClick={() => navigate("/jobs/add")} 
+            className="action-button bg-gradient-primary hover:shadow-glow font-light font-inter text-xs sm:text-sm flex-1 sm:flex-none"
+          >
+            <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            Create Job
+          </Button>
         </div>
       </div>
 
