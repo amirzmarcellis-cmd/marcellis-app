@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Briefcase, Users, Search, TrendingUp, CheckCircle, XCircle, Send, ListChecks, CalendarIcon, X, ArrowUpDown, ArrowUp, ArrowDown, Download } from "lucide-react";
+import { Briefcase, Users, Search, TrendingUp, CheckCircle, XCircle, Send, ListChecks, CalendarIcon, X, ArrowUpDown, ArrowUp, ArrowDown, Download, FileText } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -231,6 +231,37 @@ export default function ActiveJobsAnalytics() {
         rejected,
         submitted
       };
+    }
+  });
+
+  // Fetch contract type breakdown
+  const { data: contractTypeCounts, isLoading: contractTypeLoading } = useQuery({
+    queryKey: ['contract-type-counts', jobScope, dateRange.from?.toISOString(), dateRange.to?.toISOString()],
+    queryFn: async () => {
+      let query = supabase.from('Jobs').select('Type');
+      
+      if (jobScope === 'active') {
+        query = query.eq('Processed', 'Yes');
+      }
+      
+      if (dateRange.from) {
+        query = query.gte('Timestamp', format(dateRange.from, 'yyyy-MM-dd'));
+      }
+      if (dateRange.to) {
+        query = query.lte('Timestamp', format(dateRange.to, 'yyyy-MM-dd') + ' 23:59:59');
+      }
+      
+      const { data, error } = await query;
+      if (error) throw error;
+      
+      const counts = { permanent: 0, contract: 0 };
+      data?.forEach(job => {
+        const type = (job.Type || '').toLowerCase();
+        if (type === 'permanent') counts.permanent++;
+        else if (type === 'contract') counts.contract++;
+      });
+      
+      return counts;
     }
   });
 
@@ -1010,6 +1041,107 @@ export default function ActiveJobsAnalytics() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Contract Type Breakdown */}
+      <Card className="bg-card/50 backdrop-blur-xl border-border/50">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg font-medium flex items-center gap-2">
+            <FileText className="w-5 h-5 text-primary" />
+            Contract Type Breakdown
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Permanent Jobs Card */}
+            <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                <span className="text-sm text-muted-foreground">Permanent</span>
+              </div>
+              {contractTypeLoading ? (
+                <Skeleton className="h-9 w-16" />
+              ) : (
+                <>
+                  <p className="text-3xl font-light text-emerald-500">
+                    {contractTypeCounts?.permanent ?? 0}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {calculatePercentage(
+                      contractTypeCounts?.permanent ?? 0,
+                      (contractTypeCounts?.permanent ?? 0) + (contractTypeCounts?.contract ?? 0)
+                    )} of total
+                  </p>
+                </>
+              )}
+            </div>
+            
+            {/* Contract Jobs Card */}
+            <div className="p-4 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-500/20">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-3 h-3 rounded-full bg-blue-500" />
+                <span className="text-sm text-muted-foreground">Contract</span>
+              </div>
+              {contractTypeLoading ? (
+                <Skeleton className="h-9 w-16" />
+              ) : (
+                <>
+                  <p className="text-3xl font-light text-blue-500">
+                    {contractTypeCounts?.contract ?? 0}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {calculatePercentage(
+                      contractTypeCounts?.contract ?? 0,
+                      (contractTypeCounts?.permanent ?? 0) + (contractTypeCounts?.contract ?? 0)
+                    )} of total
+                  </p>
+                </>
+              )}
+            </div>
+            
+            {/* Visual Distribution Bar */}
+            <div className="p-4 rounded-xl bg-muted/30 border border-border/50">
+              <span className="text-sm text-muted-foreground">Distribution</span>
+              {contractTypeLoading ? (
+                <div className="mt-3 space-y-3">
+                  <Skeleton className="h-5 w-full" />
+                  <Skeleton className="h-5 w-full" />
+                </div>
+              ) : (
+                <div className="mt-3 space-y-3">
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-emerald-400">Permanent</span>
+                      <span className="text-muted-foreground">{contractTypeCounts?.permanent ?? 0}</span>
+                    </div>
+                    <div className="h-4 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                        style={{ 
+                          width: `${((contractTypeCounts?.permanent ?? 0) / Math.max((contractTypeCounts?.permanent ?? 0) + (contractTypeCounts?.contract ?? 0), 1)) * 100}%` 
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-blue-400">Contract</span>
+                      <span className="text-muted-foreground">{contractTypeCounts?.contract ?? 0}</span>
+                    </div>
+                    <div className="h-4 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                        style={{ 
+                          width: `${((contractTypeCounts?.contract ?? 0) / Math.max((contractTypeCounts?.permanent ?? 0) + (contractTypeCounts?.contract ?? 0), 1)) * 100}%` 
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
