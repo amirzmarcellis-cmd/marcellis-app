@@ -205,10 +205,10 @@ export function JobManagementPanel() {
           console.log(`JobManagementPanel: Job "${job.job_title}" longlisted count: ${longlisted_count}`);
         }
 
-        // Shortlisted: only longlisted candidates with score >= 74 (matches JobFunnel exactly)
+        // Shortlisted: candidates with score >= 75 (unified definition)
         const shortlisted_count = longlistedCandidates.filter(c => {
           const score = parseInt(c.after_call_score || "0");
-          return score >= 74;
+          return score >= 75;
         }).length;
 
         // Rejected: longlisted candidates with contacted status = 'Rejected'

@@ -15,11 +15,8 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
   
   // Memoize the counts calculation to avoid recalculating on every render
   const counts = useMemo(() => {
-    // Only count Itris and LinkedIn candidates (matching AI Longlist tab logic)
-    const longlistedCandidates = candidates.filter(c => {
-      const source = (c["Source"] || c.source || "").toLowerCase();
-      return source.includes("itris") || source.includes("linkedin");
-    });
+    // Count all candidates regardless of source (unified with job card)
+    const longlistedCandidates = candidates;
     
     const longlist = longlistedCandidates.length;
     
