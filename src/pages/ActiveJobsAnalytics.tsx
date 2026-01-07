@@ -192,40 +192,40 @@ export default function ActiveJobsAnalytics() {
       
       const jobIds = scopedJobs.map(j => j.job_id);
       
-      // Helper function to calculate overall score
-      const calculateOverallScore = (c: any) => {
-        const afterCallScore = parseFloat(c.after_call_score) || 0;
-        const cvScore = parseFloat(c.cv_score) || 0;
-        const linkedInScore = parseFloat(c.linkedin_score) || 0;
-        const source = (c.source || "").toLowerCase();
-        const isLinkedInSource = source.includes('linkedin');
-        const secondScore = isLinkedInSource ? linkedInScore : cvScore;
-        
-        if (afterCallScore > 0 && secondScore > 0) {
-          return Math.round((afterCallScore + secondScore) / 2);
-        } else if (secondScore > 0) {
-          return secondScore;
-        } else if (afterCallScore > 0) {
-          return afterCallScore;
-        }
-        return 0;
-      };
-
-      // Fetch all candidates for these jobs to calculate overall scores
-      const { data: allCandidates } = await supabase
-        .from('Jobs_CVs')
-        .select('after_call_score, cv_score, linkedin_score, source, contacted')
-        .in('job_id', jobIds);
+      // Execute all count queries in parallel for performance
+      const [longlistedResult, shortlistedResult, rejectedResult, submittedResult] = await Promise.all([
+        // Total candidates (longlisted)
+        supabase
+          .from('Jobs_CVs')
+          .select('*', { count: 'exact', head: true })
+          .in('job_id', jobIds),
+        // Shortlisted (after_call_score >= 74)
+        supabase
+          .from('Jobs_CVs')
+          .select('*', { count: 'exact', head: true })
+          .in('job_id', jobIds)
+          .gte('after_call_score', 74),
+        // Rejected
+        supabase
+          .from('Jobs_CVs')
+          .select('*', { count: 'exact', head: true })
+          .in('job_id', jobIds)
+          .eq('contacted', 'Rejected'),
+        // Submitted
+        supabase
+          .from('Jobs_CVs')
+          .select('*', { count: 'exact', head: true })
+          .in('job_id', jobIds)
+          .eq('contacted', 'Submitted')
+      ]);
       
-      const candidates = allCandidates || [];
-      const longlisted = candidates.length;
-      const shortlisted = candidates.filter(c => calculateOverallScore(c) >= 75).length;
-      const rejected = candidates.filter(c => (c.contacted || '').trim() === 'Rejected').length;
-      const submitted = candidates.filter(c => (c.contacted || '').trim() === 'Submitted').length;
+      const shortlisted = shortlistedResult.count || 0;
+      const rejected = rejectedResult.count || 0;
+      const submitted = submittedResult.count || 0;
       
       return {
         jobs: scopedJobs.length,
-        longlisted,
+        longlisted: longlistedResult.count || 0,
         shortlisted,
         pending_action: shortlisted - (rejected + submitted),
         rejected,
@@ -265,46 +265,25 @@ export default function ActiveJobsAnalytics() {
     }
   });
 
-  // Fetch per-job metrics - need to calculate overall score in JS
+  // Fetch per-job metrics directly from database for accuracy
   const { data: jobMetrics, isLoading: metricsLoading } = useQuery({
     queryKey: ['jobs-metrics-db', jobScope, jobs?.map(j => j.job_id)],
     queryFn: async () => {
       if (!jobs || jobs.length === 0) return new Map<string, { longlisted: number; shortlisted: number; rejected: number; submitted: number }>();
       
-      // Helper function to calculate overall score
-      const calculateOverallScore = (c: any) => {
-        const afterCallScore = parseFloat(c.after_call_score) || 0;
-        const cvScore = parseFloat(c.cv_score) || 0;
-        const linkedInScore = parseFloat(c.linkedin_score) || 0;
-        const source = (c.source || "").toLowerCase();
-        const isLinkedInSource = source.includes('linkedin');
-        const secondScore = isLinkedInSource ? linkedInScore : cvScore;
-        
-        if (afterCallScore > 0 && secondScore > 0) {
-          return Math.round((afterCallScore + secondScore) / 2);
-        } else if (secondScore > 0) {
-          return secondScore;
-        } else if (afterCallScore > 0) {
-          return afterCallScore;
-        }
-        return 0;
-      };
-
-      // Fetch all candidates for each job and calculate metrics
+      // Execute count queries for each job in parallel
       const metricsPromises = jobs.map(async (job) => {
-        const [candidatesRes, rejectedRes, submittedRes] = await Promise.all([
-          supabase.from('Jobs_CVs').select('after_call_score, cv_score, linkedin_score, source').eq('job_id', job.job_id),
+        const [longlistedRes, shortlistedRes, rejectedRes, submittedRes] = await Promise.all([
+          supabase.from('Jobs_CVs').select('*', { count: 'exact', head: true }).eq('job_id', job.job_id),
+          supabase.from('Jobs_CVs').select('*', { count: 'exact', head: true }).eq('job_id', job.job_id).gte('after_call_score', 74),
           supabase.from('Jobs_CVs').select('*', { count: 'exact', head: true }).eq('job_id', job.job_id).eq('contacted', 'Rejected'),
           supabase.from('Jobs_CVs').select('*', { count: 'exact', head: true }).eq('job_id', job.job_id).eq('contacted', 'Submitted')
         ]);
         
-        const candidates = candidatesRes.data || [];
-        const shortlisted = candidates.filter(c => calculateOverallScore(c) >= 75).length;
-        
         return {
           job_id: job.job_id,
-          longlisted: candidates.length,
-          shortlisted,
+          longlisted: longlistedRes.count || 0,
+          shortlisted: shortlistedRes.count || 0,
           rejected: rejectedRes.count || 0,
           submitted: submittedRes.count || 0
         };

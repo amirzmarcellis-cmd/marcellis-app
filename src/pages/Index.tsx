@@ -223,7 +223,7 @@ export default function Index() {
         const {
           data,
           error
-        } = await supabase.from('Jobs_CVs').select('job_id, recordid, cv_score, after_call_score, linkedin_score, shortlisted_at, contacted, candidate_name, candidate_email, candidate_phone_number, call_summary, lastcalltime, user_id, source, submitted_at, salary_expectations').in('job_id', jobIds).limit(1000); // Reduced from 5000 to 1000 for faster loading
+        } = await supabase.from('Jobs_CVs').select('job_id, recordid, cv_score, after_call_score, shortlisted_at, contacted, candidate_name, candidate_email, candidate_phone_number, call_summary, lastcalltime, user_id, source, submitted_at, salary_expectations').in('job_id', jobIds).limit(1000); // Reduced from 5000 to 1000 for faster loading
         jobsCvsData = data || [];
         jobsCvsError = error;
       }
@@ -269,25 +269,6 @@ export default function Index() {
       setJobs(activeJobs);
       setCvData(cvs);
 
-      // Helper function to calculate overall score (average of after_call_score and cv_score/linkedin_score)
-      const calculateOverallScore = (c: any) => {
-        const afterCallScore = parseFloat(c.after_call_score) || 0;
-        const cvScore = parseFloat(c.cv_score) || 0;
-        const linkedInScore = parseFloat(c.linkedin_score) || 0;
-        const source = (c.source || "").toLowerCase();
-        const isLinkedInSource = source.includes('linkedin');
-        const secondScore = isLinkedInSource ? linkedInScore : cvScore;
-        
-        if (afterCallScore > 0 && secondScore > 0) {
-          return Math.round((afterCallScore + secondScore) / 2);
-        } else if (secondScore > 0) {
-          return secondScore;
-        } else if (afterCallScore > 0) {
-          return afterCallScore;
-        }
-        return 0;
-      };
-
       // Per-job stats (for Active Jobs Funnel)
       const stats: Record<string, any> = {};
       activeJobs.forEach((job: any) => {
@@ -296,7 +277,7 @@ export default function Index() {
         const cvsForJob = cvs.filter((cv: any) => jobLinks.some((jc: any) => jc.Candidate_ID === cv.candidate_id));
         stats[jobId] = {
           longlist: jobLinks.length,
-          shortlist: jobLinks.filter((jc: any) => calculateOverallScore(jc) >= 75).length,
+          shortlist: jobLinks.filter((jc: any) => jc.shortlisted_at !== null).length,
           contacted: jobLinks.filter((jc: any) => jc.contacted && ['contacted', 'call done'].includes(jc.contacted.toLowerCase())).length,
           lowScored: jobLinks.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase() === 'low scored').length,
           submittedCv: jobLinks.filter((jc: any) => jc.contacted && jc.contacted.toLowerCase() === 'submitted').length,
@@ -305,12 +286,20 @@ export default function Index() {
       });
       setJobStats(stats);
 
-      // Calculate total shortlisted, submitted, and rejected counts
-      // Shortlisted: overall score >= 75
-      const totalShortlisted = links.filter((jc: any) => calculateOverallScore(jc) >= 75).length;
+      // Calculate total shortlisted, submitted, and rejected counts (case-insensitive)
+      // Shortlisted: Call Done with score >= 75
+      const totalShortlisted = links.filter((jc: any) => 
+        jc.contacted?.toLowerCase() === 'call done' && 
+        jc.after_call_score !== null && 
+        parseInt(jc.after_call_score?.toString() || '0') >= 75
+      ).length;
       
-      // Longlisted: overall score < 75
-      const totalLonglisted = links.filter((jc: any) => calculateOverallScore(jc) < 75).length;
+      // Longlisted: Call Done with score < 75
+      const totalLonglisted = links.filter((jc: any) => 
+        jc.contacted?.toLowerCase() === 'call done' && 
+        jc.after_call_score !== null && 
+        parseInt(jc.after_call_score?.toString() || '0') < 75
+      ).length;
       
       // Submitted: submitted_at is not null
       const totalSubmitted = links.filter((jc: any) => jc.submitted_at !== null).length;

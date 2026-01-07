@@ -2994,13 +2994,13 @@ mainCandidate["linkedin_score_reason"] ? (
     return cvRecord?.["CandidateStatus"] || null;
   };
 
-  // Short list candidates (overall score >= 75) sorted by Overall Score descending
+  // Short list candidates (after_call_score >= 74) sorted by Overall Score descending
   // Exclude rejected candidates from the main list
   const shortListCandidates = candidates
     .filter((candidate) => {
-      const overallScore = calculateOverallScore(candidate);
+      const score = parseFloat(candidate.after_call_score || "0");
       const isRejected = candidate["Contacted"] === "Rejected";
-      return overallScore >= 75 && !isRejected;
+      return score >= 74 && !isRejected;
     })
     .sort((a, b) => {
       const overallScoreA = calculateOverallScore(a);
@@ -3008,12 +3008,12 @@ mainCandidate["linkedin_score_reason"] ? (
       return overallScoreB - overallScoreA; // Sort highest score first
     });
 
-  // Rejected candidates (overall score >= 75 AND Contacted === "Rejected")
+  // Rejected candidates (after_call_score >= 74 AND Contacted === "Rejected")
   const rejectedShortListCandidates = candidates
     .filter((candidate) => {
-      const overallScore = calculateOverallScore(candidate);
+      const score = parseFloat(candidate.after_call_score || "0");
       const isRejected = candidate["Contacted"] === "Rejected";
-      return overallScore >= 75 && isRejected;
+      return score >= 74 && isRejected;
     })
     .sort((a, b) => {
       const overallScoreA = calculateOverallScore(a);
