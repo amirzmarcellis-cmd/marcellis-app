@@ -205,12 +205,30 @@ export function JobManagementPanel() {
           console.log(`JobManagementPanel: Job "${job.job_title}" longlisted count: ${longlisted_count}`);
         }
 
-        // Shortlisted: only Itris/LinkedIn candidates with score >= 74 AND not rejected (matches JobFunnel exactly)
+        // Helper function to calculate overall score (average of after_call_score and cv_score/linkedin_score)
+        const calculateOverallScore = (c: any) => {
+          const afterCallScore = parseFloat(c.after_call_score) || 0;
+          const cvScore = parseFloat(c.cv_score) || 0;
+          const linkedInScore = parseFloat(c.linkedin_score) || 0;
+          const source = (c.source || "").toLowerCase();
+          const isLinkedInSource = source.includes('linkedin');
+          const secondScore = isLinkedInSource ? linkedInScore : cvScore;
+          
+          if (afterCallScore > 0 && secondScore > 0) {
+            return Math.round((afterCallScore + secondScore) / 2);
+          } else if (secondScore > 0) {
+            return secondScore;
+          } else if (afterCallScore > 0) {
+            return afterCallScore;
+          }
+          return 0;
+        };
+
+        // Shortlisted: only Itris/LinkedIn candidates with overall score >= 75
         const shortlisted_count = longlistedCandidates.filter(c => {
           const source = (c.source || "").toLowerCase();
           const isItrisOrLinkedIn = source.includes("itris") || source.includes("linkedin");
-          const score = parseInt(c.after_call_score || "0");
-          return isItrisOrLinkedIn && score >= 75;
+          return isItrisOrLinkedIn && calculateOverallScore(c) >= 75;
         }).length;
 
         // Rejected: longlisted candidates with contacted status = 'Rejected'
