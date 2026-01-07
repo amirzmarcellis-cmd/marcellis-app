@@ -205,10 +205,13 @@ export function JobManagementPanel() {
           console.log(`JobManagementPanel: Job "${job.job_title}" longlisted count: ${longlisted_count}`);
         }
 
-        // Shortlisted: only longlisted candidates with score >= 74 (matches JobFunnel exactly)
+        // Shortlisted: only Itris/LinkedIn candidates with score >= 74 AND not rejected (matches JobFunnel exactly)
         const shortlisted_count = longlistedCandidates.filter(c => {
+          const source = (c.source || "").toLowerCase();
+          const isItrisOrLinkedIn = source.includes("itris") || source.includes("linkedin");
           const score = parseInt(c.after_call_score || "0");
-          return score >= 74;
+          const isRejected = (c.contacted || "").trim() === "Rejected";
+          return isItrisOrLinkedIn && score >= 74 && !isRejected;
         }).length;
 
         // Rejected: longlisted candidates with contacted status = 'Rejected'
