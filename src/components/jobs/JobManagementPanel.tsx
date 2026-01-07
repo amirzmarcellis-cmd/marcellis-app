@@ -211,7 +211,7 @@ export function JobManagementPanel() {
           const isItrisOrLinkedIn = source.includes("itris") || source.includes("linkedin");
           const score = parseInt(c.after_call_score || "0");
           const isRejected = (c.contacted || "").trim() === "Rejected";
-          return isItrisOrLinkedIn && score >= 74 && !isRejected;
+          return isItrisOrLinkedIn && score >= 75 && !isRejected;
         }).length;
 
         // Rejected: longlisted candidates with contacted status = 'Rejected'

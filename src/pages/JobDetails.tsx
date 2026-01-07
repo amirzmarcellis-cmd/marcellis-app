@@ -3000,7 +3000,7 @@ mainCandidate["linkedin_score_reason"] ? (
     .filter((candidate) => {
       const score = parseFloat(candidate.after_call_score || "0");
       const isRejected = candidate["Contacted"] === "Rejected";
-      return score >= 74 && !isRejected;
+      return score >= 75 && !isRejected;
     })
     .sort((a, b) => {
       const overallScoreA = calculateOverallScore(a);
@@ -3013,7 +3013,7 @@ mainCandidate["linkedin_score_reason"] ? (
     .filter((candidate) => {
       const score = parseFloat(candidate.after_call_score || "0");
       const isRejected = candidate["Contacted"] === "Rejected";
-      return score >= 74 && isRejected;
+      return score >= 75 && isRejected;
     })
     .sort((a, b) => {
       const overallScoreA = calculateOverallScore(a);
