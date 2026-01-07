@@ -199,12 +199,12 @@ export default function ActiveJobsAnalytics() {
           .from('Jobs_CVs')
           .select('*', { count: 'exact', head: true })
           .in('job_id', jobIds),
-        // Shortlisted (after_call_score >= 74)
+        // Shortlisted (after_call_score >= 75)
         supabase
           .from('Jobs_CVs')
           .select('*', { count: 'exact', head: true })
           .in('job_id', jobIds)
-          .gte('after_call_score', 74),
+          .gte('after_call_score', 75),
         // Rejected
         supabase
           .from('Jobs_CVs')

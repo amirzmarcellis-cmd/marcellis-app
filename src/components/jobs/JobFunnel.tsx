@@ -53,7 +53,7 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
       }
       
       // Count shortlist candidates (score >= 74 AND not rejected)
-      if (score >= 74 && contacted !== "Rejected") {
+      if (score >= 75 && contacted !== "Rejected") {
         acc.shortlist++;
       }
       
