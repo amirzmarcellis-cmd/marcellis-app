@@ -52,8 +52,8 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
           break;
       }
       
-      // Count shortlist candidates (score >= 74)
-      if (score >= 74) {
+      // Count shortlist candidates (score >= 75) - unified definition
+      if (score >= 75) {
         acc.shortlist++;
       }
       
