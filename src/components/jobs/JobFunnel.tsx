@@ -13,6 +13,25 @@ interface JobFunnelProps {
 export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
   const isMobile = useIsMobile();
   
+  // Helper function to calculate overall score (average of after_call_score and cv_score/linkedin_score)
+  const calculateOverallScore = (c: any) => {
+    const afterCallScore = parseFloat(c.after_call_score || c["after_call_score"]) || 0;
+    const cvScore = parseFloat(c.cv_score || c["cv_score"]) || 0;
+    const linkedInScore = parseFloat(c.linkedin_score || c["linkedin_score"]) || 0;
+    const source = (c["Source"] || c.source || "").toLowerCase();
+    const isLinkedInSource = source.includes('linkedin');
+    const secondScore = isLinkedInSource ? linkedInScore : cvScore;
+    
+    if (afterCallScore > 0 && secondScore > 0) {
+      return Math.round((afterCallScore + secondScore) / 2);
+    } else if (secondScore > 0) {
+      return secondScore;
+    } else if (afterCallScore > 0) {
+      return afterCallScore;
+    }
+    return 0;
+  };
+
   // Memoize the counts calculation to avoid recalculating on every render
   const counts = useMemo(() => {
     // Only count Itris and LinkedIn candidates (matching AI Longlist tab logic)
@@ -26,7 +45,6 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
     // Use reduce for better performance with single pass through data
     const statusCounts = longlistedCandidates.reduce((acc, c) => {
       const contacted = c["contacted"];
-      const score = parseInt(c["after_call_score"] || "0");
       
       switch (contacted) {
         case "1st No Answer":
@@ -52,8 +70,9 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
           break;
       }
       
-      // Count shortlist candidates (score >= 75)
-      if (score >= 75) {
+      // Count shortlist candidates (overall score >= 75)
+      const overallScore = calculateOverallScore(c);
+      if (overallScore >= 75) {
         acc.shortlist++;
       }
       
