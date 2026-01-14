@@ -19,7 +19,7 @@ import { useUserRole } from "@/hooks/useUserRole"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 
-// Currency conversion to SAR
+// Currency conversion rates (relative to SAR)
 const CURRENCY_TO_SAR: Record<string, number> = {
   SAR: 1,
   AED: 1.02,
@@ -31,8 +31,15 @@ const CURRENCY_TO_SAR: Record<string, number> = {
   EGP: 0.076,
 };
 
-const convertToSAR = (amount: number, sourceCurrency: string) =>
-  Math.round(amount * (CURRENCY_TO_SAR[sourceCurrency.toUpperCase()] || 1));
+// Convert between any two currencies using SAR as intermediate
+const convertCurrency = (amount: number, fromCurrency: string, toCurrency: string) => {
+  const from = fromCurrency.toUpperCase();
+  const to = toCurrency.toUpperCase();
+  if (from === to) return amount;
+  const sarAmount = amount * (CURRENCY_TO_SAR[from] || 1);
+  const targetRate = CURRENCY_TO_SAR[to] || 1;
+  return Math.round(sarAmount / targetRate);
+};
 
 // Existing interface
 interface CallLogDetail {
@@ -70,6 +77,7 @@ interface CallLogDetail {
   comm_score: string | null
   nationality: string | null
   cv_link: string | null
+  job_currency: string | null
 }
 
 export default function CallLogDetails() {
@@ -197,11 +205,11 @@ export default function CallLogDetails() {
 
       console.log('Raw data from database:', data);
 
-      // Fetch job data
+      // Fetch job data including Currency
       const jobIdForLookup = data.job_id || jobId
       const { data: jobData } = await supabase
         .from('Jobs')
-        .select('job_title')
+        .select('job_title, Currency')
         .eq('job_id', jobIdForLookup)
         .maybeSingle()
 
@@ -279,7 +287,8 @@ export default function CallLogDetails() {
         comm_summary: data.comm_summary,
         comm_score: data.comm_score?.toString(),
         nationality: data.nationality,
-        cv_link: cvLink
+        cv_link: cvLink,
+        job_currency: jobData?.Currency || 'SAR'
       }
 
       console.log('Enriched data:', enrichedData);
@@ -695,8 +704,9 @@ export default function CallLogDetails() {
                   ? (() => {
                       const amt = parseInt(String(callLog.current_salary), 10);
                       if (isNaN(amt)) return callLog.current_salary;
-                      const sar = convertToSAR(amt, 'PKR');
-                      return `SAR ${sar.toLocaleString()}`;
+                      const jobCurrency = callLog.job_currency || 'SAR';
+                      const converted = convertCurrency(amt, 'PKR', jobCurrency);
+                      return `${jobCurrency} ${converted.toLocaleString()}`;
                     })()
                   : 'N/A'}
               </p>
@@ -710,21 +720,22 @@ export default function CallLogDetails() {
                       const numbers = str.match(/\d+/g)?.map((n) => parseInt(n, 10)) || [];
                       const currencyMatch = str.match(/aed|sar|usd|eur|gbp|inr|pkr|egp/gi);
                       const src = (currencyMatch?.[0] || 'SAR').toUpperCase();
-                      const toSar = (val: number) => convertToSAR(val, src);
-                      if (numbers.length === 0) return `SAR ${str}`;
+                      const jobCurrency = callLog.job_currency || 'SAR';
+                      const toJobCurrency = (val: number) => convertCurrency(val, src, jobCurrency);
+                      if (numbers.length === 0) return `${jobCurrency} ${str}`;
                       if (numbers.length >= 2) {
-                        const minSar = toSar(numbers[0]).toLocaleString();
-                        const maxSar = toSar(numbers[1]).toLocaleString();
-                        if (src !== 'SAR') {
-                          return `SAR ${minSar} - ${maxSar} (from ${src} ${numbers[0].toLocaleString()} - ${numbers[1].toLocaleString()})`;
+                        const minConverted = toJobCurrency(numbers[0]).toLocaleString();
+                        const maxConverted = toJobCurrency(numbers[1]).toLocaleString();
+                        if (src !== jobCurrency) {
+                          return `${jobCurrency} ${minConverted} - ${maxConverted} (from ${src} ${numbers[0].toLocaleString()} - ${numbers[1].toLocaleString()})`;
                         }
-                        return `SAR ${numbers[0].toLocaleString()} - ${numbers[1].toLocaleString()}`;
+                        return `${jobCurrency} ${numbers[0].toLocaleString()} - ${numbers[1].toLocaleString()}`;
                       } else {
-                        const sarVal = toSar(numbers[0]).toLocaleString();
-                        if (src !== 'SAR') {
-                          return `SAR ${sarVal} (from ${src} ${numbers[0].toLocaleString()})`;
+                        const convertedVal = toJobCurrency(numbers[0]).toLocaleString();
+                        if (src !== jobCurrency) {
+                          return `${jobCurrency} ${convertedVal} (from ${src} ${numbers[0].toLocaleString()})`;
                         }
-                        return `SAR ${numbers[0].toLocaleString()}`;
+                        return `${jobCurrency} ${numbers[0].toLocaleString()}`;
                       }
                     })()
                   : 'N/A'}
