@@ -705,8 +705,8 @@ export default function CallLogDetails() {
                       const amt = parseInt(String(callLog.current_salary), 10);
                       if (isNaN(amt)) return callLog.current_salary;
                       const jobCurrency = callLog.job_currency || 'SAR';
-                      const converted = convertCurrency(amt, 'PKR', jobCurrency);
-                      return `${jobCurrency} ${converted.toLocaleString()}`;
+                      // Display directly in job currency - no conversion needed
+                      return `${jobCurrency} ${amt.toLocaleString()}`;
                     })()
                   : 'N/A'}
               </p>
@@ -719,20 +719,21 @@ export default function CallLogDetails() {
                       const str = String(callLog.salary_expectations);
                       const numbers = str.match(/\d+/g)?.map((n) => parseInt(n, 10)) || [];
                       const currencyMatch = str.match(/aed|sar|usd|eur|gbp|inr|pkr|egp/gi);
-                      const src = (currencyMatch?.[0] || 'SAR').toUpperCase();
                       const jobCurrency = callLog.job_currency || 'SAR';
+                      // Default to job currency if no currency specified in the value
+                      const src = (currencyMatch?.[0] || jobCurrency).toUpperCase();
                       const toJobCurrency = (val: number) => convertCurrency(val, src, jobCurrency);
                       if (numbers.length === 0) return `${jobCurrency} ${str}`;
                       if (numbers.length >= 2) {
-                        const minConverted = toJobCurrency(numbers[0]).toLocaleString();
-                        const maxConverted = toJobCurrency(numbers[1]).toLocaleString();
                         if (src !== jobCurrency) {
+                          const minConverted = toJobCurrency(numbers[0]).toLocaleString();
+                          const maxConverted = toJobCurrency(numbers[1]).toLocaleString();
                           return `${jobCurrency} ${minConverted} - ${maxConverted} (from ${src} ${numbers[0].toLocaleString()} - ${numbers[1].toLocaleString()})`;
                         }
                         return `${jobCurrency} ${numbers[0].toLocaleString()} - ${numbers[1].toLocaleString()}`;
                       } else {
-                        const convertedVal = toJobCurrency(numbers[0]).toLocaleString();
                         if (src !== jobCurrency) {
+                          const convertedVal = toJobCurrency(numbers[0]).toLocaleString();
                           return `${jobCurrency} ${convertedVal} (from ${src} ${numbers[0].toLocaleString()})`;
                         }
                         return `${jobCurrency} ${numbers[0].toLocaleString()}`;
