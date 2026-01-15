@@ -16,15 +16,13 @@ import { StatusDropdown } from '@/components/candidates/StatusDropdown';
 import { useProfile } from '@/hooks/useProfile';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Play, Pause, Search, FileText, Upload, Users, Briefcase, Clock, Star, TrendingUp, Calendar, CheckCircle, XCircle, ClipboardList, Video, Target, Activity, Timer, Phone, UserCheck, Building2, UserX } from 'lucide-react';
+import { Plus, Play, Pause, Search, FileText, Upload, Users, Briefcase, Clock, Star, TrendingUp, Calendar, CheckCircle, XCircle, ClipboardList, Video, Target, Activity, Timer, Phone, UserCheck, Building2, UserX, RefreshCw, Zap, BarChart3, Percent } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'sonner';
-import { MetricCardPro } from '@/components/dashboard/MetricCardPro';
 import { ScoreRing } from '@/components/ui/ScoreRing';
-import { HeroHeader } from '@/components/dashboard/HeroHeader';
 import { BentoKpis } from '@/components/dashboard/BentoKpis';
-import { TiltCard } from '@/components/effects/TiltCard';
 import { ActivityTicker } from '@/components/dashboard/ActivityTicker';
+import { SimpleMetricCard } from '@/components/dashboard/SimpleMetricCard';
 interface DashboardData {
   totalCandidates: number;
   totalJobs: number;
@@ -580,12 +578,6 @@ export default function Index() {
       toast.error('Failed to hire candidate');
     }
   };
-  const getCurrentTimeGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
-  };
 
   // Filter candidates based on selected job
   // Helper function to get enriched candidates with job titles
@@ -622,52 +614,108 @@ export default function Index() {
           <h1 className="text-2xl font-bold">Admin Dashboard</h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <MetricCardPro title="Total Users" value="1" icon={Users} trend={[0, 0, 0, 0, 0]} />
-          <MetricCardPro title="System Health" value="100%" icon={Activity} trend={[100, 100, 100, 100, 100]} />
+          <SimpleMetricCard title="Total Users" value="1" icon={Users} />
+          <SimpleMetricCard title="System Health" value="100%" icon={Activity} />
         </div>
       </div>;
   }
+
+  const getCurrentTimeGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
+
   return <div className="min-h-screen bg-background text-foreground relative overflow-hidden mx-auto max-w-screen-2xl pb-20">
       
-      <div className="mb-4 sm:mb-6 lg:mb-8 relative z-10">
-        <div className="rounded-xl sm:rounded-2xl border border-border/50 bg-gradient-card backdrop-blur-xl p-4 sm:p-5 lg:p-6 shadow-card animate-fade-in">
-          <div className="mb-4">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-light text-foreground mb-1">
-              Mission Control
+      <div className="mb-6 sm:mb-8 relative z-10">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-light text-foreground">
+              {getCurrentTimeGreeting()}, {profile?.name?.split(' ')[0] || 'Commander'}
             </h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
-              Welcome back, {profile?.name || 'Commander'}. Your day at a glance.
+            <p className="text-sm text-muted-foreground">
+              {format(new Date(), 'EEEE, MMMM d, yyyy')}
             </p>
           </div>
+          <div className="text-sm text-muted-foreground flex items-center gap-2">
+            <span>Updated just now</span>
+            <RefreshCw className="h-4 w-4" />
+          </div>
+        </div>
 
-          <BentoKpis>
-            <TiltCard>
-              <div onClick={() => navigate('/jobs')} className="cursor-pointer">
-                <MetricCardPro title="Active Jobs" value={data?.totalJobs ?? 0} delta="+3 this week" icon={Briefcase} accent="primary" trend={[3, 5, 4, 6, 7, 8, 7, 9]} progress={Math.min(100, (data?.totalJobs ?? 0) * 12)} />
-              </div>
-            </TiltCard>
-            <TiltCard>
-              <div onClick={() => navigate('/live-feed')} className="cursor-pointer">
-                <MetricCardPro title="Waiting Review" value={highScoreActiveCount || 0} delta="-12%" icon={ClipboardList} accent="purple" trend={[12, 10, 11, 9, 8, 7, 8, 6]} progress={Math.min(100, highScoreActiveCount || 0)} className="border-2 border-primary/60 glow-cyan" />
-              </div>
-            </TiltCard>
-            <TiltCard>
-              <div onClick={() => navigate('/candidates')} className="cursor-pointer">
-                <MetricCardPro title="Shortlisted" value={totalShortlistedCount || 0} delta="+5%" icon={Users} accent="cyan" trend={[4, 5, 6, 7, 8, 9, 10, 11]} progress={Math.min(100, (totalShortlistedCount || 0) * 10)} />
-              </div>
-            </TiltCard>
-            <TiltCard>
-              <div onClick={() => navigate('/candidates')} className="cursor-pointer">
-                <MetricCardPro title="Rejected" value={totalRejectedCount || 0} delta="-3%" icon={UserX} accent="red" trend={[15, 14, 13, 12, 11, 10, 9, 8]} progress={Math.min(100, (totalRejectedCount || 0) * 5)} />
-              </div>
-            </TiltCard>
-            <TiltCard>
-              <div onClick={() => navigate('/candidates')} className="cursor-pointer">
-                <MetricCardPro title="Submitted" value={totalSubmittedCount || 0} delta="+2%" icon={CheckCircle} accent="emerald" trend={[2, 3, 4, 5, 6, 7, 8, 9]} progress={Math.min(100, (totalSubmittedCount || 0) * 8)} />
-              </div>
-            </TiltCard>
+        {/* Activity Ticker - moved above cards */}
+        <div className="mb-6">
+          <ActivityTicker items={candidates.slice(0, 10).map(c => `${c.candidate_name} • ${jobs.find(j => j.job_id === c.job_id)?.job_title || 'Unknown Job'} • Score: ${parseFloat(c.after_call_score) || parseFloat(c.cv_score) || 0}`)} />
+        </div>
+
+        {/* KPI Cards - Row 1: Key Counts */}
+        <div className="mb-4">
+          <BentoKpis columns={4}>
+            <SimpleMetricCard 
+              title="Active Jobs" 
+              value={data?.totalJobs ?? 0} 
+              delta="+3" 
+              deltaType="positive"
+              icon={Briefcase} 
+              onClick={() => navigate('/jobs')}
+            />
+            <SimpleMetricCard 
+              title="Shortlisted" 
+              value={totalShortlistedCount || 0} 
+              delta="+54%"
+              deltaType="positive"
+              icon={Users} 
+              onClick={() => navigate('/candidates')}
+            />
+            <SimpleMetricCard 
+              title="Submitted" 
+              value={totalSubmittedCount || 0} 
+              delta="+12%"
+              deltaType="positive"
+              icon={CheckCircle} 
+              onClick={() => navigate('/candidates')}
+            />
+            <SimpleMetricCard 
+              title="Interviews" 
+              value={data?.interviewsThisWeek ?? 0} 
+              delta="+8%"
+              deltaType="positive"
+              icon={Calendar} 
+              onClick={() => navigate('/interviews')}
+            />
           </BentoKpis>
         </div>
+
+        {/* KPI Cards - Row 2: Analytics with Sparklines */}
+        <BentoKpis columns={4}>
+          <SimpleMetricCard 
+            title="Pipeline Velocity" 
+            value={`${Math.round((totalSubmittedCount / Math.max(data?.totalCandidates || 1, 1)) * 100)}%`}
+            icon={Zap}
+            trend={[40, 45, 42, 48, 52, 58, 55, 62]}
+          />
+          <SimpleMetricCard 
+            title="Avg Time to Hire" 
+            value={`${data?.averageTimeToHire ?? 14}d`}
+            icon={Clock}
+            trend={[18, 17, 16, 15, 14, 14, 13, 14]}
+          />
+          <SimpleMetricCard 
+            title="Shortlist Rate" 
+            value={`${Math.round((totalShortlistedCount / Math.max(highScoreActiveCount || 1, 1)) * 100)}%`}
+            icon={BarChart3}
+            trend={[20, 25, 28, 32, 35, 38, 42, 45]}
+          />
+          <SimpleMetricCard 
+            title="Fill Rate" 
+            value={`${Math.round((totalSubmittedCount / Math.max(data?.totalJobs || 1, 1)) * 100)}%`}
+            icon={Percent}
+            trend={[15, 18, 22, 25, 28, 32, 35, 38]}
+          />
+        </BentoKpis>
       </div>
 
 
@@ -733,7 +781,6 @@ export default function Index() {
 
         {/* Right Side - Live Candidate Feed & Action Center - 60% width */}
         <div className="space-y-4 sm:space-y-5 lg:space-y-6 lg:col-span-2 order-1 lg:order-2">
-          <ActivityTicker items={enrichedCandidates.slice(0, 10).map(c => `${c.candidate_name} • ${c.job_title} • ${parseFloat(c.success_score) || 0}`)} />
           {/* Live Candidate Feed */}
           <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20">
             <CardHeader className="p-3 sm:p-4 lg:p-6">
