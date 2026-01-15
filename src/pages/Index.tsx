@@ -651,73 +651,45 @@ export default function Index() {
           <ActivityTicker items={candidates.slice(0, 10).map(c => `${c.candidate_name} • ${jobs.find(j => j.job_id === c.job_id)?.job_title || 'Unknown Job'} • Score: ${parseFloat(c.after_call_score) || parseFloat(c.cv_score) || 0}`)} />
         </div>
 
-        {/* KPI Cards - Row 1: Key Counts */}
-        <div className="mb-4">
-          <BentoKpis columns={4}>
-            <SimpleMetricCard 
-              title="Active Jobs" 
-              value={data?.totalJobs ?? 0} 
-              delta="+3" 
-              deltaType="positive"
-              icon={Briefcase} 
-              onClick={() => navigate('/jobs')}
-            />
-            <SimpleMetricCard 
-              title="Shortlisted" 
-              value={totalShortlistedCount || 0} 
-              delta="+54%"
-              deltaType="positive"
-              icon={Users} 
-              onClick={() => navigate('/candidates')}
-            />
-            <SimpleMetricCard 
-              title="Submitted" 
-              value={totalSubmittedCount || 0} 
-              delta="+12%"
-              deltaType="positive"
-              icon={CheckCircle} 
-              onClick={() => navigate('/candidates')}
-            />
-            <SimpleMetricCard 
-              title="Interviews" 
-              value={data?.interviewsThisWeek ?? 0} 
-              delta="+8%"
-              deltaType="positive"
-              icon={Calendar} 
-              onClick={() => navigate('/interviews')}
-            />
-          </BentoKpis>
-        </div>
-
-        {/* KPI Cards - Row 2: Analytics with Sparklines */}
-        <BentoKpis columns={4}>
+        {/* KPI Cards - Single Row: 5 Cards */}
+        <BentoKpis columns={5}>
           <SimpleMetricCard 
-            title="Pipeline Velocity" 
-            value={`${Math.round((totalSubmittedCount / Math.max(data?.totalCandidates || 1, 1)) * 100)}%`}
-            icon={Zap}
-            trend={[40, 45, 42, 48, 52, 58, 55, 62]}
+            title="Active Jobs" 
+            value={data?.totalJobs ?? 0} 
+            icon={Briefcase} 
+            trend={[40, 42, 38, 45, 48, 52, 50, 55]}
+            onClick={() => navigate('/jobs')}
           />
           <SimpleMetricCard 
-            title="Avg Time to Hire" 
-            value={`${data?.averageTimeToHire ?? 14}d`}
-            icon={Clock}
-            trend={[18, 17, 16, 15, 14, 14, 13, 14]}
+            title="Waiting Review" 
+            value={highScoreActiveCount || 0}
+            icon={ClipboardList} 
+            trend={[30, 32, 35, 33, 38, 40, 42, 45]}
+            onClick={() => navigate('/candidates')}
           />
           <SimpleMetricCard 
-            title="Shortlist Rate" 
-            value={`${Math.round((totalShortlistedCount / Math.max(highScoreActiveCount || 1, 1)) * 100)}%`}
-            icon={BarChart3}
+            title="Shortlisted" 
+            value={totalShortlistedCount || 0} 
+            icon={Users} 
             trend={[20, 25, 28, 32, 35, 38, 42, 45]}
+            onClick={() => navigate('/candidates')}
           />
           <SimpleMetricCard 
-            title="Fill Rate" 
-            value={`${Math.round((totalSubmittedCount / Math.max(data?.totalJobs || 1, 1)) * 100)}%`}
-            icon={Percent}
-            trend={[15, 18, 22, 25, 28, 32, 35, 38]}
+            title="Rejected" 
+            value={totalRejectedCount || 0}
+            icon={UserX}
+            trend={[15, 18, 22, 25, 28, 32, 35, 43]}
+            onClick={() => navigate('/candidates')}
+          />
+          <SimpleMetricCard 
+            title="Submitted" 
+            value={totalSubmittedCount || 0} 
+            icon={CheckCircle} 
+            trend={[10, 12, 15, 18, 20, 22, 25, 28]}
+            onClick={() => navigate('/candidates')}
           />
         </BentoKpis>
       </div>
-
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 relative z-10">
         {/* Left Side - Job Control Panels - 30% width */}
