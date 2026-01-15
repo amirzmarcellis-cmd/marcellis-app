@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 import { Sparkline } from "@/components/ui/Sparkline";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface AdvancedMetricCardProps {
   icon: LucideIcon;
@@ -16,6 +17,7 @@ interface AdvancedMetricCardProps {
   chartType?: "waveform" | "bell" | "line" | "none";
   trend?: number[];
   className?: string;
+  isLoading?: boolean;
 }
 
 // Simple bell curve SVG component
@@ -56,8 +58,32 @@ export function AdvancedMetricCard({
   chartType = "none",
   trend = [],
   className,
+  isLoading = false,
 }: AdvancedMetricCardProps) {
   const pct = typeof progress === "number" ? Math.max(0, Math.min(100, progress)) : undefined;
+
+  if (isLoading) {
+    return (
+      <Card
+        className={cn(
+          "relative overflow-hidden border border-border/30 bg-gradient-to-br from-gray-900/90 via-gray-900/80 to-gray-950/90 backdrop-blur-xl",
+          className
+        )}
+      >
+        <CardContent className="p-4 sm:p-5">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-7 w-7 rounded-md" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          </div>
+          <Skeleton className="h-10 w-20 mb-1" />
+          <Skeleton className="h-3 w-32 mb-3" />
+          <Skeleton className="h-1.5 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card

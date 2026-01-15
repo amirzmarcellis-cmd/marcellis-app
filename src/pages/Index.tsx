@@ -24,6 +24,7 @@ import { BentoKpis } from '@/components/dashboard/BentoKpis';
 import { ActivityTicker } from '@/components/dashboard/ActivityTicker';
 import { SimpleMetricCard } from '@/components/dashboard/SimpleMetricCard';
 import { AdvancedMetricCard } from '@/components/dashboard/AdvancedMetricCard';
+import { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
 interface DashboardData {
   totalCandidates: number;
   totalJobs: number;
@@ -60,6 +61,7 @@ export default function Index() {
     isTeamLeader,
     loading: rolesLoading
   } = useUserRole();
+  const { data: dashboardMetrics, isLoading: metricsLoading } = useDashboardMetrics();
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -697,36 +699,40 @@ export default function Index() {
         <AdvancedMetricCard
           icon={TrendingUp}
           title="Pipeline Velocity"
-          value={29}
-          subtitle="candidates moved (this week)"
-          delta="▼78%"
-          deltaType="negative"
+          value={dashboardMetrics?.pipelineVelocity.currentCount ?? 0}
+          subtitle="candidates shortlisted (last 30 days)"
+          delta={dashboardMetrics ? `${dashboardMetrics.pipelineVelocity.percentageChange >= 0 ? '▲' : '▼'}${Math.abs(dashboardMetrics.pipelineVelocity.percentageChange)}%` : undefined}
+          deltaType={dashboardMetrics?.pipelineVelocity.percentageChange >= 0 ? "positive" : "negative"}
           chartType="waveform"
-          trend={[40, 55, 45, 60, 50, 65, 55, 70, 60, 75]}
+          trend={[40, 55, 45, 60, 50, 65, 55, 70, 60, dashboardMetrics?.pipelineVelocity.currentCount ?? 75]}
+          isLoading={metricsLoading}
         />
         <AdvancedMetricCard
           icon={Clock}
           title="Avg Time to Hire"
-          value="— days"
-          subtitle="from first contact (6mo avg)"
+          value={dashboardMetrics?.avgTimeToHire.days !== null ? `${dashboardMetrics?.avgTimeToHire.days} days` : "— days"}
+          subtitle="from longlist to shortlist (submitted)"
           chartType="line"
+          isLoading={metricsLoading}
         />
         <AdvancedMetricCard
           icon={Target}
           title="Shortlist Rate"
-          value="15.7%"
-          benchmark="Industry benchmark: 12%"
-          progress={65}
+          value={`${dashboardMetrics?.shortlistRate.rate ?? 0}%`}
+          benchmark="Candidates with score ≥ 75"
+          progress={dashboardMetrics?.shortlistRate.rate ?? 0}
           chartType="bell"
+          isLoading={metricsLoading}
         />
         <AdvancedMetricCard
           icon={CheckCircle2}
           title="Fill Rate"
-          value="5/24"
+          value={`${dashboardMetrics?.fillRate.filledJobs ?? 0}/${dashboardMetrics?.fillRate.totalJobs ?? 0}`}
           subtitle="jobs filled (all jobs)"
-          delta="21%"
+          delta={dashboardMetrics ? `${dashboardMetrics.fillRate.percentage}%` : undefined}
           deltaType="positive"
-          progress={21}
+          progress={dashboardMetrics?.fillRate.percentage ?? 0}
+          isLoading={metricsLoading}
         />
       </div>
 
