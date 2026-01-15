@@ -14,6 +14,7 @@ import { ArrowLeft, Check, ChevronsUpDown, Plus, ChevronDown } from "lucide-reac
 import { useToast } from "@/hooks/use-toast";
 import { useProfile } from "@/hooks/useProfile";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useAdminSettings } from "@/hooks/useAdminSettings";
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -230,6 +231,7 @@ export default function AddJob() {
   const navigate = useNavigate();
   const { profile } = useProfile();
   const { isAdmin, isManager, isTeamLeader } = useUserRole();
+  const { isJobCreationPaused, loading: adminSettingsLoading } = useAdminSettings();
   
   const [formData, setFormData] = useState({
     jobTitle: "",
@@ -271,6 +273,14 @@ export default function AddJob() {
   const [selectedOptionalFields, setSelectedOptionalFields] = useState<string[]>([]);
   const [linkedInSearchEnabled, setLinkedInSearchEnabled] = useState(false);
   const [recruiterLinkedInId, setRecruiterLinkedInId] = useState<string | null>(null);
+
+  // Redirect non-admin users if job creation is paused (route protection)
+  useEffect(() => {
+    if (!adminSettingsLoading && !isAdmin && isJobCreationPaused) {
+      toast.error("Job creation is currently paused by admin");
+      navigate("/jobs");
+    }
+  }, [isAdmin, isJobCreationPaused, adminSettingsLoading, navigate]);
 
   useEffect(() => {
     // Auto-assign recruiter to current user for team members if not selected
