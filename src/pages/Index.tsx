@@ -16,13 +16,14 @@ import { StatusDropdown } from '@/components/candidates/StatusDropdown';
 import { useProfile } from '@/hooks/useProfile';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Play, Pause, Search, FileText, Upload, Users, Briefcase, Clock, Star, TrendingUp, Calendar, CheckCircle, XCircle, ClipboardList, Video, Target, Activity, Timer, Phone, UserCheck, Building2, UserX, RefreshCw, Zap, BarChart3, Percent } from 'lucide-react';
+import { Plus, Play, Pause, Search, FileText, Upload, Users, Briefcase, Clock, Star, TrendingUp, Calendar, CheckCircle, XCircle, ClipboardList, Video, Target, Activity, Timer, Phone, UserCheck, Building2, UserX, RefreshCw, Zap, BarChart3, Percent, CheckCircle2 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 import { ScoreRing } from '@/components/ui/ScoreRing';
 import { BentoKpis } from '@/components/dashboard/BentoKpis';
 import { ActivityTicker } from '@/components/dashboard/ActivityTicker';
 import { SimpleMetricCard } from '@/components/dashboard/SimpleMetricCard';
+import { AdvancedMetricCard } from '@/components/dashboard/AdvancedMetricCard';
 interface DashboardData {
   totalCandidates: number;
   totalJobs: number;
@@ -691,7 +692,45 @@ export default function Index() {
         </BentoKpis>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 relative z-10">
+      {/* Advanced Performance Metrics - 4 cards in a row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10 mt-6">
+        <AdvancedMetricCard
+          icon={TrendingUp}
+          title="Pipeline Velocity"
+          value={29}
+          subtitle="candidates moved (this week)"
+          delta="▼78%"
+          deltaType="negative"
+          chartType="waveform"
+          trend={[40, 55, 45, 60, 50, 65, 55, 70, 60, 75]}
+        />
+        <AdvancedMetricCard
+          icon={Clock}
+          title="Avg Time to Hire"
+          value="— days"
+          subtitle="from first contact (6mo avg)"
+          chartType="line"
+        />
+        <AdvancedMetricCard
+          icon={Target}
+          title="Shortlist Rate"
+          value="15.7%"
+          benchmark="Industry benchmark: 12%"
+          progress={65}
+          chartType="bell"
+        />
+        <AdvancedMetricCard
+          icon={CheckCircle2}
+          title="Fill Rate"
+          value="5/24"
+          subtitle="jobs filled (all jobs)"
+          delta="21%"
+          deltaType="positive"
+          progress={21}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 relative z-10 mt-6">
         {/* Left Side - Job Control Panels - 30% width */}
         <div className="space-y-3 sm:space-y-4 lg:col-span-1">
           <h2 className="text-base sm:text-lg font-bold font-work text-cyan-300 mb-3 sm:mb-4 flex items-center">
