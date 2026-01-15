@@ -452,7 +452,23 @@
 
   /* Marquee ticker */
   .marquee-row { @apply overflow-hidden whitespace-nowrap; }
-  .marquee-inner { @apply inline-block animate-marquee; }
+  .marquee-inner { 
+    @apply inline-flex gap-6;
+    animation: marquee 25s linear infinite;
+  }
+  .marquee-inner:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @keyframes parallax-pan {
+    0% { background-position: 0 0, 0 0; }
+    100% { background-position: 40px 40px, 80px 80px; }
+  }
 
   /* Spring animation for 3D buttons */
   @keyframes spring-in {
