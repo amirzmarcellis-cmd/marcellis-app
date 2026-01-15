@@ -32,9 +32,9 @@ export function ActivityTicker({ items, className }: ActivityTickerProps) {
         <div className="marquee-row flex-1 overflow-hidden">
           <div className="marquee-inner">
             {duplicatedItems.map((item, index) => (
-              <div key={index} className="flex items-center gap-2 text-muted-foreground whitespace-nowrap">
+              <div key={index} className="flex items-center gap-2 whitespace-nowrap">
                 <User className="h-3.5 w-3.5 text-primary/70 shrink-0" />
-                <span>{item}</span>
+                <span className="text-foreground font-semibold">{item}</span>
               </div>
             ))}
           </div>
