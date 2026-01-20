@@ -38,6 +38,42 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_log: {
+        Row: {
+          changed_fields: Json | null
+          id: string
+          new_data: Json | null
+          old_data: Json | null
+          operation: string
+          performed_at: string
+          performed_by: string | null
+          record_id: string
+          table_name: string
+        }
+        Insert: {
+          changed_fields?: Json | null
+          id?: string
+          new_data?: Json | null
+          old_data?: Json | null
+          operation: string
+          performed_at?: string
+          performed_by?: string | null
+          record_id: string
+          table_name: string
+        }
+        Update: {
+          changed_fields?: Json | null
+          id?: string
+          new_data?: Json | null
+          old_data?: Json | null
+          operation?: string
+          performed_at?: string
+          performed_by?: string | null
+          record_id?: string
+          table_name?: string
+        }
+        Relationships: []
+      }
       calendar_preferences: {
         Row: {
           created_at: string
