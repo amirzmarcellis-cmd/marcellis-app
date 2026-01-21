@@ -93,10 +93,14 @@ export default function Auth() {
     setLoading(true);
     setError(null);
     try {
-      // Validate email domain
+      // Validate email - allow marc-ellis.com domain or specific whitelisted emails
+      const allowedEmails = ['mark.staglieno@bankfab.com'];
       const emailDomain = email.split('@')[1];
-      if (emailDomain !== 'marc-ellis.com') {
-        throw new Error('Only @marc-ellis.com email addresses are allowed to access this platform');
+      const isAllowedDomain = emailDomain === 'marc-ellis.com';
+      const isWhitelistedEmail = allowedEmails.includes(email.toLowerCase());
+
+      if (!isAllowedDomain && !isWhitelistedEmail) {
+        throw new Error('This email address is not authorized to access this platform');
       }
       if (isLogin) {
         const {
