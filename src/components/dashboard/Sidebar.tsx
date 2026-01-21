@@ -43,6 +43,12 @@ export function DashboardSidebar() {
   const isMobile = useIsMobile();
   const isMini = isCollapsed && !isMobile;
   const isAdmin = profile?.is_admin || false;
+  
+  // Restricted users with limited navigation access
+  const restrictedUserEmails = ['mark.staglieno@bankfab.com'];
+  const isRestrictedUser = profile?.email && restrictedUserEmails.includes(profile.email.toLowerCase());
+  const restrictedNavItems = ['/groups', '/clients', '/candidates', '/call-log'];
+  
   const navigationItems = [{
     title: "Dashboard",
     url: "/",
@@ -146,6 +152,10 @@ export function DashboardSidebar() {
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2">
             {navigationItems.filter(item => {
+              // Hide specific items for restricted users
+              if (isRestrictedUser && restrictedNavItems.includes(item.url)) {
+                return false;
+              }
               // Viewers can only access Dashboard, Jobs, and Settings
               if (isViewer) {
                 return ['/', '/jobs', '/settings'].includes(item.url);
