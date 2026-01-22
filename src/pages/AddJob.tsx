@@ -230,7 +230,7 @@ const industries = [
 export default function AddJob() {
   const navigate = useNavigate();
   const { profile } = useProfile();
-  const { isAdmin, isManager, isTeamLeader } = useUserRole();
+  const { isAdmin, isManager, isTeamLeader, isViewer } = useUserRole();
   const { isJobCreationPaused, loading: adminSettingsLoading } = useAdminSettings();
   
   const [formData, setFormData] = useState({
@@ -274,13 +274,19 @@ export default function AddJob() {
   const [linkedInSearchEnabled, setLinkedInSearchEnabled] = useState(false);
   const [recruiterLinkedInId, setRecruiterLinkedInId] = useState<string | null>(null);
 
-  // Redirect non-admin users if job creation is paused (route protection)
+  // Redirect viewers and non-admin users if job creation is paused (route protection)
+  
   useEffect(() => {
+    if (!adminSettingsLoading && isViewer) {
+      toast.error("Viewers cannot create jobs");
+      navigate("/jobs");
+      return;
+    }
     if (!adminSettingsLoading && !isAdmin && isJobCreationPaused) {
       toast.error("Job creation is currently paused by admin");
       navigate("/jobs");
     }
-  }, [isAdmin, isJobCreationPaused, adminSettingsLoading, navigate]);
+  }, [isAdmin, isViewer, isJobCreationPaused, adminSettingsLoading, navigate]);
 
   useEffect(() => {
     // Auto-assign recruiter to current user for team members if not selected

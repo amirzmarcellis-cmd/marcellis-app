@@ -536,35 +536,39 @@ export function JobManagementPanel() {
           <p className="text-sm sm:text-base font-light font-inter text-muted-foreground">Manage job postings and recruitment campaigns</p>
         </div>
         <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-          <Button onClick={() => navigate("/groups")} variant="outline" className="flex items-center gap-2 font-light font-inter text-xs sm:text-sm flex-1 sm:flex-none">
-            <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Manage</span> Groups
-          </Button>
-          {(isAdmin || !isJobCreationPaused) ? (
-            <Button 
-              onClick={() => navigate("/jobs/add")} 
-              className="action-button bg-gradient-primary hover:shadow-glow font-light font-inter text-xs sm:text-sm flex-1 sm:flex-none"
-            >
-              <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              Create Job
+          {!isViewer && (
+            <Button onClick={() => navigate("/groups")} variant="outline" className="flex items-center gap-2 font-light font-inter text-xs sm:text-sm flex-1 sm:flex-none">
+              <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Manage</span> Groups
             </Button>
-          ) : (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    disabled
-                    className="action-button bg-muted text-muted-foreground font-light font-inter text-xs sm:text-sm flex-1 sm:flex-none cursor-not-allowed"
-                  >
-                    <Lock className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                    Create Job
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Job creation is currently paused by admin</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          )}
+          {!isViewer && (
+            (isAdmin || !isJobCreationPaused) ? (
+              <Button 
+                onClick={() => navigate("/jobs/add")} 
+                className="action-button bg-gradient-primary hover:shadow-glow font-light font-inter text-xs sm:text-sm flex-1 sm:flex-none"
+              >
+                <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                Create Job
+              </Button>
+            ) : (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      disabled
+                      className="action-button bg-muted text-muted-foreground font-light font-inter text-xs sm:text-sm flex-1 sm:flex-none cursor-not-allowed"
+                    >
+                      <Lock className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                      Create Job
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Job creation is currently paused by admin</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )
           )}
         </div>
       </div>
