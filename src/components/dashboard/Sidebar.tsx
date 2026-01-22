@@ -156,9 +156,9 @@ export function DashboardSidebar() {
               if (isRestrictedUser && restrictedNavItems.includes(item.url)) {
                 return false;
               }
-              // Viewers can only access Dashboard, Jobs, and Settings
+              // Viewers can only access Jobs
               if (isViewer) {
-                return ['/', '/jobs', '/settings'].includes(item.url);
+                return ['/jobs'].includes(item.url);
               }
               // Filter out Analytics and Reports for non-admins/non-management
               if ((item.title === 'Analytics' || item.title === 'Reports') && !canAccessAnalytics) {

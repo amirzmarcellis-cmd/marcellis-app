@@ -24,8 +24,8 @@ export function useUserRole() {
       }
 
       try {
-        // Fetch organization role first, then team memberships
-        const [userRoleResult, membershipResult] = await Promise.all([
+        // Fetch organization role, team memberships, and profile email
+        const [userRoleResult, membershipResult, profileResult] = await Promise.all([
           supabase
             .from('user_roles')
             .select('role')
@@ -34,11 +34,21 @@ export function useUserRole() {
           supabase
             .from('memberships')
             .select('role')
+            .eq('user_id', user.id),
+          supabase
+            .from('profiles')
+            .select('email')
             .eq('user_id', user.id)
+            .maybeSingle()
         ]);
 
+        // Check if user is a forced viewer by email
+        const viewerEmails = ['viewer@marc-ellis.com'];
+        const userEmail = profileResult.data?.email?.toLowerCase() || '';
+        const isForcedViewer = viewerEmails.includes(userEmail);
+
         // Get organization role (ADMIN, MANAGEMENT, VIEWER, or EMPLOYEE)
-        const orgRole = userRoleResult.data?.role || 'EMPLOYEE';
+        const orgRole = isForcedViewer ? 'VIEWER' : (userRoleResult.data?.role || 'EMPLOYEE');
         
         // Check if user is team leader in any team
         const isLeader = Array.isArray(membershipResult.data) && 
@@ -46,7 +56,7 @@ export function useUserRole() {
         
         setIsTeamLeader(isLeader);
         setIsManagement(orgRole === 'MANAGEMENT');
-        setIsViewer(orgRole === 'VIEWER');
+        setIsViewer(orgRole === 'VIEWER' || isForcedViewer);
 
         // Set roles based on hierarchy: Admin > Management > Viewer > Team Leader > Employee
         if (orgRole === 'ADMIN') {
@@ -81,7 +91,7 @@ export function useUserRole() {
   const canAccessJobsAnalytics = isAdmin || isManagement || isTeamLeader;
   const canAccessUsersPanel = isAdmin || isManagement;
   const canManageTeamMembers = isAdmin || isManagement || isTeamLeader;
-  const canCreateJobs = true; // All users can create jobs
+  const canCreateJobs = !isViewer; // All users except viewers can create jobs
 
   return {
     roles,
