@@ -3021,11 +3021,24 @@ mainCandidate["linkedin_score_reason"] ? (
       return overallScoreB - overallScoreA;
     });
 
-  // Helper function to parse salary as number
+  // Helper function to parse salary as number (handles ranges like "10000-12000")
   const parseSalary = (salary: string | null | undefined): number => {
     if (!salary) return 0;
-    const cleanSalary = salary.toString().replace(/[^0-9.]/g, "");
-    return parseFloat(cleanSalary) || 0;
+    const salaryStr = salary.toString();
+    
+    // Extract all numbers from the string
+    const numbers = salaryStr.match(/[\d.]+/g);
+    if (!numbers || numbers.length === 0) return 0;
+    
+    // Parse all numbers and return the maximum (highest expectation in a range)
+    const parsedNumbers = numbers
+      .map(n => parseFloat(n))
+      .filter(n => !isNaN(n) && n > 0);
+    
+    if (parsedNumbers.length === 0) return 0;
+    
+    // Return the maximum value (for ranges like "10000-12000", returns 12000)
+    return Math.max(...parsedNumbers);
   };
 
   // Get job budget for comparison
