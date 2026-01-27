@@ -1,65 +1,124 @@
 
+## Add Salary Note Section to Call Log Details
 
-## Remove Auto-Dial Expiration Mechanisms
+This plan adds a new "Salary Note" section under the "Salary & Notice Period" card that displays a transcript-analyzed summary of the candidate's current and expected salary with their original currencies.
 
-This plan removes two automatic dial expiration systems that are turning off jobs prematurely.
+---
+
+### Overview
+
+The Salary Note is a read-only field that captures salary information in the candidate's original currency as mentioned during the call. This differs from the existing Current Salary and Expected Salary fields which are converted to the job's currency.
+
+**Example Output:**
+- "Amir's current salary is 5 lakhs INR per month, and his expected salary is 4,000 AED per month."
 
 ---
 
 ### Changes Required
 
-#### 1. Remove Frontend 48-Hour Check
+#### 1. Database: Add salary_note Column
 
-**File:** `src/pages/JobDetails.tsx`
+Add a new text column to the `Jobs_CVs` table to store the salary note.
 
-Remove the entire useEffect block that checks and disables auto-dial after 48 hours (lines 425-464).
+```sql
+ALTER TABLE "Jobs_CVs" 
+ADD COLUMN IF NOT EXISTS salary_note TEXT;
+```
+
+---
+
+#### 2. Frontend: Update CallLogDetail Interface
+
+**File:** `src/pages/CallLogDetails.tsx`
+
+Add the new field to the interface:
 
 ```typescript
-// REMOVE THIS ENTIRE BLOCK:
-useEffect(() => {
-  const checkAutoDialExpiry = async () => {
-    if (!job?.automatic_dial || !job?.job_id) return;
-    // ... all the 48-hour checking logic
-  };
-  if (job) {
-    checkAutoDialExpiry();
-  }
-}, [job, toast]);
+interface CallLogDetail {
+  // ... existing fields ...
+  salary_note: string | null  // NEW
+}
 ```
 
 ---
 
-#### 2. Remove Database Cron Job and Function
+#### 3. Frontend: Map salary_note in Data Fetching
 
-Two SQL commands need to be executed to clean up the database:
+**File:** `src/pages/CallLogDetails.tsx`
 
-**Step 1:** Unschedule the cron job (jobid: 2)
-```sql
-SELECT cron.unschedule(2);
-```
+Update the `enrichedData` mapping in `fetchCallLogDetail`:
 
-**Step 2:** Drop the function
-```sql
-DROP FUNCTION IF EXISTS expire_old_jobs();
+```typescript
+const enrichedData: CallLogDetail = {
+  // ... existing mappings ...
+  salary_note: data.salary_note,  // NEW
+}
 ```
 
 ---
 
-### Summary of What Gets Removed
+#### 4. Frontend: Display Salary Note Section
 
-| Mechanism | Location | Trigger | Action |
-|-----------|----------|---------|--------|
-| 72-hour expiry | Database cron | Every hour | ~~Disables auto-dial if job is 72+ hours old~~ |
-| 48-hour expiry | JobDetails.tsx | User views job | ~~Disables auto-dial if enabled 48+ hours ago~~ |
+**File:** `src/pages/CallLogDetails.tsx`
+
+Add a new section inside the "Salary & Notice" card, after the Expected Salary field:
+
+```tsx
+{/* Salary Note - NEW SECTION */}
+{callLog.salary_note && (
+  <div className="pt-2 border-t border-border/30">
+    <label className="text-xs sm:text-sm font-medium text-muted-foreground">
+      Salary Note
+    </label>
+    <p className="text-sm sm:text-base text-foreground/90 mt-1 leading-relaxed break-words">
+      {callLog.salary_note}
+    </p>
+  </div>
+)}
+```
 
 ---
 
-### What Remains Active
+### Visual Layout
 
-After these changes, auto-dial will still be disabled by:
+The Salary Note will appear as the last item in the "Salary & Notice" card:
 
-1. **Shortlist threshold trigger** - Disables when 6+ candidates reach score >= 74
-2. **48-hour cron job (`disable_expired_auto_dial`)** - Still runs hourly based on `auto_dial_enabled_at`
+```text
+┌─────────────────────────────────────┐
+│ 💵 Salary & Notice                  │
+├─────────────────────────────────────┤
+│ Notice Period                       │
+│ 30 days                             │
+│                                     │
+│ Current Salary                      │
+│ SAR 30,000                          │
+│                                     │
+│ Expected Salary                     │
+│ SAR 40,000 - 45,000                 │
+│─────────────────────────────────────│
+│ Salary Note                         │ ← NEW
+│ Mohammed's current salary is        │
+│ 30,000 AED per month, and his       │
+│ expected salary is 40,000-45,000    │
+│ AED per month.                      │
+└─────────────────────────────────────┘
+```
 
-If you also want to remove the 48-hour cron job mechanism, let me know and I can include that in the plan.
+---
 
+### Technical Notes
+
+- **Data Population:** The `salary_note` field will be populated by the external AI system that processes call transcripts (same system that populates `current_salary`, `salary_expectations`, `after_call_score`, etc.)
+- **Read-Only Display:** This is a display-only field - no editing capability in the UI
+- **Conditional Rendering:** The section only appears when `salary_note` has content
+- **No Impact on Existing Fields:** The existing Current Salary and Expected Salary fields remain unchanged and continue to work with currency conversion logic
+
+---
+
+### Files to Modify
+
+| File | Change |
+|------|--------|
+| Database Migration | Add `salary_note TEXT` column to `Jobs_CVs` |
+| `src/pages/CallLogDetails.tsx` | Add to interface, data mapping, and UI display |
+| `src/integrations/supabase/types.ts` | Auto-updated after migration |
