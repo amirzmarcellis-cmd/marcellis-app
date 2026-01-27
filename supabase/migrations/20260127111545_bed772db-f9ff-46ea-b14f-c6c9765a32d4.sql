@@ -1,0 +1,1 @@
+ALTER TABLE "Jobs_CVs" ADD COLUMN market_intel text;
