@@ -59,6 +59,7 @@ interface CallLogDetail {
   notice_period: string | null
   salary_expectations: string | null
   current_salary: string | null
+  salary_note: string | null
   notes: string | null
   lastcalltime: string | null
   callcount: number | null
@@ -268,6 +269,7 @@ export default function CallLogDetails() {
         notice_period: data.notice_period,
         salary_expectations: data.salary_expectations,
         current_salary: data.current_salary,
+        salary_note: data.salary_note,
         notes: data.notes,
         lastcalltime: data.lastcalltime,
         callcount: data.callcount,
@@ -742,6 +744,15 @@ export default function CallLogDetails() {
                   : 'N/A'}
               </p>
             </div>
+            {/* Salary Note - Read-only field populated by AI transcript analysis */}
+            {callLog.salary_note && (
+              <div className="pt-2 border-t border-border/30">
+                <label className="text-xs sm:text-sm font-medium text-muted-foreground">Salary Note</label>
+                <p className="text-sm sm:text-base text-foreground/90 mt-1 leading-relaxed break-words">
+                  {callLog.salary_note}
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
