@@ -536,6 +536,7 @@ export type Database = {
           recruiter_id: string | null
           rejected_at: string | null
           salary_expectations: string | null
+          salary_note: string | null
           shortlisted_at: string | null
           source: string | null
           submitted_at: string | null
@@ -585,6 +586,7 @@ export type Database = {
           recruiter_id?: string | null
           rejected_at?: string | null
           salary_expectations?: string | null
+          salary_note?: string | null
           shortlisted_at?: string | null
           source?: string | null
           submitted_at?: string | null
@@ -634,6 +636,7 @@ export type Database = {
           recruiter_id?: string | null
           rejected_at?: string | null
           salary_expectations?: string | null
+          salary_note?: string | null
           shortlisted_at?: string | null
           source?: string | null
           submitted_at?: string | null

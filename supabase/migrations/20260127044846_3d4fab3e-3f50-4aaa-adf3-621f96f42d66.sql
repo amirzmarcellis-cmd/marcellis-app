@@ -1,0 +1,1 @@
+ALTER TABLE "Jobs_CVs" ADD COLUMN IF NOT EXISTS salary_note TEXT;
