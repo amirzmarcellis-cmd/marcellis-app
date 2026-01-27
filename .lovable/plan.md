@@ -1,57 +1,68 @@
 
-Goal
-- Make “Salary Note” visible in Call Log Details under “Salary & Notice” without affecting any existing working functionality.
+## Plan: Fix Auto-Dial 48-Hour Timer Reset
 
-What’s happening now (why you can’t see it)
-- The UI currently renders Salary Note only when `callLog.salary_note` is truthy:
-  - If the database value is `NULL`, `''` (empty string), or just whitespace, React treats it as “falsey”, so the whole section is hidden.
-- Your network request shows the page is correctly fetching `Jobs_CVs?select=*&recordid=eq.18504`, so the field is coming through if it exists. The issue is display logic + missing/empty data.
+### Problem Summary
 
-Plan (safe, minimal change)
-1) Confirm the data (so we know if it’s a UI-hide issue or missing value)
-- In Supabase SQL Editor (same environment you’re testing), run:
-  - `SELECT recordid, salary_note FROM "Jobs_CVs" WHERE recordid = 18504;`
-- Expected:
-  - If it returns `NULL` or empty, the UI won’t show it with the current condition.
+When you turn auto-dial back ON via the UI, the system correctly sets `auto_dial_enabled_at` to the current time, which should give you another 48 hours. However, there are two issues:
 
-2) Update the UI to always show the Salary Note section (no behavior changes to other fields)
-- In `src/pages/CallLogDetails.tsx`, replace the conditional block:
-  - From: `{callLog.salary_note && ( ... )}`
-  - To: always render the section, and display:
-    - the note if present (`salary_note?.trim()`),
-    - otherwise a neutral placeholder like “Not generated yet”.
-- This guarantees the section is visible even before your external transcript analyzer populates the value.
-- Also handle whitespace-only values by using `.trim()` so it won’t silently hide.
+1. **New jobs created via AddJob don't set the timestamp** - Jobs are created with `automatic_dial = true` (database default) but `auto_dial_enabled_at = NULL`, so the 48-hour timer never starts
+2. **The old `expire_old_jobs()` function was incorrectly disabling jobs** - This has been removed as of Jan 26
 
-3) Optional (recommended for quick verification): add a temporary test value
-- If you want to visually confirm immediately, update just that record:
-  - `UPDATE "Jobs_CVs" SET salary_note = 'Mohammed''s current salary is 30,000 AED per month, and his expected salary is 40,000–45,000 AED per month.' WHERE recordid = 18504;`
-- Then refresh `/call-log-details?...callid=18504`.
+### Current State
 
-4) Validation checklist (to ensure we don’t affect current working system)
-- Confirm “Salary & Notice” card still shows Notice Period / Current Salary / Expected Salary exactly as before.
-- Confirm Salary Note appears:
-  - When salary_note is NULL → shows placeholder
-  - When salary_note has text → shows the text
-  - When salary_note is empty string/whitespace → shows placeholder
-- No database logic changes beyond reading an existing column; no changes to currency conversion logic.
+| Mechanism | Status | Behavior |
+|-----------|--------|----------|
+| `disable_expired_auto_dial()` cron | Active (hourly) | Disables jobs where timestamp > 48 hours old |
+| `expire_old_jobs()` cron | **DELETED** | Was incorrectly disabling jobs |
+| Shortlist threshold trigger | Active | Disables when 6+ candidates score >= 74 |
+| UI toggle sets timestamp | Working | Sets `auto_dial_enabled_at` to current time when turning ON |
 
-Notes about “system must generate Salary Note”
-- With the current architecture, Salary Note generation is not happening in the frontend; it must be written into `Jobs_CVs.salary_note` by your external transcript analysis process (as you described).
-- The change above ensures the UI section is always present and ready, and it clearly indicates when the note hasn’t been generated yet.
+### Solution
 
-Files involved
-- `src/pages/CallLogDetails.tsx`
-  - Only change: Salary Note rendering logic (always render + fallback text)
-- No additional schema changes needed (column already exists).
+**Step 1: Add timestamp when creating new jobs**
 
-Risks / mitigations
-- Risk: None to existing flow; this is a display-only change inside the same card.
-- Mitigation: Keep all existing salary fields untouched and only adjust the Salary Note block.
+Update `src/pages/AddJob.tsx` to include `auto_dial_enabled_at: new Date().toISOString()` in the insert statement.
 
-Acceptance criteria
-- On `/call-log-details?candidate=272888&job=me-j-0238&callid=18504&fromTab=shortlist`:
-  - “Salary Note” label is visible under Expected Salary.
-  - If salary_note is empty → shows “Not generated yet” (or “N/A”).
-  - If salary_note is set → shows the note text exactly.
+This ensures newly created jobs start their 48-hour timer immediately.
 
+**Step 2 (Optional): Set timestamp for existing jobs with NULL**
+
+Run a one-time UPDATE to set `auto_dial_enabled_at` for jobs that currently have `automatic_dial = true` but no timestamp:
+- `me-j-0235`
+- `me-j-0236`
+
+### Technical Details
+
+**File: `src/pages/AddJob.tsx`**
+
+Add to the insert object at line ~596:
+```typescript
+automatic_dial: true,  // Keep the default
+auto_dial_enabled_at: new Date().toISOString()  // Start the 48-hour timer
+```
+
+**SQL for existing jobs (one-time fix via Supabase SQL Editor):**
+```sql
+UPDATE "Jobs"
+SET auto_dial_enabled_at = NOW()
+WHERE automatic_dial = TRUE
+  AND auto_dial_enabled_at IS NULL;
+```
+
+### Behavior After Fix
+
+1. **New jobs**: Created with auto-dial ON and 48-hour timer started
+2. **Turning auto-dial OFF then ON**: Timer resets to 48 hours (already working)
+3. **Reaching 6 shortlisted**: Auto-dial disabled by threshold trigger
+4. **After 48 hours**: Auto-dial disabled by cron
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `src/pages/AddJob.tsx` | Add `auto_dial_enabled_at` to job insert |
+
+### Risks
+
+- **None to existing functionality** - Only adds a timestamp field to new job creation
+- **Existing jobs with NULL timestamp** - These will continue to run indefinitely until you run the optional SQL fix or toggle them via UI
