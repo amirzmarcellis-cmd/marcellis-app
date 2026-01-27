@@ -1,161 +1,57 @@
 
-## Auto-Generate Salary Note from Transcript using AI
+Goal
+- Make “Salary Note” visible in Call Log Details under “Salary & Notice” without affecting any existing working functionality.
 
-This plan adds an AI-powered system to automatically analyze call transcripts and generate the `salary_note` field with the candidate's exact salary and currency as stated during the call.
+What’s happening now (why you can’t see it)
+- The UI currently renders Salary Note only when `callLog.salary_note` is truthy:
+  - If the database value is `NULL`, `''` (empty string), or just whitespace, React treats it as “falsey”, so the whole section is hidden.
+- Your network request shows the page is correctly fetching `Jobs_CVs?select=*&recordid=eq.18504`, so the field is coming through if it exists. The issue is display logic + missing/empty data.
 
----
+Plan (safe, minimal change)
+1) Confirm the data (so we know if it’s a UI-hide issue or missing value)
+- In Supabase SQL Editor (same environment you’re testing), run:
+  - `SELECT recordid, salary_note FROM "Jobs_CVs" WHERE recordid = 18504;`
+- Expected:
+  - If it returns `NULL` or empty, the UI won’t show it with the current condition.
 
-### Current State Analysis
+2) Update the UI to always show the Salary Note section (no behavior changes to other fields)
+- In `src/pages/CallLogDetails.tsx`, replace the conditional block:
+  - From: `{callLog.salary_note && ( ... )}`
+  - To: always render the section, and display:
+    - the note if present (`salary_note?.trim()`),
+    - otherwise a neutral placeholder like “Not generated yet”.
+- This guarantees the section is visible even before your external transcript analyzer populates the value.
+- Also handle whitespace-only values by using `.trim()` so it won’t silently hide.
 
-From the database record (recordid: 18504):
-- **Transcript EXISTS** - Full call recording with salary discussion
-- **`current_salary: 30000`** and **`salary_expectations: "40000 to 45000"`** - Already extracted (by external system)
-- **`salary_note: NULL`** - Not being generated
+3) Optional (recommended for quick verification): add a temporary test value
+- If you want to visually confirm immediately, update just that record:
+  - `UPDATE "Jobs_CVs" SET salary_note = 'Mohammed''s current salary is 30,000 AED per month, and his expected salary is 40,000–45,000 AED per month.' WHERE recordid = 18504;`
+- Then refresh `/call-log-details?...callid=18504`.
 
-**Salary mentioned in transcript:**
-- Current: "30k" AED per month (line 60)
-- Expected: "40 to 45" thousand AED per month (line 64-66)
+4) Validation checklist (to ensure we don’t affect current working system)
+- Confirm “Salary & Notice” card still shows Notice Period / Current Salary / Expected Salary exactly as before.
+- Confirm Salary Note appears:
+  - When salary_note is NULL → shows placeholder
+  - When salary_note has text → shows the text
+  - When salary_note is empty string/whitespace → shows placeholder
+- No database logic changes beyond reading an existing column; no changes to currency conversion logic.
 
----
+Notes about “system must generate Salary Note”
+- With the current architecture, Salary Note generation is not happening in the frontend; it must be written into `Jobs_CVs.salary_note` by your external transcript analysis process (as you described).
+- The change above ensures the UI section is always present and ready, and it clearly indicates when the note hasn’t been generated yet.
 
-### Solution Architecture
+Files involved
+- `src/pages/CallLogDetails.tsx`
+  - Only change: Salary Note rendering logic (always render + fallback text)
+- No additional schema changes needed (column already exists).
 
-```text
-┌─────────────────────────────────────────────────────────────┐
-│                    TRIGGER OPTIONS                          │
-├─────────────────────────────────────────────────────────────┤
-│  Option A: Button in UI (manual trigger per record)         │
-│  Option B: Auto-trigger when transcript is saved (webhook)  │
-│  Option C: Batch process existing records                   │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│           Edge Function: generate-salary-note               │
-├─────────────────────────────────────────────────────────────┤
-│  1. Receive recordid                                        │
-│  2. Fetch transcript from Jobs_CVs                          │
-│  3. Call Lovable AI (Gemini) to analyze transcript          │
-│  4. Extract: current_salary, expected_salary, currencies    │
-│  5. Generate formatted salary note                          │
-│  6. Update Jobs_CVs.salary_note                             │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    OUTPUT EXAMPLE                           │
-├─────────────────────────────────────────────────────────────┤
-│  "Mohammed's current salary is 30,000 AED per month, and    │
-│   his expected salary is 40,000-45,000 AED per month."      │
-└─────────────────────────────────────────────────────────────┘
-```
+Risks / mitigations
+- Risk: None to existing flow; this is a display-only change inside the same card.
+- Mitigation: Keep all existing salary fields untouched and only adjust the Salary Note block.
 
----
+Acceptance criteria
+- On `/call-log-details?candidate=272888&job=me-j-0238&callid=18504&fromTab=shortlist`:
+  - “Salary Note” label is visible under Expected Salary.
+  - If salary_note is empty → shows “Not generated yet” (or “N/A”).
+  - If salary_note is set → shows the note text exactly.
 
-### Implementation Steps
-
-#### 1. Create Edge Function: `generate-salary-note`
-
-**File:** `supabase/functions/generate-salary-note/index.ts`
-
-```typescript
-// Edge function that:
-// - Takes a recordid
-// - Fetches the transcript from Jobs_CVs
-// - Calls Lovable AI to extract salary info
-// - Updates the salary_note field
-```
-
-**AI Prompt for extraction:**
-```text
-Analyze this call transcript and extract salary information.
-
-Return a JSON object with:
-- candidate_name: string (the person being interviewed)
-- current_salary: { amount: string, currency: string }
-- expected_salary: { amount: string, currency: string }
-
-Then generate a natural language note like:
-"[Name]'s current salary is [amount] [currency] per month, 
-and his/her expected salary is [amount] [currency] per month."
-
-Important:
-- Use the EXACT currency mentioned by the candidate
-- Do NOT convert currencies
-- If currency not explicitly stated, infer from context (AED for UAE, SAR for Saudi, etc.)
-```
-
-#### 2. Update supabase/config.toml
-
-Add the new function configuration:
-```toml
-[functions.generate-salary-note]
-verify_jwt = true
-```
-
-#### 3. Add "Generate Salary Note" Button in UI (Optional but Recommended)
-
-**File:** `src/pages/CallLogDetails.tsx`
-
-Add a small button next to "Salary Note" label that allows manual regeneration:
-- Only visible when transcript exists
-- Shows loading state while processing
-- Refreshes the page after successful generation
-
----
-
-### Files to Create/Modify
-
-| File | Action | Description |
-|------|--------|-------------|
-| `supabase/functions/generate-salary-note/index.ts` | Create | Edge function with Lovable AI integration |
-| `supabase/config.toml` | Modify | Add function configuration |
-| `src/pages/CallLogDetails.tsx` | Modify | Add optional "Generate" button |
-
----
-
-### Technical Details
-
-**Lovable AI Configuration:**
-- Model: `google/gemini-3-flash-preview` (fast, accurate for extraction)
-- Endpoint: `https://ai.gateway.lovable.dev/v1/chat/completions`
-- Auth: Uses `LOVABLE_API_KEY` (auto-provisioned)
-
-**Database Update:**
-```sql
-UPDATE "Jobs_CVs" 
-SET salary_note = 'Generated note...' 
-WHERE recordid = ?
-```
-
----
-
-### Risk Mitigation
-
-- **No changes to existing fields** - Only populates the new `salary_note` field
-- **No effect on existing transcript analysis** - This runs independently
-- **Optional manual trigger** - Can be used selectively, not auto-applied to all records
-- **Graceful error handling** - If AI fails, shows error toast but doesn't break anything
-
----
-
-### Expected Output for Record 18504
-
-Based on the transcript analysis, the generated salary note would be:
-
-**"Mohammed's current salary is 30,000 AED per month, and his expected salary is 40,000-45,000 AED per month."**
-
----
-
-### Alternative: Bulk Generate for Existing Records
-
-If you want to generate salary notes for all existing records with transcripts:
-```sql
--- Find records with transcripts but no salary_note
-SELECT recordid, candidate_name 
-FROM "Jobs_CVs" 
-WHERE transcript IS NOT NULL 
-AND (salary_note IS NULL OR salary_note = '');
-```
-
-Then call the edge function for each record.

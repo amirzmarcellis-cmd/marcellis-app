@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
-import { ArrowLeft, Phone, Clock, User, Banknote, Calendar, Link2, Save, Search, CheckCircle, ClipboardList, FileText, XCircle, ThumbsUp, Sparkles, Loader2 } from "lucide-react"
+import { ArrowLeft, Phone, Clock, User, Banknote, Calendar, Link2, Save, Search, CheckCircle, ClipboardList, FileText, XCircle, ThumbsUp } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { StatusDropdown } from "@/components/candidates/StatusDropdown"
 import { TimelineLog } from "@/components/timeline/TimelineLog"
@@ -99,7 +99,6 @@ export default function CallLogDetails() {
   const [taskLinks, setTaskLinks] = useState<string[]>([])
   const [jobAssignmentLink, setJobAssignmentLink] = useState<string | null>(null)
   const [taskId, setTaskId] = useState<string | null>(null)
-  const [generatingSalaryNote, setGeneratingSalaryNote] = useState(false)
   const firstMatchRef = useRef<HTMLElement | null>(null)
   const { profile } = useProfile()
   const { isManager, isCompanyAdmin } = useUserRole()
@@ -414,59 +413,6 @@ export default function CallLogDetails() {
       setSaving(false)
     }
   }
-
-  const generateSalaryNote = async () => {
-    if (!callid) {
-      toast({
-        title: "Error",
-        description: "No record ID available",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!callLog?.transcript) {
-      toast({
-        title: "No Transcript",
-        description: "Cannot generate salary note without a transcript",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setGeneratingSalaryNote(true);
-    try {
-      const response = await supabase.functions.invoke('generate-salary-note', {
-        body: { recordid: callid }
-      });
-
-      if (response.error) {
-        throw new Error(response.error.message || 'Failed to generate salary note');
-      }
-
-      if (response.data?.error) {
-        throw new Error(response.data.error);
-      }
-
-      const generatedNote = response.data?.salary_note;
-      if (generatedNote) {
-        setCallLog(prev => prev ? { ...prev, salary_note: generatedNote } : null);
-        toast({
-          title: "Success",
-          description: "Salary note generated successfully",
-        });
-      }
-    } catch (error) {
-      console.error('Error generating salary note:', error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to generate salary note",
-        variant: "destructive",
-      });
-    } finally {
-      setGeneratingSalaryNote(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -800,30 +746,7 @@ export default function CallLogDetails() {
             </div>
             {/* Salary Note - Read-only field populated by AI transcript analysis */}
             <div className="pt-2 border-t border-border/30">
-              <div className="flex items-center justify-between gap-2">
-                <label className="text-xs sm:text-sm font-medium text-muted-foreground">Salary Note</label>
-                {callLog.transcript && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={generateSalaryNote}
-                    disabled={generatingSalaryNote}
-                    className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
-                  >
-                    {generatingSalaryNote ? (
-                      <>
-                        <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-3 h-3 mr-1" />
-                        {callLog.salary_note?.trim() ? 'Regenerate' : 'Generate'}
-                      </>
-                    )}
-                  </Button>
-                )}
-              </div>
+              <label className="text-xs sm:text-sm font-medium text-muted-foreground">Salary Note</label>
               <p className="text-sm sm:text-base text-foreground/90 mt-1 leading-relaxed break-words">
                 {callLog.salary_note?.trim() || <span className="italic text-muted-foreground">Not generated yet</span>}
               </p>
