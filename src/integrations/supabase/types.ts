@@ -521,6 +521,7 @@ export type Database = {
           linkedin_score: number | null
           linkedin_score_reason: string | null
           longlisted_at: string | null
+          market_intel: string | null
           Message_count: number | null
           nationality: string | null
           notes: string | null
@@ -571,6 +572,7 @@ export type Database = {
           linkedin_score?: number | null
           linkedin_score_reason?: string | null
           longlisted_at?: string | null
+          market_intel?: string | null
           Message_count?: number | null
           nationality?: string | null
           notes?: string | null
@@ -621,6 +623,7 @@ export type Database = {
           linkedin_score?: number | null
           linkedin_score_reason?: string | null
           longlisted_at?: string | null
+          market_intel?: string | null
           Message_count?: number | null
           nationality?: string | null
           notes?: string | null
