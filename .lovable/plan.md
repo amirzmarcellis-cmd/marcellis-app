@@ -1,68 +1,94 @@
 
-## Plan: Fix Auto-Dial 48-Hour Timer Reset
 
-### Problem Summary
+## Add Market Intel Section to Call Log Details
 
-When you turn auto-dial back ON via the UI, the system correctly sets `auto_dial_enabled_at` to the current time, which should give you another 48 hours. However, there are two issues:
+### Overview
+Add a new "Market Intel" section under the existing "Salary Note" section in the Call Log Details page. This will be a read-only field similar to Salary Note, designed to display market intelligence extracted from call transcripts.
 
-1. **New jobs created via AddJob don't set the timestamp** - Jobs are created with `automatic_dial = true` (database default) but `auto_dial_enabled_at = NULL`, so the 48-hour timer never starts
-2. **The old `expire_old_jobs()` function was incorrectly disabling jobs** - This has been removed as of Jan 26
+---
 
 ### Current State
+- The Salary Note section exists at lines 747-753 in `src/pages/CallLogDetails.tsx`
+- The `Jobs_CVs` table does NOT have a `market_intel` column yet
+- The `CallLogDetail` interface includes `salary_note` but not `market_intel`
 
-| Mechanism | Status | Behavior |
-|-----------|--------|----------|
-| `disable_expired_auto_dial()` cron | Active (hourly) | Disables jobs where timestamp > 48 hours old |
-| `expire_old_jobs()` cron | **DELETED** | Was incorrectly disabling jobs |
-| Shortlist threshold trigger | Active | Disables when 6+ candidates score >= 74 |
-| UI toggle sets timestamp | Working | Sets `auto_dial_enabled_at` to current time when turning ON |
+---
 
-### Solution
+### Implementation Steps
 
-**Step 1: Add timestamp when creating new jobs**
+#### Step 1: Add Database Column
+Create a migration to add the `market_intel` text column to the `Jobs_CVs` table:
 
-Update `src/pages/AddJob.tsx` to include `auto_dial_enabled_at: new Date().toISOString()` in the insert statement.
-
-This ensures newly created jobs start their 48-hour timer immediately.
-
-**Step 2 (Optional): Set timestamp for existing jobs with NULL**
-
-Run a one-time UPDATE to set `auto_dial_enabled_at` for jobs that currently have `automatic_dial = true` but no timestamp:
-- `me-j-0235`
-- `me-j-0236`
-
-### Technical Details
-
-**File: `src/pages/AddJob.tsx`**
-
-Add to the insert object at line ~596:
-```typescript
-automatic_dial: true,  // Keep the default
-auto_dial_enabled_at: new Date().toISOString()  // Start the 48-hour timer
-```
-
-**SQL for existing jobs (one-time fix via Supabase SQL Editor):**
 ```sql
-UPDATE "Jobs"
-SET auto_dial_enabled_at = NOW()
-WHERE automatic_dial = TRUE
-  AND auto_dial_enabled_at IS NULL;
+ALTER TABLE "Jobs_CVs" ADD COLUMN market_intel text;
 ```
 
-### Behavior After Fix
+#### Step 2: Update Interface
+Add `market_intel` to the `CallLogDetail` interface in `src/pages/CallLogDetails.tsx`:
 
-1. **New jobs**: Created with auto-dial ON and 48-hour timer started
-2. **Turning auto-dial OFF then ON**: Timer resets to 48 hours (already working)
-3. **Reaching 6 shortlisted**: Auto-dial disabled by threshold trigger
-4. **After 48 hours**: Auto-dial disabled by cron
+```typescript
+interface CallLogDetail {
+  // ... existing fields
+  salary_note: string | null
+  market_intel: string | null  // NEW
+  // ... rest of fields
+}
+```
+
+#### Step 3: Fetch the New Field
+Update the enriched data mapping to include `market_intel`:
+
+```typescript
+const enrichedData: CallLogDetail = {
+  // ... existing mappings
+  salary_note: data.salary_note,
+  market_intel: data.market_intel,  // NEW
+  // ...
+}
+```
+
+#### Step 4: Add UI Section
+Add the Market Intel section immediately after the Salary Note section in the Salary & Notice card:
+
+```tsx
+{/* Salary Note section - existing */}
+<div className="pt-2 border-t border-border/30">
+  <label className="text-xs sm:text-sm font-medium text-muted-foreground">Salary Note</label>
+  <p className="text-sm sm:text-base text-foreground/90 mt-1 leading-relaxed break-words">
+    {callLog.salary_note?.trim() || <span className="italic text-muted-foreground">Not generated yet</span>}
+  </p>
+</div>
+
+{/* Market Intel section - NEW */}
+<div className="pt-2 border-t border-border/30">
+  <label className="text-xs sm:text-sm font-medium text-muted-foreground">Market Intel</label>
+  <p className="text-sm sm:text-base text-foreground/90 mt-1 leading-relaxed break-words">
+    {callLog.market_intel?.trim() || <span className="italic text-muted-foreground">Not generated yet</span>}
+  </p>
+</div>
+```
+
+---
 
 ### Files Changed
 
 | File | Change |
 |------|--------|
-| `src/pages/AddJob.tsx` | Add `auto_dial_enabled_at` to job insert |
+| Database migration | Add `market_intel` text column to `Jobs_CVs` |
+| `src/pages/CallLogDetails.tsx` | Add field to interface, fetch mapping, and UI display |
 
-### Risks
+---
 
-- **None to existing functionality** - Only adds a timestamp field to new job creation
-- **Existing jobs with NULL timestamp** - These will continue to run indefinitely until you run the optional SQL fix or toggle them via UI
+### Behavior After Implementation
+- The "Market Intel" section will appear below "Salary Note" in the Salary & Notice card
+- Initially shows "Not generated yet" placeholder (same as Salary Note)
+- When populated (via external AI system or future edge function), displays the market intelligence content
+- Mobile-responsive with proper text wrapping
+
+---
+
+### No Impact on Existing System
+- This is an additive change only
+- New column defaults to NULL, no effect on existing records
+- No changes to existing fields or functionality
+
