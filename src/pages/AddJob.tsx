@@ -620,7 +620,9 @@ export default function AddJob() {
           status: 'Active',
           Processed: 'Yes',
           Timestamp: new Date().toISOString(),
-          linkedin_search_enabled: linkedInSearchEnabled
+          linkedin_search_enabled: linkedInSearchEnabled,
+          automatic_dial: true,
+          auto_dial_enabled_at: new Date().toISOString()
         });
 
       if (error) {
