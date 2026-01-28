@@ -799,7 +799,7 @@ export default function Index() {
         {/* Right Side - Live Candidate Feed & Action Center - 60% width */}
         <div className="space-y-3 sm:space-y-4 lg:space-y-4 lg:col-span-2 order-1 lg:order-2">
           {/* Live Candidate Feed */}
-          <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20">
+          <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20 max-w-2xl mx-auto w-full">
             <CardHeader className="p-2 sm:p-3 lg:p-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
                 <CardTitle className="text-base sm:text-lg lg:text-xl text-cyan-300 flex items-center flex-wrap gap-2">
