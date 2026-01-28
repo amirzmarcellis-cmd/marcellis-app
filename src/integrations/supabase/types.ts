@@ -382,6 +382,7 @@ export type Database = {
           jd_link: string | null
           jd_summary: string | null
           job_description: string | null
+          Job_difficulty: string | null
           job_id: string
           job_location: string | null
           job_salary_range: number | null
@@ -420,6 +421,7 @@ export type Database = {
           jd_link?: string | null
           jd_summary?: string | null
           job_description?: string | null
+          Job_difficulty?: string | null
           job_id: string
           job_location?: string | null
           job_salary_range?: number | null
@@ -458,6 +460,7 @@ export type Database = {
           jd_link?: string | null
           jd_summary?: string | null
           job_description?: string | null
+          Job_difficulty?: string | null
           job_id?: string
           job_location?: string | null
           job_salary_range?: number | null
