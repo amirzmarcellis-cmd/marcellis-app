@@ -630,9 +630,9 @@ export default function Index() {
     return 'Good evening';
   };
 
-  return <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden mx-auto max-w-screen-2xl pb-20 w-full min-w-0 max-w-full">
+  return <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden mx-auto max-w-7xl pb-20 w-full min-w-0">
       
-      <div className="mb-6 sm:mb-8 relative z-10 w-full min-w-0 max-w-full">
+      <div className="mb-4 sm:mb-6 relative z-10 w-full min-w-0 max-w-full">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
           <div>
@@ -736,14 +736,14 @@ export default function Index() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 relative z-10 mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 relative z-10 mt-4">
         {/* Left Side - Job Control Panels - 30% width */}
-        <div className="space-y-3 sm:space-y-4 lg:col-span-1">
-          <h2 className="text-base sm:text-lg font-bold font-work text-cyan-300 mb-3 sm:mb-4 flex items-center">
-            <Target className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+        <div className="space-y-2 sm:space-y-3 lg:col-span-1">
+          <h2 className="text-sm sm:text-base font-bold font-work text-cyan-300 mb-2 sm:mb-3 flex items-center">
+            <Target className="h-4 w-4 mr-1.5" />
             Active Jobs Funnel
           </h2>
-          <ScrollArea className="h-[400px] sm:h-[500px] lg:h-[600px]">
+          <ScrollArea className="h-[300px] sm:h-[400px] lg:h-[450px]">
             <div className="space-y-3">
               {data?.activeJobs?.sort((a, b) => {
                 const aShortlist = jobStats[a.job_id]?.shortlist || 0;
@@ -822,7 +822,7 @@ export default function Index() {
               </div>
             </CardHeader>
             <CardContent className="p-3 sm:p-4 lg:p-6">
-              <ScrollArea className="h-[400px] sm:h-[450px] lg:h-[500px]">
+              <ScrollArea className="h-[300px] sm:h-[350px] lg:h-[400px]">
                 <div className="space-y-2 sm:space-y-3">
                   {enrichedCandidates.slice(0, 5).map((candidate, index) => {
                   const score = parseFloat(candidate.success_score) || 0;

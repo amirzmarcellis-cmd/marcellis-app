@@ -70,16 +70,16 @@ export function AdvancedMetricCard({
           className
         )}
       >
-        <CardContent className="p-4 sm:p-5">
-          <div className="flex items-center justify-between mb-3">
+        <CardContent className="p-3 sm:p-4">
+          <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <Skeleton className="h-7 w-7 rounded-md" />
-              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-6 w-6 rounded-md" />
+              <Skeleton className="h-3 w-20" />
             </div>
           </div>
-          <Skeleton className="h-10 w-20 mb-1" />
-          <Skeleton className="h-3 w-32 mb-3" />
-          <Skeleton className="h-1.5 w-full" />
+          <Skeleton className="h-8 w-16 mb-1" />
+          <Skeleton className="h-3 w-28 mb-2" />
+          <Skeleton className="h-1 w-full" />
         </CardContent>
       </Card>
     );
@@ -92,12 +92,12 @@ export function AdvancedMetricCard({
         className
       )}
     >
-      <CardContent className="p-4 sm:p-5 min-w-0">
+      <CardContent className="p-3 sm:p-4 min-w-0">
         {/* Header with icon and delta badge */}
-        <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between mb-2 sm:mb-3 min-w-0">
-          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
-            <div className="rounded-md bg-cyan-500/10 p-1 sm:p-1.5 shrink-0">
-              <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-cyan-400" />
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between mb-1.5 sm:mb-2 min-w-0">
+          <div className="flex items-center gap-1.5 min-w-0 flex-1">
+            <div className="rounded-md bg-cyan-500/10 p-1 shrink-0">
+              <Icon className="h-3.5 w-3.5 text-cyan-400" />
             </div>
             <span className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">
               {title}
@@ -106,7 +106,7 @@ export function AdvancedMetricCard({
           {delta && (
             <span
               className={cn(
-                "text-[10px] sm:text-xs font-semibold px-1.5 sm:px-2 py-0.5 rounded-full shrink-0 w-fit",
+                "text-[10px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 w-fit",
                 deltaType === "positive"
                   ? "bg-emerald-500/20 text-emerald-400"
                   : "bg-red-500/20 text-red-400"
@@ -118,23 +118,23 @@ export function AdvancedMetricCard({
         </div>
 
         {/* Main value */}
-        <div className="mb-0.5 sm:mb-1">
-          <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground tracking-tight">
+        <div className="mb-0.5">
+          <span className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground tracking-tight">
             {value}
           </span>
         </div>
 
         {/* Subtitle or benchmark */}
         {(subtitle || benchmark) && (
-          <p className="text-[10px] sm:text-xs text-muted-foreground mb-2 sm:mb-3 line-clamp-2">
+          <p className="text-[10px] text-muted-foreground mb-1.5 sm:mb-2 line-clamp-2">
             {subtitle || benchmark}
           </p>
         )}
 
         {/* Progress bar */}
         {typeof pct === "number" && (
-          <div className="mt-3">
-            <div className="h-1.5 w-full bg-gray-800 rounded-full overflow-hidden">
+          <div className="mt-2">
+            <div className="h-1 w-full bg-gray-800 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-full transition-all duration-500"
                 style={{ width: `${pct}%` }}
@@ -145,13 +145,13 @@ export function AdvancedMetricCard({
 
         {/* Chart variants */}
         {chartType === "waveform" && trend.length > 0 && (
-          <div className="mt-2 sm:mt-3">
-            <Sparkline data={trend} className="h-6 sm:h-10 text-cyan-400/70" />
+          <div className="mt-1.5 sm:mt-2">
+            <Sparkline data={trend} className="h-5 sm:h-8 text-cyan-400/70" />
           </div>
         )}
 
         {chartType === "bell" && (
-          <div className="mt-2 sm:mt-3">
+          <div className="mt-1.5 sm:mt-2">
             <BellCurve />
           </div>
         )}
