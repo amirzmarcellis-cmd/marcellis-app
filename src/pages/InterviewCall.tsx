@@ -19,6 +19,7 @@ interface InterviewData {
   job_id: string;
   callcount: number | null;
   two_questions_of_interview: string | null;
+  contacted_status: string | null;
   
   // From Jobs
   job_title: string | null;
@@ -31,6 +32,16 @@ interface InterviewData {
   things_to_look_for: string | null;
   vapi_ai_assistant: string | null;
 }
+
+// Statuses that allow interview access
+const ALLOWED_STATUSES = [
+  'Ready to Call',
+  'Ready to Contact',
+  'Contacted',
+  '1st No Answer',
+  '2nd No Answer',
+  '3rd No Answer',
+];
 
 // Voice animation component
 const VoiceAnimation = ({ isSpeaking, isConnected }: { isSpeaking: boolean; isConnected: boolean }) => (
@@ -86,7 +97,7 @@ const InterviewCall: React.FC = () => {
         // Fetch candidate data from Jobs_CVs using recordid
         const { data: candidateRecord, error: candidateError } = await supabase
           .from('Jobs_CVs')
-          .select('recordid, candidate_name, candidate_email, job_id, user_id, callcount, two_questions_of_interview')
+          .select('recordid, candidate_name, candidate_email, job_id, user_id, callcount, two_questions_of_interview, contacted')
           .eq('recordid', parseInt(callId))
           .single();
 
@@ -117,6 +128,7 @@ const InterviewCall: React.FC = () => {
           job_id: candidateRecord.job_id,
           callcount: candidateRecord.callcount,
           two_questions_of_interview: candidateRecord.two_questions_of_interview,
+          contacted_status: candidateRecord.contacted,
           // From Jobs
           job_title: jobRecord?.job_title || null,
           job_location: jobRecord?.job_location || null,
@@ -203,6 +215,41 @@ const InterviewCall: React.FC = () => {
             <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Interview Not Available</h2>
             <p className="text-muted-foreground">{fetchError}</p>
+          </GlassCard>
+        </div>
+      </MissionBackground>
+    );
+  }
+
+  // Check if candidate status allows interview access
+  const isStatusAllowed = interviewData?.contacted_status && ALLOWED_STATUSES.includes(interviewData.contacted_status);
+  
+  if (interviewData && !isStatusAllowed) {
+    const isCallDone = interviewData.contacted_status === 'Call Done';
+    return (
+      <MissionBackground>
+        <div className="min-h-screen flex flex-col items-center justify-center p-4">
+          <div className="mb-8">
+            <img src={companyLogo} alt="Company Logo" className="h-16 w-auto" />
+          </div>
+          <GlassCard className="w-full max-w-md p-8 text-center">
+            {isCallDone ? (
+              <>
+                <CheckCircle2 className="h-12 w-12 text-primary mx-auto mb-4" />
+                <h2 className="text-xl font-semibold mb-2">Interview Already Completed</h2>
+                <p className="text-muted-foreground">
+                  Your interview has already been completed. Our team will review it and be in touch soon.
+                </p>
+              </>
+            ) : (
+              <>
+                <AlertCircle className="h-12 w-12 text-amber-500/80 mx-auto mb-4" />
+                <h2 className="text-xl font-semibold mb-2">Interview Not Available</h2>
+                <p className="text-muted-foreground">
+                  This interview is no longer available. Please contact the recruiter for assistance.
+                </p>
+              </>
+            )}
           </GlassCard>
         </div>
       </MissionBackground>
