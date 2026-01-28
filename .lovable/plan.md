@@ -1,69 +1,102 @@
 
-## Fix Dashboard Alignment - Scale Content to Fit
+## Fix Dashboard Alignment - All Cards Visible
 
-### Problem
-The 5 KPI cards are still not fitting on your custom domain because:
-- The sidebar takes up **16rem (256px)** when expanded
-- Even at **xl breakpoint (1280px)**, the content area is only ~1024px
-- This leaves insufficient space for 5 cards to display properly
+### Problem Analysis
 
-### Solution
-Apply a "zoom reduction" effect by either:
-1. **Delay 5-column layout to 2xl breakpoint (1536px)** - ensures sufficient width
-2. **Reduce card padding and text sizes** for more compact cards
-3. **Add CSS transform scale** for a true "zoom out" effect on smaller screens
+From the screenshot of https://marcellis.eezi.ai/, I can see:
 
-### Recommended Approach
-Change the 5-column breakpoint from `xl` to `2xl` (1536px), which accounts for the sidebar width and ensures all 5 cards fit comfortably.
+| Row | Expected Cards | Visible Cards | Issue |
+|-----|----------------|---------------|-------|
+| Top (KPI cards) | 5 | 4 (Submitted cut off) | Grid showing 4 columns but overflowing |
+| Bottom (Advanced Metrics) | 4 | 3 (Fill Rate cut off) | `lg:grid-cols-4` too aggressive |
+
+The sidebar takes **256px** when expanded. At a viewport of ~1400px, the content area is only ~1144px, which is insufficient for 4-5 large cards.
 
 ---
 
-### Implementation
+### Root Cause
 
-#### File: `src/components/dashboard/BentoKpis.tsx`
+1. **BentoKpis**: Currently uses `md:grid-cols-4` which triggers at 768px - but with sidebar, effective content width is ~512px
+2. **Advanced Metrics grid**: Uses `lg:grid-cols-4` (1024px breakpoint) - but with sidebar, effective content width is ~768px
+3. Both grids overflow because the cards' minimum widths exceed available space
+
+---
+
+### Solution
+
+#### 1. Fix Top KPI Row (`BentoKpis.tsx`)
+
+Change breakpoints to be more conservative:
+
+```typescript
+const gridCols = columns === 5 
+  ? "grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5" 
+  : "grid-cols-2 sm:grid-cols-2 lg:grid-cols-4"
+```
+
+| Viewport | Columns | With Sidebar |
+|----------|---------|--------------|
+| < 640px | 2 | Mobile overlay |
+| 640-767px | 2 | ~400px content → 2 cards fit |
+| 768-1023px | 3 | ~550px content → 3 cards fit |
+| 1024-1535px | 4 | ~800px content → 4 cards fit |
+| 1536px+ | 5 | ~1280px content → 5 cards fit |
+
+#### 2. Fix Advanced Metrics Row (`Index.tsx`)
+
+Change the grid breakpoint from `lg:grid-cols-4` to `xl:grid-cols-4`:
 
 **Current:**
 ```typescript
-const gridCols = columns === 5 
-  ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5" 
-  : "grid-cols-2 sm:grid-cols-2 lg:grid-cols-4"
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10 mt-6">
 ```
 
 **Updated:**
 ```typescript
-const gridCols = columns === 5 
-  ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5" 
-  : "grid-cols-2 sm:grid-cols-2 lg:grid-cols-4"
+<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 relative z-10 min-w-0 overflow-hidden">
 ```
 
-This means:
-| Screen Width | With Sidebar (256px) | Content Width | Columns |
-|--------------|---------------------|---------------|---------|
-| < 640px | Mobile overlay | Full | 2 |
-| 640px - 767px | ~384px | ~600px | 3 |
-| 768px - 1535px | ~512px | ~1024px | 4 |
-| **1536px+** | ~1280px | **5** |
+This ensures 4 columns only appear at `xl` (1280px) viewport, giving ~1024px content width.
 
-At **2xl (1536px)**, the content area has ~1280px available, which comfortably fits 5 cards even with the sidebar expanded.
+#### 3. Ensure Container Constraints
+
+Add `min-w-0 overflow-hidden` to the Advanced Metrics grid container to prevent overflow.
 
 ---
 
-### Alternative: Compact Cards (Optional)
+### Implementation Details
 
-If you prefer 5 columns at smaller screens, we can also reduce the card size:
+#### File: `src/components/dashboard/BentoKpis.tsx`
 
-#### File: `src/components/dashboard/SimpleMetricCard.tsx`
+| Line | Change |
+|------|--------|
+| 11-12 | Update breakpoints: `md:grid-cols-4` → `lg:grid-cols-4` and add `md:grid-cols-3` |
 
-- Reduce padding from `p-4` to `p-3`
-- Reduce value text from `text-3xl` to `text-2xl`
-- Reduce icon container size
+#### File: `src/pages/Index.tsx`
+
+| Line | Change |
+|------|--------|
+| 698 | Change `lg:grid-cols-4` to `xl:grid-cols-4`, add `min-w-0 overflow-hidden` |
 
 ---
 
-### Summary
+### Expected Result
+
+At ~1400px viewport with expanded sidebar:
+- **Top row**: 4 KPI cards (all visible, no overflow)
+- **Bottom row**: 2 Advanced Metric cards per row (all visible, no overflow)
+
+At 1536px+ viewport:
+- **Top row**: 5 KPI cards
+- **Bottom row**: 4 Advanced Metric cards
+
+---
+
+### Summary of Changes
 
 | File | Change |
 |------|--------|
-| `src/components/dashboard/BentoKpis.tsx` | Change `xl:grid-cols-5` to `2xl:grid-cols-5` |
+| `src/components/dashboard/BentoKpis.tsx` | Adjust breakpoints: `md:grid-cols-3`, `lg:grid-cols-4`, `2xl:grid-cols-5` |
+| `src/pages/Index.tsx` | Change Advanced Metrics grid from `lg:grid-cols-4` to `xl:grid-cols-4` + add overflow handling |
 
-This ensures the 5-column layout only activates when there's truly enough horizontal space (1536px viewport), preventing the 4th/5th card from being cut off on your custom domain.
+This ensures both card rows display properly on your custom domain without any content being cut off.
