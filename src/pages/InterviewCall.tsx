@@ -8,7 +8,7 @@ import { MissionBackground } from '@/components/layout/MissionBackground';
 import { useVapiCall } from '@/hooks/useVapiCall';
 import { cn } from '@/lib/utils';
 import { Phone, PhoneOff, Mic, AlertCircle, CheckCircle2 } from 'lucide-react';
-import companyLogo from '@/assets/default-logo.png';
+import companyLogo from '@/assets/me-logo-white.png';
 
 interface CandidateData {
   candidate_name: string | null;
@@ -130,7 +130,7 @@ const InterviewCall: React.FC = () => {
       <MissionBackground>
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
           <div className="mb-8">
-            <img src={companyLogo} alt="Company Logo" className="h-8 w-8" />
+            <img src={companyLogo} alt="Company Logo" className="h-16 w-auto" />
           </div>
           <GlassCard className="w-full max-w-md p-8">
             <Skeleton className="h-8 w-3/4 mb-4" />
@@ -149,7 +149,7 @@ const InterviewCall: React.FC = () => {
       <MissionBackground>
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
           <div className="mb-8">
-            <img src={companyLogo} alt="Company Logo" className="h-8 w-8" />
+            <img src={companyLogo} alt="Company Logo" className="h-16 w-auto" />
           </div>
           <GlassCard className="w-full max-w-md p-8 text-center">
             <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
@@ -167,7 +167,7 @@ const InterviewCall: React.FC = () => {
       <MissionBackground>
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
           <div className="mb-8">
-            <img src={companyLogo} alt="Company Logo" className="h-8 w-8" />
+            <img src={companyLogo} alt="Company Logo" className="h-16 w-auto" />
           </div>
           <GlassCard className="w-full max-w-md p-8 text-center">
             <AlertCircle className="h-12 w-12 text-amber-500/80 mx-auto mb-4" />
@@ -187,7 +187,7 @@ const InterviewCall: React.FC = () => {
       <MissionBackground>
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
           <div className="mb-8">
-            <img src={companyLogo} alt="Company Logo" className="h-8 w-8" />
+            <img src={companyLogo} alt="Company Logo" className="h-16 w-auto" />
           </div>
           <GlassCard className="w-full max-w-md p-8 text-center">
             <CheckCircle2 className="h-16 w-16 text-primary mx-auto mb-4" />
@@ -212,7 +212,7 @@ const InterviewCall: React.FC = () => {
     <MissionBackground>
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <div className="mb-8">
-          <img src={companyLogo} alt="Company Logo" className="h-8 w-8" />
+          <img src={companyLogo} alt="Company Logo" className="h-16 w-auto" />
         </div>
         
         <GlassCard className="w-full max-w-md p-8">
