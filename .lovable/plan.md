@@ -1,19 +1,19 @@
 
 
-## Make Live Candidate Feed Cards More Compact
+## Fix Live Candidate Feed Layout and Button Colors
 
-This plan reduces the Live Candidate Feed card size further so the score and content are more visible without horizontal overflow.
+This plan addresses two issues visible in the dashboard:
+1. Score and buttons are cut off on the right side of the Live Candidate Feed cards
+2. Buttons have white/light backgrounds instead of matching the dark theme
 
 ---
 
 ### Summary of Changes
 
-1. **Reduce card padding** - Make inner spacing tighter
-2. **Reduce avatar size** - Smaller profile pictures
-3. **Remove the description section** - Free up vertical space
-4. **Simplify footer** - Combine or reduce footer elements
-5. **Reduce score section width** - Make buttons more compact
-6. **Reduce overall spacing** - Tighter gaps between elements
+1. **Fix overflow cutting off content** - Remove `overflow-hidden` from card items and ensure content fits
+2. **Fix button colors** - Change button backgrounds to match dark theme (transparent with dark hover states)
+3. **Adjust container width** - Remove the restrictive `max-w-[96%]` that's cutting content
+4. **Ensure proper spacing** - Give the score and buttons section adequate space
 
 ---
 
@@ -21,74 +21,78 @@ This plan reduces the Live Candidate Feed card size further so the score and con
 
 | File | Changes |
 |------|---------|
-| `src/pages/Index.tsx` | Make Live Candidate Feed cards more compact by reducing padding, avatar size, removing description, and tightening all spacing |
+| `src/components/dashboard/DashboardLayout.tsx` | Remove restrictive max-width that's cutting off content |
+| `src/pages/Index.tsx` | Fix button colors for dark theme, remove overflow-hidden from cards, ensure proper width for buttons section |
 
 ---
 
 ### Detailed Changes
 
-**File: `src/pages/Index.tsx` (Lines 824-900)**
+**File: `src/components/dashboard/DashboardLayout.tsx` (Line 51)**
 
-1. **Reduce card container padding**:
-   - From: `p-2 sm:p-3`
-   - To: `p-1.5 sm:p-2`
+Remove the `max-w-[98%] sm:max-w-[96%]` that's constraining the main content area:
 
-2. **Reduce card item padding**:
-   - From: `p-2`
-   - To: `p-1.5`
+```tsx
+// From:
+<main className="flex-1 p-1.5 sm:p-3 md:p-4 lg:p-6 w-full min-w-0 ml-auto max-w-[98%] sm:max-w-[96%]">
 
-3. **Reduce avatar size**:
-   - From: `w-8 h-8 sm:w-10 sm:h-10`
-   - To: `w-6 h-6 sm:w-8 sm:h-8`
+// To:
+<main className="flex-1 p-1.5 sm:p-3 md:p-4 lg:p-6 w-full min-w-0">
+```
 
-4. **Remove the description section** (lines 877-880):
-   - Remove the entire `<p className="text-xs text-gray-300 mt-2...">` block
-   - This frees up significant vertical space per card
+**File: `src/pages/Index.tsx` (Lines 830, 860-873)**
 
-5. **Reduce score section minimum width**:
-   - From: `min-w-[70px] sm:min-w-[90px]`
-   - To: `min-w-[60px] sm:min-w-[80px]`
+1. Remove `overflow-hidden` from the card item:
+```tsx
+// From:
+className={`bg-gradient-to-r rounded-lg p-1.5 border overflow-hidden ${index < 3...`
 
-6. **Reduce score font size**:
-   - From: `text-lg sm:text-xl`
-   - To: `text-base sm:text-lg`
+// To:
+className={`bg-gradient-to-r rounded-lg p-1.5 border ${index < 3...`
+```
 
-7. **Make buttons smaller**:
-   - Height: from `h-6` to `h-5`
-   - Padding: from `px-1.5 py-0.5` to `px-1 py-0`
+2. Fix button styling to use dark-theme appropriate colors:
+```tsx
+// Reject Button - From:
+className="bg-transparent border border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300..."
 
-8. **Reduce spacing between cards**:
-   - From: `space-y-2`
-   - To: `space-y-1.5`
+// To:
+className="bg-red-500/10 border border-red-400 text-red-400 hover:bg-red-500/20 hover:border-red-300 hover:text-red-300..."
 
-9. **Reduce footer margin**:
-   - From: `mt-2`
-   - To: `mt-1`
+// Submit Button - From:
+className="bg-transparent border border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300..."
 
-10. **Reduce badge spacing in footer**:
-    - Simplify and shrink badges
+// To:
+className="bg-green-500/10 border border-green-400 text-green-400 hover:bg-green-500/20 hover:border-green-300 hover:text-green-300..."
+```
+
+3. Increase the minimum width for the score/buttons section to prevent cutoff:
+```tsx
+// From:
+<div className="flex flex-col items-end gap-0.5 flex-shrink-0 min-w-[60px] sm:min-w-[80px]">
+
+// To:
+<div className="flex flex-col items-end gap-0.5 flex-shrink-0 min-w-[70px] sm:min-w-[90px]">
+```
 
 ---
 
 ### Visual Impact
 
 ```text
-Before (current):
-┌─────────────────────────────────────────────────┐
-│ (Avatar) Candidate Name              │  92    │
-│         Job Title                    │ [Reject]│
-│         [UserID] [JobID]             │ [Submit]│
-│ ─────────────────────────────────────────────── │
-│ "No after call reason available..."              │
-│ Updated: 1/28/2026          [Call Done]         │
-└─────────────────────────────────────────────────┘
+Before:
+┌───────────────────────────────────────────────────┐
+│ (A) Ayan Das                    │ (cut off)  │
+│     Lead Product Designer       │   Rej... │
+│                                 │   Sub... │
+└───────────────────────────────────────────────────┘
 
-After (more compact - no description):
-┌─────────────────────────────────────────────────┐
-│ (A) Candidate Name            │ 92 │
-│     Job Title                 │[X][✓]│
-│     [UserID] [JobID]   1/28   │ Done │
-└─────────────────────────────────────────────────┘
+After:
+┌───────────────────────────────────────────────────┐
+│ (A) Ayan Das                    │  92  │
+│     Lead Product Designer       │ [Reject] │
+│     [UserID] [JobID]            │ [Submit] │
+└───────────────────────────────────────────────────┘
 ```
 
 ---
@@ -97,7 +101,7 @@ After (more compact - no description):
 
 - All changes are purely visual/CSS adjustments
 - No business logic or data fetching is affected
-- Changes are localized to the Live Candidate Feed section in Index.tsx
-- No impact on other pages or the standalone LiveCandidateFeed page
-- The description can still be viewed on the full Live Candidate Feed page
+- Changes are localized to the dashboard layout and Live Candidate Feed section
+- No impact on other pages or components
+- Existing dark/light mode support is preserved with simplified dark-mode-first colors
 
