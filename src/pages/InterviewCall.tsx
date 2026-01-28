@@ -7,7 +7,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { MissionBackground } from '@/components/layout/MissionBackground';
 import { useVapiCall } from '@/hooks/useVapiCall';
 import { cn } from '@/lib/utils';
-import { Phone, PhoneOff, Mic, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Phone, PhoneOff, Mic, AlertCircle, CheckCircle2, Lock } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import companyLogo from '@/assets/me-logo-white.png';
 
 interface InterviewData {
@@ -15,6 +17,7 @@ interface InterviewData {
   recordid: number;
   candidate_name: string | null;
   candidate_email: string | null;
+  candidate_phone_number: string | null;
   candidate_id: string;
   job_id: string;
   callcount: number | null;
@@ -32,6 +35,11 @@ interface InterviewData {
   things_to_look_for: string | null;
   vapi_ai_assistant: string | null;
 }
+
+// Phone normalization helper
+const normalizePhone = (phone: string): string => {
+  return phone.replace(/\D/g, '');
+};
 
 // Statuses that allow interview access
 const ALLOWED_STATUSES = [
@@ -77,10 +85,14 @@ const formatDuration = (seconds: number): string => {
 const InterviewCall: React.FC = () => {
   const [searchParams] = useSearchParams();
   const callId = searchParams.get('callId');
+  const verificationType = searchParams.get('type'); // 'phone' or 'email'
   
   const [loading, setLoading] = useState(true);
   const [interviewData, setInterviewData] = useState<InterviewData | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [isVerified, setIsVerified] = useState(false);
+  const [verificationInput, setVerificationInput] = useState('');
+  const [verificationError, setVerificationError] = useState<string | null>(null);
   
   const { status, isSpeaking, duration, error, startCall, endCall } = useVapiCall();
 
@@ -97,7 +109,7 @@ const InterviewCall: React.FC = () => {
         // Fetch candidate data from Jobs_CVs using recordid
         const { data: candidateRecord, error: candidateError } = await supabase
           .from('Jobs_CVs')
-          .select('recordid, candidate_name, candidate_email, job_id, user_id, callcount, two_questions_of_interview, contacted')
+          .select('recordid, candidate_name, candidate_email, candidate_phone_number, job_id, user_id, callcount, two_questions_of_interview, contacted')
           .eq('recordid', parseInt(callId))
           .single();
 
@@ -124,6 +136,7 @@ const InterviewCall: React.FC = () => {
           recordid: candidateRecord.recordid,
           candidate_name: candidateRecord.candidate_name,
           candidate_email: candidateRecord.candidate_email,
+          candidate_phone_number: candidateRecord.candidate_phone_number,
           candidate_id: candidateRecord.user_id,
           job_id: candidateRecord.job_id,
           callcount: candidateRecord.callcount,
@@ -150,6 +163,37 @@ const InterviewCall: React.FC = () => {
 
     fetchData();
   }, [callId]);
+
+  // Verification handler
+  const handleVerification = () => {
+    if (!interviewData) return;
+    
+    const inputValue = verificationInput.trim();
+    
+    if (verificationType === 'phone') {
+      const storedPhone = normalizePhone(interviewData.candidate_phone_number || '');
+      const enteredPhone = normalizePhone(inputValue);
+      
+      // Check if entered phone ends with or matches stored phone (flexible matching)
+      if (storedPhone && enteredPhone.length >= 6 && 
+          (storedPhone.endsWith(enteredPhone) || enteredPhone.endsWith(storedPhone) || storedPhone === enteredPhone)) {
+        setIsVerified(true);
+        setVerificationError(null);
+      } else {
+        setVerificationError("The phone number you entered doesn't match our records.");
+      }
+    } else if (verificationType === 'email') {
+      const storedEmail = (interviewData.candidate_email || '').toLowerCase().trim();
+      const enteredEmail = inputValue.toLowerCase().trim();
+      
+      if (storedEmail && storedEmail === enteredEmail) {
+        setIsVerified(true);
+        setVerificationError(null);
+      } else {
+        setVerificationError("The email address you entered doesn't match our records.");
+      }
+    }
+  };
 
   const handleStartInterview = async () => {
     if (!interviewData?.vapi_ai_assistant) {
@@ -221,6 +265,26 @@ const InterviewCall: React.FC = () => {
     );
   }
 
+  // Invalid or missing type parameter
+  if (!verificationType || !['phone', 'email'].includes(verificationType)) {
+    return (
+      <MissionBackground>
+        <div className="min-h-screen flex flex-col items-center justify-center p-4">
+          <div className="mb-8">
+            <img src={companyLogo} alt="Company Logo" className="h-16 w-auto" />
+          </div>
+          <GlassCard className="w-full max-w-md p-8 text-center">
+            <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">Invalid Link</h2>
+            <p className="text-muted-foreground">
+              This interview link is invalid. Please check your email for the correct link.
+            </p>
+          </GlassCard>
+        </div>
+      </MissionBackground>
+    );
+  }
+
   // Check if candidate status allows interview access
   const isStatusAllowed = interviewData?.contacted_status && ALLOWED_STATUSES.includes(interviewData.contacted_status);
   
@@ -270,6 +334,61 @@ const InterviewCall: React.FC = () => {
             <p className="text-muted-foreground">
               This interview is not available at the moment. Please contact the recruiter.
             </p>
+          </GlassCard>
+        </div>
+      </MissionBackground>
+    );
+  }
+
+  // Verification screen (shown when not verified)
+  if (!isVerified && interviewData && isStatusAllowed) {
+    return (
+      <MissionBackground>
+        <div className="min-h-screen flex flex-col items-center justify-center p-4">
+          <div className="mb-8">
+            <img src={companyLogo} alt="Company Logo" className="h-16 w-auto" />
+          </div>
+          
+          <GlassCard className="w-full max-w-md p-8">
+            <div className="text-center mb-6">
+              <Lock className="h-12 w-12 text-primary mx-auto mb-4" />
+              <h2 className="text-xl font-semibold mb-2">Verify Your Identity</h2>
+              <p className="text-muted-foreground text-sm">
+                {verificationType === 'phone' 
+                  ? 'Please enter your phone number to access the interview.'
+                  : 'Please enter your email address to access the interview.'}
+              </p>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="verification">
+                  {verificationType === 'phone' ? 'Phone Number' : 'Email Address'}
+                </Label>
+                <Input
+                  id="verification"
+                  type={verificationType === 'phone' ? 'tel' : 'email'}
+                  placeholder={verificationType === 'phone' ? '+1 234 567 8900' : 'you@example.com'}
+                  value={verificationInput}
+                  onChange={(e) => setVerificationInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleVerification()}
+                />
+              </div>
+              
+              {verificationError && (
+                <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
+                  <p className="text-destructive text-sm text-center">{verificationError}</p>
+                </div>
+              )}
+              
+              <Button 
+                onClick={handleVerification}
+                className="w-full"
+                disabled={!verificationInput.trim()}
+              >
+                Continue to Interview
+              </Button>
+            </div>
           </GlassCard>
         </div>
       </MissionBackground>
