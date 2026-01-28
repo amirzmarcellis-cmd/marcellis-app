@@ -43,6 +43,7 @@ const PlatformAdmin = lazy(() => import("./pages/PlatformAdmin"));
 const LinkedInCallback = lazy(() => import("./pages/LinkedInCallback"));
 const AIOutreach = lazy(() => import("./pages/AIOutreach"));
 const ActiveJobsAnalytics = lazy(() => import("./pages/ActiveJobsAnalytics"));
+const InterviewCall = lazy(() => import("./pages/InterviewCall"));
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient({
@@ -70,6 +71,7 @@ const App = () => (
                   <Route path="/apply" element={<Apply />} />
                   <Route path="/apply/:subdomain" element={<Apply />} />
                   <Route path="/call-candidate" element={<CallCandidate />} />
+                  <Route path="/interview-call" element={<InterviewCall />} />
                   <Route path="/redirect-webhook" element={<RedirectWebhook />} />
                   <Route path="/" element={<DashboardLayout><Index /></DashboardLayout>} />
                   <Route path="/live-feed" element={<DashboardLayout><LiveCandidateFeed /></DashboardLayout>} />

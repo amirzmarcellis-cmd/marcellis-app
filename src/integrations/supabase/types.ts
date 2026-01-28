@@ -401,6 +401,7 @@ export type Database = {
           things_to_look_for: string | null
           Timestamp: string | null
           Type: string | null
+          vapi_ai_assistant: string | null
         }
         Insert: {
           assignment?: string | null
@@ -438,6 +439,7 @@ export type Database = {
           things_to_look_for?: string | null
           Timestamp?: string | null
           Type?: string | null
+          vapi_ai_assistant?: string | null
         }
         Update: {
           assignment?: string | null
@@ -475,6 +477,7 @@ export type Database = {
           things_to_look_for?: string | null
           Timestamp?: string | null
           Type?: string | null
+          vapi_ai_assistant?: string | null
         }
         Relationships: [
           {
