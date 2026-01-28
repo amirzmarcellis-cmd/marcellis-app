@@ -1,125 +1,88 @@
 
 
-## Expand VAPI Variable Values for Interview Calls
+## Restrict Interview Access by Candidate Status
 
 ### Overview
-Update the interview call page to fetch and pass all available data from `Jobs` and `Jobs_CVs` tables to the VAPI assistant, with the clarified variable mappings.
+Add status validation to the interview call page so only candidates with specific statuses can access the interview. This prevents candidates who have already completed calls or been rejected from accessing the interview link.
 
 ---
 
-### Variable Mappings (Updated)
+### Allowed Statuses
 
-| VAPI Variable | Source Table | Database Column |
-|---------------|--------------|-----------------|
-| `Job_id` | Jobs | `job_id` |
-| `recordid` | Jobs_CVs | `recordid` |
-| `job_title` | Jobs | `job_title` |
-| `client_name` | Jobs | `client_name` |
-| `candidate_id` | Jobs_CVs | `user_id` |
-| `candidate_name` | Jobs_CVs | `candidate_name` |
-| `candidate_name_ipa` | Jobs_CVs | `candidate_name` (same value) |
-| `job_salary_range` | Jobs | `job_salary_range` |
-| `job_location` | Jobs | `job_location` |
-| `client_description` | Jobs | `client_description` |
-| `contract_perm_type` | Jobs | `Type` |
-| `callcount` | Jobs_CVs | `callcount` |
-| `job_itris_id` | Jobs | `itris_job_id` |
-| `things_to_look_for_in_candidate` | Jobs | `things_to_look_for` |
-| `list_of_3_specific_questions` | Jobs_CVs | `two_questions_of_interview` |
-
-**Removed (per your request):**
-- `Scenario_id` - Not needed
-- `company_name` - Not needed
+| Status | Access |
+|--------|--------|
+| `Ready to Call` / `Ready to Contact` | Allowed |
+| `Contacted` | Allowed |
+| `1st No Answer` | Allowed |
+| `2nd No Answer` | Allowed |
+| `3rd No Answer` | Allowed |
+| `Call Done` | Blocked |
+| `Rejected` | Blocked |
+| `Not Contacted` | Blocked |
+| `Low Scored` | Blocked |
+| `Tasked` | Blocked |
 
 ---
 
-### Files to Modify
+### Implementation
 
-#### 1. `src/hooks/useVapiCall.ts`
-Update type signature to accept mixed value types:
+#### File: `src/pages/InterviewCall.tsx`
 
+**1. Add status to data fetching:**
 ```typescript
-// Change from:
-Record<string, string>
-
-// To:
-Record<string, string | number>
+// Add 'contacted' to the select query
+.select('recordid, candidate_name, candidate_email, job_id, user_id, callcount, two_questions_of_interview, contacted')
 ```
 
-#### 2. `src/pages/InterviewCall.tsx`
-
-**Expand the data interface:**
+**2. Add status to interface:**
 ```typescript
 interface InterviewData {
-  // From Jobs_CVs
-  recordid: number;
-  candidate_name: string | null;
-  candidate_email: string | null;
-  candidate_id: string;
-  job_id: string;
-  callcount: number | null;
-  two_questions_of_interview: string | null;
-  
-  // From Jobs
-  job_title: string | null;
-  job_location: string | null;
-  job_salary_range: number | null;
-  client_name: string | null;
-  client_description: string | null;
-  contract_perm_type: string | null;
-  job_itris_id: string | null;
-  things_to_look_for: string | null;
-  vapi_ai_assistant: string | null;
+  // ... existing fields
+  contacted_status: string | null;
 }
 ```
 
-**Update Supabase queries:**
+**3. Add status validation constant:**
 ```typescript
-// Jobs_CVs query - add two_questions_of_interview
-.select('recordid, candidate_name, candidate_email, job_id, user_id, callcount, two_questions_of_interview')
-
-// Jobs query
-.select('job_title, job_location, job_salary_range, client_name, client_description, Type, itris_job_id, things_to_look_for, vapi_ai_assistant')
+const ALLOWED_STATUSES = [
+  'Ready to Call',
+  'Ready to Contact',
+  'Contacted',
+  '1st No Answer',
+  '2nd No Answer',
+  '3rd No Answer',
+];
 ```
 
-**Pass all variables to VAPI:**
-```typescript
-await startCall(interviewData.vapi_ai_assistant, {
-  // IDs
-  Job_id: interviewData.job_id,
-  recordid: interviewData.recordid,
-  candidate_id: interviewData.candidate_id,
-  job_itris_id: interviewData.job_itris_id || '',
-  
-  // Candidate info
-  candidate_name: interviewData.candidate_name || 'Candidate',
-  candidate_name_ipa: interviewData.candidate_name || 'Candidate',
-  callcount: interviewData.callcount || 0,
-  
-  // Job info  
-  job_title: interviewData.job_title || 'Position',
-  job_location: interviewData.job_location || '',
-  job_salary_range: interviewData.job_salary_range || 0,
-  contract_perm_type: interviewData.contract_perm_type || '',
-  
-  // Client info
-  client_name: interviewData.client_name || '',
-  client_description: interviewData.client_description || '',
-  
-  // Interview context
-  things_to_look_for_in_candidate: interviewData.things_to_look_for || '',
-  list_of_3_specific_questions: interviewData.two_questions_of_interview || '',
-});
-```
+**4. Add status check after fetching data:**
+- Check if `contacted_status` is in the allowed list
+- If not, show a "Interview Not Available" message with appropriate text
+
+**5. Add new blocked status UI state:**
+A new screen will display when the candidate's status doesn't allow interview access:
+- For `Call Done`: "Your interview has already been completed"
+- For `Rejected` / other: "This interview is no longer available"
 
 ---
 
-### Summary
+### User Experience
 
-| File | Change |
-|------|--------|
-| `src/hooks/useVapiCall.ts` | Update type to accept `string \| number` values |
-| `src/pages/InterviewCall.tsx` | Expand queries and pass 15 variables to VAPI |
+| Scenario | Message Shown |
+|----------|--------------|
+| Status = `Ready to Call` | Normal interview UI |
+| Status = `Contacted` | Normal interview UI |
+| Status = `1st/2nd/3rd No Answer` | Normal interview UI |
+| Status = `Call Done` | "Your interview has already been completed. Our team will be in touch soon." |
+| Status = `Rejected` | "This interview is no longer available. Please contact the recruiter." |
+| Status = other blocked | "This interview is not available at the moment. Please contact the recruiter." |
 
-This will pass **15 variables** to the VAPI assistant, providing full context for personalized interviews.
+---
+
+### Technical Summary
+
+| Change | Description |
+|--------|-------------|
+| Add `contacted` to query | Fetch status from `Jobs_CVs` table |
+| Add status validation | Check against allowed statuses list |
+| Add blocked UI states | Show appropriate message based on status |
 
