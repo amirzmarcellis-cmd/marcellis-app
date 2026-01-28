@@ -827,7 +827,7 @@ export default function Index() {
                   {enrichedCandidates.slice(0, 5).map((candidate, index) => {
                   const score = parseFloat(candidate.success_score) || 0;
                   const jobTitle = candidate.job_title || 'Unknown Position';
-                  return <div key={index} className={`bg-gradient-to-r rounded-lg p-1.5 border overflow-hidden ${index < 3 ? 'from-amber-400/20 to-yellow-500/20 border-yellow-400/40' : 'from-white/5 to-white/10 border-white/20'} hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group cursor-pointer active:scale-[0.98]`} onClick={() => handleCandidateClick(candidate.recordid, candidate.job_id)}>
+                  return <div key={index} className={`bg-gradient-to-r rounded-lg p-1.5 border ${index < 3 ? 'from-amber-400/20 to-yellow-500/20 border-yellow-400/40' : 'from-white/5 to-white/10 border-white/20'} hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group cursor-pointer active:scale-[0.98]`} onClick={() => handleCandidateClick(candidate.recordid, candidate.job_id)}>
                         {/* Main row: Info + Score + Buttons */}
                         <div className="flex items-start justify-between gap-1.5 w-full">
                           {/* Left: Avatar + Info */}
@@ -852,7 +852,7 @@ export default function Index() {
                             </div>
                           </div>
                           {/* Right: Score + Buttons - guaranteed width */}
-                          <div className="flex flex-col items-end gap-0.5 flex-shrink-0 min-w-[60px] sm:min-w-[80px]">
+                          <div className="flex flex-col items-end gap-0.5 flex-shrink-0 min-w-[70px] sm:min-w-[90px]">
                             <div className={`text-base sm:text-lg font-bold ${getScoreColor(score)}`}>
                               {score}
                             </div>
@@ -860,14 +860,14 @@ export default function Index() {
                               <Button size="xs" variant="outline" onClick={e => {
                                 e.stopPropagation();
                                 handleRejectCandidate(candidate.Candidate_ID, candidate.job_id);
-                              }} className="bg-transparent border border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200 text-[8px] px-1 py-0 h-5 w-full">
+                              }} className="bg-red-500/10 border border-red-400 text-red-400 hover:bg-red-500/20 hover:border-red-300 hover:text-red-300 transition-all duration-200 text-[8px] px-1 py-0 h-5 w-full">
                                 <XCircle className="w-2.5 h-2.5" />
                                 <span className="hidden sm:inline ml-0.5">Reject</span>
                               </Button>
                               <Button size="xs" variant="outline" onClick={e => {
                                 e.stopPropagation();
                                 handleCVSubmitted(candidate.Candidate_ID, candidate.job_id);
-                              }} className="bg-transparent border border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200 text-[8px] px-1 py-0 h-5 w-full">
+                              }} className="bg-green-500/10 border border-green-400 text-green-400 hover:bg-green-500/20 hover:border-green-300 hover:text-green-300 transition-all duration-200 text-[8px] px-1 py-0 h-5 w-full">
                                 <CheckCircle className="w-2.5 h-2.5" />
                                 <span className="hidden sm:inline ml-0.5">Submit</span>
                               </Button>
