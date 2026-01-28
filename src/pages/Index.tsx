@@ -797,10 +797,10 @@ export default function Index() {
         </div>
 
         {/* Right Side - Live Candidate Feed & Action Center - 60% width */}
-        <div className="space-y-4 sm:space-y-5 lg:space-y-6 lg:col-span-2 order-1 lg:order-2">
+        <div className="space-y-3 sm:space-y-4 lg:space-y-4 lg:col-span-2 order-1 lg:order-2">
           {/* Live Candidate Feed */}
           <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20">
-            <CardHeader className="p-3 sm:p-4 lg:p-6">
+            <CardHeader className="p-2 sm:p-3 lg:p-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
                 <CardTitle className="text-base sm:text-lg lg:text-xl text-cyan-300 flex items-center flex-wrap gap-2">
                   <Activity className="h-4 w-4 sm:h-5 sm:w-5 animate-pulse text-cyan-400" />
@@ -822,7 +822,7 @@ export default function Index() {
               </div>
             </CardHeader>
             <CardContent className="p-1.5 sm:p-2">
-              <ScrollArea className="h-[250px] sm:h-[300px] lg:h-[350px]">
+              <ScrollArea className="h-[200px] sm:h-[240px] lg:h-[280px]">
                 <div className="space-y-1.5">
                   {enrichedCandidates.slice(0, 5).map((candidate, index) => {
                   const score = parseFloat(candidate.success_score) || 0;
