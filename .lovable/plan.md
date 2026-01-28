@@ -1,17 +1,15 @@
 
+## Reduce Dashboard Width While Preserving Live Candidate Feed Height
 
-## Reduce Dashboard Page Size
-
-This plan makes the dashboard more compact by reducing card sizes and the overall content max-width.
+This plan reduces the overall width of the dashboard content area while keeping the live candidate feed item heights intact.
 
 ---
 
 ### Summary of Changes
 
-1. **Reduce max-width** of the dashboard content container from `max-w-screen-2xl` (1536px) to `max-w-7xl` (1280px)
-2. **Make KPI cards smaller** by reducing padding, font sizes, and icon sizes
-3. **Make Advanced Metric cards smaller** by reducing padding and font sizes
-4. **Reduce section heights** for the Jobs Funnel and Live Feed scroll areas
+1. **Reduce dashboard max-width** from `max-w-7xl` (1280px) to `max-w-6xl` (1152px)
+2. **Keep live candidate feed heights unchanged** - no modifications to ScrollArea heights or card item heights
+3. **Ensure content remains visible** - adjust internal spacing to accommodate narrower width
 
 ---
 
@@ -19,103 +17,65 @@ This plan makes the dashboard more compact by reducing card sizes and the overal
 
 | File | Changes |
 |------|---------|
-| `src/pages/Index.tsx` | Reduce max-width, decrease scroll area heights, reduce gaps between sections |
-| `src/components/dashboard/SimpleMetricCard.tsx` | Smaller padding (p-4 → p-3), smaller value text (text-3xl → text-2xl), smaller icon |
-| `src/components/dashboard/AdvancedMetricCard.tsx` | Smaller padding (p-4/p-5 → p-3/p-4), smaller value text (text-4xl → text-2xl) |
-| `src/components/dashboard/BentoKpis.tsx` | Reduce gap between cards (gap-4 → gap-3) |
+| `src/pages/Index.tsx` | Reduce main container max-width from `max-w-7xl` to `max-w-6xl` |
 
 ---
 
 ### Detailed Changes
 
-**File: `src/pages/Index.tsx`**
+**File: `src/pages/Index.tsx` (Line 633)**
 
-1. Change the main container max-width:
-   - From: `max-w-screen-2xl` (1536px)
-   - To: `max-w-7xl` (1280px)
+Reduce the main dashboard container width:
 
-2. Reduce scroll area heights:
-   - Jobs Funnel: from `h-[400px] sm:h-[500px] lg:h-[600px]` to `h-[300px] sm:h-[400px] lg:h-[450px]`
-   - Live Feed: from `h-[400px] sm:h-[450px] lg:h-[500px]` to `h-[300px] sm:h-[350px] lg:h-[400px]`
+```tsx
+// From:
+<div className="min-h-screen bg-background text-foreground relative overflow-x-hidden mx-auto max-w-7xl pb-20 w-full min-w-0">
 
-3. Reduce gaps between sections:
-   - Main grid gap: from `gap-4 sm:gap-6` to `gap-3 sm:gap-4`
-   - Header margin: from `mb-6 sm:mb-8` to `mb-4 sm:mb-6`
+// To:
+<div className="min-h-screen bg-background text-foreground relative overflow-x-hidden mx-auto max-w-6xl pb-20 w-full min-w-0">
+```
 
 ---
 
-**File: `src/components/dashboard/SimpleMetricCard.tsx`**
+### What Stays Unchanged
 
-1. Reduce card padding:
-   - From: `p-4`
-   - To: `p-3`
+The following elements will NOT be modified:
 
-2. Reduce main value font size:
-   - From: `text-3xl`
-   - To: `text-2xl`
-
-3. Reduce icon container:
-   - Padding: `p-2` → `p-1.5`
-   - Icon size: `h-5 w-5` → `h-4 w-4`
-
-4. Reduce sparkline margin:
-   - From: `mt-3`
-   - To: `mt-2`
-
----
-
-**File: `src/components/dashboard/AdvancedMetricCard.tsx`**
-
-1. Reduce card padding:
-   - From: `p-4 sm:p-5`
-   - To: `p-3 sm:p-4`
-
-2. Reduce main value font size:
-   - From: `text-2xl sm:text-3xl md:text-4xl`
-   - To: `text-xl sm:text-2xl md:text-3xl`
-
-3. Reduce icon container size:
-   - From: `p-1 sm:p-1.5`
-   - To: `p-1`
-
----
-
-**File: `src/components/dashboard/BentoKpis.tsx`**
-
-1. Reduce grid gap:
-   - From: `gap-3 sm:gap-4`
-   - To: `gap-2 sm:gap-3`
+- **Live Candidate Feed ScrollArea height**: `h-[200px] sm:h-[240px] lg:h-[280px]`
+- **Individual candidate card heights**: All padding, text sizes, and button dimensions remain the same
+- **Button colors**: Already fixed to use dark theme colors (`bg-red-500/10`, `bg-green-500/10`)
+- **Score/buttons section width**: Already set to `min-w-[70px] sm:min-w-[90px]`
 
 ---
 
 ### Visual Impact
 
 ```text
-Before:
-┌────────────────────────────────────────────────────────────────┐
-│                    max-width: 1536px                           │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
-│  │  Large   │ │  Large   │ │  Large   │ │  Large   │ │  Large   │
-│  │  Cards   │ │  Cards   │ │  Cards   │ │  Cards   │ │  Cards   │
-│  └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘
-└────────────────────────────────────────────────────────────────┘
+Before (max-w-7xl = 1280px):
+┌──────────────────────────────────────────────────────────────────┐
+│                         Dashboard Content                         │
+│  ┌─────────────┬─────────────┬─────────────┬─────────────┬─────┐  │
+│  │ Active Jobs │ Waiting     │ Shortlisted │ Rejected    │ Sub │  │
+│  └─────────────┴─────────────┴─────────────┴─────────────┴─────┘  │
+└──────────────────────────────────────────────────────────────────┘
 
-After:
-┌────────────────────────────────────────────────────────┐
-│               max-width: 1280px                        │
-│  ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
-│  │Compact │ │Compact │ │Compact │ │Compact │ │Compact │
-│  │ Cards  │ │ Cards  │ │ Cards  │ │ Cards  │ │ Cards  │
-│  └────────┘ └────────┘ └────────┘ └────────┘ └────────┘
-└────────────────────────────────────────────────────────┘
+After (max-w-6xl = 1152px):
+┌────────────────────────────────────────────────────────────┐
+│                      Dashboard Content                      │
+│  ┌───────────┬───────────┬───────────┬───────────┬───────┐ │
+│  │Active Jobs│ Waiting   │ Shortlist │ Rejected  │  Sub  │ │
+│  └───────────┴───────────┴───────────┴───────────┴───────┘ │
+└────────────────────────────────────────────────────────────┘
 ```
+
+The dashboard will be approximately 128px narrower (10% reduction), creating a more compact layout while all content remains fully visible.
 
 ---
 
 ### Safety Notes
 
-- All changes are purely visual/CSS adjustments
+- This is a single CSS class change affecting only the max-width constraint
 - No business logic or data fetching is affected
-- Changes are localized to dashboard components only
-- No impact on other pages or the live system
-
+- All card content, buttons, and scores will remain visible
+- Mobile responsive breakpoints are preserved
+- No impact on other pages
