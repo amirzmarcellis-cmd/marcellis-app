@@ -630,9 +630,9 @@ export default function Index() {
     return 'Good evening';
   };
 
-  return <div className="min-h-screen bg-background text-foreground relative overflow-hidden mx-auto max-w-screen-2xl pb-20">
+  return <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden mx-auto max-w-screen-2xl pb-20 w-full min-w-0 max-w-full">
       
-      <div className="mb-6 sm:mb-8 relative z-10 w-full min-w-0 overflow-hidden">
+      <div className="mb-6 sm:mb-8 relative z-10 w-full min-w-0 max-w-full">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
           <div>
@@ -695,7 +695,7 @@ export default function Index() {
       </div>
 
       {/* Advanced Performance Metrics - 4 cards in a row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 relative z-10 mt-6 min-w-0 overflow-hidden">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 relative z-10 mt-6 w-full min-w-0 max-w-full">
         <AdvancedMetricCard
           icon={TrendingUp}
           title="Pipeline Velocity"
