@@ -1,18 +1,19 @@
 
 
-## Fix Live Candidate Feed Layout on Dashboard
+## Make Live Candidate Feed Cards More Compact
 
-The Live Candidate Feed section on the dashboard is cutting off the candidate score and action buttons on the right side. This plan fixes the layout to ensure all content is visible.
+This plan reduces the Live Candidate Feed card size further so the score and content are more visible without horizontal overflow.
 
 ---
 
-### Root Cause Analysis
+### Summary of Changes
 
-The issue is in the candidate card layout within the Live Candidate Feed section. The current layout has:
-1. Candidate info taking too much horizontal space
-2. Score and buttons on the right side getting pushed out of view
-3. The parent container not properly constraining content width
-4. Missing `overflow-hidden` on key containers
+1. **Reduce card padding** - Make inner spacing tighter
+2. **Reduce avatar size** - Smaller profile pictures
+3. **Remove the description section** - Free up vertical space
+4. **Simplify footer** - Combine or reduce footer elements
+5. **Reduce score section width** - Make buttons more compact
+6. **Reduce overall spacing** - Tighter gaps between elements
 
 ---
 
@@ -20,109 +21,83 @@ The issue is in the candidate card layout within the Live Candidate Feed section
 
 | File | Changes |
 |------|---------|
-| `src/pages/Index.tsx` | Fix the candidate card layout in the Live Candidate Feed section |
+| `src/pages/Index.tsx` | Make Live Candidate Feed cards more compact by reducing padding, avatar size, removing description, and tightening all spacing |
 
 ---
 
 ### Detailed Changes
 
-**File: `src/pages/Index.tsx` (Lines 830-893)**
+**File: `src/pages/Index.tsx` (Lines 824-900)**
 
-1. **Fix the main card layout** (Line 830-832):
-   - Change the flex layout from `flex-col sm:flex-row` to always use a proper responsive structure
-   - Ensure the candidate info section has proper max-width constraints
+1. **Reduce card container padding**:
+   - From: `p-2 sm:p-3`
+   - To: `p-1.5 sm:p-2`
 
-2. **Constrain the left info section** (Lines 832-856):
-   - Add `min-w-0` to the candidate info container to allow text truncation
-   - Change `flex-1` to have a max-width so the right section (score + buttons) has guaranteed space
-   - Ensure text truncation works properly on nested elements
+2. **Reduce card item padding**:
+   - From: `p-2`
+   - To: `p-1.5`
 
-3. **Ensure right section visibility** (Lines 857-879):
-   - Give the right section (score + buttons) a minimum width of `min-w-[100px] sm:min-w-[140px]`
-   - Add `flex-shrink-0` to prevent the score/button section from shrinking
-   - Reduce button text on small screens to just icons
+3. **Reduce avatar size**:
+   - From: `w-8 h-8 sm:w-10 sm:h-10`
+   - To: `w-6 h-6 sm:w-8 sm:h-8`
 
-4. **Reduce overall padding and spacing** (Lines 830-893):
-   - Reduce card padding from `p-3 sm:p-4 md:p-6` to `p-2 sm:p-3`
-   - Reduce gaps between elements
-   - Make buttons smaller
+4. **Remove the description section** (lines 877-880):
+   - Remove the entire `<p className="text-xs text-gray-300 mt-2...">` block
+   - This frees up significant vertical space per card
 
----
+5. **Reduce score section minimum width**:
+   - From: `min-w-[70px] sm:min-w-[90px]`
+   - To: `min-w-[60px] sm:min-w-[80px]`
 
-### Specific Code Changes
+6. **Reduce score font size**:
+   - From: `text-lg sm:text-xl`
+   - To: `text-base sm:text-lg`
 
-**Fix card structure (around line 830)**:
-```jsx
-// Current structure causes overflow
-<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
-  <div className="flex items-start sm:items-center space-x-3 min-w-0 flex-1">
-    ...
-  </div>
-  <div className="flex sm:flex-col items-center sm:items-end gap-3 sm:gap-2 flex-shrink-0">
-    ...
-  </div>
-</div>
+7. **Make buttons smaller**:
+   - Height: from `h-6` to `h-5`
+   - Padding: from `px-1.5 py-0.5` to `px-1 py-0`
 
-// Fixed structure - ensure score section has fixed width
-<div className="flex items-start justify-between gap-2 mb-2 w-full">
-  <div className="flex items-start space-x-2 min-w-0 flex-1 overflow-hidden">
-    ...info section (truncated text)
-  </div>
-  <div className="flex flex-col items-end gap-1 flex-shrink-0 min-w-[80px] sm:min-w-[100px]">
-    ...score + buttons (guaranteed width)
-  </div>
-</div>
-```
+8. **Reduce spacing between cards**:
+   - From: `space-y-2`
+   - To: `space-y-1.5`
 
-**Reduce button sizes and make them icon-only on mobile**:
-```jsx
-<Button size="xs" className="text-[10px] px-1.5 py-0.5 sm:px-2 sm:py-1">
-  <XCircle className="w-3 h-3" />
-  <span className="hidden sm:inline ml-1">Reject</span>
-</Button>
-```
+9. **Reduce footer margin**:
+   - From: `mt-2`
+   - To: `mt-1`
 
-**Reduce overall card padding**:
-```jsx
-// From: p-3 sm:p-4 lg:p-6
-// To: p-2 sm:p-3 lg:p-4
-<CardContent className="p-2 sm:p-3 lg:p-4">
-```
+10. **Reduce badge spacing in footer**:
+    - Simplify and shrink badges
 
 ---
 
 ### Visual Impact
 
 ```text
-Before (current - score cut off):
-┌──────────────────────────────────────────────────┐
-│ Live Candidate Feed                        [LIVE]│
-│ ┌──────────────────────────────────────────────┐ │
-│ │ (A) Ayan Das                            │ 9X │ │  <- Score cut off
-│ │     Lead Product Designer - (Unassigned)│    │ │
-│ │     User ID: 297250  Job ID: me-j-0211  │[Re]│ │  <- Buttons cut off
-│ └──────────────────────────────────────────────┘ │
-└──────────────────────────────────────────────────┘
+Before (current):
+┌─────────────────────────────────────────────────┐
+│ (Avatar) Candidate Name              │  92    │
+│         Job Title                    │ [Reject]│
+│         [UserID] [JobID]             │ [Submit]│
+│ ─────────────────────────────────────────────── │
+│ "No after call reason available..."              │
+│ Updated: 1/28/2026          [Call Done]         │
+└─────────────────────────────────────────────────┘
 
-After (fixed - all visible):
-┌──────────────────────────────────────────────────┐
-│ Live Candidate Feed                        [LIVE]│
-│ ┌──────────────────────────────────────────────┐ │
-│ │ (A) Ayan Das                           │ 92 │ │  <- Score visible
-│ │     Lead Product Designer...           │    │ │
-│ │     User ID: 297250  Job ID: me-j..    │[X] │ │  <- Icon buttons
-│ │                                        │[✓] │ │
-│ └──────────────────────────────────────────────┘ │
-└──────────────────────────────────────────────────┘
+After (more compact - no description):
+┌─────────────────────────────────────────────────┐
+│ (A) Candidate Name            │ 92 │
+│     Job Title                 │[X][✓]│
+│     [UserID] [JobID]   1/28   │ Done │
+└─────────────────────────────────────────────────┘
 ```
 
 ---
 
 ### Safety Notes
 
-- Changes are purely layout/CSS adjustments
+- All changes are purely visual/CSS adjustments
 - No business logic or data fetching is affected
 - Changes are localized to the Live Candidate Feed section in Index.tsx
-- No impact on other pages or components
-- The standalone LiveCandidateFeed page remains unchanged
+- No impact on other pages or the standalone LiveCandidateFeed page
+- The description can still be viewed on the full Live Candidate Feed page
 
