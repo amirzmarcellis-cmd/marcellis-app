@@ -257,7 +257,7 @@ export default function AddJob() {
     itrisId: "",
     groupId: "",
     recruiterId: "",
-    jobDifficulty: "HARD"
+    jobDifficulty: 75
   });
   const [newHeadhuntingUrl, setNewHeadhuntingUrl] = useState("");
   const [groups, setGroups] = useState<Array<{id: string, name: string, color: string | null}>>([]);
@@ -766,16 +766,16 @@ export default function AddJob() {
             <div className="space-y-2">
               <Label htmlFor="jobDifficulty" className="font-medium">Job Difficulty</Label>
               <Select 
-                value={formData.jobDifficulty} 
-                onValueChange={(value) => handleInputChange("jobDifficulty", value)}
+                value={formData.jobDifficulty?.toString()} 
+                onValueChange={(value) => handleInputChange("jobDifficulty", parseInt(value))}
               >
                 <SelectTrigger className="h-11">
                   <SelectValue placeholder="Select difficulty" />
                 </SelectTrigger>
                 <SelectContent className="bg-popover">
-                  <SelectItem value="EASY">EASY</SelectItem>
-                  <SelectItem value="MEDIUM">MEDIUM</SelectItem>
-                  <SelectItem value="HARD">HARD</SelectItem>
+                  <SelectItem value="75">A Job</SelectItem>
+                  <SelectItem value="80">B Job</SelectItem>
+                  <SelectItem value="85">C Job</SelectItem>
                 </SelectContent>
               </Select>
             </div>

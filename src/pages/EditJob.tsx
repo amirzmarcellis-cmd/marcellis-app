@@ -137,7 +137,7 @@ interface JobData {
   itris_job_id?: string;
   group_id?: string;
   recruiter_id?: string;
-  Job_difficulty?: string;
+  Job_difficulty?: number;
 }
 
 export default function EditJob() {
@@ -185,7 +185,7 @@ export default function EditJob() {
     itris_job_id: "",
     group_id: "",
     recruiter_id: "",
-    Job_difficulty: "HARD"
+    Job_difficulty: 75
   });
 
   useEffect(() => {
@@ -293,7 +293,13 @@ export default function EditJob() {
       }
       
       if (data) {
-        setFormData(data);
+        // Convert legacy text Job_difficulty values to numeric
+        let difficultyValue = data.Job_difficulty;
+        if (typeof difficultyValue === 'string') {
+          const legacyMap: Record<string, number> = { 'EASY': 75, 'MEDIUM': 80, 'HARD': 85 };
+          difficultyValue = legacyMap[difficultyValue] || 75;
+        }
+        setFormData({ ...data, Job_difficulty: difficultyValue as number });
         setHasAssignment(!!data.assignment);
         setLinkedInSearchEnabled(data.linkedin_search_enabled || false);
         
@@ -369,7 +375,7 @@ export default function EditJob() {
         assignment: hasAssignment ? formData.assignment : null,
         group_id: formData.group_id || null,
         linkedin_search_enabled: linkedInSearchEnabled,
-        Job_difficulty: formData.Job_difficulty || "HARD"
+        Job_difficulty: formData.Job_difficulty || 75
       };
 
       const { error } = await supabase
@@ -523,16 +529,16 @@ export default function EditJob() {
                   <div className="space-y-1.5 sm:space-y-2 min-w-0">
                     <Label htmlFor="jobDifficulty" className="text-xs sm:text-sm">Job Difficulty</Label>
                     <Select 
-                      value={formData.Job_difficulty || "HARD"} 
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, Job_difficulty: value }))}
+                      value={formData.Job_difficulty?.toString() || "75"} 
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, Job_difficulty: parseInt(value) }))}
                     >
                       <SelectTrigger className="h-11 sm:h-10 text-sm min-w-0 w-full">
                         <SelectValue placeholder="Select difficulty" />
                       </SelectTrigger>
                       <SelectContent className="z-[60] bg-popover">
-                        <SelectItem value="EASY">EASY</SelectItem>
-                        <SelectItem value="MEDIUM">MEDIUM</SelectItem>
-                        <SelectItem value="HARD">HARD</SelectItem>
+                        <SelectItem value="75">A Job</SelectItem>
+                        <SelectItem value="80">B Job</SelectItem>
+                        <SelectItem value="85">C Job</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
