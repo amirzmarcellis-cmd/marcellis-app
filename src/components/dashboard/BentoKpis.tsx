@@ -13,7 +13,7 @@ export function BentoKpis({ children, className, columns = 4 }: BentoKpisProps) 
     : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
   
   return (
-    <div className={cn("grid gap-2 sm:gap-3 w-full min-w-0 max-w-full", gridCols, className)}>
+    <div className={cn("grid gap-1.5 sm:gap-2 w-full min-w-0 max-w-full", gridCols, className)}>
       {children}
     </div>
   )
