@@ -23,7 +23,7 @@ interface AdvancedMetricCardProps {
 // Simple bell curve SVG component
 function BellCurve({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 100 40" className={cn("w-full h-5 sm:h-8 text-cyan-400/60", className)}>
+    <svg viewBox="0 0 100 40" className={cn("w-full h-4 sm:h-6 text-cyan-400/60", className)}>
       <path
         d="M0,40 Q25,40 35,20 T50,5 T65,20 T100,40"
         fill="none"
@@ -92,12 +92,12 @@ export function AdvancedMetricCard({
         className
       )}
     >
-      <CardContent className="p-3 sm:p-4 min-w-0">
+      <CardContent className="p-2 sm:p-3 min-w-0">
         {/* Header with icon and delta badge */}
-        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between mb-1.5 sm:mb-2 min-w-0">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between mb-1 sm:mb-1.5 min-w-0">
           <div className="flex items-center gap-1.5 min-w-0 flex-1">
             <div className="rounded-md bg-cyan-500/10 p-1 shrink-0">
-              <Icon className="h-3.5 w-3.5 text-cyan-400" />
+              <Icon className="h-3 w-3 text-cyan-400" />
             </div>
             <span className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">
               {title}
@@ -118,22 +118,22 @@ export function AdvancedMetricCard({
         </div>
 
         {/* Main value */}
-        <div className="mb-0.5">
-          <span className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground tracking-tight">
+        <div>
+          <span className="text-lg sm:text-xl md:text-2xl font-bold text-foreground tracking-tight">
             {value}
           </span>
         </div>
 
         {/* Subtitle or benchmark */}
         {(subtitle || benchmark) && (
-          <p className="text-[10px] text-muted-foreground mb-1.5 sm:mb-2 line-clamp-2">
+          <p className="text-[10px] text-muted-foreground mb-1 sm:mb-1.5 line-clamp-2">
             {subtitle || benchmark}
           </p>
         )}
 
         {/* Progress bar */}
         {typeof pct === "number" && (
-          <div className="mt-2">
+          <div className="mt-1.5">
             <div className="h-1 w-full bg-gray-800 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-full transition-all duration-500"
@@ -145,19 +145,19 @@ export function AdvancedMetricCard({
 
         {/* Chart variants */}
         {chartType === "waveform" && trend.length > 0 && (
-          <div className="mt-1.5 sm:mt-2">
-            <Sparkline data={trend} className="h-5 sm:h-8 text-cyan-400/70" />
+          <div className="mt-1 sm:mt-1.5">
+            <Sparkline data={trend} className="h-4 sm:h-6 text-cyan-400/70" />
           </div>
         )}
 
         {chartType === "bell" && (
-          <div className="mt-1.5 sm:mt-2">
+          <div className="mt-1 sm:mt-1.5">
             <BellCurve />
           </div>
         )}
 
         {chartType === "line" && (
-          <div className="mt-3">
+          <div className="mt-2">
             <HorizontalLine />
           </div>
         )}
