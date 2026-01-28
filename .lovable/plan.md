@@ -1,18 +1,19 @@
 
 
-## Make Live Candidate Feed Section More Compact
+## Make Live Candidate Feed Cards More Compact
 
-This plan will significantly reduce the size of the Live Candidate Feed section so that all content (scores, buttons) fits properly without being cut off.
+This plan reduces the Live Candidate Feed card size further so the score and content are more visible without horizontal overflow.
 
 ---
 
 ### Summary of Changes
 
-1. **Reduce ScrollArea height** - Make the feed area shorter
-2. **Make candidate cards more compact** - Reduce padding and spacing
-3. **Simplify the card layout** - Stack score and buttons more efficiently
-4. **Reduce header size** - Make the section header more compact
-5. **Show fewer candidates** - Display only 3 candidates instead of 5
+1. **Reduce card padding** - Make inner spacing tighter
+2. **Reduce avatar size** - Smaller profile pictures
+3. **Remove the description section** - Free up vertical space
+4. **Simplify footer** - Combine or reduce footer elements
+5. **Reduce score section width** - Make buttons more compact
+6. **Reduce overall spacing** - Tighter gaps between elements
 
 ---
 
@@ -20,155 +21,74 @@ This plan will significantly reduce the size of the Live Candidate Feed section 
 
 | File | Changes |
 |------|---------|
-| `src/pages/Index.tsx` | Reduce heights, padding, fonts, and show fewer candidates |
+| `src/pages/Index.tsx` | Make Live Candidate Feed cards more compact by reducing padding, avatar size, removing description, and tightening all spacing |
 
 ---
 
 ### Detailed Changes
 
-**File: `src/pages/Index.tsx`**
+**File: `src/pages/Index.tsx` (Lines 824-900)**
 
-**1. Make CardHeader more compact (Lines 803-822)**
+1. **Reduce card container padding**:
+   - From: `p-2 sm:p-3`
+   - To: `p-1.5 sm:p-2`
 
-```tsx
-// From:
-<CardHeader className="p-2 sm:p-3 lg:p-4">
+2. **Reduce card item padding**:
+   - From: `p-2`
+   - To: `p-1.5`
 
-// To:
-<CardHeader className="p-1.5 sm:p-2 lg:p-3">
-```
+3. **Reduce avatar size**:
+   - From: `w-8 h-8 sm:w-10 sm:h-10`
+   - To: `w-6 h-6 sm:w-8 sm:h-8`
 
-Also reduce the title font size:
-```tsx
-// From:
-<CardTitle className="text-base sm:text-lg lg:text-xl text-cyan-300...">
+4. **Remove the description section** (lines 877-880):
+   - Remove the entire `<p className="text-xs text-gray-300 mt-2...">` block
+   - This frees up significant vertical space per card
 
-// To:
-<CardTitle className="text-sm sm:text-base lg:text-lg text-cyan-300...">
-```
+5. **Reduce score section minimum width**:
+   - From: `min-w-[70px] sm:min-w-[90px]`
+   - To: `min-w-[60px] sm:min-w-[80px]`
 
-**2. Reduce ScrollArea height (Line 825)**
+6. **Reduce score font size**:
+   - From: `text-lg sm:text-xl`
+   - To: `text-base sm:text-lg`
 
-```tsx
-// From:
-<ScrollArea className="h-[200px] sm:h-[240px] lg:h-[280px]">
+7. **Make buttons smaller**:
+   - Height: from `h-6` to `h-5`
+   - Padding: from `px-1.5 py-0.5` to `px-1 py-0`
 
-// To:
-<ScrollArea className="h-[150px] sm:h-[180px] lg:h-[200px]">
-```
+8. **Reduce spacing between cards**:
+   - From: `space-y-2`
+   - To: `space-y-1.5`
 
-**3. Show only 3 candidates instead of 5 (Line 827)**
+9. **Reduce footer margin**:
+   - From: `mt-2`
+   - To: `mt-1`
 
-```tsx
-// From:
-{enrichedCandidates.slice(0, 5).map((candidate, index) => {
-
-// To:
-{enrichedCandidates.slice(0, 3).map((candidate, index) => {
-```
-
-**4. Reduce spacing between candidate cards (Line 826)**
-
-```tsx
-// From:
-<div className="space-y-1.5">
-
-// To:
-<div className="space-y-1">
-```
-
-**5. Make candidate cards more compact (Line 830)**
-
-```tsx
-// From:
-className={`bg-gradient-to-r rounded-lg p-1.5 border ${index < 3...`
-
-// To:
-className={`bg-gradient-to-r rounded-md p-1 border ${index < 3...`
-```
-
-**6. Make avatar smaller (Lines 836-838)**
-
-```tsx
-// From:
-<div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br...">
-
-// To:
-<div className="w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-br...">
-```
-
-**7. Make score/buttons section narrower (Line 855)**
-
-```tsx
-// From:
-<div className="flex flex-col items-end gap-0.5 flex-shrink-0 min-w-[70px] sm:min-w-[90px]">
-
-// To:
-<div className="flex flex-col items-end gap-0.5 flex-shrink-0 min-w-[55px] sm:min-w-[70px]">
-```
-
-**8. Make score text smaller (Line 856)**
-
-```tsx
-// From:
-<div className={`text-base sm:text-lg font-bold ${getScoreColor(score)}`}>
-
-// To:
-<div className={`text-sm sm:text-base font-bold ${getScoreColor(score)}`}>
-```
-
-**9. Make buttons even smaller (Lines 860-873)**
-
-```tsx
-// From (Reject button):
-className="bg-red-500/10 border border-red-400 text-red-400 hover:bg-red-500/20 hover:border-red-300 hover:text-red-300 transition-all duration-200 text-[8px] px-1 py-0 h-5 w-full"
-
-// To (Reject button):
-className="bg-red-500/10 border border-red-400 text-red-400 hover:bg-red-500/20 hover:border-red-300 hover:text-red-300 transition-all duration-200 text-[7px] px-0.5 py-0 h-4 w-full"
-
-// Same change for Submit button
-```
-
-**10. Remove the footer section from cards (Lines 878-885)**
-
-Remove or hide the footer with date and badge to make cards more compact:
-```tsx
-// Remove this section entirely:
-{/* Footer - compact */}
-<div className="flex items-center justify-between gap-1 mt-1">
-  <div className="text-[9px] text-gray-400">
-    {new Date(candidate.lastcalltime || Date.now()).toLocaleDateString()}
-  </div>
-  <Badge className="...">📞 Done</Badge>
-</div>
-```
+10. **Reduce badge spacing in footer**:
+    - Simplify and shrink badges
 
 ---
 
 ### Visual Impact
 
 ```text
-Before (tall, content cut off):
-┌──────────────────────────────────────────────────────┐
-│ [Icon] Live Candidate Feed [LIVE]    [Active] [Open] │
-├──────────────────────────────────────────────────────┤
-│ (A) Candidate 1 - Position        │ (cut off)        │
-│     [badges]                      │ Rej... Sub...    │
-│     Date | 📞 Done                                   │
-│ (A) Candidate 2...                                   │
-│ (A) Candidate 3...                                   │
-│ (A) Candidate 4...                                   │
-│ (A) Candidate 5...                                   │
-└──────────────────────────────────────────────────────┘
+Before (current):
+┌─────────────────────────────────────────────────┐
+│ (Avatar) Candidate Name              │  92    │
+│         Job Title                    │ [Reject]│
+│         [UserID] [JobID]             │ [Submit]│
+│ ─────────────────────────────────────────────── │
+│ "No after call reason available..."              │
+│ Updated: 1/28/2026          [Call Done]         │
+└─────────────────────────────────────────────────┘
 
-After (compact, everything visible):
-┌────────────────────────────────────────────────────┐
-│ [Icon] Live Candidate Feed [LIVE]  [Active] [Open] │
-├────────────────────────────────────────────────────┤
-│ (A) Candidate 1 - Position   │ 92   [Rej] [Sub]    │
-│ (A) Candidate 2 - Position   │ 88   [Rej] [Sub]    │
-│ (A) Candidate 3 - Position   │ 85   [Rej] [Sub]    │
-└────────────────────────────────────────────────────┘
+After (more compact - no description):
+┌─────────────────────────────────────────────────┐
+│ (A) Candidate Name            │ 92 │
+│     Job Title                 │[X][✓]│
+│     [UserID] [JobID]   1/28   │ Done │
+└─────────────────────────────────────────────────┘
 ```
 
 ---
@@ -177,7 +97,7 @@ After (compact, everything visible):
 
 - All changes are purely visual/CSS adjustments
 - No business logic or data fetching is affected
-- Users can still click "View All" or "Open Feed" to see all candidates
-- Existing functionality remains intact
-- The section will be approximately 40% smaller in height
+- Changes are localized to the Live Candidate Feed section in Index.tsx
+- No impact on other pages or the standalone LiveCandidateFeed page
+- The description can still be viewed on the full Live Candidate Feed page
 
