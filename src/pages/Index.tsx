@@ -632,7 +632,7 @@ export default function Index() {
 
   return <div className="min-h-screen bg-background text-foreground relative overflow-hidden mx-auto max-w-screen-2xl pb-20">
       
-      <div className="mb-6 sm:mb-8 relative z-10">
+      <div className="mb-6 sm:mb-8 relative z-10 w-full min-w-0 overflow-hidden">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
           <div>
