@@ -44,8 +44,8 @@ export function SimpleMetricCard({
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">
             {title}
           </p>
-          <div className="flex items-baseline gap-2 min-w-0">
-            <span className="text-3xl font-semibold text-foreground truncate">{value}</span>
+          <div className="flex items-baseline gap-2 min-w-0 overflow-hidden">
+            <span className="text-2xl sm:text-3xl font-semibold text-foreground truncate">{value}</span>
             {delta && (
               <span className={cn("text-sm font-medium", deltaColor[deltaType])}>
                 {delta}
