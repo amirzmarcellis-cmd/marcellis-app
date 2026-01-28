@@ -137,6 +137,7 @@ interface JobData {
   itris_job_id?: string;
   group_id?: string;
   recruiter_id?: string;
+  Job_difficulty?: string;
 }
 
 export default function EditJob() {
@@ -183,7 +184,8 @@ export default function EditJob() {
     Currency: "",
     itris_job_id: "",
     group_id: "",
-    recruiter_id: ""
+    recruiter_id: "",
+    Job_difficulty: "HARD"
   });
 
   useEffect(() => {
@@ -366,7 +368,8 @@ export default function EditJob() {
         contract_length: formData.Type === "Contract" ? formData.contract_length : null,
         assignment: hasAssignment ? formData.assignment : null,
         group_id: formData.group_id || null,
-        linkedin_search_enabled: linkedInSearchEnabled
+        linkedin_search_enabled: linkedInSearchEnabled,
+        Job_difficulty: formData.Job_difficulty || "HARD"
       };
 
       const { error } = await supabase
@@ -512,6 +515,24 @@ export default function EditJob() {
                             </div>
                           </SelectItem>
                         ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Job Difficulty */}
+                  <div className="space-y-1.5 sm:space-y-2 min-w-0">
+                    <Label htmlFor="jobDifficulty" className="text-xs sm:text-sm">Job Difficulty</Label>
+                    <Select 
+                      value={formData.Job_difficulty || "HARD"} 
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, Job_difficulty: value }))}
+                    >
+                      <SelectTrigger className="h-11 sm:h-10 text-sm min-w-0 w-full">
+                        <SelectValue placeholder="Select difficulty" />
+                      </SelectTrigger>
+                      <SelectContent className="z-[60] bg-popover">
+                        <SelectItem value="EASY">EASY</SelectItem>
+                        <SelectItem value="MEDIUM">MEDIUM</SelectItem>
+                        <SelectItem value="HARD">HARD</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

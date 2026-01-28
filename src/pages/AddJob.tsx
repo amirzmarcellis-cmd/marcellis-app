@@ -256,7 +256,8 @@ export default function AddJob() {
     currency: "",
     itrisId: "",
     groupId: "",
-    recruiterId: ""
+    recruiterId: "",
+    jobDifficulty: "HARD"
   });
   const [newHeadhuntingUrl, setNewHeadhuntingUrl] = useState("");
   const [groups, setGroups] = useState<Array<{id: string, name: string, color: string | null}>>([]);
@@ -622,7 +623,8 @@ export default function AddJob() {
           Timestamp: new Date().toISOString(),
           linkedin_search_enabled: linkedInSearchEnabled,
           automatic_dial: true,
-          auto_dial_enabled_at: new Date().toISOString()
+          auto_dial_enabled_at: new Date().toISOString(),
+          Job_difficulty: formData.jobDifficulty || "HARD"
         });
 
       if (error) {
@@ -756,6 +758,24 @@ export default function AddJob() {
                       </div>
                     </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Job Difficulty */}
+            <div className="space-y-2">
+              <Label htmlFor="jobDifficulty" className="font-medium">Job Difficulty</Label>
+              <Select 
+                value={formData.jobDifficulty} 
+                onValueChange={(value) => handleInputChange("jobDifficulty", value)}
+              >
+                <SelectTrigger className="h-11">
+                  <SelectValue placeholder="Select difficulty" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover">
+                  <SelectItem value="EASY">EASY</SelectItem>
+                  <SelectItem value="MEDIUM">MEDIUM</SelectItem>
+                  <SelectItem value="HARD">HARD</SelectItem>
                 </SelectContent>
               </Select>
             </div>
