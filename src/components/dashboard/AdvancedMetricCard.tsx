@@ -88,14 +88,14 @@ export function AdvancedMetricCard({
   return (
     <Card
       className={cn(
-        "relative overflow-hidden border border-border/30 bg-gradient-to-br from-gray-900/90 via-gray-900/80 to-gray-950/90 backdrop-blur-xl hover:border-cyan-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10",
+        "relative overflow-hidden border border-border/30 bg-gradient-to-br from-gray-900/90 via-gray-900/80 to-gray-950/90 backdrop-blur-xl hover:border-cyan-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10 min-w-0 max-w-full",
         className
       )}
     >
-      <CardContent className="p-4 sm:p-5">
+      <CardContent className="p-4 sm:p-5 min-w-0">
         {/* Header with icon and delta badge */}
-        <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between mb-2 sm:mb-3">
-          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+        <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between mb-2 sm:mb-3 min-w-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
             <div className="rounded-md bg-cyan-500/10 p-1 sm:p-1.5 shrink-0">
               <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-cyan-400" />
             </div>
