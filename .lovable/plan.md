@@ -1,135 +1,17 @@
 
 
-## Update Job Difficulty Field
+## Reduce Dashboard Page Size
 
-This plan updates the Job Difficulty dropdown to use new options (A Job, B Job, C Job) with numeric values stored in the database.
+This plan makes the dashboard more compact by reducing card sizes and the overall content max-width.
 
 ---
 
 ### Summary of Changes
 
-1. **Database Migration**: Change `Job_difficulty` column from TEXT to INTEGER
-2. **UI Updates**: Update dropdown options in both Add Job and Edit Job forms
-3. **Value Mapping**: Convert display labels to/from numeric database values
-
----
-
-### Database Changes
-
-**File: New Migration**
-
-Change the `Job_difficulty` column in the `Jobs` table:
-- Convert from `text` to `integer` type
-- Set default value to `75`
-- Update all existing rows to `75`
-
-```text
-Migration SQL:
-1. Update all existing values to 75 (as text first for compatibility)
-2. Alter column type from text to integer
-3. Set new default to 75
-```
-
----
-
-### Frontend Changes
-
-**File: `src/pages/AddJob.tsx`**
-
-1. Update form state default value:
-   - Change `jobDifficulty: "HARD"` to `jobDifficulty: 75`
-
-2. Update dropdown options (around line 765-781):
-   - Replace `EASY`, `MEDIUM`, `HARD` with `A Job`, `B Job`, `C Job`
-   - Map display values to numeric values:
-     - A Job → 75
-     - B Job → 80  
-     - C Job → 85
-
-3. Update the Select component to handle numeric values:
-   - Store the numeric value in state
-   - Display the label (A Job, B Job, C Job) to the user
-
-4. Ensure the submit handler (around line 627) saves the numeric value directly
-
-**File: `src/pages/EditJob.tsx`**
-
-1. Update form state interface (line 140):
-   - Change `Job_difficulty?: string` to `Job_difficulty?: number`
-
-2. Update default value (line 188):
-   - Change `Job_difficulty: "HARD"` to `Job_difficulty: 75`
-
-3. Update dropdown options (around line 522-538):
-   - Replace `EASY`, `MEDIUM`, `HARD` with `A Job`, `B Job`, `C Job`
-   - Use same value mapping as AddJob
-
-4. Update the fetchJob handler to convert existing text values:
-   - Map legacy values: EASY → 75, MEDIUM → 80, HARD → 85
-   - Handle existing numeric values directly
-
-5. Update the submit handler (line 372):
-   - Save numeric value directly (no conversion needed once state is numeric)
-
----
-
-### Value Mapping Reference
-
-```text
-Display Label → Database Value
-A Job         → 75
-B Job         → 80
-C Job         → 85
-```
-
-When loading existing jobs with old text values:
-```text
-EASY   → 75
-MEDIUM → 80
-HARD   → 85
-```
-
----
-
-### Technical Details
-
-**Dropdown Implementation Pattern:**
-```jsx
-// Constants for mapping
-const JOB_DIFFICULTY_OPTIONS = [
-  { value: 75, label: "A Job" },
-  { value: 80, label: "B Job" },
-  { value: 85, label: "C Job" }
-];
-
-// In the Select component
-<Select 
-  value={formData.jobDifficulty?.toString()} 
-  onValueChange={(val) => handleInputChange("jobDifficulty", parseInt(val))}
->
-  <SelectTrigger>
-    <SelectValue placeholder="Select difficulty" />
-  </SelectTrigger>
-  <SelectContent>
-    {JOB_DIFFICULTY_OPTIONS.map(opt => (
-      <SelectItem key={opt.value} value={opt.value.toString()}>
-        {opt.label}
-      </SelectItem>
-    ))}
-  </SelectContent>
-</Select>
-```
-
-**Legacy Value Handling (EditJob only):**
-When fetching existing jobs, convert any legacy text values:
-```jsx
-// After fetching job data
-let difficultyValue = data.Job_difficulty;
-if (typeof difficultyValue === 'string') {
-  const legacyMap = { 'EASY': 75, 'MEDIUM': 80, 'HARD': 85 };
-  difficultyValue = legacyMap[difficultyValue] || 75;
-}
-```
+1. **Reduce max-width** of the dashboard content container from `max-w-screen-2xl` (1536px) to `max-w-7xl` (1280px)
+2. **Make KPI cards smaller** by reducing padding, font sizes, and icon sizes
+3. **Make Advanced Metric cards smaller** by reducing padding and font sizes
+4. **Reduce section heights** for the Jobs Funnel and Live Feed scroll areas
 
 ---
 
@@ -137,16 +19,103 @@ if (typeof difficultyValue === 'string') {
 
 | File | Changes |
 |------|---------|
-| `src/pages/AddJob.tsx` | Update dropdown options, default value, and form state type |
-| `src/pages/EditJob.tsx` | Update dropdown options, default value, interface, and add legacy value conversion |
-| Database Migration | Change column type to INTEGER, set default to 75, update existing values |
+| `src/pages/Index.tsx` | Reduce max-width, decrease scroll area heights, reduce gaps between sections |
+| `src/components/dashboard/SimpleMetricCard.tsx` | Smaller padding (p-4 → p-3), smaller value text (text-3xl → text-2xl), smaller icon |
+| `src/components/dashboard/AdvancedMetricCard.tsx` | Smaller padding (p-4/p-5 → p-3/p-4), smaller value text (text-4xl → text-2xl) |
+| `src/components/dashboard/BentoKpis.tsx` | Reduce gap between cards (gap-4 → gap-3) |
+
+---
+
+### Detailed Changes
+
+**File: `src/pages/Index.tsx`**
+
+1. Change the main container max-width:
+   - From: `max-w-screen-2xl` (1536px)
+   - To: `max-w-7xl` (1280px)
+
+2. Reduce scroll area heights:
+   - Jobs Funnel: from `h-[400px] sm:h-[500px] lg:h-[600px]` to `h-[300px] sm:h-[400px] lg:h-[450px]`
+   - Live Feed: from `h-[400px] sm:h-[450px] lg:h-[500px]` to `h-[300px] sm:h-[350px] lg:h-[400px]`
+
+3. Reduce gaps between sections:
+   - Main grid gap: from `gap-4 sm:gap-6` to `gap-3 sm:gap-4`
+   - Header margin: from `mb-6 sm:mb-8` to `mb-4 sm:mb-6`
+
+---
+
+**File: `src/components/dashboard/SimpleMetricCard.tsx`**
+
+1. Reduce card padding:
+   - From: `p-4`
+   - To: `p-3`
+
+2. Reduce main value font size:
+   - From: `text-3xl`
+   - To: `text-2xl`
+
+3. Reduce icon container:
+   - Padding: `p-2` → `p-1.5`
+   - Icon size: `h-5 w-5` → `h-4 w-4`
+
+4. Reduce sparkline margin:
+   - From: `mt-3`
+   - To: `mt-2`
+
+---
+
+**File: `src/components/dashboard/AdvancedMetricCard.tsx`**
+
+1. Reduce card padding:
+   - From: `p-4 sm:p-5`
+   - To: `p-3 sm:p-4`
+
+2. Reduce main value font size:
+   - From: `text-2xl sm:text-3xl md:text-4xl`
+   - To: `text-xl sm:text-2xl md:text-3xl`
+
+3. Reduce icon container size:
+   - From: `p-1 sm:p-1.5`
+   - To: `p-1`
+
+---
+
+**File: `src/components/dashboard/BentoKpis.tsx`**
+
+1. Reduce grid gap:
+   - From: `gap-3 sm:gap-4`
+   - To: `gap-2 sm:gap-3`
+
+---
+
+### Visual Impact
+
+```text
+Before:
+┌────────────────────────────────────────────────────────────────┐
+│                    max-width: 1536px                           │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
+│  │  Large   │ │  Large   │ │  Large   │ │  Large   │ │  Large   │
+│  │  Cards   │ │  Cards   │ │  Cards   │ │  Cards   │ │  Cards   │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘
+└────────────────────────────────────────────────────────────────┘
+
+After:
+┌────────────────────────────────────────────────────────┐
+│               max-width: 1280px                        │
+│  ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
+│  │Compact │ │Compact │ │Compact │ │Compact │ │Compact │
+│  │ Cards  │ │ Cards  │ │ Cards  │ │ Cards  │ │ Cards  │
+│  └────────┘ └────────┘ └────────┘ └────────┘ └────────┘
+└────────────────────────────────────────────────────────┘
+```
 
 ---
 
 ### Safety Notes
 
-- All changes are localized to the job form components
-- Existing jobs will be migrated to value 75 (equivalent to "A Job")
-- Legacy text values in the database will be handled gracefully during the transition
-- No impact on other parts of the live system
+- All changes are purely visual/CSS adjustments
+- No business logic or data fetching is affected
+- Changes are localized to dashboard components only
+- No impact on other pages or the live system
 
