@@ -516,6 +516,7 @@ export type Database = {
           client_status: string | null
           comm_score: number | null
           comm_summary: string | null
+          company_name: string | null
           contacted: string | null
           current_salary: number | null
           cv_score: number | null
@@ -567,6 +568,7 @@ export type Database = {
           client_status?: string | null
           comm_score?: number | null
           comm_summary?: string | null
+          company_name?: string | null
           contacted?: string | null
           current_salary?: number | null
           cv_score?: number | null
@@ -618,6 +620,7 @@ export type Database = {
           client_status?: string | null
           comm_score?: number | null
           comm_summary?: string | null
+          company_name?: string | null
           contacted?: string | null
           current_salary?: number | null
           cv_score?: number | null
