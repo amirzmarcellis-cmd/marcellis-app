@@ -1,19 +1,17 @@
 
 
-## Make Live Candidate Feed Cards More Compact
+## Reduce Dashboard Page Size
 
-This plan reduces the Live Candidate Feed card size further so the score and content are more visible without horizontal overflow.
+This plan makes the dashboard more compact by reducing card sizes and the overall content max-width.
 
 ---
 
 ### Summary of Changes
 
-1. **Reduce card padding** - Make inner spacing tighter
-2. **Reduce avatar size** - Smaller profile pictures
-3. **Remove the description section** - Free up vertical space
-4. **Simplify footer** - Combine or reduce footer elements
-5. **Reduce score section width** - Make buttons more compact
-6. **Reduce overall spacing** - Tighter gaps between elements
+1. **Reduce max-width** of the dashboard content container from `max-w-screen-2xl` (1536px) to `max-w-7xl` (1280px)
+2. **Make KPI cards smaller** by reducing padding, font sizes, and icon sizes
+3. **Make Advanced Metric cards smaller** by reducing padding and font sizes
+4. **Reduce section heights** for the Jobs Funnel and Live Feed scroll areas
 
 ---
 
@@ -21,74 +19,95 @@ This plan reduces the Live Candidate Feed card size further so the score and con
 
 | File | Changes |
 |------|---------|
-| `src/pages/Index.tsx` | Make Live Candidate Feed cards more compact by reducing padding, avatar size, removing description, and tightening all spacing |
+| `src/pages/Index.tsx` | Reduce max-width, decrease scroll area heights, reduce gaps between sections |
+| `src/components/dashboard/SimpleMetricCard.tsx` | Smaller padding (p-4 → p-3), smaller value text (text-3xl → text-2xl), smaller icon |
+| `src/components/dashboard/AdvancedMetricCard.tsx` | Smaller padding (p-4/p-5 → p-3/p-4), smaller value text (text-4xl → text-2xl) |
+| `src/components/dashboard/BentoKpis.tsx` | Reduce gap between cards (gap-4 → gap-3) |
 
 ---
 
 ### Detailed Changes
 
-**File: `src/pages/Index.tsx` (Lines 824-900)**
+**File: `src/pages/Index.tsx`**
 
-1. **Reduce card container padding**:
-   - From: `p-2 sm:p-3`
-   - To: `p-1.5 sm:p-2`
+1. Change the main container max-width:
+   - From: `max-w-screen-2xl` (1536px)
+   - To: `max-w-7xl` (1280px)
 
-2. **Reduce card item padding**:
-   - From: `p-2`
-   - To: `p-1.5`
+2. Reduce scroll area heights:
+   - Jobs Funnel: from `h-[400px] sm:h-[500px] lg:h-[600px]` to `h-[300px] sm:h-[400px] lg:h-[450px]`
+   - Live Feed: from `h-[400px] sm:h-[450px] lg:h-[500px]` to `h-[300px] sm:h-[350px] lg:h-[400px]`
 
-3. **Reduce avatar size**:
-   - From: `w-8 h-8 sm:w-10 sm:h-10`
-   - To: `w-6 h-6 sm:w-8 sm:h-8`
+3. Reduce gaps between sections:
+   - Main grid gap: from `gap-4 sm:gap-6` to `gap-3 sm:gap-4`
+   - Header margin: from `mb-6 sm:mb-8` to `mb-4 sm:mb-6`
 
-4. **Remove the description section** (lines 877-880):
-   - Remove the entire `<p className="text-xs text-gray-300 mt-2...">` block
-   - This frees up significant vertical space per card
+---
 
-5. **Reduce score section minimum width**:
-   - From: `min-w-[70px] sm:min-w-[90px]`
-   - To: `min-w-[60px] sm:min-w-[80px]`
+**File: `src/components/dashboard/SimpleMetricCard.tsx`**
 
-6. **Reduce score font size**:
-   - From: `text-lg sm:text-xl`
-   - To: `text-base sm:text-lg`
+1. Reduce card padding:
+   - From: `p-4`
+   - To: `p-3`
 
-7. **Make buttons smaller**:
-   - Height: from `h-6` to `h-5`
-   - Padding: from `px-1.5 py-0.5` to `px-1 py-0`
+2. Reduce main value font size:
+   - From: `text-3xl`
+   - To: `text-2xl`
 
-8. **Reduce spacing between cards**:
-   - From: `space-y-2`
-   - To: `space-y-1.5`
+3. Reduce icon container:
+   - Padding: `p-2` → `p-1.5`
+   - Icon size: `h-5 w-5` → `h-4 w-4`
 
-9. **Reduce footer margin**:
-   - From: `mt-2`
-   - To: `mt-1`
+4. Reduce sparkline margin:
+   - From: `mt-3`
+   - To: `mt-2`
 
-10. **Reduce badge spacing in footer**:
-    - Simplify and shrink badges
+---
+
+**File: `src/components/dashboard/AdvancedMetricCard.tsx`**
+
+1. Reduce card padding:
+   - From: `p-4 sm:p-5`
+   - To: `p-3 sm:p-4`
+
+2. Reduce main value font size:
+   - From: `text-2xl sm:text-3xl md:text-4xl`
+   - To: `text-xl sm:text-2xl md:text-3xl`
+
+3. Reduce icon container size:
+   - From: `p-1 sm:p-1.5`
+   - To: `p-1`
+
+---
+
+**File: `src/components/dashboard/BentoKpis.tsx`**
+
+1. Reduce grid gap:
+   - From: `gap-3 sm:gap-4`
+   - To: `gap-2 sm:gap-3`
 
 ---
 
 ### Visual Impact
 
 ```text
-Before (current):
-┌─────────────────────────────────────────────────┐
-│ (Avatar) Candidate Name              │  92    │
-│         Job Title                    │ [Reject]│
-│         [UserID] [JobID]             │ [Submit]│
-│ ─────────────────────────────────────────────── │
-│ "No after call reason available..."              │
-│ Updated: 1/28/2026          [Call Done]         │
-└─────────────────────────────────────────────────┘
+Before:
+┌────────────────────────────────────────────────────────────────┐
+│                    max-width: 1536px                           │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
+│  │  Large   │ │  Large   │ │  Large   │ │  Large   │ │  Large   │
+│  │  Cards   │ │  Cards   │ │  Cards   │ │  Cards   │ │  Cards   │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘
+└────────────────────────────────────────────────────────────────┘
 
-After (more compact - no description):
-┌─────────────────────────────────────────────────┐
-│ (A) Candidate Name            │ 92 │
-│     Job Title                 │[X][✓]│
-│     [UserID] [JobID]   1/28   │ Done │
-└─────────────────────────────────────────────────┘
+After:
+┌────────────────────────────────────────────────────────┐
+│               max-width: 1280px                        │
+│  ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
+│  │Compact │ │Compact │ │Compact │ │Compact │ │Compact │
+│  │ Cards  │ │ Cards  │ │ Cards  │ │ Cards  │ │ Cards  │
+│  └────────┘ └────────┘ └────────┘ └────────┘ └────────┘
+└────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -97,7 +116,6 @@ After (more compact - no description):
 
 - All changes are purely visual/CSS adjustments
 - No business logic or data fetching is affected
-- Changes are localized to the Live Candidate Feed section in Index.tsx
-- No impact on other pages or the standalone LiveCandidateFeed page
-- The description can still be viewed on the full Live Candidate Feed page
+- Changes are localized to dashboard components only
+- No impact on other pages or the live system
 
