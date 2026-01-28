@@ -630,7 +630,14 @@ export default function Index() {
     return 'Good evening';
   };
 
-  return <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden mx-auto max-w-screen-2xl pb-20 w-full min-w-0 max-w-full">
+  return <div 
+    className="min-h-screen bg-background text-foreground relative overflow-x-hidden mx-auto pb-20 min-w-0"
+    style={{ 
+      transform: 'scale(0.8)', 
+      transformOrigin: 'top left',
+      width: '125%'
+    }}
+  >
       
       <div className="mb-6 sm:mb-8 relative z-10 w-full min-w-0 max-w-full">
         {/* Header */}
