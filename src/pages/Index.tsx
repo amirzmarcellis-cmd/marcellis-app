@@ -630,13 +630,7 @@ export default function Index() {
     return 'Good evening';
   };
 
-  // Apply 80% scale on custom domain to fit all dashboard cards
-  const isCustomDomain = typeof window !== 'undefined' && window.location.hostname === 'marcellis.eezi.ai';
-
-  return <div className={cn(
-    "min-h-screen bg-background text-foreground relative overflow-x-hidden mx-auto max-w-screen-2xl pb-20 w-full min-w-0 max-w-full",
-    isCustomDomain && "origin-top-left scale-[0.8] w-[125%]"
-  )}>
+  return <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden mx-auto max-w-screen-2xl pb-20 w-full min-w-0 max-w-full">
       
       <div className="mb-6 sm:mb-8 relative z-10 w-full min-w-0 max-w-full">
         {/* Header */}
