@@ -10,11 +10,25 @@ import { cn } from '@/lib/utils';
 import { Phone, PhoneOff, Mic, AlertCircle, CheckCircle2 } from 'lucide-react';
 import companyLogo from '@/assets/me-logo-white.png';
 
-interface CandidateData {
+interface InterviewData {
+  // From Jobs_CVs
+  recordid: number;
   candidate_name: string | null;
   candidate_email: string | null;
+  candidate_id: string;
   job_id: string;
+  callcount: number | null;
+  two_questions_of_interview: string | null;
+  
+  // From Jobs
   job_title: string | null;
+  job_location: string | null;
+  job_salary_range: number | null;
+  client_name: string | null;
+  client_description: string | null;
+  contract_perm_type: string | null;
+  job_itris_id: string | null;
+  things_to_look_for: string | null;
   vapi_ai_assistant: string | null;
 }
 
@@ -54,7 +68,7 @@ const InterviewCall: React.FC = () => {
   const callId = searchParams.get('callId');
   
   const [loading, setLoading] = useState(true);
-  const [candidateData, setCandidateData] = useState<CandidateData | null>(null);
+  const [interviewData, setInterviewData] = useState<InterviewData | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
   
   const { status, isSpeaking, duration, error, startCall, endCall } = useVapiCall();
@@ -72,7 +86,7 @@ const InterviewCall: React.FC = () => {
         // Fetch candidate data from Jobs_CVs using recordid
         const { data: candidateRecord, error: candidateError } = await supabase
           .from('Jobs_CVs')
-          .select('candidate_name, candidate_email, job_id')
+          .select('recordid, candidate_name, candidate_email, job_id, user_id, callcount, two_questions_of_interview')
           .eq('recordid', parseInt(callId))
           .single();
 
@@ -86,7 +100,7 @@ const InterviewCall: React.FC = () => {
         // Fetch job data including vapi_ai_assistant
         const { data: jobRecord, error: jobError } = await supabase
           .from('Jobs')
-          .select('job_title, vapi_ai_assistant')
+          .select('job_title, job_location, job_salary_range, client_name, client_description, Type, itris_job_id, things_to_look_for, vapi_ai_assistant')
           .eq('job_id', candidateRecord.job_id)
           .single();
 
@@ -94,11 +108,24 @@ const InterviewCall: React.FC = () => {
           console.error('Error fetching job:', jobError);
         }
 
-        setCandidateData({
+        setInterviewData({
+          // From Jobs_CVs
+          recordid: candidateRecord.recordid,
           candidate_name: candidateRecord.candidate_name,
           candidate_email: candidateRecord.candidate_email,
+          candidate_id: candidateRecord.user_id,
           job_id: candidateRecord.job_id,
+          callcount: candidateRecord.callcount,
+          two_questions_of_interview: candidateRecord.two_questions_of_interview,
+          // From Jobs
           job_title: jobRecord?.job_title || null,
+          job_location: jobRecord?.job_location || null,
+          job_salary_range: jobRecord?.job_salary_range || null,
+          client_name: jobRecord?.client_name || null,
+          client_description: jobRecord?.client_description || null,
+          contract_perm_type: jobRecord?.Type || null,
+          job_itris_id: jobRecord?.itris_job_id || null,
+          things_to_look_for: jobRecord?.things_to_look_for || null,
           vapi_ai_assistant: jobRecord?.vapi_ai_assistant || null,
         });
       } catch (err) {
@@ -113,14 +140,35 @@ const InterviewCall: React.FC = () => {
   }, [callId]);
 
   const handleStartInterview = async () => {
-    if (!candidateData?.vapi_ai_assistant) {
+    if (!interviewData?.vapi_ai_assistant) {
       return;
     }
 
-    await startCall(candidateData.vapi_ai_assistant, {
-      candidateName: candidateData.candidate_name || 'Candidate',
-      jobTitle: candidateData.job_title || 'Position',
-      candidateEmail: candidateData.candidate_email || '',
+    await startCall(interviewData.vapi_ai_assistant, {
+      // IDs
+      Job_id: interviewData.job_id,
+      recordid: interviewData.recordid,
+      candidate_id: interviewData.candidate_id || '',
+      job_itris_id: interviewData.job_itris_id || '',
+      
+      // Candidate info
+      candidate_name: interviewData.candidate_name || 'Candidate',
+      candidate_name_ipa: interviewData.candidate_name || 'Candidate',
+      callcount: interviewData.callcount || 0,
+      
+      // Job info
+      job_title: interviewData.job_title || 'Position',
+      job_location: interviewData.job_location || '',
+      job_salary_range: interviewData.job_salary_range || 0,
+      contract_perm_type: interviewData.contract_perm_type || '',
+      
+      // Client info
+      client_name: interviewData.client_name || '',
+      client_description: interviewData.client_description || '',
+      
+      // Interview context
+      things_to_look_for_in_candidate: interviewData.things_to_look_for || '',
+      list_of_3_specific_questions: interviewData.two_questions_of_interview || '',
     });
   };
 
@@ -162,7 +210,7 @@ const InterviewCall: React.FC = () => {
   }
 
   // No assistant configured
-  if (!candidateData?.vapi_ai_assistant) {
+  if (!interviewData?.vapi_ai_assistant) {
     return (
       <MissionBackground>
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -219,10 +267,10 @@ const InterviewCall: React.FC = () => {
           {/* Candidate Info */}
           <div className="text-center mb-6">
             <h1 className="text-2xl font-semibold mb-1">
-              Welcome, {candidateData.candidate_name || 'Candidate'}
+              Welcome, {interviewData.candidate_name || 'Candidate'}
             </h1>
             <p className="text-muted-foreground">
-              Position: {candidateData.job_title || 'Open Position'}
+              Position: {interviewData.job_title || 'Open Position'}
             </p>
             <p className="text-sm text-muted-foreground mt-1">
               Interview with AI Recruiter

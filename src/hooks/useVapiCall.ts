@@ -7,7 +7,7 @@ interface UseVapiCallReturn {
   isUserSpeaking: boolean;
   duration: number;
   error: string | null;
-  startCall: (assistantId: string, variableValues?: Record<string, string>) => Promise<void>;
+  startCall: (assistantId: string, variableValues?: Record<string, string | number>) => Promise<void>;
   endCall: () => void;
 }
 
@@ -103,7 +103,7 @@ export function useVapiCall(): UseVapiCallReturn {
     };
   }, [status]);
 
-  const startCall = useCallback(async (assistantId: string, variableValues?: Record<string, string>) => {
+  const startCall = useCallback(async (assistantId: string, variableValues?: Record<string, string | number>) => {
     if (!vapiRef.current) {
       setError('VAPI is not initialized. Please check your API key configuration.');
       return;
