@@ -8,7 +8,7 @@ import { MissionBackground } from '@/components/layout/MissionBackground';
 import { useVapiCall } from '@/hooks/useVapiCall';
 import { cn } from '@/lib/utils';
 import { Phone, PhoneOff, Mic, AlertCircle, CheckCircle2 } from 'lucide-react';
-import companyLogo from '@/assets/company-logo.png';
+import companyLogo from '@/assets/default-logo.png';
 
 interface CandidateData {
   candidate_name: string | null;
