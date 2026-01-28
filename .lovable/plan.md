@@ -1,53 +1,67 @@
-# Plan Complete
 
-## Implement Interview Call Page - VAPI Browser Voice Integration
 
-### Status: ✅ COMPLETED
+## Fix Interview Call Page - Logo and Assistant Configuration
 
----
-
-### Implementation Summary
-
-All components have been successfully implemented:
-
-| Component | Status | File |
-|-----------|--------|------|
-| `@vapi-ai/web` package | ✅ Installed | package.json |
-| `vapi_ai_assistant` column | ✅ Added | Jobs table |
-| `useVapiCall.ts` hook | ✅ Created | src/hooks/useVapiCall.ts |
-| `InterviewCall.tsx` page | ✅ Created | src/pages/InterviewCall.tsx |
-| `/interview-call` route | ✅ Added | src/App.tsx |
+### Overview
+Two issues need to be addressed:
+1. The logo file is a placeholder, not an actual image
+2. The job lacks a VAPI assistant configuration (data issue, not code)
 
 ---
 
-### Technical Details
+### Issue 1: Logo Not Displaying
 
-**VAPI Public Key**: Using `VITE_VAPI_PUBLIC_KEY` from `.env` file (already configured)
+**Root Cause**: `src/assets/company-logo.png` contains text `placeholder_for_actual_logo` instead of an actual image.
 
-**Data Flow:**
-1. Extract `callId` (recordid) from URL query parameters
-2. Fetch candidate from `Jobs_CVs` using `recordid`
-3. Fetch job data including `vapi_ai_assistant` from `Jobs`
-4. Initialize VAPI with candidate context (name, email, job title)
+**Solution**: Replace with an existing logo from the project.
 
-**UI States:**
-- Loading: Skeleton with company logo
-- Error: Error card for invalid/missing data
-- No Assistant: Warning if job doesn't have vapi_ai_assistant configured
-- Ready: Candidate info + "Start Interview" button
-- Connecting: Pulsing animation
-- In Call: Voice animation + duration timer + "End Call" button
-- Ended: Thank you message with duration
+**Available Options in Project:**
+- `src/assets/ai-longlist-logo.png` - AI Longlist logo
+- `src/assets/default-logo.png` - Default logo
+- `public/lovable-uploads/79fc3415-a8cb-4486-9765-0907521e9cda.png` - Uploaded image
 
----
+**Implementation**: Update the import in `InterviewCall.tsx` to use an existing logo:
 
-### Usage
+```typescript
+// Change from:
+import companyLogo from '@/assets/company-logo.png';
 
-Access the interview call page at:
-```
-/interview-call?callId={recordid}
+// To (using the default logo):
+import companyLogo from '@/assets/default-logo.png';
 ```
 
-Where `recordid` is the ID from the `Jobs_CVs` table.
+---
 
-For the interview to work, the associated job must have a `vapi_ai_assistant` ID configured.
+### Issue 2: "Interview Not Ready" Message
+
+**Root Cause**: The job `me-j-0239` (Product Engineer) has `vapi_ai_assistant = NULL` in the database.
+
+**This is expected behavior** - the page correctly shows this message when no assistant is configured.
+
+**To Enable Interviews**: You need to:
+1. Get your VAPI Assistant ID from the VAPI dashboard
+2. Update the job with the assistant ID
+
+**Database Update (run in Supabase SQL editor):**
+```sql
+UPDATE "Jobs" 
+SET vapi_ai_assistant = 'your-vapi-assistant-id-here'
+WHERE job_id = 'me-j-0239';
+```
+
+Alternatively, we can add a VAPI Assistant ID field to the Edit Job form for easier configuration.
+
+---
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `src/pages/InterviewCall.tsx` | Update logo import to use existing logo |
+
+---
+
+### Optional Enhancement
+
+Add a field in the Edit Job form to configure `vapi_ai_assistant` so recruiters can easily set up interviews without SQL access.
+
