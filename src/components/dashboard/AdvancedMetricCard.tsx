@@ -92,7 +92,7 @@ export function AdvancedMetricCard({
         className
       )}
     >
-      <CardContent className="p-4 sm:p-5 min-w-0 overflow-hidden">
+      <CardContent className="p-4 sm:p-5 min-w-0">
         {/* Header with icon and delta badge */}
         <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between mb-2 sm:mb-3 min-w-0">
           <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
