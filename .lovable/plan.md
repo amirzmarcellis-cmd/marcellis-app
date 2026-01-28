@@ -1,96 +1,90 @@
 
+Goal
+- Stop KPI + Advanced Metric cards from being clipped on the right on https://marcellis.eezi.ai/ (custom domain), without introducing horizontal scrolling and without breaking the live system.
 
-## Problem Analysis: Why "Submitted" and "Fill Rate" Cards Are Not Visible
+What we know from your answers + code review
+- Issue reproduces only on the custom domain (marcellis.eezi.ai), not on the lovable.app domain.
+- Sidebar is collapsed when it happens (so the content area should be wider, yet it’s still clipping).
+- There is no horizontal scrollbar; content is clipped. That almost always means an ancestor has overflow hidden AND at least one child is still wider than the available width.
+- In the dashboard page (src/pages/Index.tsx), the top-level wrapper uses `overflow-hidden` (line ~633). KPI grid containers also use overflow-hidden. So if anything inside has an “intrinsic min width” (charts/SVGs/text), it will get cut off instead of forcing a wrap or shrink.
 
-### Root Cause
-The dashboard has **multiple overlapping `overflow-hidden` containers** that are silently clipping the rightmost cards:
+Likely root cause (most probable)
+- One or more dashboard cards (or chart/SVG inside them) is creating a minimum width larger than its grid cell, and because we have `overflow-hidden` at multiple levels, the UI gets clipped.
+- The reason it shows “only on custom domain” can be subtle differences in computed viewport width, font rendering, or any extra injected styles/scripts by the custom domain/CDN layer. Even a small width difference can push the last card over the edge when min-width is not allowed to shrink.
 
-1. **MissionBackground** (`src/components/layout/MissionBackground.tsx` line 12): Uses `overflow-hidden` - this clips BOTH horizontal and vertical overflow
-2. **DashboardLayout** (`src/components/dashboard/DashboardLayout.tsx` line 32): Uses `overflow-x-hidden` - clips horizontal overflow
-3. **Index.tsx** (line 633): Uses `overflow-x-hidden` - another horizontal clip layer
+Fix strategy (robust, responsive, minimal regression risk)
+We’ll make the dashboard resilient by ensuring:
+1) Grid items are allowed to shrink (min-w-0/max-w-full).
+2) The KPI and Advanced Metrics grids use more conservative breakpoints (so columns don’t get forced too early).
+3) We remove or reduce “clipping” overflow-hidden at the exact places where it hides layout bugs, while still preventing horizontal scrolling globally.
 
-When the viewport is not wide enough to fit all 5 KPI cards (or 4 Advanced Metric cards) at their minimum widths, the cards that don't fit are **silently clipped** rather than wrapping to the next row or shrinking.
+Implementation plan (code changes)
+A) Make the dashboard containers “shrink-safe”
+- File: src/pages/Index.tsx
+  - Update the main page wrapper at the return root:
+    - Keep overall page from horizontally scrolling (handled already in DashboardLayout outer container with `overflow-x-hidden`), but avoid clipping critical content.
+    - Change `overflow-hidden` to `overflow-x-hidden` (so vertical effects still work, but horizontal clipping is limited and more predictable).
+    - Add `w-full min-w-0 max-w-full` to ensure the page content truly respects the available width inside SidebarInset.
+  - Rationale: This prevents silent clipping while keeping your “no horizontal scroll” requirement.
 
-### Why Cards Have Minimum Widths
-- **SimpleMetricCard** and **AdvancedMetricCard** contain text elements and Sparkline/SVG charts that establish an intrinsic minimum width
-- Even with `min-w-0` applied, some internal elements (text nodes, chart containers) may still be enforcing minimum sizes
+B) Make KPI grid breakpoints even more conservative + shrink-safe
+- File: src/components/dashboard/BentoKpis.tsx
+  - Ensure the grid container always has `w-full min-w-0 max-w-full`.
+  - For 5-column mode, use a more gradual ramp that delays 4 columns until the viewport is truly large:
+    - Proposed (more conservative than current):
+      - `grid-cols-1`
+      - `sm:grid-cols-2`
+      - `lg:grid-cols-3`
+      - `xl:grid-cols-4`
+      - `2xl:grid-cols-5`
+  - Rationale: Even if custom domain is effectively narrower (fonts, zoom, etc.), this prevents 4 columns from being forced too early and avoids that last card getting clipped.
 
----
+C) Make KPI cards themselves shrink-safe
+- File: src/components/dashboard/SimpleMetricCard.tsx
+  - Add `min-w-0 max-w-full` to the card root.
+  - Ensure internal flex rows have `min-w-0` where needed (especially the left text block) and that long text cannot force width (use `truncate` where appropriate).
+  - Rationale: If any child tries to be wider than its cell, min-w-0 ensures it can shrink instead of pushing the grid wider.
 
-## Solution Plan
+D) Advanced metrics grid: same shrink-safe rules + breakpoint adjustment
+- File: src/pages/Index.tsx
+  - The Advanced Metrics grid already uses `xl:grid-cols-4`. We will:
+    - Add `w-full max-w-full` and ensure the grid items can shrink.
+    - If needed, make it more conservative on the step before `xl` (e.g., keep it 2 columns until xl).
+  - Rationale: Prevent the “Fill Rate” card from being clipped, even if custom domain width is slightly smaller.
 
-### File 1: `src/components/layout/MissionBackground.tsx`
-**Change**: Replace `overflow-hidden` with `overflow-x-hidden`
+E) Verify no other container is forcing width
+- Quick audit (read-only already suggests likely culprits, but we will confirm during implementation):
+  - Any `max-w-*` or `w-[...]` wrappers around the dashboard sections
+  - Any charts/SVGs with fixed widths (AdvancedMetricCard uses `w-full`; Sparkline uses ResponsiveContainer width 100%, so should be OK, but we’ll ensure their parents have min-w-0)
 
-Why: Allow vertical content to overflow naturally (for scrolling) while only preventing horizontal scrollbar. The background decorative elements (Aurora, Particles) will still be clipped horizontally.
+How we’ll validate (no regressions)
+- Test in preview and published:
+  1) Desktop widths: 1280, 1366, 1440, 1536+.
+  2) Sidebar collapsed and expanded.
+  3) Confirm: no KPI/Advanced cards cut off; no horizontal scroll on dashboard.
+- Specifically re-check your “no horizontal scrolling on mobile” constraint:
+  - Test mobile widths (390/414) on the dashboard.
+- Confirm other pages are unaffected:
+  - Because changes are localized to Index page layout + KPI card components, regression risk is low.
 
-```text
-Line 12:
-BEFORE: className={cn("relative min-h-screen bg-gradient-hero text-foreground overflow-hidden", className)}
-AFTER:  className={cn("relative min-h-screen bg-gradient-hero text-foreground overflow-x-hidden", className)}
-```
+Why this should fix your custom domain specifically
+- Even if marcellis.eezi.ai has slightly different effective width (or an injected style), the combination of:
+  - more conservative column breakpoints,
+  - min-w-0 on grid items and card internals,
+  - and removing “hard clipping” overflow-hidden at the wrong layer
+  makes the layout adapt instead of cutting off the last cards.
 
-### File 2: `src/pages/Index.tsx`
-**Change 1**: Remove conflicting `max-w-screen-2xl` and keep only `max-w-full` on line 633
+Files we expect to change
+- src/pages/Index.tsx
+- src/components/dashboard/BentoKpis.tsx
+- src/components/dashboard/SimpleMetricCard.tsx
+(Optionally, if we find a specific internal element forcing width:)
+- src/components/dashboard/AdvancedMetricCard.tsx
 
-Why: Having both `max-w-screen-2xl` (1536px) and `max-w-full` (100%) creates unpredictable behavior. The container should fill the available width inside the sidebar inset.
+Notes about the live system constraint
+- We are not changing business logic or data fetching—only layout CSS classes and shrink behavior—so this is safe and low-risk for a live system.
 
-```text
-Line 633:
-BEFORE: className="min-h-screen bg-background text-foreground relative overflow-x-hidden mx-auto max-w-screen-2xl pb-20 w-full min-w-0 max-w-full"
-AFTER:  className="min-h-screen bg-background text-foreground relative overflow-x-hidden pb-20 w-full min-w-0"
-```
-
-**Change 2**: Add `min-w-0 overflow-hidden` to each grid item wrapper for the KPI cards (lines 659-693) and AdvancedMetricCard items (lines 699-736)
-
-Why: Ensures each grid cell can shrink independently and its contents won't force the grid wider.
-
-### File 3: `src/components/dashboard/SimpleMetricCard.tsx`
-**Change**: Ensure internal containers have proper shrink constraints
-
-Add `overflow-hidden` to the card's internal text containers so long values are truncated rather than forcing width:
-
-```text
-Add truncate to the value span:
-<span className="text-3xl font-semibold text-foreground truncate">{value}</span>
-```
-
-### File 4: `src/components/dashboard/AdvancedMetricCard.tsx`
-**Change**: Add `overflow-hidden` to the main card content wrapper to ensure chart/SVG elements don't force width:
-
-```text
-Line 95:
-BEFORE: <CardContent className="p-4 sm:p-5 min-w-0">
-AFTER:  <CardContent className="p-4 sm:p-5 min-w-0 overflow-hidden">
-```
-
----
-
-## Technical Summary
-
-| File | Change | Purpose |
-|------|--------|---------|
-| MissionBackground.tsx | `overflow-hidden` → `overflow-x-hidden` | Stop vertical content clipping |
-| Index.tsx | Remove `max-w-screen-2xl mx-auto` | Eliminate conflicting max-width |
-| SimpleMetricCard.tsx | Add `truncate` to value | Allow value text to shrink |
-| AdvancedMetricCard.tsx | Add `overflow-hidden` to CardContent | Prevent charts from forcing width |
-
----
-
-## Expected Result
-After these changes:
-- **"Submitted" card** (5th KPI card) will be visible even on narrower viewports
-- **"Fill Rate" card** (4th Advanced Metric card) will be visible
-- Cards will properly wrap to the next row on smaller screens based on the grid breakpoints
-- No horizontal scrollbar will appear
-- The layout will be truly responsive across all screen sizes
-
----
-
-## Validation Plan
-1. Test at viewport widths: 1280px, 1366px, 1440px, 1536px+
-2. Test with sidebar collapsed and expanded
-3. Confirm all 5 KPI cards are visible (wrapping is OK)
-4. Confirm all 4 Advanced Metric cards are visible
-5. Verify no horizontal scrolling on mobile (390px, 414px)
-
+Rollout
+- Implement in Test.
+- You publish.
+- You verify on marcellis.eezi.ai with a normal refresh (hard refresh should not be required once the layout no longer depends on near-threshold widths).
