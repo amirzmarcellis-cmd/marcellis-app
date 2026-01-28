@@ -821,73 +821,71 @@ export default function Index() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-3 sm:p-4 lg:p-6">
+            <CardContent className="p-2 sm:p-3">
               <ScrollArea className="h-[250px] sm:h-[300px] lg:h-[350px]">
-                <div className="space-y-2 sm:space-y-3">
+                <div className="space-y-2">
                   {enrichedCandidates.slice(0, 5).map((candidate, index) => {
                   const score = parseFloat(candidate.success_score) || 0;
                   const jobTitle = candidate.job_title || 'Unknown Position';
-                  return <div key={index} className={`bg-gradient-to-r rounded-lg sm:rounded-xl p-3 border ${index < 3 ? 'from-amber-400/20 to-yellow-500/20 border-yellow-400/40' : 'from-white/5 to-white/10 border-white/20'} hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group cursor-pointer active:scale-[0.98]`} onClick={() => handleCandidateClick(candidate.recordid, candidate.job_id)}>
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
-                          <div className="flex items-start sm:items-center space-x-3 min-w-0 flex-1">
+                  return <div key={index} className={`bg-gradient-to-r rounded-lg p-2 border overflow-hidden ${index < 3 ? 'from-amber-400/20 to-yellow-500/20 border-yellow-400/40' : 'from-white/5 to-white/10 border-white/20'} hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group cursor-pointer active:scale-[0.98]`} onClick={() => handleCandidateClick(candidate.recordid, candidate.job_id)}>
+                        {/* Main row: Info + Score + Buttons */}
+                        <div className="flex items-start justify-between gap-2 w-full">
+                          {/* Left: Avatar + Info */}
+                          <div className="flex items-start space-x-2 min-w-0 flex-1 overflow-hidden">
                             <div className="relative flex-shrink-0">
-                              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-base sm:text-lg shadow-lg">
+                              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
                                 {candidate.candidate_name?.charAt(0) || 'C'}
                               </div>
-                              <div className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border-2 border-white animate-pulse"></div>
+                              <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border border-white animate-pulse"></div>
                             </div>
-                             <div className="min-w-0 flex-1">
-                               <h4 className="font-work text-foreground group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors text-base sm:text-lg font-normal truncate">{candidate.candidate_name}</h4>
-                               <p className="text-purple-300 text-xs sm:text-sm font-normal truncate">{jobTitle} - ({candidate.recruiter})</p>
-                               <div className="flex flex-wrap gap-1 sm:gap-2 mt-1">
-                                 <Badge variant="outline" className="text-[10px] sm:text-xs border-cyan-400/50 text-cyan-400 bg-cyan-400/10 px-1.5 py-0.5">
-                                   User ID: {candidate.user_id}
-                                 </Badge>
-                                 <Badge variant="outline" className="text-[10px] sm:text-xs border-purple-400/50 text-purple-400 bg-purple-400/10 px-1.5 py-0.5">
-                                   Job ID: {candidate.job_id}
-                                 </Badge>
-                                 {candidate.salary_expectations && (
-                                   <Badge variant="outline" className="text-[10px] sm:text-xs border-emerald-400/50 text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5">
-                                     Expected: {String(candidate.salary_expectations)}
-                                   </Badge>
-                                 )}
-                               </div>
-                             </div>
+                            <div className="min-w-0 flex-1 overflow-hidden">
+                              <h4 className="font-work text-foreground group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors text-sm font-normal truncate">{candidate.candidate_name}</h4>
+                              <p className="text-purple-300 text-xs font-normal truncate">{jobTitle}</p>
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                <Badge variant="outline" className="text-[9px] border-cyan-400/50 text-cyan-400 bg-cyan-400/10 px-1 py-0">
+                                  {candidate.user_id}
+                                </Badge>
+                                <Badge variant="outline" className="text-[9px] border-purple-400/50 text-purple-400 bg-purple-400/10 px-1 py-0">
+                                  {candidate.job_id}
+                                </Badge>
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex sm:flex-col items-center sm:items-end gap-3 sm:gap-2 flex-shrink-0">
-                            <div className={`text-xl sm:text-2xl font-bold ${getScoreColor(score)}`}>
+                          {/* Right: Score + Buttons - guaranteed width */}
+                          <div className="flex flex-col items-end gap-1 flex-shrink-0 min-w-[70px] sm:min-w-[90px]">
+                            <div className={`text-lg sm:text-xl font-bold ${getScoreColor(score)}`}>
                               {score}
                             </div>
-                            <div className="flex sm:flex-col gap-2 flex-1 sm:flex-initial w-full sm:w-auto">
+                            <div className="flex flex-col gap-1 w-full">
                               <Button size="xs" variant="outline" onClick={e => {
-                            e.stopPropagation();
-                            handleRejectCandidate(candidate.Candidate_ID, candidate.job_id);
-                          }} className="bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200 text-[10px] sm:text-xs px-2 py-1 flex-1 sm:flex-initial whitespace-nowrap">
-                                <XCircle className="w-3 h-3 sm:mr-1" />
-                                <span className="hidden sm:inline">Reject Candidate</span>
-                                <span className="sm:hidden">Reject</span>
+                                e.stopPropagation();
+                                handleRejectCandidate(candidate.Candidate_ID, candidate.job_id);
+                              }} className="bg-transparent border border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200 text-[9px] px-1.5 py-0.5 h-6 w-full">
+                                <XCircle className="w-3 h-3" />
+                                <span className="hidden sm:inline ml-1">Reject</span>
                               </Button>
                               <Button size="xs" variant="outline" onClick={e => {
-                            e.stopPropagation();
-                            handleCVSubmitted(candidate.Candidate_ID, candidate.job_id);
-                          }} className="bg-transparent border-2 border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200 text-[10px] sm:text-xs px-2 py-1 flex-1 sm:flex-initial whitespace-nowrap">
-                                <CheckCircle className="w-3 h-3 sm:mr-1" />
-                                <span className="hidden sm:inline">Submit CV</span>
-                                <span className="sm:hidden">Submit</span>
+                                e.stopPropagation();
+                                handleCVSubmitted(candidate.Candidate_ID, candidate.job_id);
+                              }} className="bg-transparent border border-green-500 text-green-600 hover:bg-green-100 hover:border-green-600 hover:text-green-700 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-300 dark:hover:text-green-300 transition-all duration-200 text-[9px] px-1.5 py-0.5 h-6 w-full">
+                                <CheckCircle className="w-3 h-3" />
+                                <span className="hidden sm:inline ml-1">Submit</span>
                               </Button>
                             </div>
                           </div>
                         </div>
-                        <p className="text-xs sm:text-sm text-gray-300 mb-3 sm:mb-4 leading-relaxed bg-black/20 p-2 sm:p-3 rounded-lg line-clamp-3">
-                          {candidate.after_call_reason ? candidate.after_call_reason.slice(0, 200) + "..." : "No after call reason available"}
+                        {/* Description */}
+                        <p className="text-xs text-gray-300 mt-2 leading-relaxed bg-black/20 p-2 rounded-lg line-clamp-2">
+                          {candidate.after_call_reason ? candidate.after_call_reason.slice(0, 150) + "..." : "No after call reason available"}
                         </p>
-                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                          <div className="text-xs sm:text-sm text-gray-400">
+                        {/* Footer */}
+                        <div className="flex items-center justify-between gap-2 mt-2">
+                          <div className="text-[10px] text-gray-400">
                             Updated: {new Date(candidate.lastcalltime || Date.now()).toLocaleDateString()}
                           </div>
-                           <Badge className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 border-blue-400/40 animate-pulse text-xs">
-                             📞 Call Done
-                           </Badge>
+                          <Badge className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 border-blue-400/40 animate-pulse text-[10px] px-1.5 py-0">
+                            📞 Call Done
+                          </Badge>
                         </div>
                       </div>;
                 })}
