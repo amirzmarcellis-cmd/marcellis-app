@@ -1,88 +1,121 @@
 
 
-## Restrict Interview Access by Candidate Status
+## Add Job Difficulty Dropdown to Job Forms
 
 ### Overview
-Add status validation to the interview call page so only candidates with specific statuses can access the interview. This prevents candidates who have already completed calls or been rejected from accessing the interview link.
+Add a "Job Difficulty" dropdown field to both the Create New Job and Edit Job forms, positioned directly after the "Assigned Recruiter" field. The dropdown will offer three options: EASY, MEDIUM, and HARD.
 
 ---
 
-### Allowed Statuses
+### Database Confirmation
 
-| Status | Access |
-|--------|--------|
-| `Ready to Call` / `Ready to Contact` | Allowed |
-| `Contacted` | Allowed |
-| `1st No Answer` | Allowed |
-| `2nd No Answer` | Allowed |
-| `3rd No Answer` | Allowed |
-| `Call Done` | Blocked |
-| `Rejected` | Blocked |
-| `Not Contacted` | Blocked |
-| `Low Scored` | Blocked |
-| `Tasked` | Blocked |
+The `Job_difficulty` column already exists in the `Jobs` table:
+- Column: `Job_difficulty`
+- Type: `text`
+- Default: `'HARD'::text`
+- No schema changes needed
 
 ---
 
-### Implementation
+### Files to Modify
 
-#### File: `src/pages/InterviewCall.tsx`
+#### 1. `src/pages/AddJob.tsx`
 
-**1. Add status to data fetching:**
+**Add to formData state (around line 259):**
 ```typescript
-// Add 'contacted' to the select query
-.select('recordid, candidate_name, candidate_email, job_id, user_id, callcount, two_questions_of_interview, contacted')
+recruiterId: "",
+jobDifficulty: "HARD"  // Add new field with default value
 ```
 
-**2. Add status to interface:**
+**Add dropdown after Assigned Recruiter (after line 761):**
 ```typescript
-interface InterviewData {
-  // ... existing fields
-  contacted_status: string | null;
-}
+{/* Job Difficulty */}
+<div className="space-y-2">
+  <Label htmlFor="jobDifficulty" className="font-medium">Job Difficulty</Label>
+  <Select 
+    value={formData.jobDifficulty} 
+    onValueChange={(value) => handleInputChange("jobDifficulty", value)}
+  >
+    <SelectTrigger className="h-11">
+      <SelectValue placeholder="Select difficulty" />
+    </SelectTrigger>
+    <SelectContent className="bg-popover">
+      <SelectItem value="EASY">EASY</SelectItem>
+      <SelectItem value="MEDIUM">MEDIUM</SelectItem>
+      <SelectItem value="HARD">HARD</SelectItem>
+    </SelectContent>
+  </Select>
+</div>
 ```
 
-**3. Add status validation constant:**
+**Include in job submission (around line 601):**
 ```typescript
-const ALLOWED_STATUSES = [
-  'Ready to Call',
-  'Ready to Contact',
-  'Contacted',
-  '1st No Answer',
-  '2nd No Answer',
-  '3rd No Answer',
-];
+Job_difficulty: formData.jobDifficulty || "HARD",
 ```
-
-**4. Add status check after fetching data:**
-- Check if `contacted_status` is in the allowed list
-- If not, show a "Interview Not Available" message with appropriate text
-
-**5. Add new blocked status UI state:**
-A new screen will display when the candidate's status doesn't allow interview access:
-- For `Call Done`: "Your interview has already been completed"
-- For `Rejected` / other: "This interview is no longer available"
 
 ---
 
-### User Experience
+#### 2. `src/pages/EditJob.tsx`
 
-| Scenario | Message Shown |
-|----------|--------------|
-| Status = `Ready to Call` | Normal interview UI |
-| Status = `Contacted` | Normal interview UI |
-| Status = `1st/2nd/3rd No Answer` | Normal interview UI |
-| Status = `Call Done` | "Your interview has already been completed. Our team will be in touch soon." |
-| Status = `Rejected` | "This interview is no longer available. Please contact the recruiter." |
-| Status = other blocked | "This interview is not available at the moment. Please contact the recruiter." |
+**Add Job_difficulty to JobData interface (around line 140):**
+```typescript
+recruiter_id?: string;
+Job_difficulty?: string;  // Add to interface
+```
+
+**Add Job_difficulty to initial formData (around line 186):**
+```typescript
+recruiter_id: "",
+Job_difficulty: "HARD"  // Add with default
+```
+
+**Add dropdown after Assigned Recruiter select (after line 517, before LinkedIn Search Toggle):**
+```typescript
+{/* Job Difficulty */}
+<div className="space-y-1.5 sm:space-y-2 min-w-0">
+  <Label htmlFor="jobDifficulty" className="text-xs sm:text-sm">Job Difficulty</Label>
+  <Select 
+    value={formData.Job_difficulty || "HARD"} 
+    onValueChange={(value) => setFormData(prev => ({ ...prev, Job_difficulty: value }))}
+  >
+    <SelectTrigger className="h-11 sm:h-10 text-sm min-w-0 w-full">
+      <SelectValue placeholder="Select difficulty" />
+    </SelectTrigger>
+    <SelectContent className="z-[60] bg-popover">
+      <SelectItem value="EASY">EASY</SelectItem>
+      <SelectItem value="MEDIUM">MEDIUM</SelectItem>
+      <SelectItem value="HARD">HARD</SelectItem>
+    </SelectContent>
+  </Select>
+</div>
+```
+
+**Include in update submission (around line 369):**
+```typescript
+linkedin_search_enabled: linkedInSearchEnabled,
+Job_difficulty: formData.Job_difficulty || "HARD"
+```
 
 ---
 
-### Technical Summary
+### Dropdown Options
 
-| Change | Description |
-|--------|-------------|
-| Add `contacted` to query | Fetch status from `Jobs_CVs` table |
-| Add status validation | Check against allowed statuses list |
-| Add blocked UI states | Show appropriate message based on status |
+| Value | Display |
+|-------|---------|
+| `EASY` | EASY |
+| `MEDIUM` | MEDIUM |
+| `HARD` | HARD |
+
+All values stored in uppercase as requested.
+
+---
+
+### Summary
+
+| File | Changes |
+|------|---------|
+| `src/pages/AddJob.tsx` | Add `jobDifficulty` to state, add dropdown UI, include in submission |
+| `src/pages/EditJob.tsx` | Add to interface & state, add dropdown UI, include in update |
+
+The field will appear directly below "Assigned Recruiter" on both forms, maintaining consistency with the existing layout and styling patterns.
 
