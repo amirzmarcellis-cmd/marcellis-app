@@ -34,11 +34,14 @@ export function SimpleMetricCard({
     <div
       onClick={onClick}
       className={cn(
-        // Mobile: visible boundaries with ring + border + shadow + lighter bg
-        "relative overflow-visible rounded-xl border bg-white/10 border-white/20 ring-1 ring-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.5)] p-2 transition-all duration-200 min-w-0 max-w-full",
+        // Mobile: inset boundary (cannot be clipped) + visible bg + compact padding
+        "relative rounded-xl border bg-white/15 border-white/25 ring-1 ring-white/10",
+        "shadow-[inset_0_0_0_1px_rgba(255,255,255,0.18),0_6px_18px_rgba(0,0,0,0.55)]",
+        "p-1.5 transition-all duration-200 min-w-0 max-w-full",
         // Desktop: revert to original subtle styling
-        "sm:overflow-hidden sm:bg-card sm:border-border/60 sm:ring-0 sm:shadow-none sm:p-2",
-        "hover:border-border",
+        "sm:bg-card sm:border-border/60 sm:ring-0 sm:shadow-none sm:p-2",
+        // Hover: mobile keeps white border, desktop uses theme
+        "hover:border-white/30 sm:hover:border-border",
         onClick && "cursor-pointer hover:bg-accent/5",
         className
       )}
@@ -57,12 +60,12 @@ export function SimpleMetricCard({
             )}
           </div>
         </div>
-        <div className="rounded-lg bg-muted/50 p-1">
-          <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+        <div className="rounded-lg bg-muted/50 p-0.5 sm:p-1">
+          <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground" />
         </div>
       </div>
       {trend.length > 0 && (
-        <div className="mt-1">
+        <div className="mt-0.5 sm:mt-1">
           <Sparkline data={trend} />
         </div>
       )}

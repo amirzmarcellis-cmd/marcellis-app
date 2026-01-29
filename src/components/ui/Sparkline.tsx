@@ -10,9 +10,9 @@ interface SparklineProps {
 export function Sparkline({ data, className }: SparklineProps) {
   const chartData = data.map((v, i) => ({ i, v }))
   return (
-    <div className={cn("h-6 sm:h-12 w-full text-primary", className)}>
+    <div className={cn("h-5 sm:h-12 w-full text-primary", className)}>
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={chartData} margin={{ top: 6, bottom: 0, left: 0, right: 0 }}>
+        <LineChart data={chartData} margin={{ top: 4, bottom: 0, left: 0, right: 0 }}>
           <Line type="monotone" dataKey="v" stroke="currentColor" strokeWidth={2} dot={false} />
         </LineChart>
       </ResponsiveContainer>
