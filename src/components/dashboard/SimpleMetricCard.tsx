@@ -35,7 +35,7 @@ export function SimpleMetricCard({
       onClick={onClick}
       className={cn(
         // Mobile: reduced width + centered so both left/right borders are visible equally
-        "w-[calc(100%-16px)] mx-auto sm:w-full sm:mx-0",
+        "w-[calc(100%-28px)] mx-auto sm:w-full sm:mx-0",
         // Mobile: stronger glass effect with clearly visible boundaries
         "relative rounded-xl border bg-white/20 border-white/40 ring-1 ring-white/20",
         "shadow-[inset_0_0_0_2px_rgba(255,255,255,0.25),0_6px_18px_rgba(0,0,0,0.55)]",
