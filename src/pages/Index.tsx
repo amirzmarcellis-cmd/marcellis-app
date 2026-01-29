@@ -695,7 +695,7 @@ export default function Index() {
       </div>
 
       {/* Advanced Performance Metrics - 4 cards in a row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 relative z-10 mt-4 w-full min-w-0 max-w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-3 relative z-10 mt-3 sm:mt-4 w-full min-w-0 max-w-full">
         <AdvancedMetricCard
           icon={TrendingUp}
           title="Pipeline Velocity"
@@ -738,7 +738,7 @@ export default function Index() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-3 relative z-10 mt-3">
         {/* Left Side - Job Control Panels - 30% width */}
-        <div className="space-y-2 sm:space-y-3 lg:col-span-1">
+        <div className="space-y-2 sm:space-y-3 lg:col-span-1 order-2 lg:order-1">
           <h2 className="text-sm sm:text-base font-bold font-work text-cyan-300 mb-2 sm:mb-3 flex items-center">
             <Target className="h-4 w-4 mr-1.5" />
             Active Jobs Funnel
@@ -799,7 +799,7 @@ export default function Index() {
         {/* Right Side - Live Candidate Feed & Action Center - 60% width */}
         <div className="space-y-3 sm:space-y-4 lg:space-y-4 lg:col-span-2 order-1 lg:order-2">
           {/* Live Candidate Feed */}
-          <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20 max-w-2xl mx-auto w-full">
+          <Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20 w-full lg:max-w-2xl lg:mx-auto">
             <CardHeader className="p-2 sm:p-3 lg:p-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
                 <CardTitle className="text-base sm:text-lg lg:text-xl text-cyan-300 flex items-center flex-wrap gap-2">
