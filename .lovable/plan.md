@@ -1,92 +1,75 @@
 
-## What I found (why the right edge still looks “missing”)
-From the code, the KPI cards themselves already have mobile-only border/ring/shadow, and the KPI grid (`BentoKpis`) already has a small mobile padding (`px-1`). So if the **right edge is still cut off**, the most likely cause is **the overall dashboard content container is slightly wider than the mobile viewport**, or it is being **centered with `mx-auto` + max-width** in a way that results in the content appearing shifted right on some devices/browsers.
 
-In `src/pages/Index.tsx`, the dashboard page wrapper is:
+## Problem Analysis (from your screenshot)
 
-- `mx-auto max-w-6xl w-full ... overflow-x-hidden`
+Looking at your mobile screenshot, I can see three issues:
 
-This is great for desktop, but on mobile (and especially on iOS Safari / some Android WebViews), the combination of:
-- a centered container (`mx-auto`),
-- nested padding from the layout (`DashboardLayout` main has `px-4`),
-- and other nested blocks,
-can lead to the **content rendering a few pixels off** (appearing shifted), which makes the **right boundary of full-width cards** look like it’s “missing.”
+1. **Excessive left padding** - The `px-3` I added to Index.tsx stacks with `px-4` from DashboardLayout, creating too much space on the left
+2. **Right boundary not visible** - The KPI cards (Active Jobs, Waiting Review, etc.) have no visible right edge - they blend into the dark background
+3. **Cards look flat** - The current styling isn't creating enough contrast to show card boundaries
 
-## Goal (mobile only)
-- Shift the dashboard content slightly left / normalize it so KPI cards never get clipped on the right.
-- Ensure KPI cards look compact and have visible boundaries on mobile.
-- Desktop/laptop must remain 100% unchanged.
+## Root Cause
 
-## Implementation approach (safe + minimal, mobile-only)
-### A) Fix the “page shifted right” at the source: the dashboard wrapper container (mobile only)
+The padding stacking:
+- DashboardLayout main: `px-4` (16px)
+- Index.tsx wrapper: `px-3` (12px)
+- BentoKpis grid: `px-2` (8px)
+
+This creates ~36px left padding on mobile, which is way too much.
+
+## Solution (Mobile Only - Desktop Unchanged)
+
+### 1. Remove the extra padding from Index.tsx wrapper
 **File:** `src/pages/Index.tsx`
 
-Change the outermost dashboard wrapper classes so that on mobile it does NOT use a centered max-width container, and instead uses true full-width with explicit padding.
+Remove the `px-3` I added since DashboardLayout already provides padding:
+```
+Before: mx-0 max-w-full px-3 sm:mx-auto sm:max-w-6xl sm:px-0
+After:  mx-0 max-w-full sm:mx-auto sm:max-w-6xl
+```
 
-Planned adjustments:
-1) Replace:
-   - `mx-auto max-w-6xl`
-   with responsive equivalents:
-   - `mx-0 max-w-full sm:mx-auto sm:max-w-6xl`
-
-2) Add explicit mobile padding directly on the Index wrapper (so the page is always “inside” the screen):
-   - `px-3 sm:px-0`
-   (Desktop remains as-is because padding is removed at `sm`.)
-
-Why this works:
-- On mobile, removing `mx-auto` and `max-w-6xl` eliminates centering math that can cause subtle right-shift.
-- Adding `px-3` ensures a guaranteed left/right gutter so the right edge is always visible.
-- Desktop remains identical because `sm:mx-auto sm:max-w-6xl` restores the original behavior.
-
-### B) Keep KPI grid breathing room (already done) but make it slightly more robust (mobile only)
+### 2. Remove extra padding from BentoKpis grid
 **File:** `src/components/dashboard/BentoKpis.tsx`
 
-Currently it has `px-1 sm:px-0`. If the right edge still feels tight on real devices, increase slightly:
-- `px-2 sm:px-0`
+Remove the `px-2` since the layout already handles it:
+```
+Before: px-2 sm:px-0
+After:  (remove entirely)
+```
 
-This is mobile-only and does not change desktop.
-
-### C) Ensure the KPI cards’ boundary is visible even if parent containers clip
+### 3. Strengthen the card boundary visibility significantly
 **File:** `src/components/dashboard/SimpleMetricCard.tsx`
 
-You already have an inset boundary shadow (good). I will ensure two extra safeguards:
-1) Add a mobile-only `outline` (outlines are not part of layout and remain visible even when borders blend):
-   - `outline outline-1 outline-white/10 outline-offset-0 sm:outline-none`
+The current `bg-white/15` and `border-white/25` aren't visible enough in dark mode. I'll make the boundary much more prominent:
 
-2) Keep the inset boundary shadow as the primary boundary, since it can’t be “lost” at the right edge due to overflow clipping.
+- Increase background to `bg-white/20` (more visible glass effect)
+- Increase border to `border-white/40` (much more visible)
+- Add a stronger inset glow: `shadow-[inset_0_0_0_2px_rgba(255,255,255,0.25)]`
+- Keep the outline as additional safeguard
 
-Desktop remains unchanged with `sm:` overrides.
+### 4. Ensure DashboardLayout main has proper mobile padding
+**File:** `src/components/dashboard/DashboardLayout.tsx`
 
-### D) Confirm there is no global horizontal overflow on mobile
-**Files:** `src/components/dashboard/DashboardLayout.tsx`, `src/components/layout/MissionBackground.tsx`
+Reduce mobile padding slightly to give cards more room:
+```
+Before: px-4 py-1.5
+After:  px-2 py-1.5 sm:p-3 (smaller mobile padding, desktop unchanged)
+```
 
-I will **not** change desktop behavior, but I will add a safe mobile-only clamp to prevent any accidental horizontal overflow from any child element:
-- Add `overflow-x-hidden` specifically on the main content wrapper for mobile, while keeping existing desktop behavior unchanged.
+## Technical Summary
 
-(You already have `overflow-x-hidden` in `DashboardLayout` outer wrapper; this step just ensures the content area itself can’t create a wider scroll width.)
+| File | Change | Mobile Effect | Desktop |
+|------|--------|---------------|---------|
+| Index.tsx | Remove `px-3` | Less left space | Unchanged |
+| BentoKpis.tsx | Remove `px-2 sm:px-0` | Cards use full width | Unchanged |
+| SimpleMetricCard.tsx | Stronger `bg-white/20`, `border-white/40` | Visible boundaries | Unchanged via `sm:` |
+| DashboardLayout.tsx | `px-2` instead of `px-4` | More card room | Unchanged via `sm:` |
 
-## Deployment / verification (important for custom domain)
-Because you’re testing via **custom domain**, you will only see changes after **Publish → Update**, and sometimes mobile browsers cache aggressively.
+## Expected Result
 
-Verification steps:
-1) Publish → Update.
-2) On your phone browser: hard refresh (or open in private/incognito) to bypass cache.
-3) Confirm the dashboard no longer appears shifted right and KPI right borders are visible.
+After these changes on mobile:
+- No excessive left padding - content fills the screen properly
+- KPI cards have clearly visible boundaries on ALL sides (including right)
+- Cards still look compact
+- Desktop view remains 100% identical
 
-## Acceptance checklist (what you should see)
-On mobile dashboard:
-- KPI cards show a visible right boundary (not clipped).
-- Page content is aligned (no “shifted right” look).
-- KPI cards are compact (shorter).
-- Desktop/laptop view looks exactly the same as before.
-
-## Exact files to change (no backend risk)
-1) `src/pages/Index.tsx` (main fix: mobile wrapper alignment; desktop preserved via `sm:`)
-2) `src/components/dashboard/BentoKpis.tsx` (optional: slightly more mobile padding)
-3) `src/components/dashboard/SimpleMetricCard.tsx` (add mobile-only outline safeguard)
-4) `src/components/dashboard/DashboardLayout.tsx` (optional: mobile-only overflow-x clamp)
-
-## Risk management (to protect the live system)
-- These changes are CSS/className-only.
-- No database, auth, or business logic changes.
-- Desktop is protected via `sm:` overrides so it remains unchanged.
