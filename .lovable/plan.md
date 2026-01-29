@@ -1,139 +1,92 @@
 
-## What I believe is happening
-You’re describing a very specific symptom: **the right edge of the KPI cards has no visible boundary on mobile**, even though we already added border/ring/shadow classes.
+## What I found (why the right edge still looks “missing”)
+From the code, the KPI cards themselves already have mobile-only border/ring/shadow, and the KPI grid (`BentoKpis`) already has a small mobile padding (`px-1`). So if the **right edge is still cut off**, the most likely cause is **the overall dashboard content container is slightly wider than the mobile viewport**, or it is being **centered with `mx-auto` + max-width** in a way that results in the content appearing shifted right on some devices/browsers.
 
-That usually happens for one (or both) of these reasons:
+In `src/pages/Index.tsx`, the dashboard page wrapper is:
 
-1) **The “boundary” is being drawn outside the card (shadow/ring) but gets clipped by a parent container** (common when a parent has `overflow-x-hidden` / `overflow-hidden`).  
-2) **The card is flush against the container edge**, so even a border exists, but visually it blends (especially in dark mode + black background).
+- `mx-auto max-w-6xl w-full ... overflow-x-hidden`
 
-Because you also said “elements are not aligned / bad UI”, we should fix the **card boundary in a way that cannot be clipped** and also ensure the KPI grid has consistent spacing on mobile.
-
-Crucially: we will keep **desktop/laptop 100% unchanged** using `sm:` overrides only.
-
----
+This is great for desktop, but on mobile (and especially on iOS Safari / some Android WebViews), the combination of:
+- a centered container (`mx-auto`),
+- nested padding from the layout (`DashboardLayout` main has `px-4`),
+- and other nested blocks,
+can lead to the **content rendering a few pixels off** (appearing shifted), which makes the **right boundary of full-width cards** look like it’s “missing.”
 
 ## Goal (mobile only)
-On mobile dashboard:
-- KPI cards have an obvious visible boundary on **all sides including right**
-- KPI cards are more compact (less height)
-- Spacing/alignment looks consistent (no “stuck to the edge” feeling)
-- Desktop/laptop view remains exactly as-is
+- Shift the dashboard content slightly left / normalize it so KPI cards never get clipped on the right.
+- Ensure KPI cards look compact and have visible boundaries on mobile.
+- Desktop/laptop must remain 100% unchanged.
 
----
+## Implementation approach (safe + minimal, mobile-only)
+### A) Fix the “page shifted right” at the source: the dashboard wrapper container (mobile only)
+**File:** `src/pages/Index.tsx`
 
-## Changes I will make (mobile only, desktop unchanged)
+Change the outermost dashboard wrapper classes so that on mobile it does NOT use a centered max-width container, and instead uses true full-width with explicit padding.
 
-### 1) Make the boundary “uncuttable” by using an **inset boundary** (cannot be clipped)
-**File:** `src/components/dashboard/SimpleMetricCard.tsx`
+Planned adjustments:
+1) Replace:
+   - `mx-auto max-w-6xl`
+   with responsive equivalents:
+   - `mx-0 max-w-full sm:mx-auto sm:max-w-6xl`
 
-**Why:** Shadows/rings can be clipped by `overflow-x-hidden` on parent containers.  
-So we’ll render the boundary **inside** the card using an **inset box-shadow** (and optionally an `outline` fallback), which will remain visible even if ancestors clip overflow.
+2) Add explicit mobile padding directly on the Index wrapper (so the page is always “inside” the screen):
+   - `px-3 sm:px-0`
+   (Desktop remains as-is because padding is removed at `sm`.)
 
-**Implementation approach (mobile base styles):**
-- Keep `overflow-visible` on the card (mobile) but don’t rely on it.
-- Replace the current “boundary look” with:
-  - Slightly stronger mobile background: `bg-white/12` or `bg-white/15`
-  - Stronger border color: `border-white/25` (still subtle but visible)
-  - Add inset boundary via shadow, e.g.:
-    - `shadow-[inset_0_0_0_1px_rgba(255,255,255,0.18),0_6px_18px_rgba(0,0,0,0.55)]`
-  - Keep ring, but treat it as secondary:
-    - `ring-1 ring-white/10`
-- Fix hover so it **doesn’t revert to the theme border** on mobile:
-  - Change `hover:border-border` to a responsive version:
-    - `hover:border-white/30 sm:hover:border-border`
+Why this works:
+- On mobile, removing `mx-auto` and `max-w-6xl` eliminates centering math that can cause subtle right-shift.
+- Adding `px-3` ensures a guaranteed left/right gutter so the right edge is always visible.
+- Desktop remains identical because `sm:mx-auto sm:max-w-6xl` restores the original behavior.
 
-**Desktop safety:**
-- Keep/strengthen existing `sm:` overrides so desktop stays exactly the same:
-  - `sm:bg-card sm:border-border/60 sm:ring-0 sm:shadow-none sm:overflow-hidden`
-
-This specifically targets your “right boundary missing” complaint because the **inset border is inside the card**, so it cannot disappear due to clipping.
-
----
-
-### 2) Make the KPI cards more compact (mobile only)
-**File:** `src/components/dashboard/SimpleMetricCard.tsx`
-
-We’ll reduce vertical bulk without touching desktop:
-- Change padding on mobile from `p-2` → `p-1.5`
-- Tighten spacing:
-  - Title already small; keep it but ensure it doesn’t add extra height
-  - Reduce sparkline container margin: `mt-0.5` (mobile)
-- Slightly reduce icon container size on mobile:
-  - Icon wrapper: `p-0.5` (mobile), `sm:p-1`
-  - Icon size: `h-3 w-3` (mobile), `sm:h-3.5 sm:w-3.5`
-
-Desktop remains unchanged via `sm:` sizing.
-
----
-
-### 3) Ensure the KPI grid has proper “breathing room” from the right edge (mobile only)
+### B) Keep KPI grid breathing room (already done) but make it slightly more robust (mobile only)
 **File:** `src/components/dashboard/BentoKpis.tsx`
 
-Even if the cards have borders, if the grid sits too close to the container edge, it still looks misaligned.
+Currently it has `px-1 sm:px-0`. If the right edge still feels tight on real devices, increase slightly:
+- `px-2 sm:px-0`
 
-So we’ll add **mobile-only padding** to the KPI grid:
-- Add `px-1` (or `px-1.5`) to the grid container on mobile
-- Keep desktop as-is with `sm:px-0`
+This is mobile-only and does not change desktop.
 
-This will help ensure the **right border is not visually fused with the screen edge**, improving perceived alignment.
+### C) Ensure the KPI cards’ boundary is visible even if parent containers clip
+**File:** `src/components/dashboard/SimpleMetricCard.tsx`
 
----
+You already have an inset boundary shadow (good). I will ensure two extra safeguards:
+1) Add a mobile-only `outline` (outlines are not part of layout and remain visible even when borders blend):
+   - `outline outline-1 outline-white/10 outline-offset-0 sm:outline-none`
 
-### 4) Make the sparkline shorter only on mobile (already changed, but we’ll confirm)
-**File:** `src/components/ui/Sparkline.tsx`
+2) Keep the inset boundary shadow as the primary boundary, since it can’t be “lost” at the right edge due to overflow clipping.
 
-You want “more compact”. We’ll keep desktop unchanged (`sm:h-12`) and ensure mobile is short:
-- If it’s currently `h-6 sm:h-12`, keep it
-- If it’s still too tall on your device, reduce to `h-5 sm:h-12`
+Desktop remains unchanged with `sm:` overrides.
 
----
+### D) Confirm there is no global horizontal overflow on mobile
+**Files:** `src/components/dashboard/DashboardLayout.tsx`, `src/components/layout/MissionBackground.tsx`
 
-### 5) Deployment verification (to stop guessing)
-Because you’re testing on a **custom domain**, it’s easy to end up viewing an older deployment or cached assets.
+I will **not** change desktop behavior, but I will add a safe mobile-only clamp to prevent any accidental horizontal overflow from any child element:
+- Add `overflow-x-hidden` specifically on the main content wrapper for mobile, while keeping existing desktop behavior unchanged.
 
-To remove doubt, I will add a **temporary mobile-only build marker** that is hidden on desktop:
-- A tiny `sm:hidden` text like “KPI UI v2” inside the KPI section (not visible on desktop).
-- Once you confirm the fix is live, we can remove it in a follow-up.
+(You already have `overflow-x-hidden` in `DashboardLayout` outer wrapper; this step just ensures the content area itself can’t create a wider scroll width.)
 
-This does not affect business logic and does not change desktop visuals.
+## Deployment / verification (important for custom domain)
+Because you’re testing via **custom domain**, you will only see changes after **Publish → Update**, and sometimes mobile browsers cache aggressively.
 
----
+Verification steps:
+1) Publish → Update.
+2) On your phone browser: hard refresh (or open in private/incognito) to bypass cache.
+3) Confirm the dashboard no longer appears shifted right and KPI right borders are visible.
 
-## Acceptance checklist
-After these changes (on your custom domain, mobile, dark mode):
-- You can clearly see the KPI card boundary on **left + right**
-- Cards look tighter (less tall)
-- KPI grid looks aligned and not stuck to the edge
-- Desktop/laptop KPI cards look exactly as they do today
+## Acceptance checklist (what you should see)
+On mobile dashboard:
+- KPI cards show a visible right boundary (not clipped).
+- Page content is aligned (no “shifted right” look).
+- KPI cards are compact (shorter).
+- Desktop/laptop view looks exactly the same as before.
 
----
+## Exact files to change (no backend risk)
+1) `src/pages/Index.tsx` (main fix: mobile wrapper alignment; desktop preserved via `sm:`)
+2) `src/components/dashboard/BentoKpis.tsx` (optional: slightly more mobile padding)
+3) `src/components/dashboard/SimpleMetricCard.tsx` (add mobile-only outline safeguard)
+4) `src/components/dashboard/DashboardLayout.tsx` (optional: mobile-only overflow-x clamp)
 
-## Files I will update
-1) `src/components/dashboard/SimpleMetricCard.tsx`  
-   - Switch to inset boundary shadow + stronger mobile-only styling + compact spacing  
-   - Fix mobile hover border so it doesn’t revert to `border-border`
-
-2) `src/components/dashboard/BentoKpis.tsx`  
-   - Add mobile-only `px-*` breathing room (desktop unchanged)
-
-3) `src/components/ui/Sparkline.tsx`  
-   - Confirm mobile height is compact; keep `sm:h-12` for desktop unchanged
-
-4) (Optional, temporary) `src/pages/Index.tsx`  
-   - Add a very small `sm:hidden` “KPI UI v2” marker near the KPI block to confirm deployment
-
----
-
-## How you’ll test (end-to-end)
-1) Open the dashboard on your phone (custom domain) in dark mode.
-2) Confirm you see the tiny mobile-only marker (if we add it). That proves you’re on the latest build.
-3) Check KPI cards: verify right edge boundary is visible and spacing feels aligned.
-4) Open on laptop/desktop: verify KPI cards look unchanged.
-
----
-
-## Safety promise
-- No data/schema/auth changes.
-- No logic changes.
-- Only mobile-only layout/styling updates using responsive (`sm:`) overrides to protect desktop.
+## Risk management (to protect the live system)
+- These changes are CSS/className-only.
+- No database, auth, or business logic changes.
+- Desktop is protected via `sm:` overrides so it remains unchanged.
