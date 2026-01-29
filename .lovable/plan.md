@@ -4,13 +4,13 @@
 Make the SimpleMetricCard even smaller on mobile to ensure the right-side border is fully visible, without affecting the desktop view.
 
 ## Current Mobile Settings
-- **Width**: `w-[calc(100%-24px)]` (24px narrower than container)
+- **Width**: `w-[calc(100%-32px)]` (32px narrower than container)
 - **Left Margin**: `ml-0` (flush-left)
-- **Right Margin**: `mr-6` (24px)
+- **Right Margin**: `mr-8` (32px)
 
 ## Requested Changes (Mobile Only)
-- **Width**: `w-[calc(100%-32px)]` (32px narrower than container)
-- **Right Margin**: `mr-8` (32px)
+- **Width**: `w-[calc(100%-42px)]` (42px narrower than container)
+- **Right Margin**: `mr-8` (unchanged)
 
 ## Desktop Settings (Unchanged)
 - `sm:w-full` - full width on desktop
@@ -23,10 +23,10 @@ Make the SimpleMetricCard even smaller on mobile to ensure the right-side border
 ### Change
 ```
 // Before
-"w-[calc(100%-24px)] ml-0 mr-6 sm:w-full sm:mr-0"
+"w-[calc(100%-32px)] ml-0 mr-8 sm:w-full sm:mr-0"
 
 // After
-"w-[calc(100%-32px)] ml-0 mr-8 sm:w-full sm:mr-0"
+"w-[calc(100%-42px)] ml-0 mr-8 sm:w-full sm:mr-0"
 ```
 
 ## Testing Checklist
