@@ -34,8 +34,10 @@ export function SimpleMetricCard({
     <div
       onClick={onClick}
       className={cn(
-        "relative overflow-hidden rounded-xl border bg-white/5 border-white/10 shadow-md p-2 transition-all duration-200 min-w-0 max-w-full",
-        "sm:bg-card sm:border-border/60 sm:shadow-none sm:p-2",
+        // Mobile: visible boundaries with ring + border + shadow + lighter bg
+        "relative overflow-visible rounded-xl border bg-white/10 border-white/20 ring-1 ring-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.5)] p-2 transition-all duration-200 min-w-0 max-w-full",
+        // Desktop: revert to original subtle styling
+        "sm:overflow-hidden sm:bg-card sm:border-border/60 sm:ring-0 sm:shadow-none sm:p-2",
         "hover:border-border",
         onClick && "cursor-pointer hover:bg-accent/5",
         className
@@ -43,11 +45,11 @@ export function SimpleMetricCard({
     >
       <div className="flex items-start justify-between min-w-0">
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide truncate mb-0.5">
+          <p className="text-[9px] sm:text-[10px] font-medium text-muted-foreground uppercase tracking-wide truncate mb-0.5">
             {title}
           </p>
           <div className="flex items-baseline gap-1.5 min-w-0">
-            <span className="text-lg sm:text-xl font-semibold text-foreground truncate">{value}</span>
+            <span className="text-base sm:text-xl font-semibold text-foreground truncate">{value}</span>
             {delta && (
               <span className={cn("text-xs font-medium", deltaColor[deltaType])}>
                 {delta}
@@ -60,7 +62,7 @@ export function SimpleMetricCard({
         </div>
       </div>
       {trend.length > 0 && (
-        <div className="mt-1.5">
+        <div className="mt-1">
           <Sparkline data={trend} />
         </div>
       )}
