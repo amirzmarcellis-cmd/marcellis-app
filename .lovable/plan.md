@@ -1,46 +1,36 @@
 
+
 ## Goal
-Make the right-side border of SimpleMetricCard clearly visible on mobile without changing the desktop view.
+Make the SimpleMetricCard even smaller on mobile to ensure the right-side border is fully visible, without affecting the desktop view.
 
-## Root Cause Analysis
-After reviewing the code, I found that:
+## Current Mobile Settings
+- **Width**: `w-[calc(100%-24px)]` (24px narrower than container)
+- **Left Margin**: `ml-0` (flush-left)
+- **Right Margin**: `mr-6` (24px)
 
-1. **The SimpleMetricCard changes ARE in the file** - The code shows `w-[calc(100%-40px)] mx-auto` and the internal frame span
-2. **The problem is multiple layers of clipping** - There are THREE nested `overflow-x-hidden` declarations:
-   - `DashboardLayout.tsx` line 32: outer wrapper
-   - `DashboardLayout.tsx` line 51: main content area (also has only `px-2` padding on mobile)
-   - `Index.tsx` line 633: page wrapper
+## Requested Changes (Mobile Only)
+- **Width**: `w-[calc(100%-32px)]` (32px narrower than container)
+- **Right Margin**: `mr-8` (32px)
 
-3. **The mobile horizontal padding is too tight** - The `<main>` element only has `px-2` (8px) on each side, which combined with the card's calc width, still pushes content close to the edge
+## Desktop Settings (Unchanged)
+- `sm:w-full` - full width on desktop
+- `sm:mr-0` - no right margin on desktop
+- `sm:p-2` - 8px padding on desktop
 
-## Fix Strategy (Mobile Only, Desktop Unchanged)
+## File to Modify
+**`src/components/dashboard/SimpleMetricCard.tsx`** (Line 38)
 
-### Option A: Increase card breathing room (Preferred)
-Change the card width calculation from `w-[calc(100%-40px)]` to `w-[calc(100%-56px)]` or even `w-[calc(100%-64px)]` to provide more visual margin on mobile. This is purely mobile-scoped via `sm:w-full`.
+### Change
+```
+// Before
+"w-[calc(100%-24px)] ml-0 mr-6 sm:w-full sm:mr-0"
 
-### Option B: Remove one layer of overflow-x-hidden on mobile
-Keep `overflow-x-hidden` on desktop but use responsive class to remove it on mobile for the inner containers. However, this risks horizontal scroll on mobile which the user explicitly wants to avoid.
+// After
+"w-[calc(100%-32px)] ml-0 mr-8 sm:w-full sm:mr-0"
+```
 
-### Recommended Fix
-1. **SimpleMetricCard.tsx**: Increase the mobile width reduction from `40px` to `56px`:
-   - Change: `w-[calc(100%-40px)]` → `w-[calc(100%-56px)]`
-   - This gives 28px breathing room on each side of the card
-   - Desktop unchanged via `sm:w-full sm:mx-0`
+## Testing Checklist
+1. Hard refresh on iPhone Safari
+2. Verify all SimpleMetricCard right borders are visible
+3. Confirm desktop dashboard is unchanged
 
-2. **Ensure internal border is strong enough**: Increase the internal frame border opacity from `border-white/35` to `border-white/50` for better visibility
-
-### Files to Change
-- `src/components/dashboard/SimpleMetricCard.tsx`
-  - Line 38: Change width calculation for more breathing room
-  - Line 52: Increase internal border visibility
-
-### Desktop Safety
-All changes remain scoped to mobile via:
-- `sm:w-full sm:mx-0` keeps desktop at full width
-- `sm:hidden` keeps internal frame hidden on desktop
-
-### Testing Checklist
-1. **Hard refresh on iPhone Safari** (Settings → Safari → Clear History and Website Data, OR hold refresh button → "Reload Without Content Blockers")
-2. Verify all 5 SimpleMetricCard right borders are visible
-3. Check desktop dashboard is unchanged
-4. Publish the changes and test on the live published site
