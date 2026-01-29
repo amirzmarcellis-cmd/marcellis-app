@@ -695,7 +695,7 @@ export default function Index() {
       </div>
 
       {/* Advanced Performance Metrics - 4 cards in a row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-3 relative z-10 mt-3 sm:mt-4 w-full min-w-0 max-w-full justify-items-start sm:justify-items-stretch">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-3 relative z-10 mt-3 sm:mt-4 w-full min-w-0 max-w-full justify-items-center sm:justify-items-stretch">
         <AdvancedMetricCard
           icon={TrendingUp}
           title="Pipeline Velocity"
