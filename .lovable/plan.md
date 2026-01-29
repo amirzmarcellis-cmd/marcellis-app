@@ -1,51 +1,46 @@
 
-Goal
-- Fix mobile so the SimpleMetricCard clearly shows the right-side border (and overall boundary) as in your screenshot.
-- Keep desktop view unchanged.
+## Goal
+Make the right-side border of SimpleMetricCard clearly visible on mobile without changing the desktop view.
 
-What’s happening (based on code + screenshot)
-- The SimpleMetricCard uses mobile-only “outer” effects: `ring-*` and `outline-*`.
-- Your dashboard containers use `overflow-x-hidden` in multiple places (`DashboardLayout` main wrapper and `Index` page wrapper). That’s good for preventing horizontal scroll, but it can clip any visual effect that renders outside the element’s box (especially `outline` and sometimes `ring`).
-- Result: the card’s “edge” looks cut off on the right in mobile even if the normal `border` exists, because the visible boundary you’re relying on is the clipped outer effect.
+## Root Cause Analysis
+After reviewing the code, I found that:
 
-Fix strategy (mobile-only; desktop unchanged)
-1) Make the border/ring “inset” (draw inside the card, not outside)
-- Update the SimpleMetricCard mobile ring to use `ring-inset`.
-- Remove the mobile `outline` (outline cannot be inset and is the most likely to be clipped).
-- Keep desktop behavior exactly as-is via the existing `sm:*` overrides.
+1. **The SimpleMetricCard changes ARE in the file** - The code shows `w-[calc(100%-40px)] mx-auto` and the internal frame span
+2. **The problem is multiple layers of clipping** - There are THREE nested `overflow-x-hidden` declarations:
+   - `DashboardLayout.tsx` line 32: outer wrapper
+   - `DashboardLayout.tsx` line 51: main content area (also has only `px-2` padding on mobile)
+   - `Index.tsx` line 633: page wrapper
 
-2) Add an internal “frame layer” inside the card (guaranteed visible)
-- Add `overflow-hidden` to the card so the internal frame respects rounded corners.
-- Add a `span` as the first child:
-  - Positioned absolute: `absolute inset-0 rounded-xl`
-  - Adds a subtle internal border/frame: `border border-white/35`
-  - Mobile-only (hidden on desktop): `sm:hidden`
-- This creates a real border that’s rendered inside the card, so it cannot be clipped by parent overflow and will always show on the right.
+3. **The mobile horizontal padding is too tight** - The `<main>` element only has `px-2` (8px) on each side, which combined with the card's calc width, still pushes content close to the edge
 
-3) (Optional, only if you still can’t see it) Slightly increase mobile breathing room
-- If the right edge still feels too tight visually, adjust width from `w-[calc(100%-28px)]` to something like `w-[calc(100%-40px)]`.
-- This is purely mobile and won’t affect desktop due to `sm:w-full`.
+## Fix Strategy (Mobile Only, Desktop Unchanged)
 
-Files to change
-- src/components/dashboard/SimpleMetricCard.tsx
-  - Change mobile ring to `ring-inset`
-  - Remove mobile outline classes
-  - Add `overflow-hidden`
-  - Add internal frame `<span ... />` (mobile-only)
-  - (Optional) tweak the mobile calc width if needed
+### Option A: Increase card breathing room (Preferred)
+Change the card width calculation from `w-[calc(100%-40px)]` to `w-[calc(100%-56px)]` or even `w-[calc(100%-64px)]` to provide more visual margin on mobile. This is purely mobile-scoped via `sm:w-full`.
 
-Exact implementation notes (so desktop is not affected)
-- Keep: `sm:bg-card sm:border-border/60 sm:ring-0 sm:shadow-none sm:p-2 sm:outline-none`
-- Add internal frame only on mobile: `sm:hidden`
-- Keep desktop width unchanged: `sm:w-full sm:mx-0`
+### Option B: Remove one layer of overflow-x-hidden on mobile
+Keep `overflow-x-hidden` on desktop but use responsive class to remove it on mobile for the inner containers. However, this risks horizontal scroll on mobile which the user explicitly wants to avoid.
 
-Test checklist (must-do)
-1) Mobile dashboard:
-   - Confirm right-side border is clearly visible on all SimpleMetricCards (Active Jobs, Waiting Review, Shortlisted, Rejected, Submitted).
-   - Scroll a little to ensure it stays correct as you move the page.
-2) Desktop dashboard:
-   - Confirm KPI grid looks exactly the same as before (no border/frame differences, no width differences).
-3) Hard refresh on your phone (mobile browsers often cache CSS).
+### Recommended Fix
+1. **SimpleMetricCard.tsx**: Increase the mobile width reduction from `40px` to `56px`:
+   - Change: `w-[calc(100%-40px)]` → `w-[calc(100%-56px)]`
+   - This gives 28px breathing room on each side of the card
+   - Desktop unchanged via `sm:w-full sm:mx-0`
 
-If it still doesn’t work after this
-- Next step would be to stop using any “outside” effects on mobile (ring/shadows that expand) and rely only on a fully internal frame (a full inset border + inset shadow), which is 100% unclippable. We’ll only do that if needed, because it changes the mobile visual style more.
+2. **Ensure internal border is strong enough**: Increase the internal frame border opacity from `border-white/35` to `border-white/50` for better visibility
+
+### Files to Change
+- `src/components/dashboard/SimpleMetricCard.tsx`
+  - Line 38: Change width calculation for more breathing room
+  - Line 52: Increase internal border visibility
+
+### Desktop Safety
+All changes remain scoped to mobile via:
+- `sm:w-full sm:mx-0` keeps desktop at full width
+- `sm:hidden` keeps internal frame hidden on desktop
+
+### Testing Checklist
+1. **Hard refresh on iPhone Safari** (Settings → Safari → Clear History and Website Data, OR hold refresh button → "Reload Without Content Blockers")
+2. Verify all 5 SimpleMetricCard right borders are visible
+3. Check desktop dashboard is unchanged
+4. Publish the changes and test on the live published site
