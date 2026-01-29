@@ -630,7 +630,7 @@ export default function Index() {
     return 'Good evening';
   };
 
-  return <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden mx-auto max-w-6xl pb-20 w-full min-w-0">
+  return <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden mx-auto max-w-6xl pb-20 w-full min-w-0 px-3 sm:px-4 lg:px-0">
       
       <div className="mb-4 sm:mb-6 relative z-10 w-full min-w-0 max-w-full">
         {/* Header */}
@@ -828,9 +828,9 @@ export default function Index() {
                   const score = parseFloat(candidate.success_score) || 0;
                   const jobTitle = candidate.job_title || 'Unknown Position';
                   return <div key={index} className={`bg-gradient-to-r rounded-lg p-1.5 border ${index < 3 ? 'from-amber-400/20 to-yellow-500/20 border-yellow-400/40' : 'from-white/5 to-white/10 border-white/20'} hover:border-cyan-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 group cursor-pointer active:scale-[0.98]`} onClick={() => handleCandidateClick(candidate.recordid, candidate.job_id)}>
-                        {/* Main row: Info + Score + Buttons */}
-                        <div className="flex items-start justify-between gap-1.5 w-full">
-                          {/* Left: Avatar + Info */}
+                        {/* Main row: Info + Score + Buttons - stacks on mobile */}
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1.5 w-full">
+                          {/* Left: Avatar + Info + Score on mobile */}
                           <div className="flex items-start space-x-1.5 min-w-0 flex-1 overflow-hidden">
                             <div className="relative flex-shrink-0">
                               <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg">
@@ -839,7 +839,10 @@ export default function Index() {
                               <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border border-white animate-pulse"></div>
                             </div>
                             <div className="min-w-0 flex-1 overflow-hidden">
-                              <h4 className="font-work text-foreground group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors text-xs font-normal truncate">{candidate.candidate_name}</h4>
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-work text-foreground group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors text-xs font-normal truncate">{candidate.candidate_name}</h4>
+                                <span className={`sm:hidden text-sm font-bold ${getScoreColor(score)}`}>{score}</span>
+                              </div>
                               <p className="text-purple-300 text-[10px] font-normal truncate">{jobTitle}</p>
                               <div className="flex flex-wrap gap-0.5 mt-0.5">
                                 <Badge variant="outline" className="text-[8px] border-cyan-400/50 text-cyan-400 bg-cyan-400/10 px-0.5 py-0">
@@ -851,25 +854,25 @@ export default function Index() {
                               </div>
                             </div>
                           </div>
-                          {/* Right: Score + Buttons - guaranteed width */}
-                          <div className="flex flex-col items-end gap-0.5 flex-shrink-0 min-w-[70px] sm:min-w-[90px]">
-                            <div className={`text-base sm:text-lg font-bold ${getScoreColor(score)}`}>
+                          {/* Right: Score (desktop) + Buttons - horizontal on mobile, vertical on desktop */}
+                          <div className="flex items-center gap-2 sm:flex-col sm:items-end sm:gap-0.5 sm:flex-shrink-0 sm:min-w-[90px] w-full sm:w-auto">
+                            <div className={`hidden sm:block text-base sm:text-lg font-bold ${getScoreColor(score)}`}>
                               {score}
                             </div>
-                            <div className="flex flex-col gap-0.5 w-full">
+                            <div className="flex gap-1 sm:flex-col sm:gap-0.5 flex-1 sm:flex-none sm:w-full">
                               <Button size="xs" variant="outline" onClick={e => {
                                 e.stopPropagation();
                                 handleRejectCandidate(candidate.Candidate_ID, candidate.job_id);
-                              }} className="bg-red-500/10 border border-red-400 text-red-400 hover:bg-red-500/20 hover:border-red-300 hover:text-red-300 transition-all duration-200 text-[8px] px-1 py-0 h-4 sm:h-5 w-full">
+                              }} className="bg-red-500/10 border border-red-400 text-red-400 hover:bg-red-500/20 hover:border-red-300 hover:text-red-300 transition-all duration-200 text-[8px] px-1 py-0 h-5 flex-1 sm:flex-none sm:w-full">
                                 <XCircle className="w-2.5 h-2.5" />
-                                <span className="hidden sm:inline ml-0.5">Reject</span>
+                                <span className="ml-0.5">Reject</span>
                               </Button>
                               <Button size="xs" variant="outline" onClick={e => {
                                 e.stopPropagation();
                                 handleCVSubmitted(candidate.Candidate_ID, candidate.job_id);
-                              }} className="bg-green-500/10 border border-green-400 text-green-400 hover:bg-green-500/20 hover:border-green-300 hover:text-green-300 transition-all duration-200 text-[8px] px-1 py-0 h-4 sm:h-5 w-full">
+                              }} className="bg-green-500/10 border border-green-400 text-green-400 hover:bg-green-500/20 hover:border-green-300 hover:text-green-300 transition-all duration-200 text-[8px] px-1 py-0 h-5 flex-1 sm:flex-none sm:w-full">
                                 <CheckCircle className="w-2.5 h-2.5" />
-                                <span className="hidden sm:inline ml-0.5">Submit</span>
+                                <span className="ml-0.5">Submit</span>
                               </Button>
                             </div>
                           </div>
