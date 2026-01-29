@@ -34,15 +34,15 @@ export function SimpleMetricCard({
     <div
       onClick={onClick}
       className={cn(
-        // Mobile: inset boundary (cannot be clipped) + visible bg + compact padding + outline safeguard
-        "relative rounded-xl border bg-white/15 border-white/25 ring-1 ring-white/10",
-        "shadow-[inset_0_0_0_1px_rgba(255,255,255,0.18),0_6px_18px_rgba(0,0,0,0.55)]",
-        "outline outline-1 outline-white/10 outline-offset-0",
+        // Mobile: stronger glass effect with clearly visible boundaries
+        "relative rounded-xl border bg-white/20 border-white/40 ring-1 ring-white/20",
+        "shadow-[inset_0_0_0_2px_rgba(255,255,255,0.25),0_6px_18px_rgba(0,0,0,0.55)]",
+        "outline outline-1 outline-white/15 outline-offset-0",
         "p-1.5 transition-all duration-200 min-w-0 max-w-full",
         // Desktop: revert to original subtle styling
         "sm:bg-card sm:border-border/60 sm:ring-0 sm:shadow-none sm:p-2 sm:outline-none",
         // Hover: mobile keeps white border, desktop uses theme
-        "hover:border-white/30 sm:hover:border-border",
+        "hover:border-white/50 sm:hover:border-border",
         onClick && "cursor-pointer hover:bg-accent/5",
         className
       )}
