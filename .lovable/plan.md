@@ -1,104 +1,51 @@
 
-## Objective (mobile only)
-Make the 9 dashboard cards visually “smaller in width” and aligned to the left on mobile so the **right border is always visible**, without changing card height and without changing anything on desktop.
+Goal
+- Fix mobile so the SimpleMetricCard clearly shows the right-side border (and overall boundary) as in your screenshot.
+- Keep desktop view unchanged.
 
-Cards to target (as you listed):
-1) Active Jobs  
-2) Waiting Review  
-3) Shortlisted  
-4) Rejected  
-5) Submitted  
-6) Pipeline Velocity  
-7) Avg Time to Hire  
-8) Shortlist Rate  
-9) Fill Rate  
+What’s happening (based on code + screenshot)
+- The SimpleMetricCard uses mobile-only “outer” effects: `ring-*` and `outline-*`.
+- Your dashboard containers use `overflow-x-hidden` in multiple places (`DashboardLayout` main wrapper and `Index` page wrapper). That’s good for preventing horizontal scroll, but it can clip any visual effect that renders outside the element’s box (especially `outline` and sometimes `ring`).
+- Result: the card’s “edge” looks cut off on the right in mobile even if the normal `border` exists, because the visible boundary you’re relying on is the clipped outer effect.
 
-## What’s causing your issue (from the current code)
-- On mobile, your grids are `grid-cols-1`, which makes each card stretch to the full column width.
-- If anything in the layout is slightly offset/cropped (device/browser quirks, overflow rules, container rounding, etc.), the **right edge is the first thing to get clipped**.
-- Making borders stronger didn’t help consistently because the cards are still trying to be “full width”.
+Fix strategy (mobile-only; desktop unchanged)
+1) Make the border/ring “inset” (draw inside the card, not outside)
+- Update the SimpleMetricCard mobile ring to use `ring-inset`.
+- Remove the mobile `outline` (outline cannot be inset and is the most likely to be clipped).
+- Keep desktop behavior exactly as-is via the existing `sm:*` overrides.
 
-So instead of fighting clipping, we’ll **intentionally reduce card width on mobile** and **align them left**, leaving a small right-side breathing space that guarantees the right border can be seen.
+2) Add an internal “frame layer” inside the card (guaranteed visible)
+- Add `overflow-hidden` to the card so the internal frame respects rounded corners.
+- Add a `span` as the first child:
+  - Positioned absolute: `absolute inset-0 rounded-xl`
+  - Adds a subtle internal border/frame: `border border-white/35`
+  - Mobile-only (hidden on desktop): `sm:hidden`
+- This creates a real border that’s rendered inside the card, so it cannot be clipped by parent overflow and will always show on the right.
 
-## Solution approach
-We will do two things (mobile only):
-1) Tell the grid containers to **not force children to stretch** (align items to start).
-2) Give these card components a **slightly reduced width on mobile** (example: `calc(100% - 12px)`), while keeping desktop `w-full`.
+3) (Optional, only if you still can’t see it) Slightly increase mobile breathing room
+- If the right edge still feels too tight visually, adjust width from `w-[calc(100%-28px)]` to something like `w-[calc(100%-40px)]`.
+- This is purely mobile and won’t affect desktop due to `sm:w-full`.
 
-This preserves height because we will not change padding, font sizes, or vertical spacing.
+Files to change
+- src/components/dashboard/SimpleMetricCard.tsx
+  - Change mobile ring to `ring-inset`
+  - Remove mobile outline classes
+  - Add `overflow-hidden`
+  - Add internal frame `<span ... />` (mobile-only)
+  - (Optional) tweak the mobile calc width if needed
 
-## Implementation details (exact code strategy)
+Exact implementation notes (so desktop is not affected)
+- Keep: `sm:bg-card sm:border-border/60 sm:ring-0 sm:shadow-none sm:p-2 sm:outline-none`
+- Add internal frame only on mobile: `sm:hidden`
+- Keep desktop width unchanged: `sm:w-full sm:mx-0`
 
-### A) KPI grid (first 5 cards) should allow “non-stretched” children on mobile
-**File:** `src/components/dashboard/BentoKpis.tsx`
+Test checklist (must-do)
+1) Mobile dashboard:
+   - Confirm right-side border is clearly visible on all SimpleMetricCards (Active Jobs, Waiting Review, Shortlisted, Rejected, Submitted).
+   - Scroll a little to ensure it stays correct as you move the page.
+2) Desktop dashboard:
+   - Confirm KPI grid looks exactly the same as before (no border/frame differences, no width differences).
+3) Hard refresh on your phone (mobile browsers often cache CSS).
 
-Update the wrapper classes:
-- Add: `justify-items-start` on mobile so cards can be narrower than the column
-- Add: `sm:justify-items-stretch` to keep desktop behavior identical (cards fill their column)
-
-Result:
-- Mobile: items align left and do not stretch
-- Desktop: unchanged
-
-### B) Make KPI cards slightly narrower on mobile (but full width on desktop)
-**File:** `src/components/dashboard/SimpleMetricCard.tsx`
-
-Add mobile-only width + alignment:
-- `w-[calc(100%-12px)]` (or 10–16px; we’ll pick a value that clearly exposes the right border)
-- `mr-auto` so it stays aligned to the left
-- `sm:w-full sm:mr-0` to preserve desktop exactly
-
-Important:
-- We will NOT change `p-*`, typography, icon size, or sparkline spacing in this step, so card height stays the same.
-
-### C) Advanced metrics grid (4 cards) should also allow non-stretched children on mobile
-These 4 cards are NOT in `BentoKpis`. They’re in a separate grid in `Index.tsx`:
-```tsx
-<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 ...">
-  <AdvancedMetricCard ... />
-  ...
-</div>
-```
-
-**File:** `src/pages/Index.tsx`
-
-Update that grid container to:
-- Add: `justify-items-start sm:justify-items-stretch`
-
-This ensures the AdvancedMetricCard can also be narrower on mobile, left-aligned.
-
-### D) Make AdvancedMetricCard slightly narrower on mobile (but full width on desktop)
-**File:** `src/components/dashboard/AdvancedMetricCard.tsx`
-
-Add mobile-only width + alignment on the top-level `<Card />`:
-- `w-[calc(100%-12px)] mr-auto`
-- `sm:w-full sm:mr-0`
-
-Again, no vertical changes, so height remains consistent.
-
-## Why this will fix what you’re seeing
-- Even if the page/container has some subtle offset or clipping, the cards will no longer be “flush” to the right edge.
-- The right border will always have space to render and be visible.
-- Desktop stays unchanged because all of this is constrained to mobile via `sm:` overrides.
-
-## Files that will be changed
-1) `src/components/dashboard/BentoKpis.tsx`  
-   - Add mobile left alignment behavior for grid items (`justify-items-start sm:justify-items-stretch`)
-
-2) `src/components/dashboard/SimpleMetricCard.tsx`  
-   - Add mobile-only reduced width + left alignment (`w-[calc(100%-12px)] mr-auto`, restore `sm:w-full`)
-
-3) `src/pages/Index.tsx`  
-   - Add `justify-items-start sm:justify-items-stretch` to the Advanced Metrics grid container
-
-4) `src/components/dashboard/AdvancedMetricCard.tsx`  
-   - Add mobile-only reduced width + left alignment on the card container, restore desktop width at `sm`
-
-## Testing checklist (end-to-end)
-1) On mobile dashboard: verify all 9 cards have visible right borders and are aligned to the left.
-2) Verify card heights did not change (compare before/after; padding and typography remain the same).
-3) On desktop: verify KPI row + Advanced Metrics look exactly as they did previously (no spacing/width changes).
-4) Hard refresh on phone after Publish → Update (mobile browsers can cache heavily).
-
-## Rollback safety
-These are className-only changes. If you dislike the look, we can revert just the mobile `w-[calc(...)]` additions and keep desktop untouched.
+If it still doesn’t work after this
+- Next step would be to stop using any “outside” effects on mobile (ring/shadows that expand) and rely only on a fully internal frame (a full inset border + inset shadow), which is 100% unclippable. We’ll only do that if needed, because it changes the mobile visual style more.
