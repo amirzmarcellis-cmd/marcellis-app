@@ -1,22 +1,27 @@
 
-## Fix Mobile Dashboard UI Issues
+## Fix Mobile Dashboard UI - Card Alignment, Boundaries, and Live Candidate Feed Actions
 
-This plan addresses the mobile UI issues:
-1. Cards not aligned properly
-2. Cards appear too large on mobile
-3. Live Candidate Feed is not visible (need to scroll down)
+This plan addresses all the mobile UI issues while keeping the laptop/desktop view completely unchanged.
 
-All changes use mobile-first responsive classes that only affect screens smaller than `lg` breakpoint (1024px), leaving the laptop/desktop view completely unchanged.
+---
+
+### Issues Identified
+
+| Issue | Root Cause |
+|-------|------------|
+| Cards not aligned properly | Missing horizontal padding on main container for mobile |
+| Right side boundary missing on cards | Cards extend to viewport edge without margin |
+| Live Candidate Feed actions (reject, submit, score) not visible | The score and buttons column is too compressed on mobile |
+| Cards appear too large | Need smaller padding and gaps on mobile |
 
 ---
 
 ### Summary of Changes
 
-| Issue | Solution |
-|-------|----------|
-| Live Candidate Feed not visible | Move it above Active Jobs Funnel on mobile using order classes |
-| Cards too large | Reduce padding and font sizes on mobile only |
-| Cards not aligned | Remove `max-w-2xl mx-auto` on mobile (keep for desktop) |
+1. **Add horizontal padding to main container** for mobile to create proper card boundaries
+2. **Improve Live Candidate Feed card items** to show score and action buttons clearly on mobile
+3. **Reduce card padding and gaps** on mobile for a more compact layout
+4. **Ensure all content stays within viewport** - no overflow or cut-off
 
 ---
 
@@ -24,69 +29,122 @@ All changes use mobile-first responsive classes that only affect screens smaller
 
 | File | Changes |
 |------|---------|
-| `src/pages/Index.tsx` | Fix ordering, card sizing, and alignment for mobile |
+| `src/pages/Index.tsx` | Add mobile padding to main container, improve Live Candidate Feed item layout |
 
 ---
 
 ### Detailed Changes
 
-**1. Fix Live Candidate Feed visibility on mobile (Lines 741, 800)**
+**1. Add horizontal padding to main container (Line 633)**
 
-Make Live Candidate Feed appear FIRST on mobile by adding proper order classes:
+Add horizontal padding for mobile so cards don't touch viewport edges:
 
 ```tsx
-// Line 741 - Active Jobs Funnel section
 // From:
-<div className="space-y-2 sm:space-y-3 lg:col-span-1">
+<div className="min-h-screen bg-background text-foreground relative overflow-x-hidden mx-auto max-w-6xl pb-20 w-full min-w-0">
 
 // To:
-<div className="space-y-2 sm:space-y-3 lg:col-span-1 order-2 lg:order-1">
-
-
-// Line 800 - Live Candidate Feed section (already has order-1 lg:order-2, no change needed)
-<div className="space-y-3 sm:space-y-4 lg:space-y-4 lg:col-span-2 order-1 lg:order-2">
+<div className="min-h-screen bg-background text-foreground relative overflow-x-hidden mx-auto max-w-6xl pb-20 w-full min-w-0 px-3 sm:px-4 lg:px-0">
 ```
 
-**2. Fix Live Candidate Feed card alignment on mobile (Line 802)**
+This adds:
+- `px-3` - 12px horizontal padding on mobile (creates visible boundaries)
+- `sm:px-4` - 16px padding on tablets
+- `lg:px-0` - No extra padding on desktop (unchanged layout)
 
-Remove max-width constraint on mobile so it aligns with other cards:
+---
+
+**2. Improve Live Candidate Feed card item layout for mobile (Lines 830-876)**
+
+Restructure the card items to show score and buttons more clearly on mobile:
 
 ```tsx
+// Current structure has issues on mobile:
+// - Score and buttons are in a narrow column that gets compressed
+// - Buttons only show icons on mobile (text hidden)
+
+// Improved structure:
+// - Show score inline with candidate info
+// - Stack buttons horizontally at bottom on mobile
+// - Keep current layout on desktop (sm+)
+```
+
+Specific changes to the candidate card items:
+
+**Line 832** - Change the main row layout:
+```tsx
 // From:
-<Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20 max-w-2xl mx-auto w-full">
+<div className="flex items-start justify-between gap-1.5 w-full">
 
 // To:
-<Card className="bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-cyan-400/30 shadow-2xl shadow-cyan-500/20 w-full lg:max-w-2xl lg:mx-auto">
+<div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1.5 w-full">
 ```
 
-**3. Reduce KPI card sizes on mobile (BentoKpis)**
-
-The BentoKpis grid already uses `grid-cols-1` on mobile. We can add smaller gap on mobile:
-
-```tsx
-// Line 658 - BentoKpis
-// From:
-<BentoKpis columns={5}>
-
-// The BentoKpis component already handles responsive grid
-// No changes needed here as it uses grid-cols-1 on mobile
-```
-
-**4. Reduce Advanced Metric Card sizes on mobile (Line 698)**
-
-Add smaller gap on mobile:
-
+**Lines 855-875** - Restructure score and buttons section:
 ```tsx
 // From:
-<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 relative z-10 mt-4 w-full min-w-0 max-w-full">
+<div className="flex flex-col items-end gap-0.5 flex-shrink-0 min-w-[70px] sm:min-w-[90px]">
+  <div className={`text-base sm:text-lg font-bold ${getScoreColor(score)}`}>
+    {score}
+  </div>
+  <div className="flex flex-col gap-0.5 w-full">
+    // Reject button
+    // Submit button
+  </div>
+</div>
 
 // To:
-<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-3 relative z-10 mt-3 sm:mt-4 w-full min-w-0 max-w-full">
+<div className="flex items-center gap-2 sm:flex-col sm:items-end sm:gap-0.5 sm:flex-shrink-0 sm:min-w-[90px] w-full sm:w-auto">
+  <div className={`text-base sm:text-lg font-bold ${getScoreColor(score)}`}>
+    {score}
+  </div>
+  <div className="flex gap-1 sm:flex-col sm:gap-0.5 flex-1 sm:flex-none sm:w-full">
+    // Reject button (visible text on mobile now)
+    // Submit button (visible text on mobile now)
+  </div>
+</div>
 ```
 
-**5. Reduce Active Jobs Funnel ScrollArea height on mobile (Line 746)**
+**Lines 860-873** - Update button styling to show text on mobile:
+```tsx
+// From (Reject button):
+<span className="hidden sm:inline ml-0.5">Reject</span>
 
-Already has mobile-responsive height: `h-[250px] sm:h-[320px] lg:h-[380px]` - no change needed.
+// To:
+<span className="ml-0.5">Reject</span>
+
+// From (Submit button):
+<span className="hidden sm:inline ml-0.5">Submit</span>
+
+// To:
+<span className="ml-0.5">Submit</span>
+```
+
+---
+
+**3. Adjust card info section layout (Lines 834-852)**
+
+Make the candidate info section work better with the new mobile layout:
+
+```tsx
+// From:
+<div className="flex items-start space-x-1.5 min-w-0 flex-1 overflow-hidden">
+
+// To:
+<div className="flex items-start space-x-1.5 min-w-0 flex-1 overflow-hidden sm:flex-1">
+```
+
+And add score display inline for mobile:
+
+```tsx
+// Add after candidate name on mobile:
+<div className="flex items-center gap-2">
+  <h4 className="...truncate">{candidate.candidate_name}</h4>
+  <span className={`sm:hidden text-sm font-bold ${getScoreColor(score)}`}>
+    {score}
+  </span>
+</div>
+```
 
 ---
 
@@ -94,55 +152,37 @@ Already has mobile-responsive height: `h-[250px] sm:h-[320px] lg:h-[380px]` - no
 
 ```text
 Before (Mobile):
-┌────────────────────────────┐
-│   Header + Activity        │
-│   ┌──────────────────────┐ │
-│   │  5 large KPI cards   │ │ ← Too large
-│   │  (stacked)           │ │
-│   └──────────────────────┘ │
-│   ┌──────────────────────┐ │
-│   │  4 large metric cards│ │ ← Too large
-│   │  (stacked)           │ │
-│   └──────────────────────┘ │
-│   ┌──────────────────────┐ │
-│   │  Active Jobs Funnel  │ │ ← Shows first
-│   │  (user sees this)    │ │
-│   └──────────────────────┘ │
-│   ┌─────────────────┐      │
-│   │  Live Candidate │      │ ← Hidden (need scroll)
-│   │  Feed (narrow)  │      │ ← Misaligned
-│   └─────────────────┘      │
-└────────────────────────────┘
+┌────────────────────────────────┐
+│  Card touches edges            │ ← No boundary
+│ ┌────────────────────────────┐ │
+│ │ Avatar │ Name + Job        │ │
+│ │        │ Badges            │S│ ← Score barely visible
+│ │        │                   │?│ ← Buttons cut off
+│ └────────────────────────────┘ │
+└────────────────────────────────┘
 
 After (Mobile):
-┌────────────────────────────┐
-│   Header + Activity        │
-│   ┌──────────────────────┐ │
-│   │  5 KPI cards         │ │ ← Proper size
-│   │  (stacked, compact)  │ │
-│   └──────────────────────┘ │
-│   ┌──────────────────────┐ │
-│   │  4 metric cards      │ │ ← Smaller gap
-│   │  (stacked, compact)  │ │
-│   └──────────────────────┘ │
-│   ┌──────────────────────┐ │
-│   │  Live Candidate Feed │ │ ← Shows FIRST
-│   │  (full width)        │ │ ← Properly aligned
-│   └──────────────────────┘ │
-│   ┌──────────────────────┐ │
-│   │  Active Jobs Funnel  │ │ ← Shows second
-│   └──────────────────────┘ │
-└────────────────────────────┘
+┌──────────────────────────────────┐
+│   ← padding →                    │
+│  ┌────────────────────────────┐  │
+│  │ Avatar │ Name    │ Score 85│  │ ← Score visible
+│  │        │ Job Title         │  │
+│  │        │ Badges            │  │
+│  │ [Reject] [Submit]          │  │ ← Full buttons visible
+│  └────────────────────────────┘  │
+│   ← visible boundaries →         │
+└──────────────────────────────────┘
 ```
 
 ---
 
 ### Desktop View (Unchanged)
 
-The laptop/desktop view will remain exactly the same because:
-- All changes use responsive classes that only apply below the `lg` breakpoint
-- `lg:order-1`, `lg:order-2`, `lg:max-w-2xl`, `lg:mx-auto` preserve desktop behavior
-- `sm:gap-3`, `sm:mt-4` preserve tablet/desktop spacing
+All changes use responsive prefixes that only apply to mobile:
+- `px-3 sm:px-4 lg:px-0` - No change at lg+ screens
+- `flex-col sm:flex-row` - Desktop stays as row layout
+- `sm:hidden` / `hidden sm:inline` - Desktop shows original elements
+- All existing lg: and xl: classes preserved
 
 ---
 
@@ -150,5 +190,6 @@ The laptop/desktop view will remain exactly the same because:
 
 - All changes are CSS-only using Tailwind responsive prefixes
 - No business logic or data fetching is affected
-- Desktop view is preserved using `lg:` and `sm:` prefixes
+- Desktop/laptop view is preserved using `sm:` and `lg:` prefixes
 - No impact on other pages or components
+- Live production system remains stable
