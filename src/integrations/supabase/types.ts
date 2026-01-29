@@ -505,6 +505,7 @@ export type Database = {
           after_call_pros: string | null
           after_call_reason: string | null
           after_call_score: number | null
+          "Browser call - chatid": string | null
           "Browser call - email": boolean | null
           "Browser call - phone": boolean | null
           call_summary: string | null
@@ -559,6 +560,7 @@ export type Database = {
           after_call_pros?: string | null
           after_call_reason?: string | null
           after_call_score?: number | null
+          "Browser call - chatid"?: string | null
           "Browser call - email"?: boolean | null
           "Browser call - phone"?: boolean | null
           call_summary?: string | null
@@ -613,6 +615,7 @@ export type Database = {
           after_call_pros?: string | null
           after_call_reason?: string | null
           after_call_score?: number | null
+          "Browser call - chatid"?: string | null
           "Browser call - email"?: boolean | null
           "Browser call - phone"?: boolean | null
           call_summary?: string | null

@@ -34,6 +34,8 @@ export function SimpleMetricCard({
     <div
       onClick={onClick}
       className={cn(
+        // Mobile: reduced width + left aligned so right border is always visible
+        "w-[calc(100%-12px)] mr-auto sm:w-full sm:mr-0",
         // Mobile: stronger glass effect with clearly visible boundaries
         "relative rounded-xl border bg-white/20 border-white/40 ring-1 ring-white/20",
         "shadow-[inset_0_0_0_2px_rgba(255,255,255,0.25),0_6px_18px_rgba(0,0,0,0.55)]",

@@ -88,6 +88,8 @@ export function AdvancedMetricCard({
   return (
     <Card
       className={cn(
+        // Mobile: reduced width + left aligned so right border is always visible
+        "w-[calc(100%-12px)] mr-auto sm:w-full sm:mr-0",
         "relative overflow-hidden border border-border/30 bg-gradient-to-br from-gray-900/90 via-gray-900/80 to-gray-950/90 backdrop-blur-xl hover:border-cyan-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10 min-w-0 max-w-full",
         className
       )}
