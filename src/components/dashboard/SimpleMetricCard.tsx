@@ -34,7 +34,9 @@ export function SimpleMetricCard({
     <div
       onClick={onClick}
       className={cn(
-        "relative overflow-hidden rounded-xl border border-border/60 bg-card p-3 sm:p-2 transition-all duration-200 hover:border-border min-w-0 max-w-full",
+        "relative overflow-hidden rounded-xl border bg-white/5 border-white/10 shadow-md p-2 transition-all duration-200 min-w-0 max-w-full",
+        "sm:bg-card sm:border-border/60 sm:shadow-none sm:p-2",
+        "hover:border-border",
         onClick && "cursor-pointer hover:bg-accent/5",
         className
       )}
@@ -45,7 +47,7 @@ export function SimpleMetricCard({
             {title}
           </p>
           <div className="flex items-baseline gap-1.5 min-w-0">
-            <span className="text-xl font-semibold text-foreground truncate">{value}</span>
+            <span className="text-lg sm:text-xl font-semibold text-foreground truncate">{value}</span>
             {delta && (
               <span className={cn("text-xs font-medium", deltaColor[deltaType])}>
                 {delta}
