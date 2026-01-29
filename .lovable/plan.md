@@ -1,143 +1,101 @@
 
-## Fix Mobile Dashboard Card Alignment and Boundaries
+## Goal
+Fix the dashboard cards on **mobile** so they:
+- Have a clear visible **card boundary** (left + right)
+- Look **smaller/compact** (less height)
+- Do **not change anything on desktop/laptop** (same look as now)
 
-This plan addresses the mobile UI issues shown in your screenshot where cards don't have proper boundaries and appear too long/stretched. The laptop view will remain completely unchanged.
-
----
-
-### Issues Identified from Screenshot
-
-| Issue | Root Cause |
-|-------|------------|
-| Cards extending to screen edges | Insufficient combined padding from DashboardLayout + Index.tsx on mobile |
-| Right side boundary missing | Sparkline component may overflow or card border not visible |
-| Cards appear too long | Cards are stacking at full width without proper margins |
+Your screenshot shows the KPI cards blend into the page because in dark mode:
+- `--background` is pure black
+- `--card` is also pure black  
+So `bg-card` becomes visually identical to the page, making borders look “missing”.
 
 ---
 
-### Summary of Changes
+## What I will change (mobile-only, desktop unchanged)
 
-1. **Increase mobile padding in DashboardLayout** - Change `p-1.5` to `px-4 py-1.5` for better horizontal margins
-2. **Ensure cards have visible rounded borders on mobile** - Add explicit border styling for better visibility
-3. **Keep Index.tsx padding as-is** since DashboardLayout is the proper place for global padding
+### 1) Make KPI cards visibly “card-like” only on mobile
+**File:** `src/components/dashboard/SimpleMetricCard.tsx`
 
----
+Update the card wrapper classes so that on **mobile** it uses:
+- Slightly lighter background (e.g. `bg-white/5`) so it separates from black page
+- A clearer border in dark mode (e.g. `border-white/10`)
+- A subtle shadow to define the card edges
+- Smaller padding and smaller value font size
 
-### Files to Modify
+And on **sm and above** (tablet/desktop/laptop) it keeps the existing styling by overriding back to:
+- `sm:bg-card`
+- `sm:border-border/60`
+- `sm:shadow-none`
+- `sm:text-xl` for the value
 
-| File | Changes |
-|------|---------|
-| `src/components/dashboard/DashboardLayout.tsx` | Increase mobile horizontal padding in main content area |
-| `src/components/dashboard/SimpleMetricCard.tsx` | Ensure sparkline doesn't overflow and border is visible |
+Concrete approach:
+- Wrapper class becomes something like:
+  - `bg-white/5 border-white/10 shadow-soft p-2`
+  - plus `sm:bg-card sm:border-border/60 sm:shadow-none sm:p-2`
+- Value text becomes:
+  - `text-lg sm:text-xl`
 
----
-
-### Detailed Changes
-
-**1. Fix DashboardLayout mobile padding (Line 51)**
-
-Increase horizontal padding on mobile so cards have proper breathing room:
-
-```tsx
-// From:
-<main className="flex-1 p-1.5 sm:p-3 md:p-4 lg:p-6 w-full min-w-0">
-
-// To:
-<main className="flex-1 px-4 py-1.5 sm:p-3 md:p-4 lg:p-6 w-full min-w-0">
-```
-
-This changes mobile padding from 6px all around to:
-- `px-4` = 16px horizontal padding on mobile (proper card boundaries)
-- `py-1.5` = 6px vertical padding on mobile (keeps compact look)
-- `sm:p-3` and above remain unchanged for tablet/desktop
+This ensures:
+- Mobile gets visible boundaries and more compact size
+- Desktop keeps exactly the current visuals
 
 ---
 
-**2. Remove duplicate padding from Index.tsx (Line 633)**
+### 2) Reduce KPI card height by making the sparkline shorter only on mobile
+**File:** `src/components/ui/Sparkline.tsx`
 
-Since DashboardLayout now handles padding properly, remove the redundant padding from Index.tsx to avoid double-padding:
+The sparkline currently uses `h-12` which makes the KPI cards tall.
+Change the sparkline container to:
+- `h-8 sm:h-12`
 
-```tsx
-// From:
-<div className="min-h-screen bg-background text-foreground relative overflow-x-hidden mx-auto max-w-6xl pb-20 w-full min-w-0 px-3 sm:px-4 lg:px-0">
-
-// To:
-<div className="min-h-screen bg-background text-foreground relative overflow-x-hidden mx-auto max-w-6xl pb-20 w-full min-w-0">
-```
-
----
-
-**3. Ensure SimpleMetricCard border is visible (Lines 36-40)**
-
-Add a more visible border on mobile:
-
-```tsx
-// From:
-className={cn(
-  "relative overflow-hidden rounded-xl border border-border/50 bg-card p-2 transition-all duration-200 hover:border-border min-w-0 max-w-full",
-  onClick && "cursor-pointer hover:bg-accent/5",
-  className
-)}
-
-// To:
-className={cn(
-  "relative overflow-hidden rounded-xl border border-border/60 bg-card p-3 sm:p-2 transition-all duration-200 hover:border-border min-w-0 max-w-full",
-  onClick && "cursor-pointer hover:bg-accent/5",
-  className
-)}
-```
-
-Changes:
-- `border-border/60` - Slightly more visible border (from 50% to 60% opacity)
-- `p-3 sm:p-2` - Slightly more internal padding on mobile for better touch targets
+So:
+- Mobile KPI cards become shorter (smaller)
+- Desktop stays the same height as before
 
 ---
 
-### Visual Impact on Mobile
+### 3) Verify global spacing is not the real issue (no risky layout changes)
+**File:** `src/components/dashboard/DashboardLayout.tsx`
 
-```text
-Before (Mobile):
-┌───────────────────────────────────┐
-│ACTIVE JOBS                        │ ← No visible boundary
-│35                                 │
-│━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━│ ← Sparkline touches edge
-│WAITING REVIEW                     │
-│23                                 │
-│━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━│
-└───────────────────────────────────┘
+We already added `px-4` on mobile in `<main>`, which should give the page left/right breathing room.
+I will **not** change desktop spacing.
+If needed, I’ll adjust only the mobile value slightly (e.g., `px-5`), but only if after the KPI fixes the boundary still appears flush.
 
-After (Mobile):
-┌─────────────────────────────────┐
-│  ┌─────────────────────────────┐│
-│  │ ACTIVE JOBS             📁 ││ ← Visible card boundary
-│  │ 35                          ││
-│  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━ ││ ← Sparkline inside card
-│  └─────────────────────────────┘│
-│  ┌─────────────────────────────┐│
-│  │ WAITING REVIEW          📋 ││
-│  │ 23                          ││
-│  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━ ││
-│  └─────────────────────────────┘│
-└─────────────────────────────────┘
-   ↑                             ↑
-   16px padding                  16px padding
-```
+Given your screenshot, the bigger issue is the KPI cards’ background equals the page background; fixing the KPI card styling should solve the “no boundaries” look without further layout changes.
 
 ---
 
-### Desktop View (Unchanged)
+## Why this will not affect desktop
+All visual changes will be applied with Tailwind’s responsive pattern:
+- Base classes = mobile behavior
+- `sm:` classes = revert to existing desktop styling
 
-All changes use responsive prefixes:
-- `px-4 py-1.5 sm:p-3` - Desktop uses `lg:p-6` which overrides mobile settings
-- `p-3 sm:p-2` - Desktop uses `sm:p-2` (unchanged from current behavior)
-- The `max-w-6xl` constraint on Index.tsx preserves the centered layout
+That means laptop/desktop view retains:
+- the current background (black card)
+- the same border intensity
+- the same spacing/size
 
 ---
 
-### Safety Notes
+## Acceptance checklist (what you should see after)
+On mobile dashboard:
+- Each KPI card has a clearly visible rounded boundary (left and right)
+- KPI cards are shorter and more compact (not long/tall)
+- No horizontal overflow / no clipped right side
+- Desktop looks identical to before
 
-- All changes are CSS-only using Tailwind responsive prefixes
-- No business logic or data fetching is affected
-- Desktop/laptop view is preserved using `sm:` and `lg:` prefixes
-- No impact on other pages since DashboardLayout padding affects all pages consistently
-- Live production system remains stable
+---
+
+## Files to edit
+1. `src/components/dashboard/SimpleMetricCard.tsx`
+2. `src/components/ui/Sparkline.tsx`
+(Only if still needed after those: `src/components/dashboard/DashboardLayout.tsx` for mobile-only padding micro-adjust)
+
+---
+
+## Safety / Regression notes
+- No business logic changes
+- No routing changes
+- No data changes
+- Only mobile CSS adjustments with `sm:` overrides to preserve desktop visuals
