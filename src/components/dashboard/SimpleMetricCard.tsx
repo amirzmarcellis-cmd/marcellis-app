@@ -34,7 +34,7 @@ export function SimpleMetricCard({
     <div
       onClick={onClick}
       className={cn(
-        "relative overflow-hidden rounded-xl border border-border/50 bg-card p-2 transition-all duration-200 hover:border-border min-w-0 max-w-full",
+        "relative overflow-hidden rounded-xl border border-border/60 bg-card p-3 sm:p-2 transition-all duration-200 hover:border-border min-w-0 max-w-full",
         onClick && "cursor-pointer hover:bg-accent/5",
         className
       )}
