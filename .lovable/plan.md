@@ -1,68 +1,115 @@
 
 
 ## Goal
-Add a prominent warning message on the Interview Call page that appears after the user verifies their identity, reminding them to keep their screen on during the interview to prevent it from being cancelled.
+Add a "Longlist Only" toggle option to the job creation form. When enabled, this will set `automatic_dial` to `false` in the database, meaning candidates for this job will only be longlisted (collected) without automatic calling.
 
-## Current Flow
-1. User lands on `/interview-call` page with callId and type parameters
-2. User verifies identity via phone or email
-3. After verification, user sees the main interview UI with "Start Interview" button
-4. User starts and conducts the interview
+## Current Behavior
+- Jobs are created with `automatic_dial: true` by default (line 625 of AddJob.tsx)
+- Auto-dial enables automatic calling of candidates
 
-## Proposed Change
-Add an alert/warning banner in the main interview UI (shown after verification) that displays a message about keeping the screen on.
+## New Feature
+A toggle switch in the Mandatory Information section that allows recruiters to choose "Longlist Only" mode:
+- **OFF (default)**: Job is created with `automatic_dial: true` (normal behavior - candidates will be called)
+- **ON**: Job is created with `automatic_dial: false` (longlist only - no automatic calling)
+
+---
 
 ## Implementation Details
 
 ### File to Modify
-**`src/pages/InterviewCall.tsx`**
+**`src/pages/AddJob.tsx`**
 
 ### Changes
 
-1. **Import Alert components** (Line 1-13)
-   - Add import for `Alert`, `AlertTitle`, `AlertDescription` from `@/components/ui/alert`
-   - Add import for `Smartphone` icon from `lucide-react`
+1. **Add State for Longlist Only** (around line 275)
+   - Add new state: `const [longlistOnly, setLonglistOnly] = useState(false);`
 
-2. **Add Screen Warning Alert** (After line 444, inside main interview UI)
-   - Add an alert box between the candidate info section and the voice animation section
-   - Show only when `status === 'idle'` (before the call starts)
-   - Use amber/warning styling to draw attention
-   - Include clear messaging about keeping screen on
+2. **Add Toggle UI in Mandatory Section** (after Job Difficulty field, around line 781)
+   - Add a styled toggle section similar to the LinkedIn Search feature
+   - Include clear label and description explaining the feature
 
-### UI Preview
-The alert will appear like this in the main interview card:
+3. **Update Database Insert** (line 625)
+   - Change from: `automatic_dial: true`
+   - To: `automatic_dial: !longlistOnly`
 
+---
+
+## UI Design
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│ * Mandatory Information                                      │
+├─────────────────────────────────────────────────────────────┤
+│ Job Title *          │ Itris ID *         │ Group           │
+├─────────────────────────────────────────────────────────────┤
+│ Assigned Recruiter *                                        │
+├─────────────────────────────────────────────────────────────┤
+│ Job Difficulty                                              │
+├─────────────────────────────────────────────────────────────┤
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 📋 Longlist Only                              [Toggle]  │ │ ← NEW
+│ │ Collect candidates without automatic calling.           │ │
+│ │ Candidates will be longlisted for manual review.        │ │
+│ └─────────────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────────────┤
+│ 🔍 LinkedIn Search                                [Toggle]  │
+│ ...                                                         │
+└─────────────────────────────────────────────────────────────┘
 ```
-┌─────────────────────────────────────┐
-│  Welcome, [Candidate Name]          │
-│  Position: [Job Title]              │
-│  Interview with AI Recruiter        │
-├─────────────────────────────────────┤
-│ ⚠️ Keep Your Screen On              │ ← NEW ALERT
-│ Please keep your screen on during   │
-│ the interview. If your screen turns │
-│ off, it may cancel the interview.   │
-├─────────────────────────────────────┤
-│       [Voice Animation]             │
-│                                     │
-│     [ Start Interview ]             │
-│     🎤 Microphone access required   │
-└─────────────────────────────────────┘
+
+---
+
+## Technical Details
+
+### State Addition
+```tsx
+const [longlistOnly, setLonglistOnly] = useState(false);
 ```
 
-### Styling
-- Amber/warning color scheme (`bg-amber-500/10 border-amber-500/30`)
-- Smartphone icon to reinforce the message
-- Text explaining the importance of keeping screen active
-- Only visible before interview starts (idle state)
+### UI Component (styled similarly to LinkedIn Search toggle)
+```tsx
+<div className="space-y-3 p-5 border-2 border-amber-500/30 rounded-xl bg-gradient-to-br from-amber-500/5 to-amber-500/10 shadow-sm">
+  <div className="flex items-center justify-between">
+    <div className="space-y-1.5 flex-1">
+      <div className="flex items-center gap-2">
+        <Label className="font-semibold text-base">📋 Longlist Only</Label>
+        {longlistOnly && (
+          <span className="px-2 py-0.5 text-xs font-medium bg-amber-500/20 text-amber-700 dark:text-amber-400 rounded-full border border-amber-500/30">
+            Active
+          </span>
+        )}
+      </div>
+      <p className="text-sm text-muted-foreground leading-relaxed">
+        Collect candidates without automatic calling. Candidates will be longlisted for manual review only.
+      </p>
+    </div>
+    <Switch
+      checked={longlistOnly}
+      onCheckedChange={setLonglistOnly}
+      className="ml-4"
+    />
+  </div>
+</div>
+```
+
+### Database Insert Update
+```tsx
+// Before
+automatic_dial: true,
+
+// After
+automatic_dial: !longlistOnly,
+```
+
+---
 
 ## Testing Checklist
-1. Navigate to interview call page with valid callId
-2. Complete phone/email verification
-3. Verify warning message appears before starting interview
-4. Start interview and confirm warning disappears during active call
-5. Check mobile view for proper display
+1. Create a new job with "Longlist Only" OFF - verify `automatic_dial` is `true` in database
+2. Create a new job with "Longlist Only" ON - verify `automatic_dial` is `false` in database
+3. Verify desktop layout looks correct with new toggle
+4. Verify mobile layout displays properly
+5. Confirm existing job creation flow still works normally
 
-## Desktop Impact
-None - this is an additive change that doesn't affect any existing functionality.
+## No Impact on Desktop
+This is an additive change - the toggle is OFF by default, maintaining the current behavior for all existing workflows.
 
