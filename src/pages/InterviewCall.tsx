@@ -7,9 +7,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { MissionBackground } from '@/components/layout/MissionBackground';
 import { useVapiCall } from '@/hooks/useVapiCall';
 import { cn } from '@/lib/utils';
-import { Phone, PhoneOff, Mic, AlertCircle, CheckCircle2, Lock } from 'lucide-react';
+import { Phone, PhoneOff, Mic, AlertCircle, CheckCircle2, Lock, Smartphone } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import companyLogo from '@/assets/me-logo-white.png';
 
 interface InterviewData {
@@ -442,6 +443,17 @@ const InterviewCall: React.FC = () => {
               Interview with AI Recruiter
             </p>
           </div>
+
+          {/* Screen On Warning - Only show before call starts */}
+          {status === 'idle' && (
+            <Alert className="mb-6 bg-amber-500/10 border-amber-500/30">
+              <Smartphone className="h-4 w-4 text-amber-500" />
+              <AlertTitle className="text-amber-500">Keep Your Screen On</AlertTitle>
+              <AlertDescription className="text-amber-500/80">
+                Please keep your screen on during the interview. If your screen turns off, it may cancel the interview.
+              </AlertDescription>
+            </Alert>
+          )}
 
           {/* Voice Animation */}
           <div className="bg-background/50 rounded-xl p-4 mb-6">
