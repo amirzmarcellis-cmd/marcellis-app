@@ -274,6 +274,7 @@ export default function AddJob() {
   const [selectedOptionalFields, setSelectedOptionalFields] = useState<string[]>([]);
   const [linkedInSearchEnabled, setLinkedInSearchEnabled] = useState(false);
   const [recruiterLinkedInId, setRecruiterLinkedInId] = useState<string | null>(null);
+  const [longlistOnly, setLonglistOnly] = useState(false);
 
   // Redirect viewers and non-admin users if job creation is paused (route protection)
   
@@ -622,7 +623,7 @@ export default function AddJob() {
           Processed: 'Yes',
           Timestamp: new Date().toISOString(),
           linkedin_search_enabled: linkedInSearchEnabled,
-          automatic_dial: true,
+          automatic_dial: !longlistOnly,
           auto_dial_enabled_at: new Date().toISOString(),
           Job_difficulty: formData.jobDifficulty || "HARD"
         });
@@ -778,6 +779,30 @@ export default function AddJob() {
                   <SelectItem value="85">C Job</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Longlist Only Toggle */}
+            <div className="space-y-3 p-5 border-2 border-amber-500/30 rounded-xl bg-gradient-to-br from-amber-500/5 to-amber-500/10 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1.5 flex-1">
+                  <div className="flex items-center gap-2">
+                    <Label className="font-semibold text-base">📋 Longlist Only</Label>
+                    {longlistOnly && (
+                      <span className="px-2 py-0.5 text-xs font-medium bg-amber-500/20 text-amber-700 dark:text-amber-400 rounded-full border border-amber-500/30">
+                        Active
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Collect candidates without automatic calling. Candidates will be longlisted for manual review only.
+                  </p>
+                </div>
+                <Switch
+                  checked={longlistOnly}
+                  onCheckedChange={setLonglistOnly}
+                  className="ml-4"
+                />
+              </div>
             </div>
 
             {/* LinkedIn Search Toggle - Prominent Feature */}
