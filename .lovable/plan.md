@@ -1,36 +1,68 @@
 
 
 ## Goal
-Reduce SimpleMetricCard width further on mobile so the right-side border is fully visible.
+Add a prominent warning message on the Interview Call page that appears after the user verifies their identity, reminding them to keep their screen on during the interview to prevent it from being cancelled.
 
-## Current Mobile Settings
-- **Width**: `w-[calc(100%-42px)]` (42px narrower than container)
-- **Left Margin**: `ml-0` (flush-left)
-- **Right Margin**: `mr-8` (32px)
+## Current Flow
+1. User lands on `/interview-call` page with callId and type parameters
+2. User verifies identity via phone or email
+3. After verification, user sees the main interview UI with "Start Interview" button
+4. User starts and conducts the interview
 
-## Requested Changes (Mobile Only)
-- **Width**: `w-[calc(100%-56px)]` (56px narrower than container)
-- **Right Margin**: `mr-8` (unchanged)
+## Proposed Change
+Add an alert/warning banner in the main interview UI (shown after verification) that displays a message about keeping the screen on.
 
-## Desktop Settings (Unchanged)
-- `sm:w-full` - full width on desktop
-- `sm:mr-0` - no right margin on desktop
-- `sm:p-2` - 8px padding on desktop
+## Implementation Details
 
-## File to Modify
-**`src/components/dashboard/SimpleMetricCard.tsx`** (Line 38)
+### File to Modify
+**`src/pages/InterviewCall.tsx`**
 
-### Change
+### Changes
+
+1. **Import Alert components** (Line 1-13)
+   - Add import for `Alert`, `AlertTitle`, `AlertDescription` from `@/components/ui/alert`
+   - Add import for `Smartphone` icon from `lucide-react`
+
+2. **Add Screen Warning Alert** (After line 444, inside main interview UI)
+   - Add an alert box between the candidate info section and the voice animation section
+   - Show only when `status === 'idle'` (before the call starts)
+   - Use amber/warning styling to draw attention
+   - Include clear messaging about keeping screen on
+
+### UI Preview
+The alert will appear like this in the main interview card:
+
 ```
-// Before
-"w-[calc(100%-42px)] ml-0 mr-8 sm:w-full sm:mr-0"
-
-// After
-"w-[calc(100%-56px)] ml-0 mr-8 sm:w-full sm:mr-0"
+┌─────────────────────────────────────┐
+│  Welcome, [Candidate Name]          │
+│  Position: [Job Title]              │
+│  Interview with AI Recruiter        │
+├─────────────────────────────────────┤
+│ ⚠️ Keep Your Screen On              │ ← NEW ALERT
+│ Please keep your screen on during   │
+│ the interview. If your screen turns │
+│ off, it may cancel the interview.   │
+├─────────────────────────────────────┤
+│       [Voice Animation]             │
+│                                     │
+│     [ Start Interview ]             │
+│     🎤 Microphone access required   │
+└─────────────────────────────────────┘
 ```
+
+### Styling
+- Amber/warning color scheme (`bg-amber-500/10 border-amber-500/30`)
+- Smartphone icon to reinforce the message
+- Text explaining the importance of keeping screen active
+- Only visible before interview starts (idle state)
 
 ## Testing Checklist
-1. Hard refresh on iPhone Safari
-2. Verify all SimpleMetricCard right borders are visible
-3. Confirm desktop dashboard is unchanged
+1. Navigate to interview call page with valid callId
+2. Complete phone/email verification
+3. Verify warning message appears before starting interview
+4. Start interview and confirm warning disappears during active call
+5. Check mobile view for proper display
+
+## Desktop Impact
+None - this is an additive change that doesn't affect any existing functionality.
 
