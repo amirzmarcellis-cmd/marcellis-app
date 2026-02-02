@@ -1412,7 +1412,7 @@ export default function JobDetails() {
       console.log("Regenerate AI webhook payload:", payload);
       console.log("Job recruiter_id:", job?.recruiter_id);
       console.log("User profile ID:", profile?.user_id);
-      const response = await fetch("https://hook.eu2.make.com/w10612c8i0lg2em4p305sbhhnkj73auj", {
+      const response = await fetch("https://n8n.srv1158803.hstgr.cloud/webhook/ecb9d9ed-1f43-4f15-b4fc-5dd5ef0a455c", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
