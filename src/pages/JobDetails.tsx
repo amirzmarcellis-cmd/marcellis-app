@@ -1148,7 +1148,7 @@ export default function JobDetails() {
         .from("Jobs_CVs")
         .select("*")
         .eq("job_id", jobId)
-        .eq("contacted", "Shortlisted from Similar Jobs")
+        .eq("contacted", "Shortlisted from Similar jobs")
         .order("cv_score", { ascending: false });
 
       if (error) throw error;
