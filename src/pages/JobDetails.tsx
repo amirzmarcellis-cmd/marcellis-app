@@ -5712,34 +5712,26 @@ mainCandidate["linkedin_score_reason"] ? (
                                     <Phone className="w-3 h-3 mr-1" />
                                     {callingCandidateId === candidateId ? "Calling..." : "Call"}
                                   </Button>
-                                  {candidate.recording && (
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="h-8 text-xs"
-                                      onClick={() =>
-                                        navigate(`/call-log/${candidate.recordid}`, {
-                                          state: {
-                                            from: location.pathname,
-                                            tab: activeTab,
-                                            focusCandidateId: candidateId,
-                                          },
-                                        })
-                                      }
-                                    >
-                                      <FileText className="w-3 h-3 mr-1" />
-                                      Call Log
-                                    </Button>
-                                  )}
                                   <Button
                                     size="sm"
                                     variant="outline"
                                     className="h-8 text-xs"
                                     onClick={() =>
-                                      navigate(`/candidates/${candidate.user_id}`, {
+                                      navigate(`/call-log-details?recordId=${candidate.recordid}&jobId=${job.job_id}&fromTab=similar-jobs`)
+                                    }
+                                  >
+                                    <FileText className="w-3 h-3 mr-1" />
+                                    Call Log
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-8 text-xs"
+                                    onClick={() =>
+                                      navigate(`/candidate/${candidate.user_id}`, {
                                         state: {
-                                          from: location.pathname,
-                                          tab: activeTab,
+                                          fromJob: id,
+                                          tab: "similar-jobs",
                                           focusCandidateId: candidateId,
                                         },
                                       })
