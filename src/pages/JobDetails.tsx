@@ -126,6 +126,15 @@ export default function JobDetails() {
   // AI Long List filters
   const [longListSourceFilter, setLongListSourceFilter] = useState("all");
   
+  // Similar Jobs tab state
+  const [similarJobsCandidates, setSimilarJobsCandidates] = useState<any[]>([]);
+  const [similarJobsLoading, setSimilarJobsLoading] = useState(false);
+  const [similarJobsNameFilter, setSimilarJobsNameFilter] = useState("");
+  const [similarJobsEmailFilter, setSimilarJobsEmailFilter] = useState("");
+  const [similarJobsPhoneFilter, setSimilarJobsPhoneFilter] = useState("");
+  const [similarJobsUserIdFilter, setSimilarJobsUserIdFilter] = useState("");
+  const [similarJobsSelectedCandidates, setSimilarJobsSelectedCandidates] = useState<Set<string>>(new Set());
+  
   // Analytics data
   const [analyticsData, setAnalyticsData] = useState<{
     jobAddedDate: string | null;
@@ -380,6 +389,7 @@ export default function JobDetails() {
       fetchLonglistedCandidates(id);
       fetchApplications(id);
       fetchTaskCandidates(id);
+      fetchSimilarJobsCandidates(id);
 
       // Check for shortlist disabled status
       const storageKey = `shortlist_${id}_disabled`;
@@ -1130,6 +1140,31 @@ export default function JobDetails() {
       console.error("Error fetching longlisted status:", error);
     }
   };
+
+  const fetchSimilarJobsCandidates = async (jobId: string) => {
+    setSimilarJobsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("Jobs_CVs")
+        .select("*")
+        .eq("job_id", jobId)
+        .eq("contacted", "Shortlisted from Similar Jobs")
+        .order("cv_score", { ascending: false });
+
+      if (error) throw error;
+      setSimilarJobsCandidates(data || []);
+    } catch (error) {
+      console.error("Error fetching similar jobs candidates:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load candidates from similar jobs",
+        variant: "destructive",
+      });
+    } finally {
+      setSimilarJobsLoading(false);
+    }
+  };
+
   const fetchTaskCandidates = async (jobId: string) => {
     if (!profile?.slug) return;
     try {
@@ -3315,6 +3350,7 @@ mainCandidate["linkedin_score_reason"] ? (
                 </SelectItem>
                 <SelectItem value="boolean-search">AI Longlist</SelectItem>
                 <SelectItem value="shortlist">AI Short List</SelectItem>
+                <SelectItem value="similar-jobs">Similar Jobs</SelectItem>
                 <SelectItem value="analytics">Job Analytics</SelectItem>
               </SelectContent>
             </Select>
@@ -3346,6 +3382,9 @@ mainCandidate["linkedin_score_reason"] ? (
               </TabsTrigger>
               <TabsTrigger value="shortlist" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
                 AI Short List
+              </TabsTrigger>
+              <TabsTrigger value="similar-jobs" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
+                Similar Jobs
               </TabsTrigger>
               <TabsTrigger value="analytics" className="w-full justify-start text-left text-xs sm:text-sm md:text-base px-3 sm:px-3 md:px-4 py-2.5 sm:py-2.5 h-11 md:h-auto whitespace-normal leading-tight md:whitespace-nowrap">
                 Job Analytics
@@ -5421,6 +5460,306 @@ mainCandidate["linkedin_score_reason"] ? (
               </>
             )}
           </div>
+        </TabsContent>
+
+        {/* Similar Jobs Tab Content */}
+        <TabsContent value="similar-jobs" className="space-y-3 sm:space-y-6 pb-20 sm:pb-32 max-w-full">
+          <Card className="max-w-full overflow-hidden">
+            <CardHeader className="p-3 sm:p-4 md:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <CardTitle className="text-base sm:text-lg md:text-xl flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    Shortlisted from Similar Jobs
+                    <Badge variant="secondary" className="ml-2">
+                      {similarJobsCandidates.length}
+                    </Badge>
+                  </CardTitle>
+                  <CardDescription className="text-xs sm:text-sm mt-1">
+                    Candidates shortlisted from similar job positions
+                  </CardDescription>
+                </div>
+                {similarJobsSelectedCandidates.size > 0 && (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSimilarJobsSelectedCandidates(new Set())}
+                      className="h-8"
+                    >
+                      Clear
+                    </Button>
+                    <Badge variant="outline" className="h-8 px-3 flex items-center">
+                      {similarJobsSelectedCandidates.size} selected
+                    </Badge>
+                    <Button
+                      size="sm"
+                      className="h-8 bg-primary hover:bg-primary/90"
+                      onClick={() => {
+                        similarJobsSelectedCandidates.forEach((candidateId) => {
+                          const candidate = similarJobsCandidates.find(
+                            (c) => (c.user_id || c.recordid?.toString()) === candidateId
+                          );
+                          if (candidate) {
+                            handleCallCandidate(
+                              candidate.recordid?.toString() || candidateId,
+                              job.job_id,
+                              candidate.recordid
+                            );
+                          }
+                        });
+                      }}
+                    >
+                      <Phone className="w-4 h-4 mr-1" />
+                      Call Selected
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
+              {/* Filters */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+                <Input
+                  placeholder="Filter by name..."
+                  value={similarJobsNameFilter}
+                  onChange={(e) => setSimilarJobsNameFilter(e.target.value)}
+                  className="h-9"
+                />
+                <Input
+                  placeholder="Filter by email..."
+                  value={similarJobsEmailFilter}
+                  onChange={(e) => setSimilarJobsEmailFilter(e.target.value)}
+                  className="h-9"
+                />
+                <Input
+                  placeholder="Filter by phone..."
+                  value={similarJobsPhoneFilter}
+                  onChange={(e) => setSimilarJobsPhoneFilter(e.target.value)}
+                  className="h-9"
+                />
+                <Input
+                  placeholder="Filter by user ID..."
+                  value={similarJobsUserIdFilter}
+                  onChange={(e) => setSimilarJobsUserIdFilter(e.target.value)}
+                  className="h-9"
+                />
+              </div>
+
+              {/* Select All */}
+              <div className="flex items-center gap-2 mb-4 pb-3 border-b">
+                <Checkbox
+                  checked={
+                    similarJobsCandidates.length > 0 &&
+                    similarJobsSelectedCandidates.size === similarJobsCandidates.length
+                  }
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      const allIds = new Set(
+                        similarJobsCandidates.map((c) => c.user_id || c.recordid?.toString())
+                      );
+                      setSimilarJobsSelectedCandidates(allIds);
+                    } else {
+                      setSimilarJobsSelectedCandidates(new Set());
+                    }
+                  }}
+                />
+                <span className="text-sm text-muted-foreground">Select All</span>
+              </div>
+
+              {similarJobsLoading ? (
+                <div className="text-center py-8">
+                  <p>Loading candidates...</p>
+                </div>
+              ) : (() => {
+                const filteredCandidates = similarJobsCandidates.filter((candidate) => {
+                  const nameMatch =
+                    !similarJobsNameFilter ||
+                    (candidate.candidate_name || "").toLowerCase().includes(similarJobsNameFilter.toLowerCase());
+                  const emailMatch =
+                    !similarJobsEmailFilter ||
+                    (candidate.candidate_email || "").toLowerCase().includes(similarJobsEmailFilter.toLowerCase());
+                  const phoneMatch =
+                    !similarJobsPhoneFilter ||
+                    (candidate.candidate_phone_number || "").includes(similarJobsPhoneFilter);
+                  const userIdMatch =
+                    !similarJobsUserIdFilter ||
+                    (candidate.user_id || "").toString().includes(similarJobsUserIdFilter);
+                  return nameMatch && emailMatch && phoneMatch && userIdMatch;
+                });
+
+                return filteredCandidates.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No candidates from similar jobs</h3>
+                    <p className="text-muted-foreground">
+                      Candidates shortlisted from similar job positions will appear here
+                    </p>
+                  </div>
+                ) : (
+                  <ScrollArea className="h-[600px] w-full">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4 w-full max-w-full">
+                      {filteredCandidates.map((candidate) => {
+                        const candidateId = candidate.user_id || candidate.recordid?.toString();
+                        const isSelected = similarJobsSelectedCandidates.has(candidateId);
+                        
+                        return (
+                          <Card
+                            key={candidateId}
+                            id={`similar-candidate-card-${candidateId}`}
+                            className={cn(
+                              "border border-border/50 hover:border-primary/50 transition-colors hover:shadow-lg max-w-full overflow-hidden",
+                              isSelected && "border-primary bg-primary/5"
+                            )}
+                          >
+                            <CardContent className="p-3 sm:p-4">
+                              <div className="space-y-2 sm:space-y-3">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex items-start gap-2 sm:gap-3 min-w-0 flex-1">
+                                    <Checkbox
+                                      checked={isSelected}
+                                      onCheckedChange={() => {
+                                        const newSelected = new Set(similarJobsSelectedCandidates);
+                                        if (isSelected) {
+                                          newSelected.delete(candidateId);
+                                        } else {
+                                          newSelected.add(candidateId);
+                                        }
+                                        setSimilarJobsSelectedCandidates(newSelected);
+                                      }}
+                                      className="mt-1"
+                                    />
+                                    <div className="min-w-0 flex-1">
+                                      <h4 className="font-semibold text-xs sm:text-sm md:text-base line-clamp-2">
+                                        {candidate.candidate_name || candidate.candidate_email?.split("@")[0] || `Candidate ${candidateId}`}
+                                      </h4>
+                                    </div>
+                                  </div>
+                                  {candidate.source && (
+                                    <Badge variant="outline" className="text-xs shrink-0">
+                                      {candidate.source}
+                                    </Badge>
+                                  )}
+                                </div>
+
+                                <div className="space-y-1 text-xs sm:text-sm text-muted-foreground">
+                                  {candidate.candidate_email && (
+                                    <div className="flex items-center">
+                                      <Mail className="w-4 h-4 mr-2" />
+                                      <span className="truncate">{candidate.candidate_email}</span>
+                                    </div>
+                                  )}
+                                  {candidate.candidate_phone_number && (
+                                    <div className="flex items-center">
+                                      <Phone className="w-4 h-4 mr-2" />
+                                      <span className="truncate">{candidate.candidate_phone_number}</span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Scores Section */}
+                                <div className="grid grid-cols-2 gap-2 pt-2 border-t text-xs">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-muted-foreground">
+                                      {(candidate.source || "").toLowerCase().includes("linkedin") ? "LinkedIn Score:" : "CV Score:"}
+                                    </span>
+                                    {(() => {
+                                      const score = (candidate.source || "").toLowerCase().includes("linkedin")
+                                        ? (candidate.linkedin_score ?? candidate.cv_score ?? "N/A")
+                                        : (candidate.cv_score ?? "N/A");
+                                      const numScore = parseInt(score);
+                                      let scoreClass = "font-medium";
+                                      if (!isNaN(numScore)) {
+                                        if (numScore < 50) {
+                                          scoreClass = "font-bold text-red-600 dark:text-red-400";
+                                        } else if (numScore < 75) {
+                                          scoreClass = "font-medium text-amber-600 dark:text-amber-400";
+                                        } else {
+                                          scoreClass = "font-medium text-green-600 dark:text-green-400";
+                                        }
+                                      }
+                                      return <span className={scoreClass}>{score}</span>;
+                                    })()}
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-muted-foreground">User ID:</span>
+                                    <span className="font-mono text-xs">{candidate.user_id || "N/A"}</span>
+                                  </div>
+                                </div>
+
+                                {/* Status Badge */}
+                                <div className="pt-2 border-t">
+                                  <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+                                    Shortlisted from Similar Jobs
+                                  </Badge>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="flex flex-wrap gap-2 pt-2 border-t">
+                                  <Button
+                                    size="sm"
+                                    variant="default"
+                                    className="h-8 text-xs"
+                                    disabled={callingCandidateId === candidateId}
+                                    onClick={() =>
+                                      handleCallCandidate(
+                                        candidate.recordid?.toString() || candidateId,
+                                        job.job_id,
+                                        candidate.recordid
+                                      )
+                                    }
+                                  >
+                                    <Phone className="w-3 h-3 mr-1" />
+                                    {callingCandidateId === candidateId ? "Calling..." : "Call"}
+                                  </Button>
+                                  {candidate.recording && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-8 text-xs"
+                                      onClick={() =>
+                                        navigate(`/call-log/${candidate.recordid}`, {
+                                          state: {
+                                            from: location.pathname,
+                                            tab: activeTab,
+                                            focusCandidateId: candidateId,
+                                          },
+                                        })
+                                      }
+                                    >
+                                      <FileText className="w-3 h-3 mr-1" />
+                                      Call Log
+                                    </Button>
+                                  )}
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-8 text-xs"
+                                    onClick={() =>
+                                      navigate(`/candidates/${candidate.user_id}`, {
+                                        state: {
+                                          from: location.pathname,
+                                          tab: activeTab,
+                                          focusCandidateId: candidateId,
+                                        },
+                                      })
+                                    }
+                                  >
+                                    <User className="w-3 h-3 mr-1" />
+                                    View Profile
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  </ScrollArea>
+                );
+              })()}
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
 
