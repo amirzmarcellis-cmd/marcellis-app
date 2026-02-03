@@ -2990,12 +2990,13 @@ mainCandidate["linkedin_score_reason"] ? (
   };
 
   // Short list candidates (after_call_score >= 74) sorted by Overall Score descending
-  // Exclude rejected candidates from the main list
+  // Exclude rejected candidates and "Shortlisted from Similar jobs" candidates from the main list
   const shortListCandidates = candidates
     .filter((candidate) => {
       const score = parseFloat(candidate.after_call_score || "0");
       const isRejected = candidate["Contacted"] === "Rejected";
-      return score >= 74 && !isRejected;
+      const isFromSimilarJobs = candidate["contacted"] === "Shortlisted from Similar jobs";
+      return score >= 74 && !isRejected && !isFromSimilarJobs;
     })
     .sort((a, b) => {
       const overallScoreA = calculateOverallScore(a);
@@ -3004,11 +3005,13 @@ mainCandidate["linkedin_score_reason"] ? (
     });
 
   // Rejected candidates (after_call_score >= 74 AND Contacted === "Rejected")
+  // Exclude "Shortlisted from Similar jobs" candidates
   const rejectedShortListCandidates = candidates
     .filter((candidate) => {
       const score = parseFloat(candidate.after_call_score || "0");
       const isRejected = candidate["Contacted"] === "Rejected";
-      return score >= 74 && isRejected;
+      const isFromSimilarJobs = candidate["contacted"] === "Shortlisted from Similar jobs";
+      return score >= 74 && isRejected && !isFromSimilarJobs;
     })
     .sort((a, b) => {
       const overallScoreA = calculateOverallScore(a);

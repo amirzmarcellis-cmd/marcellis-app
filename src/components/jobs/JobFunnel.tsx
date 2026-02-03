@@ -50,7 +50,8 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
       }
       
       // Count shortlist candidates (score >= 75) - unified definition
-      if (score >= 75) {
+      // Exclude candidates with "Shortlisted from Similar jobs" status
+      if (score >= 75 && contacted !== "Shortlisted from Similar jobs") {
         acc.shortlist++;
       }
       

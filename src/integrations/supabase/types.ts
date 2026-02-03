@@ -196,7 +196,6 @@ export type Database = {
       }
       CVs: {
         Row: {
-          applied_for: string[] | null
           cv_link: string | null
           cv_text: string | null
           done_questions: string | null
@@ -212,7 +211,6 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          applied_for?: string[] | null
           cv_link?: string | null
           cv_text?: string | null
           done_questions?: string | null
@@ -228,7 +226,6 @@ export type Database = {
           user_id?: string
         }
         Update: {
-          applied_for?: string[] | null
           cv_link?: string | null
           cv_text?: string | null
           done_questions?: string | null

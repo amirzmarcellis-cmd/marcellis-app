@@ -199,12 +199,13 @@ export default function ActiveJobsAnalytics() {
           .from('Jobs_CVs')
           .select('*', { count: 'exact', head: true })
           .in('job_id', jobIds),
-        // Shortlisted (after_call_score >= 74)
+        // Shortlisted (after_call_score >= 74), excluding "Shortlisted from Similar jobs"
         supabase
           .from('Jobs_CVs')
           .select('*', { count: 'exact', head: true })
           .in('job_id', jobIds)
-          .gte('after_call_score', 74),
+          .gte('after_call_score', 74)
+          .neq('contacted', 'Shortlisted from Similar jobs'),
         // Rejected
         supabase
           .from('Jobs_CVs')
@@ -275,7 +276,7 @@ export default function ActiveJobsAnalytics() {
       const metricsPromises = jobs.map(async (job) => {
         const [longlistedRes, shortlistedRes, rejectedRes, submittedRes] = await Promise.all([
           supabase.from('Jobs_CVs').select('*', { count: 'exact', head: true }).eq('job_id', job.job_id),
-          supabase.from('Jobs_CVs').select('*', { count: 'exact', head: true }).eq('job_id', job.job_id).gte('after_call_score', 74),
+          supabase.from('Jobs_CVs').select('*', { count: 'exact', head: true }).eq('job_id', job.job_id).gte('after_call_score', 74).neq('contacted', 'Shortlisted from Similar jobs'),
           supabase.from('Jobs_CVs').select('*', { count: 'exact', head: true }).eq('job_id', job.job_id).eq('contacted', 'Rejected'),
           supabase.from('Jobs_CVs').select('*', { count: 'exact', head: true }).eq('job_id', job.job_id).eq('contacted', 'Submitted')
         ]);

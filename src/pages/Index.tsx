@@ -288,11 +288,12 @@ export default function Index() {
       setJobStats(stats);
 
       // Calculate total shortlisted, submitted, and rejected counts (case-insensitive)
-      // Shortlisted: Call Done with score >= 75
+      // Shortlisted: Call Done with score >= 75, excluding "Shortlisted from Similar jobs"
       const totalShortlisted = links.filter((jc: any) => 
         jc.contacted?.toLowerCase() === 'call done' && 
         jc.after_call_score !== null && 
-        parseInt(jc.after_call_score?.toString() || '0') >= 75
+        parseInt(jc.after_call_score?.toString() || '0') >= 75 &&
+        jc.contacted !== 'Shortlisted from Similar jobs'
       ).length;
       
       // Longlisted: Call Done with score < 75

@@ -67,7 +67,7 @@ export function useReportsData(dateRange: DateRange) {
       
       const records = data || [];
       const totalLonglisted = records.filter(r => r.longlisted_at).length;
-      const shortlisted = records.filter(r => r.shortlisted_at).length;
+      const shortlisted = records.filter(r => r.shortlisted_at && r.contacted !== 'Shortlisted from Similar jobs').length;
       const called = records.filter(r => r.after_call_score !== null).length;
       const submitted = records.filter(r => r.contacted === 'Submitted').length;
       const rejected = records.filter(r => r.contacted === 'Rejected').length;
