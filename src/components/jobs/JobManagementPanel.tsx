@@ -206,9 +206,11 @@ export function JobManagementPanel() {
         }
 
         // Shortlisted: candidates with score >= 75 (unified definition)
+        // Exclude candidates with "Shortlisted from Similar jobs" status
         const shortlisted_count = longlistedCandidates.filter(c => {
           const score = parseInt(c.after_call_score || "0");
-          return score >= 75;
+          const contacted = c.contacted || "";
+          return score >= 75 && contacted !== "Shortlisted from Similar jobs";
         }).length;
 
         // Rejected: longlisted candidates with contacted status = 'Rejected'
