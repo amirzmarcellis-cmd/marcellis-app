@@ -196,6 +196,9 @@ export type Database = {
       }
       CVs: {
         Row: {
+          applied_for: string | null
+          current_company: string | null
+          Current_role: string | null
           cv_link: string | null
           cv_text: string | null
           done_questions: string | null
@@ -204,13 +207,19 @@ export type Database = {
           formatted_cv: string | null
           job_id: string | null
           Lastname: string | null
+          linkedin: string | null
           name: string | null
+          nationality: string | null
           notes: string | null
           phone_number: string | null
+          Skills: string[] | null
           updated_time: string | null
           user_id: string
         }
         Insert: {
+          applied_for?: string | null
+          current_company?: string | null
+          Current_role?: string | null
           cv_link?: string | null
           cv_text?: string | null
           done_questions?: string | null
@@ -219,13 +228,19 @@ export type Database = {
           formatted_cv?: string | null
           job_id?: string | null
           Lastname?: string | null
+          linkedin?: string | null
           name?: string | null
+          nationality?: string | null
           notes?: string | null
           phone_number?: string | null
+          Skills?: string[] | null
           updated_time?: string | null
           user_id?: string
         }
         Update: {
+          applied_for?: string | null
+          current_company?: string | null
+          Current_role?: string | null
           cv_link?: string | null
           cv_text?: string | null
           done_questions?: string | null
@@ -234,9 +249,12 @@ export type Database = {
           formatted_cv?: string | null
           job_id?: string | null
           Lastname?: string | null
+          linkedin?: string | null
           name?: string | null
+          nationality?: string | null
           notes?: string | null
           phone_number?: string | null
+          Skills?: string[] | null
           updated_time?: string | null
           user_id?: string
         }
