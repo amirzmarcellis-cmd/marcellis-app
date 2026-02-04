@@ -18,97 +18,414 @@ import FileUpload from "@/components/upload/FileUpload";
 import { ApiMultiSelect } from "@/components/ui/api-multi-select";
 
 const europeanCountries = [
-  "Albania", "Andorra", "Austria", "Azerbaijan", "Belgium", "Bosnia and Herzegovina", 
-  "United Kingdom", "Cyprus", "Denmark", "Croatia", "France", "Finland", "Netherlands", 
-  "Germany", "Georgia", "Estonia", "Greece", "Iceland", "Ireland", "Italy", "Kazakhstan", 
-  "Poland", "Portugal", "Romania", "Russia", "Malta", "Moldova", "Northern Ireland", 
-  "Norway", "Luxembourg", "Serbia", "Slovakia", "Slovenia", "Spain", "Switzerland", "Sweden"
+  "Albania",
+  "Andorra",
+  "Austria",
+  "Azerbaijan",
+  "Belgium",
+  "Bosnia and Herzegovina",
+  "United Kingdom",
+  "Cyprus",
+  "Denmark",
+  "Croatia",
+  "France",
+  "Finland",
+  "Netherlands",
+  "Germany",
+  "Georgia",
+  "Estonia",
+  "Greece",
+  "Iceland",
+  "Ireland",
+  "Italy",
+  "Kazakhstan",
+  "Poland",
+  "Portugal",
+  "Romania",
+  "Russia",
+  "Malta",
+  "Moldova",
+  "Northern Ireland",
+  "Norway",
+  "Luxembourg",
+  "Serbia",
+  "Slovakia",
+  "Slovenia",
+  "Spain",
+  "Switzerland",
+  "Sweden",
 ];
 
 const arabianCountries = [
-  "Algeria", "Bahrain", "Egypt", "Iraq", "Jordan", "Kuwait", "Lebanon", "Libya", 
-  "Morocco", "Oman", "Palestine", "Qatar", "Saudi Arabia", "Sudan", "Syria", 
-  "Tunisia", "United Arab Emirates", "Yemen"
+  "Algeria",
+  "Bahrain",
+  "Egypt",
+  "Iraq",
+  "Jordan",
+  "Kuwait",
+  "Lebanon",
+  "Libya",
+  "Morocco",
+  "Oman",
+  "Palestine",
+  "Qatar",
+  "Saudi Arabia",
+  "Sudan",
+  "Syria",
+  "Tunisia",
+  "United Arab Emirates",
+  "Yemen",
 ];
 
 const countries = [
-  "Afghanistan", "Albania", "Algeria", "United States", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia",
-  "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium",
-  "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Brazil", "United Kingdom", "Brunei", "Bulgaria", "Burkina Faso",
-  "Myanmar", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Central African Republic", "Chad", "Chile", "China",
-  "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti",
-  "Dominican Republic", "Netherlands", "East Timor", "Ecuador", "Egypt", "United Arab Emirates", "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia",
-  "Fiji", "Philippines", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece",
-  "Grenada", "Guatemala", "Guinea-Bissau", "Guinea", "Guyana", "Haiti", "Herzegovina", "Honduras", "Hungary", "Iceland",
-  "India", "Indonesia", "Iran", "Iraq", "Ireland", "Italy", "Ivory Coast", "Jamaica", "Japan",
-  "Jordan", "Kazakhstan", "Kenya", "Saint Kitts and Nevis", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Liberia",
-  "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "North Macedonia", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali",
-  "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Morocco",
-  "Lesotho", "Botswana", "Mozambique", "Namibia", "Nauru", "Nepal", "New Zealand", "Vanuatu", "Nicaragua", "Nigeria",
-  "Niger", "North Korea", "Northern Ireland", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay",
-  "Peru", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Lucia", "El Salvador", "Samoa",
-  "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Scotland", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia",
-  "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "Spain", "Sri Lanka", "Sudan", "Suriname", "Eswatini",
-  "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Togo", "Tonga", "Trinidad and Tobago",
-  "Tunisia", "Turkey", "Tuvalu", "Uganda", "Ukraine", "Uruguay", "Uzbekistan", "Venezuela", "Vietnam", "Wales",
-  "Yemen", "Zambia", "Zimbabwe"
+  "Afghanistan",
+  "Albania",
+  "Algeria",
+  "United States",
+  "Andorra",
+  "Angola",
+  "Antigua and Barbuda",
+  "Argentina",
+  "Armenia",
+  "Australia",
+  "Austria",
+  "Azerbaijan",
+  "Bahamas",
+  "Bahrain",
+  "Bangladesh",
+  "Barbados",
+  "Belarus",
+  "Belgium",
+  "Belize",
+  "Benin",
+  "Bhutan",
+  "Bolivia",
+  "Bosnia and Herzegovina",
+  "Brazil",
+  "United Kingdom",
+  "Brunei",
+  "Bulgaria",
+  "Burkina Faso",
+  "Myanmar",
+  "Burundi",
+  "Cambodia",
+  "Cameroon",
+  "Canada",
+  "Cape Verde",
+  "Central African Republic",
+  "Chad",
+  "Chile",
+  "China",
+  "Colombia",
+  "Comoros",
+  "Congo",
+  "Costa Rica",
+  "Croatia",
+  "Cuba",
+  "Cyprus",
+  "Czech Republic",
+  "Denmark",
+  "Djibouti",
+  "Dominican Republic",
+  "Netherlands",
+  "East Timor",
+  "Ecuador",
+  "Egypt",
+  "United Arab Emirates",
+  "Equatorial Guinea",
+  "Eritrea",
+  "Estonia",
+  "Ethiopia",
+  "Fiji",
+  "Philippines",
+  "Finland",
+  "France",
+  "Gabon",
+  "Gambia",
+  "Georgia",
+  "Germany",
+  "Ghana",
+  "Greece",
+  "Grenada",
+  "Guatemala",
+  "Guinea-Bissau",
+  "Guinea",
+  "Guyana",
+  "Haiti",
+  "Herzegovina",
+  "Honduras",
+  "Hungary",
+  "Iceland",
+  "India",
+  "Indonesia",
+  "Iran",
+  "Iraq",
+  "Ireland",
+  "Italy",
+  "Ivory Coast",
+  "Jamaica",
+  "Japan",
+  "Jordan",
+  "Kazakhstan",
+  "Kenya",
+  "Saint Kitts and Nevis",
+  "Kuwait",
+  "Kyrgyzstan",
+  "Laos",
+  "Latvia",
+  "Lebanon",
+  "Liberia",
+  "Libya",
+  "Liechtenstein",
+  "Lithuania",
+  "Luxembourg",
+  "North Macedonia",
+  "Madagascar",
+  "Malawi",
+  "Malaysia",
+  "Maldives",
+  "Mali",
+  "Malta",
+  "Marshall Islands",
+  "Mauritania",
+  "Mauritius",
+  "Mexico",
+  "Micronesia",
+  "Moldova",
+  "Monaco",
+  "Mongolia",
+  "Morocco",
+  "Lesotho",
+  "Botswana",
+  "Mozambique",
+  "Namibia",
+  "Nauru",
+  "Nepal",
+  "New Zealand",
+  "Vanuatu",
+  "Nicaragua",
+  "Nigeria",
+  "Niger",
+  "North Korea",
+  "Northern Ireland",
+  "Norway",
+  "Oman",
+  "Pakistan",
+  "Palau",
+  "Palestine",
+  "Panama",
+  "Papua New Guinea",
+  "Paraguay",
+  "Peru",
+  "Poland",
+  "Portugal",
+  "Qatar",
+  "Romania",
+  "Russia",
+  "Rwanda",
+  "Saint Lucia",
+  "El Salvador",
+  "Samoa",
+  "San Marino",
+  "Sao Tome and Principe",
+  "Saudi Arabia",
+  "Scotland",
+  "Senegal",
+  "Serbia",
+  "Seychelles",
+  "Sierra Leone",
+  "Singapore",
+  "Slovakia",
+  "Slovenia",
+  "Solomon Islands",
+  "Somalia",
+  "South Africa",
+  "South Korea",
+  "Spain",
+  "Sri Lanka",
+  "Sudan",
+  "Suriname",
+  "Eswatini",
+  "Sweden",
+  "Switzerland",
+  "Syria",
+  "Taiwan",
+  "Tajikistan",
+  "Tanzania",
+  "Thailand",
+  "Togo",
+  "Tonga",
+  "Trinidad and Tobago",
+  "Tunisia",
+  "Turkey",
+  "Tuvalu",
+  "Uganda",
+  "Ukraine",
+  "Uruguay",
+  "Uzbekistan",
+  "Venezuela",
+  "Vietnam",
+  "Wales",
+  "Yemen",
+  "Zambia",
+  "Zimbabwe",
 ];
 
-const noticePeriods = [
-  "Immediate",
-  "7 Days",
-  "14 Days", 
-  "30 Days",
-  "60 Days",
-  "90 Days"
-];
+const noticePeriods = ["Immediate", "7 Days", "14 Days", "30 Days", "60 Days", "90 Days"];
 
 const contractLengths = [
   "1 Month",
   "2 Months",
   "3 Months",
-  "6 Months", 
+  "6 Months",
   "9 Months",
   "12 Months",
   "18 Months",
-  "24 Months"
+  "24 Months",
 ];
 
 const industriesList = [
-  "Accounting", "Airlines / Aviation", "Alternative Dispute Resolution", "Alternative Medicine",
-  "Animation", "Apparel & Fashion", "Architecture & Planning", "Arts & Crafts", "Automotive",
-  "Aviation & Aerospace", "Banking", "Biotechnology", "Broadcast Media", "Building Materials",
-  "Business Supplies & Equipment", "Capital Markets", "Chemicals", "Civic & Social Organization",
-  "Civil Engineering", "Commercial Real Estate", "Computer & Network Security", "Computer Games",
-  "Computer Hardware", "Computer Networking", "Computer Software", "Construction",
-  "Consumer Electronics", "Consumer Goods", "Consumer Services", "Cosmetics", "Dairy",
-  "Defense & Space", "Design", "E-Learning", "Education Management",
-  "Electrical/Electronic Manufacturing", "Entertainment", "Environmental Services",
-  "Events Services", "Executive Office", "Facilities Services", "Farming", "Financial Services",
-  "Fine Art", "Fishery", "Food & Beverages", "Food Production", "Fund‐Raising", "Furniture",
-  "Gambling & Casinos", "Glass, Ceramics & Concrete", "Government Administration",
-  "Government Relations", "Graphic Design", "Health, Wellness and Fitness", "Higher Education",
-  "Hospital & Health Care", "Hospitality", "Human Resources", "Import and Export",
-  "Individual & Family Services", "Industrial Automation", "Information Services",
-  "Information Technology & Services", "Insurance", "International Affairs",
-  "International Trade & Development", "Internet", "Investment Banking", "Investment Management",
-  "Judiciary", "Law Enforcement", "Law Practice", "Legal Services", "Legislative Office",
-  "Leisure, Travel & Tourism", "Libraries", "Logistics & Supply Chain", "Luxury Goods & Jewelry",
-  "Machinery", "Management Consulting", "Maritime", "Market Research", "Marketing & Advertising",
-  "Mechanical or Industrial Engineering", "Media Production", "Medical Devices", "Medical Practice",
-  "Mental Health Care", "Military", "Mining & Metals", "Motion Pictures & Film",
-  "Museums & Institutions", "Music", "Nanotechnology", "Newspapers",
-  "Nonprofit Organization Management", "Oil & Energy", "Online Media", "Outsourcing / Offshoring",
-  "Package / Freight Delivery", "Packaging & Containers", "Paper & Forest Products",
-  "Performing Arts", "Pharmaceuticals", "Photography", "Plastics", "Political Organization",
-  "Primary / Secondary Education", "Printing", "Professional Training & Coaching",
-  "Program Development", "Public Policy", "Public Relations & Communications", "Public Safety",
-  "Publishing", "Real Estate", "Recreational Facilities & Services", "Religious Institutions",
-  "Renewables & Environment", "Research", "Restaurants", "Retail", "Security & Investigations",
-  "Semiconductors", "Shipbuilding", "Sporting Goods", "Sports", "Staffing & Recruiting",
-  "Supermarkets", "Telecommunications", "Textiles", "Transportation / Trucking / Railroad",
-  "Utilities", "Venture Capital & Private Equity", "Veterinary", "Warehousing", "Wholesale",
-  "Wine & Spirits", "Wireless", "Writing & Editing"
+  "Accounting",
+  "Airlines / Aviation",
+  "Alternative Dispute Resolution",
+  "Alternative Medicine",
+  "Animation",
+  "Apparel & Fashion",
+  "Architecture & Planning",
+  "Arts & Crafts",
+  "Automotive",
+  "Aviation & Aerospace",
+  "Banking",
+  "Biotechnology",
+  "Broadcast Media",
+  "Building Materials",
+  "Business Supplies & Equipment",
+  "Capital Markets",
+  "Chemicals",
+  "Civic & Social Organization",
+  "Civil Engineering",
+  "Commercial Real Estate",
+  "Computer & Network Security",
+  "Computer Games",
+  "Computer Hardware",
+  "Computer Networking",
+  "Computer Software",
+  "Construction",
+  "Consumer Electronics",
+  "Consumer Goods",
+  "Consumer Services",
+  "Cosmetics",
+  "Dairy",
+  "Defense & Space",
+  "Design",
+  "E-Learning",
+  "Education Management",
+  "Electrical/Electronic Manufacturing",
+  "Entertainment",
+  "Environmental Services",
+  "Events Services",
+  "Executive Office",
+  "Facilities Services",
+  "Farming",
+  "Financial Services",
+  "Fine Art",
+  "Fishery",
+  "Food & Beverages",
+  "Food Production",
+  "Fund‐Raising",
+  "Furniture",
+  "Gambling & Casinos",
+  "Glass, Ceramics & Concrete",
+  "Government Administration",
+  "Government Relations",
+  "Graphic Design",
+  "Health, Wellness and Fitness",
+  "Higher Education",
+  "Hospital & Health Care",
+  "Hospitality",
+  "Human Resources",
+  "Import and Export",
+  "Individual & Family Services",
+  "Industrial Automation",
+  "Information Services",
+  "Information Technology & Services",
+  "Insurance",
+  "International Affairs",
+  "International Trade & Development",
+  "Internet",
+  "Investment Banking",
+  "Investment Management",
+  "Judiciary",
+  "Law Enforcement",
+  "Law Practice",
+  "Legal Services",
+  "Legislative Office",
+  "Leisure, Travel & Tourism",
+  "Libraries",
+  "Logistics & Supply Chain",
+  "Luxury Goods & Jewelry",
+  "Machinery",
+  "Management Consulting",
+  "Maritime",
+  "Market Research",
+  "Marketing & Advertising",
+  "Mechanical or Industrial Engineering",
+  "Media Production",
+  "Medical Devices",
+  "Medical Practice",
+  "Mental Health Care",
+  "Military",
+  "Mining & Metals",
+  "Motion Pictures & Film",
+  "Museums & Institutions",
+  "Music",
+  "Nanotechnology",
+  "Newspapers",
+  "Nonprofit Organization Management",
+  "Oil & Energy",
+  "Online Media",
+  "Outsourcing / Offshoring",
+  "Package / Freight Delivery",
+  "Packaging & Containers",
+  "Paper & Forest Products",
+  "Performing Arts",
+  "Pharmaceuticals",
+  "Photography",
+  "Plastics",
+  "Political Organization",
+  "Primary / Secondary Education",
+  "Printing",
+  "Professional Training & Coaching",
+  "Program Development",
+  "Public Policy",
+  "Public Relations & Communications",
+  "Public Safety",
+  "Publishing",
+  "Real Estate",
+  "Recreational Facilities & Services",
+  "Religious Institutions",
+  "Renewables & Environment",
+  "Research",
+  "Restaurants",
+  "Retail",
+  "Security & Investigations",
+  "Semiconductors",
+  "Shipbuilding",
+  "Sporting Goods",
+  "Sports",
+  "Staffing & Recruiting",
+  "Supermarkets",
+  "Telecommunications",
+  "Textiles",
+  "Transportation / Trucking / Railroad",
+  "Utilities",
+  "Venture Capital & Private Equity",
+  "Veterinary",
+  "Warehousing",
+  "Wholesale",
+  "Wine & Spirits",
+  "Wireless",
+  "Writing & Editing",
 ];
 
 interface JobData {
@@ -151,9 +468,11 @@ export default function EditJob() {
   const [nationalityToExclude, setNationalityToExclude] = useState<string[]>([]);
   const [preferedNationality, setPreferedNationality] = useState<string[]>([]);
   const [notPreferedNationality, setNotPreferedNationality] = useState<string[]>([]);
-  const [uploadedFiles, setUploadedFiles] = useState<Array<{ id: string; file_name: string; file_url: string; file_type: string; file_size: number }>>([]);
-  const [groups, setGroups] = useState<Array<{id: string, name: string, color: string | null}>>([]);
-  const [recruiters, setRecruiters] = useState<Array<{user_id: string, name: string, email: string}>>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<
+    Array<{ id: string; file_name: string; file_url: string; file_type: string; file_size: number }>
+  >([]);
+  const [groups, setGroups] = useState<Array<{ id: string; name: string; color: string | null }>>([]);
+  const [recruiters, setRecruiters] = useState<Array<{ user_id: string; name: string; email: string }>>([]);
   const [isAmendMode, setIsAmendMode] = useState(false);
   const [currentTab, setCurrentTab] = useState("details");
   const [industries, setIndustries] = useState<string[]>([]);
@@ -185,7 +504,7 @@ export default function EditJob() {
     itris_job_id: "",
     group_id: "",
     recruiter_id: "",
-    Job_difficulty: 75
+    Job_difficulty: 75,
   });
 
   useEffect(() => {
@@ -206,20 +525,20 @@ export default function EditJob() {
 
       try {
         const { data, error } = await supabase
-          .from('profiles')
-          .select('linkedin_id')
-          .eq('user_id', formData.recruiter_id)
+          .from("profiles")
+          .select("linkedin_id")
+          .eq("user_id", formData.recruiter_id)
           .single();
 
         if (error) throw error;
         setRecruiterLinkedInId(data?.linkedin_id || null);
-        
+
         // Disable LinkedIn search if recruiter doesn't have LinkedIn ID
         if (!data?.linkedin_id) {
           setLinkedInSearchEnabled(false);
         }
       } catch (error) {
-        console.error('Error fetching recruiter LinkedIn ID:', error);
+        console.error("Error fetching recruiter LinkedIn ID:", error);
         setRecruiterLinkedInId(null);
       }
     };
@@ -230,16 +549,16 @@ export default function EditJob() {
   // Reset salary when currency changes to/from INR
   useEffect(() => {
     const currentSalary = salaryRange[0];
-    
-    if (formData.Currency === 'INR' && currentSalary > 100000) {
+
+    if (formData.Currency === "INR" && currentSalary > 100000) {
       // Already in INR range, no need to reset
       return;
     }
-    
-    if (formData.Currency !== 'INR' && currentSalary > 100000) {
+
+    if (formData.Currency !== "INR" && currentSalary > 100000) {
       // Switching from INR to other currency with INR-range value
       setSalaryRange([10000]);
-    } else if (formData.Currency === 'INR' && currentSalary <= 100000) {
+    } else if (formData.Currency === "INR" && currentSalary <= 100000) {
       // Switching to INR from other currency
       setSalaryRange([100000]);
     }
@@ -247,71 +566,61 @@ export default function EditJob() {
 
   const fetchGroups = async () => {
     try {
-      const { data, error } = await supabase
-        .from('groups')
-        .select('id, name, color')
-        .order('name');
+      const { data, error } = await supabase.from("groups").select("id, name, color").order("name");
 
       if (error) throw error;
       setGroups(data || []);
     } catch (error) {
-      console.error('Error fetching groups:', error);
+      console.error("Error fetching groups:", error);
     }
   };
 
   const fetchRecruiters = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('user_id, name, email')
-        .order('name');
+      const { data, error } = await supabase.from("profiles").select("user_id, name, email").order("name");
 
       if (error) throw error;
       setRecruiters(data || []);
     } catch (error) {
-      console.error('Error fetching recruiters:', error);
+      console.error("Error fetching recruiters:", error);
     }
   };
 
   const fetchJob = async () => {
     try {
-      const { data, error } = await supabase
-        .from('Jobs')
-        .select('*')
-        .eq('job_id', id)
-        .maybeSingle();
+      const { data, error } = await supabase.from("Jobs").select("*").eq("job_id", id).maybeSingle();
 
       if (error) {
-        console.error('Error fetching job:', error);
+        console.error("Error fetching job:", error);
         toast.error("Failed to load job details");
         return;
       }
-      
+
       if (!data) {
         toast.error("Job not found");
         return;
       }
-      
+
       if (data) {
         // Convert legacy text Job_difficulty values to numeric
         let difficultyValue = data.Job_difficulty;
-        if (typeof difficultyValue === 'string') {
-          const legacyMap: Record<string, number> = { 'EASY': 75, 'MEDIUM': 80, 'HARD': 85 };
+        if (typeof difficultyValue === "string") {
+          const legacyMap: Record<string, number> = { EASY: 75, MEDIUM: 80, HARD: 85 };
           difficultyValue = legacyMap[difficultyValue] || 75;
         }
         setFormData({ ...data, Job_difficulty: difficultyValue as number });
         setHasAssignment(!!data.assignment);
         setLinkedInSearchEnabled(data.linkedin_search_enabled || false);
-        
+
         // Parse salary range
         const salaryStr = data.job_salary_range;
         if (salaryStr) {
-          const salaryNum = parseInt(salaryStr.toString().replace(/[^\d]/g, ''));
+          const salaryNum = parseInt(salaryStr.toString().replace(/[^\d]/g, ""));
           if (!isNaN(salaryNum)) {
             setSalaryRange([salaryNum]);
           }
         }
-        
+
         // Parse nationality arrays
         if (data.nationality_to_include) {
           setNationalityToInclude(data.nationality_to_include.split(", ").filter(Boolean));
@@ -325,7 +634,7 @@ export default function EditJob() {
         if (data.not_prefered_nationality) {
           setNotPreferedNationality(data.not_prefered_nationality.split(", ").filter(Boolean));
         }
-        
+
         // Parse industries and headhunting companies
         if (data.industry) {
           setIndustries(data.industry.split(", ").filter(Boolean));
@@ -335,7 +644,7 @@ export default function EditJob() {
         }
       }
     } catch (error) {
-      console.error('Error fetching job:', error);
+      console.error("Error fetching job:", error);
       toast.error("Failed to load job details");
     } finally {
       setLoading(false);
@@ -344,9 +653,9 @@ export default function EditJob() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -375,20 +684,17 @@ export default function EditJob() {
         assignment: hasAssignment ? formData.assignment : null,
         group_id: formData.group_id || null,
         linkedin_search_enabled: linkedInSearchEnabled,
-        Job_difficulty: formData.Job_difficulty || 75
+        Job_difficulty: formData.Job_difficulty || 75,
       };
 
-      const { error } = await supabase
-        .from('Jobs')
-        .update(jobDataToUpdate)
-        .eq('job_id', id);
+      const { error } = await supabase.from("Jobs").update(jobDataToUpdate).eq("job_id", id);
 
       if (error) throw error;
 
       toast.success("Job updated successfully!");
       navigate("/jobs");
     } catch (error) {
-      console.error('Error updating job:', error);
+      console.error("Error updating job:", error);
       toast.error("Failed to update job");
     } finally {
       setSaving(false);
@@ -404,9 +710,9 @@ export default function EditJob() {
 
   const handleFileUpload = async (files: any[]) => {
     if (files.length > 0) {
-      setUploadedFiles(prev => [...prev, ...files]);
+      setUploadedFiles((prev) => [...prev, ...files]);
       toast("Files uploaded successfully", {
-        description: `${files.length} file(s) uploaded to the job.`
+        description: `${files.length} file(s) uploaded to the job.`,
       });
     }
   };
@@ -423,8 +729,8 @@ export default function EditJob() {
     <div className="container mx-auto max-w-7xl px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6 space-y-3 sm:space-y-4 md:space-y-6 overflow-x-hidden pb-20 sm:pb-24">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 md:gap-4 min-w-0">
         <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 w-full min-w-0">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => navigate("/jobs")}
             className="flex items-center gap-2 h-11 sm:h-10 md:h-9 w-full sm:w-auto justify-start sm:justify-center min-h-[44px] sm:min-h-0"
           >
@@ -432,15 +738,21 @@ export default function EditJob() {
             <span className="text-sm sm:text-base">Back to Jobs</span>
           </Button>
           <div className="min-w-0">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light font-work tracking-tight break-words">Edit Job</h1>
-            <p className="text-xs sm:text-sm md:text-base font-light font-inter text-muted-foreground mt-1">Update job posting details</p>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light font-work tracking-tight break-words">
+              Edit Job
+            </h1>
+            <p className="text-xs sm:text-sm md:text-base font-light font-inter text-muted-foreground mt-1">
+              Update job posting details
+            </p>
           </div>
         </div>
       </div>
 
       <Card className="mission-card w-full max-w-full overflow-hidden">
         <CardHeader className="p-3 sm:p-4 md:p-6">
-          <CardTitle className="text-lg sm:text-xl md:text-2xl font-light font-work tracking-tight break-words">Edit Job Posting</CardTitle>
+          <CardTitle className="text-lg sm:text-xl md:text-2xl font-light font-work tracking-tight break-words">
+            Edit Job Posting
+          </CardTitle>
           <CardDescription className="font-light font-inter text-xs sm:text-sm md:text-base mt-1">
             Update the job details and requirements
           </CardDescription>
@@ -449,16 +761,24 @@ export default function EditJob() {
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 md:space-y-6 w-full min-w-0">
             <Tabs value={currentTab} onValueChange={setCurrentTab} className="space-y-4 sm:space-y-5 md:space-y-6">
               <TabsList className="glass-card p-1 sm:p-1.5 w-full grid grid-cols-3 gap-1 h-auto">
-                <TabsTrigger value="details" className="min-h-[44px] sm:min-h-[36px] text-xs sm:text-sm py-2.5">Job Details</TabsTrigger>
-                <TabsTrigger value="documents" className="min-h-[44px] sm:min-h-[36px] text-xs sm:text-sm py-2.5">Documents</TabsTrigger>
-                <TabsTrigger value="amend" className="min-h-[44px] sm:min-h-[36px] text-xs sm:text-sm py-2.5">Ai Requirements</TabsTrigger>
+                <TabsTrigger value="details" className="min-h-[44px] sm:min-h-[36px] text-xs sm:text-sm py-2.5">
+                  Job Details
+                </TabsTrigger>
+                <TabsTrigger value="documents" className="min-h-[44px] sm:min-h-[36px] text-xs sm:text-sm py-2.5">
+                  Documents
+                </TabsTrigger>
+                <TabsTrigger value="amend" className="min-h-[44px] sm:min-h-[36px] text-xs sm:text-sm py-2.5">
+                  Ai Requirements
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="details" className="space-y-3 sm:space-y-4 md:space-y-6">
                 <div className="space-y-3 sm:space-y-4 md:space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 min-w-0">
                     <div className="space-y-1.5 sm:space-y-2 min-w-0">
-                      <Label htmlFor="job_title" className="font-light font-inter text-xs sm:text-sm">Job Title *</Label>
+                      <Label htmlFor="job_title" className="font-light font-inter text-xs sm:text-sm">
+                        Job Title *
+                      </Label>
                       <Input
                         id="job_title"
                         name="job_title"
@@ -470,7 +790,9 @@ export default function EditJob() {
                       />
                     </div>
                     <div className="space-y-1.5 sm:space-y-2 min-w-0">
-                      <Label htmlFor="itris_job_id" className="font-light font-inter text-xs sm:text-sm">Itris ID</Label>
+                      <Label htmlFor="itris_job_id" className="font-light font-inter text-xs sm:text-sm">
+                        Itris ID
+                      </Label>
                       <Input
                         id="itris_job_id"
                         name="itris_job_id"
@@ -483,8 +805,15 @@ export default function EditJob() {
                   </div>
 
                   <div className="space-y-1.5 sm:space-y-2 min-w-0">
-                    <Label htmlFor="group" className="text-xs sm:text-sm">Group</Label>
-                    <Select value={formData.group_id || "none"} onValueChange={(value) => setFormData(prev => ({ ...prev, group_id: value === "none" ? "" : value }))}>
+                    <Label htmlFor="group" className="text-xs sm:text-sm">
+                      Group
+                    </Label>
+                    <Select
+                      value={formData.group_id || "none"}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, group_id: value === "none" ? "" : value }))
+                      }
+                    >
                       <SelectTrigger className="h-11 sm:h-10 text-sm min-w-0 w-full">
                         <SelectValue placeholder="Select a group (optional)" className="truncate" />
                       </SelectTrigger>
@@ -493,7 +822,7 @@ export default function EditJob() {
                         {groups.map((group) => (
                           <SelectItem key={group.id} value={group.id}>
                             <div className="flex items-center gap-2">
-                              <div 
+                              <div
                                 className="w-3 h-3 rounded-full flex-shrink-0"
                                 style={{ backgroundColor: group.color || "#3B82F6" }}
                               />
@@ -506,8 +835,15 @@ export default function EditJob() {
                   </div>
 
                   <div className="space-y-1.5 sm:space-y-2 min-w-0">
-                    <Label htmlFor="recruiter" className="text-xs sm:text-sm">Assigned Recruiter</Label>
-                    <Select value={formData.recruiter_id || "none"} onValueChange={(value) => setFormData(prev => ({ ...prev, recruiter_id: value === "none" ? "" : value }))}>
+                    <Label htmlFor="recruiter" className="text-xs sm:text-sm">
+                      Assigned Recruiter
+                    </Label>
+                    <Select
+                      value={formData.recruiter_id || "none"}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, recruiter_id: value === "none" ? "" : value }))
+                      }
+                    >
                       <SelectTrigger className="h-11 sm:h-10 text-sm min-w-0 w-full">
                         <SelectValue placeholder="Select a recruiter (optional)" className="truncate" />
                       </SelectTrigger>
@@ -516,7 +852,7 @@ export default function EditJob() {
                         {recruiters.map((recruiter) => (
                           <SelectItem key={recruiter.user_id} value={recruiter.user_id}>
                             <div className="flex items-center gap-2 min-w-0">
-                              <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0"/>
+                              <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
                               <span className="truncate">{recruiter.name || recruiter.email}</span>
                             </div>
                           </SelectItem>
@@ -527,18 +863,20 @@ export default function EditJob() {
 
                   {/* Job Difficulty */}
                   <div className="space-y-1.5 sm:space-y-2 min-w-0">
-                    <Label htmlFor="jobDifficulty" className="text-xs sm:text-sm">Job Difficulty</Label>
-                    <Select 
-                      value={formData.Job_difficulty?.toString() || "75"} 
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, Job_difficulty: parseInt(value) }))}
+                    <Label htmlFor="jobDifficulty" className="text-xs sm:text-sm">
+                      Job Difficulty
+                    </Label>
+                    <Select
+                      value={formData.Job_difficulty?.toString() || "75"}
+                      onValueChange={(value) => setFormData((prev) => ({ ...prev, Job_difficulty: parseInt(value) }))}
                     >
                       <SelectTrigger className="h-11 sm:h-10 text-sm min-w-0 w-full">
                         <SelectValue placeholder="Select difficulty" />
                       </SelectTrigger>
                       <SelectContent className="z-[60] bg-popover">
                         <SelectItem value="75">A Job</SelectItem>
-                        <SelectItem value="80">B Job</SelectItem>
-                        <SelectItem value="85">C Job</SelectItem>
+                        <SelectItem value="75">B Job</SelectItem>
+                        <SelectItem value="75">C Job</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -582,7 +920,8 @@ export default function EditJob() {
                         <div className="flex items-start gap-2 p-2.5 sm:p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
                           <span className="text-amber-600 dark:text-amber-400 text-sm flex-shrink-0">⚠️</span>
                           <p className="text-xs text-amber-700 dark:text-amber-300 leading-relaxed break-words">
-                            The assigned recruiter needs to connect their LinkedIn account first. Click "Connect LinkedIn" to set it up.
+                            The assigned recruiter needs to connect their LinkedIn account first. Click "Connect
+                            LinkedIn" to set it up.
                           </p>
                         </div>
                       )}
@@ -610,7 +949,7 @@ export default function EditJob() {
                       apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=INDUSTRY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
                       apiHeaders={{
                         "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
-                        "Accept": "application/json"
+                        Accept: "application/json",
                       }}
                       placeholder="Select industries..."
                       searchPlaceholder="Search industries..."
@@ -626,7 +965,7 @@ export default function EditJob() {
                       apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
                       apiHeaders={{
                         "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
-                        "Accept": "application/json"
+                        Accept: "application/json",
                       }}
                       placeholder="Select companies..."
                       searchPlaceholder="Search companies..."
@@ -639,15 +978,16 @@ export default function EditJob() {
                     <ApiMultiSelect
                       value={formData.client_name ? [formData.client_name] : []}
                       onChange={(values) => {
-                        setFormData(prev => ({
+                        setFormData((prev) => ({
                           ...prev,
-                          client_name: values[values.length - 1] || ""
+                          client_name: values[values.length - 1] || "",
                         }));
                       }}
                       apiEndpoint="https://sofrxfgjptargppbepbi.supabase.co/rest/v1/clients?select=id,name&name=ilike.*{keywords}*&order=name.asc&limit=50"
                       apiHeaders={{
-                        "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvZnJ4ZmdqcHRhcmdwcGJlcGJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMDMxNzYsImV4cCI6MjA2OTg3OTE3Nn0._xVCMGu8VY2_JSs38wOdL7nG7EKpl3996heMiu33j9A",
-                        "Accept": "application/json"
+                        apikey:
+                          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvZnJ4ZmdqcHRhcmdwcGJlcGJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMDMxNzYsImV4cCI6MjA2OTg3OTE3Nn0._xVCMGu8VY2_JSs38wOdL7nG7EKpl3996heMiu33j9A",
+                        Accept: "application/json",
                       }}
                       placeholder="Select client..."
                       searchPlaceholder="Search clients..."
@@ -669,9 +1009,11 @@ export default function EditJob() {
                     />
                   </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                  <div className="space-y-2 sm:space-y-3">
-                    <Label htmlFor="job_location" className="text-sm sm:text-base">Job Location</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                    <div className="space-y-2 sm:space-y-3">
+                      <Label htmlFor="job_location" className="text-sm sm:text-base">
+                        Job Location
+                      </Label>
                       <Input
                         id="job_location"
                         name="job_location"
@@ -697,10 +1039,15 @@ export default function EditJob() {
                     </div>
                   </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                  <div className="space-y-2 sm:space-y-3">
-                    <Label htmlFor="notice_period" className="text-sm sm:text-base">Notice Period</Label>
-                      <Select value={formData.notice_period} onValueChange={(value) => setFormData(prev => ({ ...prev, notice_period: value }))}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                    <div className="space-y-2 sm:space-y-3">
+                      <Label htmlFor="notice_period" className="text-sm sm:text-base">
+                        Notice Period
+                      </Label>
+                      <Select
+                        value={formData.notice_period}
+                        onValueChange={(value) => setFormData((prev) => ({ ...prev, notice_period: value }))}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select notice period" className="truncate" />
                         </SelectTrigger>
@@ -715,7 +1062,10 @@ export default function EditJob() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="Currency">Currency</Label>
-                      <Select value={formData.Currency} onValueChange={(value) => setFormData(prev => ({ ...prev, Currency: value }))}>
+                      <Select
+                        value={formData.Currency}
+                        onValueChange={(value) => setFormData((prev) => ({ ...prev, Currency: value }))}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select currency" className="truncate" />
                         </SelectTrigger>
@@ -734,19 +1084,25 @@ export default function EditJob() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Countries to Include</Label>
-                      <Select onValueChange={(value) => {
-                        if (value === "European Countries") {
-                          // Add all European countries that aren't already included
-                          const newCountries = europeanCountries.filter(country => !nationalityToInclude.includes(country));
-                          setNationalityToInclude([...nationalityToInclude, ...newCountries]);
-                        } else if (value === "Arabian Countries") {
-                          // Add all Arabian countries that aren't already included
-                          const newCountries = arabianCountries.filter(country => !nationalityToInclude.includes(country));
-                          setNationalityToInclude([...nationalityToInclude, ...newCountries]);
-                        } else if (!nationalityToInclude.includes(value)) {
-                          setNationalityToInclude([...nationalityToInclude, value]);
-                        }
-                      }}>
+                      <Select
+                        onValueChange={(value) => {
+                          if (value === "European Countries") {
+                            // Add all European countries that aren't already included
+                            const newCountries = europeanCountries.filter(
+                              (country) => !nationalityToInclude.includes(country),
+                            );
+                            setNationalityToInclude([...nationalityToInclude, ...newCountries]);
+                          } else if (value === "Arabian Countries") {
+                            // Add all Arabian countries that aren't already included
+                            const newCountries = arabianCountries.filter(
+                              (country) => !nationalityToInclude.includes(country),
+                            );
+                            setNationalityToInclude([...nationalityToInclude, ...newCountries]);
+                          } else if (!nationalityToInclude.includes(value)) {
+                            setNationalityToInclude([...nationalityToInclude, value]);
+                          }
+                        }}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select countries to include..." className="truncate" />
                         </SelectTrigger>
@@ -757,13 +1113,13 @@ export default function EditJob() {
                           <SelectItem value="Arabian Countries" className="font-semibold text-primary">
                             🕌 Arabian Countries (Select All)
                           </SelectItem>
-                          {countries.filter(country => 
-                            !nationalityToInclude.includes(country)
-                          ).map((country) => (
-                            <SelectItem key={country} value={country}>
-                              {country}
-                            </SelectItem>
-                          ))}
+                          {countries
+                            .filter((country) => !nationalityToInclude.includes(country))
+                            .map((country) => (
+                              <SelectItem key={country} value={country}>
+                                {country}
+                              </SelectItem>
+                            ))}
                         </SelectContent>
                       </Select>
                       {nationalityToInclude.length > 0 && (
@@ -790,19 +1146,25 @@ export default function EditJob() {
                     </div>
                     <div className="space-y-2">
                       <Label>Countries to Exclude</Label>
-                      <Select onValueChange={(value) => {
-                        if (value === "European Countries") {
-                          // Add all European countries that aren't already excluded
-                          const newCountries = europeanCountries.filter(country => !nationalityToExclude.includes(country));
-                          setNationalityToExclude([...nationalityToExclude, ...newCountries]);
-                        } else if (value === "Arabian Countries") {
-                          // Add all Arabian countries that aren't already excluded
-                          const newCountries = arabianCountries.filter(country => !nationalityToExclude.includes(country));
-                          setNationalityToExclude([...nationalityToExclude, ...newCountries]);
-                        } else if (!nationalityToExclude.includes(value)) {
-                          setNationalityToExclude([...nationalityToExclude, value]);
-                        }
-                      }}>
+                      <Select
+                        onValueChange={(value) => {
+                          if (value === "European Countries") {
+                            // Add all European countries that aren't already excluded
+                            const newCountries = europeanCountries.filter(
+                              (country) => !nationalityToExclude.includes(country),
+                            );
+                            setNationalityToExclude([...nationalityToExclude, ...newCountries]);
+                          } else if (value === "Arabian Countries") {
+                            // Add all Arabian countries that aren't already excluded
+                            const newCountries = arabianCountries.filter(
+                              (country) => !nationalityToExclude.includes(country),
+                            );
+                            setNationalityToExclude([...nationalityToExclude, ...newCountries]);
+                          } else if (!nationalityToExclude.includes(value)) {
+                            setNationalityToExclude([...nationalityToExclude, value]);
+                          }
+                        }}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select countries to exclude..." className="truncate" />
                         </SelectTrigger>
@@ -813,13 +1175,13 @@ export default function EditJob() {
                           <SelectItem value="Arabian Countries" className="font-semibold text-destructive">
                             🕌 Arabian Countries (Select All)
                           </SelectItem>
-                          {countries.filter(country => 
-                            !nationalityToExclude.includes(country)
-                          ).map((country) => (
-                            <SelectItem key={country} value={country}>
-                              {country}
-                            </SelectItem>
-                          ))}
+                          {countries
+                            .filter((country) => !nationalityToExclude.includes(country))
+                            .map((country) => (
+                              <SelectItem key={country} value={country}>
+                                {country}
+                              </SelectItem>
+                            ))}
                         </SelectContent>
                       </Select>
                       {nationalityToExclude.length > 0 && (
@@ -848,17 +1210,23 @@ export default function EditJob() {
 
                   <div className="space-y-2">
                     <Label>Preferred Nationality</Label>
-                    <Select onValueChange={(value) => {
-                      if (value === "European Countries") {
-                        const newCountries = europeanCountries.filter(country => !preferedNationality.includes(country));
-                        setPreferedNationality([...preferedNationality, ...newCountries]);
-                      } else if (value === "Arabian Countries") {
-                        const newCountries = arabianCountries.filter(country => !preferedNationality.includes(country));
-                        setPreferedNationality([...preferedNationality, ...newCountries]);
-                      } else if (!preferedNationality.includes(value)) {
-                        setPreferedNationality([...preferedNationality, value]);
-                      }
-                    }}>
+                    <Select
+                      onValueChange={(value) => {
+                        if (value === "European Countries") {
+                          const newCountries = europeanCountries.filter(
+                            (country) => !preferedNationality.includes(country),
+                          );
+                          setPreferedNationality([...preferedNationality, ...newCountries]);
+                        } else if (value === "Arabian Countries") {
+                          const newCountries = arabianCountries.filter(
+                            (country) => !preferedNationality.includes(country),
+                          );
+                          setPreferedNationality([...preferedNationality, ...newCountries]);
+                        } else if (!preferedNationality.includes(value)) {
+                          setPreferedNationality([...preferedNationality, value]);
+                        }
+                      }}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select preferred nationalities..." className="truncate" />
                       </SelectTrigger>
@@ -869,13 +1237,13 @@ export default function EditJob() {
                         <SelectItem value="Arabian Countries" className="font-semibold text-primary">
                           🕌 Arabian Countries (Select All)
                         </SelectItem>
-                        {countries.filter(country => 
-                          !preferedNationality.includes(country)
-                        ).map((country) => (
-                          <SelectItem key={country} value={country}>
-                            {country}
-                          </SelectItem>
-                        ))}
+                        {countries
+                          .filter((country) => !preferedNationality.includes(country))
+                          .map((country) => (
+                            <SelectItem key={country} value={country}>
+                              {country}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                     {preferedNationality.length > 0 && (
@@ -903,17 +1271,23 @@ export default function EditJob() {
 
                   <div className="space-y-2">
                     <Label>Not Preferred Nationality</Label>
-                    <Select onValueChange={(value) => {
-                      if (value === "European Countries") {
-                        const newCountries = europeanCountries.filter(country => !notPreferedNationality.includes(country));
-                        setNotPreferedNationality([...notPreferedNationality, ...newCountries]);
-                      } else if (value === "Arabian Countries") {
-                        const newCountries = arabianCountries.filter(country => !notPreferedNationality.includes(country));
-                        setNotPreferedNationality([...notPreferedNationality, ...newCountries]);
-                      } else if (!notPreferedNationality.includes(value)) {
-                        setNotPreferedNationality([...notPreferedNationality, value]);
-                      }
-                    }}>
+                    <Select
+                      onValueChange={(value) => {
+                        if (value === "European Countries") {
+                          const newCountries = europeanCountries.filter(
+                            (country) => !notPreferedNationality.includes(country),
+                          );
+                          setNotPreferedNationality([...notPreferedNationality, ...newCountries]);
+                        } else if (value === "Arabian Countries") {
+                          const newCountries = arabianCountries.filter(
+                            (country) => !notPreferedNationality.includes(country),
+                          );
+                          setNotPreferedNationality([...notPreferedNationality, ...newCountries]);
+                        } else if (!notPreferedNationality.includes(value)) {
+                          setNotPreferedNationality([...notPreferedNationality, value]);
+                        }
+                      }}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select not preferred nationalities..." className="truncate" />
                       </SelectTrigger>
@@ -924,13 +1298,13 @@ export default function EditJob() {
                         <SelectItem value="Arabian Countries" className="font-semibold text-primary">
                           🕌 Arabian Countries (Select All)
                         </SelectItem>
-                        {countries.filter(country => 
-                          !notPreferedNationality.includes(country)
-                        ).map((country) => (
-                          <SelectItem key={country} value={country}>
-                            {country}
-                          </SelectItem>
-                        ))}
+                        {countries
+                          .filter((country) => !notPreferedNationality.includes(country))
+                          .map((country) => (
+                            <SelectItem key={country} value={country}>
+                              {country}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                     {notPreferedNationality.length > 0 && (
@@ -957,9 +1331,14 @@ export default function EditJob() {
                   </div>
 
                   <div className="space-y-4">
-                  <div className="space-y-2 sm:space-y-3">
-                    <Label htmlFor="Type" className="text-sm sm:text-base">Job Type</Label>
-                      <Select value={formData.Type} onValueChange={(value) => setFormData(prev => ({ ...prev, Type: value }))}>
+                    <div className="space-y-2 sm:space-y-3">
+                      <Label htmlFor="Type" className="text-sm sm:text-base">
+                        Job Type
+                      </Label>
+                      <Select
+                        value={formData.Type}
+                        onValueChange={(value) => setFormData((prev) => ({ ...prev, Type: value }))}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select job type" className="truncate" />
                         </SelectTrigger>
@@ -969,11 +1348,16 @@ export default function EditJob() {
                         </SelectContent>
                       </Select>
                     </div>
-                    
+
                     {formData.Type === "Contract" && (
-                  <div className="space-y-2 sm:space-y-3">
-                    <Label htmlFor="contract_length" className="text-sm sm:text-base">Contract Length</Label>
-                        <Select value={formData.contract_length || ""} onValueChange={(value) => setFormData(prev => ({ ...prev, contract_length: value }))}>
+                      <div className="space-y-2 sm:space-y-3">
+                        <Label htmlFor="contract_length" className="text-sm sm:text-base">
+                          Contract Length
+                        </Label>
+                        <Select
+                          value={formData.contract_length || ""}
+                          onValueChange={(value) => setFormData((prev) => ({ ...prev, contract_length: value }))}
+                        >
                           <SelectTrigger>
                             <SelectValue placeholder="Select contract length" />
                           </SelectTrigger>
@@ -990,17 +1374,12 @@ export default function EditJob() {
                   </div>
                 </div>
 
-
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2">
-                    <Switch
-                      id="hasAssignment"
-                      checked={hasAssignment}
-                      onCheckedChange={setHasAssignment}
-                    />
+                    <Switch id="hasAssignment" checked={hasAssignment} onCheckedChange={setHasAssignment} />
                     <Label htmlFor="hasAssignment">Has Assignment?</Label>
                   </div>
-                  
+
                   {hasAssignment && (
                     <div className="space-y-2">
                       <Label htmlFor="assignment">Assignment Link</Label>
@@ -1030,7 +1409,7 @@ export default function EditJob() {
                       multiple={true}
                     />
                   </div>
-                  
+
                   {uploadedFiles.length > 0 && (
                     <div>
                       <h4 className="font-medium mb-2">Uploaded Files:</h4>
@@ -1056,23 +1435,25 @@ export default function EditJob() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <Label htmlFor="amendMode" className="text-xs sm:text-sm">Enable Editing</Label>
-                      <Switch
-                        id="amendMode"
-                        checked={isAmendMode}
-                        onCheckedChange={handleAmendToggle}
-                      />
+                      <Label htmlFor="amendMode" className="text-xs sm:text-sm">
+                        Enable Editing
+                      </Label>
+                      <Switch id="amendMode" checked={isAmendMode} onCheckedChange={handleAmendToggle} />
                     </div>
                   </div>
 
                   <div className="space-y-4 sm:space-y-5 md:space-y-6 p-3 sm:p-4 md:p-6 border border-primary/20 rounded-lg bg-gradient-to-br from-primary/5 to-primary/10 min-w-0 max-w-full overflow-hidden">
                     <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 bg-primary/10 rounded-md border border-primary/20">
                       <h4 className="font-semibold text-primary mb-1 text-sm sm:text-base">✏️ Editing Mode Active</h4>
-                      <p className="text-xs sm:text-sm text-muted-foreground break-words">Edit the specific job requirements below and click 'Update Job Requirements' to save.</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground break-words">
+                        Edit the specific job requirements below and click 'Update Job Requirements' to save.
+                      </p>
                     </div>
 
                     <div className="space-y-1.5 sm:space-y-2 min-w-0">
-                      <Label htmlFor="things_to_look_for" className="text-sm sm:text-base font-semibold">🔍 Things to Look For</Label>
+                      <Label htmlFor="things_to_look_for" className="text-sm sm:text-base font-semibold">
+                        🔍 Things to Look For
+                      </Label>
                       <Textarea
                         id="things_to_look_for"
                         name="things_to_look_for"
@@ -1085,7 +1466,9 @@ export default function EditJob() {
                     </div>
 
                     <div className="space-y-1.5 sm:space-y-2 min-w-0">
-                      <Label htmlFor="musttohave" className="text-sm sm:text-base font-semibold">⭐ Must Have Requirements</Label>
+                      <Label htmlFor="musttohave" className="text-sm sm:text-base font-semibold">
+                        ⭐ Must Have Requirements
+                      </Label>
                       <Textarea
                         id="musttohave"
                         name="musttohave"
@@ -1098,7 +1481,9 @@ export default function EditJob() {
                     </div>
 
                     <div className="space-y-1.5 sm:space-y-2 min-w-0">
-                      <Label htmlFor="nicetohave" className="text-sm sm:text-base font-semibold">💫 Nice to Have Requirements</Label>
+                      <Label htmlFor="nicetohave" className="text-sm sm:text-base font-semibold">
+                        💫 Nice to Have Requirements
+                      </Label>
                       <Textarea
                         id="nicetohave"
                         name="nicetohave"
@@ -1111,8 +1496,8 @@ export default function EditJob() {
                     </div>
 
                     <div className="flex justify-end pt-3 sm:pt-4 border-t border-primary/20">
-                      <Button 
-                        type="submit" 
+                      <Button
+                        type="submit"
                         disabled={saving}
                         className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white px-6 sm:px-8 py-2 font-semibold w-full sm:w-auto h-11 sm:h-10 text-sm min-h-[44px] sm:min-h-0"
                       >
@@ -1121,23 +1506,22 @@ export default function EditJob() {
                       </Button>
                     </div>
                   </div>
-
                 </div>
               </TabsContent>
             </Tabs>
 
             <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 md:gap-4 pt-4 sm:pt-6 border-t border-border/30 min-w-0">
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => navigate("/jobs")}
                 className="w-full sm:w-auto h-11 sm:h-10 text-sm min-h-[44px] sm:min-h-0"
               >
                 <X className="h-4 w-4 mr-2" />
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={saving}
                 className="action-button bg-gradient-primary hover:shadow-glow w-full sm:w-auto h-11 sm:h-10 text-sm min-h-[44px] sm:min-h-0"
               >
