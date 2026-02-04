@@ -875,8 +875,8 @@ export default function EditJob() {
                       </SelectTrigger>
                       <SelectContent className="z-[60] bg-popover">
                         <SelectItem value="75">A Job</SelectItem>
-                        <SelectItem value="75">B Job</SelectItem>
-                        <SelectItem value="75">C Job</SelectItem>
+                        <SelectItem value="80">B Job</SelectItem>
+                        <SelectItem value="85">C Job</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
