@@ -3195,8 +3195,7 @@ mainCandidate["linkedin_score_reason"] ? (
   );
   return (
     <div className={cn("min-w-0 w-full space-y-2 sm:space-y-4 md:space-y-6 p-2 sm:p-4 md:p-6 overflow-x-hidden max-w-full", isShaking && "animate-shake")}>
-      {/* Processing Animation Overlay */}
-      {job?.status === 'Processing' && job?.Processed === 'Yes' && <ProcessingAnimation />}
+      {/* Processing Animation - controlled by local state during AI generation, not database fields */}
       
       {/* Apple Loading Bar */}
       <AppleLoadingBar isLoading={loading} className="absolute top-0 left-0 right-0 z-50" />
