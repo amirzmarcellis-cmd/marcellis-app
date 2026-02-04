@@ -25,62 +25,269 @@ import { cn } from "@/lib/utils";
 import { ApiMultiSelect } from "@/components/ui/api-multi-select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
-
 const europeanCountries = [
-  "Albania", "Andorra", "Austria", "Azerbaijan", "Belgium", "Bosnia and Herzegovina", 
-  "United Kingdom", "Cyprus", "Denmark", "Croatia", "France", "Finland", "Netherlands", 
-  "Germany", "Georgia", "Estonia", "Greece", "Iceland", "Ireland", "Italy", "Kazakhstan", 
-  "Poland", "Portugal", "Romania", "Russia", "Malta", "Moldova", "Northern Ireland", 
-  "Norway", "Luxembourg", "Serbia", "Slovakia", "Slovenia", "Spain", "Switzerland", "Sweden"
+  "Albania",
+  "Andorra",
+  "Austria",
+  "Azerbaijan",
+  "Belgium",
+  "Bosnia and Herzegovina",
+  "United Kingdom",
+  "Cyprus",
+  "Denmark",
+  "Croatia",
+  "France",
+  "Finland",
+  "Netherlands",
+  "Germany",
+  "Georgia",
+  "Estonia",
+  "Greece",
+  "Iceland",
+  "Ireland",
+  "Italy",
+  "Kazakhstan",
+  "Poland",
+  "Portugal",
+  "Romania",
+  "Russia",
+  "Malta",
+  "Moldova",
+  "Northern Ireland",
+  "Norway",
+  "Luxembourg",
+  "Serbia",
+  "Slovakia",
+  "Slovenia",
+  "Spain",
+  "Switzerland",
+  "Sweden",
 ];
 
 const arabianCountries = [
-  "Algeria", "Bahrain", "Egypt", "Iraq", "Jordan", "Kuwait", "Lebanon", "Libya", 
-  "Morocco", "Oman", "Palestine", "Qatar", "Saudi Arabia", "Sudan", "Syria", 
-  "Tunisia", "United Arab Emirates", "Yemen"
+  "Algeria",
+  "Bahrain",
+  "Egypt",
+  "Iraq",
+  "Jordan",
+  "Kuwait",
+  "Lebanon",
+  "Libya",
+  "Morocco",
+  "Oman",
+  "Palestine",
+  "Qatar",
+  "Saudi Arabia",
+  "Sudan",
+  "Syria",
+  "Tunisia",
+  "United Arab Emirates",
+  "Yemen",
 ];
 
 const countries = [
-  "Afghanistan", "Albania", "Algeria", "United States", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia",
-  "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium",
-  "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Brazil", "United Kingdom", "Brunei", "Bulgaria", "Burkina Faso",
-  "Myanmar", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Central African Republic", "Chad", "Chile", "China",
-  "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti",
-  "Dominican Republic", "Netherlands", "East Timor", "Ecuador", "Egypt", "United Arab Emirates", "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia",
-  "Fiji", "Philippines", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece",
-  "Grenada", "Guatemala", "Guinea-Bissau", "Guinea", "Guyana", "Haiti", "Herzegovina", "Honduras", "Hungary", "Iceland",
-  "India", "Indonesia", "Iran", "Iraq", "Ireland", "Italy", "Ivory Coast", "Jamaica", "Japan",
-  "Jordan", "Kazakhstan", "Kenya", "Saint Kitts and Nevis", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Liberia",
-  "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "North Macedonia", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali",
-  "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Morocco",
-  "Lesotho", "Botswana", "Mozambique", "Namibia", "Nauru", "Nepal", "New Zealand", "Vanuatu", "Nicaragua", "Nigeria",
-  "Niger", "North Korea", "Northern Ireland", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay",
-  "Peru", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Lucia", "El Salvador", "Samoa",
-  "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia",
-  "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "Spain", "Sri Lanka", "Sudan", "Suriname", "Eswatini",
-  "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Togo", "Tonga", "Trinidad and Tobago",
-  "Tunisia", "Turkey", "Tuvalu", "Uganda", "Ukraine", "Uruguay", "Uzbekistan", "Venezuela", "Vietnam",
-  "Yemen", "Zambia", "Zimbabwe"
+  "Afghanistan",
+  "Albania",
+  "Algeria",
+  "United States",
+  "Andorra",
+  "Angola",
+  "Antigua and Barbuda",
+  "Argentina",
+  "Armenia",
+  "Australia",
+  "Austria",
+  "Azerbaijan",
+  "Bahamas",
+  "Bahrain",
+  "Bangladesh",
+  "Barbados",
+  "Belarus",
+  "Belgium",
+  "Belize",
+  "Benin",
+  "Bhutan",
+  "Bolivia",
+  "Bosnia and Herzegovina",
+  "Brazil",
+  "United Kingdom",
+  "Brunei",
+  "Bulgaria",
+  "Burkina Faso",
+  "Myanmar",
+  "Burundi",
+  "Cambodia",
+  "Cameroon",
+  "Canada",
+  "Cape Verde",
+  "Central African Republic",
+  "Chad",
+  "Chile",
+  "China",
+  "Colombia",
+  "Comoros",
+  "Congo",
+  "Costa Rica",
+  "Croatia",
+  "Cuba",
+  "Cyprus",
+  "Czech Republic",
+  "Denmark",
+  "Djibouti",
+  "Dominican Republic",
+  "Netherlands",
+  "East Timor",
+  "Ecuador",
+  "Egypt",
+  "United Arab Emirates",
+  "Equatorial Guinea",
+  "Eritrea",
+  "Estonia",
+  "Ethiopia",
+  "Fiji",
+  "Philippines",
+  "Finland",
+  "France",
+  "Gabon",
+  "Gambia",
+  "Georgia",
+  "Germany",
+  "Ghana",
+  "Greece",
+  "Grenada",
+  "Guatemala",
+  "Guinea-Bissau",
+  "Guinea",
+  "Guyana",
+  "Haiti",
+  "Herzegovina",
+  "Honduras",
+  "Hungary",
+  "Iceland",
+  "India",
+  "Indonesia",
+  "Iran",
+  "Iraq",
+  "Ireland",
+  "Italy",
+  "Ivory Coast",
+  "Jamaica",
+  "Japan",
+  "Jordan",
+  "Kazakhstan",
+  "Kenya",
+  "Saint Kitts and Nevis",
+  "Kuwait",
+  "Kyrgyzstan",
+  "Laos",
+  "Latvia",
+  "Lebanon",
+  "Liberia",
+  "Libya",
+  "Liechtenstein",
+  "Lithuania",
+  "Luxembourg",
+  "North Macedonia",
+  "Madagascar",
+  "Malawi",
+  "Malaysia",
+  "Maldives",
+  "Mali",
+  "Malta",
+  "Marshall Islands",
+  "Mauritania",
+  "Mauritius",
+  "Mexico",
+  "Micronesia",
+  "Moldova",
+  "Monaco",
+  "Mongolia",
+  "Morocco",
+  "Lesotho",
+  "Botswana",
+  "Mozambique",
+  "Namibia",
+  "Nauru",
+  "Nepal",
+  "New Zealand",
+  "Vanuatu",
+  "Nicaragua",
+  "Nigeria",
+  "Niger",
+  "North Korea",
+  "Northern Ireland",
+  "Norway",
+  "Oman",
+  "Pakistan",
+  "Palau",
+  "Palestine",
+  "Panama",
+  "Papua New Guinea",
+  "Paraguay",
+  "Peru",
+  "Poland",
+  "Portugal",
+  "Qatar",
+  "Romania",
+  "Russia",
+  "Rwanda",
+  "Saint Lucia",
+  "El Salvador",
+  "Samoa",
+  "San Marino",
+  "Sao Tome and Principe",
+  "Saudi Arabia",
+  "Senegal",
+  "Serbia",
+  "Seychelles",
+  "Sierra Leone",
+  "Singapore",
+  "Slovakia",
+  "Slovenia",
+  "Solomon Islands",
+  "Somalia",
+  "South Africa",
+  "South Korea",
+  "Spain",
+  "Sri Lanka",
+  "Sudan",
+  "Suriname",
+  "Eswatini",
+  "Sweden",
+  "Switzerland",
+  "Syria",
+  "Taiwan",
+  "Tajikistan",
+  "Tanzania",
+  "Thailand",
+  "Togo",
+  "Tonga",
+  "Trinidad and Tobago",
+  "Tunisia",
+  "Turkey",
+  "Tuvalu",
+  "Uganda",
+  "Ukraine",
+  "Uruguay",
+  "Uzbekistan",
+  "Venezuela",
+  "Vietnam",
+  "Yemen",
+  "Zambia",
+  "Zimbabwe",
 ];
 
-const noticePeriods = [
-  "Immediate",
-  "7 Days",
-  "14 Days", 
-  "30 Days",
-  "60 Days",
-  "90 Days"
-];
+const noticePeriods = ["Immediate", "7 Days", "14 Days", "30 Days", "60 Days", "90 Days"];
 
 const contractLengths = [
   "1 Month",
   "2 Months",
   "3 Months",
-  "6 Months", 
+  "6 Months",
   "9 Months",
   "12 Months",
   "18 Months",
-  "24 Months"
+  "24 Months",
 ];
 
 const industries = [
@@ -224,7 +431,7 @@ const industries = [
   "Wholesale",
   "Wine & Spirits",
   "Wireless",
-  "Writing & Editing"
+  "Writing & Editing",
 ];
 
 export default function AddJob() {
@@ -232,7 +439,7 @@ export default function AddJob() {
   const { profile } = useProfile();
   const { isAdmin, isManager, isTeamLeader, isViewer } = useUserRole();
   const { isJobCreationPaused, loading: adminSettingsLoading } = useAdminSettings();
-  
+
   const [formData, setFormData] = useState({
     jobTitle: "",
     jobDescription: "",
@@ -257,12 +464,12 @@ export default function AddJob() {
     itrisId: "",
     groupId: "",
     recruiterId: "",
-    jobDifficulty: 75
+    jobDifficulty: 75,
   });
   const [newHeadhuntingUrl, setNewHeadhuntingUrl] = useState("");
-  const [groups, setGroups] = useState<Array<{id: string, name: string, color: string | null}>>([]);
-  const [recruiters, setRecruiters] = useState<Array<{user_id: string, name: string, email: string}>>([]);
-  const [clients, setClients] = useState<Array<{id: string, name: string, description: string | null}>>([]);
+  const [groups, setGroups] = useState<Array<{ id: string; name: string; color: string | null }>>([]);
+  const [recruiters, setRecruiters] = useState<Array<{ user_id: string; name: string; email: string }>>([]);
+  const [clients, setClients] = useState<Array<{ id: string; name: string; description: string | null }>>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [industryPopoverOpen, setIndustryPopoverOpen] = useState(false);
   const [clientPopoverOpen, setClientPopoverOpen] = useState(false);
@@ -277,7 +484,7 @@ export default function AddJob() {
   const [longlistOnly, setLonglistOnly] = useState(false);
 
   // Redirect viewers and non-admin users if job creation is paused (route protection)
-  
+
   useEffect(() => {
     if (!adminSettingsLoading && isViewer) {
       toast.error("Viewers cannot create jobs");
@@ -294,7 +501,7 @@ export default function AddJob() {
     // Auto-assign recruiter to current user for team members if not selected
     const isTeamMember = !(isAdmin || isManager || isTeamLeader);
     if (profile?.user_id && isTeamMember && !formData.recruiterId) {
-      setFormData(prev => ({ ...prev, recruiterId: profile.user_id }));
+      setFormData((prev) => ({ ...prev, recruiterId: profile.user_id }));
     }
   }, [profile?.user_id, isAdmin, isManager, isTeamLeader]);
 
@@ -303,7 +510,6 @@ export default function AddJob() {
     fetchRecruiters();
     fetchClients();
   }, [profile?.user_id]);
-
 
   // Fetch recruiter's LinkedIn ID when recruiter changes
   useEffect(() => {
@@ -316,20 +522,20 @@ export default function AddJob() {
 
       try {
         const { data, error } = await supabase
-          .from('profiles')
-          .select('linkedin_id')
-          .eq('user_id', formData.recruiterId)
+          .from("profiles")
+          .select("linkedin_id")
+          .eq("user_id", formData.recruiterId)
           .single();
 
         if (error) throw error;
         setRecruiterLinkedInId(data?.linkedin_id || null);
-        
+
         // Disable LinkedIn search if recruiter doesn't have LinkedIn ID
         if (!data?.linkedin_id) {
           setLinkedInSearchEnabled(false);
         }
       } catch (error) {
-        console.error('Error fetching recruiter LinkedIn ID:', error);
+        console.error("Error fetching recruiter LinkedIn ID:", error);
         setRecruiterLinkedInId(null);
         setLinkedInSearchEnabled(false);
       }
@@ -340,56 +546,50 @@ export default function AddJob() {
 
   const fetchGroups = async () => {
     try {
-      const { data, error } = await supabase
-        .from('groups')
-        .select('id, name, color')
-        .order('name');
+      const { data, error } = await supabase.from("groups").select("id, name, color").order("name");
 
       if (error) throw error;
       setGroups(data || []);
     } catch (error) {
-      console.error('Error fetching groups:', error);
+      console.error("Error fetching groups:", error);
     }
   };
 
   const fetchRecruiters = async () => {
     try {
       // Show all users to everyone (both team leaders and regular members)
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('user_id, name, email')
-        .order('name');
+      const { data, error } = await supabase.from("profiles").select("user_id, name, email").order("name");
 
       if (error) throw error;
       setRecruiters(data || []);
     } catch (error) {
-      console.error('Error fetching recruiters:', error);
+      console.error("Error fetching recruiters:", error);
     }
   };
 
   const fetchClients = async () => {
     try {
-      const { data, error } = await supabase
-        .from('clients')
-        .select('id, name, description')
-        .order('name');
+      const { data, error } = await supabase.from("clients").select("id, name, description").order("name");
 
       if (error) throw error;
-      
+
       // Deduplicate clients by name (case-insensitive)
-      const uniqueClients = (data || []).reduce((acc: Array<{id: string, name: string, description: string | null}>, current) => {
-        const duplicate = acc.find(
-          client => client.name.toLowerCase().trim() === current.name.toLowerCase().trim()
-        );
-        if (!duplicate) {
-          acc.push(current);
-        }
-        return acc;
-      }, []);
-      
+      const uniqueClients = (data || []).reduce(
+        (acc: Array<{ id: string; name: string; description: string | null }>, current) => {
+          const duplicate = acc.find(
+            (client) => client.name.toLowerCase().trim() === current.name.toLowerCase().trim(),
+          );
+          if (!duplicate) {
+            acc.push(current);
+          }
+          return acc;
+        },
+        [],
+      );
+
       setClients(uniqueClients);
     } catch (error) {
-      console.error('Error fetching clients:', error);
+      console.error("Error fetching clients:", error);
     }
   };
 
@@ -401,7 +601,7 @@ export default function AddJob() {
 
     try {
       const { data, error } = await supabase
-        .from('clients')
+        .from("clients")
         .insert({
           name: newClientData.name,
           description: newClientData.description || null,
@@ -418,70 +618,73 @@ export default function AddJob() {
       setAddClientDialogOpen(false);
       setClientPopoverOpen(false);
     } catch (error) {
-      console.error('Error adding client:', error);
+      console.error("Error adding client:", error);
       toast.error("Failed to add client");
     }
   };
 
-  const autoSaveNationality = useCallback(async (field: string, value: string[]) => {
-    // Only auto-save if we have a job_id (after initial creation)
-    if (!currentJobId) return;
+  const autoSaveNationality = useCallback(
+    async (field: string, value: string[]) => {
+      // Only auto-save if we have a job_id (after initial creation)
+      if (!currentJobId) return;
 
-    try {
-      const fieldMap = {
-        'nationalityToInclude': 'nationality_to_include',
-        'nationalityToExclude': 'nationality_to_exclude',
-        'preferedNationality': 'prefered_nationality',
-        'notPreferedNationality': 'not_prefered_nationality'
-      };
+      try {
+        const fieldMap = {
+          nationalityToInclude: "nationality_to_include",
+          nationalityToExclude: "nationality_to_exclude",
+          preferedNationality: "prefered_nationality",
+          notPreferedNationality: "not_prefered_nationality",
+        };
 
-      const dbField = fieldMap[field];
-      if (!dbField) return;
+        const dbField = fieldMap[field];
+        if (!dbField) return;
 
-      // Set to null if array is empty, otherwise join with comma
-      const dbValue = value.length > 0 ? value.join(", ") : null;
+        // Set to null if array is empty, otherwise join with comma
+        const dbValue = value.length > 0 ? value.join(", ") : null;
 
-      const { error } = await supabase
-        .from('Jobs')
-        .update({ [dbField]: dbValue })
-        .eq('job_id', currentJobId);
+        const { error } = await supabase
+          .from("Jobs")
+          .update({ [dbField]: dbValue })
+          .eq("job_id", currentJobId);
 
-      if (error) {
-        console.error('Error auto-saving nationality:', error);
-      } else {
-        toast.success("Saved automatically", { duration: 1000 });
+        if (error) {
+          console.error("Error auto-saving nationality:", error);
+        } else {
+          toast.success("Saved automatically", { duration: 1000 });
+        }
+      } catch (error) {
+        console.error("Error auto-saving:", error);
       }
-    } catch (error) {
-      console.error('Error auto-saving:', error);
-    }
-  }, [currentJobId]);
+    },
+    [currentJobId],
+  );
 
   const handleInputChange = (field: string, value: string | boolean | number[] | string[]) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const newData = { ...prev, [field]: value };
-      
+
       // Reset salary when currency changes to/from INR
-      if (field === 'currency') {
+      if (field === "currency") {
         const oldCurrency = prev.currency;
         const newCurrency = value as string;
-        
+
         if (oldCurrency !== newCurrency) {
           // If switching to INR, reset to a reasonable INR default
-          if (newCurrency === 'INR') {
+          if (newCurrency === "INR") {
             newData.jobSalaryRange = [100000];
-          } 
+          }
           // If switching from INR to other currencies, reset to standard default
-          else if (oldCurrency === 'INR') {
+          else if (oldCurrency === "INR") {
             newData.jobSalaryRange = [10000];
           }
         }
       }
-      
+
       return newData;
     });
 
     // Auto-save nationality fields with debounce
-    if (['nationalityToInclude', 'nationalityToExclude', 'preferedNationality'].includes(field)) {
+    if (["nationalityToInclude", "nationalityToExclude", "preferedNationality"].includes(field)) {
       if (autoSaveTimerRef.current) {
         clearTimeout(autoSaveTimerRef.current);
       }
@@ -492,19 +695,19 @@ export default function AddJob() {
   };
 
   const generateJobId = async () => {
-    const slug = profile?.slug || 'me';
+    const slug = profile?.slug || "me";
     let attempts = 0;
     const maxAttempts = 10;
-    
+
     while (attempts < maxAttempts) {
       // Get the highest existing job number for this slug
       const { data: existingJobs } = await supabase
-        .from('Jobs')
-        .select('job_id')
-        .like('job_id', `${slug}-j-%`)
-        .order('job_id', { ascending: false })
+        .from("Jobs")
+        .select("job_id")
+        .like("job_id", `${slug}-j-%`)
+        .order("job_id", { ascending: false })
         .limit(1);
-      
+
       let nextNumber = 1;
       if (existingJobs && existingJobs.length > 0) {
         const lastJobId = existingJobs[0].job_id;
@@ -513,24 +716,20 @@ export default function AddJob() {
           nextNumber = parseInt(match[1], 10) + 1;
         }
       }
-      
-      const paddedNumber = nextNumber.toString().padStart(4, '0');
+
+      const paddedNumber = nextNumber.toString().padStart(4, "0");
       const newJobId = `${slug}-j-${paddedNumber}`;
-      
+
       // Check if this ID already exists
-      const { data: duplicateCheck } = await supabase
-        .from('Jobs')
-        .select('job_id')
-        .eq('job_id', newJobId)
-        .limit(1);
-      
+      const { data: duplicateCheck } = await supabase.from("Jobs").select("job_id").eq("job_id", newJobId).limit(1);
+
       if (!duplicateCheck || duplicateCheck.length === 0) {
         return newJobId;
       }
-      
+
       attempts++;
     }
-    
+
     // Fallback to timestamp-based ID if we can't find a unique sequential number
     const timestamp = Date.now().toString().slice(-6);
     return `${slug}-j-${timestamp}`;
@@ -538,7 +737,7 @@ export default function AddJob() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate all mandatory fields
     if (!formData.jobTitle.trim()) {
       toast.error("Job Title is required");
@@ -586,61 +785,63 @@ export default function AddJob() {
     }
 
     setIsSubmitting(true);
-    
+
     try {
       const jobId = await generateJobId();
       const isTeamMember = !(isAdmin || isManager || isTeamLeader);
       const recruiterIdToSave = formData.recruiterId || (isTeamMember ? profile?.user_id : null);
-      console.log('Creating job with recruiter_id:', recruiterIdToSave, 'for user_id:', profile?.user_id);
-      
-      const { error } = await supabase
-        .from('Jobs')
-        .insert({
-          job_id: jobId,
-          job_title: formData.jobTitle.trim(),
-          job_description: formData.jobDescription.trim(),
-          industry: formData.industries.length > 0 ? formData.industries.join(", ") : null,
-          headhunting_companies: formData.headhuntingCompanies.length > 0 ? formData.headhuntingCompanies.join(", ") : null,
-          companies_to_exclude: formData.companiesToExclude.length > 0 ? formData.companiesToExclude.join(", ") : null,
-          client_id: formData.clientId,
-          client_name: formData.clientName.trim() || null,
-          client_description: formData.clientDescription ? formData.clientDescription.trim() : null,
-          job_location: formData.jobLocation.trim(),
-          job_salary_range: formData.jobSalaryRange[0],
-          assignment: formData.hasAssignment && formData.assignmentLink ? formData.assignmentLink.trim() : null,
-          notice_period: formData.noticePeriod,
-          nationality_to_include: formData.nationalityToInclude.length > 0 ? formData.nationalityToInclude.join(", ") : null,
-          nationality_to_exclude: formData.nationalityToExclude.length > 0 ? formData.nationalityToExclude.join(", ") : null,
-          prefered_nationality: formData.preferedNationality.length > 0 ? formData.preferedNationality.join(", ") : null,
-          not_prefered_nationality: formData.notPreferedNationality.length > 0 ? formData.notPreferedNationality.join(", ") : null,
-          Type: formData.type,
-          contract_length: formData.type === "Contract" && formData.contractLength ? formData.contractLength : null,
-          Currency: formData.currency,
-          itris_job_id: formData.itrisId ? formData.itrisId.trim() : null,
-          group_id: formData.groupId || null,
-          recruiter_id: recruiterIdToSave,
-          status: 'Active',
-          Processed: 'Yes',
-          Timestamp: new Date().toISOString(),
-          linkedin_search_enabled: linkedInSearchEnabled,
-          automatic_dial: !longlistOnly,
-          auto_dial_enabled_at: new Date().toISOString(),
-          Job_difficulty: formData.jobDifficulty || "HARD"
-        });
+      console.log("Creating job with recruiter_id:", recruiterIdToSave, "for user_id:", profile?.user_id);
+
+      const { error } = await supabase.from("Jobs").insert({
+        job_id: jobId,
+        job_title: formData.jobTitle.trim(),
+        job_description: formData.jobDescription.trim(),
+        industry: formData.industries.length > 0 ? formData.industries.join(", ") : null,
+        headhunting_companies:
+          formData.headhuntingCompanies.length > 0 ? formData.headhuntingCompanies.join(", ") : null,
+        companies_to_exclude: formData.companiesToExclude.length > 0 ? formData.companiesToExclude.join(", ") : null,
+        client_id: formData.clientId,
+        client_name: formData.clientName.trim() || null,
+        client_description: formData.clientDescription ? formData.clientDescription.trim() : null,
+        job_location: formData.jobLocation.trim(),
+        job_salary_range: formData.jobSalaryRange[0],
+        assignment: formData.hasAssignment && formData.assignmentLink ? formData.assignmentLink.trim() : null,
+        notice_period: formData.noticePeriod,
+        nationality_to_include:
+          formData.nationalityToInclude.length > 0 ? formData.nationalityToInclude.join(", ") : null,
+        nationality_to_exclude:
+          formData.nationalityToExclude.length > 0 ? formData.nationalityToExclude.join(", ") : null,
+        prefered_nationality: formData.preferedNationality.length > 0 ? formData.preferedNationality.join(", ") : null,
+        not_prefered_nationality:
+          formData.notPreferedNationality.length > 0 ? formData.notPreferedNationality.join(", ") : null,
+        Type: formData.type,
+        contract_length: formData.type === "Contract" && formData.contractLength ? formData.contractLength : null,
+        Currency: formData.currency,
+        itris_job_id: formData.itrisId ? formData.itrisId.trim() : null,
+        group_id: formData.groupId || null,
+        recruiter_id: recruiterIdToSave,
+        status: "Active",
+        Processed: "Yes",
+        Timestamp: new Date().toISOString(),
+        linkedin_search_enabled: linkedInSearchEnabled,
+        automatic_dial: !longlistOnly,
+        auto_dial_enabled_at: new Date().toISOString(),
+        Job_difficulty: formData.jobDifficulty || "HARD",
+      });
 
       if (error) {
-        console.error('Error creating job:', error);
+        console.error("Error creating job:", error);
         toast.error(`Failed to create job: ${error.message}`);
         return;
       }
-      
+
       // Set the current job ID to enable auto-save for future changes
       setCurrentJobId(jobId);
-      
+
       toast.success("Job created successfully");
       navigate("/jobs");
     } catch (error) {
-      console.error('Error creating job:', error);
+      console.error("Error creating job:", error);
       toast.error("Failed to create job");
     } finally {
       setIsSubmitting(false);
@@ -659,21 +860,15 @@ export default function AddJob() {
   ];
 
   const toggleOptionalField = (fieldId: string) => {
-    setSelectedOptionalFields(prev => 
-      prev.includes(fieldId) 
-        ? prev.filter(id => id !== fieldId)
-        : [...prev, fieldId]
+    setSelectedOptionalFields((prev) =>
+      prev.includes(fieldId) ? prev.filter((id) => id !== fieldId) : [...prev, fieldId],
     );
   };
 
   return (
     <div className="container mx-auto p-6 max-w-5xl">
       <div className="mb-8">
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/jobs")}
-          className="mb-4 font-light"
-        >
+        <Button variant="ghost" onClick={() => navigate("/jobs")} className="mb-4 font-light">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Jobs
         </Button>
@@ -717,8 +912,13 @@ export default function AddJob() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="group" className="font-medium">Group</Label>
-                <Select value={formData.groupId || "none"} onValueChange={(value) => handleInputChange("groupId", value === "none" ? "" : value)}>
+                <Label htmlFor="group" className="font-medium">
+                  Group
+                </Label>
+                <Select
+                  value={formData.groupId || "none"}
+                  onValueChange={(value) => handleInputChange("groupId", value === "none" ? "" : value)}
+                >
                   <SelectTrigger className="h-11">
                     <SelectValue placeholder="Select group" />
                   </SelectTrigger>
@@ -727,10 +927,7 @@ export default function AddJob() {
                     {groups.map((group) => (
                       <SelectItem key={group.id} value={group.id}>
                         <div className="flex items-center gap-2">
-                          <div 
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: group.color || "#3B82F6" }}
-                          />
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: group.color || "#3B82F6" }} />
                           {group.name}
                         </div>
                       </SelectItem>
@@ -745,7 +942,10 @@ export default function AddJob() {
               <Label htmlFor="recruiter" className="font-medium flex items-center gap-1">
                 Assigned Recruiter <span className="text-primary">*</span>
               </Label>
-              <Select value={formData.recruiterId || "none"} onValueChange={(value) => handleInputChange("recruiterId", value === "none" ? "" : value)}>
+              <Select
+                value={formData.recruiterId || "none"}
+                onValueChange={(value) => handleInputChange("recruiterId", value === "none" ? "" : value)}
+              >
                 <SelectTrigger className="h-11">
                   <SelectValue placeholder="Select a recruiter" />
                 </SelectTrigger>
@@ -754,7 +954,7 @@ export default function AddJob() {
                   {recruiters.map((recruiter) => (
                     <SelectItem key={recruiter.user_id} value={recruiter.user_id}>
                       <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-primary"/>
+                        <div className="w-2 h-2 rounded-full bg-primary" />
                         {recruiter.name || recruiter.email}
                       </div>
                     </SelectItem>
@@ -765,9 +965,11 @@ export default function AddJob() {
 
             {/* Job Difficulty */}
             <div className="space-y-2">
-              <Label htmlFor="jobDifficulty" className="font-medium">Job Difficulty</Label>
-              <Select 
-                value={formData.jobDifficulty?.toString()} 
+              <Label htmlFor="jobDifficulty" className="font-medium">
+                Job Difficulty
+              </Label>
+              <Select
+                value={formData.jobDifficulty?.toString()}
                 onValueChange={(value) => handleInputChange("jobDifficulty", parseInt(value))}
               >
                 <SelectTrigger className="h-11">
@@ -775,8 +977,8 @@ export default function AddJob() {
                 </SelectTrigger>
                 <SelectContent className="bg-popover">
                   <SelectItem value="75">A Job</SelectItem>
-                  <SelectItem value="80">B Job</SelectItem>
-                  <SelectItem value="85">C Job</SelectItem>
+                  <SelectItem value="75">B Job</SelectItem>
+                  <SelectItem value="75">C Job</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -797,11 +999,7 @@ export default function AddJob() {
                     Collect candidates without automatic calling. Candidates will be longlisted for manual review only.
                   </p>
                 </div>
-                <Switch
-                  checked={longlistOnly}
-                  onCheckedChange={setLonglistOnly}
-                  className="ml-4"
-                />
+                <Switch checked={longlistOnly} onCheckedChange={setLonglistOnly} className="ml-4" />
               </div>
             </div>
 
@@ -844,7 +1042,8 @@ export default function AddJob() {
                   <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
                     <span className="text-amber-600 dark:text-amber-400 text-sm">⚠️</span>
                     <p className="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">
-                      The assigned recruiter needs to connect their LinkedIn account first. Click "Connect LinkedIn" to set it up.
+                      The assigned recruiter needs to connect their LinkedIn account first. Click "Connect LinkedIn" to
+                      set it up.
                     </p>
                   </div>
                 )}
@@ -890,12 +1089,12 @@ export default function AddJob() {
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 text-muted-foreground" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-popover/95 backdrop-blur-xl border-border/50 shadow-lg" align="start">
+                <PopoverContent
+                  className="w-[var(--radix-popover-trigger-width)] p-0 bg-popover/95 backdrop-blur-xl border-border/50 shadow-lg"
+                  align="start"
+                >
                   <Command className="bg-transparent">
-                    <CommandInput 
-                      placeholder="Search clients..." 
-                      className="h-12 border-b border-border/50 text-sm"
-                    />
+                    <CommandInput placeholder="Search clients..." className="h-12 border-b border-border/50 text-sm" />
                     <CommandList className="max-h-[300px]">
                       <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">
                         No client found.
@@ -927,7 +1126,7 @@ export default function AddJob() {
                             <Check
                               className={cn(
                                 "mr-3 h-4 w-4 text-primary",
-                                formData.clientId === client.id ? "opacity-100" : "opacity-0"
+                                formData.clientId === client.id ? "opacity-100" : "opacity-0",
                               )}
                             />
                             <div className="flex-1 min-w-0">
@@ -994,7 +1193,10 @@ export default function AddJob() {
                 <Label htmlFor="noticePeriod" className="font-medium flex items-center gap-1">
                   Notice Period <span className="text-primary">*</span>
                 </Label>
-                <Select value={formData.noticePeriod} onValueChange={(value) => handleInputChange("noticePeriod", value)}>
+                <Select
+                  value={formData.noticePeriod}
+                  onValueChange={(value) => handleInputChange("noticePeriod", value)}
+                >
                   <SelectTrigger className="h-11">
                     <SelectValue placeholder="Select notice period" />
                   </SelectTrigger>
@@ -1044,8 +1246,13 @@ export default function AddJob() {
             {/* Contract Length (conditional) */}
             {formData.type === "Contract" && (
               <div className="space-y-2">
-                <Label htmlFor="contractLength" className="font-medium">Contract Length</Label>
-                <Select value={formData.contractLength} onValueChange={(value) => handleInputChange("contractLength", value)}>
+                <Label htmlFor="contractLength" className="font-medium">
+                  Contract Length
+                </Label>
+                <Select
+                  value={formData.contractLength}
+                  onValueChange={(value) => handleInputChange("contractLength", value)}
+                >
                   <SelectTrigger className="h-11">
                     <SelectValue placeholder="Select contract length" />
                   </SelectTrigger>
@@ -1067,18 +1274,11 @@ export default function AddJob() {
           <CardHeader>
             <Collapsible open={optionalFieldsOpen} onOpenChange={setOptionalFieldsOpen}>
               <CollapsibleTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full justify-between p-0 hover:bg-transparent"
-                >
-                  <CardTitle className="text-2xl font-light font-work tracking-tight">
-                    Optional Fields
-                  </CardTitle>
-                  <ChevronDown className={cn(
-                    "h-5 w-5 transition-transform duration-200",
-                    optionalFieldsOpen && "rotate-180"
-                  )} />
+                <Button type="button" variant="ghost" className="w-full justify-between p-0 hover:bg-transparent">
+                  <CardTitle className="text-2xl font-light font-work tracking-tight">Optional Fields</CardTitle>
+                  <ChevronDown
+                    className={cn("h-5 w-5 transition-transform duration-200", optionalFieldsOpen && "rotate-180")}
+                  />
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent>
@@ -1104,7 +1304,7 @@ export default function AddJob() {
               </CollapsibleContent>
             </Collapsible>
           </CardHeader>
-          
+
           {selectedOptionalFields.length > 0 && (
             <CardContent className="space-y-6 pt-0">
               {selectedOptionalFields.includes("industry") && (
@@ -1116,7 +1316,7 @@ export default function AddJob() {
                     apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=INDUSTRY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
                     apiHeaders={{
                       "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
-                      "Accept": "application/json"
+                      Accept: "application/json",
                     }}
                     placeholder="Select industries..."
                     searchPlaceholder="Type to search industries..."
@@ -1137,7 +1337,7 @@ export default function AddJob() {
                     apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
                     apiHeaders={{
                       "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
-                      "Accept": "application/json"
+                      Accept: "application/json",
                     }}
                     placeholder="Select headhunting companies..."
                     searchPlaceholder="Type to search companies..."
@@ -1158,7 +1358,7 @@ export default function AddJob() {
                     apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
                     apiHeaders={{
                       "X-API-KEY": "CUtAWkNK.eM32jndkskOxhrUC5QqcgWntJWBZRNq9cGqH5jJXXe4=",
-                      "Accept": "application/json"
+                      Accept: "application/json",
                     }}
                     placeholder="Select companies to exclude..."
                     searchPlaceholder="Type to search companies..."
@@ -1173,18 +1373,20 @@ export default function AddJob() {
               {selectedOptionalFields.includes("locations_include") && (
                 <div className="space-y-2 p-4 border border-border/50 rounded-lg bg-accent/5">
                   <Label className="font-medium">Locations to Include</Label>
-                  <Select onValueChange={(value) => {
-                    const currentInclude = formData.nationalityToInclude || [];
-                    if (value === "European Countries") {
-                      const newCountries = europeanCountries.filter(country => !currentInclude.includes(country));
-                      handleInputChange("nationalityToInclude", [...currentInclude, ...newCountries]);
-                    } else if (value === "Arabian Countries") {
-                      const newCountries = arabianCountries.filter(country => !currentInclude.includes(country));
-                      handleInputChange("nationalityToInclude", [...currentInclude, ...newCountries]);
-                    } else if (!currentInclude.includes(value)) {
-                      handleInputChange("nationalityToInclude", [...currentInclude, value]);
-                    }
-                  }}>
+                  <Select
+                    onValueChange={(value) => {
+                      const currentInclude = formData.nationalityToInclude || [];
+                      if (value === "European Countries") {
+                        const newCountries = europeanCountries.filter((country) => !currentInclude.includes(country));
+                        handleInputChange("nationalityToInclude", [...currentInclude, ...newCountries]);
+                      } else if (value === "Arabian Countries") {
+                        const newCountries = arabianCountries.filter((country) => !currentInclude.includes(country));
+                        handleInputChange("nationalityToInclude", [...currentInclude, ...newCountries]);
+                      } else if (!currentInclude.includes(value)) {
+                        handleInputChange("nationalityToInclude", [...currentInclude, value]);
+                      }
+                    }}
+                  >
                     <SelectTrigger className="h-11">
                       <SelectValue placeholder="Select countries to include..." />
                     </SelectTrigger>
@@ -1195,13 +1397,13 @@ export default function AddJob() {
                       <SelectItem value="Arabian Countries" className="font-semibold text-primary">
                         🕌 Arabian Countries (Select All)
                       </SelectItem>
-                      {countries.filter(country => 
-                        !(formData.nationalityToInclude || []).includes(country)
-                      ).map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {country}
-                        </SelectItem>
-                      ))}
+                      {countries
+                        .filter((country) => !(formData.nationalityToInclude || []).includes(country))
+                        .map((country) => (
+                          <SelectItem key={country} value={country}>
+                            {country}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                   {(formData.nationalityToInclude || []).length > 0 && (
@@ -1237,18 +1439,20 @@ export default function AddJob() {
               {selectedOptionalFields.includes("locations_exclude") && (
                 <div className="space-y-2 p-4 border border-border/50 rounded-lg bg-accent/5">
                   <Label className="font-medium">Locations to Exclude</Label>
-                  <Select onValueChange={(value) => {
-                    const currentExclude = formData.nationalityToExclude || [];
-                    if (value === "European Countries") {
-                      const newCountries = europeanCountries.filter(country => !currentExclude.includes(country));
-                      handleInputChange("nationalityToExclude", [...currentExclude, ...newCountries]);
-                    } else if (value === "Arabian Countries") {
-                      const newCountries = arabianCountries.filter(country => !currentExclude.includes(country));
-                      handleInputChange("nationalityToExclude", [...currentExclude, ...newCountries]);
-                    } else if (!currentExclude.includes(value)) {
-                      handleInputChange("nationalityToExclude", [...currentExclude, value]);
-                    }
-                  }}>
+                  <Select
+                    onValueChange={(value) => {
+                      const currentExclude = formData.nationalityToExclude || [];
+                      if (value === "European Countries") {
+                        const newCountries = europeanCountries.filter((country) => !currentExclude.includes(country));
+                        handleInputChange("nationalityToExclude", [...currentExclude, ...newCountries]);
+                      } else if (value === "Arabian Countries") {
+                        const newCountries = arabianCountries.filter((country) => !currentExclude.includes(country));
+                        handleInputChange("nationalityToExclude", [...currentExclude, ...newCountries]);
+                      } else if (!currentExclude.includes(value)) {
+                        handleInputChange("nationalityToExclude", [...currentExclude, value]);
+                      }
+                    }}
+                  >
                     <SelectTrigger className="h-11">
                       <SelectValue placeholder="Select countries to exclude..." />
                     </SelectTrigger>
@@ -1259,13 +1463,13 @@ export default function AddJob() {
                       <SelectItem value="Arabian Countries" className="font-semibold text-destructive">
                         🕌 Arabian Countries (Select All)
                       </SelectItem>
-                      {countries.filter(country => 
-                        !(formData.nationalityToExclude || []).includes(country)
-                      ).map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {country}
-                        </SelectItem>
-                      ))}
+                      {countries
+                        .filter((country) => !(formData.nationalityToExclude || []).includes(country))
+                        .map((country) => (
+                          <SelectItem key={country} value={country}>
+                            {country}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                   {(formData.nationalityToExclude || []).length > 0 && (
@@ -1301,18 +1505,20 @@ export default function AddJob() {
               {selectedOptionalFields.includes("preferred_nationality") && (
                 <div className="space-y-2 p-4 border border-border/50 rounded-lg bg-accent/5">
                   <Label className="font-medium">Preferred Nationality</Label>
-                  <Select onValueChange={(value) => {
-                    const currentPrefered = formData.preferedNationality || [];
-                    if (value === "European Countries") {
-                      const newCountries = europeanCountries.filter(country => !currentPrefered.includes(country));
-                      handleInputChange("preferedNationality", [...currentPrefered, ...newCountries]);
-                    } else if (value === "Arabian Countries") {
-                      const newCountries = arabianCountries.filter(country => !currentPrefered.includes(country));
-                      handleInputChange("preferedNationality", [...currentPrefered, ...newCountries]);
-                    } else if (!currentPrefered.includes(value)) {
-                      handleInputChange("preferedNationality", [...currentPrefered, value]);
-                    }
-                  }}>
+                  <Select
+                    onValueChange={(value) => {
+                      const currentPrefered = formData.preferedNationality || [];
+                      if (value === "European Countries") {
+                        const newCountries = europeanCountries.filter((country) => !currentPrefered.includes(country));
+                        handleInputChange("preferedNationality", [...currentPrefered, ...newCountries]);
+                      } else if (value === "Arabian Countries") {
+                        const newCountries = arabianCountries.filter((country) => !currentPrefered.includes(country));
+                        handleInputChange("preferedNationality", [...currentPrefered, ...newCountries]);
+                      } else if (!currentPrefered.includes(value)) {
+                        handleInputChange("preferedNationality", [...currentPrefered, value]);
+                      }
+                    }}
+                  >
                     <SelectTrigger className="h-11">
                       <SelectValue placeholder="Select preferred nationalities..." />
                     </SelectTrigger>
@@ -1323,13 +1529,13 @@ export default function AddJob() {
                       <SelectItem value="Arabian Countries" className="font-semibold text-primary">
                         🕌 Arabian Countries (Select All)
                       </SelectItem>
-                      {countries.filter(country => 
-                        !(formData.preferedNationality || []).includes(country)
-                      ).map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {country}
-                        </SelectItem>
-                      ))}
+                      {countries
+                        .filter((country) => !(formData.preferedNationality || []).includes(country))
+                        .map((country) => (
+                          <SelectItem key={country} value={country}>
+                            {country}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                   {(formData.preferedNationality || []).length > 0 && (
@@ -1365,18 +1571,24 @@ export default function AddJob() {
               {selectedOptionalFields.includes("not_preferred_nationality") && (
                 <div className="space-y-2 p-4 border border-border/50 rounded-lg bg-accent/5">
                   <Label className="font-medium">Not Preferred Nationality</Label>
-                  <Select onValueChange={(value) => {
-                    const currentNotPrefered = formData.notPreferedNationality || [];
-                    if (value === "European Countries") {
-                      const newCountries = europeanCountries.filter(country => !currentNotPrefered.includes(country));
-                      handleInputChange("notPreferedNationality", [...currentNotPrefered, ...newCountries]);
-                    } else if (value === "Arabian Countries") {
-                      const newCountries = arabianCountries.filter(country => !currentNotPrefered.includes(country));
-                      handleInputChange("notPreferedNationality", [...currentNotPrefered, ...newCountries]);
-                    } else if (!currentNotPrefered.includes(value)) {
-                      handleInputChange("notPreferedNationality", [...currentNotPrefered, value]);
-                    }
-                  }}>
+                  <Select
+                    onValueChange={(value) => {
+                      const currentNotPrefered = formData.notPreferedNationality || [];
+                      if (value === "European Countries") {
+                        const newCountries = europeanCountries.filter(
+                          (country) => !currentNotPrefered.includes(country),
+                        );
+                        handleInputChange("notPreferedNationality", [...currentNotPrefered, ...newCountries]);
+                      } else if (value === "Arabian Countries") {
+                        const newCountries = arabianCountries.filter(
+                          (country) => !currentNotPrefered.includes(country),
+                        );
+                        handleInputChange("notPreferedNationality", [...currentNotPrefered, ...newCountries]);
+                      } else if (!currentNotPrefered.includes(value)) {
+                        handleInputChange("notPreferedNationality", [...currentNotPrefered, value]);
+                      }
+                    }}
+                  >
                     <SelectTrigger className="h-11">
                       <SelectValue placeholder="Select not preferred nationalities..." />
                     </SelectTrigger>
@@ -1387,13 +1599,13 @@ export default function AddJob() {
                       <SelectItem value="Arabian Countries" className="font-semibold text-primary">
                         🕌 Arabian Countries (Select All)
                       </SelectItem>
-                      {countries.filter(country => 
-                        !(formData.notPreferedNationality || []).includes(country)
-                      ).map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {country}
-                        </SelectItem>
-                      ))}
+                      {countries
+                        .filter((country) => !(formData.notPreferedNationality || []).includes(country))
+                        .map((country) => (
+                          <SelectItem key={country} value={country}>
+                            {country}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                   {(formData.notPreferedNationality || []).length > 0 && (
@@ -1434,9 +1646,11 @@ export default function AddJob() {
                       checked={formData.hasAssignment}
                       onCheckedChange={(value) => handleInputChange("hasAssignment", value)}
                     />
-                    <Label htmlFor="hasAssignment" className="font-medium">Has Assignment?</Label>
+                    <Label htmlFor="hasAssignment" className="font-medium">
+                      Has Assignment?
+                    </Label>
                   </div>
-                  
+
                   {formData.hasAssignment && (
                     <>
                       <Label htmlFor="assignmentLink">Assignment Link</Label>
@@ -1463,13 +1677,13 @@ export default function AddJob() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle className="font-work">Add New Client</DialogTitle>
-              <DialogDescription className="font-light">
-                Add a new client to your database
-              </DialogDescription>
+              <DialogDescription className="font-light">Add a new client to your database</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="newClientName" className="font-light">Client Name *</Label>
+                <Label htmlFor="newClientName" className="font-light">
+                  Client Name *
+                </Label>
                 <Input
                   id="newClientName"
                   value={newClientData.name}
@@ -1478,7 +1692,9 @@ export default function AddJob() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="newClientDescription" className="font-light">Description</Label>
+                <Label htmlFor="newClientDescription" className="font-light">
+                  Description
+                </Label>
                 <Textarea
                   id="newClientDescription"
                   value={newClientData.description}
@@ -1499,11 +1715,7 @@ export default function AddJob() {
                 >
                   Cancel
                 </Button>
-                <Button
-                  type="button"
-                  onClick={handleAddClient}
-                  className="font-light"
-                >
+                <Button type="button" onClick={handleAddClient} className="font-light">
                   Add Client
                 </Button>
               </div>
@@ -1511,15 +1723,9 @@ export default function AddJob() {
           </DialogContent>
         </Dialog>
 
-
         {/* Submit Buttons */}
         <div className="flex gap-4 pb-6">
-          <Button 
-            type="submit" 
-            disabled={isSubmitting} 
-            size="lg" 
-            className="px-8"
-          >
+          <Button type="submit" disabled={isSubmitting} size="lg" className="px-8">
             {isSubmitting ? "Creating..." : "Create Job"}
           </Button>
           <Button type="button" variant="outline" onClick={() => navigate("/jobs")} size="lg" className="px-8">
