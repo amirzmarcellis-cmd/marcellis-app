@@ -614,6 +614,32 @@ export default function JobDetails() {
       supabase.removeChannel(channel);
     };
   }, [job?.job_id, job?.status, job?.Processed]);
+
+  // Auto-correct status based on existing candidates on page load
+  useEffect(() => {
+    if (!job || !job.job_id) return;
+    
+    // If status is Processing but Processed is Yes and we have candidates, 
+    // it should be Recruiting
+    if (job.status === 'Processing' && job.Processed === 'Yes' && candidates.length > 0) {
+      const updateStatus = async () => {
+        try {
+          const { error } = await supabase
+            .from('Jobs')
+            .update({ status: 'Recruiting' })
+            .eq('job_id', job.job_id);
+          
+          if (!error) {
+            setJob((prev: any) => ({ ...prev, status: 'Recruiting' }));
+          }
+        } catch (error) {
+          console.error('Error auto-correcting job status:', error);
+        }
+      };
+      updateStatus();
+    }
+  }, [job?.job_id, job?.status, job?.Processed, candidates.length]);
+
   const handleAutomaticDialToggle = async (checked: boolean) => {
     if (!job?.job_id) return;
 
