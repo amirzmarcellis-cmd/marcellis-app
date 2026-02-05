@@ -899,6 +899,7 @@ export default function JobDetails() {
         .from("Jobs_CVs")
         .select("*")
         .eq("job_id", jobId)
+        .neq("contacted", "Shortlisted from Similar jobs")
         .limit(10000)
         .order("cv_score", {
           ascending: false,
