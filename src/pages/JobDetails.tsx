@@ -4531,8 +4531,9 @@ mainCandidate["linkedin_score_reason"] ? (
                                 </div>
 
                                 {/* Call Log Buttons */}
-                                <div className="space-y-2 pt-2 border-t">
-                                  <div className="flex flex-col sm:flex-row gap-2">
+                                <div className="pt-2 border-t">
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {/* Row 1: Call Candidate | Call Log */}
                                     <Button
                                       variant="default"
                                       size="sm"
@@ -4540,7 +4541,7 @@ mainCandidate["linkedin_score_reason"] ? (
                                         handleCallCandidate(mainCandidate["Candidate_ID"], id!, mainCandidate["callid"])
                                       }
                                       disabled={callingCandidateId === candidateId}
-                                      className="w-full sm:flex-1 bg-foreground hover:bg-foreground/90 text-background disabled:opacity-50 text-xs md:text-sm"
+                                      className="bg-foreground hover:bg-foreground/90 text-background disabled:opacity-50 text-xs"
                                     >
                                       <Phone className="w-3 h-3 mr-1" />
                                       {callingCandidateId === candidateId ? "Calling..." : "Call Candidate"}
@@ -4566,7 +4567,7 @@ mainCandidate["linkedin_score_reason"] ? (
                                             variant="outline"
                                             size="sm"
                                             asChild
-                                            className="flex-1 min-w-0 text-xs md:text-sm"
+                                            className="text-xs"
                                           >
                                             <Link
                                               to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid || latestContact.recordid || candidateId}&longListSourceFilter=${encodeURIComponent(longListSourceFilter)}&fromTab=boolean-search`}
@@ -4580,7 +4581,19 @@ mainCandidate["linkedin_score_reason"] ? (
                                       }
 
                                       // For non-LinkedIn candidates, only show if they have call logs
-                                      if (contactsWithCalls.length === 0) return null;
+                                      if (contactsWithCalls.length === 0) {
+                                        return (
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            disabled
+                                            className="text-xs opacity-50"
+                                          >
+                                            <FileText className="w-3 h-3 mr-1" />
+                                            Call Log
+                                          </Button>
+                                        );
+                                      }
 
                                       // Get the latest call log (highest callid)
                                       const latestContact = contactsWithCalls.reduce((latest, current) =>
@@ -4592,7 +4605,7 @@ mainCandidate["linkedin_score_reason"] ? (
                                           variant="outline"
                                           size="sm"
                                           asChild
-                                          className="flex-1 min-w-0 text-xs md:text-sm"
+                                          className="text-xs"
                                         >
                                           <Link
                                             to={`/call-log-details?candidate=${candidateId}&job=${id}&callid=${latestContact.callid}&longListSourceFilter=${encodeURIComponent(longListSourceFilter)}&fromTab=boolean-search`}
@@ -4604,11 +4617,9 @@ mainCandidate["linkedin_score_reason"] ? (
                                         </Button>
                                       );
                                     })()}
-                                  </div>
 
-                                  {/* Show All Record Info Button */}
-                                  <div className="flex gap-2">
-                                    <Button variant="ghost" size="sm" asChild className="flex-1 text-xs md:text-sm">
+                                    {/* Row 2: View Profile | Submit CV */}
+                                    <Button variant="ghost" size="sm" asChild className="text-xs">
                                       <Link
                                         to={`/candidate/${candidateId}`}
                                         state={{
@@ -4626,30 +4637,12 @@ mainCandidate["linkedin_score_reason"] ? (
                                         View Profile
                                       </Link>
                                     </Button>
-                                    {typeof mainCandidate["Source"] === "string" &&
-                                      mainCandidate["Source"].toLowerCase().includes("itris") && (
-                                        <Button
-                                          variant="outline"
-                                          size="sm"
-                                          className="flex-1 text-xs md:text-sm"
-                                          onClick={() => {
-                                            navigate(`/cv-viewer/${candidateId}/${id}`);
-                                          }}
-                                        >
-                                          <FileText className="w-3 h-3 mr-1" />
-                                          View CV
-                                        </Button>
-                                      )}
-                                  </div>
-
-                                  {/* Submit CV Button */}
-                                  <div className="pt-2 border-t">
                                     {mainCandidate["Contacted"] !== "Submitted" && mainCandidate["Contacted"] !== "Rejected" ? (
                                       <Button
                                         variant="outline"
                                         size="sm"
                                         onClick={() => openHireDialog(id!, candidateId, mainCandidate.recordid)}
-                                        className="w-full h-10 bg-transparent border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-500 dark:hover:text-green-300"
+                                        className="text-xs bg-transparent border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-500 dark:hover:text-green-300"
                                       >
                                         <FileCheck className="w-3 h-3 mr-1" />
                                         Submit CV
@@ -4658,13 +4651,15 @@ mainCandidate["linkedin_score_reason"] ? (
                                       <Button
                                         variant="outline"
                                         size="sm"
-                                        className="w-full h-10 bg-transparent border-2 border-blue-500 text-blue-600 cursor-default"
+                                        className="text-xs bg-transparent border-2 border-blue-500 text-blue-600 cursor-default"
                                         disabled
                                       >
                                         <FileCheck className="w-3 h-3 mr-1" />
                                         CV Submitted
                                       </Button>
-                                    ) : null}
+                                    ) : (
+                                      <div></div>
+                                    )}
                                   </div>
                                 </div>
                               </div>
