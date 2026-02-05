@@ -1685,6 +1685,7 @@ export default function JobDetails() {
       if (id) {
         fetchCandidates(id);
         fetchLonglistedCandidates(id);
+        fetchSimilarJobsCandidates(id);
       }
 
       setShowHireDialog(false);
@@ -4640,6 +4641,31 @@ mainCandidate["linkedin_score_reason"] ? (
                                         </Button>
                                       )}
                                   </div>
+
+                                  {/* Submit CV Button */}
+                                  <div className="pt-2 border-t">
+                                    {mainCandidate["Contacted"] !== "Submitted" && mainCandidate["Contacted"] !== "Rejected" ? (
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => openHireDialog(id!, candidateId, mainCandidate.recordid)}
+                                        className="w-full h-10 bg-transparent border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-500 dark:hover:text-green-300"
+                                      >
+                                        <FileCheck className="w-3 h-3 mr-1" />
+                                        Submit CV
+                                      </Button>
+                                    ) : mainCandidate["Contacted"] === "Submitted" ? (
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-full h-10 bg-transparent border-2 border-blue-500 text-blue-600 cursor-default"
+                                        disabled
+                                      >
+                                        <FileCheck className="w-3 h-3 mr-1" />
+                                        CV Submitted
+                                      </Button>
+                                    ) : null}
+                                  </div>
                                 </div>
                               </div>
                             </CardContent>
@@ -5769,6 +5795,28 @@ mainCandidate["linkedin_score_reason"] ? (
                                     <User className="w-3 h-3 mr-1" />
                                     View Profile
                                   </Button>
+                                  {/* Submit CV Button */}
+                                  {candidate.contacted !== "Submitted" && candidate.contacted !== "Rejected" ? (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-8 text-xs border-green-600 text-green-600 hover:bg-green-50 dark:hover:bg-green-950/30"
+                                      onClick={() => openHireDialog(job.job_id, candidateId, candidate.recordid)}
+                                    >
+                                      <FileCheck className="w-3 h-3 mr-1" />
+                                      Submit CV
+                                    </Button>
+                                  ) : candidate.contacted === "Submitted" ? (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-8 text-xs border-blue-500 text-blue-600 cursor-default"
+                                      disabled
+                                    >
+                                      <FileCheck className="w-3 h-3 mr-1" />
+                                      Submitted
+                                    </Button>
+                                  ) : null}
                                 </div>
                               </div>
                             </CardContent>
