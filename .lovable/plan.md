@@ -1,22 +1,9 @@
 
 
-## Add "Submit CV" Option to AI Longlist and Similar Jobs Tabs
+## Add Export to CSV for AI Longlist Tab
 
 ### Summary
-Add a "Submit CV" button to candidate cards in both the **AI Longlist** and **Similar Jobs** tabs, allowing recruiters to submit any candidate's CV directly from these views without needing to first call them and move them to the shortlist.
-
----
-
-### Current Behavior
-- The "Submit CV" button only exists in the **AI Short List** tab
-- It requires candidates to have a call record (`callid`) before submission
-- Candidates in AI Longlist and Similar Jobs cannot be submitted without going through the call flow
-
-### New Behavior
-- Add "Submit CV" button to each candidate card in **AI Longlist** tab
-- Add "Submit CV" button to each candidate card in **Similar Jobs** tab
-- Use the candidate's `recordid` as the identifier (same pattern as call flow)
-- Reuse the existing `openHireDialog` and `handleHireCandidate` functions
+Add an "Export CSV" button to the AI Longlist tab that exports the currently filtered candidates to a nicely formatted CSV file that opens correctly in Excel with proper encoding and column formatting.
 
 ---
 
@@ -24,136 +11,188 @@ Add a "Submit CV" button to candidate cards in both the **AI Longlist** and **Si
 
 **File: `src/pages/JobDetails.tsx`**
 
-#### 1. Modify the Handler for Longlist/Similar Jobs Submission
-Create a simpler handler that uses `recordid` directly instead of requiring `callid`:
+#### 1. Add Download Icon Import (line ~27-54)
+Add `Download` to the existing lucide-react import:
 
 ```typescript
-// New handler for submitting candidates without a call record
-const handleDirectCVSubmit = (jobId: string, candidateId: string, recordid: number) => {
-  // recordid is the primary key in Jobs_CVs, same as callid for candidates with calls
-  openHireDialog(jobId, candidateId, recordid);
+import {
+  ArrowLeft,
+  MapPin,
+  Calendar,
+  // ... existing imports
+  Download,  // Add this
+} from "lucide-react";
+```
+
+#### 2. Create Export Function (after other handlers, around line 1700)
+Add a new export function that creates a well-formatted CSV:
+
+```typescript
+const exportLonglistToCSV = () => {
+  // Apply same filters as the display
+  const filteredCandidates = longlistedCandidates.filter((candidate) => {
+    const nameMatch = !nameFilter || 
+      (candidate["Candidate Name"] || "").toLowerCase().includes(nameFilter.toLowerCase());
+    const emailMatch = !emailFilter || 
+      (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
+    const phoneMatch = !phoneFilter || 
+      (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
+    const userIdMatch = !userIdFilter || 
+      (candidate.user_id || candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
+    const source = (candidate["Source"] || candidate.source || "").toLowerCase();
+    const sourceFilterMatch = !longListSourceFilter || 
+      longListSourceFilter === "all" || 
+      source.includes(longListSourceFilter.toLowerCase());
+    let scoreMatch = true;
+    if (scoreFilter !== "all") {
+      const score = parseInt(candidate["cv_score"] || "0");
+      switch (scoreFilter) {
+        case "high": scoreMatch = score >= 75; break;
+        case "moderate": scoreMatch = score >= 50 && score < 75; break;
+        case "poor": scoreMatch = score >= 1 && score < 50; break;
+        case "none": scoreMatch = score === 0 || isNaN(score); break;
+      }
+    }
+    let contactedMatch = true;
+    if (contactedFilter !== "all") {
+      const contacted = candidate["Contacted"] || "";
+      contactedMatch = contacted === contactedFilter || 
+        (contactedFilter === "Ready to Call" && contacted === "Ready to Contact");
+    }
+    return nameMatch && emailMatch && phoneMatch && userIdMatch && 
+           sourceFilterMatch && scoreMatch && contactedMatch;
+  });
+
+  // Sort by score descending
+  const sortedCandidates = [...filteredCandidates].sort((a, b) => {
+    const scoreA = Math.max(
+      parseInt(a["cv_score"] || "0"), 
+      parseInt(a["linkedin_score"] || "0")
+    );
+    const scoreB = Math.max(
+      parseInt(b["cv_score"] || "0"), 
+      parseInt(b["linkedin_score"] || "0")
+    );
+    return scoreB - scoreA;
+  });
+
+  if (sortedCandidates.length === 0) {
+    toast({ title: "No candidates to export", variant: "destructive" });
+    return;
+  }
+
+  // Define headers
+  const headers = [
+    'Name',
+    'Email', 
+    'Phone',
+    'Source',
+    'CV Score',
+    'LinkedIn Score',
+    'Status',
+    'User ID',
+    'Score Reason',
+    'Created At'
+  ];
+
+  // Build rows
+  const rows = sortedCandidates.map((c) => [
+    c["Candidate Name"] || '',
+    c["Candidate Email"] || '',
+    c["Candidate Phone Number"] || '',
+    c["Source"] || '',
+    c["cv_score"]?.toString() || '',
+    c["linkedin_score"]?.toString() || '',
+    c["Contacted"] || '',
+    c["user_id"] || c["Candidate_ID"] || '',
+    c["cv_score_reason"] || c["linkedin_score_reason"] || '',
+    c["created_at"] ? format(new Date(c["created_at"]), 'yyyy-MM-dd HH:mm') : ''
+  ]);
+
+  // Create CSV with BOM for Excel compatibility
+  const BOM = '\uFEFF';
+  const csvContent = BOM + [
+    headers.join(','),
+    ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+  ].join('\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const jobTitle = job?.job_title?.replace(/[^a-zA-Z0-9]/g, '_') || 'longlist';
+  const timestamp = format(new Date(), 'yyyy-MM-dd');
+  link.href = URL.createObjectURL(blob);
+  link.download = `AI_Longlist_${jobTitle}_${timestamp}.csv`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+
+  toast({ title: `Exported ${sortedCandidates.length} candidates` });
 };
 ```
 
-#### 2. Add Submit CV Button to AI Longlist Candidate Cards (around line 4607)
-After the existing action buttons section, add:
+#### 3. Add Export Button to Header (around line 3925)
+Add the Export CSV button next to the existing action buttons in the CardHeader:
 
 ```tsx
-{/* Submit CV Button */}
-{mainCandidate["Contacted"] !== "Submitted" && mainCandidate["Contacted"] !== "Rejected" && (
+<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+  {/* Export Button */}
   <Button
     variant="outline"
     size="sm"
-    onClick={() => handleDirectCVSubmit(id!, candidateId, mainCandidate.recordid)}
-    className="w-full h-10 bg-transparent border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-500 dark:hover:text-green-300"
+    onClick={exportLonglistToCSV}
+    disabled={longlistedLoading || longlistedCandidates.length === 0}
+    className="w-full sm:w-auto h-11 sm:h-9 text-sm min-h-[44px] sm:min-h-0"
   >
-    <FileCheck className="w-3 h-3 mr-1" />
-    Submit CV
+    <Download className="w-4 h-4 mr-2 flex-shrink-0" />
+    Export CSV
   </Button>
-)}
-{mainCandidate["Contacted"] === "Submitted" && (
-  <Button
-    variant="outline"
-    size="sm"
-    className="w-full h-10 bg-transparent border-2 border-blue-500 text-blue-600 cursor-default"
-    disabled
-  >
-    <FileCheck className="w-3 h-3 mr-1" />
-    CV Submitted
-  </Button>
-)}
+  
+  {/* Existing Generate/Search buttons */}
+  {job?.longlist && job.longlist > 0 ? (
+    <ExpandableSearchButton ... />
+  ) : (
+    <Button onClick={handleGenerateLongList} ... />
+  )}
+</div>
 ```
 
-#### 3. Add Submit CV Button to Similar Jobs Candidate Cards (around line 5771)
-In the action buttons div, add after existing buttons:
+---
 
-```tsx
-{/* Submit CV Button */}
-{candidate.contacted !== "Submitted" && candidate.contacted !== "Rejected" && (
-  <Button
-    size="sm"
-    variant="outline"
-    className="h-8 text-xs border-green-600 text-green-600 hover:bg-green-50"
-    onClick={() => handleDirectCVSubmit(job.job_id, candidateId, candidate.recordid)}
-  >
-    <FileCheck className="w-3 h-3 mr-1" />
-    Submit CV
-  </Button>
-)}
-{candidate.contacted === "Submitted" && (
-  <Button
-    size="sm"
-    variant="outline"
-    className="h-8 text-xs border-blue-500 text-blue-600 cursor-default"
-    disabled
-  >
-    <FileCheck className="w-3 h-3 mr-1" />
-    Submitted
-  </Button>
-)}
-```
+### CSV Output Format
 
-#### 4. Update Local State After Submission
-Modify the `handleHireCandidate` function (around line 1684-1688) to also refresh similar jobs candidates:
+The exported file will include:
 
-```typescript
-// Refresh candidates data
-if (id) {
-  fetchCandidates(id);
-  fetchLonglistedCandidates(id);
-  fetchSimilarJobsCandidates(id);  // Add this line
-}
-```
+| Column | Description |
+|--------|-------------|
+| Name | Candidate full name |
+| Email | Candidate email address |
+| Phone | Phone number |
+| Source | Where candidate came from (Itris, LinkedIn) |
+| CV Score | AI-generated CV match score |
+| LinkedIn Score | AI-generated LinkedIn profile score |
+| Status | Current status (Ready to Contact, Call Done, etc.) |
+| User ID | Unique candidate identifier |
+| Score Reason | AI explanation for the score |
+| Created At | When candidate was added |
+
+---
+
+### Excel Compatibility
+- UTF-8 BOM character added for proper Excel encoding
+- All cell values wrapped in quotes to handle commas/special characters
+- Double-quotes escaped properly
+- Sorted by score (highest first) matching the UI display
+- Respects all current filter selections
 
 ---
 
 ### UI Preview
 
-**AI Longlist Card:**
 ```text
-┌─────────────────────────────────────────┐
-│ ☐ John Smith                            │
-│   📧 john@example.com                   │
-│   📱 +1234567890                         │
-│   CV Score: 82                          │
-├─────────────────────────────────────────┤
-│ [Call Candidate] [Call Log]             │
-│ [View Profile]   [View CV]              │
-│ [Submit CV]                 ← NEW       │
-└─────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│ AI Longlist (156 candidates)                                │
+│ Candidates added to the longlist for this position          │
+│                                                             │
+│                    [Export CSV] [Search More ▾]             │
+└─────────────────────────────────────────────────────────────┘
 ```
-
-**Similar Jobs Card:**
-```text
-┌─────────────────────────────────────────┐
-│ ☐ Jane Doe                  [LinkedIn]  │
-│   📧 jane@example.com                   │
-│   CV Score: 78                          │
-│   [Shortlisted from Similar Jobs]       │
-├─────────────────────────────────────────┤
-│ [Call] [Call Log] [View Profile]        │
-│ [Submit CV]                 ← NEW       │
-└─────────────────────────────────────────┘
-```
-
----
-
-### Data Flow
-1. User clicks "Submit CV" on a candidate card
-2. `handleDirectCVSubmit` calls `openHireDialog` with `recordid`
-3. User selects reason and adds additional info in dialog
-4. `handleHireCandidate` updates `Jobs_CVs` record:
-   - Sets `contacted` to "Submitted"
-   - Sets `Reason_to_Hire` with reason + details
-   - Sets `submitted_at` to current timestamp
-5. UI refreshes all candidate lists
-
----
-
-### Impact
-- Recruiters can submit CVs directly from AI Longlist without calling first
-- Recruiters can submit CVs from Similar Jobs candidates
-- Uses existing dialog and database update logic (no new backend changes)
-- Submitted candidates show visual indicator (disabled button with "CV Submitted")
-- Existing shortlist submission flow remains unchanged
 
