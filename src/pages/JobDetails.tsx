@@ -5745,11 +5745,11 @@ mainCandidate["linkedin_score_reason"] ? (
                                 </div>
 
                                 {/* Action Buttons */}
-                                <div className="flex flex-wrap gap-2 pt-2 border-t">
+                                <div className="grid grid-cols-2 gap-2 pt-2 border-t">
                                   <Button
                                     size="sm"
                                     variant="default"
-                                    className="h-8 text-xs"
+                                    className="h-8 text-xs w-full"
                                     disabled={callingCandidateId === candidateId}
                                     onClick={() =>
                                       handleCallCandidate(
@@ -5765,7 +5765,7 @@ mainCandidate["linkedin_score_reason"] ? (
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    className="h-8 text-xs"
+                                    className="h-8 text-xs w-full"
                                     onClick={() =>
                                       navigate(`/call-log-details?recordId=${candidate.recordid}&jobId=${job.job_id}&fromTab=similar-jobs`)
                                     }
@@ -5776,7 +5776,7 @@ mainCandidate["linkedin_score_reason"] ? (
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    className="h-8 text-xs"
+                                    className="h-8 text-xs w-full"
                                     onClick={() =>
                                       navigate(`/candidate/${candidate.user_id}`, {
                                         state: {
@@ -5795,7 +5795,7 @@ mainCandidate["linkedin_score_reason"] ? (
                                     <Button
                                       size="sm"
                                       variant="outline"
-                                      className="h-8 text-xs border-green-600 text-green-600 hover:bg-green-50 dark:hover:bg-green-950/30"
+                                      className="h-8 text-xs w-full border-green-600 text-green-600 hover:bg-green-50 dark:hover:bg-green-950/30"
                                       onClick={() => openHireDialog(job.job_id, candidateId, candidate.recordid)}
                                     >
                                       <FileCheck className="w-3 h-3 mr-1" />
@@ -5805,13 +5805,15 @@ mainCandidate["linkedin_score_reason"] ? (
                                     <Button
                                       size="sm"
                                       variant="outline"
-                                      className="h-8 text-xs border-blue-500 text-blue-600 cursor-default"
+                                      className="h-8 text-xs w-full border-blue-500 text-blue-600 cursor-default"
                                       disabled
                                     >
                                       <FileCheck className="w-3 h-3 mr-1" />
                                       Submitted
                                     </Button>
-                                  ) : null}
+                                  ) : (
+                                    <div />
+                                  )}
                                 </div>
                               </div>
                             </CardContent>
