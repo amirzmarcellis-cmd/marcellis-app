@@ -1,65 +1,56 @@
 
 
-## Fix: Exclude "Shortlisted from Similar Jobs" from Auto-Dial Threshold
+## Exclude "Shortlisted from Similar Jobs" from AI Longlist
 
-### Current Issue
-The `disable_auto_dial_at_threshold()` trigger counts **all** candidates with `after_call_score >= 74`, including candidates with status `'Shortlisted from Similar jobs'`. This causes auto-dial to turn off prematurely when jobs have imported candidates.
-
-### Solution
-Add a filter to exclude candidates with `contacted = 'Shortlisted from Similar jobs'` from the shortlist count.
+### Summary
+Add a filter to the AI Longlist query to exclude candidates with `contacted = 'Shortlisted from Similar jobs'`. This ensures imported candidates only appear in their dedicated "Similar Jobs" tab.
 
 ---
 
-### Database Migration
+### Technical Changes
 
-```sql
-CREATE OR REPLACE FUNCTION public.disable_auto_dial_at_threshold()
-RETURNS TRIGGER AS $$
-DECLARE
-  shortlisted_count INTEGER;
-  current_auto_dial BOOLEAN;
-BEGIN
-  -- Get current automatic_dial status
-  SELECT automatic_dial INTO current_auto_dial
-  FROM "Jobs"
-  WHERE job_id = NEW.job_id;
-  
-  -- Only proceed if automatic_dial is currently enabled
-  IF current_auto_dial = TRUE THEN
-    -- Count shortlisted candidates (after_call_score >= 74)
-    -- EXCLUDE candidates with status 'Shortlisted from Similar jobs'
-    SELECT COUNT(*) INTO shortlisted_count
-    FROM "Jobs_CVs"
-    WHERE job_id = NEW.job_id
-      AND (after_call_score::INTEGER) >= 74
-      AND (contacted IS NULL OR contacted != 'Shortlisted from Similar jobs');
-    
-    -- Disable auto-dial if we've reached 6 shortlisted candidates
-    IF shortlisted_count >= 6 THEN
-      UPDATE "Jobs"
-      SET automatic_dial = FALSE,
-          auto_dial_enabled_at = NULL
-      WHERE job_id = NEW.job_id;
-    END IF;
-  END IF;
-  
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+**File: `src/pages/JobDetails.tsx`** (lines 898-906)
+
+Update the `fetchLonglistedCandidates` function:
+
+```typescript
+// Before
+const { data: longlistedData, error: longlistedError } = await supabase
+  .from("Jobs_CVs")
+  .select("*")
+  .eq("job_id", jobId)
+  .limit(10000)
+  .order("cv_score", {
+    ascending: false,
+    nullsLast: true,
+  });
+
+// After
+const { data: longlistedData, error: longlistedError } = await supabase
+  .from("Jobs_CVs")
+  .select("*")
+  .eq("job_id", jobId)
+  .neq("contacted", "Shortlisted from Similar jobs")  // Exclude imported candidates
+  .limit(10000)
+  .order("cv_score", {
+    ascending: false,
+    nullsLast: true,
+  });
 ```
 
 ---
 
-### Key Change
-
-| Before | After |
-|--------|-------|
-| `WHERE after_call_score >= 74` | `WHERE after_call_score >= 74 AND contacted != 'Shortlisted from Similar jobs'` |
+### Note on Field Name
+The field storing candidate status is `contacted` (not `status`). This is consistent with:
+- The auto-dial threshold trigger we just updated
+- The Similar Jobs tab filter
+- The shortlist exclusion pattern used elsewhere in the system
 
 ---
 
-### Impact
-- Auto-dial will only count "organic" shortlisted candidates
-- Candidates imported from similar jobs won't trigger the 6+ threshold
-- Aligns with the shortlist definition used in Job Details, Job Funnel, and Active Jobs Analytics
+### Result
+- AI Longlist will only display organic candidates
+- Candidates sorted by highest score first (already configured)
+- Imported candidates remain in the "Shortlisted from Similar Jobs" tab
+- Longlist count in the tab header will be accurate
 
