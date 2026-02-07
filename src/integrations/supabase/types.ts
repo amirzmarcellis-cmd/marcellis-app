@@ -74,36 +74,6 @@ export type Database = {
         }
         Relationships: []
       }
-      auto_dial_audit_log: {
-        Row: {
-          changed_at: string | null
-          changed_by: string | null
-          id: string
-          job_id: string
-          new_value: boolean | null
-          old_value: boolean | null
-          source: string | null
-        }
-        Insert: {
-          changed_at?: string | null
-          changed_by?: string | null
-          id?: string
-          job_id: string
-          new_value?: boolean | null
-          old_value?: boolean | null
-          source?: string | null
-        }
-        Update: {
-          changed_at?: string | null
-          changed_by?: string | null
-          id?: string
-          job_id?: string
-          new_value?: boolean | null
-          old_value?: boolean | null
-          source?: string | null
-        }
-        Relationships: []
-      }
       calendar_preferences: {
         Row: {
           created_at: string
