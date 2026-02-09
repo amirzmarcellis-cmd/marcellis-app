@@ -21,3 +21,34 @@ export function formatScheduledTime(date: string | Date | null): string | null {
   const d = new Date(date);
   return d.toISOString().slice(0, -1); // Format: 2025-10-09T10:51:31.129
 }
+
+/** Extract the first non-empty string from a JSON-array-formatted text field. */
+export function extractFirstFromArray(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const str = String(value).trim();
+  if (str.startsWith('[')) {
+    try {
+      const arr = JSON.parse(str);
+      if (Array.isArray(arr)) {
+        const first = arr.find((item: unknown) => item !== null && item !== undefined && String(item).trim() !== '');
+        return first != null ? String(first) : null;
+      }
+    } catch {
+      // Not valid JSON, fall through
+    }
+  }
+  return str || null;
+}
+
+/** Format a duration value (possibly array-formatted) into a readable string like "1m 7s". */
+export function formatCallDuration(value: string | null | undefined): string {
+  const raw = extractFirstFromArray(value);
+  if (!raw) return 'N/A';
+  const num = parseFloat(raw);
+  if (isNaN(num)) return raw;
+  const totalSeconds = Math.round(num * 60);
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+  if (mins === 0) return `${secs}s`;
+  return `${mins}m ${secs}s`;
+}

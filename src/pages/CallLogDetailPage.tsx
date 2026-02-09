@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, User, Phone, Mail, Calendar, Star, FileText, Clock, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { extractFirstFromArray, formatCallDuration } from "@/lib/utils";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -356,7 +357,7 @@ export default function CallLogDetailPage() {
             </div>
             <div className="space-y-2">
               <span className="text-muted-foreground">Duration:</span>
-              <p className="font-medium">{record.duration || 'N/A'}</p>
+              <p className="font-medium">{formatCallDuration(record.duration)}</p>
             </div>
             <div className="space-y-2">
               <span className="text-muted-foreground">Last Call:</span>
@@ -364,7 +365,7 @@ export default function CallLogDetailPage() {
             </div>
             <div className="space-y-2">
               <span className="text-muted-foreground">Recording:</span>
-              <p className="font-medium">{record.recording ? 'Available' : 'N/A'}</p>
+              <p className="font-medium">{extractFirstFromArray(record.recording) ? 'Available' : 'N/A'}</p>
             </div>
           </div>
         </CardContent>
