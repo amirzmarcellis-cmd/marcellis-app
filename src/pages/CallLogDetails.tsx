@@ -275,8 +275,8 @@ export default function CallLogDetails() {
         notes: data.notes,
         lastcalltime: data.lastcalltime,
         callcount: data.callcount,
-        duration: data.duration,
-        recording: data.recording,
+        duration: extractFirstFromArray(data.duration),
+        recording: extractFirstFromArray(data.recording),
         notes_updated_by: data.notes_updated_by,
         notes_updated_at: data.notes_updated_at,
         job_title: jobData?.job_title,
@@ -666,7 +666,7 @@ export default function CallLogDetails() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               <div>
                 <label className="text-xs sm:text-sm font-medium text-muted-foreground">Duration</label>
-                <p className="text-base sm:text-lg break-words">{callLog.duration || 'N/A'}</p>
+                <p className="text-base sm:text-lg break-words">{formatCallDuration(callLog.duration)}</p>
               </div>
               <div>
                 <label className="text-xs sm:text-sm font-medium text-muted-foreground">Last Call Time</label>

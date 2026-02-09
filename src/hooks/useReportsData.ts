@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useMemo } from "react";
+import { extractFirstFromArray } from "@/lib/utils";
 
 interface DateRange {
   from?: Date;
@@ -128,7 +129,10 @@ export function useReportsData(dateRange: DateRange) {
       
       return {
         totalCalls: calledRecords.length,
-        callsWithRecordings: calledRecords.filter(r => r.recording).length,
+        callsWithRecordings: calledRecords.filter(r => {
+          const rec = extractFirstFromArray(r.recording);
+          return rec && rec.length > 0;
+        }).length,
         avgAiScore: Math.round(avgAiScore),
         avgCvScore: Math.round(avgCvScore),
         avgCommScore: Math.round(avgCommScore),
