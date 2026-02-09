@@ -1667,7 +1667,9 @@ export default function JobDetails() {
       const source = (candidate["Source"] || candidate.source || "").toLowerCase();
       const sourceFilterMatch = !longListSourceFilter || 
         longListSourceFilter === "all" || 
-        source.includes(longListSourceFilter.toLowerCase());
+        (longListSourceFilter.toLowerCase() === "itris"
+          ? source.includes("itris") || source.includes("internal database")
+          : source.includes(longListSourceFilter.toLowerCase()));
       let scoreMatch = true;
       if (scoreFilter !== "all") {
         const score = parseInt(candidate["cv_score"] || "0");
@@ -2517,7 +2519,7 @@ export default function JobDetails() {
     if (candidate["Source"] && typeof candidate["Source"] === "string") {
       if (candidate["Source"].toLowerCase().includes("linkedin")) {
         sourceType = " (linkedin)";
-      } else if (candidate["Source"].toLowerCase().includes("itris")) {
+      } else if (candidate["Source"].toLowerCase().includes("itris") || candidate["Source"].toLowerCase().includes("internal database")) {
         sourceType = " (cv)";
       }
     }
@@ -2572,10 +2574,13 @@ export default function JobDetails() {
         !emailFilter || (candidate["Candidate Email"] || "").toLowerCase().includes(emailFilter.toLowerCase());
       const phoneMatch = !phoneFilter || (candidate["Candidate Phone Number"] || "").includes(phoneFilter);
       const userIdMatch = !userIdFilter || (candidate.user_id || candidate["Candidate_ID"] || "").toString().includes(userIdFilter);
+      const source = (candidate["Source"] || "").toLowerCase();
       const sourceMatch =
         !longListSourceFilter ||
         longListSourceFilter === "all" ||
-        (candidate["Source"] || "").toLowerCase().includes(longListSourceFilter.toLowerCase());
+        (longListSourceFilter.toLowerCase() === "itris"
+          ? source.includes("itris") || source.includes("internal database")
+          : source.includes(longListSourceFilter.toLowerCase()));
       let scoreMatch = true;
       if (scoreFilter !== "all") {
         // Try multiple possible field names for CV score
@@ -3187,10 +3192,13 @@ mainCandidate["linkedin_score_reason"] ? (
       const userIdMatch =
         !shortListUserIdFilter ||
         (candidate.user_id || candidate["user_id"] || "").toString().includes(shortListUserIdFilter);
+      const shortSource = (candidate["Source"] || "").toLowerCase();
       const sourceMatch =
         !shortListSourceFilter ||
         shortListSourceFilter === "all" ||
-        (candidate["Source"] || "").toLowerCase().includes(shortListSourceFilter.toLowerCase());
+        (shortListSourceFilter.toLowerCase() === "itris"
+          ? shortSource.includes("itris") || shortSource.includes("internal database")
+          : shortSource.includes(shortListSourceFilter.toLowerCase()));
       let scoreMatch = true;
       if (shortListScoreFilter !== "all") {
         const score = parseInt(candidate["Success Score"] || candidate["cv_score"] || candidate["CV Score"] || "0");
@@ -4018,7 +4026,7 @@ mainCandidate["linkedin_score_reason"] ? (
                       {
                         longlistedCandidates.filter((c) => {
                           const source = (c["Source"] || c.source || "").toLowerCase();
-                          return source.includes("itris") || source.includes("linkedin");
+                          return source.includes("itris") || source.includes("internal database") || source.includes("linkedin");
                         }).length
                       }{" "}
                       candidates)
@@ -4298,7 +4306,9 @@ mainCandidate["linkedin_score_reason"] ? (
                         const sourceFilterMatch =
                           !longListSourceFilter ||
                           longListSourceFilter === "all" ||
-                          source.includes(longListSourceFilter.toLowerCase());
+                          (longListSourceFilter.toLowerCase() === "itris"
+                            ? source.includes("itris") || source.includes("internal database")
+                            : source.includes(longListSourceFilter.toLowerCase()));
                         let scoreMatch = true;
                         if (scoreFilter !== "all") {
                           const score = parseInt(
