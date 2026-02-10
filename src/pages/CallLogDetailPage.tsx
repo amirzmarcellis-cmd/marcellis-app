@@ -5,11 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, User, Phone, Mail, Calendar, Star, FileText, Clock, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { extractFirstFromArray, formatCallDuration } from "@/lib/utils";
+import { extractFirstFromArray, formatCallDuration, parseCallArray, formatSingleDuration } from "@/lib/utils";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import WaveformPlayer from "@/components/calls/WaveformPlayer";
 
 // Currency conversion rates (approximate, to SAR base)
 const CURRENCY_TO_SAR: { [key: string]: number } = {
@@ -356,18 +357,42 @@ export default function CallLogDetailPage() {
               <p className="font-medium">{record.callcount || 'N/A'}</p>
             </div>
             <div className="space-y-2">
-              <span className="text-muted-foreground">Duration:</span>
-              <p className="font-medium">{formatCallDuration(record.duration)}</p>
-            </div>
-            <div className="space-y-2">
               <span className="text-muted-foreground">Last Call:</span>
               <p className="font-medium">{record.lastcalltime || 'N/A'}</p>
             </div>
-            <div className="space-y-2">
-              <span className="text-muted-foreground">Recording:</span>
-              <p className="font-medium">{extractFirstFromArray(record.recording) ? 'Available' : 'N/A'}</p>
-            </div>
           </div>
+          {(() => {
+            const durations = parseCallArray(record.duration);
+            const recordings = parseCallArray(record.recording);
+            const maxLen = Math.max(durations.length, recordings.length);
+            if (maxLen === 0) return null;
+            return (
+              <div className="space-y-4 mt-6">
+                {Array.from({ length: maxLen }).map((_, i) => {
+                  const dur = durations[i];
+                  const rec = recordings[i];
+                  const recUrl = rec && String(rec).trim() && String(rec).trim() !== 'null' ? String(rec).trim() : null;
+                  return (
+                    <div key={i} className="space-y-2 p-3 rounded-lg border border-border/50 bg-secondary/30">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">
+                          Call {i + 1} {i === 0 ? '(latest)' : ''}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          Duration: {formatSingleDuration(dur)}
+                        </span>
+                      </div>
+                      {recUrl ? (
+                        <WaveformPlayer url={recUrl} />
+                      ) : (
+                        <p className="text-xs text-muted-foreground italic">No recording available</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </CardContent>
       </GlassCard>
 

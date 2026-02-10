@@ -52,3 +52,28 @@ export function formatCallDuration(value: string | null | undefined): string {
   if (mins === 0) return `${secs}s`;
   return `${mins}m ${secs}s`;
 }
+
+/** Parse a JSON-array-formatted text field into a full array of values. */
+export function parseCallArray(value: string | null | undefined): (string | null)[] {
+  if (!value) return [];
+  const str = String(value).trim();
+  if (str.startsWith('[')) {
+    try {
+      const arr = JSON.parse(str);
+      if (Array.isArray(arr)) return arr;
+    } catch { /* fall through */ }
+  }
+  return str ? [str] : [];
+}
+
+/** Format a single duration number (in minutes) into a readable string like "1m 7s". */
+export function formatSingleDuration(val: number | string | null | undefined): string {
+  if (val === null || val === undefined) return 'N/A';
+  const num = typeof val === 'string' ? parseFloat(val) : val;
+  if (isNaN(num)) return 'N/A';
+  const totalSeconds = Math.round(num * 60);
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+  if (mins === 0) return `${secs}s`;
+  return `${mins}m ${secs}s`;
+}
