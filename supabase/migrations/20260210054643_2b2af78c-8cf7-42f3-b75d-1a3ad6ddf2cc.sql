@@ -1,0 +1,1 @@
+UPDATE "Jobs" SET vapi_ai_assistant = '39bfd897-8145-4e43-b2a8-ea020cebfaf3' WHERE job_id = 'me-j-0275';
