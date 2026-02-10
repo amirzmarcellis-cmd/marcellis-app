@@ -88,6 +88,30 @@ serve(async (req) => {
         }
       }
       
+      // Trigger webhook for returning applicant
+      const webhookPayload = {
+        user_id: existingCV.user_id,
+        Firstname: clean(body.Firstname),
+        Lastname: clean(body.Lastname) || null,
+        email: normalizedEmail,
+        phone_number: clean(body.phone_number),
+        job_id: clean(body.job_id),
+        existing: true
+      };
+
+      try {
+        await fetch(`${SUPABASE_URL}/functions/v1/send-push-webhook`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${SERVICE_ROLE}`
+          },
+          body: JSON.stringify(webhookPayload)
+        });
+      } catch (webhookError) {
+        console.error("Webhook trigger failed (non-blocking):", webhookError);
+      }
+
       return new Response(JSON.stringify({ 
         ok: true, 
         user_id: existingCV.user_id,
@@ -144,6 +168,30 @@ serve(async (req) => {
         JSON.stringify({ error: error.message }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    // Trigger webhook for new applicant
+    const newWebhookPayload = {
+      user_id,
+      Firstname: clean(body.Firstname),
+      Lastname: clean(body.Lastname) || null,
+      email: normalizedEmail,
+      phone_number: clean(body.phone_number),
+      job_id: clean(body.job_id),
+      existing: false
+    };
+
+    try {
+      await fetch(`${SUPABASE_URL}/functions/v1/send-push-webhook`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SERVICE_ROLE}`
+        },
+        body: JSON.stringify(newWebhookPayload)
+      });
+    } catch (webhookError) {
+      console.error("Webhook trigger failed (non-blocking):", webhookError);
     }
 
     return new Response(JSON.stringify({ ok: true, user_id }), {
