@@ -1,47 +1,40 @@
 
 
-## Handle Array Format for Recording and Duration Fields
+## Display Multiple Call Recordings and Durations
 
 ### Summary
-The `recording` and `duration` columns in the `Jobs_CVs` table now store JSON array strings (e.g., `["https://...url.wav"]` and `[1.1185]`) instead of plain text values. The app currently treats them as plain strings, so recordings don't play and durations display as raw array text like `[1.1185]`.
-
-### Solution
-Create a small utility to safely extract the first value from these array-formatted strings, and update all files that read `recording` or `duration`.
+The `recording` and `duration` fields now store arrays with multiple values (e.g., `[16.9323, 0.4295, null]`). Each element represents a separate call, with the latest call first. The UI should display all calls individually as "Call 1 (latest)", "Call 2", etc., with their respective duration and recording player.
 
 ---
 
 ### Technical Changes
 
-#### 1. Add helper functions in `src/lib/utils.ts`
+#### 1. Add new helper in `src/lib/utils.ts`
+
+Add a `parseCallArray` function that returns the full parsed array (not just the first element):
 
 ```typescript
-/** Extract the first non-empty string from a JSON-array-formatted text field. */
-export function extractFirstFromArray(value: string | null | undefined): string | null {
-  if (!value) return null;
+export function parseCallArray(value: string | null | undefined): (string | null)[] {
+  if (!value) return [];
   const str = String(value).trim();
-  // If it looks like a JSON array, parse it
   if (str.startsWith('[')) {
     try {
       const arr = JSON.parse(str);
-      if (Array.isArray(arr)) {
-        const first = arr.find((item: unknown) => item !== null && item !== undefined && String(item).trim() !== '');
-        return first != null ? String(first) : null;
-      }
-    } catch {
-      // Not valid JSON, fall through
-    }
+      if (Array.isArray(arr)) return arr;
+    } catch { /* fall through */ }
   }
-  // Already a plain value
-  return str || null;
+  return str ? [str] : [];
 }
+```
 
-/** Format a duration value (possibly array-formatted) into a readable string like "1m 7s". */
-export function formatCallDuration(value: string | null | undefined): string {
-  const raw = extractFirstFromArray(value);
-  if (!raw) return 'N/A';
-  const num = parseFloat(raw);
-  if (isNaN(num)) return raw; // Return as-is if not a number
-  const totalSeconds = Math.round(num * 60); // value is in minutes
+Also add a single-duration formatter that takes a raw number (not array string):
+
+```typescript
+export function formatSingleDuration(val: number | string | null): string {
+  if (val === null || val === undefined) return 'N/A';
+  const num = typeof val === 'string' ? parseFloat(val) : val;
+  if (isNaN(num)) return 'N/A';
+  const totalSeconds = Math.round(num * 60);
   const mins = Math.floor(totalSeconds / 60);
   const secs = totalSeconds % 60;
   if (mins === 0) return `${secs}s`;
@@ -49,49 +42,79 @@ export function formatCallDuration(value: string | null | undefined): string {
 }
 ```
 
-#### 2. Update `src/pages/CallLogDetails.tsx`
+The existing `extractFirstFromArray` and `formatCallDuration` remain unchanged for backward compatibility in other parts of the app.
 
-**Data mapping (~line 278-279):** Extract first values when mapping from raw DB data:
+---
+
+#### 2. Update `src/pages/CallLogDetails.tsx` -- Call Information section
+
+**Data mapping (lines 278-279):** Store the raw array strings instead of extracting only the first value:
+
 ```typescript
-duration: extractFirstFromArray(data.duration),
-recording: extractFirstFromArray(data.recording),
+duration: data.duration,    // keep raw for multi-call display
+recording: data.recording,  // keep raw for multi-call display
 ```
 
-**Duration display (~line 669):** Use `formatCallDuration` or display the extracted plain value:
-```tsx
-<p>{formatCallDuration(callLog.duration) || 'N/A'}</p>
-```
+**Call Information card (lines 658-688):** Replace single duration/recording display with a loop over all calls:
 
-**Recording playback (~line 680-684):** The `extractFirstFromArray` at mapping time means `callLog.recording` will already be a plain URL string, so `WaveformPlayer` will work as before.
+- Parse `callLog.duration` and `callLog.recording` using `parseCallArray`
+- Render each call as a labeled section: "Call 1 (latest)", "Call 2", etc.
+- Each call shows its formatted duration and, if a recording URL exists, a `WaveformPlayer`
+- Calls with `null` duration or recording are shown as "N/A" / no player
+- The total duration line is replaced by per-call breakdowns
 
-#### 3. Update `src/pages/CallLogDetailPage.tsx`
+---
 
-**Duration display (~line 359):**
-```tsx
-<p>{formatCallDuration(record.duration) || 'N/A'}</p>
-```
+#### 3. Update `src/pages/CallLogDetailPage.tsx` -- Call Information section
 
-**Recording display (~line 367):**
-```tsx
-<p>{extractFirstFromArray(record.recording) ? 'Available' : 'N/A'}</p>
-```
+**Duration display (line 359-361):** Replace single duration with a loop showing all call durations.
 
-#### 4. Update `src/pages/JobDetails.tsx` (~lines 835, 1054)
+**Recording display (line 366-369):** Replace the simple "Available/N/A" text with individual call entries, each with its own recording status or waveform player (if recording URL exists).
 
-When mapping `duration` and `recording` into call log objects:
-```typescript
-duration: extractFirstFromArray(row.duration),
-recording: extractFirstFromArray(row.recording),
-```
+The Transcript section remains as-is since it appears to be a single combined transcript.
 
-#### 5. Update `src/hooks/useReportsData.ts` (~line 131)
+---
 
-Fix the "calls with recordings" count to handle array format:
+#### 4. `src/pages/JobDetails.tsx` -- Keep as-is
+
+The job details page candidate cards show summary info (first/latest duration and recording). This is correct behavior for a card view -- no change needed here. The `extractFirstFromArray` usage remains appropriate for showing the most recent call's data in summary cards.
+
+---
+
+#### 5. `src/hooks/useReportsData.ts` -- Update recording count
+
+Update the recording count logic to count candidates that have **any** non-null recording in the array:
+
 ```typescript
 callsWithRecordings: calledRecords.filter(r => {
-  const rec = extractFirstFromArray(r.recording);
-  return rec && rec.length > 0;
+  const recs = parseCallArray(r.recording);
+  return recs.some(rec => rec !== null && String(rec).trim() !== '');
 }).length,
+```
+
+---
+
+### UI Layout for Multi-Call Display
+
+In the Call Information card, the calls will be displayed as a vertical list:
+
+```
+Call Information
+------------------------------
+Call 1 (latest)
+  Duration: 16m 56s
+  [======= Waveform Player =======]
+
+Call 2
+  Duration: 26s
+  [======= Waveform Player =======]
+
+Call 3
+  Duration: N/A
+  No recording available
+------------------------------
+Call Count: 3
+Last Call Time: 2026-02-09 14:30
 ```
 
 ---
@@ -100,15 +123,11 @@ callsWithRecordings: calledRecords.filter(r => {
 
 | File | Change |
 |------|--------|
-| `src/lib/utils.ts` | Add `extractFirstFromArray` and `formatCallDuration` helpers |
-| `src/pages/CallLogDetails.tsx` | Parse array values at data mapping; format duration display |
-| `src/pages/CallLogDetailPage.tsx` | Format duration and recording display |
-| `src/pages/JobDetails.tsx` | Extract first values when building call log objects |
-| `src/hooks/useReportsData.ts` | Fix recording count filter |
+| `src/lib/utils.ts` | Add `parseCallArray` and `formatSingleDuration` helpers |
+| `src/pages/CallLogDetails.tsx` | Store raw arrays; render per-call duration + recording players |
+| `src/pages/CallLogDetailPage.tsx` | Render per-call duration + recording status/players |
+| `src/hooks/useReportsData.ts` | Update recording count to check full array |
 
-### Behavior After Fix
-
-- **Duration**: `[1.1185]` displays as `1m 7s` instead of raw array text
-- **Recording**: `["https://...wav"]` extracts the URL so `WaveformPlayer` receives a valid URL
-- **Empty arrays**: `[]` or `[""]` gracefully show `N/A`
-- **Legacy plain values**: Still work correctly (backward compatible)
+### No changes to
+- `src/pages/JobDetails.tsx` (summary cards correctly use first/latest value)
+- Database schema (no changes needed)
