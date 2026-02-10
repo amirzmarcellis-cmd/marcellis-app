@@ -18,6 +18,7 @@ import { useProfile } from "@/hooks/useProfile"
 import { useUserRole } from "@/hooks/useUserRole"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
+import { parseCallArray, formatSingleDuration } from "@/lib/utils"
 
 // Currency conversion rates (relative to SAR)
 const CURRENCY_TO_SAR: Record<string, number> = {
@@ -275,8 +276,8 @@ export default function CallLogDetails() {
         notes: data.notes,
         lastcalltime: data.lastcalltime,
         callcount: data.callcount,
-        duration: extractFirstFromArray(data.duration),
-        recording: extractFirstFromArray(data.recording),
+        duration: data.duration,
+        recording: data.recording,
         notes_updated_by: data.notes_updated_by,
         notes_updated_at: data.notes_updated_at,
         job_title: jobData?.job_title,
@@ -665,10 +666,6 @@ export default function CallLogDetails() {
           <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               <div>
-                <label className="text-xs sm:text-sm font-medium text-muted-foreground">Duration</label>
-                <p className="text-base sm:text-lg break-words">{formatCallDuration(callLog.duration)}</p>
-              </div>
-              <div>
                 <label className="text-xs sm:text-sm font-medium text-muted-foreground">Last Call Time</label>
                 <p className="text-base sm:text-lg break-words">{callLog.lastcalltime ? new Date(callLog.lastcalltime).toLocaleString() : 'N/A'}</p>
               </div>
@@ -677,14 +674,38 @@ export default function CallLogDetails() {
                 <p className="text-base sm:text-lg">{callLog.callcount || 0}</p>
               </div>
             </div>
-            {callLog.recording && (
-              <div className="pt-2">
-                <label className="text-xs sm:text-sm font-medium text-muted-foreground">Playback</label>
-                <div className="mt-2">
-                  <WaveformPlayer url={callLog.recording!} />
+            {(() => {
+              const durations = parseCallArray(callLog.duration);
+              const recordings = parseCallArray(callLog.recording);
+              const maxLen = Math.max(durations.length, recordings.length);
+              if (maxLen === 0) return null;
+              return (
+                <div className="space-y-4 pt-2">
+                  {Array.from({ length: maxLen }).map((_, i) => {
+                    const dur = durations[i];
+                    const rec = recordings[i];
+                    const recUrl = rec && String(rec).trim() && String(rec).trim() !== 'null' ? String(rec).trim() : null;
+                    return (
+                      <div key={i} className="space-y-2 p-3 rounded-lg border border-border/50 bg-secondary/30">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs sm:text-sm font-medium">
+                            Call {i + 1} {i === 0 ? '(latest)' : ''}
+                          </span>
+                          <span className="text-xs sm:text-sm text-muted-foreground">
+                            Duration: {formatSingleDuration(dur)}
+                          </span>
+                        </div>
+                        {recUrl ? (
+                          <WaveformPlayer url={recUrl} />
+                        ) : (
+                          <p className="text-xs text-muted-foreground italic">No recording available</p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </CardContent>
         </Card>
 
