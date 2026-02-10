@@ -61,7 +61,7 @@ import { JobFunnel } from "@/components/jobs/JobFunnel";
 import { JobDialog } from "@/components/jobs/JobDialog";
 import { StatusDropdown } from "@/components/candidates/StatusDropdown";
 import { useToast } from "@/components/ui/use-toast";
-import { formatDate } from "@/lib/utils";
+import { formatDate, extractFirstFromArray } from "@/lib/utils";
 import { useProfile } from "@/hooks/useProfile";
 import { useButtonCooldown } from "@/hooks/useButtonCooldown";
 import { useIsMobile } from "@/hooks/use-mobile";
