@@ -170,6 +170,24 @@ export type Database = {
         }
         Relationships: []
       }
+      canidate_chat_histories: {
+        Row: {
+          id: number
+          message: Json | null
+          session_id: string | null
+        }
+        Insert: {
+          id?: number
+          message?: Json | null
+          session_id?: string | null
+        }
+        Update: {
+          id?: number
+          message?: Json | null
+          session_id?: string | null
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           created_at: string
@@ -404,6 +422,7 @@ export type Database = {
           job_title: string | null
           linkedin_search_enabled: boolean | null
           longlist: number | null
+          longlist_more: boolean
           musttohave: string | null
           nationality_to_exclude: string | null
           nationality_to_include: string | null
@@ -443,6 +462,7 @@ export type Database = {
           job_title?: string | null
           linkedin_search_enabled?: boolean | null
           longlist?: number | null
+          longlist_more?: boolean
           musttohave?: string | null
           nationality_to_exclude?: string | null
           nationality_to_include?: string | null
@@ -482,6 +502,7 @@ export type Database = {
           job_title?: string | null
           linkedin_search_enabled?: boolean | null
           longlist?: number | null
+          longlist_more?: boolean
           musttohave?: string | null
           nationality_to_exclude?: string | null
           nationality_to_include?: string | null
@@ -927,6 +948,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      message_buffer: {
+        Row: {
+          chat_id: string
+          created_at: string | null
+          id: string
+          message_id: string
+          message_text: string | null
+          sender_phone: string | null
+          timestamp: number | null
+        }
+        Insert: {
+          chat_id: string
+          created_at?: string | null
+          id?: string
+          message_id: string
+          message_text?: string | null
+          sender_phone?: string | null
+          timestamp?: number | null
+        }
+        Update: {
+          chat_id?: string
+          created_at?: string | null
+          id?: string
+          message_id?: string
+          message_text?: string | null
+          sender_phone?: string | null
+          timestamp?: number | null
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
