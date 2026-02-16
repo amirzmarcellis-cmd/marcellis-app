@@ -1308,6 +1308,7 @@ export type Database = {
     }
     Functions: {
       disable_expired_auto_dial: { Args: never; Returns: undefined }
+      disable_longlist_more_at_threshold: { Args: never; Returns: undefined }
       format_scheduled_time_iso: { Args: { ts: string }; Returns: string }
       get_org_role: {
         Args: { _user_id: string }
