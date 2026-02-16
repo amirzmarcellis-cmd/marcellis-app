@@ -1,49 +1,61 @@
 
 
-## Auto-Disable longlist_more When Longlist Exceeds 150
+## Fix: Nationality Matching for "Portuguese" / "Portugal"
 
-### What This Does
-Creates a scheduled job that runs every 5 minutes to check all jobs in the `Jobs` table. If a job's `longlist` count is 150 or more, it automatically sets `longlist_more` to `false` so no more candidates are added to the longlist.
+### Problem
+The `matchesPreferredNationality` function in `JobDetails.tsx` has a mapping table that converts between country names and demonyms (e.g., "Egypt" <-> "Egyptian"). However, **Portugal is not in this mapping**, so "Portuguese" (the candidate's nationality) does not match "Portugal" (the job's preferred nationality).
 
-### Implementation
+### Solution
+Add Portugal and other missing European/common countries to the `nationalityMap` in `JobDetails.tsx` (around line 3241).
 
-**Step 1: Create the database function (via migration)**
+### Changes
 
-```sql
-CREATE OR REPLACE FUNCTION public.disable_longlist_more_at_threshold()
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path TO 'public'
-AS $$
-BEGIN
-  UPDATE "Jobs"
-  SET longlist_more = false
-  WHERE longlist >= 150
-    AND longlist_more = true;
-END;
-$$;
-```
+**File: `src/pages/JobDetails.tsx`**
 
-**Step 2: Schedule a cron job every 5 minutes (via insert tool)**
+Add the following entries to the `nationalityMap` object (after the existing entries, before the closing `}`):
 
-This uses the `pg_cron` extension to run the function directly in the database every 5 minutes:
+- `'portugal': ['portuguese', 'portugal']`
+- `'spain': ['spanish', 'spain']`
+- `'france': ['french', 'france']`
+- `'germany': ['german', 'germany']`
+- `'italy': ['italian', 'italy']`
+- `'netherlands': ['dutch', 'netherlands', 'holland']`
+- `'belgium': ['belgian', 'belgium']`
+- `'switzerland': ['swiss', 'switzerland']`
+- `'austria': ['austrian', 'austria']`
+- `'greece': ['greek', 'greece']`
+- `'ireland': ['irish', 'ireland']`
+- `'sweden': ['swedish', 'sweden']`
+- `'norway': ['norwegian', 'norway']`
+- `'denmark': ['danish', 'denmark']`
+- `'finland': ['finnish', 'finland']`
+- `'poland': ['polish', 'poland']`
+- `'czech republic': ['czech', 'czech republic', 'czechia']`
+- `'romania': ['romanian', 'romania']`
+- `'hungary': ['hungarian', 'hungary']`
+- `'turkey': ['turkish', 'turkey']`
+- `'brazil': ['brazilian', 'brazil']`
+- `'mexico': ['mexican', 'mexico']`
+- `'colombia': ['colombian', 'colombia']`
+- `'argentina': ['argentinian', 'argentine', 'argentina']`
+- `'nigeria': ['nigerian', 'nigeria']`
+- `'kenya': ['kenyan', 'kenya']`
+- `'ghana': ['ghanaian', 'ghana']`
+- `'ethiopia': ['ethiopian', 'ethiopia']`
+- `'china': ['chinese', 'china']`
+- `'japan': ['japanese', 'japan']`
+- `'south korea': ['south korean', 'korean', 'south korea']`
+- `'thailand': ['thai', 'thailand']`
+- `'vietnam': ['vietnamese', 'vietnam']`
+- `'sri lanka': ['sri lankan', 'sri lanka']`
+- `'nepal': ['nepalese', 'nepali', 'nepal']`
+- `'iran': ['iranian', 'persian', 'iran']`
+- `'russia': ['russian', 'russia']`
+- `'ukraine': ['ukrainian', 'ukraine']`
 
-```sql
-SELECT cron.schedule(
-  'disable-longlist-more-check',
-  '*/5 * * * *',
-  $$SELECT public.disable_longlist_more_at_threshold();$$
-);
-```
+This will immediately fix the Portuguese/Portugal mismatch and prevent similar issues for many other nationalities.
 
-### How It Works
-- Every 5 minutes, the cron job calls the function
-- The function finds all jobs where `longlist >= 150` AND `longlist_more = true`
-- It sets `longlist_more = false` for those jobs
-- Jobs already set to `false` are skipped (no unnecessary updates)
-
-### Notes
-- This requires the `pg_cron` and `pg_net` extensions to be enabled in your Supabase project (they are available by default)
-- The cron schedule SQL will be run via the insert tool (not migration) since it contains runtime configuration
-
+### Technical Details
+- Only one file is modified: `src/pages/JobDetails.tsx`
+- The change is additive (adding entries to an existing map) with zero risk of breaking existing functionality
+- The matching logic itself is already correct -- it just needs more entries in the lookup table
