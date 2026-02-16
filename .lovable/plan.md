@@ -1,104 +1,49 @@
 
 
-## Capitalize First Letter of Candidate Names in CVs and Jobs_CVs
+## Auto-Disable longlist_more When Longlist Exceeds 150
 
 ### What This Does
-Automatically formats candidate names so the first letter is capitalized and the rest is lowercase (e.g., "JOHN" or "john" becomes "John") whenever a record is added or updated. Also fixes all existing records.
+Creates a scheduled job that runs every 5 minutes to check all jobs in the `Jobs` table. If a job's `longlist` count is 150 or more, it automatically sets `longlist_more` to `false` so no more candidates are added to the longlist.
 
-### Affected Columns
-- **CVs table**: `Firstname`, `Lastname`, `name`
-- **Jobs_CVs table**: `candidate_name`
+### Implementation
 
-### Current State
-- **CVs**: ~158,572 records need formatting
-- **Jobs_CVs**: ~15,003 records need formatting
-
-### Implementation Steps
-
-1. **Create a trigger function for CVs** that applies `INITCAP()` (capitalizes first letter of each word) on INSERT or UPDATE.
-
-2. **Create a trigger function for Jobs_CVs** that does the same for `candidate_name`.
-
-3. **Attach BEFORE INSERT OR UPDATE triggers** to both tables.
-
-4. **Update all existing records** in both tables using the same formatting.
-
-### Technical Details
-
-**Migration SQL (schema changes):**
+**Step 1: Create the database function (via migration)**
 
 ```sql
--- Trigger function for CVs table
-CREATE OR REPLACE FUNCTION public.normalize_candidate_names_cvs()
-RETURNS trigger
+CREATE OR REPLACE FUNCTION public.disable_longlist_more_at_threshold()
+RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path TO 'public'
 AS $$
 BEGIN
-  IF NEW."Firstname" IS NOT NULL THEN
-    NEW."Firstname" = INITCAP(TRIM(NEW."Firstname"));
-  END IF;
-  IF NEW."Lastname" IS NOT NULL THEN
-    NEW."Lastname" = INITCAP(TRIM(NEW."Lastname"));
-  END IF;
-  IF NEW.name IS NOT NULL THEN
-    NEW.name = INITCAP(TRIM(NEW.name));
-  END IF;
-  RETURN NEW;
+  UPDATE "Jobs"
+  SET longlist_more = false
+  WHERE longlist >= 150
+    AND longlist_more = true;
 END;
 $$;
-
--- Trigger function for Jobs_CVs table
-CREATE OR REPLACE FUNCTION public.normalize_candidate_names_jobs_cvs()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path TO 'public'
-AS $$
-BEGIN
-  IF NEW.candidate_name IS NOT NULL THEN
-    NEW.candidate_name = INITCAP(TRIM(NEW.candidate_name));
-  END IF;
-  RETURN NEW;
-END;
-$$;
-
--- Attach triggers
-CREATE TRIGGER trg_normalize_cvs_names
-  BEFORE INSERT OR UPDATE ON "CVs"
-  FOR EACH ROW
-  EXECUTE FUNCTION normalize_candidate_names_cvs();
-
-CREATE TRIGGER trg_normalize_jobs_cvs_names
-  BEFORE INSERT OR UPDATE ON "Jobs_CVs"
-  FOR EACH ROW
-  EXECUTE FUNCTION normalize_candidate_names_jobs_cvs();
 ```
 
-**Data update queries (for existing records):**
+**Step 2: Schedule a cron job every 5 minutes (via insert tool)**
+
+This uses the `pg_cron` extension to run the function directly in the database every 5 minutes:
 
 ```sql
--- Update existing CVs records
-UPDATE "CVs"
-SET "Firstname" = INITCAP(TRIM("Firstname")),
-    "Lastname" = INITCAP(TRIM("Lastname")),
-    name = INITCAP(TRIM(name))
-WHERE "Firstname" IS DISTINCT FROM INITCAP(TRIM("Firstname"))
-   OR "Lastname" IS DISTINCT FROM INITCAP(TRIM("Lastname"))
-   OR name IS DISTINCT FROM INITCAP(TRIM(name));
-
--- Update existing Jobs_CVs records
-UPDATE "Jobs_CVs"
-SET candidate_name = INITCAP(TRIM(candidate_name))
-WHERE candidate_name IS DISTINCT FROM INITCAP(TRIM(candidate_name));
+SELECT cron.schedule(
+  'disable-longlist-more-check',
+  '*/5 * * * *',
+  $$SELECT public.disable_longlist_more_at_threshold();$$
+);
 ```
 
-### How INITCAP Works
-- `"john doe"` becomes `"John Doe"`
-- `"JANE SMITH"` becomes `"Jane Smith"`
-- `"mARY"` becomes `"Mary"`
+### How It Works
+- Every 5 minutes, the cron job calls the function
+- The function finds all jobs where `longlist >= 150` AND `longlist_more = true`
+- It sets `longlist_more = false` for those jobs
+- Jobs already set to `false` are skipped (no unnecessary updates)
 
-### Important Note
-The existing data update will affect ~158K records in CVs and ~15K in Jobs_CVs. The triggers will be created first so any new records arriving during the update are also formatted correctly. This update will also fire the audit triggers, so expect audit log entries for these changes.
+### Notes
+- This requires the `pg_cron` and `pg_net` extensions to be enabled in your Supabase project (they are available by default)
+- The cron schedule SQL will be run via the insert tool (not migration) since it contains runtime configuration
 
