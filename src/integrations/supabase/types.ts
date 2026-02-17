@@ -401,6 +401,7 @@ export type Database = {
         Row: {
           assignment: string | null
           auto_dial_enabled_at: string | null
+          auto_dial_system_disabled: boolean
           automatic_dial: boolean | null
           client_description: string | null
           client_id: string | null
@@ -442,6 +443,7 @@ export type Database = {
         Insert: {
           assignment?: string | null
           auto_dial_enabled_at?: string | null
+          auto_dial_system_disabled?: boolean
           automatic_dial?: boolean | null
           client_description?: string | null
           client_id?: string | null
@@ -483,6 +485,7 @@ export type Database = {
         Update: {
           assignment?: string | null
           auto_dial_enabled_at?: string | null
+          auto_dial_system_disabled?: boolean
           automatic_dial?: boolean | null
           client_description?: string | null
           client_id?: string | null
