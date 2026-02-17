@@ -408,6 +408,7 @@ export type Database = {
           companies_to_exclude: string | null
           contract_length: string | null
           Currency: string | null
+          gender_preference: string | null
           group_id: string | null
           headhunting_companies: string | null
           industry: string | null
@@ -448,6 +449,7 @@ export type Database = {
           companies_to_exclude?: string | null
           contract_length?: string | null
           Currency?: string | null
+          gender_preference?: string | null
           group_id?: string | null
           headhunting_companies?: string | null
           industry?: string | null
@@ -488,6 +490,7 @@ export type Database = {
           companies_to_exclude?: string | null
           contract_length?: string | null
           Currency?: string | null
+          gender_preference?: string | null
           group_id?: string | null
           headhunting_companies?: string | null
           industry?: string | null
