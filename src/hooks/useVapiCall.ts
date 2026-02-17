@@ -114,10 +114,9 @@ export function useVapiCall(): UseVapiCallReturn {
       setError(null);
       setDuration(0);
 
-      // Request microphone permission
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-
       // Start the call with assistant ID and variable overrides
+      // VAPI handles microphone access internally - do NOT call getUserMedia separately
+      // as it consumes the user gesture context and causes the call to end immediately
       await vapiRef.current.start(assistantId, {
         variableValues,
       });
