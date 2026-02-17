@@ -461,6 +461,7 @@ export default function AddJob() {
     type: "",
     contractLength: "",
     currency: "",
+    genderPreference: "Any",
     itrisId: "",
     groupId: "",
     recruiterId: "",
@@ -775,6 +776,10 @@ export default function AddJob() {
       toast.error("Job Type is required");
       return;
     }
+    if (!formData.genderPreference) {
+      toast.error("Preferred Gender is required");
+      return;
+    }
     if (formData.type === "Contract" && !formData.contractLength) {
       toast.error("Contract Length is required for contract positions");
       return;
@@ -817,6 +822,7 @@ export default function AddJob() {
         Type: formData.type,
         contract_length: formData.type === "Contract" && formData.contractLength ? formData.contractLength : null,
         Currency: formData.currency,
+        gender_preference: formData.genderPreference,
         itris_job_id: formData.itrisId ? formData.itrisId.trim() : null,
         group_id: formData.groupId || null,
         recruiter_id: recruiterIdToSave,
@@ -1238,6 +1244,25 @@ export default function AddJob() {
                   <SelectContent>
                     <SelectItem value="Permanent">Permanent</SelectItem>
                     <SelectItem value="Contract">Contract</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Row 7: Preferred Gender */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="genderPreference" className="font-medium flex items-center gap-1">
+                  Preferred Gender <span className="text-primary">*</span>
+                </Label>
+                <Select value={formData.genderPreference} onValueChange={(value) => handleInputChange("genderPreference", value)}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Select preferred gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                    <SelectItem value="Any">Any</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -1,0 +1,1 @@
+UPDATE "Jobs" SET gender_preference = 'Any' WHERE gender_preference IS NULL OR TRIM(gender_preference) = ''

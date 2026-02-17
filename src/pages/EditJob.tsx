@@ -451,6 +451,7 @@ interface JobData {
   Type: string;
   contract_length: string | null;
   Currency: string;
+  gender_preference: string;
   itris_job_id?: string;
   group_id?: string;
   recruiter_id?: string;
@@ -501,6 +502,7 @@ export default function EditJob() {
     Type: "",
     contract_length: "",
     Currency: "",
+    gender_preference: "Any",
     itris_job_id: "",
     group_id: "",
     recruiter_id: "",
@@ -1076,6 +1078,27 @@ export default function EditJob() {
                           <SelectItem value="USD">USD</SelectItem>
                           <SelectItem value="EUR">EUR</SelectItem>
                           <SelectItem value="INR">INR</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                    <div className="space-y-2 sm:space-y-3">
+                      <Label htmlFor="gender_preference" className="text-sm sm:text-base">
+                        Preferred Gender
+                      </Label>
+                      <Select
+                        value={formData.gender_preference || "Any"}
+                        onValueChange={(value) => setFormData((prev) => ({ ...prev, gender_preference: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select preferred gender" className="truncate" />
+                        </SelectTrigger>
+                        <SelectContent className="z-[60] bg-popover">
+                          <SelectItem value="Male">Male</SelectItem>
+                          <SelectItem value="Female">Female</SelectItem>
+                          <SelectItem value="Any">Any</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
