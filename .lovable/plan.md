@@ -1,61 +1,36 @@
 
 
-## Fix: Nationality Matching for "Portuguese" / "Portugal"
+## Add "Preferred Gender" Dropdown to Create Job and Edit Job
 
-### Problem
-The `matchesPreferredNationality` function in `JobDetails.tsx` has a mapping table that converts between country names and demonyms (e.g., "Egypt" <-> "Egyptian"). However, **Portugal is not in this mapping**, so "Portuguese" (the candidate's nationality) does not match "Portugal" (the job's preferred nationality).
+### What will change
+A new required dropdown field called **Preferred Gender** will be added to both the Create Job and Edit Job forms. It will have three options: Male, Female, and Any. The default value will be "Any", and the selected value will be saved to the existing `gender_preference` column in the Jobs table.
 
-### Solution
-Add Portugal and other missing European/common countries to the `nationalityMap` in `JobDetails.tsx` (around line 3241).
+Additionally, all existing jobs that currently have a null/empty `gender_preference` will be updated to "Any".
 
 ### Changes
 
-**File: `src/pages/JobDetails.tsx`**
+#### 1. Update all existing jobs (data update)
+- Set `gender_preference = 'Any'` for all jobs where the value is currently NULL or empty.
 
-Add the following entries to the `nationalityMap` object (after the existing entries, before the closing `}`):
+#### 2. AddJob.tsx
+- Add `genderPreference: "Any"` to the `formData` state (default value).
+- Add the Preferred Gender dropdown in the mandatory fields section, near the Notice Period / Currency / Job Type row.
+- Add validation to ensure the field is filled before submission.
+- Include `gender_preference: formData.genderPreference` in the insert payload.
 
-- `'portugal': ['portuguese', 'portugal']`
-- `'spain': ['spanish', 'spain']`
-- `'france': ['french', 'france']`
-- `'germany': ['german', 'germany']`
-- `'italy': ['italian', 'italy']`
-- `'netherlands': ['dutch', 'netherlands', 'holland']`
-- `'belgium': ['belgian', 'belgium']`
-- `'switzerland': ['swiss', 'switzerland']`
-- `'austria': ['austrian', 'austria']`
-- `'greece': ['greek', 'greece']`
-- `'ireland': ['irish', 'ireland']`
-- `'sweden': ['swedish', 'sweden']`
-- `'norway': ['norwegian', 'norway']`
-- `'denmark': ['danish', 'denmark']`
-- `'finland': ['finnish', 'finland']`
-- `'poland': ['polish', 'poland']`
-- `'czech republic': ['czech', 'czech republic', 'czechia']`
-- `'romania': ['romanian', 'romania']`
-- `'hungary': ['hungarian', 'hungary']`
-- `'turkey': ['turkish', 'turkey']`
-- `'brazil': ['brazilian', 'brazil']`
-- `'mexico': ['mexican', 'mexico']`
-- `'colombia': ['colombian', 'colombia']`
-- `'argentina': ['argentinian', 'argentine', 'argentina']`
-- `'nigeria': ['nigerian', 'nigeria']`
-- `'kenya': ['kenyan', 'kenya']`
-- `'ghana': ['ghanaian', 'ghana']`
-- `'ethiopia': ['ethiopian', 'ethiopia']`
-- `'china': ['chinese', 'china']`
-- `'japan': ['japanese', 'japan']`
-- `'south korea': ['south korean', 'korean', 'south korea']`
-- `'thailand': ['thai', 'thailand']`
-- `'vietnam': ['vietnamese', 'vietnam']`
-- `'sri lanka': ['sri lankan', 'sri lanka']`
-- `'nepal': ['nepalese', 'nepali', 'nepal']`
-- `'iran': ['iranian', 'persian', 'iran']`
-- `'russia': ['russian', 'russia']`
-- `'ukraine': ['ukrainian', 'ukraine']`
-
-This will immediately fix the Portuguese/Portugal mismatch and prevent similar issues for many other nationalities.
+#### 3. EditJob.tsx
+- Add `gender_preference` to the `JobData` interface with default `"Any"`.
+- Add the Preferred Gender dropdown in the details tab, near the Notice Period / Currency row.
+- The field will be populated from the fetched job data (already handled by the spread `setFormData({ ...data })`).
+- The value is already included in the update payload since EditJob spreads formData into the update object.
 
 ### Technical Details
-- Only one file is modified: `src/pages/JobDetails.tsx`
-- The change is additive (adding entries to an existing map) with zero risk of breaking existing functionality
-- The matching logic itself is already correct -- it just needs more entries in the lookup table
+
+**Files modified:**
+- `src/pages/AddJob.tsx` -- add state field, dropdown UI, validation, and insert field
+- `src/pages/EditJob.tsx` -- add to interface, add dropdown UI
+
+**Database:**
+- No schema changes needed (column `gender_preference` already exists in the Jobs table)
+- Data update: `UPDATE "Jobs" SET gender_preference = 'Any' WHERE gender_preference IS NULL OR TRIM(gender_preference) = ''`
+
