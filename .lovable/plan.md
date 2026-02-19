@@ -1,32 +1,41 @@
 
+## Plan: Two UI Improvements
 
-## Remove Webhook Calls from submit_application and Use Supabase Database Webhook Instead
+### 1. Show Rejection Reason on Hover (AI Shortlist tab)
 
-### What Changes
-The notification webhook will no longer be triggered from the `submit_application` edge function code. Instead, you'll set up a **Supabase Database Webhook** on the `CVs` table (on INSERT) that sends the full record directly to n8n. The payload will be in the Supabase database webhook format you shared.
+Currently, when a candidate is rejected in the AI Shortlist, the card shows a red banner with "Rejected on [date]" but the rejection reason is only visible in the call log. 
 
-### Important Note
-A Supabase Database Webhook on INSERT will only fire for **new** applicants (inserts). Returning applicants (where the email already exists) trigger an UPDATE, not an INSERT. If you also need notifications for returning applicants, you'd need to add an UPDATE webhook as well, or we can keep the edge function call just for the returning-applicant case. Let me know if you want both INSERT and UPDATE, or just INSERT.
+**Change:** Add a tooltip (using the existing HoverCard component) to the rejected banner so hovering over it shows the rejection reason.
 
-### Code Changes
+**File:** `src/pages/JobDetails.tsx`
+- On the rejected banner (lines 2655-2659), wrap it with a `HoverCard` + `HoverCardTrigger` + `HoverCardContent`
+- On hover, display `mainCandidate["Reason_to_reject"]` (already available via the `...row` spread on line 812)
+- Also add the reason to the disabled "Rejected" button area (lines 3070-3079) as a tooltip
+- Import `HoverCard, HoverCardTrigger, HoverCardContent` from the existing hover-card component
 
-**File: `supabase/functions/submit_application/index.ts`**
-- Remove the webhook call block for returning applicants (lines 91-113)
-- Remove the webhook call block for new applicants (lines 173-195)
-- Everything else stays the same (validation, dedup, insert logic)
+### 2. Shortlisted Box Click Navigates to AI Shortlist (Jobs page)
 
-**File: `supabase/functions/send-push-webhook/index.ts`**
-- Can be deleted entirely since nothing will call it anymore (the database webhook sends directly to n8n)
+Currently, the candidate count boxes (Longlisted, Shortlisted, Rejected, Submitted) on each job card in the Jobs page are static displays.
 
-**File: `supabase/config.toml`**
-- Remove the `[functions.send-push-webhook]` section
+**Change:** Make the "Shortlisted" count box clickable so it navigates to `/job/{job_id}` with the AI Shortlist tab active.
 
-### Manual Step (Supabase Dashboard)
-After the code changes, you'll need to create a Database Webhook in the Supabase dashboard:
-1. Go to **Database > Webhooks** in the Supabase dashboard
-2. Create a new webhook on the `CVs` table for `INSERT` events
-3. Set the URL to: `https://n8n.srv1158803.hstgr.cloud/webhook/050985a0-7a33-457b-a57b-715b56fb570a`
-4. Set method to POST with Content-Type: application/json
+**File:** `src/components/jobs/JobManagementPanel.tsx`
+- On the Shortlisted count box (lines 879-885), wrap it with a clickable element or add an `onClick` handler
+- Navigate to `/job/${job.job_id}` with `state: { tab: "shortlist" }` (the JobDetails page already supports `location.state?.tab` on line 411)
+- Add cursor-pointer styling to indicate it's clickable
 
-This will automatically send the full record payload in the format you showed.
+### Technical Details
 
+**Imports needed in JobDetails.tsx:**
+```
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
+```
+
+**Rejected banner with hover (JobDetails.tsx ~line 2655):**
+- Wrap the existing red banner div in HoverCard/HoverCardTrigger
+- Show HoverCardContent with the rejection reason text
+- Only show HoverCardContent if `Reason_to_reject` exists
+
+**Shortlisted box click (JobManagementPanel.tsx ~line 879):**
+- Add `onClick={() => navigate(`/job/${job.job_id}`, { state: { tab: "shortlist" } })}` to the shortlisted count div
+- Add `cursor-pointer` class for visual feedback
