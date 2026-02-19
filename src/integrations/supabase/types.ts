@@ -563,7 +563,7 @@ export type Database = {
           comm_summary: string | null
           company_name: string | null
           contacted: string | null
-          current_salary: number | null
+          current_salary: string | null
           cv_score: number | null
           cv_score_reason: string | null
           duration: string | null
@@ -618,7 +618,7 @@ export type Database = {
           comm_summary?: string | null
           company_name?: string | null
           contacted?: string | null
-          current_salary?: number | null
+          current_salary?: string | null
           cv_score?: number | null
           cv_score_reason?: string | null
           duration?: string | null
@@ -673,7 +673,7 @@ export type Database = {
           comm_summary?: string | null
           company_name?: string | null
           contacted?: string | null
-          current_salary?: number | null
+          current_salary?: string | null
           cv_score?: number | null
           cv_score_reason?: string | null
           duration?: string | null

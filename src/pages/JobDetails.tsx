@@ -19,6 +19,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
@@ -2653,10 +2654,20 @@ export default function JobDetails() {
       <Card key={candidateId} id={`candidate-card-${candidateId}`} className={cardClassName}>
         {/* Status timestamp banner for Rejected/Submitted */}
         {isRejected && mainCandidate["rejected_at"] && (
-          <div className="bg-red-500/20 px-3 py-1.5 text-xs text-red-600 dark:text-red-400 flex items-center gap-1 border-b border-red-500/30 rounded-t-lg">
-            <X className="w-3 h-3" />
-            Rejected on {format(new Date(mainCandidate["rejected_at"]), "dd MMM yyyy, HH:mm")}
-          </div>
+          <HoverCard openDelay={200}>
+            <HoverCardTrigger asChild>
+              <div className="bg-red-500/20 px-3 py-1.5 text-xs text-red-600 dark:text-red-400 flex items-center gap-1 border-b border-red-500/30 rounded-t-lg cursor-help">
+                <X className="w-3 h-3" />
+                Rejected on {format(new Date(mainCandidate["rejected_at"]), "dd MMM yyyy, HH:mm")}
+              </div>
+            </HoverCardTrigger>
+            {mainCandidate["Reason_to_reject"] && (
+              <HoverCardContent className="w-80 text-sm">
+                <p className="font-semibold text-red-600 dark:text-red-400 mb-1">Rejection Reason</p>
+                <p className="text-muted-foreground whitespace-pre-wrap">{mainCandidate["Reason_to_reject"]}</p>
+              </HoverCardContent>
+            )}
+          </HoverCard>
         )}
         {isSubmitted && mainCandidate["submitted_at"] && (
           <div className="bg-emerald-500/20 px-3 py-1.5 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1 border-b border-emerald-500/30 rounded-t-lg">
@@ -3068,15 +3079,25 @@ mainCandidate["linkedin_score_reason"] ? (
                   </Button>
                 )}
                 {mainCandidate["Contacted"] === "Rejected" ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-gray-400 text-gray-500 cursor-not-allowed"
-                    disabled
-                  >
-                    <X className="w-4 h-4 mr-1.5" />
-                    Rejected
-                  </Button>
+                  <HoverCard openDelay={200}>
+                    <HoverCardTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-gray-400 text-gray-500 cursor-help"
+                        disabled
+                      >
+                        <X className="w-4 h-4 mr-1.5" />
+                        Rejected
+                      </Button>
+                    </HoverCardTrigger>
+                    {mainCandidate["Reason_to_reject"] && (
+                      <HoverCardContent className="w-80 text-sm">
+                        <p className="font-semibold text-red-600 dark:text-red-400 mb-1">Rejection Reason</p>
+                        <p className="text-muted-foreground whitespace-pre-wrap">{mainCandidate["Reason_to_reject"]}</p>
+                      </HoverCardContent>
+                    )}
+                  </HoverCard>
                 ) : (
                   <Button
                     variant="outline"
