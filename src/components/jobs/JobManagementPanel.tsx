@@ -876,7 +876,11 @@ const JobGrid = memo(function JobGrid({
                 </div>
                 <span className="text-xs text-muted-foreground mt-1">Longlisted</span>
               </div>
-              <div className="flex flex-col items-center p-2 sm:p-2.5 rounded-md bg-warning/10 border border-warning/20">
+              <div
+                className="flex flex-col items-center p-2 sm:p-2.5 rounded-md bg-warning/10 border border-warning/20 cursor-pointer hover:bg-warning/20 transition-colors"
+                onClick={() => navigate(`/job/${job.job_id}`, { state: { tab: "shortlist" } })}
+                title="Click to view AI Shortlist"
+              >
                 <div className="flex items-center gap-1 text-warning">
                   <Users className="h-4 w-4 sm:h-3 sm:w-3" />
                   <span className="font-bold text-lg sm:text-xl">{job.shortlisted_count || 0}</span>
