@@ -887,14 +887,22 @@ const JobGrid = memo(function JobGrid({
                 </div>
                 <span className="text-xs text-muted-foreground mt-1">Shortlisted</span>
               </div>
-              <div className="flex flex-col items-center p-2 sm:p-2.5 rounded-md bg-destructive/10 border border-destructive/20">
+              <div
+                className="flex flex-col items-center p-2 sm:p-2.5 rounded-md bg-destructive/10 border border-destructive/20 cursor-pointer hover:bg-destructive/20 transition-colors"
+                onClick={() => navigate(`/job/${job.job_id}`, { state: { tab: "shortlist" } })}
+                title="Click to view AI Shortlist"
+              >
                 <div className="flex items-center gap-1 text-destructive">
                   <Users className="h-4 w-4 sm:h-3 sm:w-3" />
                   <span className="font-bold text-lg sm:text-xl">{job.rejected_count || 0}</span>
                 </div>
                 <span className="text-xs text-muted-foreground mt-1">Rejected</span>
               </div>
-              <div className="flex flex-col items-center p-2 sm:p-2.5 rounded-md bg-success/10 border border-success/20">
+              <div
+                className="flex flex-col items-center p-2 sm:p-2.5 rounded-md bg-success/10 border border-success/20 cursor-pointer hover:bg-success/20 transition-colors"
+                onClick={() => navigate(`/job/${job.job_id}`, { state: { tab: "shortlist" } })}
+                title="Click to view AI Shortlist"
+              >
                 <div className="flex items-center gap-1 text-success">
                   <Users className="h-4 w-4 sm:h-3 sm:w-3" />
                   <span className="font-bold text-lg sm:text-xl">{job.submitted_count || 0}</span>
