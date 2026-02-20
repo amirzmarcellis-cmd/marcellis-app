@@ -13,14 +13,10 @@ interface JobFunnelProps {
 export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
   const isMobile = useIsMobile();
   
-  // Memoize the counts calculation to avoid recalculating on every render
   const counts = useMemo(() => {
-    // Count all candidates regardless of source (unified with job card)
     const longlistedCandidates = candidates;
-    
     const longlist = longlistedCandidates.length;
     
-    // Use reduce for better performance with single pass through data
     const statusCounts = longlistedCandidates.reduce((acc, c) => {
       const contacted = c["contacted"];
       const score = parseInt(c["after_call_score"] || "0");
@@ -47,10 +43,11 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
         case "Rejected":
           acc.rejected++;
           break;
+        case "Pipeline":
+          acc.pipeline++;
+          break;
       }
       
-      // Count shortlist candidates (score >= 75) - unified definition
-      // Exclude candidates with "Shortlisted from Similar jobs" status
       if (score >= 75 && contacted !== "Shortlisted from Similar jobs") {
         acc.shortlist++;
       }
@@ -64,7 +61,8 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
       lowScored: 0,
       submitted: 0,
       rejected: 0,
-      shortlist: 0
+      shortlist: 0,
+      pipeline: 0
     });
 
     return {
@@ -73,7 +71,6 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
     };
   }, [candidates]);
 
-  // Memoize stages array
   const allStages = useMemo(() => [
     { name: "Longlist", count: counts.longlist, bgColor: "bg-blue-600", textColor: "text-black dark:text-white" },
     { name: "1st No Answer", count: counts.firstNoAnswer, bgColor: "bg-orange-500", textColor: "text-black dark:text-white" },
@@ -82,13 +79,14 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
     { name: "Contacted", count: counts.contacted, bgColor: "bg-green-600", textColor: "text-black dark:text-white" },
     { name: "Low Scored", count: counts.lowScored, bgColor: "bg-red-600", textColor: "text-black dark:text-white" },
     { name: "Shortlist", count: counts.shortlist, bgColor: "bg-emerald-600", textColor: "text-black dark:text-white" },
+    { name: "Pipeline", count: counts.pipeline, bgColor: "bg-violet-600", textColor: "text-black dark:text-white" },
     { name: "Submitted", count: counts.submitted, bgColor: "bg-purple-600", textColor: "text-black dark:text-white" }
   ], [counts]);
 
-  // Mobile view shows only key stages
   const mobileStages = useMemo(() => [
     { name: "Longlist", count: counts.longlist, bgColor: "bg-blue-600", textColor: "text-black dark:text-white" },
     { name: "Shortlist", count: counts.shortlist, bgColor: "bg-emerald-600", textColor: "text-black dark:text-white" },
+    { name: "Pipeline", count: counts.pipeline, bgColor: "bg-violet-600", textColor: "text-black dark:text-white" },
     { name: "Submitted", count: counts.submitted, bgColor: "bg-purple-600", textColor: "text-black dark:text-white" }
   ], [counts]);
 
@@ -105,7 +103,6 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        {/* Horizontal funnel layout */}
         <div className="flex flex-wrap md:flex-nowrap items-center justify-start md:justify-between gap-3 md:gap-2 mb-4 w-full">
           {stages.map((stage, index) => (
             <div key={stage.name} className="flex items-center gap-2 sm:gap-2">
