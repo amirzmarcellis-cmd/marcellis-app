@@ -54,6 +54,7 @@ import {
   Play,
   Download,
   GitBranch,
+  Pencil,
 } from "lucide-react";
 import { FuturisticActionButton } from "@/components/ui/FuturisticActionButton";
 import { ActionButton } from "@/components/ui/ActionButton";
@@ -382,6 +383,12 @@ export default function JobDetails() {
   ]);
   const [interviewType, setInterviewType] = useState<"Phone" | "Online Meeting">("Phone");
   const [interviewLink, setInterviewLink] = useState("");
+
+  // Notes dialog state for AI Shortlist cards
+  const [notesDialogOpen, setNotesDialogOpen] = useState(false);
+  const [notesDialogCandidate, setNotesDialogCandidate] = useState<any>(null);
+  const [notesDialogValue, setNotesDialogValue] = useState("");
+  const [notesSaving, setNotesSaving] = useState(false);
   useEffect(() => {
     if (id) {
       // Load job data first to show page immediately
@@ -2119,6 +2126,45 @@ export default function JobDetails() {
     }
   };
 
+  const saveCardNotes = async () => {
+    if (!notesDialogCandidate) return;
+    setNotesSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const recordid = notesDialogCandidate["recordid"];
+      const userId = notesDialogCandidate["user_id"];
+      const jobId = notesDialogCandidate["Job ID"];
+
+      let updateQuery: any = supabase.from("Jobs_CVs").update({
+        notes: notesDialogValue,
+        notes_updated_by: user?.id,
+        notes_updated_at: new Date().toISOString(),
+      });
+
+      if (recordid) {
+        updateQuery = updateQuery.eq("recordid", recordid);
+      } else if (userId && jobId) {
+        updateQuery = updateQuery.eq("user_id", userId).eq("job_id", jobId);
+      }
+
+      const { error } = await updateQuery;
+      if (error) throw error;
+
+      setCandidates((prev) =>
+        prev.map((c) =>
+          c["recordid"] === recordid ? { ...c, Notes: notesDialogValue, notes: notesDialogValue } : c
+        )
+      );
+      setNotesDialogOpen(false);
+      toast({ title: "Notes saved successfully" });
+    } catch (err) {
+      console.error("Error saving notes:", err);
+      toast({ title: "Failed to save notes", variant: "destructive" });
+    } finally {
+      setNotesSaving(false);
+    }
+  };
+
   const handleClientStatusChange = async (candidateId: string, newStatus: string) => {
     try {
       const { error } = await supabase
@@ -2770,6 +2816,17 @@ mainCandidate["linkedin_score_reason"] ? (
     </div>
   )
 )}
+{(mainCandidate["Notes"] || mainCandidate["notes"]) && (
+  <div className="mt-2 p-2 bg-blue-50/50 dark:bg-blue-950/20 rounded-sm border-l-2 border-blue-400/50">
+    <div className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-1 flex items-center gap-1">
+      <Pencil className="w-3 h-3" />
+      Notes
+    </div>
+    <p className="text-xs text-muted-foreground line-clamp-2">
+      {mainCandidate["Notes"] || mainCandidate["notes"]}
+    </p>
+  </div>
+)}
 {mainCandidate["Salary Expectations"] && (
   <div className="flex items-center gap-2 text-sm mt-1">
     <Banknote className="w-3 h-3 text-muted-foreground" />
@@ -2779,24 +2836,39 @@ mainCandidate["linkedin_score_reason"] ? (
   </div>
 )}
               </div>
-              {(mainCandidate["Contacted"]?.toLowerCase() === "call done" ||
-                mainCandidate["Contacted"]?.toLowerCase() === "contacted" ||
-                mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
-                mainCandidate["Contacted"]?.toLowerCase() === "tasked") &&
-                mainCandidate["lastcalltime"] && (
-                  <div className="text-xs text-muted-foreground text-right">
-                    <div className="flex items-center">
-                      <Clock className="w-3 h-3 mr-1" />
-                      {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
+              <div className="flex flex-col items-end gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-muted-foreground hover:text-primary shrink-0"
+                  title="Add/Edit Notes"
+                  onClick={() => {
+                    setNotesDialogCandidate(mainCandidate);
+                    setNotesDialogValue(mainCandidate["Notes"] || mainCandidate["notes"] || "");
+                    setNotesDialogOpen(true);
+                  }}
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </Button>
+                {(mainCandidate["Contacted"]?.toLowerCase() === "call done" ||
+                  mainCandidate["Contacted"]?.toLowerCase() === "contacted" ||
+                  mainCandidate["Contacted"]?.toLowerCase() === "low scored" ||
+                  mainCandidate["Contacted"]?.toLowerCase() === "tasked") &&
+                  mainCandidate["lastcalltime"] && (
+                    <div className="text-xs text-muted-foreground text-right">
+                      <div className="flex items-center">
+                        <Clock className="w-3 h-3 mr-1" />
+                        {new Date(mainCandidate["lastcalltime"]).toLocaleDateString()}
+                      </div>
+                      <div className="text-xs">
+                        {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </div>
                     </div>
-                    <div className="text-xs">
-                      {new Date(mainCandidate["lastcalltime"]).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </div>
-                  </div>
-                )}
+                  )}
+              </div>
             </div>
 
             <div className="space-y-2 text-sm">
@@ -6345,6 +6417,32 @@ mainCandidate["linkedin_score_reason"] ? (
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Notes Dialog for AI Shortlist Cards */}
+      <Dialog open={notesDialogOpen} onOpenChange={setNotesDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Notes — {notesDialogCandidate?.["Candidate Name"] || "Candidate"}</DialogTitle>
+            <DialogDescription>
+              Add or edit notes for this candidate. Notes will also appear in the Call Details page.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            placeholder="Add your notes..."
+            value={notesDialogValue}
+            onChange={(e) => setNotesDialogValue(e.target.value)}
+            className="min-h-[150px]"
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setNotesDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={saveCardNotes} disabled={notesSaving}>
+              {notesSaving ? "Saving..." : "Save Notes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Reject Candidate Dialog */}
       <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
