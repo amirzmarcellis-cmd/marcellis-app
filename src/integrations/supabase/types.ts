@@ -218,11 +218,13 @@ export type Database = {
           current_company: string | null
           Current_role: string | null
           cv_link: string | null
+          cv_processing: boolean
           cv_text: string | null
           done_questions: string | null
           email: string | null
           Firstname: string | null
           formatted_cv: string | null
+          gender: string | null
           job_id: string | null
           Lastname: string | null
           linkedin: string | null
@@ -239,11 +241,13 @@ export type Database = {
           current_company?: string | null
           Current_role?: string | null
           cv_link?: string | null
+          cv_processing?: boolean
           cv_text?: string | null
           done_questions?: string | null
           email?: string | null
           Firstname?: string | null
           formatted_cv?: string | null
+          gender?: string | null
           job_id?: string | null
           Lastname?: string | null
           linkedin?: string | null
@@ -260,11 +264,13 @@ export type Database = {
           current_company?: string | null
           Current_role?: string | null
           cv_link?: string | null
+          cv_processing?: boolean
           cv_text?: string | null
           done_questions?: string | null
           email?: string | null
           Firstname?: string | null
           formatted_cv?: string | null
+          gender?: string | null
           job_id?: string | null
           Lastname?: string | null
           linkedin?: string | null

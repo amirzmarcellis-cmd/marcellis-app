@@ -2653,21 +2653,29 @@ export default function JobDetails() {
     return (
       <Card key={candidateId} id={`candidate-card-${candidateId}`} className={cardClassName}>
         {/* Status timestamp banner for Rejected/Submitted */}
-        {isRejected && mainCandidate["rejected_at"] && (
-          <HoverCard openDelay={200}>
-            <HoverCardTrigger asChild>
-              <div className="bg-red-500/20 px-3 py-1.5 text-xs text-red-600 dark:text-red-400 flex items-center gap-1 border-b border-red-500/30 rounded-t-lg cursor-help">
-                <X className="w-3 h-3" />
-                Rejected on {format(new Date(mainCandidate["rejected_at"]), "dd MMM yyyy, HH:mm")}
+          {isRejected && mainCandidate["rejected_at"] && (
+          <>
+            <HoverCard openDelay={200}>
+              <HoverCardTrigger asChild>
+                <div className="bg-red-500/20 px-3 py-1.5 text-xs text-red-600 dark:text-red-400 flex items-center gap-1 border-b border-red-500/30 rounded-t-lg cursor-help">
+                  <X className="w-3 h-3" />
+                  Rejected on {format(new Date(mainCandidate["rejected_at"]), "dd MMM yyyy, HH:mm")}
+                </div>
+              </HoverCardTrigger>
+              {mainCandidate["Reason_to_reject"] && (
+                <HoverCardContent className="w-80 text-sm">
+                  <p className="font-semibold text-red-600 dark:text-red-400 mb-1">Rejection Reason</p>
+                  <p className="text-muted-foreground whitespace-pre-wrap">{mainCandidate["Reason_to_reject"]}</p>
+                </HoverCardContent>
+              )}
+            </HoverCard>
+            {isMobile && mainCandidate["Reason_to_reject"] && (
+              <div className="bg-red-500/10 px-3 py-2 text-xs text-red-600 dark:text-red-400 border-b border-red-500/20">
+                <span className="font-semibold">Rejection Reason: </span>
+                {mainCandidate["Reason_to_reject"]}
               </div>
-            </HoverCardTrigger>
-            {mainCandidate["Reason_to_reject"] && (
-              <HoverCardContent className="w-80 text-sm">
-                <p className="font-semibold text-red-600 dark:text-red-400 mb-1">Rejection Reason</p>
-                <p className="text-muted-foreground whitespace-pre-wrap">{mainCandidate["Reason_to_reject"]}</p>
-              </HoverCardContent>
             )}
-          </HoverCard>
+          </>
         )}
         {isSubmitted && mainCandidate["submitted_at"] && (
           <div className="bg-emerald-500/20 px-3 py-1.5 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1 border-b border-emerald-500/30 rounded-t-lg">
@@ -3079,25 +3087,33 @@ mainCandidate["linkedin_score_reason"] ? (
                   </Button>
                 )}
                 {mainCandidate["Contacted"] === "Rejected" ? (
-                  <HoverCard openDelay={200}>
-                    <HoverCardTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-gray-400 text-gray-500 cursor-help"
-                        disabled
-                      >
-                        <X className="w-4 h-4 mr-1.5" />
-                        Rejected
-                      </Button>
-                    </HoverCardTrigger>
-                    {mainCandidate["Reason_to_reject"] && (
-                      <HoverCardContent className="w-80 text-sm">
-                        <p className="font-semibold text-red-600 dark:text-red-400 mb-1">Rejection Reason</p>
-                        <p className="text-muted-foreground whitespace-pre-wrap">{mainCandidate["Reason_to_reject"]}</p>
-                      </HoverCardContent>
+                  <>
+                    <HoverCard openDelay={200}>
+                      <HoverCardTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-gray-400 text-gray-500 cursor-help"
+                          disabled
+                        >
+                          <X className="w-4 h-4 mr-1.5" />
+                          Rejected
+                        </Button>
+                      </HoverCardTrigger>
+                      {mainCandidate["Reason_to_reject"] && (
+                        <HoverCardContent className="w-80 text-sm">
+                          <p className="font-semibold text-red-600 dark:text-red-400 mb-1">Rejection Reason</p>
+                          <p className="text-muted-foreground whitespace-pre-wrap">{mainCandidate["Reason_to_reject"]}</p>
+                        </HoverCardContent>
+                      )}
+                    </HoverCard>
+                    {isMobile && mainCandidate["Reason_to_reject"] && (
+                      <div className="w-full text-xs text-red-500 dark:text-red-400 px-1 mt-1">
+                        <span className="font-semibold">Reason: </span>
+                        {mainCandidate["Reason_to_reject"]}
+                      </div>
                     )}
-                  </HoverCard>
+                  </>
                 ) : (
                   <Button
                     variant="outline"
