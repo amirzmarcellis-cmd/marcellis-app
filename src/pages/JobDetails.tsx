@@ -2102,11 +2102,19 @@ export default function JobDetails() {
     if (!error) {
       toast({ title: "Pipeline", description: "Candidate added to pipeline." });
       setCandidates((prev) =>
-        prev.map((c) =>
-          c["user_id"] === candidateId || c["Candidate_ID"] === candidateId
-            ? { ...c, Contacted: "Pipeline", contacted: "Pipeline" }
-            : c
-        )
+        prev.map((c) => {
+          const cUserId = c["user_id"] ?? "";
+          const cCandidateId = c["Candidate_ID"] ?? "";
+          const cRecordId = c["recordid"]?.toString() ?? "";
+          if (
+            cUserId === candidateId ||
+            cCandidateId === candidateId ||
+            cRecordId === candidateId
+          ) {
+            return { ...c, Contacted: "Pipeline", contacted: "Pipeline" };
+          }
+          return c;
+        })
       );
     }
   };
