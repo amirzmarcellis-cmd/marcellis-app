@@ -1,41 +1,51 @@
 
-## Plan: Two UI Improvements
+## Fix: Rejection Reason Visible on Mobile (AI Shortlist Tab)
 
-### 1. Show Rejection Reason on Hover (AI Shortlist tab)
+### Root Cause
+`HoverCard` relies on mouse hover events (`mouseenter`/`mouseleave`). On touch devices (mobile), these events don't fire reliably — tapping doesn't trigger a hover, so the rejection reason tooltip never appears.
 
-Currently, when a candidate is rejected in the AI Shortlist, the card shows a red banner with "Rejected on [date]" but the rejection reason is only visible in the call log. 
+### Solution
+Use the already-imported `isMobile` flag (from `useIsMobile`, already in `JobDetails.tsx`) to render two different experiences:
 
-**Change:** Add a tooltip (using the existing HoverCard component) to the rejected banner so hovering over it shows the rejection reason.
+- **Desktop**: Keep the existing `HoverCard` hover tooltip (no change for desktop users)
+- **Mobile**: Show the rejection reason as **always-visible inline text** directly below the red "Rejected on..." banner and below the disabled "Rejected" button — no interaction needed
 
-**File:** `src/pages/JobDetails.tsx`
-- On the rejected banner (lines 2655-2659), wrap it with a `HoverCard` + `HoverCardTrigger` + `HoverCardContent`
-- On hover, display `mainCandidate["Reason_to_reject"]` (already available via the `...row` spread on line 812)
-- Also add the reason to the disabled "Rejected" button area (lines 3070-3079) as a tooltip
-- Import `HoverCard, HoverCardTrigger, HoverCardContent` from the existing hover-card component
+### File to Change: `src/pages/JobDetails.tsx`
 
-### 2. Shortlisted Box Click Navigates to AI Shortlist (Jobs page)
+**Change 1 — Red banner area (line ~2656)**
 
-Currently, the candidate count boxes (Longlisted, Shortlisted, Rejected, Submitted) on each job card in the Jobs page are static displays.
+Current: `HoverCard` wraps the banner, reason only shows on hover.
 
-**Change:** Make the "Shortlisted" count box clickable so it navigates to `/job/{job_id}` with the AI Shortlist tab active.
-
-**File:** `src/components/jobs/JobManagementPanel.tsx`
-- On the Shortlisted count box (lines 879-885), wrap it with a clickable element or add an `onClick` handler
-- Navigate to `/job/${job.job_id}` with `state: { tab: "shortlist" }` (the JobDetails page already supports `location.state?.tab` on line 411)
-- Add cursor-pointer styling to indicate it's clickable
-
-### Technical Details
-
-**Imports needed in JobDetails.tsx:**
+New on mobile: After the banner div, add a visible block:
 ```
-import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
+{isMobile && mainCandidate["Reason_to_reject"] && (
+  <div className="bg-red-500/10 px-3 py-2 text-xs text-red-600 dark:text-red-400 border-b border-red-500/20">
+    <span className="font-semibold">Rejection Reason: </span>
+    {mainCandidate["Reason_to_reject"]}
+  </div>
+)}
 ```
 
-**Rejected banner with hover (JobDetails.tsx ~line 2655):**
-- Wrap the existing red banner div in HoverCard/HoverCardTrigger
-- Show HoverCardContent with the rejection reason text
-- Only show HoverCardContent if `Reason_to_reject` exists
+The HoverCard banner itself stays for desktop. On mobile, `HoverCard` is rendered but effectively non-interactive — the inline block beneath replaces it.
 
-**Shortlisted box click (JobManagementPanel.tsx ~line 879):**
-- Add `onClick={() => navigate(`/job/${job.job_id}`, { state: { tab: "shortlist" } })}` to the shortlisted count div
-- Add `cursor-pointer` class for visual feedback
+**Change 2 — Disabled "Rejected" button area (line ~3082)**
+
+Same approach: after the HoverCard button, add a mobile-only visible reason block:
+```
+{isMobile && mainCandidate["Reason_to_reject"] && (
+  <div className="w-full text-xs text-red-500 dark:text-red-400 px-1 mt-1">
+    <span className="font-semibold">Reason: </span>
+    {mainCandidate["Reason_to_reject"]}
+  </div>
+)}
+```
+
+### No New Imports Needed
+- `isMobile` is already declared (`const isMobile = useIsMobile()` on line 91)
+- No additional packages required
+
+### What Users Will See on Mobile
+When a candidate is rejected on mobile:
+1. The red "Rejected on [date]" banner shows at the top of the card
+2. Directly below it, a light red box shows: **"Rejection Reason: [the full reason text]"** — always visible, no tap needed
+3. The disabled grey "Rejected" button has the reason text displayed beneath it as small red text
