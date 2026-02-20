@@ -1,49 +1,81 @@
 
-## Fix: Show Job Date on Mobile (Jobs Page)
+## AI Shortlist: Rename Buttons & Add "Pipeline" Button (UI Only)
 
-### Root Cause
-The entire job details block — including the Created date, recruiter name, location, salary, and contract length — is wrapped in a `div` with `className="hidden sm:block"`. This hides all of it on mobile screens (below the `sm` breakpoint of 640px).
+### What's changing
+Three button changes in the AI Shortlist section of `src/pages/JobDetails.tsx`, around lines 3058–3128:
 
-The relevant code is in `src/components/jobs/JobManagementPanel.tsx` around **line 863**:
+1. **"Submit CV" → "Submit"** — same click action, shorter label
+2. **"Reject Candidate" → "Reject"** — same click action, shorter label
+3. **New "Pipeline" button** — UI only, no database changes, no status updates
+
+---
+
+### File: `src/pages/JobDetails.tsx`
+
+---
+
+### Change 1 — Rename "Submit CV" → "Submit" (line 3086)
+
 ```tsx
-<div className="hidden sm:block space-y-1 sm:space-y-2 text-xs sm:text-sm">
-  {job.recruiter_name && ...}
-  {job.job_location && ...}
-  {job.job_salary_range && ...}
-  {job.contract_length && ...}
-  {job.Timestamp && <div>Created: ...</div>}   ← hidden on mobile
-</div>
+// Before
+<FileCheck className="w-4 h-4 mr-1.5" />
+Submit CV
+
+// After
+<FileCheck className="w-4 h-4 mr-1.5" />
+Submit
 ```
 
-### Solution
-Show the **Created date** on mobile by pulling it out of the hidden block and making it always visible. The other details (recruiter, location, salary, contract length) can stay hidden on mobile to keep the card compact — but the date is a key piece of information that should always be shown.
+---
 
-**File:** `src/components/jobs/JobManagementPanel.tsx`
+### Change 2 — Rename "Reject Candidate" → "Reject" (line 3125)
 
-**Change 1 — Remove the date from the `hidden sm:block` div** and place it outside (below the block) so it renders on both mobile and desktop:
-
-Before (inside the hidden block, lines ~883-886):
 ```tsx
-{job.Timestamp && <div className="flex items-center text-muted-foreground min-w-0">
-    <Calendar className="h-4 w-4 mr-2 text-primary flex-shrink-0" />
-    <span className="truncate">Created: {format(new Date(job.Timestamp), 'MMM dd, yyyy HH:mm')}</span>
-  </div>}
+// Before
+<X className="w-4 h-4 mr-1.5" />
+Reject Candidate
+
+// After
+<X className="w-4 h-4 mr-1.5" />
+Reject
 ```
 
-After — remove it from the `hidden sm:block` div and add it just below that div, always visible:
+---
+
+### Change 3 — Add "Pipeline" button (line 3128, inside the same `flex flex-col sm:flex-row gap-2` div)
+
+The Pipeline button is a **UI-only button** — clicking it will show a toast notification (e.g. "Added to Pipeline") but will **not update any database field or candidate status**. It appears in the same button row as Submit and Reject.
+
+Button styled in purple/indigo to visually distinguish it:
+
 ```tsx
-{job.Timestamp && (
-  <div className="flex items-center text-muted-foreground text-xs sm:text-sm min-w-0">
-    <Calendar className="h-4 w-4 mr-2 text-primary flex-shrink-0" />
-    <span className="truncate">Created: {format(new Date(job.Timestamp), 'MMM dd, yyyy HH:mm')}</span>
-  </div>
-)}
+<Button
+  variant="outline"
+  size="sm"
+  onClick={() => toast({ title: "Pipeline", description: "Candidate added to pipeline." })}
+  className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-purple-500 text-purple-600 hover:bg-purple-50 hover:border-purple-600 hover:text-purple-700 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-950/30 transition-all duration-200"
+>
+  <GitBranch className="w-4 h-4 mr-1.5" />
+  Pipeline
+</Button>
 ```
 
-This way:
-- **Mobile**: Shows the created date below the card header, before the candidate count boxes
-- **Desktop**: Continues to show it in the same position as before (just outside the hidden block now, same visual area)
-- All other details (recruiter, location, salary, contract) remain hidden on mobile to keep cards compact
+Add `GitBranch` to the existing `lucide-react` import.
 
-### What Users Will See on Mobile
-Each job card will now display the creation date (e.g., "Created: Feb 20, 2026 10:30") with a calendar icon — always visible on both mobile and desktop — without cluttering the mobile card with all other details.
+---
+
+### Final button layout
+
+```text
+[ Submit ]  [ Pipeline ]  [ Reject ]
+```
+
+All three stack vertically on mobile and sit side by side on desktop (existing `flex-col sm:flex-row` layout handles this automatically).
+
+---
+
+### What will NOT change
+- No database writes
+- No status field updates
+- No logic changes to the existing Submit or Reject handlers
+- The "CV Submitted" and "Rejected" disabled states remain exactly as they are
