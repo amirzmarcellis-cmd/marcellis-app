@@ -961,6 +961,27 @@ export type Database = {
           },
         ]
       }
+      "message history WA": {
+        Row: {
+          created_at: string
+          id: number
+          message: string | null
+          phone: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          message?: string | null
+          phone?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          message?: string | null
+          phone?: string | null
+        }
+        Relationships: []
+      }
       message_buffer: {
         Row: {
           chat_id: string
