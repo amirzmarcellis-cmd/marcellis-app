@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Briefcase, Phone, PhoneOff, UserCircle, Calendar, Clock, X, Info, Lock } from "lucide-react";
+import { Plus, Building2, MapPin, Banknote, Users, Edit, Trash2, Play, Pause, Briefcase, Phone, PhoneOff, UserCircle, Calendar, Clock, X, Info, Lock, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
@@ -52,6 +52,7 @@ export function JobManagementPanel() {
   const [loading, setLoading] = useState(true);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedGroupFilter, setSelectedGroupFilter] = useState<string>("");
   const [selectedRecruiterFilter, setSelectedRecruiterFilter] = useState<string>("");
   const [dateRange, setDateRange] = useState<{
@@ -517,10 +518,16 @@ export function JobManagementPanel() {
       if (!selectedRecruiterFilter) return jobList;
       return jobList.filter(job => job.recruiter_id === selectedRecruiterFilter);
     };
+    const filterJobsByTitle = (jobList: Job[]) => {
+      if (!searchQuery.trim()) return jobList;
+      const q = searchQuery.toLowerCase();
+      return jobList.filter(job => job.job_title?.toLowerCase().includes(q));
+    };
     const applyFilters = (jobList: Job[]) => {
       let filtered = filterJobsByGroup(jobList);
       filtered = filterJobsByDate(filtered);
       filtered = filterJobsByRecruiter(filtered);
+      filtered = filterJobsByTitle(filtered);
       return filtered;
     };
     const activeJobs = jobs.filter(job => job.Processed === "Yes");
@@ -530,7 +537,7 @@ export function JobManagementPanel() {
       pausedJobs: applyFilters(pausedJobs),
       allJobs: applyFilters(jobs)
     };
-  }, [jobs, selectedGroupFilter, selectedRecruiterFilter, dateRange]);
+  }, [jobs, selectedGroupFilter, selectedRecruiterFilter, dateRange, searchQuery]);
   return <div className="space-y-4 sm:space-y-6 w-full">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
         <div className="w-full sm:w-auto">
@@ -577,6 +584,22 @@ export function JobManagementPanel() {
 
       {/* Filters */}
         <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
+          {/* Search by Job Title */}
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Search className="h-4 w-4 text-muted-foreground shrink-0" />
+            <input
+              type="text"
+              placeholder="Search by job title..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="h-10 px-3 py-2 rounded-md border border-border bg-background text-sm font-light font-inter w-full sm:w-[240px] focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all"
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery("")} className="text-muted-foreground hover:text-foreground transition-colors">
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
           {/* Group Filter */}
           <div className="flex flex-col gap-1.5 w-full sm:w-auto sm:flex-row sm:items-center sm:gap-2">
             <label className="text-xs sm:text-sm font-light font-inter">Filter by Group:</label>
