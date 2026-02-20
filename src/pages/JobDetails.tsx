@@ -3217,7 +3217,8 @@ mainCandidate["linkedin_score_reason"] ? (
       const score = parseFloat(candidate.after_call_score || "0");
       const isRejected = candidate["Contacted"] === "Rejected";
       const isFromSimilarJobs = candidate["contacted"] === "Shortlisted from Similar jobs";
-      return score >= 74 && !isRejected && !isFromSimilarJobs;
+      const isPipeline = candidate["Contacted"] === "Pipeline" || candidate["contacted"] === "Pipeline";
+      return score >= 74 && !isRejected && !isFromSimilarJobs && !isPipeline;
     })
     .sort((a, b) => {
       const overallScoreA = calculateOverallScore(a);
@@ -3239,6 +3240,16 @@ mainCandidate["linkedin_score_reason"] ? (
       const overallScoreB = calculateOverallScore(b);
       return overallScoreB - overallScoreA;
     });
+
+  // Pipeline candidates (after_call_score >= 74 AND contacted === "Pipeline")
+  const pipelineShortListCandidates = candidates
+    .filter((candidate) => {
+      const score = parseFloat(candidate.after_call_score || "0");
+      const isPipeline = candidate["Contacted"] === "Pipeline" || candidate["contacted"] === "Pipeline";
+      const isFromSimilarJobs = candidate["contacted"] === "Shortlisted from Similar jobs";
+      return score >= 74 && isPipeline && !isFromSimilarJobs;
+    })
+    .sort((a, b) => calculateOverallScore(b) - calculateOverallScore(a));
 
   // Helper function to parse salary as number (handles ranges like "10000-12000")
   const parseSalary = (salary: string | null | undefined): number => {
@@ -5502,6 +5513,50 @@ mainCandidate["linkedin_score_reason"] ? (
                             return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
                           },
                         );
+                      })()}
+                    </div>
+                  </ScrollArea>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Pipeline Section */}
+            <Card className="max-w-full overflow-hidden">
+              <CardHeader className="p-3 sm:p-6">
+                <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+                  <GitBranch className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0 text-purple-500" />
+                  Pipeline ({pipelineShortListCandidates.length} candidates)
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm mt-1">
+                  Candidates who have been moved to the pipeline
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {pipelineShortListCandidates.length === 0 ? (
+                  <div className="text-center py-8">
+                    <GitBranch className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No pipeline candidates</h3>
+                    <p className="text-muted-foreground">
+                      Candidates added to the pipeline will appear here
+                    </p>
+                  </div>
+                ) : (
+                  <ScrollArea className="h-[600px] w-full">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4 w-full max-w-full">
+                      {(() => {
+                        const grouped = pipelineShortListCandidates.reduce((acc, candidate) => {
+                          const cId = candidate["user_id"] || candidate["Candidate_ID"];
+                          if (!acc[cId]) acc[cId] = [];
+                          acc[cId].push(candidate);
+                          return acc;
+                        }, {} as Record<string, any[]>);
+
+                        return Object.entries(grouped)
+                          .sort(([, a], [, b]) => calculateOverallScore(b[0]) - calculateOverallScore(a[0]))
+                          .map(([candidateId, candidateContacts]) => {
+                            const mainCandidate = candidateContacts[0];
+                            return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
+                          });
                       })()}
                     </div>
                   </ScrollArea>
