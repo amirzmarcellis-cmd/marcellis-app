@@ -1,76 +1,104 @@
 
-## Fix: Pipeline Candidates Stay in AI Shortlist
+## Add Pipeline Section to AI Shortlist Tab
 
-### What the user confirmed
-After clicking the Pipeline button, candidates must remain visible in the AI Shortlist tab. The concern is whether the local state update correctly keeps them there.
+### What the user wants
+A dedicated **"Pipeline" section** inside the AI Shortlist tab that shows all candidates whose `contacted` status is `"Pipeline"`. These candidates should appear there and NOT in the Within Budget / Above Budget sections (since they already have a dedicated section).
 
-### Current State (already in place from previous implementation)
-- `handlePipeline` function exists at lines 2095-2112 — it updates `contacted = "Pipeline"` in the DB and tries to update local state
-- Pipeline button at lines 3148-3168 renders as disabled "In Pipeline" when `Contacted === "Pipeline"`
-- `shortListCandidates` filter at lines 3207-3212 does NOT exclude Pipeline candidates (only excludes "Rejected" and "Shortlisted from Similar jobs")
+### Current State
+- `shortListCandidates` includes Pipeline candidates — they currently show up in Within Budget or Above Budget sections
+- There are 4 existing sections: Within Budget, Above Budget, Not in Preferred Nationality, Rejected Candidates
+- The `renderCandidateCard` function is already used by all sections — reuse it for the new Pipeline section
 
-### Root Cause of Disappearing Candidates
+### Changes — `src/pages/JobDetails.tsx` only
 
-The local state update at lines 2104-2110 matches candidates using:
+#### 1. Add a `pipelineShortListCandidates` computed variable (after line 3241)
+
 ```ts
-c["user_id"] === candidateId || c["Candidate_ID"] === candidateId
-```
-
-This is close but can silently fail if `c["user_id"]` is undefined or has a type mismatch. When the match fails, the candidate's local `Contacted` field stays as its old value (e.g. "Call Done"). The `shortListCandidates` filter still passes them through — BUT the button condition (`mainCandidate["Contacted"] === "Pipeline"`) doesn't update, so the button stays active. That isn't the disappearing issue.
-
-The real disappearing issue is that `fetchCandidates(id)` is called after Reject (line 1625) and Submit (line 1792) actions, which **overwrites the entire `candidates` state** from the DB. Since the DB is correctly set to "Pipeline", the refetched data WILL include the Pipeline candidate — so they should reappear. The `shortListCandidates` filter at line 3212 does not filter out Pipeline, so they stay.
-
-The conclusion: the implementation is correct. Candidates will NOT disappear from the AI Shortlist after clicking Pipeline because:
-1. `shortListCandidates` filter only excludes `Contacted === "Rejected"` and `contacted === "Shortlisted from Similar jobs"` — Pipeline passes both checks
-2. The DB is correctly updated to `contacted = "Pipeline"`
-3. The local state update sets `Contacted: "Pipeline"` which causes the button to switch to the disabled "In Pipeline" state immediately
-
-### The One Remaining Fix to Apply
-
-The matching in `handlePipeline` should be hardened to also check `recordid` to ensure no edge cases:
-
-**File: `src/pages/JobDetails.tsx`, lines 2104-2110**
-
-Change from:
-```ts
-setCandidates((prev) =>
-  prev.map((c) =>
-    c["user_id"] === candidateId || c["Candidate_ID"] === candidateId
-      ? { ...c, Contacted: "Pipeline", contacted: "Pipeline" }
-      : c
-  )
-);
-```
-
-Change to:
-```ts
-setCandidates((prev) =>
-  prev.map((c) => {
-    const cUserId = c["user_id"] ?? "";
-    const cCandidateId = c["Candidate_ID"] ?? "";
-    const cRecordId = c["recordid"]?.toString() ?? "";
-    if (
-      cUserId === candidateId ||
-      cCandidateId === candidateId ||
-      cRecordId === candidateId
-    ) {
-      return { ...c, Contacted: "Pipeline", contacted: "Pipeline" };
-    }
-    return c;
+// Pipeline candidates (after_call_score >= 74 AND contacted === "Pipeline")
+const pipelineShortListCandidates = candidates
+  .filter((candidate) => {
+    const score = parseFloat(candidate.after_call_score || "0");
+    const isPipeline = candidate["Contacted"] === "Pipeline" || candidate["contacted"] === "Pipeline";
+    const isFromSimilarJobs = candidate["contacted"] === "Shortlisted from Similar jobs";
+    return score >= 74 && isPipeline && !isFromSimilarJobs;
   })
-);
+  .sort((a, b) => calculateOverallScore(b) - calculateOverallScore(a));
 ```
 
-### What the user will see
-1. Click Pipeline on a candidate in the AI Shortlist tab
-2. The button immediately changes to a disabled purple "In Pipeline" button
-3. The candidate card STAYS in the AI Shortlist — it does not disappear
-4. The `contacted` column in `Jobs_CVs` is updated to `"Pipeline"` in the database
-5. The candidate also appears in the Live Feed → Pipeline Candidates section
+#### 2. Exclude Pipeline candidates from `shortListCandidates` (line 3220)
+
+Change:
+```ts
+return score >= 74 && !isRejected && !isFromSimilarJobs;
+```
+To:
+```ts
+const isPipeline = candidate["Contacted"] === "Pipeline" || candidate["contacted"] === "Pipeline";
+return score >= 74 && !isRejected && !isFromSimilarJobs && !isPipeline;
+```
+
+This ensures Pipeline candidates no longer appear in Within Budget or Above Budget — they will only appear in the new Pipeline section.
+
+#### 3. Add the Pipeline section in the JSX (after the Rejected Candidates `</Card>`, before `</div></TabsContent>`, around line 5510)
+
+The new section follows the exact same pattern as Rejected Candidates:
+
+```tsx
+{/* Pipeline Section */}
+<Card className="max-w-full overflow-hidden">
+  <CardHeader className="p-3 sm:p-6">
+    <CardTitle className="flex items-center text-base sm:text-lg md:text-xl">
+      <GitBranch className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0 text-purple-500" />
+      Pipeline ({pipelineShortListCandidates.length} candidates)
+    </CardTitle>
+    <CardDescription className="text-xs sm:text-sm mt-1">
+      Candidates who have been moved to the pipeline
+    </CardDescription>
+  </CardHeader>
+  <CardContent>
+    {pipelineShortListCandidates.length === 0 ? (
+      <div className="text-center py-8">
+        <GitBranch className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+        <h3 className="text-lg font-semibold mb-2">No pipeline candidates</h3>
+        <p className="text-muted-foreground">
+          Candidates added to the pipeline will appear here
+        </p>
+      </div>
+    ) : (
+      <ScrollArea className="h-[600px] w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 pr-2 sm:pr-4 w-full max-w-full">
+          {(() => {
+            const grouped = pipelineShortListCandidates.reduce((acc, candidate) => {
+              const cId = candidate["user_id"] || candidate["Candidate_ID"];
+              if (!acc[cId]) acc[cId] = [];
+              acc[cId].push(candidate);
+              return acc;
+            }, {} as Record<string, any[]>);
+
+            return Object.entries(grouped)
+              .sort(([, a], [, b]) => calculateOverallScore(b[0]) - calculateOverallScore(a[0]))
+              .map(([candidateId, candidateContacts]) => {
+                const mainCandidate = candidateContacts[0];
+                return renderCandidateCard(candidateId, candidateContacts, mainCandidate);
+              });
+          })()}
+        </div>
+      </ScrollArea>
+    )}
+  </CardContent>
+</Card>
+```
+
+#### 4. `GitBranch` import check
+`GitBranch` was already added in the previous implementation to `JobDetails.tsx`. No new import needed if it's already there.
 
 ### What will NOT change
+- Within Budget section — unchanged (Pipeline candidates just won't appear there anymore since they're excluded)
+- Above Budget section — unchanged
+- Not in Preferred Nationality section — unchanged
+- Rejected Candidates section — unchanged
 - Submit button — unchanged
 - Reject button — unchanged
-- The `shortListCandidates` filter logic — already correct, no change needed
-- Live Feed pipeline section — already implemented, no change needed
-- No other pages, components, or tables touched
+- Pipeline button behavior (DB update + local state) — unchanged
+- Live Feed pipeline section — unchanged
+- No other files touched
