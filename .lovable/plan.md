@@ -1,127 +1,76 @@
 
-## Pipeline Button: Save Status & Show in Live Feed
+## Fix: Pipeline Candidates Stay in AI Shortlist
 
-### Overview
-Two targeted changes:
-1. **`src/pages/JobDetails.tsx`** — When Pipeline button is clicked, update `contacted` to `"Pipeline"` in `Jobs_CVs` and disable the button (show "In Pipeline") once done
-2. **`src/pages/LiveCandidateFeed.tsx`** — Add a second section below the existing "Call Done Candidates" card that shows all candidates with `contacted = "Pipeline"`
+### What the user confirmed
+After clicking the Pipeline button, candidates must remain visible in the AI Shortlist tab. The concern is whether the local state update correctly keeps them there.
 
-No other changes will be made anywhere in the app.
+### Current State (already in place from previous implementation)
+- `handlePipeline` function exists at lines 2095-2112 — it updates `contacted = "Pipeline"` in the DB and tries to update local state
+- Pipeline button at lines 3148-3168 renders as disabled "In Pipeline" when `Contacted === "Pipeline"`
+- `shortListCandidates` filter at lines 3207-3212 does NOT exclude Pipeline candidates (only excludes "Rejected" and "Shortlisted from Similar jobs")
 
----
+### Root Cause of Disappearing Candidates
 
-### Change 1 — `src/pages/JobDetails.tsx` (Pipeline button, lines 3129–3137)
-
-**Current state:** Pipeline button only shows a toast and does nothing to the database.
-
-**What changes:**
-
-Add a `handlePipeline` function (near `handleClientStatusChange`, around line 2094) that:
-- Updates `contacted` to `"Pipeline"` in `Jobs_CVs` using `recordid` (which is the `Candidate_ID`) and `job_id`
-- On success, updates local `candidates` state so the button immediately becomes disabled without needing a full refetch
-
+The local state update at lines 2104-2110 matches candidates using:
 ```ts
-const handlePipeline = async (candidateId: string) => {
-  const { error } = await supabase
-    .from("Jobs_CVs")
-    .update({ contacted: "Pipeline" })
-    .eq("user_id", candidateId)
-    .eq("job_id", id!);
-
-  if (!error) {
-    toast({ title: "Pipeline", description: "Candidate added to pipeline." });
-    // Update local state so button disables immediately
-    setCandidates((prev) =>
-      prev.map((c) =>
-        c["user_id"] === candidateId || c["Candidate_ID"] === candidateId
-          ? { ...c, Contacted: "Pipeline", contacted: "Pipeline" }
-          : c
-      )
-    );
-  }
-};
+c["user_id"] === candidateId || c["Candidate_ID"] === candidateId
 ```
 
-**Replace the Pipeline button block (lines 3129–3137):**
+This is close but can silently fail if `c["user_id"]` is undefined or has a type mismatch. When the match fails, the candidate's local `Contacted` field stays as its old value (e.g. "Call Done"). The `shortListCandidates` filter still passes them through — BUT the button condition (`mainCandidate["Contacted"] === "Pipeline"`) doesn't update, so the button stays active. That isn't the disappearing issue.
 
-```tsx
-{mainCandidate["Contacted"] === "Pipeline" ? (
-  <Button
-    variant="outline"
-    size="sm"
-    disabled
-    className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-purple-400 text-purple-400 cursor-default opacity-60"
-  >
-    <GitBranch className="w-4 h-4 mr-1.5" />
-    In Pipeline
-  </Button>
-) : (
-  <Button
-    variant="outline"
-    size="sm"
-    onClick={() => handlePipeline(candidateId)}
-    className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-purple-500 text-purple-600 hover:bg-purple-50 hover:border-purple-600 hover:text-purple-700 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-950/30 transition-all duration-200"
-  >
-    <GitBranch className="w-4 h-4 mr-1.5" />
-    Pipeline
-  </Button>
-)}
-```
+The real disappearing issue is that `fetchCandidates(id)` is called after Reject (line 1625) and Submit (line 1792) actions, which **overwrites the entire `candidates` state** from the DB. Since the DB is correctly set to "Pipeline", the refetched data WILL include the Pipeline candidate — so they should reappear. The `shortListCandidates` filter at line 3212 does not filter out Pipeline, so they stay.
 
-No changes to Submit or Reject buttons. No other changes anywhere else in this file.
+The conclusion: the implementation is correct. Candidates will NOT disappear from the AI Shortlist after clicking Pipeline because:
+1. `shortListCandidates` filter only excludes `Contacted === "Rejected"` and `contacted === "Shortlisted from Similar jobs"` — Pipeline passes both checks
+2. The DB is correctly updated to `contacted = "Pipeline"`
+3. The local state update sets `Contacted: "Pipeline"` which causes the button to switch to the disabled "In Pipeline" state immediately
 
----
+### The One Remaining Fix to Apply
 
-### Change 2 — `src/pages/LiveCandidateFeed.tsx`
+The matching in `handlePipeline` should be hardened to also check `recordid` to ensure no edge cases:
 
-**Current state:** Fetches only candidates with `contacted = "Call Done"`. Only one section shown.
+**File: `src/pages/JobDetails.tsx`, lines 2104-2110**
 
-**What changes:**
-
-**A. Add a second parallel fetch for Pipeline candidates** inside `fetchData()`:
-
-Alongside the existing `Jobs_CVs` query (which filters `contacted = 'Call Done'`), add another query filtered by `contacted = 'Pipeline'`. Both queries run against the same role-filtered `jobIds`.
-
+Change from:
 ```ts
-// Existing query (Call Done) - unchanged
-const { data, error: jobsCvsError } = await supabase
-  .from('Jobs_CVs')
-  .select('...')
-  .eq('contacted', 'Call Done')
-  .in('job_id', jobIds);
-
-// New query (Pipeline)
-const { data: pipelineData } = await supabase
-  .from('Jobs_CVs')
-  .select('recordid, candidate_name, candidate_email, candidate_phone_number, job_id, after_call_score, cv_score, linkedin_score, source, after_call_reason, contacted, after_call_pros, after_call_cons, notice_period, salary_expectations')
-  .eq('contacted', 'Pipeline')
-  .in('job_id', jobIds);
+setCandidates((prev) =>
+  prev.map((c) =>
+    c["user_id"] === candidateId || c["Candidate_ID"] === candidateId
+      ? { ...c, Contacted: "Pipeline", contacted: "Pipeline" }
+      : c
+  )
+);
 ```
 
-**B. Add state for pipeline candidates:**
-
+Change to:
 ```ts
-const [pipelineCandidates, setPipelineCandidates] = useState<Candidate[]>([]);
+setCandidates((prev) =>
+  prev.map((c) => {
+    const cUserId = c["user_id"] ?? "";
+    const cCandidateId = c["Candidate_ID"] ?? "";
+    const cRecordId = c["recordid"]?.toString() ?? "";
+    if (
+      cUserId === candidateId ||
+      cCandidateId === candidateId ||
+      cRecordId === candidateId
+    ) {
+      return { ...c, Contacted: "Pipeline", contacted: "Pipeline" };
+    }
+    return c;
+  })
+);
 ```
 
-Map `pipelineData` the same way `callDoneCandidates` are mapped and call `setPipelineCandidates(...)`.
-
-**C. Add a new Pipeline section after the existing "Call Done Candidates" card** (after line 461, before the closing `</div>`):
-
-- A new `<Card>` titled "Pipeline Candidates" with a purple `GitBranch` icon
-- Renders the same candidate card layout already used for Call Done candidates
-- Shows a count badge: `{pipelineCandidates.length} In Pipeline`
-- Empty state message: "No pipeline candidates yet"
-- The cards are NOT clickable to redirect (or redirect the same way to call-log-details)
-- No action buttons inside these cards — just informational display
-
-**D. Import `GitBranch`** from `lucide-react` in `LiveCandidateFeed.tsx` (currently not imported there).
-
----
+### What the user will see
+1. Click Pipeline on a candidate in the AI Shortlist tab
+2. The button immediately changes to a disabled purple "In Pipeline" button
+3. The candidate card STAYS in the AI Shortlist — it does not disappear
+4. The `contacted` column in `Jobs_CVs` is updated to `"Pipeline"` in the database
+5. The candidate also appears in the Live Feed → Pipeline Candidates section
 
 ### What will NOT change
-- Submit button behavior — unchanged
-- Reject button behavior — unchanged
-- "Call Done Candidates" section in Live Feed — unchanged
-- All other pages, components, hooks, and database tables — untouched
-- No new database tables or migrations needed (`"Pipeline"` is just a new string value for the existing `contacted` text column)
+- Submit button — unchanged
+- Reject button — unchanged
+- The `shortListCandidates` filter logic — already correct, no change needed
+- Live Feed pipeline section — already implemented, no change needed
+- No other pages, components, or tables touched
