@@ -2092,6 +2092,25 @@ export default function JobDetails() {
     }
   };
 
+  const handlePipeline = async (candidateId: string) => {
+    const { error } = await supabase
+      .from("Jobs_CVs")
+      .update({ contacted: "Pipeline" })
+      .eq("user_id", candidateId)
+      .eq("job_id", id!);
+
+    if (!error) {
+      toast({ title: "Pipeline", description: "Candidate added to pipeline." });
+      setCandidates((prev) =>
+        prev.map((c) =>
+          c["user_id"] === candidateId || c["Candidate_ID"] === candidateId
+            ? { ...c, Contacted: "Pipeline", contacted: "Pipeline" }
+            : c
+        )
+      );
+    }
+  };
+
   const handleClientStatusChange = async (candidateId: string, newStatus: string) => {
     try {
       const { error } = await supabase
@@ -3126,15 +3145,27 @@ mainCandidate["linkedin_score_reason"] ? (
                     Reject
                   </Button>
                 )}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => toast({ title: "Pipeline", description: "Candidate added to pipeline." })}
-                  className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-purple-500 text-purple-600 hover:bg-purple-50 hover:border-purple-600 hover:text-purple-700 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-950/30 transition-all duration-200"
-                >
-                  <GitBranch className="w-4 h-4 mr-1.5" />
-                  Pipeline
-                </Button>
+                {mainCandidate["Contacted"] === "Pipeline" ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled
+                    className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-purple-400 text-purple-400 cursor-default opacity-60"
+                  >
+                    <GitBranch className="w-4 h-4 mr-1.5" />
+                    In Pipeline
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePipeline(candidateId)}
+                    className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-purple-500 text-purple-600 hover:bg-purple-50 hover:border-purple-600 hover:text-purple-700 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-950/30 transition-all duration-200"
+                  >
+                    <GitBranch className="w-4 h-4 mr-1.5" />
+                    Pipeline
+                  </Button>
+                )}
               </div>
 
               {/* Client Status Dropdown - Shows when CV is Submitted */}

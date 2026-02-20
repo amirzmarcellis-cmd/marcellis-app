@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Search, Filter, Users, Zap, Activity, Star, Mail, Phone, Briefcase, XCircle, CheckCircle } from 'lucide-react';
+import { Search, Filter, Users, Zap, Activity, Star, Mail, Phone, Briefcase, XCircle, CheckCircle, GitBranch } from 'lucide-react';
 import { toast } from 'sonner';
 import { useProfile } from '@/hooks/useProfile';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -58,6 +58,7 @@ export default function LiveCandidateFeed() {
   
   // Force cache reload - this is the updated version without interview functionality
   const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [pipelineCandidates, setPipelineCandidates] = useState<Candidate[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -158,9 +159,45 @@ export default function LiveCandidateFeed() {
           .eq('contacted', 'Call Done')
           .in('job_id', jobIds);
         
+        const { data: pipelineData } = await supabase
+          .from('Jobs_CVs')
+          .select('recordid, candidate_name, candidate_email, candidate_phone_number, job_id, after_call_score, cv_score, linkedin_score, source, after_call_reason, contacted, after_call_pros, after_call_cons, notice_period, salary_expectations')
+          .eq('contacted', 'Pipeline')
+          .in('job_id', jobIds);
+        
         console.log('LiveFeed: Candidates fetched:', data?.length || 0, 'Error:', jobsCvsError);
         if (jobsCvsError) throw jobsCvsError;
         jobsCvsData = data || [];
+
+        const mappedPipeline = (pipelineData || []).map(candidate => ({
+          'Candidate_ID': candidate.recordid?.toString() || '',
+          'Candidate Name': candidate.candidate_name || '',
+          'Candidate Email': candidate.candidate_email || '',
+          'Candidate Phone Number': candidate.candidate_phone_number || '',
+          'Job ID': candidate.job_id || '',
+          'Job Title': jobsData?.find(job => job.job_id === candidate.job_id)?.job_title || '',
+          'Success Score': candidate.after_call_score?.toString() || candidate.cv_score?.toString() || '0',
+          'Score and Reason': candidate.after_call_reason || '',
+          'Contacted': candidate.contacted || '',
+          'Summary': '',
+          'pros': candidate.after_call_pros || '',
+          'cons': candidate.after_call_cons || '',
+          'Notice Period': candidate.notice_period || '',
+          'Salary Expectations': candidate.salary_expectations || '',
+          candidate_id: candidate.recordid?.toString() || '',
+          candidate_name: candidate.candidate_name || '',
+          candidate_email: candidate.candidate_email || '',
+          job_id: candidate.job_id || '',
+          success_score: candidate.after_call_score?.toString() || candidate.cv_score?.toString() || '0',
+          after_call_reason: candidate.after_call_reason || '',
+          callid: candidate.recordid || 0,
+          recordid: candidate.recordid || 0,
+          after_call_score: candidate.after_call_score || 0,
+          cv_score: candidate.cv_score || 0,
+          linkedin_score: candidate.linkedin_score || 0,
+          source: candidate.source || ''
+        }));
+        setPipelineCandidates(mappedPipeline);
       } else {
         console.log('LiveFeed: No job IDs, skipping candidate fetch');
       }
@@ -453,6 +490,101 @@ export default function LiveCandidateFeed() {
                   <Users className="w-12 h-12 sm:w-16 sm:h-16 text-gray-500 mx-auto mb-3 sm:mb-4" />
                   <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">No candidates found</h3>
                   <p className="text-sm sm:text-base text-gray-400 px-4">No candidates with "Call Done" status found. Try adjusting your filters.</p>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
+
+      {/* Pipeline Candidates Section */}
+      <Card className="mt-6 bg-card border-border dark:bg-gradient-to-br dark:from-purple-950/30 dark:to-white/5 dark:backdrop-blur-xl dark:border-purple-500/20 shadow-2xl">
+        <CardHeader className="p-3 sm:p-4 md:p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <CardTitle className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light font-work tracking-tight text-foreground flex items-center flex-wrap gap-2">
+              <GitBranch className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400 shrink-0" />
+              <span>Pipeline Candidates</span>
+              <Badge className="bg-gradient-to-r from-purple-400/20 to-purple-600/20 text-purple-300 border-purple-400/40 font-light font-inter text-xs sm:text-sm">
+                {pipelineCandidates.length} In Pipeline
+              </Badge>
+            </CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="p-2 sm:p-4 md:p-6">
+          <ScrollArea className="h-[400px] sm:h-[500px] pr-1 sm:pr-4">
+            <div className="space-y-2 sm:space-y-4">
+              {pipelineCandidates.map((candidate, index) => {
+                const score = calculateOverallScore(candidate);
+                return (
+                  <div
+                    key={index}
+                    className="group relative p-2.5 sm:p-4 md:p-6 rounded-lg sm:rounded-xl md:rounded-2xl border transition-all duration-300 hover:shadow-xl w-full max-w-full overflow-hidden bg-gradient-to-r from-purple-400/10 to-purple-600/20 border-purple-400/30 backdrop-blur-sm animate-fade-in"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    {/* Score Badge */}
+                    <div className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 z-10">
+                      <Badge className={`text-xs sm:text-sm md:text-base font-bold px-1.5 py-0.5 sm:px-2.5 sm:py-1 ${getScoreColor(score)} border`}>
+                        {score}
+                        <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 ml-0.5 sm:ml-1 fill-current" />
+                      </Badge>
+                    </div>
+
+                    {/* Candidate Info */}
+                    <div className="flex items-start gap-2 sm:gap-3 md:gap-4 pr-12 sm:pr-14 md:pr-20 w-full max-w-full">
+                      <Avatar className="w-9 h-9 sm:w-12 sm:h-12 md:w-16 md:h-16 border-2 border-purple-400/50 shrink-0">
+                        <AvatarFallback className="bg-gradient-to-br from-purple-500 to-purple-700 text-white text-xs sm:text-base md:text-lg font-bold">
+                          {candidate.candidate_name?.charAt(0) || 'C'}
+                        </AvatarFallback>
+                      </Avatar>
+
+                      <div className="flex-1 min-w-0 max-w-full overflow-hidden">
+                        <div className="mb-1.5 sm:mb-2 md:mb-3">
+                          <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-light font-work tracking-tight text-foreground break-words line-clamp-2">
+                            {candidate.candidate_name}
+                          </h3>
+                          <Badge className="mt-1 bg-purple-500/20 text-purple-300 border-purple-400/40 text-xs">
+                            <GitBranch className="w-2.5 h-2.5 mr-1" />
+                            In Pipeline
+                          </Badge>
+                        </div>
+
+                        <div className="space-y-1.5 sm:space-y-2 text-[10px] sm:text-xs md:text-sm font-light font-inter w-full max-w-full">
+                          <div className="flex items-start gap-1 sm:gap-1.5 text-muted-foreground min-w-0 w-full">
+                            <Zap className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-yellow-400 shrink-0 mt-0.5" />
+                            <span className="break-words flex-1 leading-tight">{candidate['Job Title']}</span>
+                          </div>
+                          <div className="flex items-start gap-1 sm:gap-1.5 text-muted-foreground min-w-0 w-full">
+                            <Mail className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-cyan-400 shrink-0 mt-0.5" />
+                            <span className="break-all flex-1 leading-tight text-[9px] sm:text-xs">{candidate.candidate_email}</span>
+                          </div>
+                          <div className="flex items-start gap-1 sm:gap-1.5 text-muted-foreground min-w-0 w-full">
+                            <Phone className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-green-400 shrink-0 mt-0.5" />
+                            <span className="break-words flex-1 leading-tight">{candidate['Candidate Phone Number']}</span>
+                          </div>
+                          <div className="flex items-start gap-1 sm:gap-1.5 text-muted-foreground min-w-0 w-full">
+                            <Briefcase className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-orange-400 shrink-0 mt-0.5" />
+                            <span className="break-words flex-1 leading-tight">💰 {candidate['Salary Expectations'] || 'Negotiable'}</span>
+                          </div>
+                        </div>
+
+                        {candidate.after_call_reason && (
+                          <div className="mt-1.5 sm:mt-2 md:mt-3 p-1.5 sm:p-2 md:p-3 bg-black/20 rounded-md sm:rounded-lg w-full max-w-full overflow-hidden">
+                            <p className="text-[10px] sm:text-xs md:text-sm text-gray-300 leading-snug sm:leading-relaxed line-clamp-2 sm:line-clamp-3 break-words">
+                              {candidate.after_call_reason.slice(0, 150)}...
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {pipelineCandidates.length === 0 && (
+                <div className="text-center py-12 sm:py-16">
+                  <GitBranch className="w-12 h-12 sm:w-16 sm:h-16 text-purple-400/40 mx-auto mb-3 sm:mb-4" />
+                  <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">No pipeline candidates yet</h3>
+                  <p className="text-sm sm:text-base text-gray-400 px-4">Candidates added to the pipeline from Job Details will appear here.</p>
                 </div>
               )}
             </div>
