@@ -1,60 +1,49 @@
 
-## Add Job Title Search Bar to Jobs Page
+## Fix: Show Job Date on Mobile (Jobs Page)
 
-### What's being added
-A search input field on the Jobs page that filters job cards in real-time by job title as the user types.
+### Root Cause
+The entire job details block — including the Created date, recruiter name, location, salary, and contract length — is wrapped in a `div` with `className="hidden sm:block"`. This hides all of it on mobile screens (below the `sm` breakpoint of 640px).
 
-### Where the changes go
-**File:** `src/components/jobs/JobManagementPanel.tsx`
-
-### Technical Details
-
-**1. Add search state variable** (after the existing filter states around line 55):
-```ts
-const [searchQuery, setSearchQuery] = useState<string>("");
-```
-
-**2. Add search input UI** in the Filters section (around line 579), before the Group Filter — a styled text input with a Search icon:
+The relevant code is in `src/components/jobs/JobManagementPanel.tsx` around **line 863**:
 ```tsx
-<div className="flex items-center gap-2 w-full sm:w-auto">
-  <Search className="h-4 w-4 text-muted-foreground shrink-0" />
-  <input
-    type="text"
-    placeholder="Search by job title..."
-    value={searchQuery}
-    onChange={e => setSearchQuery(e.target.value)}
-    className="h-10 px-3 py-2 rounded-md border border-border bg-background text-sm font-light font-inter w-full sm:w-[240px]"
-  />
-  {searchQuery && (
-    <button onClick={() => setSearchQuery("")}>
-      <X className="h-4 w-4 text-muted-foreground" />
-    </button>
-  )}
+<div className="hidden sm:block space-y-1 sm:space-y-2 text-xs sm:text-sm">
+  {job.recruiter_name && ...}
+  {job.job_location && ...}
+  {job.job_salary_range && ...}
+  {job.contract_length && ...}
+  {job.Timestamp && <div>Created: ...</div>}   ← hidden on mobile
 </div>
 ```
 
-**3. Add search filtering to the `filteredJobs` useMemo** (around line 520 in `applyFilters`):
-```ts
-const filterJobsByTitle = (jobList: Job[]) => {
-  if (!searchQuery.trim()) return jobList;
-  const q = searchQuery.toLowerCase();
-  return jobList.filter(job => job.job_title?.toLowerCase().includes(q));
-};
+### Solution
+Show the **Created date** on mobile by pulling it out of the hidden block and making it always visible. The other details (recruiter, location, salary, contract length) can stay hidden on mobile to keep the card compact — but the date is a key piece of information that should always be shown.
 
-const applyFilters = (jobList: Job[]) => {
-  let filtered = filterJobsByGroup(jobList);
-  filtered = filterJobsByDate(filtered);
-  filtered = filterJobsByRecruiter(filtered);
-  filtered = filterJobsByTitle(filtered);
-  return filtered;
-};
+**File:** `src/components/jobs/JobManagementPanel.tsx`
+
+**Change 1 — Remove the date from the `hidden sm:block` div** and place it outside (below the block) so it renders on both mobile and desktop:
+
+Before (inside the hidden block, lines ~883-886):
+```tsx
+{job.Timestamp && <div className="flex items-center text-muted-foreground min-w-0">
+    <Calendar className="h-4 w-4 mr-2 text-primary flex-shrink-0" />
+    <span className="truncate">Created: {format(new Date(job.Timestamp), 'MMM dd, yyyy HH:mm')}</span>
+  </div>}
 ```
-Also add `searchQuery` to the `useMemo` dependency array.
 
-**4. Import `Search` icon** — add `Search` to the existing `lucide-react` import on line 9 (it's already destructured from there alongside other icons).
+After — remove it from the `hidden sm:block` div and add it just below that div, always visible:
+```tsx
+{job.Timestamp && (
+  <div className="flex items-center text-muted-foreground text-xs sm:text-sm min-w-0">
+    <Calendar className="h-4 w-4 mr-2 text-primary flex-shrink-0" />
+    <span className="truncate">Created: {format(new Date(job.Timestamp), 'MMM dd, yyyy HH:mm')}</span>
+  </div>
+)}
+```
 
-### What users will see
-- A search box appears at the top of the filters row, before the Group and Recruiter filters
-- Typing in it instantly filters the Active, Paused, and All Jobs tabs simultaneously
-- A small ✕ clear button appears when there's text in the search box, making it easy to reset
-- The job count in each tab updates live to reflect the search results
+This way:
+- **Mobile**: Shows the created date below the card header, before the candidate count boxes
+- **Desktop**: Continues to show it in the same position as before (just outside the hidden block now, same visual area)
+- All other details (recruiter, location, salary, contract) remain hidden on mobile to keep cards compact
+
+### What Users Will See on Mobile
+Each job card will now display the creation date (e.g., "Created: Feb 20, 2026 10:30") with a calendar icon — always visible on both mobile and desktop — without cluttering the mobile card with all other details.
