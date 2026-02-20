@@ -880,11 +880,14 @@ const JobGrid = memo(function JobGrid({
                   <span className="truncate">{job.contract_length}</span>
                 </div>}
               
-              {job.Timestamp && <div className="flex items-center text-muted-foreground min-w-0">
-                  <Calendar className="h-4 w-4 mr-2 text-primary flex-shrink-0" />
-                  <span className="truncate">Created: {format(new Date(job.Timestamp), 'MMM dd, yyyy HH:mm')}</span>
-                </div>}
             </div>
+
+            {job.Timestamp && (
+              <div className="flex items-center text-muted-foreground text-xs sm:text-sm min-w-0">
+                <Calendar className="h-4 w-4 mr-2 text-primary flex-shrink-0" />
+                <span className="truncate">Created: {format(new Date(job.Timestamp), 'MMM dd, yyyy HH:mm')}</span>
+              </div>
+            )}
 
             {job.client_description && <p className="text-sm text-muted-foreground line-clamp-3">
                 {job.client_description}
