@@ -1,23 +1,26 @@
 
 
-## Fix: WhatsApp History Page Shows No Data
+## Fix `{{newline}}` Display in Pros/Cons on Call Log Details Pages
 
 ### Problem
-The `message history WA` table has Row Level Security (RLS) enabled but **no policies defined**. This means all queries return empty results, even though the table contains 115 rows.
+The `after_call_pros` and `after_call_cons` fields from the database contain the literal string `{{newline}}` as a separator. Both call log detail pages render this text as-is instead of converting it to actual line breaks.
 
 ### Solution
-Add an RLS policy that allows authenticated users to read from the table. This follows the same pattern used by other tables in the project (e.g., `Jobs_CVs`, `CVs`).
+Replace all occurrences of `{{newline}}` with `\n` before rendering. Since both pages already use `whitespace-pre-wrap` or `leading-relaxed` styles, converting to real newlines will display them correctly.
 
-### Database Change
-A single SQL migration to add a SELECT policy:
+### Changes
 
-```sql
-CREATE POLICY "Authenticated users can view message history"
-  ON "message history WA"
-  FOR SELECT
-  USING (auth.role() = 'authenticated');
-```
+#### 1. `src/pages/CallLogDetails.tsx` (2 lines)
+- **Line 926**: Replace `{callLog.after_call_pros || ...}` with `{(callLog.after_call_pros || 'No pros available').replace(/\{\{newline\}\}/g, '\n')}`
+- **Line 935**: Replace `{callLog.after_call_cons || ...}` with `{(callLog.after_call_cons || 'No cons available').replace(/\{\{newline\}\}/g, '\n')}`
 
-### No Code Changes Needed
-The page code (`src/pages/WhatsAppHistory.tsx`) is already correct -- once the policy is added, the existing query will return data and the page will display contacts and messages.
+#### 2. `src/pages/CallLogDetailPage.tsx` (2 lines)
+- **Line 419**: Replace `{record.after_call_pros}` with `{record.after_call_pros.replace(/\{\{newline\}\}/g, '\n')}`
+- **Line 430**: Replace `{record.after_call_cons}` with `{record.after_call_cons.replace(/\{\{newline\}\}/g, '\n')}`
+- Also add `whitespace-pre-wrap` to the `<p>` className on these lines so newlines render visually.
+
+### What stays the same
+- No database changes
+- No new dependencies
+- All other sections on both pages remain untouched
 
