@@ -923,7 +923,7 @@ export default function CallLogDetails() {
             <CardTitle className="text-green-600 text-base sm:text-lg md:text-xl">Pros</CardTitle>
           </CardHeader>
           <CardContent className="p-4 sm:p-6">
-            <p className="whitespace-pre-wrap break-words text-sm sm:text-base">{(callLog.after_call_pros || 'No pros available').replace(/\{\{newline\}\}/g, '\n')}</p>
+            <p className="whitespace-pre-wrap break-words text-sm sm:text-base">{(callLog.after_call_pros || 'No pros available').replace(/\{\{newline\}\}/g, '\n\n')}</p>
           </CardContent>
         </Card>
 
@@ -932,7 +932,7 @@ export default function CallLogDetails() {
             <CardTitle className="text-red-600 text-base sm:text-lg md:text-xl">Cons</CardTitle>
           </CardHeader>
           <CardContent className="p-4 sm:p-6">
-            <p className="whitespace-pre-wrap break-words text-sm sm:text-base">{(callLog.after_call_cons || 'No cons available').replace(/\{\{newline\}\}/g, '\n')}</p>
+            <p className="whitespace-pre-wrap break-words text-sm sm:text-base">{(callLog.after_call_cons || 'No cons available').replace(/\{\{newline\}\}/g, '\n\n')}</p>
           </CardContent>
         </Card>
       </div>
