@@ -44,6 +44,7 @@ const LinkedInCallback = lazy(() => import("./pages/LinkedInCallback"));
 const AIOutreach = lazy(() => import("./pages/AIOutreach"));
 const ActiveJobsAnalytics = lazy(() => import("./pages/ActiveJobsAnalytics"));
 const InterviewCall = lazy(() => import("./pages/InterviewCall"));
+const WhatsAppHistory = lazy(() => import("./pages/WhatsAppHistory"));
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient({
@@ -109,6 +110,7 @@ const App = () => (
                     </ProtectedRoute>
                   } />
                   <Route path="/ai-outreach" element={<AIOutreach />} />
+                  <Route path="/whatsapp-history" element={<DashboardLayout><WhatsAppHistory /></DashboardLayout>} />
                   <Route path="/settings" element={<DashboardLayout><Settings /></DashboardLayout>} />
                   <Route path="/users-panel" element={
                     <ProtectedRoute requiresUsersPanel={true}>
