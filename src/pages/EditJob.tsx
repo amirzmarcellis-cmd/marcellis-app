@@ -16,6 +16,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { toast } from "sonner";
 import FileUpload from "@/components/upload/FileUpload";
 import { ApiMultiSelect } from "@/components/ui/api-multi-select";
+import { headhuntingPresetGroups } from "@/constants/headhunting-presets";
 
 const europeanCountries = [
   "Albania",
@@ -961,7 +962,7 @@ export default function EditJob() {
 
                   <div className="space-y-2">
                     <Label>Headhunting Companies</Label>
-                    <ApiMultiSelect
+                   <ApiMultiSelect
                       value={headhuntingCompanies}
                       onChange={setHeadhuntingCompanies}
                       apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
@@ -972,6 +973,7 @@ export default function EditJob() {
                       placeholder="Select companies..."
                       searchPlaceholder="Search companies..."
                       emptyText="No companies found"
+                      presetGroups={headhuntingPresetGroups}
                     />
                   </div>
 

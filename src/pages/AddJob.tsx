@@ -23,6 +23,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { ApiMultiSelect } from "@/components/ui/api-multi-select";
+import { headhuntingPresetGroups } from "@/constants/headhunting-presets";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const europeanCountries = [
@@ -1356,7 +1357,7 @@ export default function AddJob() {
               {selectedOptionalFields.includes("headhunting") && (
                 <div className="space-y-2 p-4 border border-border/50 rounded-lg bg-accent/5">
                   <Label className="font-medium">Headhunting Companies</Label>
-                  <ApiMultiSelect
+                   <ApiMultiSelect
                     value={formData.headhuntingCompanies}
                     onChange={(value) => handleInputChange("headhuntingCompanies", value)}
                     apiEndpoint="https://api4.unipile.com:13494/api/v1/linkedin/search/parameters?keywords={keywords}&type=COMPANY&account_id=TRe-JAwkQ-Kgoz27AwWxdw"
@@ -1367,6 +1368,7 @@ export default function AddJob() {
                     placeholder="Select headhunting companies..."
                     searchPlaceholder="Type to search companies..."
                     emptyText="Type to search for companies"
+                    presetGroups={headhuntingPresetGroups}
                   />
                   <p className="text-xs text-muted-foreground italic mt-2">
                     Note: This will affect the candidate longlist

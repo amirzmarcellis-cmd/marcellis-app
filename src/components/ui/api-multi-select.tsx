@@ -11,6 +11,11 @@ interface ApiOption {
   title: string;
 }
 
+interface PresetGroup {
+  label: string;
+  items: string[];
+}
+
 interface ApiMultiSelectProps {
   value: string[];
   onChange: (value: string[]) => void;
@@ -19,8 +24,9 @@ interface ApiMultiSelectProps {
   placeholder?: string;
   searchPlaceholder?: string;
   emptyText?: string;
-  labelField?: string; // Field name to use as the display label (default: "title")
-  isDatabase?: boolean; // If true, expects direct array response instead of {items: [...]}
+  labelField?: string;
+  isDatabase?: boolean;
+  presetGroups?: PresetGroup[];
 }
 
 export function ApiMultiSelect({
@@ -32,7 +38,8 @@ export function ApiMultiSelect({
   searchPlaceholder = "Search...",
   emptyText = "No results found.",
   labelField = "title",
-  isDatabase = false
+  isDatabase = false,
+  presetGroups
 }: ApiMultiSelectProps) {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<ApiOption[]>([]);
@@ -112,6 +119,32 @@ export function ApiMultiSelect({
 
   return (
     <div className="space-y-2">
+      {presetGroups && presetGroups.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {presetGroups.map((group) => {
+            const allSelected = group.items.every((item) => value.includes(item));
+            return (
+              <Button
+                key={group.label}
+                type="button"
+                variant={allSelected ? "default" : "outline"}
+                size="xs"
+                onClick={() => {
+                  if (allSelected) {
+                    onChange(value.filter((v) => !group.items.includes(v)));
+                  } else {
+                    onChange([...new Set([...value, ...group.items])]);
+                  }
+                }}
+                className="gap-1.5"
+              >
+                {allSelected && <Check className="h-3 w-3" />}
+                {group.label}
+              </Button>
+            );
+          })}
+        </div>
+      )}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button

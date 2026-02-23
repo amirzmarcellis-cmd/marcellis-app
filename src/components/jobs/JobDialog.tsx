@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Upload, FileText, Briefcase } from "lucide-react";
+import { Upload, FileText, Briefcase, Check } from "lucide-react";
+import { headhuntingPresetGroups } from "@/constants/headhunting-presets";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -337,6 +338,30 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
 
               <div className="space-y-2">
                 <Label>Headhunting Company URLs</Label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {headhuntingPresetGroups.map((group) => {
+                    const allSelected = group.items.every((item) => headhuntingCompanies.includes(item));
+                    return (
+                      <Button
+                        key={group.label}
+                        type="button"
+                        variant={allSelected ? "default" : "outline"}
+                        size="xs"
+                        onClick={() => {
+                          if (allSelected) {
+                            setHeadhuntingCompanies(headhuntingCompanies.filter((v) => !group.items.includes(v)));
+                          } else {
+                            setHeadhuntingCompanies([...new Set([...headhuntingCompanies, ...group.items])]);
+                          }
+                        }}
+                        className="gap-1.5"
+                      >
+                        {allSelected && <Check className="h-3 w-3" />}
+                        {group.label}
+                      </Button>
+                    );
+                  })}
+                </div>
                 <div className="flex gap-2">
                   <Input
                     value={newHeadhuntingUrl}
