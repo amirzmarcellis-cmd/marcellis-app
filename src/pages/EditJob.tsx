@@ -689,6 +689,7 @@ export default function EditJob() {
         assignment: hasAssignment ? formData.assignment : null,
         group_id: formData.group_id || null,
         linkedin_search_enabled: linkedInSearchEnabled,
+        religion: formData.religion === "Muslim" ? "muslim" : formData.religion,
         Job_difficulty: formData.Job_difficulty || 75,
       };
 
