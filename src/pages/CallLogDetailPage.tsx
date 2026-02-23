@@ -416,7 +416,7 @@ export default function CallLogDetailPage() {
                 <CardTitle className="text-emerald-400">Pros</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm leading-relaxed whitespace-pre-wrap text-emerald-300">{record.after_call_pros.replace(/\{\{newline\}\}/g, '\n')}</p>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap text-emerald-300">{record.after_call_pros.replace(/\{\{newline\}\}/g, '\n\n')}</p>
               </CardContent>
             </GlassCard>
           )}
@@ -427,7 +427,7 @@ export default function CallLogDetailPage() {
                 <CardTitle className="text-rose-400">Cons</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm leading-relaxed whitespace-pre-wrap text-rose-300">{record.after_call_cons.replace(/\{\{newline\}\}/g, '\n')}</p>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap text-rose-300">{record.after_call_cons.replace(/\{\{newline\}\}/g, '\n\n')}</p>
               </CardContent>
             </GlassCard>
           )}
