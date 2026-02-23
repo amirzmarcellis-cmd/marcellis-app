@@ -440,6 +440,7 @@ export type Database = {
           prefered_nationality: string | null
           Processed: string | null
           recruiter_id: string | null
+          religion: string | null
           status: string | null
           things_to_look_for: string | null
           Timestamp: string | null
@@ -482,6 +483,7 @@ export type Database = {
           prefered_nationality?: string | null
           Processed?: string | null
           recruiter_id?: string | null
+          religion?: string | null
           status?: string | null
           things_to_look_for?: string | null
           Timestamp?: string | null
@@ -524,6 +526,7 @@ export type Database = {
           prefered_nationality?: string | null
           Processed?: string | null
           recruiter_id?: string | null
+          religion?: string | null
           status?: string | null
           things_to_look_for?: string | null
           Timestamp?: string | null
