@@ -463,6 +463,7 @@ export default function AddJob() {
     contractLength: "",
     currency: "",
     genderPreference: "Any",
+    religion: "Any",
     itrisId: "",
     groupId: "",
     recruiterId: "",
@@ -824,6 +825,7 @@ export default function AddJob() {
         contract_length: formData.type === "Contract" && formData.contractLength ? formData.contractLength : null,
         Currency: formData.currency,
         gender_preference: formData.genderPreference,
+        religion: formData.religion,
         itris_job_id: formData.itrisId ? formData.itrisId.trim() : null,
         group_id: formData.groupId || null,
         recruiter_id: recruiterIdToSave,
@@ -1263,6 +1265,20 @@ export default function AddJob() {
                   <SelectContent>
                     <SelectItem value="Male">Male</SelectItem>
                     <SelectItem value="Female">Female</SelectItem>
+                    <SelectItem value="Any">Any</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="religion" className="font-medium">
+                  Religion
+                </Label>
+                <Select value={formData.religion} onValueChange={(value) => handleInputChange("religion", value)}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Select religion" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Muslim">Muslim</SelectItem>
                     <SelectItem value="Any">Any</SelectItem>
                   </SelectContent>
                 </Select>

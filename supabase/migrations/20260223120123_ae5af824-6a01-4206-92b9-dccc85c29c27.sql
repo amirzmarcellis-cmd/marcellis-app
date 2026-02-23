@@ -1,0 +1,1 @@
+UPDATE "Jobs" SET religion = 'Any' WHERE religion IS NULL OR TRIM(religion) = '';
