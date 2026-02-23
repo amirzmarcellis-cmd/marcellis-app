@@ -451,8 +451,9 @@ interface JobData {
   prefered_nationality?: string;
   Type: string;
   contract_length: string | null;
-  Currency: string;
+   Currency: string;
   gender_preference: string;
+  religion: string;
   itris_job_id?: string;
   group_id?: string;
   recruiter_id?: string;
@@ -504,6 +505,7 @@ export default function EditJob() {
     contract_length: "",
     Currency: "",
     gender_preference: "Any",
+    religion: "Any",
     itris_job_id: "",
     group_id: "",
     recruiter_id: "",
@@ -1100,6 +1102,23 @@ export default function EditJob() {
                         <SelectContent className="z-[60] bg-popover">
                           <SelectItem value="Male">Male</SelectItem>
                           <SelectItem value="Female">Female</SelectItem>
+                          <SelectItem value="Any">Any</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2 sm:space-y-3">
+                      <Label htmlFor="religion" className="text-sm sm:text-base">
+                        Religion
+                      </Label>
+                      <Select
+                        value={formData.religion || "Any"}
+                        onValueChange={(value) => setFormData((prev) => ({ ...prev, religion: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select religion" className="truncate" />
+                        </SelectTrigger>
+                        <SelectContent className="z-[60] bg-popover">
+                          <SelectItem value="Muslim">Muslim</SelectItem>
                           <SelectItem value="Any">Any</SelectItem>
                         </SelectContent>
                       </Select>
