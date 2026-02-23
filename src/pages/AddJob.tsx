@@ -825,7 +825,7 @@ export default function AddJob() {
         contract_length: formData.type === "Contract" && formData.contractLength ? formData.contractLength : null,
         Currency: formData.currency,
         gender_preference: formData.genderPreference,
-        religion: formData.religion,
+        religion: formData.religion === "Muslim" ? "muslim" : formData.religion,
         itris_job_id: formData.itrisId ? formData.itrisId.trim() : null,
         group_id: formData.groupId || null,
         recruiter_id: recruiterIdToSave,
