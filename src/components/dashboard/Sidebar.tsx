@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { BarChart3, Phone, Users, Settings, Home, TrendingUp, FileText, Briefcase, LogOut, PhoneCall, Activity, Sun, Moon, Building2, FolderOpen, User, Crown, Megaphone, PieChart } from "lucide-react";
+import { BarChart3, Phone, Users, Settings, Home, TrendingUp, FileText, Briefcase, LogOut, PhoneCall, Activity, Sun, Moon, Building2, FolderOpen, User, Crown, Megaphone, PieChart, MessageSquare } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useAppSettings } from '@/contexts/AppSettingsContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -77,6 +77,10 @@ export function DashboardSidebar() {
     title: "Call Log",
     url: "/call-log",
     icon: PhoneCall
+  }, {
+    title: "WhatsApp",
+    url: "/whatsapp-history",
+    icon: MessageSquare
   }, {
     title: "Analytics",
     url: "/analytics",
