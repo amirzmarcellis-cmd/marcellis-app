@@ -3810,6 +3810,14 @@ mainCandidate["linkedin_score_reason"] ? (
                   <span>{job.industry || "N/A"}</span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-muted-foreground">Preferred Gender:</span>
+                  <span>{job.gender_preference || "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Religion:</span>
+                  <span>{job.religion ? (job.religion.toLowerCase() === "muslim" ? "Muslim" : job.religion) : "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Headhunting Companies:</span>
                   <div className="flex flex-col gap-1 items-end">
                     {job.headhunting_companies ? (
