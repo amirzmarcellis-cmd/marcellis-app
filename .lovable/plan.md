@@ -1,35 +1,33 @@
 
 
-## Add Religion Field to Job Forms and Backfill Data
+## Add Pipeline Count to Job Cards on Jobs Tab
 
 ### Overview
-Add a "Religion" dropdown (options: "Muslim", "Any") to the Add Job and Edit Job forms, and update all existing jobs with null/empty religion to "Any".
+Add a "Pipeline" count badge to each job card in the Jobs tab, positioned between "Rejected" and "Submitted". The count logic mirrors the existing JobFunnel: candidates with `contacted = 'Pipeline'`.
 
 ### Changes
 
-#### 1. Database: Backfill null/empty religion values
-Run a SQL update to set all Jobs where `religion` is null or empty to `'Any'`. The column already exists with a default of `'Any'`, so no schema change is needed.
+#### 1. `src/components/jobs/JobManagementPanel.tsx`
 
-```sql
-UPDATE "Jobs" SET religion = 'Any' WHERE religion IS NULL OR TRIM(religion) = '';
+**Type update (~line 37-42):** Add `pipeline_count?: number` to the job interface.
+
+**Count calculation (~line 218-227):** Add pipeline count computation after the rejected count:
+```typescript
+const pipeline_count = longlistedCandidates.filter(c => {
+  const contacted = (c.contacted || "").trim();
+  return contacted === 'Pipeline';
+}).length;
 ```
 
-#### 2. `src/pages/AddJob.tsx`
-- Add `religion: "Any"` to the form state (alongside `genderPreference`)
-- Include `religion: formData.religion` in the job data object sent to Supabase
-- Add a Religion `<Select>` field next to the Preferred Gender field (change grid from `grid-cols-3` to include the new field, or add it as a sibling)
-  - Options: "Muslim", "Any"
-  - Default: "Any"
+Include `pipeline_count` in the returned job object (~line 228-234).
 
-#### 3. `src/pages/EditJob.tsx`
-- Add `religion: "Any"` to the form state interface and default values
-- Load `religion` from fetched job data
-- Include `religion` in the update payload
-- Add a Religion `<Select>` field next to the Preferred Gender field
-  - Options: "Muslim", "Any"
-  - Default: "Any"
+**UI update (~line 897):** Change grid from `grid-cols-4` to `grid-cols-5` (desktop) and keep `grid-cols-2` for mobile. Add a new Pipeline card between Rejected and Submitted:
+- Violet color scheme (`bg-violet-500/10`, `border-violet-500/20`, `text-violet-500`)
+- Clickable, navigates to the job's shortlist tab
+- Shows `job.pipeline_count || 0`
 
-### Technical Notes
-- The `religion` column already exists on the `Jobs` table with default `'Any'`
-- No schema migration needed, only a data backfill
-- Pattern follows the existing `gender_preference` field exactly
+The final order will be: **Longlisted | Shortlisted | Rejected | Pipeline | Submitted**
+
+### No database or backend changes required
+The `contacted` field already supports the "Pipeline" value. This is purely a UI addition with client-side count logic.
+
