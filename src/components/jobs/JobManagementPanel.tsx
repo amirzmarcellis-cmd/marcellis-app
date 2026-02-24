@@ -38,6 +38,7 @@ interface Job {
   longlisted_count?: number;
   shortlisted_count?: number;
   rejected_count?: number;
+  pipeline_count?: number;
   submitted_count?: number;
   recruiter_id?: string | null;
   recruiter_name?: string | null;
@@ -220,6 +221,12 @@ export function JobManagementPanel() {
           return contacted === 'Rejected';
         }).length;
 
+        // Pipeline: longlisted candidates with contacted status = 'Pipeline'
+        const pipeline_count = longlistedCandidates.filter(c => {
+          const contacted = (c.contacted || "").trim();
+          return contacted === 'Pipeline';
+        }).length;
+
         // Submitted: only longlisted candidates with contacted status = 'Submitted' (matches JobFunnel)
         const submitted_count = longlistedCandidates.filter(c => {
           const contacted = (c.contacted || "").trim();
@@ -230,6 +237,7 @@ export function JobManagementPanel() {
           longlisted_count,
           shortlisted_count,
           rejected_count,
+          pipeline_count,
           submitted_count,
           recruiter_name: job.recruiter_id ? recruiterNamesMap.get(job.recruiter_id) || null : null
         };
@@ -894,7 +902,7 @@ const JobGrid = memo(function JobGrid({
               </p>}
 
             {/* Candidate Counts */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
               <div className="flex flex-col items-center p-2 sm:p-2.5 rounded-md bg-blue/10 border border-blue/20">
                 <div className="flex items-center gap-1 text-blue">
                   <Users className="h-4 w-4 sm:h-3 sm:w-3" />
@@ -923,6 +931,17 @@ const JobGrid = memo(function JobGrid({
                   <span className="font-bold text-lg sm:text-xl">{job.rejected_count || 0}</span>
                 </div>
                 <span className="text-xs text-muted-foreground mt-1">Rejected</span>
+              </div>
+              <div
+                className="flex flex-col items-center p-2 sm:p-2.5 rounded-md bg-violet-500/10 border border-violet-500/20 cursor-pointer hover:bg-violet-500/20 transition-colors"
+                onClick={() => navigate(`/job/${job.job_id}`, { state: { tab: "shortlist" } })}
+                title="Click to view Pipeline candidates"
+              >
+                <div className="flex items-center gap-1 text-violet-500">
+                  <Users className="h-4 w-4 sm:h-3 sm:w-3" />
+                  <span className="font-bold text-lg sm:text-xl">{job.pipeline_count || 0}</span>
+                </div>
+                <span className="text-xs text-muted-foreground mt-1">Pipeline</span>
               </div>
               <div
                 className="flex flex-col items-center p-2 sm:p-2.5 rounded-md bg-success/10 border border-success/20 cursor-pointer hover:bg-success/20 transition-colors"
