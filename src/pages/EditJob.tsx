@@ -1112,7 +1112,7 @@ export default function EditJob() {
                         Religion
                       </Label>
                       <Select
-                        value={formData.religion || "Any"}
+                        value={formData.religion?.toLowerCase() === "muslim" ? "Muslim" : (formData.religion || "Any")}
                         onValueChange={(value) => setFormData((prev) => ({ ...prev, religion: value }))}
                       >
                         <SelectTrigger>
