@@ -1,33 +1,29 @@
 
 
-## Add Pipeline Count to Job Cards on Jobs Tab
+## Display Religion and Gender in Job Details + Fix Case Mismatch
 
-### Overview
-Add a "Pipeline" count badge to each job card in the Jobs tab, positioned between "Rejected" and "Submitted". The count logic mirrors the existing JobFunnel: candidates with `contacted = 'Pipeline'`.
+### Problem
+1. The Job Details overview page does not show the Religion or Preferred Gender fields.
+2. In EditJob, the religion value "muslim" (lowercase in DB) doesn't match the Select option value "Muslim" (capitalized), so the dropdown appears blank when editing a job with religion set to "muslim".
 
 ### Changes
 
-#### 1. `src/components/jobs/JobManagementPanel.tsx`
+#### 1. `src/pages/JobDetails.tsx` (~line 3807-3811, in the "Job Information" card)
+Add two new rows after the "Industry" row (before "Headhunting Companies"):
 
-**Type update (~line 37-42):** Add `pipeline_count?: number` to the job interface.
+- **Preferred Gender**: Display `job.gender_preference || "N/A"`
+- **Religion**: Display `job.religion` with capitalization fix -- if the value is "muslim", display "Muslim"; otherwise show the value or "N/A"
 
-**Count calculation (~line 218-227):** Add pipeline count computation after the rejected count:
-```typescript
-const pipeline_count = longlistedCandidates.filter(c => {
-  const contacted = (c.contacted || "").trim();
-  return contacted === 'Pipeline';
-}).length;
-```
+#### 2. `src/pages/EditJob.tsx` (~line 1115, religion Select value)
+Fix the value mapping so lowercase "muslim" from the DB maps to the Select option "Muslim":
 
-Include `pipeline_count` in the returned job object (~line 228-234).
+- Change `value={formData.religion || "Any"}` to normalize: if `formData.religion?.toLowerCase() === "muslim"` use `"Muslim"`, else use the value or `"Any"`
 
-**UI update (~line 897):** Change grid from `grid-cols-4` to `grid-cols-5` (desktop) and keep `grid-cols-2` for mobile. Add a new Pipeline card between Rejected and Submitted:
-- Violet color scheme (`bg-violet-500/10`, `border-violet-500/20`, `text-violet-500`)
-- Clickable, navigates to the job's shortlist tab
-- Shows `job.pipeline_count || 0`
+#### 3. `src/pages/AddJob.tsx` (same pattern check)
+Verify and apply the same normalization if needed for the religion Select component.
 
-The final order will be: **Longlisted | Shortlisted | Rejected | Pipeline | Submitted**
-
-### No database or backend changes required
-The `contacted` field already supports the "Pipeline" value. This is purely a UI addition with client-side count logic.
+### Technical Details
+- The DB stores "muslim" (lowercase) but the `<SelectItem value="Muslim">` expects capitalized "Muslim"
+- The fix normalizes the display value so lowercase DB values correctly match the UI options
+- No database changes needed
 
