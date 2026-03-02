@@ -3155,12 +3155,12 @@ mainCandidate["linkedin_score_reason"] ? (
                 </Button>
               </div>
               {/* Action Buttons - CV Submitted and Reject */}
-              <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex flex-wrap gap-2">
                 {mainCandidate["Contacted"] === "Submitted" ? (
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-blue-500 text-blue-600 cursor-default"
+                    className="flex-1 min-w-[90px] h-10 bg-transparent border-2 border-blue-500 text-blue-600 cursor-default"
                     disabled
                   >
                     <FileCheck className="w-4 h-4 mr-1.5" />
@@ -3180,7 +3180,7 @@ mainCandidate["linkedin_score_reason"] ? (
                           : null;
                       handleCVSubmitted(candidateId, latestContact?.callid);
                     }}
-                    className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-500 dark:hover:text-green-300 transition-all duration-200"
+                    className="flex-1 min-w-[90px] h-10 bg-transparent border-2 border-green-600 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-950/30 dark:hover:border-green-500 dark:hover:text-green-300 transition-all duration-200"
                   >
                     <FileCheck className="w-4 h-4 mr-1.5" />
                     Submit
@@ -3193,7 +3193,7 @@ mainCandidate["linkedin_score_reason"] ? (
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-gray-400 text-gray-500 cursor-help"
+                          className="flex-1 min-w-[90px] h-10 bg-transparent border-2 border-gray-400 text-gray-500 cursor-help"
                           disabled
                         >
                           <X className="w-4 h-4 mr-1.5" />
@@ -3218,7 +3218,7 @@ mainCandidate["linkedin_score_reason"] ? (
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200"
+                    className="flex-1 min-w-[90px] h-10 bg-transparent border-2 border-red-500 text-red-600 hover:bg-red-100 hover:border-red-600 hover:text-red-700 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:border-red-300 dark:hover:text-red-300 transition-all duration-200"
                     onClick={() => openRejectDialog(id!, candidateId, candidateContacts[0].callid)}
                   >
                     <X className="w-4 h-4 mr-1.5" />
@@ -3230,7 +3230,7 @@ mainCandidate["linkedin_score_reason"] ? (
                     variant="outline"
                     size="sm"
                     disabled
-                    className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-purple-400 text-purple-400 cursor-default opacity-60"
+                    className="flex-1 min-w-[90px] h-10 bg-transparent border-2 border-purple-400 text-purple-400 cursor-default opacity-60"
                   >
                     <GitBranch className="w-4 h-4 mr-1.5" />
                     In Pipeline
@@ -3240,7 +3240,7 @@ mainCandidate["linkedin_score_reason"] ? (
                     variant="outline"
                     size="sm"
                     onClick={() => handlePipeline(candidateId)}
-                    className="w-full sm:flex-1 min-w-0 sm:min-w-[120px] h-10 bg-transparent border-2 border-purple-500 text-purple-600 hover:bg-purple-50 hover:border-purple-600 hover:text-purple-700 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-950/30 transition-all duration-200"
+                    className="flex-1 min-w-[90px] h-10 bg-transparent border-2 border-purple-500 text-purple-600 hover:bg-purple-50 hover:border-purple-600 hover:text-purple-700 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-950/30 transition-all duration-200"
                   >
                     <GitBranch className="w-4 h-4 mr-1.5" />
                     Pipeline
