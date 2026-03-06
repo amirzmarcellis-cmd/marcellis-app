@@ -599,7 +599,6 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
                 />
               </div>
             </CardContent>
-            </CardContent>
           </Card>
         </div>
 
