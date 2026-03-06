@@ -95,12 +95,16 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
     musttohave: "",
     nicetohave: "",
     status: "No",
+    requiredSkills: [] as string[],
+    requiredYearsExperience: [] as string[],
   });
   const [loading, setLoading] = useState(false);
   const [jdFile, setJdFile] = useState<File | null>(null);
   const [industries, setIndustries] = useState<string[]>([]);
   const [headhuntingCompanies, setHeadhuntingCompanies] = useState<string[]>([]);
   const [newHeadhuntingUrl, setNewHeadhuntingUrl] = useState("");
+  const [newSkill, setNewSkill] = useState("");
+  const [newYearsExp, setNewYearsExp] = useState("");
   const { toast } = useToast();
   
 
@@ -118,6 +122,8 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
         musttohave: job.musttohave || "",
         nicetohave: job.nicetohave || "",
         status: job["Processed"] || "No",
+        requiredSkills: (job as any).required_skills || [],
+        requiredYearsExperience: (job as any).required_years_experience || [],
       });
       
       // Parse industries and headhunting companies
@@ -144,6 +150,8 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
         musttohave: "",
         nicetohave: "",
         status: "No",
+        requiredSkills: [],
+        requiredYearsExperience: [],
       });
       setIndustries([]);
       setHeadhuntingCompanies([]);
@@ -198,6 +206,8 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
         jd_summary: formData.summary,
         musttohave: formData.musttohave,
         nicetohave: formData.nicetohave,
+        required_skills: formData.requiredSkills.length > 0 ? formData.requiredSkills : null,
+        required_years_experience: formData.requiredYearsExperience.length > 0 ? formData.requiredYearsExperience : null,
         company_id: null,
         Timestamp: (job as any)?.Timestamp || new Date().toISOString(),
       };
@@ -537,6 +547,82 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
                   placeholder="Preferred skills and bonuses"
                   className="bg-background/50 min-h-[100px]"
                 />
+              </div>
+
+              {/* Required Skills */}
+              <div className="space-y-2">
+                <Label>Required Skills</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newSkill}
+                    onChange={(e) => setNewSkill(e.target.value)}
+                    placeholder="e.g., React, Python"
+                    className="bg-background/50"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (newSkill.trim()) {
+                          setFormData(prev => ({ ...prev, requiredSkills: [...prev.requiredSkills, newSkill.trim()] }));
+                          setNewSkill("");
+                        }
+                      }
+                    }}
+                  />
+                  <Button type="button" variant="secondary" onClick={() => {
+                    if (newSkill.trim()) {
+                      setFormData(prev => ({ ...prev, requiredSkills: [...prev.requiredSkills, newSkill.trim()] }));
+                      setNewSkill("");
+                    }
+                  }}>Add</Button>
+                </div>
+                {formData.requiredSkills.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {formData.requiredSkills.map((skill, index) => (
+                      <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary">
+                        {skill}
+                        <button type="button" onClick={() => setFormData(prev => ({ ...prev, requiredSkills: prev.requiredSkills.filter((_, i) => i !== index) }))} className="ml-1 text-primary/60 hover:text-primary">×</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Required Years Experience */}
+              <div className="space-y-2">
+                <Label>Required Years of Experience</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newYearsExp}
+                    onChange={(e) => setNewYearsExp(e.target.value)}
+                    placeholder="e.g., 5+ years"
+                    className="bg-background/50"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (newYearsExp.trim()) {
+                          setFormData(prev => ({ ...prev, requiredYearsExperience: [...prev.requiredYearsExperience, newYearsExp.trim()] }));
+                          setNewYearsExp("");
+                        }
+                      }
+                    }}
+                  />
+                  <Button type="button" variant="secondary" onClick={() => {
+                    if (newYearsExp.trim()) {
+                      setFormData(prev => ({ ...prev, requiredYearsExperience: [...prev.requiredYearsExperience, newYearsExp.trim()] }));
+                      setNewYearsExp("");
+                    }
+                  }}>Add</Button>
+                </div>
+                {formData.requiredYearsExperience.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {formData.requiredYearsExperience.map((exp, index) => (
+                      <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-accent/20 text-accent-foreground">
+                        {exp}
+                        <button type="button" onClick={() => setFormData(prev => ({ ...prev, requiredYearsExperience: prev.requiredYearsExperience.filter((_, i) => i !== index) }))} className="ml-1 text-accent-foreground/60 hover:text-accent-foreground">×</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

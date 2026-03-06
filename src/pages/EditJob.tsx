@@ -458,6 +458,8 @@ interface JobData {
   group_id?: string;
   recruiter_id?: string;
   Job_difficulty?: number;
+  required_skills?: string[];
+  required_years_experience?: string[];
 }
 
 export default function EditJob() {
@@ -482,6 +484,8 @@ export default function EditJob() {
   const [headhuntingCompanies, setHeadhuntingCompanies] = useState<string[]>([]);
   const [linkedInSearchEnabled, setLinkedInSearchEnabled] = useState(false);
   const [recruiterLinkedInId, setRecruiterLinkedInId] = useState<string | null>(null);
+  const [newSkill, setNewSkill] = useState("");
+  const [newYearsExp, setNewYearsExp] = useState("");
   const [formData, setFormData] = useState<JobData>({
     job_id: "",
     job_title: "",
@@ -510,6 +514,8 @@ export default function EditJob() {
     group_id: "",
     recruiter_id: "",
     Job_difficulty: 75,
+    required_skills: [],
+    required_years_experience: [],
   });
 
   useEffect(() => {
@@ -691,6 +697,8 @@ export default function EditJob() {
         linkedin_search_enabled: linkedInSearchEnabled,
         religion: formData.religion === "Muslim" ? "muslim" : formData.religion,
         Job_difficulty: formData.Job_difficulty || 75,
+        required_skills: formData.required_skills && formData.required_skills.length > 0 ? formData.required_skills : null,
+        required_years_experience: formData.required_years_experience && formData.required_years_experience.length > 0 ? formData.required_years_experience : null,
       };
 
       const { error } = await supabase.from("Jobs").update(jobDataToUpdate).eq("job_id", id);
@@ -1124,6 +1132,80 @@ export default function EditJob() {
                         </SelectContent>
                       </Select>
                     </div>
+                  </div>
+
+                  {/* Required Skills */}
+                  <div className="space-y-2 sm:space-y-3">
+                    <Label className="text-sm sm:text-base">Required Skills</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={newSkill}
+                        onChange={(e) => setNewSkill(e.target.value)}
+                        placeholder="e.g., React, Python, Project Management"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            if (newSkill.trim()) {
+                              setFormData((prev) => ({ ...prev, required_skills: [...(prev.required_skills || []), newSkill.trim()] }));
+                              setNewSkill("");
+                            }
+                          }
+                        }}
+                      />
+                      <Button type="button" variant="secondary" onClick={() => {
+                        if (newSkill.trim()) {
+                          setFormData((prev) => ({ ...prev, required_skills: [...(prev.required_skills || []), newSkill.trim()] }));
+                          setNewSkill("");
+                        }
+                      }}>Add</Button>
+                    </div>
+                    {formData.required_skills && formData.required_skills.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {formData.required_skills.map((skill, index) => (
+                          <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary">
+                            {skill}
+                            <button type="button" onClick={() => setFormData((prev) => ({ ...prev, required_skills: (prev.required_skills || []).filter((_, i) => i !== index) }))} className="ml-1 text-primary/60 hover:text-primary">×</button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Required Years Experience */}
+                  <div className="space-y-2 sm:space-y-3">
+                    <Label className="text-sm sm:text-base">Required Years of Experience</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={newYearsExp}
+                        onChange={(e) => setNewYearsExp(e.target.value)}
+                        placeholder="e.g., 5+ years, 3-5 years"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            if (newYearsExp.trim()) {
+                              setFormData((prev) => ({ ...prev, required_years_experience: [...(prev.required_years_experience || []), newYearsExp.trim()] }));
+                              setNewYearsExp("");
+                            }
+                          }
+                        }}
+                      />
+                      <Button type="button" variant="secondary" onClick={() => {
+                        if (newYearsExp.trim()) {
+                          setFormData((prev) => ({ ...prev, required_years_experience: [...(prev.required_years_experience || []), newYearsExp.trim()] }));
+                          setNewYearsExp("");
+                        }
+                      }}>Add</Button>
+                    </div>
+                    {formData.required_years_experience && formData.required_years_experience.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {formData.required_years_experience.map((exp, index) => (
+                          <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-accent/20 text-accent-foreground">
+                            {exp}
+                            <button type="button" onClick={() => setFormData((prev) => ({ ...prev, required_years_experience: (prev.required_years_experience || []).filter((_, i) => i !== index) }))} className="ml-1 text-accent-foreground/60 hover:text-accent-foreground">×</button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

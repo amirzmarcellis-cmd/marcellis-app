@@ -3818,6 +3818,14 @@ mainCandidate["linkedin_score_reason"] ? (
                   <span>{job.religion ? (job.religion.toLowerCase() === "muslim" ? "Muslim" : job.religion) : "N/A"}</span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-muted-foreground">Required Skills:</span>
+                  <span>{job.required_skills && job.required_skills.length > 0 ? job.required_skills.join(", ") : "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Required Experience:</span>
+                  <span>{job.required_years_experience && job.required_years_experience.length > 0 ? job.required_years_experience.join(", ") : "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Headhunting Companies:</span>
                   <div className="flex flex-col gap-1 items-end">
                     {job.headhunting_companies ? (
