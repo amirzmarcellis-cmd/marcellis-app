@@ -485,7 +485,6 @@ export default function EditJob() {
   const [linkedInSearchEnabled, setLinkedInSearchEnabled] = useState(false);
   const [recruiterLinkedInId, setRecruiterLinkedInId] = useState<string | null>(null);
   const [newSkill, setNewSkill] = useState("");
-  const [newYearsExp, setNewYearsExp] = useState("");
   const [formData, setFormData] = useState<JobData>({
     job_id: "",
     job_title: "",

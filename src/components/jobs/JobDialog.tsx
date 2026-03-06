@@ -598,7 +598,7 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
                   min="0"
                 />
               </div>
-              </div>
+            </CardContent>
             </CardContent>
           </Card>
         </div>
