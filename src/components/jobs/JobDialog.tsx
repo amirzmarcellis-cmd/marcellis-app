@@ -96,7 +96,7 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
     nicetohave: "",
     status: "No",
     requiredSkills: [] as string[],
-    requiredYearsExperience: [] as string[],
+    requiredYearsExperience: "",
   });
   const [loading, setLoading] = useState(false);
   const [jdFile, setJdFile] = useState<File | null>(null);
@@ -104,7 +104,6 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
   const [headhuntingCompanies, setHeadhuntingCompanies] = useState<string[]>([]);
   const [newHeadhuntingUrl, setNewHeadhuntingUrl] = useState("");
   const [newSkill, setNewSkill] = useState("");
-  const [newYearsExp, setNewYearsExp] = useState("");
   const { toast } = useToast();
   
 
@@ -123,7 +122,7 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
         nicetohave: job.nicetohave || "",
         status: job["Processed"] || "No",
         requiredSkills: (job as any).required_skills || [],
-        requiredYearsExperience: (job as any).required_years_experience || [],
+        requiredYearsExperience: (job as any).required_years_experience?.[0] || "",
       });
       
       // Parse industries and headhunting companies
@@ -151,7 +150,7 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
         nicetohave: "",
         status: "No",
         requiredSkills: [],
-        requiredYearsExperience: [],
+        requiredYearsExperience: "",
       });
       setIndustries([]);
       setHeadhuntingCompanies([]);
@@ -207,7 +206,7 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
         musttohave: formData.musttohave,
         nicetohave: formData.nicetohave,
         required_skills: formData.requiredSkills.length > 0 ? formData.requiredSkills : null,
-        required_years_experience: formData.requiredYearsExperience.length > 0 ? formData.requiredYearsExperience : null,
+        required_years_experience: formData.requiredYearsExperience ? [formData.requiredYearsExperience] : null,
         company_id: null,
         Timestamp: (job as any)?.Timestamp || new Date().toISOString(),
       };
@@ -590,39 +589,14 @@ export function JobDialog({ job, open, onOpenChange, onSave }: JobDialogProps) {
               {/* Required Years Experience */}
               <div className="space-y-2">
                 <Label>Required Years of Experience</Label>
-                <div className="flex gap-2">
-                  <Input
-                    value={newYearsExp}
-                    onChange={(e) => setNewYearsExp(e.target.value)}
-                    placeholder="e.g., 5+ years"
-                    className="bg-background/50"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        if (newYearsExp.trim()) {
-                          setFormData(prev => ({ ...prev, requiredYearsExperience: [...prev.requiredYearsExperience, newYearsExp.trim()] }));
-                          setNewYearsExp("");
-                        }
-                      }
-                    }}
-                  />
-                  <Button type="button" variant="secondary" onClick={() => {
-                    if (newYearsExp.trim()) {
-                      setFormData(prev => ({ ...prev, requiredYearsExperience: [...prev.requiredYearsExperience, newYearsExp.trim()] }));
-                      setNewYearsExp("");
-                    }
-                  }}>Add</Button>
-                </div>
-                {formData.requiredYearsExperience.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {formData.requiredYearsExperience.map((exp, index) => (
-                      <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-accent/20 text-accent-foreground">
-                        {exp}
-                        <button type="button" onClick={() => setFormData(prev => ({ ...prev, requiredYearsExperience: prev.requiredYearsExperience.filter((_, i) => i !== index) }))} className="ml-1 text-accent-foreground/60 hover:text-accent-foreground">×</button>
-                      </span>
-                    ))}
-                  </div>
-                )}
+                <Input
+                  type="number"
+                  value={formData.requiredYearsExperience}
+                  onChange={(e) => setFormData(prev => ({ ...prev, requiredYearsExperience: e.target.value }))}
+                  placeholder="e.g., 5"
+                  className="bg-background/50"
+                  min="0"
+                />
               </div>
             </CardContent>
           </Card>

@@ -3823,7 +3823,7 @@ mainCandidate["linkedin_score_reason"] ? (
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Required Experience:</span>
-                  <span>{job.required_years_experience && job.required_years_experience.length > 0 ? job.required_years_experience.join(", ") : "N/A"}</span>
+                  <span>{job.required_years_experience && job.required_years_experience.length > 0 ? `${job.required_years_experience[0]} years` : "N/A"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Headhunting Companies:</span>

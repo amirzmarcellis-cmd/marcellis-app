@@ -469,11 +469,10 @@ export default function AddJob() {
     recruiterId: "",
     jobDifficulty: 75,
     requiredSkills: [] as string[],
-    requiredYearsExperience: [] as string[],
+    requiredYearsExperience: "",
   });
   const [newHeadhuntingUrl, setNewHeadhuntingUrl] = useState("");
   const [newSkill, setNewSkill] = useState("");
-  const [newYearsExp, setNewYearsExp] = useState("");
   const [groups, setGroups] = useState<Array<{ id: string; name: string; color: string | null }>>([]);
   const [recruiters, setRecruiters] = useState<Array<{ user_id: string; name: string; email: string }>>([]);
   const [clients, setClients] = useState<Array<{ id: string; name: string; description: string | null }>>([]);
@@ -841,7 +840,7 @@ export default function AddJob() {
         auto_dial_enabled_at: new Date().toISOString(),
         Job_difficulty: formData.jobDifficulty || "HARD",
         required_skills: formData.requiredSkills.length > 0 ? formData.requiredSkills : null,
-        required_years_experience: formData.requiredYearsExperience.length > 0 ? formData.requiredYearsExperience : null,
+        required_years_experience: formData.requiredYearsExperience ? [formData.requiredYearsExperience] : null,
       });
 
       if (error) {
@@ -1338,45 +1337,14 @@ export default function AddJob() {
             {/* Required Years Experience */}
             <div className="space-y-2">
               <Label className="font-medium">Required Years of Experience</Label>
-              <div className="flex gap-2">
-                <Input
-                  value={newYearsExp}
-                  onChange={(e) => setNewYearsExp(e.target.value)}
-                  placeholder="e.g., 5+ years, 3-5 years"
-                  className="h-11"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      if (newYearsExp.trim()) {
-                        handleInputChange("requiredYearsExperience", [...formData.requiredYearsExperience, newYearsExp.trim()]);
-                        setNewYearsExp("");
-                      }
-                    }
-                  }}
-                />
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    if (newYearsExp.trim()) {
-                      handleInputChange("requiredYearsExperience", [...formData.requiredYearsExperience, newYearsExp.trim()]);
-                      setNewYearsExp("");
-                    }
-                  }}
-                >
-                  Add
-                </Button>
-              </div>
-              {formData.requiredYearsExperience.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {formData.requiredYearsExperience.map((exp, index) => (
-                    <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-accent/20 text-accent-foreground">
-                      {exp}
-                      <button type="button" onClick={() => handleInputChange("requiredYearsExperience", formData.requiredYearsExperience.filter((_, i) => i !== index))} className="ml-1 text-accent-foreground/60 hover:text-accent-foreground">×</button>
-                    </span>
-                  ))}
-                </div>
-              )}
+              <Input
+                type="number"
+                value={formData.requiredYearsExperience}
+                onChange={(e) => handleInputChange("requiredYearsExperience", e.target.value)}
+                placeholder="e.g., 5"
+                className="h-11"
+                min="0"
+              />
             </div>
 
             {/* Contract Length (conditional) */}
