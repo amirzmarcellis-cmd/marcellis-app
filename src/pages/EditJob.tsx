@@ -1173,38 +1173,13 @@ export default function EditJob() {
                   {/* Required Years Experience */}
                   <div className="space-y-2 sm:space-y-3">
                     <Label className="text-sm sm:text-base">Required Years of Experience</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        value={newYearsExp}
-                        onChange={(e) => setNewYearsExp(e.target.value)}
-                        placeholder="e.g., 5+ years, 3-5 years"
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            if (newYearsExp.trim()) {
-                              setFormData((prev) => ({ ...prev, required_years_experience: [...(prev.required_years_experience || []), newYearsExp.trim()] }));
-                              setNewYearsExp("");
-                            }
-                          }
-                        }}
-                      />
-                      <Button type="button" variant="secondary" onClick={() => {
-                        if (newYearsExp.trim()) {
-                          setFormData((prev) => ({ ...prev, required_years_experience: [...(prev.required_years_experience || []), newYearsExp.trim()] }));
-                          setNewYearsExp("");
-                        }
-                      }}>Add</Button>
-                    </div>
-                    {formData.required_years_experience && formData.required_years_experience.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {formData.required_years_experience.map((exp, index) => (
-                          <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-accent/20 text-accent-foreground">
-                            {exp}
-                            <button type="button" onClick={() => setFormData((prev) => ({ ...prev, required_years_experience: (prev.required_years_experience || []).filter((_, i) => i !== index) }))} className="ml-1 text-accent-foreground/60 hover:text-accent-foreground">×</button>
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    <Input
+                      type="number"
+                      value={formData.required_years_experience?.[0] || ""}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, required_years_experience: e.target.value ? [e.target.value] : [] }))}
+                      placeholder="e.g., 5"
+                      min="0"
+                    />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
