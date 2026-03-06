@@ -1,30 +1,24 @@
 
 
-## Add Shortlisted Boolean Check + Display Disqualification Reason
+## Fix Pipeline Button Overflowing Outside Card
 
-### Three changes needed:
+### Problem
+The Submit, Reject, and Pipeline action buttons in the AI Shortlist candidate cards overflow outside the card boundary. The layout was originally designed for 2 buttons but now has 3, causing overflow on smaller screens.
 
-#### 1. Update existing shortlisted records (SQL data update)
-Run an UPDATE query to set `shortlisted = true` for all Jobs_CVs records that qualify as shortlisted (score >= 74 and not "Shortlisted from Similar jobs"):
-```sql
-UPDATE "Jobs_CVs" SET shortlisted = true 
-WHERE after_call_score >= 74 
-AND (contacted IS NULL OR contacted != 'Shortlisted from Similar jobs');
-```
+### Root Cause
+The button container at line 3158 uses `flex flex-col sm:flex-row` with each button having `sm:min-w-[120px]`. With 3 buttons, the combined minimum width exceeds the card width, pushing Pipeline outside.
 
-#### 2. Set `shortlisted = true` when submitting/shortlisting (`src/pages/JobDetails.tsx`)
-- In `handleHireCandidate` (~line 1773): add `shortlisted: true` to the update payload alongside `contacted: "Submitted"`
-- In `handleRejectCandidate` (~line 1600): no change needed (rejected candidates may have been shortlisted previously)
-- Find any other place where a candidate's status changes to a shortlist-qualifying state and ensure `shortlisted: true` is set
+### Fix: `src/pages/JobDetails.tsx` (line ~3158)
 
-Also, the `shortlisted` boolean should be set to `true` in the mapped candidate data when score >= 74 (in the `fetchCandidates` mapping ~line 801), so the UI can reference it.
+1. **Change the button container layout** from `flex flex-col sm:flex-row` to a wrapping grid/flex layout that accommodates 3 buttons:
+   - Use `flex flex-wrap gap-2` so buttons wrap to a new row if needed
+   - Remove `sm:min-w-[120px]` from all three buttons (Submit, Reject, Pipeline)
+   - Use `flex-1 min-w-[90px]` instead so they share space evenly and wrap gracefully
 
-#### 3. Display `disqualification_reason` in candidate cards (`src/pages/JobDetails.tsx`)
-- In `renderCandidateCard` (~line 2706): after the rejected/submitted banners, add a disqualification reason display when `mainCandidate["disqualification_reason"]` exists
-- Show it as a warning banner similar to the rejection reason pattern, with an amber/orange color scheme
-- The data is already fetched since the query uses `select("*")`
+2. **Update all 3 button groups** (lines ~3158-3248):
+   - Submit button: change class from `w-full sm:flex-1 min-w-0 sm:min-w-[120px]` to `flex-1 min-w-[90px]`
+   - Reject button: same change
+   - Pipeline button: same change
+   - The disabled/active variants of each button get the same class update
 
-### Files to modify:
-- `src/pages/JobDetails.tsx` - Add `shortlisted: true` to submit update, map `disqualification_reason` in candidate data, display it in card UI
-- SQL data update for existing records (using insert tool)
-
+This ensures all 3 buttons fit within the card at all screen sizes, wrapping to a second row on very narrow screens.
