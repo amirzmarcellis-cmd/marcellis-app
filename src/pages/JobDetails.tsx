@@ -852,8 +852,10 @@ export default function JobDetails() {
           Score: effectiveCvScore != null ? String(effectiveCvScore) : "0",
           lastcalltime: row.lastcalltime,
           // Add timestamp fields for status highlighting
-          rejected_at: row.rejected_at,
+           rejected_at: row.rejected_at,
           submitted_at: row.submitted_at,
+          shortlisted: row.shortlisted ?? (row.after_call_score >= 74 && row.contacted !== 'Shortlisted from Similar jobs'),
+          disqualification_reason: row.disqualification_reason ?? "",
         };
       });
       setCandidates(mapped);
@@ -1770,10 +1772,11 @@ export default function JobDetails() {
       // Use callid to update the correct record (recordid in Jobs_CVs equals the callid)
       const { error } = await supabase
         .from("Jobs_CVs")
-        .update({
+         .update({
           Reason_to_Hire: `${hireReason}: ${hireAdditionalInfo}`,
           contacted: "Submitted",
           submitted_at: new Date().toISOString(),
+          shortlisted: true,
         })
         .eq("recordid", hireCandidateData.callid)
         .eq("job_id", hireCandidateData.jobId);
@@ -2755,6 +2758,13 @@ export default function JobDetails() {
           <div className="bg-emerald-500/20 px-3 py-1.5 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1 border-b border-emerald-500/30 rounded-t-lg">
             <CheckCircle className="w-3 h-3" />
             Submitted on {format(new Date(mainCandidate["submitted_at"]), "dd MMM yyyy, HH:mm")}
+          </div>
+        )}
+        {mainCandidate["disqualification_reason"] && (
+          <div className="bg-amber-500/20 px-3 py-1.5 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1 border-b border-amber-500/30">
+            <AlertTriangle className="w-3 h-3" />
+            <span className="font-semibold">Disqualification: </span>
+            <span className="truncate">{mainCandidate["disqualification_reason"]}</span>
           </div>
         )}
         <CardContent className="p-4 relative">
