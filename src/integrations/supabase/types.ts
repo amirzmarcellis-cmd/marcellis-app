@@ -217,6 +217,7 @@ export type Database = {
           applied_for: string | null
           current_company: string | null
           Current_role: string | null
+          cv_category: string | null
           cv_link: string | null
           cv_processing: boolean
           cv_text: string | null
@@ -232,6 +233,7 @@ export type Database = {
           nationality: string | null
           notes: string | null
           phone_number: string | null
+          seniority: string | null
           Skills: string[] | null
           updated_time: string | null
           user_id: string
@@ -240,6 +242,7 @@ export type Database = {
           applied_for?: string | null
           current_company?: string | null
           Current_role?: string | null
+          cv_category?: string | null
           cv_link?: string | null
           cv_processing?: boolean
           cv_text?: string | null
@@ -255,6 +258,7 @@ export type Database = {
           nationality?: string | null
           notes?: string | null
           phone_number?: string | null
+          seniority?: string | null
           Skills?: string[] | null
           updated_time?: string | null
           user_id?: string
@@ -263,6 +267,7 @@ export type Database = {
           applied_for?: string | null
           current_company?: string | null
           Current_role?: string | null
+          cv_category?: string | null
           cv_link?: string | null
           cv_processing?: boolean
           cv_text?: string | null
@@ -278,6 +283,7 @@ export type Database = {
           nationality?: string | null
           notes?: string | null
           phone_number?: string | null
+          seniority?: string | null
           Skills?: string[] | null
           updated_time?: string | null
           user_id?: string
@@ -441,6 +447,8 @@ export type Database = {
           Processed: string | null
           recruiter_id: string | null
           religion: string | null
+          required_skills: string[] | null
+          required_years_experience: string[] | null
           status: string | null
           things_to_look_for: string | null
           Timestamp: string | null
@@ -484,6 +492,8 @@ export type Database = {
           Processed?: string | null
           recruiter_id?: string | null
           religion?: string | null
+          required_skills?: string[] | null
+          required_years_experience?: string[] | null
           status?: string | null
           things_to_look_for?: string | null
           Timestamp?: string | null
@@ -527,6 +537,8 @@ export type Database = {
           Processed?: string | null
           recruiter_id?: string | null
           religion?: string | null
+          required_skills?: string[] | null
+          required_years_experience?: string[] | null
           status?: string | null
           things_to_look_for?: string | null
           Timestamp?: string | null
@@ -556,6 +568,7 @@ export type Database = {
           after_call_pros: string | null
           after_call_reason: string | null
           after_call_score: number | null
+          arabic_speaker: string | null
           "Browser call - email": boolean | null
           "Browser call - phone": boolean | null
           Browser_call_chatid: string | null
@@ -564,6 +577,7 @@ export type Database = {
           candidate_email: string | null
           candidate_fit: string | null
           candidate_fit_reason: string | null
+          candidate_location: string | null
           candidate_name: string | null
           candidate_phone_number: string | null
           "Chat id": string | null
@@ -575,6 +589,7 @@ export type Database = {
           current_salary: string | null
           cv_score: number | null
           cv_score_reason: string | null
+          disqualification_reason: string | null
           duration: string | null
           itris_job_id: string | null
           job_id: string
@@ -599,18 +614,21 @@ export type Database = {
           rejected_at: string | null
           salary_expectations: string | null
           salary_note: string | null
+          shortlisted: boolean | null
           shortlisted_at: string | null
           source: string | null
           submitted_at: string | null
           transcript: string | null
           two_questions_of_interview: string | null
           user_id: string
+          years_agency_experience: string | null
         }
         Insert: {
           after_call_cons?: string | null
           after_call_pros?: string | null
           after_call_reason?: string | null
           after_call_score?: number | null
+          arabic_speaker?: string | null
           "Browser call - email"?: boolean | null
           "Browser call - phone"?: boolean | null
           Browser_call_chatid?: string | null
@@ -619,6 +637,7 @@ export type Database = {
           candidate_email?: string | null
           candidate_fit?: string | null
           candidate_fit_reason?: string | null
+          candidate_location?: string | null
           candidate_name?: string | null
           candidate_phone_number?: string | null
           "Chat id"?: string | null
@@ -630,6 +649,7 @@ export type Database = {
           current_salary?: string | null
           cv_score?: number | null
           cv_score_reason?: string | null
+          disqualification_reason?: string | null
           duration?: string | null
           itris_job_id?: string | null
           job_id: string
@@ -654,18 +674,21 @@ export type Database = {
           rejected_at?: string | null
           salary_expectations?: string | null
           salary_note?: string | null
+          shortlisted?: boolean | null
           shortlisted_at?: string | null
           source?: string | null
           submitted_at?: string | null
           transcript?: string | null
           two_questions_of_interview?: string | null
           user_id: string
+          years_agency_experience?: string | null
         }
         Update: {
           after_call_cons?: string | null
           after_call_pros?: string | null
           after_call_reason?: string | null
           after_call_score?: number | null
+          arabic_speaker?: string | null
           "Browser call - email"?: boolean | null
           "Browser call - phone"?: boolean | null
           Browser_call_chatid?: string | null
@@ -674,6 +697,7 @@ export type Database = {
           candidate_email?: string | null
           candidate_fit?: string | null
           candidate_fit_reason?: string | null
+          candidate_location?: string | null
           candidate_name?: string | null
           candidate_phone_number?: string | null
           "Chat id"?: string | null
@@ -685,6 +709,7 @@ export type Database = {
           current_salary?: string | null
           cv_score?: number | null
           cv_score_reason?: string | null
+          disqualification_reason?: string | null
           duration?: string | null
           itris_job_id?: string | null
           job_id?: string
@@ -709,12 +734,14 @@ export type Database = {
           rejected_at?: string | null
           salary_expectations?: string | null
           salary_note?: string | null
+          shortlisted?: boolean | null
           shortlisted_at?: string | null
           source?: string | null
           submitted_at?: string | null
           transcript?: string | null
           two_questions_of_interview?: string | null
           user_id?: string
+          years_agency_experience?: string | null
         }
         Relationships: []
       }
