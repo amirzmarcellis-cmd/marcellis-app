@@ -468,11 +468,8 @@ export default function AddJob() {
     groupId: "",
     recruiterId: "",
     jobDifficulty: 75,
-    requiredSkills: [] as string[],
-    requiredYearsExperience: "",
   });
   const [newHeadhuntingUrl, setNewHeadhuntingUrl] = useState("");
-  const [newSkill, setNewSkill] = useState("");
   const [groups, setGroups] = useState<Array<{ id: string; name: string; color: string | null }>>([]);
   const [recruiters, setRecruiters] = useState<Array<{ user_id: string; name: string; email: string }>>([]);
   const [clients, setClients] = useState<Array<{ id: string; name: string; description: string | null }>>([]);
@@ -839,8 +836,6 @@ export default function AddJob() {
         automatic_dial: !longlistOnly,
         auto_dial_enabled_at: new Date().toISOString(),
         Job_difficulty: formData.jobDifficulty || "HARD",
-        required_skills: formData.requiredSkills.length > 0 ? formData.requiredSkills : null,
-        required_years_experience: formData.requiredYearsExperience ? [formData.requiredYearsExperience] : null,
       });
 
       if (error) {
@@ -1290,62 +1285,6 @@ export default function AddJob() {
               </div>
             </div>
 
-            {/* Required Skills */}
-            <div className="space-y-2">
-              <Label className="font-medium">Required Skills</Label>
-              <div className="flex gap-2">
-                <Input
-                  value={newSkill}
-                  onChange={(e) => setNewSkill(e.target.value)}
-                  placeholder="e.g., React, Python, Project Management"
-                  className="h-11"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      if (newSkill.trim()) {
-                        handleInputChange("requiredSkills", [...formData.requiredSkills, newSkill.trim()]);
-                        setNewSkill("");
-                      }
-                    }
-                  }}
-                />
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    if (newSkill.trim()) {
-                      handleInputChange("requiredSkills", [...formData.requiredSkills, newSkill.trim()]);
-                      setNewSkill("");
-                    }
-                  }}
-                >
-                  Add
-                </Button>
-              </div>
-              {formData.requiredSkills.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {formData.requiredSkills.map((skill, index) => (
-                    <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary">
-                      {skill}
-                      <button type="button" onClick={() => handleInputChange("requiredSkills", formData.requiredSkills.filter((_, i) => i !== index))} className="ml-1 text-primary/60 hover:text-primary">×</button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Required Years Experience */}
-            <div className="space-y-2">
-              <Label className="font-medium">Required Years of Experience</Label>
-              <Input
-                type="number"
-                value={formData.requiredYearsExperience}
-                onChange={(e) => handleInputChange("requiredYearsExperience", e.target.value)}
-                placeholder="e.g., 5"
-                className="h-11"
-                min="0"
-              />
-            </div>
 
             {/* Contract Length (conditional) */}
             {formData.type === "Contract" && (
