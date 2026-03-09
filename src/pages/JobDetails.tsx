@@ -753,7 +753,7 @@ export default function JobDetails() {
           .from("linkedin_boolean_search")
           .select("user_id, linkedin_id")
           .eq("job_id", jobId),
-        supabase.from("CVs").select("user_id, name, Firstname, Lastname"),
+        supabase.from("CVs").select("user_id, name, Firstname, Lastname, phone_number"),
         supabase.from("profiles").select("user_id, name"),
       ]);
       const candidatesData = candidatesResult.data;
@@ -788,14 +788,18 @@ export default function JobDetails() {
         }
       });
 
-      // Create a map of CVs data by user_id for name fallback (secondary priority)
+      // Create a map of CVs data by user_id for name and phone fallback (secondary priority)
       const cvsMap = new Map();
+      const cvsPhoneMap = new Map();
       (cvsData || []).forEach((item) => {
         if (item.user_id) {
           const fullName = item.name || 
             (item.Firstname && item.Lastname ? `${item.Firstname} ${item.Lastname}` : 
              item.Firstname || item.Lastname || "");
           cvsMap.set(item.user_id, fullName);
+          if (item.phone_number) {
+            cvsPhoneMap.set(item.user_id, item.phone_number);
+          }
         }
       });
       const mapped = (candidatesData || []).map((row: any) => {
@@ -828,7 +832,7 @@ export default function JobDetails() {
           "Score and Reason": row.cv_score_reason ?? "",
           "Candidate Name": candidateName,
           "Candidate Email": row.candidate_email ?? "",
-          "Candidate Phone Number": row.candidate_phone_number ?? "",
+          "Candidate Phone Number": cvsPhoneMap.get(row.user_id) || row.candidate_phone_number || "",
           Source: row.source ?? "",
           // Keep LinkedIn fields for UI/debug
           linkedin_id: linkedinId ?? "",
@@ -1051,7 +1055,7 @@ export default function JobDetails() {
           "Score and Reason": mergedReason || "",
           "Candidate Name": row.candidate_name ?? "",
           "Candidate Email": row.candidate_email ?? "",
-          "Candidate Phone Number": row.candidate_phone_number ?? "",
+          "Candidate Phone Number": cvsPhoneMap.get(row.user_id) || row.candidate_phone_number || "",
           Source: row.source ?? "",
           linkedin_score: row.linkedin_score ?? "",
           linkedin_score_reason: row.linkedin_score_reason ?? "",
