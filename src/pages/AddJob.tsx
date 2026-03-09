@@ -468,11 +468,8 @@ export default function AddJob() {
     groupId: "",
     recruiterId: "",
     jobDifficulty: 75,
-    requiredSkills: [] as string[],
-    requiredYearsExperience: "",
   });
   const [newHeadhuntingUrl, setNewHeadhuntingUrl] = useState("");
-  const [newSkill, setNewSkill] = useState("");
   const [groups, setGroups] = useState<Array<{ id: string; name: string; color: string | null }>>([]);
   const [recruiters, setRecruiters] = useState<Array<{ user_id: string; name: string; email: string }>>([]);
   const [clients, setClients] = useState<Array<{ id: string; name: string; description: string | null }>>([]);
