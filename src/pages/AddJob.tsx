@@ -836,8 +836,6 @@ export default function AddJob() {
         automatic_dial: !longlistOnly,
         auto_dial_enabled_at: new Date().toISOString(),
         Job_difficulty: formData.jobDifficulty || "HARD",
-        required_skills: formData.requiredSkills.length > 0 ? formData.requiredSkills : null,
-        required_years_experience: formData.requiredYearsExperience ? [formData.requiredYearsExperience] : null,
       });
 
       if (error) {
