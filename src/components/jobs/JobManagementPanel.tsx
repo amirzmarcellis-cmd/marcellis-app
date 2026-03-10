@@ -1077,24 +1077,5 @@ const JobGrid = memo(function JobGrid({
           </CardContent>
         </Card>)}
 
-      <AlertDialog open={!!pendingDialToggle} onOpenChange={(open) => { if (!open) setPendingDialToggle(null); }}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Disable Automatic Dial?</AlertDialogTitle>
-            <AlertDialogDescription>
-              When Automatic Dial is turned off, the system will not make any calls and this job will not receive any shortlisted candidates. Are you sure you want to continue?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => {
-              if (pendingDialToggle) {
-                executeAutomaticDialToggle(pendingDialToggle.jobId, false);
-                setPendingDialToggle(null);
-              }
-            }}>Yes, disable</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>;
 });
