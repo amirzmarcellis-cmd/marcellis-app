@@ -486,6 +486,7 @@ export default function AddJob() {
   const [linkedInSearchEnabled, setLinkedInSearchEnabled] = useState(false);
   const [recruiterLinkedInId, setRecruiterLinkedInId] = useState<string | null>(null);
   const [longlistOnly, setLonglistOnly] = useState(false);
+  const [showLonglistOnlyDialog, setShowLonglistOnlyDialog] = useState(false);
 
   // Redirect viewers and non-admin users if job creation is paused (route protection)
 
