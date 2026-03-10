@@ -1,6 +1,8 @@
 // @ts-nocheck
 import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -54,6 +56,7 @@ export function JobManagementPanel() {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [pendingDialToggle, setPendingDialToggle] = useState<{ jobId: string; currentValue: boolean | null } | null>(null);
   const [selectedGroupFilter, setSelectedGroupFilter] = useState<string>("");
   const [selectedRecruiterFilter, setSelectedRecruiterFilter] = useState<string>("");
   const [dateRange, setDateRange] = useState<{
@@ -394,6 +397,16 @@ export function JobManagementPanel() {
   const handleAutomaticDialToggle = async (jobId: string, currentValue: boolean | null) => {
     const newValue = !currentValue;
     
+    // If disabling, show confirmation dialog first
+    if (!newValue) {
+      setPendingDialToggle({ jobId, currentValue });
+      return;
+    }
+    
+    await executeAutomaticDialToggle(jobId, newValue);
+  };
+
+  const executeAutomaticDialToggle = async (jobId: string, newValue: boolean) => {
     // Optimistic UI update
     setJobs(prevJobs => prevJobs.map(job => 
       job.job_id === jobId 
@@ -1044,5 +1057,25 @@ const JobGrid = memo(function JobGrid({
             </div>
           </CardContent>
         </Card>)}
+
+      <AlertDialog open={!!pendingDialToggle} onOpenChange={(open) => { if (!open) setPendingDialToggle(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Disable Automatic Dial?</AlertDialogTitle>
+            <AlertDialogDescription>
+              When Automatic Dial is turned off, the system will not make any calls and this job will not receive any shortlisted candidates. Are you sure you want to continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {
+              if (pendingDialToggle) {
+                executeAutomaticDialToggle(pendingDialToggle.jobId, false);
+                setPendingDialToggle(null);
+              }
+            }}>Yes, disable</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>;
 });

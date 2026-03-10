@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { ApiMultiSelect } from "@/components/ui/api-multi-select";
 import { headhuntingPresetGroups } from "@/constants/headhunting-presets";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 const europeanCountries = [
   "Albania",
@@ -485,6 +486,7 @@ export default function AddJob() {
   const [linkedInSearchEnabled, setLinkedInSearchEnabled] = useState(false);
   const [recruiterLinkedInId, setRecruiterLinkedInId] = useState<string | null>(null);
   const [longlistOnly, setLonglistOnly] = useState(false);
+  const [showLonglistOnlyDialog, setShowLonglistOnlyDialog] = useState(false);
 
   // Redirect viewers and non-admin users if job creation is paused (route protection)
 
@@ -1008,7 +1010,13 @@ export default function AddJob() {
                     Collect candidates without automatic calling. Candidates will be longlisted for manual review only.
                   </p>
                 </div>
-                <Switch checked={longlistOnly} onCheckedChange={setLonglistOnly} className="ml-4" />
+                <Switch checked={longlistOnly} onCheckedChange={(checked) => {
+                  if (checked) {
+                    setShowLonglistOnlyDialog(true);
+                  } else {
+                    setLonglistOnly(false);
+                  }
+                }} className="ml-4" />
               </div>
             </div>
 
@@ -1777,6 +1785,21 @@ export default function AddJob() {
           </Button>
         </div>
       </form>
+
+      <AlertDialog open={showLonglistOnlyDialog} onOpenChange={setShowLonglistOnlyDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Disable Automatic Dial?</AlertDialogTitle>
+            <AlertDialogDescription>
+              When Automatic Dial is turned off, the system will not make any calls and this job will not receive any shortlisted candidates. Are you sure you want to continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => setLonglistOnly(true)}>Yes, disable</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
