@@ -923,6 +923,21 @@ export default function JobDetails() {
         });
       if (longlistedError) throw longlistedError;
 
+      // Build a local cvsPhoneMap for longlisted candidates
+      const longlistedUserIds = (longlistedData || []).map((r: any) => r.user_id).filter(Boolean);
+      const cvsPhoneMap = new Map<string, string>();
+      if (longlistedUserIds.length > 0) {
+        const { data: cvsPhoneData } = await supabase
+          .from("CVs")
+          .select("user_id, phone_number")
+          .in("user_id", longlistedUserIds);
+        (cvsPhoneData || []).forEach((item: any) => {
+          if (item.user_id && item.phone_number) {
+            cvsPhoneMap.set(item.user_id, item.phone_number);
+          }
+        });
+      }
+
       // Fetch any existing scores for this job (regardless of longlisted status)
       const { data: scoreRows, error: scoreErr } = await supabase
         .from("Jobs_CVs")
