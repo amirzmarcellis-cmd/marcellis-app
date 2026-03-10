@@ -14,7 +14,7 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
   const isMobile = useIsMobile();
   
   const counts = useMemo(() => {
-    const longlistedCandidates = candidates;
+    const longlistedCandidates = candidates.filter(c => c.contacted !== "Shortlisted from Similar jobs");
     const longlist = longlistedCandidates.length;
     
     const statusCounts = longlistedCandidates.reduce((acc, c) => {
