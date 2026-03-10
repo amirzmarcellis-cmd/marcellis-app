@@ -98,7 +98,7 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Job Funnel</CardTitle>
           <Badge variant="outline" className="text-xs">
-            {candidates.length} Total
+            {candidates.filter(c => c.contacted !== "Shortlisted from Similar jobs").length} Total
           </Badge>
         </div>
       </CardHeader>

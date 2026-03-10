@@ -200,9 +200,9 @@ export function JobManagementPanel() {
           console.log(`JobManagementPanel: Job "${job.job_title}" (${job.job_id}) has ${candidates.length} total candidates from Jobs_CVs`);
         }
 
-        // Longlisted: all candidates in Jobs_CVs (AI Long List)
-        const longlisted_count = candidates.length;
-        const longlistedCandidates = candidates;
+        // Longlisted: all candidates in Jobs_CVs (AI Long List), excluding "Shortlisted from Similar jobs"
+        const longlistedCandidates = candidates.filter(c => c.contacted !== "Shortlisted from Similar jobs");
+        const longlisted_count = longlistedCandidates.length;
 
         // Debug logging for the specific job
         if (job.job_id === 'me-j-0023') {
