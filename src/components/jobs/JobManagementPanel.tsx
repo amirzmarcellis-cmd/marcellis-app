@@ -56,6 +56,7 @@ export function JobManagementPanel() {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [pendingDialToggle, setPendingDialToggle] = useState<{ jobId: string; currentValue: boolean | null } | null>(null);
   const [selectedGroupFilter, setSelectedGroupFilter] = useState<string>("");
   const [selectedRecruiterFilter, setSelectedRecruiterFilter] = useState<string>("");
   const [dateRange, setDateRange] = useState<{
