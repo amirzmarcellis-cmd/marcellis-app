@@ -1009,7 +1009,13 @@ export default function AddJob() {
                     Collect candidates without automatic calling. Candidates will be longlisted for manual review only.
                   </p>
                 </div>
-                <Switch checked={longlistOnly} onCheckedChange={setLonglistOnly} className="ml-4" />
+                <Switch checked={longlistOnly} onCheckedChange={(checked) => {
+                  if (checked) {
+                    setShowLonglistOnlyDialog(true);
+                  } else {
+                    setLonglistOnly(false);
+                  }
+                }} className="ml-4" />
               </div>
             </div>
 
