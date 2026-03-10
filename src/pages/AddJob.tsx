@@ -1785,6 +1785,21 @@ export default function AddJob() {
           </Button>
         </div>
       </form>
+
+      <AlertDialog open={showLonglistOnlyDialog} onOpenChange={setShowLonglistOnlyDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Disable Automatic Dial?</AlertDialogTitle>
+            <AlertDialogDescription>
+              When Automatic Dial is turned off, the system will not make any calls and this job will not receive any shortlisted candidates. Are you sure you want to continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => setLonglistOnly(true)}>Yes, disable</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
