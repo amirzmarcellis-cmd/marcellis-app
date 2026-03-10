@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { ApiMultiSelect } from "@/components/ui/api-multi-select";
 import { headhuntingPresetGroups } from "@/constants/headhunting-presets";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 const europeanCountries = [
   "Albania",
