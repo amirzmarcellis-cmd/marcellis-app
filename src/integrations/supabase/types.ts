@@ -224,6 +224,7 @@ export type Database = {
           done_questions: string | null
           email: string | null
           embedding: string | null
+          embedding_done: boolean | null
           Firstname: string | null
           formatted_cv: string | null
           gender: string | null
@@ -250,6 +251,7 @@ export type Database = {
           done_questions?: string | null
           email?: string | null
           embedding?: string | null
+          embedding_done?: boolean | null
           Firstname?: string | null
           formatted_cv?: string | null
           gender?: string | null
@@ -276,6 +278,7 @@ export type Database = {
           done_questions?: string | null
           email?: string | null
           embedding?: string | null
+          embedding_done?: boolean | null
           Firstname?: string | null
           formatted_cv?: string | null
           gender?: string | null
