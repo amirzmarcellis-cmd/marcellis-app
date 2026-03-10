@@ -223,6 +223,7 @@ export type Database = {
           cv_text: string | null
           done_questions: string | null
           email: string | null
+          embedding: string | null
           Firstname: string | null
           formatted_cv: string | null
           gender: string | null
@@ -248,6 +249,7 @@ export type Database = {
           cv_text?: string | null
           done_questions?: string | null
           email?: string | null
+          embedding?: string | null
           Firstname?: string | null
           formatted_cv?: string | null
           gender?: string | null
@@ -273,6 +275,7 @@ export type Database = {
           cv_text?: string | null
           done_questions?: string | null
           email?: string | null
+          embedding?: string | null
           Firstname?: string | null
           formatted_cv?: string | null
           gender?: string | null
@@ -1396,6 +1399,13 @@ export type Database = {
         Returns: boolean
       }
       is_team_leader: { Args: { user_uuid: string }; Returns: boolean }
+      match_cvs: {
+        Args: { match_count?: number; query_embedding: string }
+        Returns: {
+          similarity: number
+          user_id: string
+        }[]
+      }
       match_documents: {
         Args: { filter?: Json; match_count?: number; query_embedding: string }
         Returns: {
