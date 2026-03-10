@@ -397,6 +397,16 @@ export function JobManagementPanel() {
   const handleAutomaticDialToggle = async (jobId: string, currentValue: boolean | null) => {
     const newValue = !currentValue;
     
+    // If disabling, show confirmation dialog first
+    if (!newValue) {
+      setPendingDialToggle({ jobId, currentValue });
+      return;
+    }
+    
+    await executeAutomaticDialToggle(jobId, newValue);
+  };
+
+  const executeAutomaticDialToggle = async (jobId: string, newValue: boolean) => {
     // Optimistic UI update
     setJobs(prevJobs => prevJobs.map(job => 
       job.job_id === jobId 
