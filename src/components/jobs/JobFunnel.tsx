@@ -14,7 +14,7 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
   const isMobile = useIsMobile();
   
   const counts = useMemo(() => {
-    const longlistedCandidates = candidates;
+    const longlistedCandidates = candidates.filter(c => c.contacted !== "Shortlisted from Similar jobs");
     const longlist = longlistedCandidates.length;
     
     const statusCounts = longlistedCandidates.reduce((acc, c) => {
@@ -98,7 +98,7 @@ export function JobFunnel({ candidates, jobAssignment }: JobFunnelProps) {
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Job Funnel</CardTitle>
           <Badge variant="outline" className="text-xs">
-            {candidates.length} Total
+            {candidates.filter(c => c.contacted !== "Shortlisted from Similar jobs").length} Total
           </Badge>
         </div>
       </CardHeader>
