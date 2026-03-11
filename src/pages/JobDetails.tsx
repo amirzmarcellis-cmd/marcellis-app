@@ -926,15 +926,30 @@ export default function JobDetails() {
       // Build a local cvsPhoneMap for longlisted candidates
       const longlistedUserIds = (longlistedData || []).map((r: any) => r.user_id).filter(Boolean);
       const cvsPhoneMap = new Map<string, string>();
+      const cvsNameMap = new Map<string, string>();
+      const longlistedProfilesMap = new Map<string, string>();
       if (longlistedUserIds.length > 0) {
-        const { data: cvsPhoneData } = await supabase
+        const { data: cvsData } = await supabase
           .from("CVs")
-          .select("user_id, phone_number")
+          .select("user_id, phone_number, name, Firstname, Lastname")
           .in("user_id", longlistedUserIds);
-        (cvsPhoneData || []).forEach((item: any) => {
+        (cvsData || []).forEach((item: any) => {
           if (item.user_id && item.phone_number) {
             cvsPhoneMap.set(item.user_id, item.phone_number);
           }
+          if (item.user_id) {
+            const fullName = item.name || [item.Firstname, item.Lastname].filter(Boolean).join(" ");
+            if (fullName) cvsNameMap.set(item.user_id, fullName);
+          }
+        });
+
+        // Fetch profiles for name fallback
+        const { data: profilesData } = await supabase
+          .from("profiles")
+          .select("user_id, name")
+          .in("user_id", longlistedUserIds);
+        (profilesData || []).forEach((p: any) => {
+          if (p.user_id && p.name) longlistedProfilesMap.set(String(p.user_id), p.name);
         });
       }
 
