@@ -572,7 +572,7 @@ export function JobManagementPanel() {
             </Button>
           )}
           {!isViewer && (
-            (isAdmin || !isJobCreationPaused) ? (
+            (false) ? (
               <Button 
                 onClick={() => navigate("/jobs/add")} 
                 className="action-button bg-gradient-primary hover:shadow-glow font-light font-inter text-xs sm:text-sm flex-1 sm:flex-none"
