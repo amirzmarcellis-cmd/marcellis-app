@@ -1083,7 +1083,7 @@ export default function JobDetails() {
           Summary: mergedReason || "",
           "Success Score": row.after_call_score?.toString() ?? "",
           "Score and Reason": mergedReason || "",
-          "Candidate Name": row.candidate_name ?? "",
+          "Candidate Name": row.candidate_name || longlistedProfilesMap.get(String(row.user_id)) || cvsNameMap.get(String(row.user_id)) || "",
           "Candidate Email": row.candidate_email ?? "",
           "Candidate Phone Number": cvsPhoneMap.get(row.user_id) || row.candidate_phone_number || "",
           Source: row.source ?? "",
