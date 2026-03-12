@@ -24,7 +24,7 @@ export function useLinkedInSearch(type: SearchType) {
     setError(null);
 
     try {
-      const searchUrl = `https://sofrxfgjptargppbepbi.supabase.co/functions/v1/linkedin-search?keywords=${encodeURIComponent(keywords)}&type=${type}`;
+      const searchUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/linkedin-search?keywords=${encodeURIComponent(keywords)}&type=${type}`;
       
       const { data: { session } } = await supabase.auth.getSession();
       
