@@ -24,7 +24,7 @@ export function useLinkedInSearch(type: SearchType) {
     setError(null);
 
     try {
-      const searchUrl = `https://sofrxfgjptargppbepbi.supabase.co/functions/v1/linkedin-search?keywords=${encodeURIComponent(keywords)}&type=${type}`;
+      const searchUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/linkedin-search?keywords=${encodeURIComponent(keywords)}&type=${type}`;
       
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -36,7 +36,7 @@ export function useLinkedInSearch(type: SearchType) {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvZnJ4ZmdqcHRhcmdwcGJlcGJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMDMxNzYsImV4cCI6MjA2OTg3OTE3Nn0._xVCMGu8VY2_JSs38wOdL7nG7EKpl3996heMiu33j9A',
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           'Content-Type': 'application/json',
         },
       });

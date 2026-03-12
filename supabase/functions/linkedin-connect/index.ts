@@ -144,7 +144,7 @@ serve(async (req) => {
     }
 
     const successRedirectUrl = `${origin}/linkedin-callback`;
-    const notifyUrl = `https://sofrxfgjptargppbepbi.supabase.co/functions/v1/linkedin-webhook`;
+    const notifyUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/linkedin-webhook`;
     
     console.log('Making request to Unipile API to create LinkedIn hosted account link');
     console.log('User:', profile.name, 'Email:', profile.email);
