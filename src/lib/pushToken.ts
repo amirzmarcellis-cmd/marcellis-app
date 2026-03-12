@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 
-const EDGE_FUNCTION_URL = 'https://sofrxfgjptargppbepbi.supabase.co/functions/v1/send-push-webhook';
+const EDGE_FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-push-webhook`;
 
 // Detect mobile platform from user agent
 function getMobilePlatform(): 'android' | 'ios' | null {
