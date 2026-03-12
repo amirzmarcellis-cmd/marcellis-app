@@ -1,24 +1,39 @@
 
 
-## Fix Pipeline Button Overflowing Outside Card
+## Fix Hardcoded Supabase Credentials
 
 ### Problem
-The Submit, Reject, and Pipeline action buttons in the AI Shortlist candidate cards overflow outside the card boundary. The layout was originally designed for 2 buttons but now has 3, causing overflow on smaller screens.
+The `.env` file has been updated to point to a new self-hosted Supabase instance, but the codebase has the old Supabase URL and key **hardcoded** in multiple files. The app is failing to connect ("Failed to fetch" error on sign-in).
 
-### Root Cause
-The button container at line 3158 uses `flex flex-col sm:flex-row` with each button having `sm:min-w-[120px]`. With 3 buttons, the combined minimum width exceeds the card width, pushing Pipeline outside.
+### Changes Required
 
-### Fix: `src/pages/JobDetails.tsx` (line ~3158)
+**1. `src/integrations/supabase/client.ts`** - Read from env variables instead of hardcoded values:
+```ts
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+```
 
-1. **Change the button container layout** from `flex flex-col sm:flex-row` to a wrapping grid/flex layout that accommodates 3 buttons:
-   - Use `flex flex-wrap gap-2` so buttons wrap to a new row if needed
-   - Remove `sm:min-w-[120px]` from all three buttons (Submit, Reject, Pipeline)
-   - Use `flex-1 min-w-[90px]` instead so they share space evenly and wrap gracefully
+**2. `src/lib/pushToken.ts`** (line 3) - Replace hardcoded edge function URL:
+```ts
+const EDGE_FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-push-webhook`;
+```
 
-2. **Update all 3 button groups** (lines ~3158-3248):
-   - Submit button: change class from `w-full sm:flex-1 min-w-0 sm:min-w-[120px]` to `flex-1 min-w-[90px]`
-   - Reject button: same change
-   - Pipeline button: same change
-   - The disabled/active variants of each button get the same class update
+**3. `src/hooks/outreach/useLinkedInSearch.ts`** (line 27) - Replace hardcoded search URL:
+```ts
+const searchUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/linkedin-search?...`;
+```
 
-This ensures all 3 buttons fit within the card at all screen sizes, wrapping to a second row on very narrow screens.
+**4. `src/pages/EditJob.tsx`** (line 1000) - Replace hardcoded REST API URL:
+```ts
+apiEndpoint={`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/clients?...`}
+```
+Also update the `apiHeaders` `apikey` value to use `import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY`.
+
+**5. `supabase/functions/linkedin-connect/index.ts`** (line 147) - Replace hardcoded webhook URL:
+```ts
+const notifyUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/linkedin-webhook`;
+```
+
+### Important Note
+The edge functions use `Deno.env.get('SUPABASE_URL')` and `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` -- these Supabase secrets will also need to be updated in the Supabase dashboard to match the new instance. I will flag this after implementation.
+
