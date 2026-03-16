@@ -154,18 +154,32 @@ export function JobManagementPanel() {
 
       // Fetch candidates only for the jobs we have access to
       const jobIds = initialJobs.map(j => j.job_id).filter(Boolean);
-      // Optimized: Fetch candidates per job with reduced limit
+      // Optimized: Batch fetch candidates using .in() instead of one query per job
       const candidatesByJob = new Map<string, any[]>();
       if (jobIds.length > 0) {
-        const perJobPromises = jobIds.map(jid => supabase.from('Jobs_CVs').select('job_id, source, contacted, shortlisted_at, longlisted_at, submitted_at, after_call_score').eq('job_id', jid).limit(500)); // Reduced from 10000 to 500
-        const perJobResults = await Promise.all(perJobPromises);
-        perJobResults.forEach((res, idx) => {
+        const BATCH_SIZE = 50;
+        const batches: string[][] = [];
+        for (let i = 0; i < jobIds.length; i += BATCH_SIZE) {
+          batches.push(jobIds.slice(i, i + BATCH_SIZE));
+        }
+        const batchPromises = batches.map(batch =>
+          supabase
+            .from('Jobs_CVs')
+            .select('job_id, source, contacted, shortlisted_at, longlisted_at, submitted_at, after_call_score')
+            .in('job_id', batch)
+            .limit(5000)
+        );
+        const batchResults = await Promise.all(batchPromises);
+        batchResults.forEach((res, batchIdx) => {
           if (res.error) {
-            console.warn('JobManagementPanel: error fetching candidates for', jobIds[idx], res.error);
+            console.warn('JobManagementPanel: error fetching candidates batch', batchIdx, res.error);
             return;
           }
-          const rows = res.data || [];
-          candidatesByJob.set(jobIds[idx], rows);
+          (res.data || []).forEach(row => {
+            const jid = row.job_id;
+            if (!candidatesByJob.has(jid)) candidatesByJob.set(jid, []);
+            candidatesByJob.get(jid)!.push(row);
+          });
         });
       }
       console.log('JobManagementPanel: Jobs fetched:', initialJobs.length);
