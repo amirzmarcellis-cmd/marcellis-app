@@ -1,24 +1,36 @@
 
 
-## Fix Pipeline Button Overflowing Outside Card
-
-### Problem
-The Submit, Reject, and Pipeline action buttons in the AI Shortlist candidate cards overflow outside the card boundary. The layout was originally designed for 2 buttons but now has 3, causing overflow on smaller screens.
+## Why the Jobs Page is Slow
 
 ### Root Cause
-The button container at line 3158 uses `flex flex-col sm:flex-row` with each button having `sm:min-w-[120px]`. With 3 buttons, the combined minimum width exceeds the card width, pushing Pipeline outside.
+In `JobManagementPanel.tsx` (line 159-170), the code fetches candidate counts by making **one separate Supabase query per job**. With 368 jobs, that's 368 parallel HTTP requests to `Jobs_CVs`, each with a 500-row limit. This takes ~4 seconds.
 
-### Fix: `src/pages/JobDetails.tsx` (line ~3158)
+### The Fix
 
-1. **Change the button container layout** from `flex flex-col sm:flex-row` to a wrapping grid/flex layout that accommodates 3 buttons:
-   - Use `flex flex-wrap gap-2` so buttons wrap to a new row if needed
-   - Remove `sm:min-w-[120px]` from all three buttons (Submit, Reject, Pipeline)
-   - Use `flex-1 min-w-[90px]` instead so they share space evenly and wrap gracefully
+Replace the per-job queries with a **single batched query** using `.in('job_id', jobIds)`, then group results client-side.
 
-2. **Update all 3 button groups** (lines ~3158-3248):
-   - Submit button: change class from `w-full sm:flex-1 min-w-0 sm:min-w-[120px]` to `flex-1 min-w-[90px]`
-   - Reject button: same change
-   - Pipeline button: same change
-   - The disabled/active variants of each button get the same class update
+### Technical Details
 
-This ensures all 3 buttons fit within the card at all screen sizes, wrapping to a second row on very narrow screens.
+**Current code (slow — N+1 query pattern):**
+```
+const perJobPromises = jobIds.map(jid => 
+  supabase.from('Jobs_CVs').select(...).eq('job_id', jid).limit(500)
+);
+const perJobResults = await Promise.all(perJobPromises);
+```
+
+**Proposed fix (single query with batching):**
+Since Supabase has a 1000-row default limit, we only need a few columns for counting. We'll:
+
+1. Replace 368 individual queries with batched `.in()` queries (chunks of ~50 job IDs) selecting only the columns needed for counts: `job_id, contacted, after_call_score, source`.
+2. Use `.limit(5000)` per batch (or paginate) to ensure we get all candidates.
+3. Group results into `candidatesByJob` map client-side.
+
+This reduces ~368 requests down to ~8 requests, cutting load time by ~90%.
+
+**Additional optimization:**
+- The real-time subscription on `Jobs` table triggers a full `fetchJobs()` on every change — this re-runs all 368 queries again. After fixing the N+1, this becomes acceptable.
+
+### Changes
+- **File:** `src/components/jobs/JobManagementPanel.tsx` — Replace lines 158-170 with batched query logic.
+
