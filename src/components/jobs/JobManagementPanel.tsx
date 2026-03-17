@@ -815,7 +815,7 @@ export function JobManagementPanel() {
                 </div>
               </CardContent>
             </Card>)}
-        </div> : <Tabs defaultValue="active" className="space-y-4 sm:space-y-6">
+        </div> : <Tabs defaultValue="active" onValueChange={handleTabChange} className="space-y-4 sm:space-y-6">
           <TabsList className="glass-card w-full grid grid-cols-3 gap-1 sm:flex sm:flex-nowrap h-auto p-1">
             <TabsTrigger value="active" className="data-[state=active]:bg-status-active data-[state=active]:text-white text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap py-2.5 px-2 sm:px-4 min-h-[44px]">
               <span className="hidden sm:inline">Active Jobs</span>
@@ -842,6 +842,7 @@ export function JobManagementPanel() {
           </TabsContent>
           
           <TabsContent value="paused">
+            {loadingPausedCounts && <div className="text-center py-4 text-sm text-muted-foreground animate-pulse">Loading candidate counts…</div>}
             <JobGrid jobs={filteredJobs.pausedJobs} loading={false} onEdit={job => {
           setSelectedJob(job);
           setIsDialogOpen(true);
