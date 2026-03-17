@@ -108,7 +108,7 @@ export function JobManagementPanel() {
       // Profile loading complete but no user - set loading false
       setLoading(false);
     }
-  }, [profile?.user_id, isAdmin, isManager, isTeamLeader, profileLoading, rolesLoading]);
+  }, [profile?.user_id, isAdmin, isManager, isTeamLeader, isViewer, profileLoading, rolesLoading]);
   const fetchJobs = useCallback(async () => {
     // Guard: Ensure we have all necessary data before fetching
     if (!profile?.user_id) {
@@ -150,7 +150,7 @@ export function JobManagementPanel() {
       }
       const jobsResult = await query.order('Timestamp', {
         ascending: false
-      });
+      }).limit(5000);
       if (jobsResult.error) throw jobsResult.error;
       const initialJobs = jobsResult.data || [];
 
@@ -289,7 +289,7 @@ export function JobManagementPanel() {
       setJobs([]); // Set empty array on error to prevent stale data
       setLoading(false);
     }
-  }, [profile?.user_id, isAdmin, isManager, isTeamLeader, rolesLoading, toast]);
+  }, [profile?.user_id, isAdmin, isManager, isTeamLeader, isViewer, rolesLoading, toast]);
 
   // Lazy-load candidate counts for paused jobs
   const fetchPausedCounts = useCallback(async () => {
