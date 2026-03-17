@@ -108,7 +108,7 @@ export function JobManagementPanel() {
       // Profile loading complete but no user - set loading false
       setLoading(false);
     }
-  }, [profile?.user_id, isAdmin, isManager, isTeamLeader, profileLoading, rolesLoading]);
+  }, [profile?.user_id, isAdmin, isManager, isTeamLeader, isViewer, profileLoading, rolesLoading]);
   const fetchJobs = useCallback(async () => {
     // Guard: Ensure we have all necessary data before fetching
     if (!profile?.user_id) {
