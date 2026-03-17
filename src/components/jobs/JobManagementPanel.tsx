@@ -52,6 +52,8 @@ interface Job {
 export function JobManagementPanel() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pausedCountsLoaded, setPausedCountsLoaded] = useState(false);
+  const [loadingPausedCounts, setLoadingPausedCounts] = useState(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -152,15 +154,16 @@ export function JobManagementPanel() {
       if (jobsResult.error) throw jobsResult.error;
       const initialJobs = jobsResult.data || [];
 
-      // Fetch candidates only for the jobs we have access to
-      const jobIds = initialJobs.map(j => j.job_id).filter(Boolean);
+      // Fetch candidates only for ACTIVE jobs initially (lazy-load paused)
+      const activeJobs = initialJobs.filter(j => j.Processed === 'Yes');
+      const activeJobIds = activeJobs.map(j => j.job_id).filter(Boolean);
       // Optimized: Batch fetch candidates using .in() instead of one query per job
       const candidatesByJob = new Map<string, any[]>();
-      if (jobIds.length > 0) {
+      if (activeJobIds.length > 0) {
         const BATCH_SIZE = 50;
         const batches: string[][] = [];
-        for (let i = 0; i < jobIds.length; i += BATCH_SIZE) {
-          batches.push(jobIds.slice(i, i + BATCH_SIZE));
+        for (let i = 0; i < activeJobIds.length; i += BATCH_SIZE) {
+          batches.push(activeJobIds.slice(i, i + BATCH_SIZE));
         }
         const batchPromises = batches.map(batch =>
           supabase
@@ -182,6 +185,8 @@ export function JobManagementPanel() {
           });
         });
       }
+      // Reset paused counts flag since we have fresh data
+      setPausedCountsLoaded(false);
       console.log('JobManagementPanel: Jobs fetched:', initialJobs.length);
       console.log('JobManagementPanel: candidatesByJob built for jobs:', candidatesByJob.size);
 
@@ -285,6 +290,71 @@ export function JobManagementPanel() {
       setLoading(false);
     }
   }, [profile?.user_id, isAdmin, isManager, isTeamLeader, rolesLoading, toast]);
+
+  // Lazy-load candidate counts for paused jobs
+  const fetchPausedCounts = useCallback(async () => {
+    if (pausedCountsLoaded || loadingPausedCounts) return;
+    const pausedJobs = jobs.filter(j => j.Processed !== 'Yes');
+    const pausedJobIds = pausedJobs.map(j => j.job_id).filter(Boolean);
+    if (pausedJobIds.length === 0) {
+      setPausedCountsLoaded(true);
+      return;
+    }
+    setLoadingPausedCounts(true);
+    try {
+      const BATCH_SIZE = 50;
+      const batches: string[][] = [];
+      for (let i = 0; i < pausedJobIds.length; i += BATCH_SIZE) {
+        batches.push(pausedJobIds.slice(i, i + BATCH_SIZE));
+      }
+      const batchPromises = batches.map(batch =>
+        supabase
+          .from('Jobs_CVs')
+          .select('job_id, source, contacted, shortlisted_at, longlisted_at, submitted_at, after_call_score')
+          .in('job_id', batch)
+          .limit(5000)
+      );
+      const batchResults = await Promise.all(batchPromises);
+      const candidatesByJob = new Map<string, any[]>();
+      batchResults.forEach((res) => {
+        if (res.error) return;
+        (res.data || []).forEach(row => {
+          const jid = row.job_id;
+          if (!candidatesByJob.has(jid)) candidatesByJob.set(jid, []);
+          candidatesByJob.get(jid)!.push(row);
+        });
+      });
+
+      setJobs(prev => prev.map(job => {
+        if (job.Processed === 'Yes') return job; // Already loaded
+        const candidates = candidatesByJob.get(job.job_id) || [];
+        const longlistedCandidates = candidates.filter(c => c.contacted !== "Shortlisted from Similar jobs");
+        return {
+          ...job,
+          longlisted_count: longlistedCandidates.length,
+          shortlisted_count: longlistedCandidates.filter(c => {
+            const score = parseInt(c.after_call_score || "0");
+            return score >= 75 && c.contacted !== "Shortlisted from Similar jobs";
+          }).length,
+          rejected_count: longlistedCandidates.filter(c => (c.contacted || "").trim() === 'Rejected').length,
+          pipeline_count: longlistedCandidates.filter(c => (c.contacted || "").trim() === 'Pipeline').length,
+          submitted_count: longlistedCandidates.filter(c => (c.contacted || "").trim() === 'Submitted').length,
+        };
+      }));
+      setPausedCountsLoaded(true);
+    } catch (error) {
+      console.error('Error fetching paused job counts:', error);
+    } finally {
+      setLoadingPausedCounts(false);
+    }
+  }, [jobs, pausedCountsLoaded, loadingPausedCounts]);
+
+  const handleTabChange = useCallback((value: string) => {
+    if ((value === 'paused' || value === 'all') && !pausedCountsLoaded) {
+      fetchPausedCounts();
+    }
+  }, [pausedCountsLoaded, fetchPausedCounts]);
+
   const fetchGroups = useCallback(async () => {
     try {
       const {
@@ -745,7 +815,7 @@ export function JobManagementPanel() {
                 </div>
               </CardContent>
             </Card>)}
-        </div> : <Tabs defaultValue="active" className="space-y-4 sm:space-y-6">
+        </div> : <Tabs defaultValue="active" onValueChange={handleTabChange} className="space-y-4 sm:space-y-6">
           <TabsList className="glass-card w-full grid grid-cols-3 gap-1 sm:flex sm:flex-nowrap h-auto p-1">
             <TabsTrigger value="active" className="data-[state=active]:bg-status-active data-[state=active]:text-white text-xs sm:text-sm whitespace-normal sm:whitespace-nowrap py-2.5 px-2 sm:px-4 min-h-[44px]">
               <span className="hidden sm:inline">Active Jobs</span>
@@ -772,6 +842,7 @@ export function JobManagementPanel() {
           </TabsContent>
           
           <TabsContent value="paused">
+            {loadingPausedCounts && <div className="text-center py-4 text-sm text-muted-foreground animate-pulse">Loading candidate counts…</div>}
             <JobGrid jobs={filteredJobs.pausedJobs} loading={false} onEdit={job => {
           setSelectedJob(job);
           setIsDialogOpen(true);
