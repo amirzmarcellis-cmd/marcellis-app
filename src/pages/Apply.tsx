@@ -29,10 +29,11 @@ type ApplicationForm = z.infer<typeof applicationSchema>;
 
 
 interface UploadedFile {
+  id: string;
   name: string;
-  url: string;
+  storageUrl: string;
   text?: string;
-  isUploading?: boolean;
+  status: 'uploading' | 'uploaded' | 'failed';
   uploadProgress?: number;
 }
 
