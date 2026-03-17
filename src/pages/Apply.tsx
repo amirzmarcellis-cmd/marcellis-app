@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import FileUpload from "@/components/upload/FileUpload";
 import { MissionBackground } from "@/components/layout/MissionBackground";
 import { Progress } from "@/components/ui/progress";
-import { Upload, X, FileText } from "lucide-react";
+import { Upload, X, FileText, CheckCircle2, AlertCircle } from "lucide-react";
 
 const applicationSchema = z.object({
   firstName: z.string().min(1, "First name is required").min(2, "First name must be at least 2 characters"),
@@ -26,7 +26,6 @@ const applicationSchema = z.object({
 });
 
 type ApplicationForm = z.infer<typeof applicationSchema>;
-
 
 interface UploadedFile {
   id: string;
@@ -58,13 +57,10 @@ export default function Apply() {
     },
   });
 
-
-
   // Fetch job details on mount
   useEffect(() => {
     const initializeForm = async () => {
       try {
-        // Resolve job id from router params or URL path as a fallback
         const path = window.location.pathname;
         const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
         const fallbackJobId = pathMatch?.[1];
@@ -77,13 +73,11 @@ export default function Apply() {
             setJobName(title);
             form.setValue("jobApplied", title, { shouldValidate: true });
           } else {
-            // If job lookup fails, still set a sensible default to avoid validation error
             const defaultJobName = "Position Available";
             setJobName(defaultJobName);
             form.setValue("jobApplied", defaultJobName, { shouldValidate: true });
           }
         } else {
-          // No job id in URL, treat as general application
           const defaultJobName = "General Application";
           setJobName(defaultJobName);
           form.setValue("jobApplied", defaultJobName, { shouldValidate: true });
@@ -98,8 +92,6 @@ export default function Apply() {
 
     initializeForm();
   }, [form, jobId]);
-
-
 
   const fetchJobName = async (jobId: string): Promise<string> => {
     try {
@@ -128,9 +120,7 @@ export default function Apply() {
     }
   };
 
-
   const onSubmit = async (data: ApplicationForm) => {
-    // Validate that at least one CV file is uploaded
     if (uploadedFiles.length === 0) {
       toast({
         title: "CV Required",
@@ -140,8 +130,7 @@ export default function Apply() {
       return;
     }
 
-    // Check if any files are still uploading
-    const stillUploading = uploadedFiles.some(file => file.isUploading);
+    const stillUploading = uploadedFiles.some(file => file.status === 'uploading');
     if (stillUploading) {
       toast({
         title: "Upload in Progress",
@@ -151,12 +140,10 @@ export default function Apply() {
       return;
     }
 
-    // Get all valid files (uploaded successfully with real Supabase URLs)
     const validFiles = uploadedFiles.filter(file => 
-      file.url && file.url.startsWith('https://') && !file.isUploading
+      file.status === 'uploaded' && file.storageUrl
     );
 
-    // Check if we have any valid files
     if (validFiles.length === 0) {
       toast({
         title: "Upload Failed",
@@ -169,15 +156,12 @@ export default function Apply() {
     setIsSubmitting(true);
     
     try {
-      // Get job_id from URL params
       const path = window.location.pathname;
       const pathMatch = path.match(/\/job\/([^/]+)\/apply/);
       const jobIdFromUrl = pathMatch?.[1] || "";
 
-      // Function to clean text data and remove null characters
       const cleanText = (text: string) => {
         if (!text) return "";
-        // Remove null bytes and most control characters that Postgres text cannot store
         return text
           .replace(/\u0000/g, "")
           .replace(/[\u0001-\u0008\u000B-\u001F\u007F-\u009F]/g, "")
@@ -185,21 +169,10 @@ export default function Apply() {
           .trim();
       };
 
-      // Get all valid files (uploaded and processed)
-      const validFiles = uploadedFiles.filter(file => 
-        file.url && file.url.startsWith('https://') && !file.isUploading
-      );
-
-      if (validFiles.length === 0) {
-        throw new Error("No valid CV files found - all uploads failed");
-      }
-
-      // Insert into CVs table - this will automatically trigger the Supabase webhook
       const firstName = cleanText(data.firstName);
       const lastName = cleanText(data.lastName);
       const fullName = lastName ? `${firstName} ${lastName}` : firstName;
       
-      // Submit via edge function to ensure reliable inserts across public/auth contexts
       const payload = {
         Firstname: firstName,
         Lastname: lastName || null,
@@ -208,7 +181,7 @@ export default function Apply() {
         phone_number: cleanText(data.phoneNumber),
         job_id: cleanText(jobIdFromUrl),
         cv_text: cleanText(validFiles.map(f => f.text || '').join('\n')),
-        cv_links: validFiles.map(f => f.url),
+        cv_links: validFiles.map(f => f.storageUrl),
       };
 
       const { data: fnRes, error: fnError } = await supabase.functions.invoke('submit_application', {
@@ -224,7 +197,7 @@ export default function Apply() {
       const userId = (fnRes as any)?.user_id || "Unknown";
       setSubmittedUserId(userId);
 
-      console.log("Application submitted successfully - Supabase webhook will be triggered automatically");
+      console.log("Application submitted successfully");
       
       toast({
         title: "Application Submitted",
@@ -244,115 +217,102 @@ export default function Apply() {
     }
   };
 
-
   const handleFileUpload = async (files: any[]) => {
-    if (files.length > 0) {
-      // Show files instantly in UI with uploading state
-      const instantFiles: UploadedFile[] = files.map(fileObj => ({
-        name: fileObj.file_name,
-        url: URL.createObjectURL(fileObj.file), // Temporary blob URL for instant display
-        text: 'Processing...',
-        isUploading: true,
-        uploadProgress: 0
-      }));
+    if (files.length === 0) return;
+
+    // Create files with stable IDs upfront
+    const newFiles: UploadedFile[] = files.map(fileObj => ({
+      id: `file-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
+      name: fileObj.file_name,
+      storageUrl: '',
+      text: 'Processing...',
+      status: 'uploading' as const,
+      uploadProgress: 0
+    }));
+    
+    setUploadedFiles(prev => [...prev, ...newFiles]);
+    setIsDialogOpen(true);
+    
+    // Helper: update file by stable ID (immune to array reordering)
+    const updateFile = (fileId: string, updates: Partial<UploadedFile>) => {
+      setUploadedFiles(prev => prev.map(f => f.id === fileId ? { ...f, ...updates } : f));
+    };
+
+    for (let i = 0; i < files.length; i++) {
+      const fileObj = files[i];
+      const fileId = newFiles[i].id;
       
-      setUploadedFiles(prev => [...prev, ...instantFiles]);
-      
-      // Automatically open the dialog after file upload
-      setIsDialogOpen(true);
-      
-      // Process files in background
-      for (let i = 0; i < files.length; i++) {
-        const fileObj = files[i];
-        const fileIndex = uploadedFiles.length + i;
+      try {
+        updateFile(fileId, { uploadProgress: 25 });
+
+        const timestamp = Date.now();
+        const fileExtension = fileObj.file_name.split('.').pop();
+        const uniqueFileName = `cv-${timestamp}-${Math.random().toString(36).substring(2, 6)}.${fileExtension}`;
         
-        try {
-          // Update progress to 25%
-          setUploadedFiles(prev => prev.map((file, index) => 
-            index === fileIndex ? { ...file, uploadProgress: 25 } : file
-          ));
+        updateFile(fileId, { uploadProgress: 50 });
 
-          // Generate unique filename with timestamp
-          const timestamp = Date.now();
-          const fileExtension = fileObj.file_name.split('.').pop();
-          const uniqueFileName = `cv-${timestamp}-${Math.random().toString(36).substring(2, 6)}.${fileExtension}`;
-          
-          // Update progress to 50%
-          setUploadedFiles(prev => prev.map((file, index) => 
-            index === fileIndex ? { ...file, uploadProgress: 50 } : file
-          ));
-
-          // Upload file to Supabase storage using the actual File object
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('cvs')
-            .upload(uniqueFileName, fileObj.file, {
-              cacheControl: '3600',
-              upsert: false
-            });
-
-          if (uploadError) {
-            throw uploadError;
-          }
-
-          // Get public URL
-          const { data: { publicUrl } } = supabase.storage
-            .from('cvs')
-            .getPublicUrl(uploadData.path);
-
-          console.log('CV upload succeeded:', { fileName: uniqueFileName, publicUrl });
-
-          // IMMEDIATELY mark upload as complete — file is in storage and usable
-          setUploadedFiles(prev => prev.map((file, index) => 
-            index === fileIndex ? {
-              ...file,
-              url: publicUrl,
-              text: 'Text extraction pending',
-              isUploading: false,
-              uploadProgress: 100
-            } : file
-          ));
-
-          // Try text extraction in background — completely non-fatal
-          try {
-            const extractResult = await supabase.functions.invoke('extract-cv-text', {
-              body: { fileUrl: publicUrl }
-            });
-            const extractedText = extractResult?.data?.text;
-            if (extractedText) {
-              setUploadedFiles(prev => prev.map((file, index) => 
-                index === fileIndex ? { ...file, text: extractedText } : file
-              ));
-            }
-          } catch (extractError) {
-            console.warn('Text extraction failed (non-fatal):', extractError);
-          }
-        } catch (error) {
-          console.error('Error processing CV:', error);
-          // Update with error state - remove the blob URL to prevent submission
-          setUploadedFiles(prev => prev.map((file, index) => 
-            index === fileIndex ? {
-              ...file,
-              url: '', // Clear the blob URL so it won't pass validation
-              text: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-              isUploading: false,
-              uploadProgress: 0
-            } : file
-          ));
-          
-          toast({
-            title: "Upload Failed",
-            description: `Failed to upload ${fileObj.file_name}. Please try again.`,
-            variant: "destructive",
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('cvs')
+          .upload(uniqueFileName, fileObj.file, {
+            cacheControl: '3600',
+            upsert: false
           });
+
+        if (uploadError) {
+          throw uploadError;
         }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('cvs')
+          .getPublicUrl(uploadData.path);
+
+        console.log('CV upload succeeded:', { fileId, fileName: uniqueFileName, publicUrl });
+
+        // Mark as uploaded IMMEDIATELY — this file is now submittable
+        updateFile(fileId, {
+          storageUrl: publicUrl,
+          text: 'Text extraction pending',
+          status: 'uploaded',
+          uploadProgress: 100
+        });
+
+        // Text extraction is non-fatal
+        try {
+          const extractResult = await supabase.functions.invoke('extract-cv-text', {
+            body: { fileUrl: publicUrl }
+          });
+          const extractedText = extractResult?.data?.text;
+          if (extractedText) {
+            updateFile(fileId, { text: extractedText });
+          }
+        } catch (extractError) {
+          console.warn('Text extraction failed (non-fatal):', extractError);
+        }
+      } catch (error) {
+        console.error('Error uploading CV:', error);
+        updateFile(fileId, {
+          storageUrl: '',
+          text: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          status: 'failed',
+          uploadProgress: 0
+        });
+        
+        toast({
+          title: "Upload Failed",
+          description: `Failed to upload ${fileObj.file_name}. Please try again.`,
+          variant: "destructive",
+        });
       }
     }
   };
 
-  const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  const removeFile = (fileId: string) => {
+    setUploadedFiles(prev => prev.filter(f => f.id !== fileId));
   };
 
+  const successCount = uploadedFiles.filter(f => f.status === 'uploaded').length;
+  const hasValidFiles = successCount > 0;
+  const isAnyUploading = uploadedFiles.some(f => f.status === 'uploading');
 
   if (isSubmitted) {
     return (
@@ -361,8 +321,8 @@ export default function Apply() {
           <Dialog open={true}>
             <DialogContent className="max-w-lg">
               <DialogHeader className="text-center space-y-4">
-                <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
-                  <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                  <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
@@ -402,7 +362,6 @@ export default function Apply() {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                {/* User ID is auto-generated and hidden from applicants */}
 
                 <FormField
                   control={form.control}
@@ -467,7 +426,11 @@ export default function Apply() {
                     {uploadedFiles.length > 0 ? (
                       <div className="space-y-2">
                         <div className="text-sm text-muted-foreground">
-                          {uploadedFiles.length} file(s) uploaded
+                          {successCount > 0 
+                            ? `${successCount} file(s) ready` 
+                            : isAnyUploading 
+                              ? 'Uploading...' 
+                              : 'No files uploaded successfully'}
                         </div>
                         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                           <DialogTrigger asChild>
@@ -485,14 +448,16 @@ export default function Apply() {
                             </DialogHeader>
                             <div className="space-y-4">
                               <div className="space-y-2">
-                                {uploadedFiles.map((file, index) => (
+                                {uploadedFiles.map((file) => (
                                   <div
-                                    key={index}
+                                    key={file.id}
                                     className="flex flex-col space-y-2 p-3 bg-muted rounded-lg"
                                   >
                                     <div className="flex items-center justify-between">
                                       <div className="flex items-center space-x-2">
-                                        <FileText className="h-4 w-4" />
+                                        {file.status === 'uploaded' && <CheckCircle2 className="h-4 w-4 text-primary" />}
+                                        {file.status === 'failed' && <AlertCircle className="h-4 w-4 text-destructive" />}
+                                        {file.status === 'uploading' && <FileText className="h-4 w-4" />}
                                         <span className="text-sm font-medium truncate">
                                           {file.name}
                                         </span>
@@ -500,12 +465,12 @@ export default function Apply() {
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() => removeFile(index)}
+                                        onClick={() => removeFile(file.id)}
                                       >
                                         <X className="h-4 w-4" />
                                       </Button>
                                     </div>
-                                    {file.isUploading && (
+                                    {file.status === 'uploading' && (
                                       <div className="space-y-1">
                                         <div className="flex justify-between text-xs text-muted-foreground">
                                           <span>Uploading...</span>
@@ -513,6 +478,9 @@ export default function Apply() {
                                         </div>
                                         <Progress value={file.uploadProgress} className="h-2" />
                                       </div>
+                                    )}
+                                    {file.status === 'failed' && (
+                                      <p className="text-xs text-destructive">Upload failed — please remove and try again.</p>
                                     )}
                                   </div>
                                 ))}
@@ -562,9 +530,15 @@ export default function Apply() {
                 <Button 
                   type="submit" 
                   className="w-full" 
-                  disabled={isSubmitting || uploadedFiles.length === 0}
+                  disabled={isSubmitting || !hasValidFiles || isAnyUploading}
                 >
-                  {isSubmitting ? "Submitting..." : uploadedFiles.length === 0 ? "Please Upload CV First" : "Submit Application"}
+                  {isSubmitting 
+                    ? "Submitting..." 
+                    : isAnyUploading 
+                      ? "Uploading CV..." 
+                      : !hasValidFiles 
+                        ? "Please Upload CV First" 
+                        : "Submit Application"}
                 </Button>
               </form>
             </Form>
