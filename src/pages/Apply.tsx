@@ -303,19 +303,23 @@ export default function Apply() {
             .from('cvs')
             .getPublicUrl(uploadData.path);
 
-          // Extract text from the uploaded CV using the public URL
-          const { data, error } = await supabase.functions.invoke('extract-cv-text', {
-            body: { fileUrl: publicUrl }
-          });
+          // Extract text from the uploaded CV (non-blocking — upload is already successful)
+          let extractedText = 'Text extraction pending';
+          try {
+            const { data } = await supabase.functions.invoke('extract-cv-text', {
+              body: { fileUrl: publicUrl }
+            });
+            if (data?.text) extractedText = data.text;
+          } catch (extractError) {
+            console.warn('Text extraction failed, continuing with upload:', extractError);
+          }
 
-          if (error) throw error;
-          
-          // Update the file entry with real URL and extracted text - completed
+          // Update the file entry with real URL — upload succeeded regardless of extraction
           setUploadedFiles(prev => prev.map((file, index) => 
             index === fileIndex ? {
               ...file,
               url: publicUrl,
-              text: data?.text || 'Text extraction failed',
+              text: extractedText,
               isUploading: false,
               uploadProgress: 100
             } : file
