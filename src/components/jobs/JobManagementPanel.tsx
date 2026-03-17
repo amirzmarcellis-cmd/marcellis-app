@@ -150,7 +150,7 @@ export function JobManagementPanel() {
       }
       const jobsResult = await query.order('Timestamp', {
         ascending: false
-      });
+      }).limit(5000);
       if (jobsResult.error) throw jobsResult.error;
       const initialJobs = jobsResult.data || [];
 
