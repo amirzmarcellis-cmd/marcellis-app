@@ -293,37 +293,38 @@ export default function Apply() {
             throw uploadError;
           }
 
-          // Update progress to 75%
-          setUploadedFiles(prev => prev.map((file, index) => 
-            index === fileIndex ? { ...file, uploadProgress: 75 } : file
-          ));
-
           // Get public URL
           const { data: { publicUrl } } = supabase.storage
             .from('cvs')
             .getPublicUrl(uploadData.path);
 
-          // Extract text from the uploaded CV (non-blocking — upload is already successful)
-          let extractedText = 'Text extraction pending';
-          try {
-            const { data } = await supabase.functions.invoke('extract-cv-text', {
-              body: { fileUrl: publicUrl }
-            });
-            if (data?.text) extractedText = data.text;
-          } catch (extractError) {
-            console.warn('Text extraction failed, continuing with upload:', extractError);
-          }
+          console.log('CV upload succeeded:', { fileName: uniqueFileName, publicUrl });
 
-          // Update the file entry with real URL — upload succeeded regardless of extraction
+          // IMMEDIATELY mark upload as complete — file is in storage and usable
           setUploadedFiles(prev => prev.map((file, index) => 
             index === fileIndex ? {
               ...file,
               url: publicUrl,
-              text: extractedText,
+              text: 'Text extraction pending',
               isUploading: false,
               uploadProgress: 100
             } : file
           ));
+
+          // Try text extraction in background — completely non-fatal
+          try {
+            const extractResult = await supabase.functions.invoke('extract-cv-text', {
+              body: { fileUrl: publicUrl }
+            });
+            const extractedText = extractResult?.data?.text;
+            if (extractedText) {
+              setUploadedFiles(prev => prev.map((file, index) => 
+                index === fileIndex ? { ...file, text: extractedText } : file
+              ));
+            }
+          } catch (extractError) {
+            console.warn('Text extraction failed (non-fatal):', extractError);
+          }
         } catch (error) {
           console.error('Error processing CV:', error);
           // Update with error state - remove the blob URL to prevent submission
