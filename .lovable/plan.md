@@ -1,52 +1,24 @@
 
 
-## Problem: CV Upload Shows "Upload Failed"
+## Fix Pipeline Button Overflowing Outside Card
+
+### Problem
+The Submit, Reject, and Pipeline action buttons in the AI Shortlist candidate cards overflow outside the card boundary. The layout was originally designed for 2 buttons but now has 3, causing overflow on smaller screens.
 
 ### Root Cause
+The button container at line 3158 uses `flex flex-col sm:flex-row` with each button having `sm:min-w-[120px]`. With 3 buttons, the combined minimum width exceeds the card width, pushing Pipeline outside.
 
-The `handleFileUpload` function in `Apply.tsx` (line 264-342) treats the **text extraction step** as mandatory. After successfully uploading the file to Supabase Storage, it calls the `extract-cv-text` edge function. If that function fails (timeout, large file, network issue), the entire upload is marked as failed — the file URL is cleared (line 329: `url: ''`), and the user sees "Upload Failed" even though the file is already in storage.
+### Fix: `src/pages/JobDetails.tsx` (line ~3158)
 
-From the logs, the edge function processed a 3.5MB text extraction — for larger files or slower connections, this would easily time out.
+1. **Change the button container layout** from `flex flex-col sm:flex-row` to a wrapping grid/flex layout that accommodates 3 buttons:
+   - Use `flex flex-wrap gap-2` so buttons wrap to a new row if needed
+   - Remove `sm:min-w-[120px]` from all three buttons (Submit, Reject, Pipeline)
+   - Use `flex-1 min-w-[90px]` instead so they share space evenly and wrap gracefully
 
-### Fix — `src/pages/Apply.tsx`
+2. **Update all 3 button groups** (lines ~3158-3248):
+   - Submit button: change class from `w-full sm:flex-1 min-w-0 sm:min-w-[120px]` to `flex-1 min-w-[90px]`
+   - Reject button: same change
+   - Pipeline button: same change
+   - The disabled/active variants of each button get the same class update
 
-Make the text extraction **non-blocking and non-fatal**:
-
-1. **Lines 306-311**: Wrap the `extract-cv-text` call in its own try-catch. If it fails, still mark the upload as successful with a fallback text like `"Text extraction pending"`.
-
-2. **Move the success state update** (lines 314-322) to run **after** the storage upload succeeds, regardless of whether text extraction works.
-
-The updated flow:
-```
-Upload to storage → success? → set URL + mark complete
-                  ↓ (in parallel or after)
-         Extract text → success? → update text
-                       → fail? → use fallback text, keep URL valid
-```
-
-**Before (current):**
-```typescript
-// If extract-cv-text fails, entire upload is marked failed
-const { data, error } = await supabase.functions.invoke('extract-cv-text', ...);
-if (error) throw error;  // ← This kills the upload
-```
-
-**After (proposed):**
-```typescript
-// Upload succeeded — set the real URL immediately
-let extractedText = 'Text extraction pending';
-try {
-  const { data } = await supabase.functions.invoke('extract-cv-text', ...);
-  if (data?.text) extractedText = data.text;
-} catch (e) {
-  console.warn('Text extraction failed, continuing with upload:', e);
-}
-
-// File is valid regardless of extraction result
-setUploadedFiles(prev => prev.map((file, index) =>
-  index === fileIndex ? { ...file, url: publicUrl, text: extractedText, isUploading: false, uploadProgress: 100 } : file
-));
-```
-
-This is a single-file change in `src/pages/Apply.tsx`, ~15 lines modified in the `handleFileUpload` function.
-
+This ensures all 3 buttons fit within the card at all screen sizes, wrapping to a second row on very narrow screens.
