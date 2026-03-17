@@ -154,15 +154,16 @@ export function JobManagementPanel() {
       if (jobsResult.error) throw jobsResult.error;
       const initialJobs = jobsResult.data || [];
 
-      // Fetch candidates only for the jobs we have access to
-      const jobIds = initialJobs.map(j => j.job_id).filter(Boolean);
+      // Fetch candidates only for ACTIVE jobs initially (lazy-load paused)
+      const activeJobs = initialJobs.filter(j => j.Processed === 'Yes');
+      const activeJobIds = activeJobs.map(j => j.job_id).filter(Boolean);
       // Optimized: Batch fetch candidates using .in() instead of one query per job
       const candidatesByJob = new Map<string, any[]>();
-      if (jobIds.length > 0) {
+      if (activeJobIds.length > 0) {
         const BATCH_SIZE = 50;
         const batches: string[][] = [];
-        for (let i = 0; i < jobIds.length; i += BATCH_SIZE) {
-          batches.push(jobIds.slice(i, i + BATCH_SIZE));
+        for (let i = 0; i < activeJobIds.length; i += BATCH_SIZE) {
+          batches.push(activeJobIds.slice(i, i + BATCH_SIZE));
         }
         const batchPromises = batches.map(batch =>
           supabase
@@ -184,6 +185,8 @@ export function JobManagementPanel() {
           });
         });
       }
+      // Reset paused counts flag since we have fresh data
+      setPausedCountsLoaded(false);
       console.log('JobManagementPanel: Jobs fetched:', initialJobs.length);
       console.log('JobManagementPanel: candidatesByJob built for jobs:', candidatesByJob.size);
 
