@@ -289,7 +289,7 @@ export function JobManagementPanel() {
       setJobs([]); // Set empty array on error to prevent stale data
       setLoading(false);
     }
-  }, [profile?.user_id, isAdmin, isManager, isTeamLeader, rolesLoading, toast]);
+  }, [profile?.user_id, isAdmin, isManager, isTeamLeader, isViewer, rolesLoading, toast]);
 
   // Lazy-load candidate counts for paused jobs
   const fetchPausedCounts = useCallback(async () => {
