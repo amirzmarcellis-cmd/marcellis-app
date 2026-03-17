@@ -52,6 +52,8 @@ interface Job {
 export function JobManagementPanel() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pausedCountsLoaded, setPausedCountsLoaded] = useState(false);
+  const [loadingPausedCounts, setLoadingPausedCounts] = useState(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
